@@ -1,0 +1,7 @@
+implementations.controller\_classes.controller\_ParaDiag\_MPI module
+====================================================================
+
+.. automodule:: implementations.controller_classes.controller_ParaDiag_MPI
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="implementations.controller_classes.controller_nonMPI module" href="implementations.controller_classes.controller_nonMPI.html" />
-    <link rel="prev" title="implementations.controller_classes.controller_MPI module" href="implementations.controller_classes.controller_MPI.html" /> 
+    <link rel="prev" title="implementations.controller_classes.controller_ParaDiag_MPI module" href="implementations.controller_classes.controller_ParaDiag_MPI.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -32,7 +32,7 @@
           <a href="implementations.controller_classes.controller_nonMPI.html" title="implementations.controller_classes.controller_nonMPI module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="implementations.controller_classes.controller_MPI.html" title="implementations.controller_classes.controller_MPI module"
+          <a href="implementations.controller_classes.controller_ParaDiag_MPI.html" title="implementations.controller_classes.controller_ParaDiag_MPI module"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
@@ -200,6 +200,17 @@ stats object containing statistics for each step, each level and each iteration<
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_G_inv">
+<span class="sig-name descname"><span class="pre">update_G_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.update_G_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_G_inv" title="Link to this definition">¶</a></dt>
+<dd><p>Rebuild G^-1 on every step if alpha changed with the iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – 0-based ParaDiag iteration index</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_solution">
 <span class="sig-name descname"><span class="pre">update_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.update_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_solution" title="Link to this definition">¶</a></dt>
 <dd><p>Since we solve for the increment, we need to update the solution between iterations by adding the increment.</p>
@@ -235,6 +246,7 @@ stats object containing statistics for each step, each level and each iteration<
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.restart_block"><code class="docutils literal notranslate"><span class="pre">restart_block()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.spread"><code class="docutils literal notranslate"><span class="pre">spread()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_G_inv"><code class="docutils literal notranslate"><span class="pre">update_G_inv()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_solution"><code class="docutils literal notranslate"><span class="pre">update_solution()</span></code></a></li>
 </ul>
 </li>
@@ -245,8 +257,8 @@ stats object containing statistics for each step, each level and each iteration<
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.controller_classes.controller_MPI.html"
-                          title="previous chapter">implementations.controller_classes.controller_MPI module</a></p>
+    <p class="topless"><a href="implementations.controller_classes.controller_ParaDiag_MPI.html"
+                          title="previous chapter">implementations.controller_classes.controller_ParaDiag_MPI module</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -287,7 +299,7 @@ stats object containing statistics for each step, each level and each iteration<
           <a href="implementations.controller_classes.controller_nonMPI.html" title="implementations.controller_classes.controller_nonMPI module"
              >next</a> |</li>
         <li class="right" >
-          <a href="implementations.controller_classes.controller_MPI.html" title="implementations.controller_classes.controller_MPI module"
+          <a href="implementations.controller_classes.controller_ParaDiag_MPI.html" title="implementations.controller_classes.controller_ParaDiag_MPI module"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>

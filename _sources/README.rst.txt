@@ -63,8 +63,8 @@ Features
   multi-level, diagonal, multi-step
 * Variants of PFASST: virtually parallel or MPI-based parallel,
   classical or multigrid perspective
-* 8 tutorials: from setting up a first collocation problem to SDC,
-  PFASST and advanced topics
+* 9 tutorials: from setting up a first collocation problem to SDC,
+  PFASST, advanced topics and ParaDiag
 * Projects: many documented projects with defined and tested outcomes
 * Many different examples, collocation types, data types already
   implemented

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.controller_classes.controller_ParaDiag_MPI module &#8212; pySDC 5.7 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=25098c49"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.controller_classes.controller_ParaDiag_nonMPI module" href="implementations.controller_classes.controller_ParaDiag_nonMPI.html" />
+    <link rel="prev" title="implementations.controller_classes.controller_MPI module" href="implementations.controller_classes.controller_MPI.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.controller_ParaDiag_nonMPI.html" title="implementations.controller_classes.controller_ParaDiag_nonMPI module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.controller_MPI.html" title="implementations.controller_classes.controller_MPI module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.controller_classes.html" accesskey="U">implementations.controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.controller_classes.controller_ParaDiag_MPI module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.controller_classes.controller_ParaDiag_MPI">
+<span id="implementations-controller-classes-controller-paradiag-mpi-module"></span><h1>implementations.controller_classes.controller_ParaDiag_MPI module<a class="headerlink" href="#module-implementations.controller_classes.controller_ParaDiag_MPI" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">controller_ParaDiag_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ParaDiagController</span></code></p>
+<p>ParaDiag controller with MPI parallelism across time steps: one step per rank.</p>
+<p>Everything here is written from a single processor’s point of view. A rank owns exactly one step
+and never inspects another rank’s data; the places where ParaDiag genuinely needs information
+from the whole block are expressed as communication:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">prepare_Jacobians</span></code>          -&gt; Allreduce(SUM) over the step communicator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compute_all_at_once_residual</span></code> -&gt; point-to-point exchange with the previous/next rank</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">apply_matrix</span></code> (the weighted FFT/iFFT in time) -&gt; a ring reduction, see below</p></li>
+<li><p>convergence                   -&gt; allreduce(LAND), because ParaDiag converges collectively</p></li>
+</ul>
+<p>Note that ParaDiag steps can only converge together, so every rank always participates in every
+iteration. That is not a policy choice: a rank that stopped early would never enter the
+collectives below and the run would hang.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.ParaDiag">
+<span class="sig-name descname"><span class="pre">ParaDiag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.ParaDiag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.ParaDiag" title="Link to this definition">¶</a></dt>
+<dd><p>Dispatch on the current stage. All ranks are always in the same stage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.apply_matrix">
+<span class="sig-name descname"><span class="pre">apply_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.apply_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.apply_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Apply a square L x L matrix across the steps, where L is the number of ranks.</p>
+<p>Each rank needs <code class="docutils literal notranslate"><span class="pre">res_i</span> <span class="pre">=</span> <span class="pre">sum_j</span> <span class="pre">mat[i,</span> <span class="pre">j]</span> <span class="pre">*</span> <span class="pre">me_j</span></code> but only holds <code class="docutils literal notranslate"><span class="pre">me_i</span></code>. This is done as a
+ring reduction: the values circulate once around the communicator and each rank accumulates
+its own row as they pass. That keeps the working set at O(M) fields per rank, independent of
+L – an allgather would instead need O(L * M) fields on every rank, which is exactly the
+gather this controller must not do.</p>
+<p>The ring costs L - 1 rounds. A butterfly would need only log2(L), but only because the matrix
+this is called with is a DFT; for a general matrix it needs the O(L * M) gather just ruled
+out. That belongs with an FFT-shaped interface rather than this one, and pays off from about
+L = 16 upwards.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> – square matrix with as many rows as there are ranks</p></li>
+<li><p><strong>quantity</strong> (<em>str</em>) – ‘residual’ or ‘increment’, the level attribute to transform in place</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.compute_all_at_once_residual">
+<span class="sig-name descname"><span class="pre">compute_all_at_once_residual</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.compute_all_at_once_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.compute_all_at_once_residual" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the residual of the composite collocation problem.</p>
+<p>Needs the previous step’s end point as this step’s initial condition, which is the only
+point-to-point communication in a ParaDiag iteration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_ParaDiag">
+<span class="sig-name descname"><span class="pre">it_ParaDiag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.it_ParaDiag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_ParaDiag" title="Link to this definition">¶</a></dt>
+<dd><p>A single ParaDiag iteration, from this rank’s point of view.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_check">
+<span class="sig-name descname"><span class="pre">it_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.it_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_check" title="Link to this definition">¶</a></dt>
+<dd><p>Check for convergence. ParaDiag converges collectively, hence the allreduce.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.prepare_Jacobians">
+<span class="sig-name descname"><span class="pre">prepare_Jacobians</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.prepare_Jacobians"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.prepare_Jacobians" title="Link to this definition">¶</a></dt>
+<dd><p>Average the solution across all steps, for constructing average Jacobians.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.restart_block">
+<span class="sig-name descname"><span class="pre">restart_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.restart_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.restart_block" title="Link to this definition">¶</a></dt>
+<dd><p>Reset this rank’s step for a new block.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.run" title="Link to this definition">¶</a></dt>
+<dd><p>Main driver.</p>
+<p>ParaDiag always runs whole blocks – every rank participates in every iteration – so unlike
+the pipelined controllers there is no communicator splitting as steps finish.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.spread">
+<span class="sig-name descname"><span class="pre">spread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.spread" title="Link to this definition">¶</a></dt>
+<dd><p>Spreading phase</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.update_G_inv">
+<span class="sig-name descname"><span class="pre">update_G_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.update_G_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.update_G_inv" title="Link to this definition">¶</a></dt>
+<dd><p>Rebuild this rank’s G^-1 if alpha changed with the iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – 0-based ParaDiag iteration index</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.update_solution">
+<span class="sig-name descname"><span class="pre">update_solution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.update_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.update_solution" title="Link to this definition">¶</a></dt>
+<dd><p>Add the increment to get the next iterate. Purely local.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.controller_classes.controller_ParaDiag_MPI module</a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI"><code class="docutils literal notranslate"><span class="pre">controller_ParaDiag_MPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.ParaDiag"><code class="docutils literal notranslate"><span class="pre">ParaDiag()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.apply_matrix"><code class="docutils literal notranslate"><span class="pre">apply_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.compute_all_at_once_residual"><code class="docutils literal notranslate"><span class="pre">compute_all_at_once_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_ParaDiag"><code class="docutils literal notranslate"><span class="pre">it_ParaDiag()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_check"><code class="docutils literal notranslate"><span class="pre">it_check()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.prepare_Jacobians"><code class="docutils literal notranslate"><span class="pre">prepare_Jacobians()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.restart_block"><code class="docutils literal notranslate"><span class="pre">restart_block()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.spread"><code class="docutils literal notranslate"><span class="pre">spread()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.update_G_inv"><code class="docutils literal notranslate"><span class="pre">update_G_inv()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.update_solution"><code class="docutils literal notranslate"><span class="pre">update_solution()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.controller_classes.controller_MPI.html"
+                          title="previous chapter">implementations.controller_classes.controller_MPI module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.controller_classes.controller_ParaDiag_nonMPI.html"
+                          title="next chapter">implementations.controller_classes.controller_ParaDiag_nonMPI module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.controller_classes.controller_ParaDiag_MPI.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.controller_ParaDiag_nonMPI.html" title="implementations.controller_classes.controller_ParaDiag_nonMPI module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.controller_MPI.html" title="implementations.controller_classes.controller_MPI module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.controller_classes.html" >implementations.controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.controller_classes.controller_ParaDiag_MPI module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

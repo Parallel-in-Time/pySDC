@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/problem_classes/odeSystem.py: 100%</title>
+    <title>Coverage for pySDC/implementations/problem_classes/odeSystem.py: 97%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_dd2e7eb5.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>implementations<span class="sep">/</span>problem_classes<span class="sep">/</span>odeSystem.py</b>:
-            <span class="pc_cov">100%</span>
+            <span class="pc_cov">97%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">187 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">187<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">0<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">181<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">6<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">18<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_polynomial_test_problem_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-07 04:33 +0000
+            created at 2026-09-07 06:55 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -541,7 +541,7 @@
     <p class="pln"><span class="n"><a id="t459" href="#t459">459</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t460" href="#t460">460</a></span><span class="t">        <span class="key">if</span> <span class="nam">t</span> <span class="op">&gt;</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t461" href="#t461">461</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t462" href="#t462">462</a></span><span class="t">            <span class="key">def</span> <span class="nam">eval_rhs</span><span class="op">(</span><span class="nam">t</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t462" href="#t462">462</a></span><span class="t">            <span class="key">def</span> <span class="nam">eval_rhs</span><span class="op">(</span><span class="nam">t</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t463" href="#t463">463</a></span><span class="t">                <span class="str">r&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t464" href="#t464">464</a></span><span class="t"><span class="str">                Evaluate the right hand side, but switch the arguments for ``SciPy``.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t465" href="#t465">465</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -552,9 +552,9 @@
     <p class="pln"><span class="n"><a id="t470" href="#t470">470</a></span><span class="t"><span class="str">                Returns:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t471" href="#t471">471</a></span><span class="t"><span class="str">                    (numpy.ndarray): Right hand side evaluation</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t472" href="#t472">472</a></span><span class="t"><span class="str">                &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t473" href="#t473">473</a></span><span class="t">                <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">u</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t473" href="#t473">473</a></span><span class="t">                <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">u</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t474" href="#t474">474</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t475" href="#t475">475</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">generate_scipy_reference_solution</span><span class="op">(</span><span class="nam">eval_rhs</span><span class="op">,</span> <span class="nam">t</span><span class="op">,</span> <span class="nam">u_init</span><span class="op">,</span> <span class="nam">t_init</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t475" href="#t475">475</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">generate_scipy_reference_solution</span><span class="op">(</span><span class="nam">eval_rhs</span><span class="op">,</span> <span class="nam">t</span><span class="op">,</span> <span class="nam">u_init</span><span class="op">,</span> <span class="nam">t_init</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t476" href="#t476">476</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t477" href="#t477">477</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">u0</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t478" href="#t478">478</a></span><span class="t">        <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
@@ -889,7 +889,7 @@
     <p class="pln"><span class="n"><a id="t807" href="#t807">807</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t808" href="#t808">808</a></span><span class="t">        <span class="key">if</span> <span class="nam">t</span> <span class="op">&gt;</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t809" href="#t809">809</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t810" href="#t810">810</a></span><span class="t">            <span class="key">def</span> <span class="nam">eval_rhs</span><span class="op">(</span><span class="nam">t</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t810" href="#t810">810</a></span><span class="t">            <span class="key">def</span> <span class="nam">eval_rhs</span><span class="op">(</span><span class="nam">t</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t811" href="#t811">811</a></span><span class="t">                <span class="str">r&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t812" href="#t812">812</a></span><span class="t"><span class="str">                Evaluate the right hand side, but switch the arguments for ``SciPy``.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t813" href="#t813">813</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -900,9 +900,9 @@
     <p class="pln"><span class="n"><a id="t818" href="#t818">818</a></span><span class="t"><span class="str">                Returns:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t819" href="#t819">819</a></span><span class="t"><span class="str">                    (numpy.ndarray): Right hand side evaluation</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t820" href="#t820">820</a></span><span class="t"><span class="str">                &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t821" href="#t821">821</a></span><span class="t">                <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">u</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t821" href="#t821">821</a></span><span class="t">                <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">eval_f</span><span class="op">(</span><span class="nam">u</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t822" href="#t822">822</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t823" href="#t823">823</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">generate_scipy_reference_solution</span><span class="op">(</span><span class="nam">eval_rhs</span><span class="op">,</span> <span class="nam">t</span><span class="op">,</span> <span class="nam">u_init</span><span class="op">,</span> <span class="nam">t_init</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t823" href="#t823">823</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">generate_scipy_reference_solution</span><span class="op">(</span><span class="nam">eval_rhs</span><span class="op">,</span> <span class="nam">t</span><span class="op">,</span> <span class="nam">u_init</span><span class="op">,</span> <span class="nam">t_init</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t824" href="#t824">824</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t825" href="#t825">825</a></span><span class="t">            <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">u0</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t826" href="#t826">826</a></span><span class="t">        <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
@@ -1016,7 +1016,7 @@
             <a class="nav" href="z_91faa57f8583c837_polynomial_test_problem_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-07 04:33 +0000
+            created at 2026-09-07 06:55 +0000
         </p>
     </div>
 </footer>

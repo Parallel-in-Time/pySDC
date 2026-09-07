@@ -231,18 +231,85 @@ keep working.</p>
 <dd><p>Bases: <a class="reference internal" href="#core.controller.Controller" title="core.controller.Controller"><code class="xref py py-class docutils literal notranslate"><span class="pre">Controller</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="core.controller.ParaDiagController.FFT_in_time">
-<span class="sig-name descname"><span class="pre">FFT_in_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.FFT_in_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.FFT_in_time" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">FFT_in_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.FFT_in_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.FFT_in_time" title="Link to this definition">¶</a></dt>
 <dd><p>Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</p>
 <dl class="simple">
 <dt>Note: The implementation via matrix-vector multiplication may be inefficient and less stable compared to an FFT</dt><dd><p>with transposes!</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>str</em>) – the level attribute to transform</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – iteration index, for an iteration dependent alpha</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.controller.ParaDiagController.get_FFT_matrices">
+<span class="sig-name descname"><span class="pre">get_FFT_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.get_FFT_matrices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.get_FFT_matrices" title="Link to this definition">¶</a></dt>
+<dd><p>Get the weighted FFT and iFFT matrices for iteration <cite>k</cite>, rebuilding them only when alpha
+actually changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – iteration index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the forward and backward weighted FFT matrices</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.controller.ParaDiagController.get_alpha">
+<span class="sig-name descname"><span class="pre">get_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.get_alpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.get_alpha" title="Link to this definition">¶</a></dt>
+<dd><p>Get the ParaDiag alpha parameter for iteration <cite>k</cite>.</p>
+<p><cite>alpha</cite> may be a single number, a sequence indexed by iteration (the last entry is reused once
+it runs out), or a callable taking the iteration index. Making it iteration dependent lets the
+outer iteration start with a well-conditioned alpha and tighten it later.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – iteration index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>alpha to use for this iteration</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.controller.ParaDiagController.iFFT_in_time">
-<span class="sig-name descname"><span class="pre">iFFT_in_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.iFFT_in_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.iFFT_in_time" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">iFFT_in_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.iFFT_in_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.iFFT_in_time" title="Link to this definition">¶</a></dt>
 <dd><p>Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>str</em>) – the level attribute to transform</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – iteration index, for an iteration dependent alpha</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.controller.ParaDiagController.update_G_inv">
+<span class="sig-name descname"><span class="pre">update_G_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/controller.html#ParaDiagController.update_G_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.controller.ParaDiagController.update_G_inv" title="Link to this definition">¶</a></dt>
+<dd><p>Rebuild G^-1 on the local step(s) when alpha changes with the iteration.</p>
+<p>G^-1 depends on alpha, so an iteration dependent alpha means the sweeper’s diagonalization has
+to be recomputed. Subclasses implement this because only they know which steps they own.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – iteration index</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -276,7 +343,10 @@ keep working.</p>
 </li>
 <li><a class="reference internal" href="#core.controller.ParaDiagController"><code class="docutils literal notranslate"><span class="pre">ParaDiagController</span></code></a><ul>
 <li><a class="reference internal" href="#core.controller.ParaDiagController.FFT_in_time"><code class="docutils literal notranslate"><span class="pre">FFT_in_time()</span></code></a></li>
+<li><a class="reference internal" href="#core.controller.ParaDiagController.get_FFT_matrices"><code class="docutils literal notranslate"><span class="pre">get_FFT_matrices()</span></code></a></li>
+<li><a class="reference internal" href="#core.controller.ParaDiagController.get_alpha"><code class="docutils literal notranslate"><span class="pre">get_alpha()</span></code></a></li>
 <li><a class="reference internal" href="#core.controller.ParaDiagController.iFFT_in_time"><code class="docutils literal notranslate"><span class="pre">iFFT_in_time()</span></code></a></li>
+<li><a class="reference internal" href="#core.controller.ParaDiagController.update_G_inv"><code class="docutils literal notranslate"><span class="pre">update_G_inv()</span></code></a></li>
 </ul>
 </li>
 </ul>

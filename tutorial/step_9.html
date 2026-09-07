@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>&lt;no title&gt; &#8212; pySDC 5.7 documentation</title>
+    <title>Step-9: ParaDiag &#8212; pySDC 5.7 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=25098c49"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -35,7 +36,7 @@
           <a href="step_8.html" title="Step-8: Advanced topics"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Step-9: ParaDiag</a></li> 
       </ul>
     </div>  
 
@@ -44,7 +45,1296 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  
+  <section id="step-9-paradiag">
+<h1>Step-9: ParaDiag<a class="headerlink" href="#step-9-paradiag" title="Link to this heading">¶</a></h1>
+<p>ParaDiag is a parallel-in-time method of a rather different flavour than PFASST.
+Instead of iterating on a hierarchy of levels and passing information forward step by step, it diagonalizes the “top layer” of Kronecker products that makes up the composite collocation problem.
+After the diagonalization, the collocation problems on the individual steps decouple and can be solved concurrently, which is where the parallelism comes from.</p>
+<p>The price is an approximation: the time-stepping matrix is replaced by an <span class="math notranslate nohighlight">\(\alpha\)</span>-circulant one, which <em>is</em> diagonalizable by a weighted Fourier transform.
+The outer iteration then corrects for that perturbation, and <span class="math notranslate nohighlight">\(\alpha\)</span> trades approximation quality against the conditioning of the diagonalization.</p>
+<section id="part-a-paradiag-for-linear-problems">
+<h2>Part A: ParaDiag for linear problems<a class="headerlink" href="#part-a-paradiag-for-linear-problems" title="Link to this heading">¶</a></h2>
+<p>We start with the linear case, where the composite collocation problem really can be written as a matrix and the whole method is a few lines of linear algebra.
+It is recommended to view this code side by side with <a class="reference external" href="https://arxiv.org/abs/2103.12571">Gaya’s paper on ParaDiag with collocation methods</a>, as the code follows the equations there closely without repeating their explanation.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li><p>The diagonalization happens across the time-steps, not across the collocation nodes.</p></li>
+<li><p>The <span class="math notranslate nohighlight">\(\alpha\)</span>-circulant approximation is what makes the diagonalization possible in the first place.</p></li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/A_paradiag_for_linear_problems.py">pySDC/tutorial/step_9/A_paradiag_for_linear_problems.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
+<span class="sd">This script introduces ParaDiag for linear problems.</span>
+<span class="sd">It is recommended to view this code side by side with `Gaya's paper on ParaDiag with collocation methods</span>
+<span class="sd">&lt;https://arxiv.org/abs/2103.12571&gt;`_ as the code is close to the equations presented there but offers no explanations</span>
+<span class="sd">about them.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.TestEquation_0D</span><span class="w"> </span><span class="kn">import</span> <span class="n">testequation0d</span> <span class="k">as</span> <span class="n">problem_class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.ParaDiagSweepers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDiagonalization</span>
+
+<span class="c1"># setup output</span>
+<span class="n">out_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_9_A_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">out_file</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+
+
+<span class="c1"># setup parameters</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># Number of parallel time steps</span>
+<span class="n">M</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Number of collocation nodes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Number of spatial degrees of freedom</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-4</span>  <span class="c1"># Circular perturbation parameter</span>
+<span class="n">restol</span> <span class="o">=</span> <span class="mf">1e-10</span>  <span class="c1"># Residual tolerance for the composite collocation problem</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># step size</span>
+
+<span class="n">my_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Running ParaDiag test script with </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1"> time steps, </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s1"> collocation nodes and </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s1"> spatial degrees of freedom'</span><span class="p">)</span>
+
+<span class="c1"># setup pySDC infrastructure for Dahlquist problem and quadrature</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">problem_class</span><span class="p">(</span><span class="n">lambdas</span><span class="o">=-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span> <span class="n">u0</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">sweeper_params</span> <span class="o">=</span> <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'num_nodes'</span><span class="p">:</span> <span class="n">M</span><span class="p">,</span> <span class="s1">'quad_type'</span><span class="p">:</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">}</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">generic_implicit</span><span class="p">(</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Setup a global NumPy array and insert initial conditions in the first step</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># setup matrices for composite collocation problem. We note the sizes of the matrices in comments after generating them.</span>
+
+<span class="c1"># Start with identity matrices (I) of various sizes</span>
+<span class="n">I_L</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>  <span class="c1"># LxL</span>
+<span class="n">I_MN</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">((</span><span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+<span class="n">I_N</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="c1"># NxN</span>
+<span class="n">I_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>  <span class="c1"># MxM</span>
+
+<span class="c1"># E matrix propagates the solution of the steps to be the initial condition for the next step</span>
+<span class="n">E</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>  <span class="c1"># LxL</span>
+
+<span class="sd">"""</span>
+<span class="sd">The H matrix computes the solution at the of an individual step from the solutions at the collocation nodes.</span>
+<span class="sd">For the RADAU-RIGHT rule we use here, the right node coincides with the end of the interval, so this is simple.</span>
+<span class="sd">We start with building the MxM matrix H_M on the node level and then extend to the spatial dimension with a Kronecker product.</span>
+<span class="sd">"""</span>
+<span class="n">H_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span> <span class="o">*</span> <span class="mi">0</span>  <span class="c1"># MxM</span>
+<span class="n">H_M</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">H_M</span><span class="p">,</span> <span class="n">I_N</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+
+<span class="sd">"""</span>
+<span class="sd">Set up collocation problem.</span>
+<span class="sd">Note that the Kronecker product from Q and A is only possible when there is an A, i.e. when the problem is linear.</span>
+<span class="sd">We will discuss non-linear problems in later steps in this tutorial</span>
+<span class="sd">"""</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># MxM</span>
+<span class="n">C_coll</span> <span class="o">=</span> <span class="n">I_MN</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+
+<span class="c1"># Set up the composite collocation / all-at-once problem</span>
+<span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">I_L</span><span class="p">,</span> <span class="n">C_coll</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">H</span><span class="p">))</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>  <span class="c1"># LMNxLMN</span>
+
+<span class="sd">"""</span>
+<span class="sd">Now that we have the full composite collocation problem as one large matrix, we can just solve it directly to get a reference solution.</span>
+<span class="sd">Of course, this is prohibitively expensive for any actual application and we would never want to do this in practice.</span>
+<span class="sd">"""</span>
+<span class="n">sol_direct</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="sd">"""</span>
+<span class="sd">The normal time-stepping approach is to solve the composite collocation problem with forward substitution</span>
+<span class="sd">"""</span>
+<span class="n">sol_stepping</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Solve the current step (sol_stepping[l] currently contains the initial conditions at step l)</span>
+<span class="sd">    Here, we only solve MNxMN systems rather than LMNxLMN systems. This is still really expensive in practice, which is why there is SDC, for example.</span>
+<span class="sd">    """</span>
+    <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">C_coll</span><span class="p">,</span> <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># place the solution to the current step as the initial conditions to the next step</span>
+    <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_stepping</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+
+
+<span class="sd">"""</span>
+<span class="sd">So far, so serial and boring. We will now parallelize this using ParaDiag.</span>
+<span class="sd">We will solve the composite collocation problem using preconditioned Picard iterations:</span>
+<span class="sd">    C_alpha delta = u_0 - Cu^k = &lt; residual of the composite collocation problem &gt;</span>
+<span class="sd">    u^{k+1} = u^k + delta</span>
+<span class="sd">The trick behind ParaDiag is to choose the preconditioner C_alpha to be a time-periodic approximation to C that can be diagonalized and therefore inverted in parallel.</span>
+<span class="sd">What we change in C_alpha compared to C is the E matrix that propagates the solutions between steps, which we amend to feed the solution to the last step back into the first step.</span>
+<span class="sd">"""</span>
+<span class="n">E_alpha</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span>  <span class="c1"># LxL</span>
+<span class="n">E_alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha</span>  <span class="c1"># make the problem time-periodic</span>
+
+<span class="sd">"""</span>
+<span class="sd">In order to diagonalize C_alpha, on the step level, we need to diagonalize I_L and E_alpha simultaneously.</span>
+<span class="sd">I_L and E_alpha are alpha-circular matrices which can be simultaneously diagonalized by a weighted Fourier transform.</span>
+<span class="sd">We start by setting the weighting matrices for the Fourier transforms and then compute the diagonal entries of the diagonal version D_alpha of E_alpha.</span>
+<span class="sd">We refrain from actually setting up the preconditioner because we will not use the expanded version here.</span>
+<span class="sd">"""</span>
+<span class="n">gamma</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>  <span class="c1"># LxL</span>
+<span class="n">J_inv</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">)</span>  <span class="c1"># LxL</span>
+
+<span class="c1"># compute diagonal entries via Fourier transform</span>
+<span class="n">D_alpha_diag_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">E_alpha</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'backward'</span><span class="p">)</span>
+
+
+<span class="sd">"""</span>
+<span class="sd">We need some convenience functions for computing matrix vector multiplication and the composite collocation problem residual here</span>
+<span class="sd">"""</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mat_vec</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Matrix vector product</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mat (np.ndarray or scipy.sparse) : Matrix</span>
+<span class="sd">        vec (np.ndarray) : vector</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: mat @ vec</span>
+<span class="sd">    """</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">+=</span> <span class="n">mat</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">vec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">residual</span><span class="p">(</span><span class="n">_u</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compute the residual of the composite collocation problem</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        _u (np.ndarray): Current iterate</span>
+<span class="sd">        u0 (np.ndarray): Initial conditions</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: LMN size array with the residual</span>
+<span class="sd">    """</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">_u</span> <span class="o">*</span> <span class="mi">0</span><span class="n">j</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="c1"># build step local residual</span>
+
+        <span class="c1"># communicate initial conditions for each step</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">_u</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+
+        <span class="c1"># evaluate and subtract integral over right hand side functions</span>
+        <span class="n">f_evals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">_u</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)])</span>
+        <span class="n">Qf</span> <span class="o">=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">f_evals</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="c1"># res[l, m, ...] -= (_u[l] - dt * Qf)[-1]</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">-=</span> <span class="p">(</span><span class="n">_u</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">Qf</span><span class="p">)[</span><span class="n">m</span><span class="p">]</span>
+            <span class="c1"># res[l, m, ...] -= np.mean((_u[l] - dt * Qf), axis=0)</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="sd">"""</span>
+<span class="sd">We will start with ParaDiag where we parallelize across the L steps but solve the collocation problems directly in serial.</span>
+<span class="sd">"""</span>
+<span class="n">sol_ParaDiag_L</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">u0</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">niter_ParaDiag_L</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">restol</span><span class="p">:</span>
+    <span class="c1"># compute weighted FFT in time to go to diagonal base of C_alpha</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span>
+        <span class="n">mat_vec</span><span class="p">(</span><span class="n">J_inv</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">res</span><span class="p">),</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">norm</span><span class="o">=</span><span class="s1">'ortho'</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># solve the collocation problems in parallel on the steps</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="c1"># construct local matrix of "collocation problem"</span>
+        <span class="n">local_matrix</span> <span class="o">=</span> <span class="p">(</span><span class="n">D_alpha_diag_vals</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span> <span class="o">+</span> <span class="n">C_coll</span><span class="p">)</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+
+        <span class="c1"># solve local "collocation problem" directly</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">local_matrix</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># compute inverse weighted FFT in time to go back from diagonal base of C_alpha</span>
+    <span class="n">sol_ParaDiag_L</span> <span class="o">+=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'ortho'</span><span class="p">))</span>
+
+    <span class="c1"># update residual</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">niter_ParaDiag_L</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">my_print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'Needed </span><span class="si">{</span><span class="n">niter_ParaDiag_L</span><span class="si">}</span><span class="s1"> iterations in parallel across the steps ParaDiag. Stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+
+<span class="sd">"""</span>
+<span class="sd">While we have distributed the work across L tasks, we are still solving perturbed collocation problems directly on a single task here.</span>
+<span class="sd">This is very expensive, and we will now additionally diagonalize the quadrature matrix Q in order to distribute the work on LM tasks, where we solve NxN systems each.</span>
+<span class="sd">We rearrange the contribution of E_alpha to arrive at a problem (I - dtQG^{-1}A)u = u0.</span>
+<span class="sd">After diagonalizing QG^{-1}, we can simply utilize the Euler solves that are implemented in pySDC, but need to keep in mind that complex valued "step sizes" are required.</span>
+
+<span class="sd">We start by setting up the G and G^{-1} matrices. Then we will setup pySDC sweepers that solve QG^{-1} with diagonalization.</span>
+<span class="sd">Here, we will not use the sweepers, but just the diagonalization computed there in order to make more clear what is going on.</span>
+<span class="sd">"""</span>
+<span class="n">G</span> <span class="o">=</span> <span class="p">[(</span><span class="n">D_alpha_diag_vals</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*</span> <span class="n">H_M</span> <span class="o">+</span> <span class="n">I_M</span><span class="p">)</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">)]</span>  <span class="c1"># MxM</span>
+<span class="n">G_inv</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">_G</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="k">for</span> <span class="n">_G</span> <span class="ow">in</span> <span class="n">G</span><span class="p">]</span>  <span class="c1"># MxM</span>
+<span class="n">sweepers</span> <span class="o">=</span> <span class="p">[</span><span class="n">QDiagonalization</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="s1">'G_inv'</span><span class="p">:</span> <span class="n">_G_inv</span><span class="p">},</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">_G_inv</span> <span class="ow">in</span> <span class="n">G_inv</span><span class="p">]</span>
+
+
+<span class="n">sol_ParaDiag</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">restol</span><span class="p">:</span>
+
+    <span class="c1"># weighted FFT in time</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span>
+        <span class="n">mat_vec</span><span class="p">(</span><span class="n">J_inv</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">res</span><span class="p">),</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">norm</span><span class="o">=</span><span class="s1">'ortho'</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># perform local solves of "collocation problems" on the steps in parallel</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+
+        <span class="c1"># diagonalize QG^-1 matrix</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">S_inv</span> <span class="o">=</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">S_inv</span>
+
+        <span class="c1"># perform local solves on the collocation nodes in parallel</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">S_inv</span> <span class="o">@</span> <span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="n">x2</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="o">=</span><span class="n">x1</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">factor</span><span class="o">=</span><span class="n">w</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="n">x1</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">S</span> <span class="o">@</span> <span class="n">x2</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">G_inv</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">@</span> <span class="n">z</span>
+
+    <span class="c1"># inverse weighted FFT in time</span>
+    <span class="n">sol_ParaDiag</span> <span class="o">+=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'ortho'</span><span class="p">))</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">my_print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'Needed </span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s1"> iterations in parallel and local paradiag with increment formulation, stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">niter_ParaDiag_L</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Running</span> <span class="n">ParaDiag</span> <span class="n">test</span> <span class="n">script</span> <span class="k">with</span> <span class="mi">4</span> <span class="n">time</span> <span class="n">steps</span><span class="p">,</span> <span class="mi">3</span> <span class="n">collocation</span> <span class="n">nodes</span> <span class="ow">and</span> <span class="mi">2</span> <span class="n">spatial</span> <span class="n">degrees</span> <span class="n">of</span> <span class="n">freedom</span>
+<span class="n">Needed</span> <span class="mi">3</span> <span class="n">iterations</span> <span class="ow">in</span> <span class="n">parallel</span> <span class="n">across</span> <span class="n">the</span> <span class="n">steps</span> <span class="n">ParaDiag</span><span class="o">.</span> <span class="n">Stopped</span> <span class="n">at</span> <span class="n">residual</span> <span class="mf">7.38e-13</span>
+<span class="n">Needed</span> <span class="mi">3</span> <span class="n">iterations</span> <span class="ow">in</span> <span class="n">parallel</span> <span class="ow">and</span> <span class="n">local</span> <span class="n">paradiag</span> <span class="k">with</span> <span class="n">increment</span> <span class="n">formulation</span><span class="p">,</span> <span class="n">stopped</span> <span class="n">at</span> <span class="n">residual</span> <span class="mf">7.38e-13</span>
+</pre></div>
+</div>
+</section>
+<section id="part-b-paradiag-for-nonlinear-problems">
+<h2>Part B: ParaDiag for nonlinear problems<a class="headerlink" href="#part-b-paradiag-for-nonlinear-problems" title="Link to this heading">¶</a></h2>
+<p>For nonlinear problems the composite collocation problem cannot be written as a matrix, so the diagonalization needs a linear operator to work with.
+This part shows the two ways out: IMEX splitting, where only the linear implicit part enters the preconditioner, and averaging the Jacobian across the steps.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li><p>Averaging the Jacobian requires communicating the average solution, which is why <code class="docutils literal notranslate"><span class="pre">average_jacobian</span></code> is off by default for linear problems.</p></li>
+<li><p>We do a single Newton iteration per ParaDiag iteration, so the number of Newton iterations per node equals the number of ParaDiag iterations.</p></li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/B_paradiag_for_nonlinear_problems.py">pySDC/tutorial/step_9/B_paradiag_for_nonlinear_problems.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
+<span class="sd">This script introduces ParaDiag for nonlinear problems with the van der Pol oscillator as an example.</span>
+
+<span class="sd">ParaDiag works by diagonalizing the "top layer" of Kronecker products that make up the circularized composite</span>
+<span class="sd">collocation problem.</span>
+<span class="sd">However, in nonlinear problems, the problem cannot be written as a matrix and therefore we cannot write the composite</span>
+<span class="sd">collocation problem as a matrix.</span>
+<span class="sd">There are two approaches for dealing with this. We can do IMEX splitting, where we treat only the linear part implicitly.</span>
+<span class="sd">The ParaDiag preconditioner is then only made up of the linear implicit part and we can again write this as a matrix and</span>
+<span class="sd">do the diagonalization just like for linear problems. The non-linear part then comes in via the residual on the right</span>
+<span class="sd">hand side.</span>
+<span class="sd">The second approach is to average Jacobians. The non-linear problems are solved with a Newton scheme, where the Jacobian</span>
+<span class="sd">matrix is computed based on the current solution and then inverted in each Newton iteration. In order to write the</span>
+<span class="sd">ParaDiag preconditioner as a matrix with Kronecker products and then only diagonalize the outermost part, we need to</span>
+<span class="sd">have the same Jacobian on all steps.</span>
+<span class="sd">The ParaDiag iteration then proceeds as follows:</span>
+<span class="sd">    - (1) Compute residual of composite collocation problem</span>
+<span class="sd">    - (2) Average the solution across the steps and nodes as preparation for computing the average Jacobian</span>
+<span class="sd">    - (3) Weighted FFT in time to diagonalize E_alpha</span>
+<span class="sd">    - (4) Solve for the increment by inverting the averaged Jacobian from (2) on the subproblems on the different steps</span>
+<span class="sd">          and nodes.</span>
+<span class="sd">    - (5) Weighted iFFT in time</span>
+<span class="sd">    - (6) Increment solution</span>
+<span class="sd">As IMEX ParaDiag is a trivial extension of ParaDiag for linear problems, we focus on the second approach here.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span> <span class="k">as</span> <span class="n">sweeper_class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">vanderpol</span>
+
+<span class="c1"># setup output</span>
+<span class="n">out_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_9_B_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">out_file</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+
+
+<span class="c1"># setup parameters</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">M</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-4</span>
+<span class="n">restol</span> <span class="o">=</span> <span class="mf">1e-8</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<span class="c1"># setup infrastructure</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">vanderpol</span><span class="p">(</span><span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">1e0</span><span class="p">,</span> <span class="n">crash_at_maxiter</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># make problem work on complex data</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)])</span>
+
+<span class="c1"># setup global solution array</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+<span class="c1"># setup collocation problem</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">sweeper_class</span><span class="p">({</span><span class="s1">'num_nodes'</span><span class="p">:</span> <span class="n">M</span><span class="p">,</span> <span class="s1">'quad_type'</span><span class="p">:</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># initial conditions</span>
+<span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">my_print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'Running ParaDiag test script for van der Pol with mu=</span><span class="si">{</span><span class="n">prob</span><span class="o">.</span><span class="n">mu</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1"> time steps and </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s1"> collocation nodes.'</span>
+<span class="p">)</span>
+
+
+<span class="sd">"""</span>
+<span class="sd">Setup matrices that make up the composite collocation problem. We do not set up the full composite collocation problem</span>
+<span class="sd">here, however. See https://arxiv.org/abs/2103.12571 for the meaning of the matrices.</span>
+<span class="sd">"""</span>
+<span class="n">I_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+<span class="n">H_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span> <span class="o">*</span> <span class="mi">0</span>
+<span class="n">H_M</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">Q</span> <span class="o">=</span> <span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
+
+<span class="n">E_alpha</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span>
+<span class="n">E_alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha</span>
+
+<span class="n">gamma</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">D_alpha_diag_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">E_alpha</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'backward'</span><span class="p">)</span>
+
+<span class="n">J</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+<span class="n">J_inv</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">)</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="p">[(</span><span class="n">D_alpha_diag_vals</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*</span> <span class="n">H_M</span> <span class="o">+</span> <span class="n">I_M</span><span class="p">)</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">)]</span>  <span class="c1"># MxM</span>
+
+<span class="c1"># prepare diagonalization of QG^{-1}</span>
+<span class="n">w</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">S</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">S_inv</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+    <span class="c1"># diagonalize QG^-1 matrix</span>
+    <span class="k">if</span> <span class="n">M</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">_w</span><span class="p">,</span> <span class="n">_S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">Q</span> <span class="o">@</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_w</span><span class="p">,</span> <span class="n">_S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">Q</span> <span class="o">/</span> <span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()))</span>
+    <span class="n">_S_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">_S</span><span class="p">)</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_w</span><span class="p">)</span>
+    <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_S</span><span class="p">)</span>
+    <span class="n">S_inv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_S_inv</span><span class="p">)</span>
+
+<span class="sd">"""</span>
+<span class="sd">Setup functions for computing matrix-vector productions on the steps and for computing the residual of the composite</span>
+<span class="sd">collocation problem</span>
+<span class="sd">"""</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mat_vec</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Matrix vector product</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mat (np.ndarray or scipy.sparse) : Matrix</span>
+<span class="sd">        vec (np.ndarray) : vector</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: mat @ vec</span>
+<span class="sd">    """</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">+=</span> <span class="n">mat</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">vec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">residual</span><span class="p">(</span><span class="n">_u</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compute the residual of the composite collocation problem</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        _u (np.ndarray): Current iterate</span>
+<span class="sd">        u0 (np.ndarray): Initial conditions</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: LMN size array with the residual</span>
+<span class="sd">    """</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">_u</span> <span class="o">*</span> <span class="mi">0</span><span class="n">j</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="c1"># build step local residual</span>
+
+        <span class="c1"># communicate initial conditions for each step</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">_u</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+
+        <span class="c1"># evaluate and subtract integral over right hand side functions</span>
+        <span class="n">f_evals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">_u</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)])</span>
+        <span class="n">Qf</span> <span class="o">=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">f_evals</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">-=</span> <span class="n">_u</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">Qf</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="c1"># do ParaDiag</span>
+<span class="n">sol_paradiag</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">*</span> <span class="mi">0</span><span class="n">j</span>
+<span class="n">u0</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_paradiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">res</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">restol</span><span class="p">:</span>
+    <span class="c1"># compute all-at-once residual</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_paradiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+
+    <span class="c1"># compute solution averaged across the L steps and M nodes. This is the difference to ParaDiag for linear problems.</span>
+    <span class="n">u_avg</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_init</span>
+    <span class="n">u_avg</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sol_paradiag</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># weighted FFT in time</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">mat_vec</span><span class="p">(</span><span class="n">J_inv</span><span class="o">.</span><span class="n">toarray</span><span class="p">(),</span> <span class="n">res</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># perform local solves of "collocation problems" on the steps in parallel</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+
+        <span class="c1"># perform local solves on the collocation nodes in parallel</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">S_inv</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">@</span> <span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="n">x2</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_jacobian</span><span class="p">(</span><span class="n">x1</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">w</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="n">m</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="n">u_avg</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">l</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">@</span> <span class="n">x2</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span>
+
+    <span class="c1"># inverse FFT in time and increment</span>
+    <span class="n">sol_paradiag</span> <span class="o">+=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">toarray</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_paradiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">niter</span> <span class="o">&lt;</span> <span class="mi">99</span><span class="p">,</span> <span class="s1">'ParaDiag did not converge for nonlinear problem!'</span>
+<span class="n">my_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Needed </span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s1"> ParaDiag iterations, stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">res</span><span class="p">))</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Running</span> <span class="n">ParaDiag</span> <span class="n">test</span> <span class="n">script</span> <span class="k">for</span> <span class="n">van</span> <span class="n">der</span> <span class="n">Pol</span> <span class="k">with</span> <span class="n">mu</span><span class="o">=</span><span class="mf">1.0</span> <span class="ow">and</span> <span class="mi">4</span> <span class="n">time</span> <span class="n">steps</span> <span class="ow">and</span> <span class="mi">3</span> <span class="n">collocation</span> <span class="n">nodes</span><span class="o">.</span>
+<span class="n">Needed</span> <span class="mi">5</span> <span class="n">ParaDiag</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">stopped</span> <span class="n">at</span> <span class="n">residual</span> <span class="mf">7.54e-10</span>
+</pre></div>
+</div>
+</section>
+<section id="part-c-paradiag-in-pysdc">
+<h2>Part C: ParaDiag in pySDC<a class="headerlink" href="#part-c-paradiag-in-pysdc" title="Link to this heading">¶</a></h2>
+<p>Here we leave the hand-written linear algebra behind and set ParaDiag up through pySDC’s controllers, comparing it to single-level PFASST in Jacobi mode and to serial time stepping.
+Both schemes are used without any optimization, so please refrain from computing parallel efficiency from these numbers.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li><p>ParaDiag needs its own sweeper (<code class="docutils literal notranslate"><span class="pre">QDiagonalization</span></code>) and its own controller.</p></li>
+<li><p>The solution becomes complex, because the diagonalization is.</p></li>
+<li><p>ParaDiag converges in very few iterations for the hyperbolic advection example, where PFASST struggles, and the picture reverses for the van der Pol oscillator.</p></li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/C_paradiag_in_pySDC.py">pySDC/tutorial/step_9/C_paradiag_in_pySDC.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
+<span class="sd">This script shows how to setup ParaDiag in pySDC for two examples and compares performance to single-level PFASST in</span>
+<span class="sd">Jacobi mode and serial time stepping.</span>
+<span class="sd">In PFASST, we use a diagonal preconditioner, which allows for the same amount of parallelism as ParaDiag.</span>
+<span class="sd">We show iteration counts per step here, but both schemes have further concurrency across the nodes.</span>
+
+<span class="sd">We have a linear advection example, discretized with finite differences, where ParaDiag converges in very few iterations.</span>
+<span class="sd">PFASST, on the hand, needs a lot more iterations for this hyperbolic problem.</span>
+<span class="sd">Note that we did not optimize either setup. With different choice of alpha in ParaDiag, or inexactness and coarsening</span>
+<span class="sd">in PFASST, both schemes could be improved significantly.</span>
+
+<span class="sd">Second is the nonlinear van der Pol oscillator. We choose the mu parameter such that the problem is not overly stiff.</span>
+<span class="sd">Here, ParaDiag needs many iterations compared to PFASST, but remember that we only perform one Newton iteration per</span>
+<span class="sd">ParaDiag iteration. So per node, the number of Newton iterations is equal to the number of ParaDiag iterations.</span>
+<span class="sd">In PFASST, on the other hand, we solve the systems to some accuracy and allow more iterations. Here, ParaDiag needs</span>
+<span class="sd">fewer Newton iterations per step in total, leaving it with greater speedup. Again, inexactness could improve PFASST.</span>
+
+<span class="sd">This script is not meant to show that one parallelization scheme is better than the other. It does, however, demonstrate</span>
+<span class="sd">that both schemes, without optimization, need fewer iterations per task than serial time stepping. Kindly refrain from</span>
+<span class="sd">computing parallel efficiency for these examples, however. ;)</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+
+<span class="c1"># prepare output</span>
+<span class="n">out_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_9_C_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">out_file</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_description</span><span class="p">(</span><span class="n">problem</span><span class="o">=</span><span class="s1">'advection'</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'ParaDiag'</span><span class="p">):</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-6</span>
+
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'copy'</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'ParaDiag'</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.ParaDiagSweepers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDiagonalization</span> <span class="k">as</span> <span class="n">sweeper_class</span>
+
+        <span class="c1"># we only want to use the averaged Jacobian and do only one Newton iteration per ParaDiag iteration!</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span> <span class="k">as</span> <span class="n">sweeper_class</span>
+
+        <span class="c1"># need diagonal preconditioner for same concurrency as ParaDiag</span>
+        <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'MIN-SR-S'</span>
+
+    <span class="k">if</span> <span class="n">problem</span> <span class="o">==</span> <span class="s1">'advection'</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span> <span class="k">as</span> <span class="n">problem_class</span>
+
+        <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'nvars'</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="s1">'order'</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'solver_type'</span><span class="p">:</span> <span class="s1">'GMRES'</span><span class="p">,</span> <span class="s1">'lintol'</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">}</span>
+    <span class="k">elif</span> <span class="n">problem</span> <span class="o">==</span> <span class="s1">'vdp'</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">vanderpol</span> <span class="k">as</span> <span class="n">problem_class</span>
+
+        <span class="c1"># need to not raise an error when Newton has not converged because we do only one iteration</span>
+        <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'newton_maxiter'</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span> <span class="s1">'crash_at_maxiter'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">'mu'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">}</span>
+
+    <span class="n">step_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">99</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="k">return</span> <span class="n">description</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_controller_params</span><span class="p">(</span><span class="n">problem</span><span class="o">=</span><span class="s1">'advection'</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'ParaDiag'</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogGlobalErrorPostRun</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_work</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogWork</span><span class="p">,</span> <span class="n">LogSDCIterations</span>
+
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'hook_class'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">LogGlobalErrorPostRun</span><span class="p">,</span> <span class="n">LogWork</span><span class="p">,</span> <span class="n">LogSDCIterations</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'ParaDiag'</span><span class="p">:</span>
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-4</span>
+
+        <span class="c1"># For nonlinear problems, we need to communicate the average solution, which allows to compute the average</span>
+        <span class="c1"># Jacobian locally. For linear problems, we do not want the extra communication.</span>
+        <span class="k">if</span> <span class="n">problem</span> <span class="o">==</span> <span class="s1">'advection'</span><span class="p">:</span>
+            <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobian'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">problem</span> <span class="o">==</span> <span class="s1">'vdp'</span><span class="p">:</span>
+            <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobian'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># We do Block-Jacobi multi-step SDC here. It's a bit silly but it's better for comparing "speedup"</span>
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">'mssdc_jac'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">controller_params</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_problem</span><span class="p">(</span>
+    <span class="n">n_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">problem</span><span class="o">=</span><span class="s1">'advection'</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s1">'ParaDiag'</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'ParaDiag'</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">controller_ParaDiag_nonMPI</span> <span class="k">as</span> <span class="n">controller_class</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span> <span class="k">as</span> <span class="n">controller_class</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">'serial'</span><span class="p">:</span>
+        <span class="n">num_procs</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_procs</span> <span class="o">=</span> <span class="n">n_steps</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="n">get_description</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="n">get_controller_params</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_class</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)])</span>
+
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">n_steps</span> <span class="o">*</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_ParaDiag_and_PFASST</span><span class="p">(</span><span class="n">n_steps</span><span class="p">,</span> <span class="n">problem</span><span class="p">):</span>
+    <span class="n">my_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Running </span><span class="si">{</span><span class="n">problem</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span><span class="n">n_steps</span><span class="si">}</span><span class="s1"> steps'</span><span class="p">)</span>
+
+    <span class="n">uend_PD</span><span class="p">,</span> <span class="n">stats_PD</span> <span class="o">=</span> <span class="n">run_problem</span><span class="p">(</span><span class="n">n_steps</span><span class="p">,</span> <span class="n">problem</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'ParaDiag'</span><span class="p">)</span>
+    <span class="n">uend_PF</span><span class="p">,</span> <span class="n">stats_PF</span> <span class="o">=</span> <span class="n">run_problem</span><span class="p">(</span><span class="n">n_steps</span><span class="p">,</span> <span class="n">problem</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'PFASST'</span><span class="p">)</span>
+    <span class="n">uend_S</span><span class="p">,</span> <span class="n">stats_S</span> <span class="o">=</span> <span class="n">run_problem</span><span class="p">(</span><span class="n">n_steps</span><span class="p">,</span> <span class="n">problem</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'serial'</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">uend_PD</span><span class="p">,</span> <span class="n">uend_PF</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">uend_S</span><span class="p">,</span> <span class="n">uend_PD</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="nb">abs</span><span class="p">(</span><span class="n">uend_PD</span> <span class="o">-</span> <span class="n">uend_PF</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="p">)</span>  <span class="c1"># two different iterative methods should not give identical results for non-zero tolerance</span>
+
+    <span class="n">k_PD</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_PD</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'k'</span><span class="p">)</span>
+    <span class="n">k_PF</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_PF</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'k'</span><span class="p">)</span>
+
+    <span class="n">my_print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'Needed </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">k_PD</span><span class="p">)</span><span class="si">}</span><span class="s1"> ParaDiag iterations and </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">k_PF</span><span class="p">)</span><span class="si">}</span><span class="s1"> single-level PFASST iterations'</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">problem</span> <span class="o">==</span> <span class="s1">'advection'</span><span class="p">:</span>
+        <span class="n">k_GMRES_PD</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_PD</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'work_GMRES'</span><span class="p">)</span>
+        <span class="n">k_GMRES_PF</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_PF</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'work_GMRES'</span><span class="p">)</span>
+        <span class="n">k_GMRES_S</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_S</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'work_GMRES'</span><span class="p">)</span>
+        <span class="n">my_print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'Maximum GMRES iterations on each step: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">k_GMRES_PD</span><span class="p">)</span><span class="si">}</span><span class="s1"> in ParaDiag, </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">k_GMRES_PF</span><span class="p">)</span><span class="si">}</span><span class="s1"> in single-level PFASST and </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">k_GMRES_S</span><span class="p">)</span><span class="si">}</span><span class="s1"> total GMRES iterations in serial'</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">problem</span> <span class="o">==</span> <span class="s1">'vdp'</span><span class="p">:</span>
+        <span class="n">k_Jac_PD</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_PD</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'work_jacobian_solves'</span><span class="p">)</span>
+        <span class="n">k_Jac_PF</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_PF</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'work_jacobian_solves'</span><span class="p">)</span>
+        <span class="n">k_Jac_S</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats_S</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'work_jacobian_solves'</span><span class="p">)</span>
+        <span class="n">my_print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'Maximum Jacabian solves on each step: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">k_Jac_PD</span><span class="p">)</span><span class="si">}</span><span class="s1"> in ParaDiag, </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">k_Jac_PF</span><span class="p">)</span><span class="si">}</span><span class="s1"> in single-level PFASST and </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">me</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">k_Jac_S</span><span class="p">)</span><span class="si">}</span><span class="s1"> total Jacobian solves in serial'</span>
+        <span class="p">)</span>
+    <span class="n">my_print</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="n">out_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_9_C_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'n_steps'</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="c1"># compare_ParaDiag_and_PFASST(**params, problem='advection')</span>
+    <span class="n">compare_ParaDiag_and_PFASST</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">,</span> <span class="n">problem</span><span class="o">=</span><span class="s1">'vdp'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Running</span> <span class="n">advection</span> <span class="k">with</span> <span class="mi">16</span> <span class="n">steps</span>
+<span class="n">Needed</span> <span class="mi">3</span> <span class="n">ParaDiag</span> <span class="n">iterations</span> <span class="ow">and</span> <span class="mi">36</span> <span class="n">single</span><span class="o">-</span><span class="n">level</span> <span class="n">PFASST</span> <span class="n">iterations</span>
+<span class="n">Maximum</span> <span class="n">GMRES</span> <span class="n">iterations</span> <span class="n">on</span> <span class="n">each</span> <span class="n">step</span><span class="p">:</span> <span class="mi">95</span> <span class="ow">in</span> <span class="n">ParaDiag</span><span class="p">,</span> <span class="mi">889</span> <span class="ow">in</span> <span class="n">single</span><span class="o">-</span><span class="n">level</span> <span class="n">PFASST</span> <span class="ow">and</span> <span class="mi">1950</span> <span class="n">total</span> <span class="n">GMRES</span> <span class="n">iterations</span> <span class="ow">in</span> <span class="n">serial</span>
+
+<span class="n">Running</span> <span class="n">vdp</span> <span class="k">with</span> <span class="mi">16</span> <span class="n">steps</span>
+<span class="n">Needed</span> <span class="mi">10</span> <span class="n">ParaDiag</span> <span class="n">iterations</span> <span class="ow">and</span> <span class="mi">24</span> <span class="n">single</span><span class="o">-</span><span class="n">level</span> <span class="n">PFASST</span> <span class="n">iterations</span>
+<span class="n">Maximum</span> <span class="n">Jacabian</span> <span class="n">solves</span> <span class="n">on</span> <span class="n">each</span> <span class="n">step</span><span class="p">:</span> <span class="mi">30</span> <span class="ow">in</span> <span class="n">ParaDiag</span><span class="p">,</span> <span class="mi">143</span> <span class="ow">in</span> <span class="n">single</span><span class="o">-</span><span class="n">level</span> <span class="n">PFASST</span> <span class="ow">and</span> <span class="mi">233</span> <span class="n">total</span> <span class="n">Jacobian</span> <span class="n">solves</span> <span class="ow">in</span> <span class="n">serial</span>
+
+</pre></div>
+</div>
+</section>
+<section id="part-d-mpi-parallel-paradiag">
+<h2>Part D: MPI-parallel ParaDiag<a class="headerlink" href="#part-d-mpi-parallel-paradiag" title="Link to this heading">¶</a></h2>
+<p>Parts A to C all ran ParaDiag with the “virtually parallel” controller, which keeps every step in a single process.
+That is what you want while developing, but it does not actually run in parallel.
+This part uses <code class="docutils literal notranslate"><span class="pre">controller_ParaDiag_MPI</span></code> instead, with one time-step per rank and the communicator spanning the block that is diagonalized.
+Nothing about the method changes: the description and the controller parameters are the same, only the controller class differs.</p>
+<p>We always integrate the same total number of time-steps and only vary how many of them run in parallel.
+With four steps in total and a block size of one, two or four, the controller has to window through four, two or one block respectively.
+Windowing works the same way in both controllers, so we run each block size with the MPI controller <em>and</em> the virtually parallel one and compare.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li><p>All steps of a block iterate together. In PFASST an early step can converge and drop out, which is what makes it pipelined; ParaDiag cannot do that, because the transform in time needs every step. A step that stopped early would leave the others waiting.</p></li>
+<li><p>Consequently the block is always full. If the end time does not divide into whole blocks, ParaDiag solves past it rather than truncating, and says so.</p></li>
+<li><p>Neither the iteration counts nor the error depend on how the time domain is split into blocks, which is what we check here. Spreading a block over more processes must not change the method, and windowing through more blocks must not either.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">alpha</span></code> may also be a list or a callable of the iteration index, if you want to start with a well-conditioned value and tighten it later.</p></li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/D_paradiag_MPI.py">pySDC/tutorial/step_9/D_paradiag_MPI.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
+<span class="sd">This script shows how to run ParaDiag with actual MPI parallelism across the time-steps.</span>
+
+<span class="sd">Part C ran ParaDiag with the "virtually parallel" controller, which holds all steps in one process and</span>
+<span class="sd">is what you want for developing and debugging. Here we use the MPI controller instead: one time-step</span>
+<span class="sd">per rank, with the communicator spanning the block that ParaDiag diagonalizes across.</span>
+
+<span class="sd">The point of this part is that nothing about the *method* changes. The description and the controller</span>
+<span class="sd">parameters are the same ones Part C would use; only the controller class differs. So you can develop a</span>
+<span class="sd">setup serially and then run it in parallel without touching it.</span>
+
+<span class="sd">We always integrate the same total number of time-steps and only vary how many of them are done in</span>
+<span class="sd">parallel. With four steps in total and a block size of one, two or four, that means four, two or one</span>
+<span class="sd">block respectively, so the controller has to window through the time domain block by block. Windowing</span>
+<span class="sd">works the same way in both controllers, which is what we check: for every block size we run the MPI</span>
+<span class="sd">controller and the virtually parallel one and compare.</span>
+
+<span class="sd">Two properties of ParaDiag are worth keeping in mind when going parallel, because they are different</span>
+<span class="sd">from PFASST:</span>
+
+<span class="sd">- All steps of a block have to iterate together. In PFASST an early step can converge and drop out of</span>
+<span class="sd">  the iteration, which is what makes it pipelined. ParaDiag cannot do that: the transform in time</span>
+<span class="sd">  needs every step, so a step that stopped early would leave the others waiting forever.</span>
+<span class="sd">- The block is therefore always full. If the end time does not divide into whole blocks, ParaDiag</span>
+<span class="sd">  solves past it rather than truncating, and says so.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<span class="c1"># we always do this many time-steps in total, no matter how many of them run in parallel</span>
+<span class="n">num_steps_total</span> <span class="o">=</span> <span class="mi">4</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_description</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up the same advection problem as in Part C.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: the description for the ParaDiag controller</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.ParaDiagSweepers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDiagonalization</span>
+
+    <span class="n">level_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-6</span>
+
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'copy'</span>
+
+    <span class="c1"># Part C uses GMRES here to count linear solver work. We only care about the parallelism, and the</span>
+    <span class="c1"># complex shifted systems ParaDiag produces are hard for GMRES, so we solve them directly instead.</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'nvars'</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="s1">'order'</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'solver_type'</span><span class="p">:</span> <span class="s1">'direct'</span><span class="p">}</span>
+
+    <span class="n">step_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">99</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">QDiagonalization</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="k">return</span> <span class="n">description</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_controller_params</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up controller parameters for ParaDiag.</span>
+
+<span class="sd">    `alpha` may also be a list or a callable of the iteration index if you want to start with a</span>
+<span class="sd">    well-conditioned value and tighten it later. We keep it fixed here.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: the controller parameters</span>
+<span class="sd">    """</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-4</span>
+
+    <span class="c1"># the advection problem is linear, so we do not need the extra communication for average Jacobians</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobian'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">controller_params</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">format_result</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    One line of output, in the same shape for both controllers so they can be compared.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mode (str): 'MPI' or 'virtual'</span>
+<span class="sd">        block_size (int): number of time-steps done in parallel</span>
+<span class="sd">        niter (list): number of iterations of each step</span>
+<span class="sd">        error (float): error against the exact solution at the end</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: the formatted line</span>
+<span class="sd">    """</span>
+    <span class="n">num_blocks</span> <span class="o">=</span> <span class="n">num_steps_total</span> <span class="o">//</span> <span class="n">block_size</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">mode</span><span class="si">:</span><span class="s1">&gt;7s</span><span class="si">}</span><span class="s1">: block size </span><span class="si">{</span><span class="n">block_size</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">num_blocks</span><span class="si">}</span><span class="s1"> block(s) of </span><span class="si">{</span><span class="n">block_size</span><span class="si">}</span><span class="s1"> step(s), '</span>
+        <span class="sa">f</span><span class="s1">'iterations </span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s1">, error </span><span class="si">{</span><span class="n">error</span><span class="si">:</span><span class="s1">.4e</span><span class="si">}</span><span class="s1">'</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_virtual</span><span class="p">(</span><span class="n">block_size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Run the same setup with the virtually parallel controller.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        block_size (int): number of time-steps in one block</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: the end value, the iteration counts and the error</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_ParaDiag_nonMPI</span>
+
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="n">get_controller_params</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'mssdc_jac'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_ParaDiag_nonMPI</span><span class="p">(</span>
+        <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">get_description</span><span class="p">(),</span> <span class="n">num_procs</span><span class="o">=</span><span class="n">block_size</span>
+    <span class="p">)</span>
+
+    <span class="c1"># ParaDiag diagonalizes in time, so the solution becomes complex</span>
+    <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)])</span>
+
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="n">num_steps_total</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">niter</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">uend</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">cwd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    A simple test program to test the MPI-parallel ParaDiag controller</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cwd (str): current working directory</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># try to import MPI here, will fail if things go wrong (and not in the subprocess part)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">mpi4py</span>
+
+        <span class="k">del</span> <span class="n">mpi4py</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">'ParaDiag with MPI needs mpi4py'</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+<span class="w">    </span><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+    <span class="c1"># Set python path once</span>
+    <span class="n">my_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">my_env</span><span class="p">[</span><span class="s1">'PYTHONPATH'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'../../..:.'</span>
+    <span class="n">my_env</span><span class="p">[</span><span class="s1">'COVERAGE_PROCESS_START'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'pyproject.toml'</span>
+
+    <span class="c1"># one time-step per rank, so the number of ranks is the block size</span>
+    <span class="n">block_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+    <span class="c1"># set up new/empty file for output</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">'step_9_D_out.txt'</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">'/../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># run the MPI controller with different block sizes, always doing num_steps_total steps in total</span>
+    <span class="k">for</span> <span class="n">block_size</span> <span class="ow">in</span> <span class="n">block_sizes</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Running ParaDiag with block size </span><span class="si">%2i</span><span class="s1">...'</span> <span class="o">%</span> <span class="n">block_size</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'mpirun -np '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">block_size</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' python playground_ParaDiag_MPI.py ../../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%2i</span><span class="s1"> processes'</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
+            <span class="n">block_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># now do the same with the virtually parallel controller and append the results</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">'/../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span>
+    <span class="n">virtual</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">block_size</span> <span class="ow">in</span> <span class="n">block_sizes</span><span class="p">:</span>
+        <span class="n">uend</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">run_virtual</span><span class="p">(</span><span class="n">block_size</span><span class="p">)</span>
+        <span class="n">virtual</span><span class="p">[</span><span class="n">block_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">uend</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">format_result</span><span class="p">(</span><span class="s1">'virtual'</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># windowing must not change the answer: every block size integrates to the same end time</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">virtual</span><span class="p">[</span><span class="n">block_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">block_size</span> <span class="ow">in</span> <span class="n">block_sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span>
+            <span class="n">virtual</span><span class="p">[</span><span class="n">block_size</span><span class="p">],</span> <span class="n">reference</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-9</span>
+        <span class="p">),</span> <span class="s1">'ERROR: virtual ParaDiag gives different results for different block sizes'</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The script running on each rank: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/playground_ParaDiag_MPI.py">pySDC/tutorial/step_9/playground_ParaDiag_MPI.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_ParaDiag_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_ParaDiag_MPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_9.D_paradiag_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_description</span><span class="p">,</span>
+    <span class="n">get_controller_params</span><span class="p">,</span>
+    <span class="n">format_result</span><span class="p">,</span>
+    <span class="n">num_steps_total</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    A simple test program to do MPI-parallel ParaDiag runs</span>
+
+<span class="sd">    One time-step per rank, so the communicator spans the block that ParaDiag diagonalizes across. We</span>
+<span class="sd">    always integrate `num_steps_total` steps, so with fewer ranks the controller simply windows</span>
+<span class="sd">    through more blocks.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># set MPI communicator</span>
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+
+    <span class="c1"># one step per rank, so the number of ranks is the block size</span>
+    <span class="n">block_size</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="c1"># instantiate the controller</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_ParaDiag_MPI</span><span class="p">(</span>
+        <span class="n">controller_params</span><span class="o">=</span><span class="n">get_controller_params</span><span class="p">(),</span> <span class="n">description</span><span class="o">=</span><span class="n">get_description</span><span class="p">(),</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span>
+    <span class="p">)</span>
+
+    <span class="c1"># ParaDiag diagonalizes in time, so the solution becomes complex</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">P</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)])</span>
+
+    <span class="c1"># get initial values</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="n">num_steps_total</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="c1"># call main function to get things done...</span>
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+    <span class="c1"># gathering the iteration counts is collective, so every rank has to take part</span>
+    <span class="n">niter</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)]</span>
+
+    <span class="c1"># only the last rank has the end point of the block, so only it writes the output</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">'step_9_D_out.txt'</span>
+        <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">format_result</span><span class="p">(</span><span class="s1">'MPI'</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">MPI</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">1</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+    <span class="n">MPI</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">2</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+    <span class="n">MPI</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">4</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">1</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">2</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">4</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+</pre></div>
+</div>
+</section>
+<section id="part-e-adaptive-alpha">
+<h2>Part E: Adaptive alpha<a class="headerlink" href="#part-e-adaptive-alpha" title="Link to this heading">¶</a></h2>
+<p>Every part so far picked <span class="math notranslate nohighlight">\(\alpha\)</span> by hand and kept it fixed, which means committing to one compromise for the whole run.
+A small <span class="math notranslate nohighlight">\(\alpha\)</span> approximates the original problem better and converges in fewer iterations, but conditions the diagonalization worse, so round-off and inexact inner solves get amplified.
+The right balance shifts as the residual falls, so a fixed value is wrong at one end of the run or the other.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">AdaptiveAlpha</span></code> convergence controller updates <span class="math notranslate nohighlight">\(\alpha\)</span> after every iteration instead, following <a class="reference external" href="https://doi.org/10.2140/camcos.2023.18.55">Čaklović et al.</a>:</p>
+<div class="math notranslate nohighlight">
+\[\gamma = L (3 \epsilon + \tau), \quad
+\alpha_{k} = \sqrt{\frac{\gamma r_k}{e_k}}, \quad
+e_{k+1} = 2 \sqrt{\gamma e_k r_k},\]</div>
+<p>with <span class="math notranslate nohighlight">\(L\)</span> the number of steps in the block, <span class="math notranslate nohighlight">\(\epsilon\)</span> machine precision, <span class="math notranslate nohighlight">\(\tau\)</span> the inner solver tolerance, <span class="math notranslate nohighlight">\(r_k\)</span> the residual and <span class="math notranslate nohighlight">\(e_k\)</span> a running bound on the error.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\gamma\)</span> is an accuracy floor. There is no point pushing <span class="math notranslate nohighlight">\(\alpha\)</span> below the level at which round-off and the inner solver dominate anyway, which is why <code class="docutils literal notranslate"><span class="pre">inner_tol</span></code> enters: a looser inner solve should get a larger <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
+<li><p>The interesting result is not that the adaptive strategy wins on iteration count. It ties with the best fixed value we tried, but it gets there without being told, and it keeps <span class="math notranslate nohighlight">\(\alpha\)</span> orders of magnitude larger while doing so, which is exactly the margin that protects you once the inner solves are inexact.</p></li>
+<li><p>The residual is taken over the whole block, so every rank computes the same <span class="math notranslate nohighlight">\(\alpha\)</span> and the controllers stay in step.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha\)</span> is a property of the method, not of the parallelization. The adaptive controller therefore has to produce the same iteration counts whether ParaDiag runs virtually or across MPI ranks, which is what we check here.</p></li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/E_adaptive_alpha.py">pySDC/tutorial/step_9/E_adaptive_alpha.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
+<span class="sd">This script shows how to let ParaDiag choose its alpha by itself.</span>
+
+<span class="sd">ParaDiag replaces the time-stepping matrix by an alpha-circulant approximation. Alpha trades two error</span>
+<span class="sd">sources against each other: a small value approximates the original problem better and converges in</span>
+<span class="sd">fewer iterations, but conditions the diagonalization worse, so round-off and inexact inner solves get</span>
+<span class="sd">amplified. A single fixed alpha therefore has to be a compromise for the whole run, even though the</span>
+<span class="sd">right balance shifts as the residual falls.</span>
+
+<span class="sd">The `AdaptiveAlpha` convergence controller updates alpha after every iteration instead, following</span>
+<span class="sd">`Caklovic et al. &lt;https://doi.org/10.2140/camcos.2023.18.55&gt;`_:</span>
+
+<span class="sd">    gamma     = L * (3 * eps + tau)</span>
+<span class="sd">    alpha_k   = sqrt(gamma * r_k / e_k)</span>
+<span class="sd">    e_{k+1}   = 2 * sqrt(gamma * e_k * r_k)</span>
+
+<span class="sd">with L the block size, eps machine precision, tau the inner solver tolerance, r_k the residual and</span>
+<span class="sd">e_k a running bound on the error. Gamma is an accuracy floor: there is no point pushing alpha below</span>
+<span class="sd">the level at which round-off and the inner solver dominate anyway.</span>
+
+<span class="sd">We compare a few fixed alphas against the adaptive one on the same advection problem used in part D.</span>
+<span class="sd">The interesting result is not that adaptive wins on iteration count -- it ties with the best fixed</span>
+<span class="sd">value -- but that it gets there without being told, and while keeping alpha orders of magnitude</span>
+<span class="sd">larger, which is exactly the margin that protects you once the inner solves are inexact.</span>
+
+<span class="sd">Since alpha is a property of the method and not of the parallelization, the adaptive controller has to</span>
+<span class="sd">give the same answer whether ParaDiag runs virtually or across MPI ranks. We check that too.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_9.D_paradiag_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_description</span><span class="p">,</span> <span class="n">num_steps_total</span>
+
+<span class="c1"># the fixed values we compare against, plus the adaptive strategy</span>
+<span class="n">alpha_settings</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-2</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="s1">'adaptive'</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_controller_params</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Controller parameters for one alpha setting.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        alpha: a number, or the string 'adaptive'</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: the controller parameters and the extra description entries</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.adaptive_alpha</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptiveAlpha</span>
+
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobian'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">extra_description</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">alpha</span> <span class="o">==</span> <span class="s1">'adaptive'</span><span class="p">:</span>
+        <span class="c1"># the adaptive controller overwrites this from the first iteration onwards, but ParaDiag needs</span>
+        <span class="c1"># some alpha to build its first transform with</span>
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-4</span>
+        <span class="n">extra_description</span><span class="p">[</span><span class="s1">'convergence_controllers'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">AdaptiveAlpha</span><span class="p">:</span> <span class="p">{}}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha</span>
+
+    <span class="k">return</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">extra_description</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">format_result</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">final_alpha</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    One line of output, in the same shape for both controllers so they can be compared.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mode (str): 'MPI' or 'virtual'</span>
+<span class="sd">        alpha: the alpha setting used</span>
+<span class="sd">        niter (int): number of iterations needed</span>
+<span class="sd">        error (float): error against the exact solution</span>
+<span class="sd">        final_alpha (float): the alpha in use when the run finished</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: the formatted line</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">mode</span><span class="si">:</span><span class="s1">&gt;7s</span><span class="si">}</span><span class="s1">: alpha </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span><span class="si">:</span><span class="s1">&gt;9s</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">niter</span><span class="si">:</span><span class="s1">2d</span><span class="si">}</span><span class="s1"> iterations, '</span>
+        <span class="sa">f</span><span class="s1">'error </span><span class="si">{</span><span class="n">error</span><span class="si">:</span><span class="s1">.4e</span><span class="si">}</span><span class="s1">, final alpha </span><span class="si">{</span><span class="n">final_alpha</span><span class="si">:</span><span class="s1">.3e</span><span class="si">}</span><span class="s1">'</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Run the advection problem from part D with one alpha setting.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        alpha: a number, or the string 'adaptive'</span>
+<span class="sd">        block_size (int): number of time-steps in one block</span>
+<span class="sd">        comm: MPI communicator, or None for the virtually parallel controller</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: the end value, the iteration count, the error and the final alpha</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+
+    <span class="n">controller_params</span><span class="p">,</span> <span class="n">extra_description</span> <span class="o">=</span> <span class="n">get_controller_params</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">get_description</span><span class="p">(),</span> <span class="o">**</span><span class="n">extra_description</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_ParaDiag_nonMPI</span>
+
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">'mssdc_jac'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_ParaDiag_nonMPI</span><span class="p">(</span>
+            <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">num_procs</span><span class="o">=</span><span class="n">block_size</span>
+        <span class="p">)</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_ParaDiag_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_ParaDiag_MPI</span>
+
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_ParaDiag_MPI</span><span class="p">(</span><span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="p">]</span>
+
+    <span class="c1"># ParaDiag diagonalizes in time, so the solution becomes complex</span>
+    <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)])</span>
+
+    <span class="n">P</span> <span class="o">=</span> <span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="n">num_steps_total</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">niter</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">uend</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)),</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">cwd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compare fixed and adaptive alpha, with both controllers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cwd (str): current working directory</span>
+<span class="sd">    """</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">mpi4py</span>
+
+        <span class="k">del</span> <span class="n">mpi4py</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">'ParaDiag with MPI needs mpi4py'</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+<span class="w">    </span><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+    <span class="n">my_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">my_env</span><span class="p">[</span><span class="s1">'PYTHONPATH'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'../../..:.'</span>
+    <span class="n">my_env</span><span class="p">[</span><span class="s1">'COVERAGE_PROCESS_START'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'pyproject.toml'</span>
+
+    <span class="n">block_size</span> <span class="o">=</span> <span class="n">num_steps_total</span>
+
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">'step_9_E_out.txt'</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">'/../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># the MPI controller, one rank per time-step, all alpha settings in one run</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Running ParaDiag with </span><span class="si">%2i</span><span class="s1"> ranks...'</span> <span class="o">%</span> <span class="n">block_size</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'mpirun -np '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">block_size</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' python playground_adaptive_alpha.py ../../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span>
+
+    <span class="c1"># and the same with the virtually parallel controller</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">'/../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alpha_settings</span><span class="p">:</span>
+        <span class="n">uend</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">final_alpha</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">alpha</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">uend</span><span class="p">,</span> <span class="n">niter</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">format_result</span><span class="p">(</span><span class="s1">'virtual'</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">final_alpha</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># the adaptive strategy should need no more iterations than the best fixed alpha we tried</span>
+    <span class="n">best_fixed</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alpha_settings</span> <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="s1">'adaptive'</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">'adaptive'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">best_fixed</span>
+    <span class="p">),</span> <span class="s1">'ERROR: adaptive alpha needed </span><span class="si">%s</span><span class="s1"> iterations, the best fixed alpha only </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">'adaptive'</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">best_fixed</span><span class="p">)</span>
+
+    <span class="c1"># alpha changes the iteration, not the problem, so all settings solve the same thing</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">alpha_settings</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alpha_settings</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">alpha</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reference</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s1">'ERROR: alpha </span><span class="si">%s</span><span class="s1"> gives a different solution'</span> <span class="o">%</span> <span class="n">alpha</span>
+        <span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The script running on each rank: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/playground_adaptive_alpha.py">pySDC/tutorial/step_9/playground_adaptive_alpha.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_9.E_adaptive_alpha</span><span class="w"> </span><span class="kn">import</span> <span class="n">alpha_settings</span><span class="p">,</span> <span class="n">format_result</span><span class="p">,</span> <span class="n">run</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compare fixed and adaptive alpha with the MPI-parallel ParaDiag controller.</span>
+
+<span class="sd">    One time-step per rank, so the communicator spans the block ParaDiag diagonalizes across. Alpha is</span>
+<span class="sd">    a property of the method rather than of the parallelization, so these numbers have to match the</span>
+<span class="sd">    ones the virtually parallel controller produces.</span>
+<span class="sd">    """</span>
+
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alpha_settings</span><span class="p">:</span>
+        <span class="n">uend</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">final_alpha</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_result</span><span class="p">(</span><span class="s1">'MPI'</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">final_alpha</span><span class="p">))</span>
+
+    <span class="c1"># only the last rank has the end point of the block, so only it writes the output</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">'step_9_E_out.txt'</span>
+        <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">MPI</span><span class="p">:</span> <span class="n">alpha</span>      <span class="mf">0.01</span> <span class="o">-&gt;</span>  <span class="mi">5</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">error</span> <span class="mf">3.3560e-05</span><span class="p">,</span> <span class="n">final</span> <span class="n">alpha</span> <span class="mf">1.000e-02</span>
+    <span class="n">MPI</span><span class="p">:</span> <span class="n">alpha</span>    <span class="mf">0.0001</span> <span class="o">-&gt;</span>  <span class="mi">3</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">error</span> <span class="mf">3.3560e-05</span><span class="p">,</span> <span class="n">final</span> <span class="n">alpha</span> <span class="mf">1.000e-04</span>
+    <span class="n">MPI</span><span class="p">:</span> <span class="n">alpha</span>     <span class="mf">1e-08</span> <span class="o">-&gt;</span>  <span class="mi">2</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">error</span> <span class="mf">3.3560e-05</span><span class="p">,</span> <span class="n">final</span> <span class="n">alpha</span> <span class="mf">1.000e-08</span>
+    <span class="n">MPI</span><span class="p">:</span> <span class="n">alpha</span>  <span class="n">adaptive</span> <span class="o">-&gt;</span>  <span class="mi">2</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">error</span> <span class="mf">3.3560e-05</span><span class="p">,</span> <span class="n">final</span> <span class="n">alpha</span> <span class="mf">2.976e-06</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">alpha</span>      <span class="mf">0.01</span> <span class="o">-&gt;</span>  <span class="mi">5</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">error</span> <span class="mf">3.3560e-05</span><span class="p">,</span> <span class="n">final</span> <span class="n">alpha</span> <span class="mf">1.000e-02</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">alpha</span>    <span class="mf">0.0001</span> <span class="o">-&gt;</span>  <span class="mi">3</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">error</span> <span class="mf">3.3560e-05</span><span class="p">,</span> <span class="n">final</span> <span class="n">alpha</span> <span class="mf">1.000e-04</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">alpha</span>     <span class="mf">1e-08</span> <span class="o">-&gt;</span>  <span class="mi">2</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">error</span> <span class="mf">3.3560e-05</span><span class="p">,</span> <span class="n">final</span> <span class="n">alpha</span> <span class="mf">1.000e-08</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">alpha</span>  <span class="n">adaptive</span> <span class="o">-&gt;</span>  <span class="mi">2</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">error</span> <span class="mf">3.3560e-05</span><span class="p">,</span> <span class="n">final</span> <span class="n">alpha</span> <span class="mf">2.976e-06</span>
+</pre></div>
+</div>
+</section>
+</section>
+
 
             <div class="clearer"></div>
           </div>
@@ -52,6 +1342,20 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Step-9: ParaDiag</a><ul>
+<li><a class="reference internal" href="#part-a-paradiag-for-linear-problems">Part A: ParaDiag for linear problems</a></li>
+<li><a class="reference internal" href="#part-b-paradiag-for-nonlinear-problems">Part B: ParaDiag for nonlinear problems</a></li>
+<li><a class="reference internal" href="#part-c-paradiag-in-pysdc">Part C: ParaDiag in pySDC</a></li>
+<li><a class="reference internal" href="#part-d-mpi-parallel-paradiag">Part D: MPI-parallel ParaDiag</a></li>
+<li><a class="reference internal" href="#part-e-adaptive-alpha">Part E: Adaptive alpha</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="step_8.html"
@@ -99,7 +1403,7 @@
           <a href="step_8.html" title="Step-8: Advanced topics"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Step-9: ParaDiag</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

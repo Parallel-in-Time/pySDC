@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="implementations.convergence_controller_classes.adaptivity module" href="implementations.convergence_controller_classes.adaptivity.html" />
-    <link rel="prev" title="implementations.convergence_controller_classes package" href="implementations.convergence_controller_classes.html" /> 
+    <link rel="prev" title="implementations.convergence_controller_classes.adaptive_alpha module" href="implementations.convergence_controller_classes.adaptive_alpha.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -32,7 +32,7 @@
           <a href="implementations.convergence_controller_classes.adaptivity.html" title="implementations.convergence_controller_classes.adaptivity module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="implementations.convergence_controller_classes.html" title="implementations.convergence_controller_classes package"
+          <a href="implementations.convergence_controller_classes.adaptive_alpha.html" title="implementations.convergence_controller_classes.adaptive_alpha module"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
@@ -201,6 +201,9 @@ on any specific rank.</p>
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.setup_status_variables">
 <span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptive_collocation.html#AdaptiveCollocation.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptive_collocation.AdaptiveCollocation.setup_status_variables" title="Link to this definition">¶</a></dt>
 <dd><p>Add an index for which collocation method to use.</p>
+<p>This lives on the step rather than on this object: every step walks through the collocation
+methods on its own, and there is one instance of this class per controller, which is a whole
+block of steps when running with more than one process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller.controller</em>) – The controller</p>
@@ -258,8 +261,8 @@ on any specific rank.</p>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.convergence_controller_classes.html"
-                          title="previous chapter">implementations.convergence_controller_classes package</a></p>
+    <p class="topless"><a href="implementations.convergence_controller_classes.adaptive_alpha.html"
+                          title="previous chapter">implementations.convergence_controller_classes.adaptive_alpha module</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -300,7 +303,7 @@ on any specific rank.</p>
           <a href="implementations.convergence_controller_classes.adaptivity.html" title="implementations.convergence_controller_classes.adaptivity module"
              >next</a> |</li>
         <li class="right" >
-          <a href="implementations.convergence_controller_classes.html" title="implementations.convergence_controller_classes package"
+          <a href="implementations.convergence_controller_classes.adaptive_alpha.html" title="implementations.convergence_controller_classes.adaptive_alpha module"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>

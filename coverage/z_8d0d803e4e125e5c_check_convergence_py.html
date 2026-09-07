@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/core/check_convergence.py: 84%</title>
+    <title>Coverage for pySDC/core/check_convergence.py: 96%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_dd2e7eb5.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>core<span class="sep">/</span>check_convergence.py</b>:
-            <span class="pc_cov">84%</span>
+            <span class="pc_cov">96%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">57 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">48<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">9<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">55<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">2<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">1<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_8d0d803e4e125e5c_collocation_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-07 04:33 +0000
+            created at 2026-09-07 06:55 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -207,14 +207,14 @@
     <p class="pln"><span class="n"><a id="t125" href="#t125">125</a></span><span class="t"><span class="str">        &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t126" href="#t126">126</a></span><span class="t">        <span class="com"># Either gather information about all status or send forward own</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t127" href="#t127">127</a></span><span class="t">        <span class="key">if</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">all_to_done</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">            <span class="key">for</span> <span class="nam">hook</span> <span class="key">in</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">hooks</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">                <span class="nam">hook</span><span class="op">.</span><span class="nam">pre_comm</span><span class="op">(</span><span class="nam">step</span><span class="op">=</span><span class="nam">S</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">=</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">            <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="op">=</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">allreduce</span><span class="op">(</span><span class="nam">sendobj</span><span class="op">=</span><span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span><span class="op">,</span> <span class="nam">op</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">MPI_LAND</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">            <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span> <span class="op">=</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">allreduce</span><span class="op">(</span><span class="nam">sendobj</span><span class="op">=</span><span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span><span class="op">,</span> <span class="nam">op</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">MPI_LOR</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">            <span class="key">for</span> <span class="nam">hook</span> <span class="key">in</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">hooks</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t133" href="#t133">133</a></span><span class="t">                <span class="nam">hook</span><span class="op">.</span><span class="nam">post_comm</span><span class="op">(</span><span class="nam">step</span><span class="op">=</span><span class="nam">S</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">=</span><span class="num">0</span><span class="op">,</span> <span class="nam">add_to_stats</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">            <span class="key">for</span> <span class="nam">hook</span> <span class="key">in</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">hooks</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">                <span class="nam">hook</span><span class="op">.</span><span class="nam">pre_comm</span><span class="op">(</span><span class="nam">step</span><span class="op">=</span><span class="nam">S</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">=</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">            <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="op">=</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">allreduce</span><span class="op">(</span><span class="nam">sendobj</span><span class="op">=</span><span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span><span class="op">,</span> <span class="nam">op</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">MPI_LAND</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">            <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span> <span class="op">=</span> <span class="nam">comm</span><span class="op">.</span><span class="nam">allreduce</span><span class="op">(</span><span class="nam">sendobj</span><span class="op">=</span><span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span><span class="op">,</span> <span class="nam">op</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">MPI_LOR</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">            <span class="key">for</span> <span class="nam">hook</span> <span class="key">in</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">hooks</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t133" href="#t133">133</a></span><span class="t">                <span class="nam">hook</span><span class="op">.</span><span class="nam">post_comm</span><span class="op">(</span><span class="nam">step</span><span class="op">=</span><span class="nam">S</span><span class="op">,</span> <span class="nam">level_number</span><span class="op">=</span><span class="num">0</span><span class="op">,</span> <span class="nam">add_to_stats</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">            <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="op">=</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="key">or</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">            <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="op">=</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">done</span> <span class="key">or</span> <span class="nam">S</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">force_done</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">            <span class="key">for</span> <span class="nam">hook</span> <span class="key">in</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">hooks</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -249,7 +249,7 @@
             <a class="nav" href="z_8d0d803e4e125e5c_collocation_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-07 04:33 +0000
+            created at 2026-09-07 06:55 +0000
         </p>
     </div>
 </footer>

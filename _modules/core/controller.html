@@ -538,35 +538,95 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">n_steps</span>
 
+<div class="viewcode-block" id="ParaDiagController.get_alpha">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.ParaDiagController.get_alpha">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_alpha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the ParaDiag alpha parameter for iteration `k`.</span>
+
+<span class="sd">        `alpha` may be a single number, a sequence indexed by iteration (the last entry is reused once</span>
+<span class="sd">        it runs out), or a callable taking the iteration index. Making it iteration dependent lets the</span>
+<span class="sd">        outer iteration start with a well-conditioned alpha and tighten it later.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k (int): iteration index</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: alpha to use for this iteration</span>
+<span class="sd">        """</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="s1">'__len__'</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParaDiagController.get_FFT_matrices">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.ParaDiagController.get_FFT_matrices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_FFT_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the weighted FFT and iFFT matrices for iteration `k`, rebuilding them only when alpha</span>
+<span class="sd">        actually changes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k (int): iteration index</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: the forward and backward weighted FFT matrices</span>
+<span class="sd">        """</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_alpha</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'_cached_alpha'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">alpha</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ParaDiagHelper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_weighted_FFT_matrix</span><span class="p">,</span> <span class="n">get_weighted_iFFT_matrix</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_FFT_matrix</span> <span class="o">=</span> <span class="n">get_weighted_FFT_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iFFT_matrix</span> <span class="o">=</span> <span class="n">get_weighted_iFFT_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cached_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_FFT_matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iFFT_matrix</span></div>
+
+
+<div class="viewcode-block" id="ParaDiagController.update_G_inv">
+<a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.ParaDiagController.update_G_inv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_G_inv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Rebuild G^-1 on the local step(s) when alpha changes with the iteration.</span>
+
+<span class="sd">        G^-1 depends on alpha, so an iteration dependent alpha means the sweeper's diagonalization has</span>
+<span class="sd">        to be recomputed. Subclasses implement this because only they know which steps they own.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k (int): iteration index</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ParaDiag controllers have to implement update_G_inv'</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="ParaDiagController.FFT_in_time">
 <a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.ParaDiagController.FFT_in_time">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">FFT_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">FFT_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</span>
 
 <span class="sd">        Note: The implementation via matrix-vector multiplication may be inefficient and less stable compared to an FFT</span>
 <span class="sd">              with transposes!</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (str): the level attribute to transform</span>
+<span class="sd">            k (int): iteration index, for an iteration dependent alpha</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'__FFT_matrix'</span><span class="p">):</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ParaDiagHelper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_weighted_FFT_matrix</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">__FFT_matrix</span> <span class="o">=</span> <span class="n">get_weighted_FFT_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__FFT_matrix</span><span class="p">,</span> <span class="n">quantity</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_FFT_matrices</span><span class="p">(</span><span class="n">k</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">quantity</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ParaDiagController.iFFT_in_time">
 <a class="viewcode-back" href="../../pySDC/core.controller.html#core.controller.ParaDiagController.iFFT_in_time">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">iFFT_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iFFT_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (str): the level attribute to transform</span>
+<span class="sd">            k (int): iteration index, for an iteration dependent alpha</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'__iFFT_matrix'</span><span class="p">):</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ParaDiagHelper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_weighted_iFFT_matrix</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">__iFFT_matrix</span> <span class="o">=</span> <span class="n">get_weighted_iFFT_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__iFFT_matrix</span><span class="p">,</span> <span class="n">quantity</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_FFT_matrices</span><span class="p">(</span><span class="n">k</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="n">quantity</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

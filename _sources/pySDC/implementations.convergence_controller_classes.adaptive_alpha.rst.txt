@@ -1,0 +1,7 @@
+implementations.convergence\_controller\_classes.adaptive\_alpha module
+=======================================================================
+
+.. automodule:: implementations.convergence_controller_classes.adaptive_alpha
+   :members:
+   :show-inheritance:
+   :undoc-members:

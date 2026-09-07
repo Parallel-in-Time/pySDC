@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>&lt;no title&gt; &#8212; pySDC 5.7 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=25098c49"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/D_paradiag_MPI.py">pySDC/tutorial/step_9/D_paradiag_MPI.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
+<span class="sd">This script shows how to run ParaDiag with actual MPI parallelism across the time-steps.</span>
+
+<span class="sd">Part C ran ParaDiag with the "virtually parallel" controller, which holds all steps in one process and</span>
+<span class="sd">is what you want for developing and debugging. Here we use the MPI controller instead: one time-step</span>
+<span class="sd">per rank, with the communicator spanning the block that ParaDiag diagonalizes across.</span>
+
+<span class="sd">The point of this part is that nothing about the *method* changes. The description and the controller</span>
+<span class="sd">parameters are the same ones Part C would use; only the controller class differs. So you can develop a</span>
+<span class="sd">setup serially and then run it in parallel without touching it.</span>
+
+<span class="sd">We always integrate the same total number of time-steps and only vary how many of them are done in</span>
+<span class="sd">parallel. With four steps in total and a block size of one, two or four, that means four, two or one</span>
+<span class="sd">block respectively, so the controller has to window through the time domain block by block. Windowing</span>
+<span class="sd">works the same way in both controllers, which is what we check: for every block size we run the MPI</span>
+<span class="sd">controller and the virtually parallel one and compare.</span>
+
+<span class="sd">Two properties of ParaDiag are worth keeping in mind when going parallel, because they are different</span>
+<span class="sd">from PFASST:</span>
+
+<span class="sd">- All steps of a block have to iterate together. In PFASST an early step can converge and drop out of</span>
+<span class="sd">  the iteration, which is what makes it pipelined. ParaDiag cannot do that: the transform in time</span>
+<span class="sd">  needs every step, so a step that stopped early would leave the others waiting forever.</span>
+<span class="sd">- The block is therefore always full. If the end time does not divide into whole blocks, ParaDiag</span>
+<span class="sd">  solves past it rather than truncating, and says so.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<span class="c1"># we always do this many time-steps in total, no matter how many of them run in parallel</span>
+<span class="n">num_steps_total</span> <span class="o">=</span> <span class="mi">4</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_description</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up the same advection problem as in Part C.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: the description for the ParaDiag controller</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">advectionNd</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.ParaDiagSweepers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDiagonalization</span>
+
+    <span class="n">level_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">'restol'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-6</span>
+
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'copy'</span>
+
+    <span class="c1"># Part C uses GMRES here to count linear solver work. We only care about the parallelism, and the</span>
+    <span class="c1"># complex shifted systems ParaDiag produces are hard for GMRES, so we solve them directly instead.</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'nvars'</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span> <span class="s1">'order'</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'solver_type'</span><span class="p">:</span> <span class="s1">'direct'</span><span class="p">}</span>
+
+    <span class="n">step_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">'maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">99</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">QDiagonalization</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'level_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">'step_params'</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="k">return</span> <span class="n">description</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_controller_params</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up controller parameters for ParaDiag.</span>
+
+<span class="sd">    `alpha` may also be a list or a callable of the iteration index if you want to start with a</span>
+<span class="sd">    well-conditioned value and tighten it later. We keep it fixed here.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: the controller parameters</span>
+<span class="sd">    """</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'logger_level'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-4</span>
+
+    <span class="c1"># the advection problem is linear, so we do not need the extra communication for average Jacobians</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobian'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">controller_params</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">format_result</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    One line of output, in the same shape for both controllers so they can be compared.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mode (str): 'MPI' or 'virtual'</span>
+<span class="sd">        block_size (int): number of time-steps done in parallel</span>
+<span class="sd">        niter (list): number of iterations of each step</span>
+<span class="sd">        error (float): error against the exact solution at the end</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: the formatted line</span>
+<span class="sd">    """</span>
+    <span class="n">num_blocks</span> <span class="o">=</span> <span class="n">num_steps_total</span> <span class="o">//</span> <span class="n">block_size</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">mode</span><span class="si">:</span><span class="s1">&gt;7s</span><span class="si">}</span><span class="s1">: block size </span><span class="si">{</span><span class="n">block_size</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">num_blocks</span><span class="si">}</span><span class="s1"> block(s) of </span><span class="si">{</span><span class="n">block_size</span><span class="si">}</span><span class="s1"> step(s), '</span>
+        <span class="sa">f</span><span class="s1">'iterations </span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s1">, error </span><span class="si">{</span><span class="n">error</span><span class="si">:</span><span class="s1">.4e</span><span class="si">}</span><span class="s1">'</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_virtual</span><span class="p">(</span><span class="n">block_size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Run the same setup with the virtually parallel controller.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        block_size (int): number of time-steps in one block</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: the end value, the iteration counts and the error</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_ParaDiag_nonMPI</span>
+
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="n">get_controller_params</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">'mssdc_jac'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_ParaDiag_nonMPI</span><span class="p">(</span>
+        <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">get_description</span><span class="p">(),</span> <span class="n">num_procs</span><span class="o">=</span><span class="n">block_size</span>
+    <span class="p">)</span>
+
+    <span class="c1"># ParaDiag diagonalizes in time, so the solution becomes complex</span>
+    <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)])</span>
+
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="n">num_steps_total</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">niter</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">uend</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">cwd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    A simple test program to test the MPI-parallel ParaDiag controller</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cwd (str): current working directory</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># try to import MPI here, will fail if things go wrong (and not in the subprocess part)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">mpi4py</span>
+
+        <span class="k">del</span> <span class="n">mpi4py</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">'ParaDiag with MPI needs mpi4py'</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+<span class="w">    </span><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+    <span class="c1"># Set python path once</span>
+    <span class="n">my_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">my_env</span><span class="p">[</span><span class="s1">'PYTHONPATH'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'../../..:.'</span>
+    <span class="n">my_env</span><span class="p">[</span><span class="s1">'COVERAGE_PROCESS_START'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'pyproject.toml'</span>
+
+    <span class="c1"># one time-step per rank, so the number of ranks is the block size</span>
+    <span class="n">block_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+    <span class="c1"># set up new/empty file for output</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">'step_9_D_out.txt'</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">'/../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># run the MPI controller with different block sizes, always doing num_steps_total steps in total</span>
+    <span class="k">for</span> <span class="n">block_size</span> <span class="ow">in</span> <span class="n">block_sizes</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Running ParaDiag with block size </span><span class="si">%2i</span><span class="s1">...'</span> <span class="o">%</span> <span class="n">block_size</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'mpirun -np '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">block_size</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' python playground_ParaDiag_MPI.py ../../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%2i</span><span class="s1"> processes'</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
+            <span class="n">block_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># now do the same with the virtually parallel controller and append the results</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">'/../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span>
+    <span class="n">virtual</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">block_size</span> <span class="ow">in</span> <span class="n">block_sizes</span><span class="p">:</span>
+        <span class="n">uend</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">run_virtual</span><span class="p">(</span><span class="n">block_size</span><span class="p">)</span>
+        <span class="n">virtual</span><span class="p">[</span><span class="n">block_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">uend</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">format_result</span><span class="p">(</span><span class="s1">'virtual'</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># windowing must not change the answer: every block size integrates to the same end time</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">virtual</span><span class="p">[</span><span class="n">block_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">block_size</span> <span class="ow">in</span> <span class="n">block_sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span>
+            <span class="n">virtual</span><span class="p">[</span><span class="n">block_size</span><span class="p">],</span> <span class="n">reference</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-9</span>
+        <span class="p">),</span> <span class="s1">'ERROR: virtual ParaDiag gives different results for different block sizes'</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The script running on each rank: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/playground_ParaDiag_MPI.py">pySDC/tutorial/step_9/playground_ParaDiag_MPI.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_ParaDiag_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_ParaDiag_MPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_9.D_paradiag_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_description</span><span class="p">,</span>
+    <span class="n">get_controller_params</span><span class="p">,</span>
+    <span class="n">format_result</span><span class="p">,</span>
+    <span class="n">num_steps_total</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    A simple test program to do MPI-parallel ParaDiag runs</span>
+
+<span class="sd">    One time-step per rank, so the communicator spans the block that ParaDiag diagonalizes across. We</span>
+<span class="sd">    always integrate `num_steps_total` steps, so with fewer ranks the controller simply windows</span>
+<span class="sd">    through more blocks.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># set MPI communicator</span>
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+
+    <span class="c1"># one step per rank, so the number of ranks is the block size</span>
+    <span class="n">block_size</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="c1"># instantiate the controller</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_ParaDiag_MPI</span><span class="p">(</span>
+        <span class="n">controller_params</span><span class="o">=</span><span class="n">get_controller_params</span><span class="p">(),</span> <span class="n">description</span><span class="o">=</span><span class="n">get_description</span><span class="p">(),</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span>
+    <span class="p">)</span>
+
+    <span class="c1"># ParaDiag diagonalizes in time, so the solution becomes complex</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">P</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="o">*</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'complex128'</span><span class="p">)])</span>
+
+    <span class="c1"># get initial values</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="n">num_steps_total</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="c1"># call main function to get things done...</span>
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+    <span class="c1"># gathering the iteration counts is collective, so every rank has to take part</span>
+    <span class="n">niter</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)]</span>
+
+    <span class="c1"># only the last rank has the end point of the block, so only it writes the output</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">'step_9_D_out.txt'</span>
+        <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">format_result</span><span class="p">(</span><span class="s1">'MPI'</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">MPI</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">1</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+    <span class="n">MPI</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">2</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+    <span class="n">MPI</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">4</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">1</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">2</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+<span class="n">virtual</span><span class="p">:</span> <span class="n">block</span> <span class="n">size</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="n">block</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">of</span> <span class="mi">4</span> <span class="n">step</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">iterations</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">error</span> <span class="mf">3.3560e-05</span>
+</pre></div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/doc_step_9_D.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
