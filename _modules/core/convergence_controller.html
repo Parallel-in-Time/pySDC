@@ -382,6 +382,38 @@
         <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="ConvergenceController.post_iteration_processing_block">
+<a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.post_iteration_processing_block">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="s1">'Controller'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Do whatever you want to after each iteration, once for the whole block rather than once per step.</span>
+
+<span class="sd">        Use this instead of `post_iteration_processing` for state that belongs to the block rather than</span>
+<span class="sd">        to a step. A convergence controller is instantiated once per *controller*, so anything stored on</span>
+<span class="sd">        `self` spans a whole block in `controller_nonMPI` but a single rank under MPI, while the per-step</span>
+<span class="sd">        hooks fire once per step. A recursion driven from a per-step hook therefore advances a different</span>
+<span class="sd">        number of times depending only on how the run was decomposed. State that genuinely belongs to a</span>
+<span class="sd">        step should go on `S.status` via `add_status_variable_to_step` instead.</span>
+
+<span class="sd">        Note this fires once per iteration **per rank**, not once per block: under MPI every rank calls</span>
+<span class="sd">        it, so a quantity that has to agree across the block still needs a reduction in here. See</span>
+<span class="sd">        `AdaptiveAlpha` for how that looks.</span>
+
+<span class="sd">        Note also what that does *not* buy you. Under a pipelined method an early step converges and</span>
+<span class="sd">        drops out, so ranks take part in different numbers of iterations by design; a recursion driven</span>
+<span class="sd">        from here therefore still advances a different number of times on different ranks, and that is</span>
+<span class="sd">        the pipelining rather than a defect. Where every step iterates together -- ParaDiag, which</span>
+<span class="sd">        cannot converge one step at a time because the transform needs them all -- this is exact.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="k">pass</span></div>
+
+
 <div class="viewcode-block" id="ConvergenceController.post_step_processing">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.post_step_processing">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="s1">'Controller'</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="s1">'Step'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

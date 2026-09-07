@@ -261,6 +261,34 @@ This variable is an integer and you can see what the current order is by using
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.post_iteration_processing_block">
+<span class="sig-name descname"><span class="pre">post_iteration_processing_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.controller.html#core.controller.Controller" title="core.controller.Controller"><span class="pre">Controller</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.post_iteration_processing_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.post_iteration_processing_block" title="Link to this definition">¶</a></dt>
+<dd><p>Do whatever you want to after each iteration, once for the whole block rather than once per step.</p>
+<p>Use this instead of <cite>post_iteration_processing</cite> for state that belongs to the block rather than
+to a step. A convergence controller is instantiated once per <em>controller</em>, so anything stored on
+<cite>self</cite> spans a whole block in <cite>controller_nonMPI</cite> but a single rank under MPI, while the per-step
+hooks fire once per step. A recursion driven from a per-step hook therefore advances a different
+number of times depending only on how the run was decomposed. State that genuinely belongs to a
+step should go on <cite>S.status</cite> via <cite>add_status_variable_to_step</cite> instead.</p>
+<p>Note this fires once per iteration <strong>per rank</strong>, not once per block: under MPI every rank calls
+it, so a quantity that has to agree across the block still needs a reduction in here. See
+<cite>AdaptiveAlpha</cite> for how that looks.</p>
+<p>Note also what that does <em>not</em> buy you. Under a pipelined method an early step converges and
+drops out, so ranks take part in different numbers of iterations by design; a recursion driven
+from here therefore still advances a different number of times on different ranks, and that is
+the pipelining rather than a defect. Where every step iterates together – ParaDiag, which
+cannot converge one step at a time because the transform needs them all – this is exact.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.post_run_processing">
 <span class="sig-name descname"><span class="pre">post_run_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.controller.html#core.controller.Controller" title="core.controller.Controller"><span class="pre">Controller</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.step.html#core.step.Step" title="core.step.Step"><span class="pre">Step</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.post_run_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.post_run_processing" title="Link to this definition">¶</a></dt>
 <dd><p>Do whatever you want to after the run here.</p>
@@ -547,6 +575,7 @@ relevant information about the controller are known.</p>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.log"><code class="docutils literal notranslate"><span class="pre">log()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_iteration_processing_block"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing_block()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_run_processing"><code class="docutils literal notranslate"><span class="pre">post_run_processing()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_spread_processing"><code class="docutils literal notranslate"><span class="pre">post_spread_processing()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.post_step_processing"><code class="docutils literal notranslate"><span class="pre">post_step_processing()</span></code></a></li>

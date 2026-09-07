@@ -127,7 +127,6 @@
 <span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">last_iter</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
@@ -147,25 +146,22 @@
         <span class="k">return</span> <span class="n">controller</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">*</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">eps</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">inner_tol</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="AdaptiveAlpha.post_iteration_processing">
-<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptive_alpha.html#implementations.convergence_controller_classes.adaptive_alpha.AdaptiveAlpha.post_iteration_processing">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AdaptiveAlpha.post_iteration_processing_block">
+<a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptive_alpha.html#implementations.convergence_controller_classes.adaptive_alpha.AdaptiveAlpha.post_iteration_processing_block">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Compute the next :math:`\alpha` from the residual of the whole block.</span>
 
+<span class="sd">        This is a block hook rather than a per-step one because :math:`\alpha` belongs to the block:</span>
+<span class="sd">        it parametrises the transform across the steps, so it has to advance once per iteration no</span>
+<span class="sd">        matter how the block was decomposed.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            S (pySDC.Step): The current step</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="c1"># The virtually parallel controller calls this once per step, the MPI one once per rank. Either</span>
-        <span class="c1"># way alpha must advance once per iteration, or the recursion below runs L times too fast.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_iter</span> <span class="o">==</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">last_iter</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span>
-
         <span class="c1"># the residual of the composite problem is the largest one across the block</span>
         <span class="n">residual</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
 
@@ -181,7 +177,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gamma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">e</span> <span class="o">*</span> <span class="n">residual</span><span class="p">)</span>
 
         <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha_min</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha_max</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Set alpha to </span><span class="si">{</span><span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="si">:</span><span class="s1">.3e</span><span class="si">}</span><span class="s1"> from residual </span><span class="si">{</span><span class="n">residual</span><span class="si">:</span><span class="s1">.3e</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Set alpha to </span><span class="si">{</span><span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="si">:</span><span class="s1">.3e</span><span class="si">}</span><span class="s1"> from residual </span><span class="si">{</span><span class="n">residual</span><span class="si">:</span><span class="s1">.3e</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">controller</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="c1"># keep the history around; it is what you want to look at when tuning</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">)</span>
