@@ -32,9 +32,11 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
         super().__init__(controller_params, description, useMPI=False, n_steps=num_procs)
 
         self.MS = []
+        self.sweeper_params = description['sweeper_params']
+        self._G_inv_alpha = self.get_alpha(0)
 
         for l in range(num_procs):
-            G_inv = get_G_inv_matrix(l, num_procs, self.params.alpha, description['sweeper_params'])
+            G_inv = get_G_inv_matrix(l, num_procs, self._G_inv_alpha, description['sweeper_params'])
             description['sweeper_params']['G_inv'] = G_inv
 
             self.MS.append(stepclass.Step(description))
@@ -154,6 +156,21 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             # compute residuals locally
             S.levels[0].sweep.compute_residual()
 
+    def update_G_inv(self, k=0):
+        """
+        Rebuild G^-1 on every step if alpha changed with the iteration.
+
+        Args:
+            k (int): 0-based ParaDiag iteration index
+        """
+        alpha = self.get_alpha(k)
+        if alpha == self._G_inv_alpha:
+            return
+        self._G_inv_alpha = alpha
+        L = len(self.MS)
+        for l, S in enumerate(self.MS):
+            S.levels[0].sweep.set_G_inv(get_G_inv_matrix(l, L, alpha, self.sweeper_params))
+
     def update_solution(self, local_MS_running):
         """
         Since we solve for the increment, we need to update the solution between iterations by adding the increment.
@@ -203,6 +220,10 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             for hook in self.hooks:
                 hook.pre_sweep(step=S, level_number=0)
 
+        # `it_check` has already incremented the counter, so the first sweep is k = 0
+        k = max(local_MS_running[0].status.iter - 1, 0)
+        self.update_G_inv(k)
+
         # communicate average residual for setting up Jacobians for non-linear problems
         self.prepare_Jacobians(local_MS_running)
 
@@ -210,7 +231,7 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
         self.compute_all_at_once_residual(local_MS_running)
 
         # weighted FFT of the residual in time
-        self.FFT_in_time(quantity='residual')
+        self.FFT_in_time(quantity='residual', k=k)
 
         # perform local solves of "collocation problems" on the steps (can be done in parallel)
         for S in local_MS_running:
@@ -218,7 +239,7 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             S.levels[0].sweep.update_nodes()
 
         # inverse FFT of the increment in time
-        self.iFFT_in_time(quantity='increment')
+        self.iFFT_in_time(quantity='increment', k=k)
 
         # get the next iterate by adding increment to previous iterate
         self.update_solution(local_MS_running)

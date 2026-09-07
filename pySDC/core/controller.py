@@ -467,27 +467,78 @@ class ParaDiagController(Controller):
 
         self.n_steps: int = n_steps
 
-    def FFT_in_time(self, quantity: Any) -> None:
+    def get_alpha(self, k: int = 0) -> float:
+        """
+        Get the ParaDiag alpha parameter for iteration `k`.
+
+        `alpha` may be a single number, a sequence indexed by iteration (the last entry is reused once
+        it runs out), or a callable taking the iteration index. Making it iteration dependent lets the
+        outer iteration start with a well-conditioned alpha and tighten it later.
+
+        Args:
+            k (int): iteration index
+
+        Returns:
+            float: alpha to use for this iteration
+        """
+        alpha = self.params.alpha
+        if callable(alpha):
+            return float(alpha(k))
+        if hasattr(alpha, '__len__'):
+            return float(alpha[min(k, len(alpha) - 1)])
+        return float(alpha)
+
+    def get_FFT_matrices(self, k: int = 0) -> Any:
+        """
+        Get the weighted FFT and iFFT matrices for iteration `k`, rebuilding them only when alpha
+        actually changes.
+
+        Args:
+            k (int): iteration index
+
+        Returns:
+            tuple: the forward and backward weighted FFT matrices
+        """
+        alpha = self.get_alpha(k)
+        if getattr(self, '_cached_alpha', None) != alpha:
+            from pySDC.helpers.ParaDiagHelper import get_weighted_FFT_matrix, get_weighted_iFFT_matrix
+
+            self._FFT_matrix = get_weighted_FFT_matrix(self.n_steps, alpha)
+            self._iFFT_matrix = get_weighted_iFFT_matrix(self.n_steps, alpha)
+            self._cached_alpha = alpha
+        return self._FFT_matrix, self._iFFT_matrix
+
+    def update_G_inv(self, k: int = 0) -> None:
+        """
+        Rebuild G^-1 on the local step(s) when alpha changes with the iteration.
+
+        G^-1 depends on alpha, so an iteration dependent alpha means the sweeper's diagonalization has
+        to be recomputed. Subclasses implement this because only they know which steps they own.
+
+        Args:
+            k (int): iteration index
+        """
+        raise NotImplementedError('ParaDiag controllers have to implement update_G_inv')
+
+    def FFT_in_time(self, quantity: Any, k: int = 0) -> None:
         """
         Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag
 
         Note: The implementation via matrix-vector multiplication may be inefficient and less stable compared to an FFT
               with transposes!
+
+        Args:
+            quantity (str): the level attribute to transform
+            k (int): iteration index, for an iteration dependent alpha
         """
-        if not hasattr(self, '__FFT_matrix'):
-            from pySDC.helpers.ParaDiagHelper import get_weighted_FFT_matrix
+        self.apply_matrix(self.get_FFT_matrices(k)[0], quantity)
 
-            self.__FFT_matrix = get_weighted_FFT_matrix(self.n_steps, self.params.alpha)
-
-        self.apply_matrix(self.__FFT_matrix, quantity)
-
-    def iFFT_in_time(self, quantity: Any) -> None:
+    def iFFT_in_time(self, quantity: Any, k: int = 0) -> None:
         """
         Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag
+
+        Args:
+            quantity (str): the level attribute to transform
+            k (int): iteration index, for an iteration dependent alpha
         """
-        if not hasattr(self, '__iFFT_matrix'):
-            from pySDC.helpers.ParaDiagHelper import get_weighted_iFFT_matrix
-
-            self.__iFFT_matrix = get_weighted_iFFT_matrix(self.n_steps, self.params.alpha)
-
-        self.apply_matrix(self.__iFFT_matrix, quantity)
+        self.apply_matrix(self.get_FFT_matrices(k)[1], quantity)
