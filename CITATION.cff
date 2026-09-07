@@ -36,11 +36,14 @@ authors:
     given-names: Abdelouahed
     orcid: https://orcid.org/0000-0003-3471-7424
     affiliation: "Jülich Supercomputing Centre, Forschungszentrum Jülich GmbH, 52425 Jülich, Germany"
+  - family-names: Čaklović
+    given-names: Gayatri
+    orcid: https://orcid.org/0000-0002-1897-8993
 
 
-version: 5.7
+version: 5.8
 doi: 10.5281/zenodo.594191
-date-released: 2026-09-04
+date-released: 2026-09-07
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"
