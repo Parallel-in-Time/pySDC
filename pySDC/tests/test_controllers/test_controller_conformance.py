@@ -25,12 +25,13 @@ What this file deliberately does NOT duplicate:
 Axes marked ``xfail`` are known asymmetries with a documented cause. They are strict, so fixing one
 without removing its marker fails the suite: the marker is a to-do list, not a suppression.
 
-A note on the iteration estimator, since that asymmetry is not the obvious shape.
-``controller_MPI`` implements it inline, ``controller_nonMPI`` not at all, and the supported
-route is a third thing -- the ``CheckIterationEstimatorNonMPI`` convergence controller, which
-tutorial step_8 C exercises. Only that third one is tested: nothing in the repository ever sets
-``use_iteration_estimator`` to ``True``, and switching it on under MPI deadlocks. So this file
-covers the virtual half of that axis only and never launches the MPI implementation.
+A note on the iteration estimator, since that axis asserts something weaker than parity.
+``controller_MPI`` used to implement it inline while ``controller_nonMPI`` did not implement it at
+all, and the supported route was a third thing -- the ``CheckIterationEstimatorNonMPI`` convergence
+controller, which tutorial step_8 C exercises. Only that third one ever worked, so the inline
+implementation was removed and both controllers now refuse the parameter identically. The
+convergence controller remains nonMPI-only, so the *feature* is still not symmetric; what the axis
+pins is that the two controllers no longer disagree in silence.
 """
 
 import os
@@ -78,7 +79,7 @@ class RecursionProbe(ConvergenceController):
         return None
 
 
-def get_description(config, errtol=None):
+def get_description(config):
     """Single-level IMEX SDC, or the same problem as two-level MLSDC/PFASST."""
     from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
     from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -97,12 +98,10 @@ def get_description(config, errtol=None):
         description['sweeper_params']['num_nodes'] = [3, 2]
         description['space_transfer_class'] = mesh_to_mesh
         description['space_transfer_params'] = {'rorder': 2, 'iorder': 6}
-    if errtol is not None:
-        description['step_params']['errtol'] = errtol
     return description
 
 
-def run(useMPI, config='single_level', probe=False, errtol=None, num_procs=NUM_PROCS):
+def run(useMPI, config='single_level', probe=False, num_procs=NUM_PROCS):
     """
     Run one configuration through one of the two transports and return everything the axes compare.
 
@@ -111,11 +110,8 @@ def run(useMPI, config='single_level', probe=False, errtol=None, num_procs=NUM_P
     """
     from pySDC.helpers.stats_helper import get_sorted
 
-    description = get_description(config, errtol=errtol)
+    description = get_description(config)
     controller_params = {'logger_level': 30}
-    if errtol is not None:
-        controller_params['use_iteration_estimator'] = True
-        controller_params['all_to_done'] = False
     if probe:
         description['convergence_controllers'] = {RecursionProbe: {}}
 
@@ -145,6 +141,33 @@ def run(useMPI, config='single_level', probe=False, errtol=None, num_procs=NUM_P
         'block_calls': probes[0].block_calls if probes else -1,
         'iters_seen': len({it for _, it in probes[0].calls}) if probes else -1,
     }
+
+
+def iteration_estimator_rejected(useMPI, num_procs=NUM_PROCS):
+    """
+    Ask a controller to build with ``use_iteration_estimator`` and report whether it refused.
+
+    Returns:
+        bool: True if the controller raised rather than accepting the parameter
+    """
+    from pySDC.core.errors import ControllerError
+
+    description = get_description('single_level')
+    controller_params = {'logger_level': 30, 'use_iteration_estimator': True}
+
+    try:
+        if useMPI:
+            from mpi4py import MPI
+            from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+
+            controller_MPI(comm=MPI.COMM_WORLD, controller_params=controller_params, description=description)
+        else:
+            from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+            controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
+    except ControllerError:
+        return True
+    return False
 
 
 CASES = {
@@ -181,6 +204,7 @@ def results(tmp_path_factory):
     for name, kwargs in CASES.items():
         mpi = {k.split('/', 1)[1]: loaded[k] for k in loaded.files if k.startswith(f'{name}/')}
         out_dict[name] = (run(useMPI=False, **kwargs), mpi)
+    out_dict['estimator_rejected_mpi'] = bool(loaded['estimator/rejected'])
     return out_dict
 
 
@@ -267,27 +291,23 @@ def test_block_hook_fires_once_per_iteration(results):
         )
 
 
-@pytest.mark.base
-@pytest.mark.xfail(strict=True, reason='use_iteration_estimator is implemented in controller_MPI only')
-def test_iteration_estimator_is_honoured():
+@pytest.mark.mpi4py
+def test_iteration_estimator_flag_treated_identically(results):
     """
-    ``use_iteration_estimator`` must do something, whichever controller is asked.
+    Both controllers must do the same thing with ``use_iteration_estimator``.
 
-    It is declared in the base controller's parameters, so *both* controllers accept it, but only
-    ``controller_MPI`` reads it. ``controller_nonMPI`` silently ignores the request and runs to
-    ``maxiter``, with no error and no warning -- the same description, two different programs.
+    They did not. It is declared in the *base* controller's parameters, so both accepted it, but only
+    ``controller_MPI`` read it -- and that implementation was never switched on anywhere, had no
+    tests, and deadlocked when used. ``controller_nonMPI`` ignored the flag in silence and ran to
+    ``maxiter``. Same description, two different programs, no error either way.
 
-    This asks only whether the flag changes the virtual controller's behaviour, and deliberately
-    does not run the MPI implementation: switching that one on deadlocks (see the module
-    docstring), and a hanging test is worse than a missing one.
+    Both now refuse it and point at the ``CheckIterationEstimatorNonMPI`` convergence controller,
+    which is the route that actually works. That is agreement, not yet parity: the convergence
+    controller is still nonMPI-only, which is the next thing to fix. Refusing loudly is what makes
+    the remaining gap visible instead of silent.
     """
-    without = run(useMPI=False)['niter']
-    with_estimator = run(useMPI=False, errtol=1e-7)['niter']
-
-    assert not np.array_equal(without, with_estimator), (
-        'use_iteration_estimator=True changed nothing in controller_nonMPI: '
-        f'{without[:, 1].tolist()} iterations either way'
-    )
+    assert iteration_estimator_rejected(useMPI=False), 'controller_nonMPI accepted use_iteration_estimator'
+    assert results['estimator_rejected_mpi'], 'controller_MPI accepted use_iteration_estimator'
 
 
 if __name__ == '__main__':
@@ -298,6 +318,7 @@ if __name__ == '__main__':
     for _name, _kwargs in CASES.items():
         _result = run(useMPI=True, **_kwargs)
         _payload.update({f'{_name}/{_k}': _v for _k, _v in _result.items()})
+    _payload['estimator/rejected'] = iteration_estimator_rejected(useMPI=True)
 
     if MPI.COMM_WORLD.rank == 0:
         np.savez(_out, **_payload)
