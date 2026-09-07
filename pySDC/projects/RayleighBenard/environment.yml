@@ -9,7 +9,7 @@ dependencies:
   - scipy>=0.17.1
   - matplotlib>=3.0
   - dill>=0.2.6
-  - mpich
+  - openmpi
   - mpi4py-fft>=2.0.2
   - mpi4py>=3.0.0
   - tqdm

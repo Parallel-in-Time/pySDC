@@ -9,6 +9,7 @@ dependencies:
   - matplotlib>=3.0
   - dill>=0.2.6
   - fenics>=2019.1.0
+  - openmpi
   - mpi4py
   - setuptools>=40.0,<70.0
   - pip

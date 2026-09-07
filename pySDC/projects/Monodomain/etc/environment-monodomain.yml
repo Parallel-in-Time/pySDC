@@ -20,7 +20,7 @@ dependencies:
   - numdifftools>=0.9.41
   - pybind11
   - mpi4py
-  - mpich
+  - openmpi
   - tqdm
   - pymp-pypi
   - pip

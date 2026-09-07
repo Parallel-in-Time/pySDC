@@ -2,22 +2,42 @@
 
 name: CI pipeline for pySDC
 
+# A bare `push:` trigger fires alongside `pull_request` for the same commit,
+# creating two runs of the ~42-job matrix. The `concurrency` group below
+# cancels the loser, but only after all its jobs have been dispatched - you
+# still see ~84 job entries. Restricting `push` to the branches that have no
+# PR of their own stops the duplicate from ever being created. Feature
+# branches get CI from `pull_request`; open a (draft) PR to run them.
 on:
   push:
+    branches:
+      - master
+      - 'v*'
   pull_request:
   schedule:
     - cron: '1 5 * * 1'
 
-# Pushing to a branch with an open PR fires both `push` and `pull_request`
-# for the same commit, doubling the ~80-job matrix. Cancel the older,
-# now-stale run instead of letting both run to completion. `head_ref` is
-# only set on pull_request events (the PR's source branch); `ref_name` is
-# the plain branch name on push events (unlike `ref`, which carries a
-# `refs/heads/` prefix that would never match `head_ref`) - so both events
-# for the same branch land in the same group.
+# Successive pushes to an open PR supersede each other; cancel the stale run
+# rather than letting both finish. `head_ref` is only set on pull_request
+# events (the PR's source branch); `ref_name` is the plain branch name on
+# push events (unlike `ref`, which carries a `refs/heads/` prefix that would
+# never match `head_ref`).
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
+
+env:
+  # Keep this: it is what proved the exit-143 deaths are silent. With stdout
+  # unbuffered there is still not one byte between "collecting ..." and the
+  # SIGTERM, so nothing inside the process is reporting an error - see the
+  # environment files for what the actual fix was.
+  PYTHONUNBUFFERED: 1
+  # OpenMPI refuses to oversubscribe by default, and PRRTE counts a "slot"
+  # as a physical core - so on a 4-vCPU runner (2 cores + hyperthreading)
+  # even `mpirun -np 3` fails with "not enough slots available". Several
+  # tests ask for 3 or 4 ranks and Monodomain's asks for 24. MPICH
+  # oversubscribed silently, which is why this only appeared after the swap.
+  PRTE_MCA_rmaps_default_mapping_policy: ':oversubscribe'
 
 jobs:
 
