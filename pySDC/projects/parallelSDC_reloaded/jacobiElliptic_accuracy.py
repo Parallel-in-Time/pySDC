@@ -61,6 +61,10 @@ fig, axs = plt.subplots(1, 2)
 
 dtVals = tEnd / nStepsList
 
+# The reference solution depends only on nSteps, so compute it once per nSteps
+# instead of once per (qDelta, nSweeps, nSteps).
+uRefs = {nSteps: solutionExact(tEnd, nSteps, pName) for nSteps in nStepsList}
+
 i = 0
 for qDelta in qDeltaList:
     for nSweeps in nSweepList:
@@ -85,7 +89,7 @@ for qDelta in qDeltaList:
         for nSteps in nStepsList:
             print(f' -- nSteps={nSteps} ...')
 
-            uRef = solutionExact(tEnd, nSteps, pName)
+            uRef = uRefs[nSteps]
 
             uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName)
 
