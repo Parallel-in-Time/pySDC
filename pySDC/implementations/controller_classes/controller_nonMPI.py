@@ -65,16 +65,19 @@ class controller_nonMPI(Controller):
         if self.nlevels == 0:
             raise ControllerError('need at least one level')
 
-        self.nsweeps = []
+        # The stages read `nsweeps` off a step they own, the same way `controller_MPI` reads it off
+        # the one step a rank has, so this only has to establish that any step will do.
         for nl in range(self.nlevels):
-            if all(S.levels[nl].params.nsweeps == self.MS[0].levels[nl].params.nsweeps for S in self.MS):
-                self.nsweeps.append(self.MS[0].levels[nl].params.nsweeps)
+            if not all(S.levels[nl].params.nsweeps == self.MS[0].levels[nl].params.nsweeps for S in self.MS):
+                raise ControllerError('all steps need to agree on the number of sweeps per level')
 
         # `it_coarse` sweeps the coarsest level exactly once. Single-level Gauss-like MSSDC routes
         # through it too, so reject multiple sweeps there as well instead of silently ignoring them.
         # `mssdc_jac` only decides the routing when there is more than one step: a single step is
         # plain SDC and always goes through `it_fine`, which honours nsweeps.
-        if self.nsweeps[-1] > 1 and (self.nlevels > 1 or (num_procs > 1 and not self.params.mssdc_jac)):
+        if self.MS[0].levels[-1].params.nsweeps > 1 and (
+            self.nlevels > 1 or (num_procs > 1 and not self.params.mssdc_jac)
+        ):
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
         self.check_variable_coefficients(num_procs)
@@ -511,21 +514,32 @@ class controller_nonMPI(Controller):
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.post_iteration_processing_block(self, MS=local_MS_running)
 
+        # Either the block agrees or each step asks its predecessor -- never both, which is how
+        # `CheckConvergence` has always done it for one step per rank. The reduction is taken over the
+        # values every step arrived at, before any of them are overwritten, because that is what an
+        # `allreduce` does and the point is for the two to mean the same thing.
+        if self.params.all_to_done:
+            block_done = all(T.status.done for T in local_MS_running)
+            block_force_done = any(T.status.force_done for T in local_MS_running)
+
         for S in local_MS_running:
-            if not S.status.first:
+            if self.params.all_to_done:
+                for hook in self.hooks:
+                    hook.pre_comm(step=S, level_number=0)
+                S.status.done = block_done
+                S.status.force_done = block_force_done
+                for hook in self.hooks:
+                    hook.post_comm(step=S, level_number=0, add_to_stats=True)
+
+                S.status.done = S.status.done or S.status.force_done
+
+            elif not S.status.first:
                 for hook in self.hooks:
                     hook.pre_comm(step=S, level_number=0)
                 S.status.prev_done = S.prev.status.done  # "communicate"
                 for hook in self.hooks:
                     hook.post_comm(step=S, level_number=0, add_to_stats=True)
                 S.status.done = S.status.done and S.status.prev_done
-
-            if self.params.all_to_done:
-                for hook in self.hooks:
-                    hook.pre_comm(step=S, level_number=0)
-                S.status.done = all(T.status.done for T in local_MS_running)
-                for hook in self.hooks:
-                    hook.post_comm(step=S, level_number=0, add_to_stats=True)
 
             if not S.status.done:
                 # increment iteration count here (and only here)
@@ -562,7 +576,9 @@ class controller_nonMPI(Controller):
         for S in local_MS_running:
             S.levels[0].status.sweep = 0
 
-        for k in range(self.nsweeps[0]):
+        nsweeps = local_MS_running[0].levels[0].params.nsweeps
+
+        for k in range(nsweeps):
             for S in local_MS_running:
                 S.levels[0].status.sweep += 1
 
@@ -570,7 +586,7 @@ class controller_nonMPI(Controller):
                 # send updated values forward
                 self.send_full(S, level=0)
                 # receive values
-                self.recv_full(S, level=0, add_to_stats=(k == self.nsweeps[0] - 1))
+                self.recv_full(S, level=0, add_to_stats=(k == nsweeps - 1))
 
             for S in local_MS_running:
                 # standard sweep workflow: update nodes, compute residual, log progress
@@ -602,7 +618,9 @@ class controller_nonMPI(Controller):
         for l in range(1, self.nlevels - 1):
             # sweep on middle levels (not on finest, not on coarsest, though)
 
-            for _ in range(self.nsweeps[l]):
+            nsweeps = local_MS_running[0].levels[l].params.nsweeps
+
+            for _ in range(nsweeps):
                 for S in local_MS_running:
                     # send updated values forward
                     self.send_full(S, level=l)
@@ -669,12 +687,14 @@ class controller_nonMPI(Controller):
 
             # on middle levels: do communication and sweep as usual
             if l - 1 > 0:
-                for k in range(self.nsweeps[l - 1]):
+                nsweeps = local_MS_running[0].levels[l - 1].params.nsweeps
+
+                for k in range(nsweeps):
                     for S in local_MS_running:
                         # send updated values forward
                         self.send_full(S, level=l - 1)
                         # receive values
-                        self.recv_full(S, level=l - 1, add_to_stats=(k == self.nsweeps[l - 1] - 1))
+                        self.recv_full(S, level=l - 1, add_to_stats=(k == nsweeps - 1))
 
                     for S in local_MS_running:
                         for hook in self.hooks:
