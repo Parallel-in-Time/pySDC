@@ -9,6 +9,15 @@ Changelog
 |:arrow_left:| :doc:`Back to main page <./index>`
 
 
+* September 7, 2026: Version 5.8 makes ParaDiag actually parallel. The new MPI controller puts one time step per rank
+  and circulates the diagonalization around a ring instead of gathering it, so the memory per rank no longer grows
+  with the block, while ``alpha`` may now vary with the iteration, letting the outer loop start well-conditioned and
+  tighten later. Tutorial step_9 gained parts D and E to go with it. We are happy to welcome
+  `\@caklovicka <https://github.com/caklovicka>`_ as an author: ParaDiag in pySDC grew out of her
+  `pyParaDiag <https://github.com/caklovicka/pyParaDiag>`_ and the collocation-ParaDiag paper behind it. The rest is
+  controller housekeeping, of which two guards are **not backward compatible**\ : iteration-dependent QDelta
+  coefficients (MIN-SR-FLEX and the Jumpers) are now restricted to single-step, single-level SDC, and serial
+  Gauss-Seidel MSSDC rejects ``nsweeps > 1`` from the constructor instead of quietly ignoring it.
 * September 4, 2026: Version 5.7 is dominated by spectral methods and Rayleigh-Bénard convection, thanks to
   `\@brownbaerchen <https://github.com/brownbaerchen>`_. The spectral helper was largely rewritten and gained Neumann boundary
   conditions in Chebychev and ultraspherical bases, a VkFFT backend and heterogeneous CPU/GPU computing, while Rayleigh-Bénard

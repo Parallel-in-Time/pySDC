@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changelog &#8212; pySDC 5.7 documentation</title>
+    <title>Changelog &#8212; pySDC 5.8 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css?v=2bf1fcf8" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=c40552b6" />
     
-    <script src="_static/documentation_options.js?v=25098c49"></script>
+    <script src="_static/documentation_options.js?v=cd132f8b"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.8 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changelog</a></li> 
       </ul>
     </div>  
@@ -40,6 +40,15 @@
 <span id="changelog-changelog"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <p>⬅️ <a class="reference internal" href="index.html"><span class="doc">Back to main page</span></a></p>
 <ul>
+<li><p>September 7, 2026: Version 5.8 makes ParaDiag actually parallel. The new MPI controller puts one time step per rank
+and circulates the diagonalization around a ring instead of gathering it, so the memory per rank no longer grows
+with the block, while <code class="docutils literal notranslate"><span class="pre">alpha</span></code> may now vary with the iteration, letting the outer loop start well-conditioned and
+tighten later. Tutorial step_9 gained parts D and E to go with it. We are happy to welcome
+<a class="reference external" href="https://github.com/caklovicka">&#64;caklovicka</a> as an author: ParaDiag in pySDC grew out of her
+<a class="reference external" href="https://github.com/caklovicka/pyParaDiag">pyParaDiag</a> and the collocation-ParaDiag paper behind it. The rest is
+controller housekeeping, of which two guards are <strong>not backward compatible</strong>: iteration-dependent QDelta
+coefficients (MIN-SR-FLEX and the Jumpers) are now restricted to single-step, single-level SDC, and serial
+Gauss-Seidel MSSDC rejects <code class="docutils literal notranslate"><span class="pre">nsweeps</span> <span class="pre">&gt;</span> <span class="pre">1</span></code> from the constructor instead of quietly ignoring it.</p></li>
 <li><p>September 4, 2026: Version 5.7 is dominated by spectral methods and Rayleigh-Bénard convection, thanks to
 <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a>. The spectral helper was largely rewritten and gained Neumann boundary
 conditions in Chebychev and ultraspherical bases, a VkFFT backend and heterogeneous CPU/GPU computing, while Rayleigh-Bénard
@@ -339,7 +348,7 @@ simplicity</p></li>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.8 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Changelog</a></li> 
       </ul>
     </div>
