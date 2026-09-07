@@ -7,7 +7,7 @@ dependencies:
   - python>=3.10,<3.14
   - mpi4py>=3.0.0
   - mpi4py-fft>=2.0.2
-  - mpich
+  - openmpi
   - matplotlib>=3.0
   - dill>=0.2.6
   - scipy>=0.17.1
