@@ -65,16 +65,19 @@ class controller_nonMPI(Controller):
         if self.nlevels == 0:
             raise ControllerError('need at least one level')
 
-        self.nsweeps = []
+        # The stages read `nsweeps` off a step they own, the same way `controller_MPI` reads it off
+        # the one step a rank has, so this only has to establish that any step will do.
         for nl in range(self.nlevels):
-            if all(S.levels[nl].params.nsweeps == self.MS[0].levels[nl].params.nsweeps for S in self.MS):
-                self.nsweeps.append(self.MS[0].levels[nl].params.nsweeps)
+            if not all(S.levels[nl].params.nsweeps == self.MS[0].levels[nl].params.nsweeps for S in self.MS):
+                raise ControllerError('all steps need to agree on the number of sweeps per level')
 
         # `it_coarse` sweeps the coarsest level exactly once. Single-level Gauss-like MSSDC routes
         # through it too, so reject multiple sweeps there as well instead of silently ignoring them.
         # `mssdc_jac` only decides the routing when there is more than one step: a single step is
         # plain SDC and always goes through `it_fine`, which honours nsweeps.
-        if self.nsweeps[-1] > 1 and (self.nlevels > 1 or (num_procs > 1 and not self.params.mssdc_jac)):
+        if self.MS[0].levels[-1].params.nsweeps > 1 and (
+            self.nlevels > 1 or (num_procs > 1 and not self.params.mssdc_jac)
+        ):
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
         self.check_variable_coefficients(num_procs)
@@ -562,7 +565,9 @@ class controller_nonMPI(Controller):
         for S in local_MS_running:
             S.levels[0].status.sweep = 0
 
-        for k in range(self.nsweeps[0]):
+        nsweeps = local_MS_running[0].levels[0].params.nsweeps
+
+        for k in range(nsweeps):
             for S in local_MS_running:
                 S.levels[0].status.sweep += 1
 
@@ -570,7 +575,7 @@ class controller_nonMPI(Controller):
                 # send updated values forward
                 self.send_full(S, level=0)
                 # receive values
-                self.recv_full(S, level=0, add_to_stats=(k == self.nsweeps[0] - 1))
+                self.recv_full(S, level=0, add_to_stats=(k == nsweeps - 1))
 
             for S in local_MS_running:
                 # standard sweep workflow: update nodes, compute residual, log progress
@@ -602,7 +607,9 @@ class controller_nonMPI(Controller):
         for l in range(1, self.nlevels - 1):
             # sweep on middle levels (not on finest, not on coarsest, though)
 
-            for _ in range(self.nsweeps[l]):
+            nsweeps = local_MS_running[0].levels[l].params.nsweeps
+
+            for _ in range(nsweeps):
                 for S in local_MS_running:
                     # send updated values forward
                     self.send_full(S, level=l)
@@ -669,12 +676,14 @@ class controller_nonMPI(Controller):
 
             # on middle levels: do communication and sweep as usual
             if l - 1 > 0:
-                for k in range(self.nsweeps[l - 1]):
+                nsweeps = local_MS_running[0].levels[l - 1].params.nsweeps
+
+                for k in range(nsweeps):
                     for S in local_MS_running:
                         # send updated values forward
                         self.send_full(S, level=l - 1)
                         # receive values
-                        self.recv_full(S, level=l - 1, add_to_stats=(k == self.nsweeps[l - 1] - 1))
+                        self.recv_full(S, level=l - 1, add_to_stats=(k == nsweeps - 1))
 
                     for S in local_MS_running:
                         for hook in self.hooks:
