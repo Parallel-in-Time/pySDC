@@ -381,6 +381,23 @@ class ConvergenceController(object):
 
         return None
 
+    def communicate_convergence(self, controller: 'Controller', S: 'Step', **kwargs: Any) -> None:
+        """
+        Share convergence status across the block, however the block happens to be spread out.
+
+        Called once per step after every step has decided for itself, which is the only point at
+        which a reduction over the block is meaningful. `CheckConvergence` is the one that does
+        something here.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
+        pass
+
     def post_spread_processing(self, controller: 'Controller', S: 'Step', **kwargs: Any) -> None:
         """
         This function is called at the end of the `SPREAD` stage in the controller

@@ -514,32 +514,9 @@ class controller_nonMPI(Controller):
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.post_iteration_processing_block(self, MS=local_MS_running)
 
-        # Either the block agrees or each step asks its predecessor -- never both, which is how
-        # `CheckConvergence` has always done it for one step per rank. The reduction is taken over the
-        # values every step arrived at, before any of them are overwritten, because that is what an
-        # `allreduce` does and the point is for the two to mean the same thing.
-        if self.params.all_to_done:
-            block_done = all(T.status.done for T in local_MS_running)
-            block_force_done = any(T.status.force_done for T in local_MS_running)
-
         for S in local_MS_running:
-            if self.params.all_to_done:
-                for hook in self.hooks:
-                    hook.pre_comm(step=S, level_number=0)
-                S.status.done = block_done
-                S.status.force_done = block_force_done
-                for hook in self.hooks:
-                    hook.post_comm(step=S, level_number=0, add_to_stats=True)
-
-                S.status.done = S.status.done or S.status.force_done
-
-            elif not S.status.first:
-                for hook in self.hooks:
-                    hook.pre_comm(step=S, level_number=0)
-                S.status.prev_done = S.prev.status.done  # "communicate"
-                for hook in self.hooks:
-                    hook.post_comm(step=S, level_number=0, add_to_stats=True)
-                S.status.done = S.status.done and S.status.prev_done
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                C.communicate_convergence(self, S, MS=local_MS_running)
 
             if not S.status.done:
                 # increment iteration count here (and only here)
