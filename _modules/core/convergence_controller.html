@@ -488,6 +488,26 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
+<div class="viewcode-block" id="ConvergenceController.communicate_convergence">
+<a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.communicate_convergence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="s1">'Controller'</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="s1">'Step'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Share convergence status across the block, however the block happens to be spread out.</span>
+
+<span class="sd">        Called once per step after every step has decided for itself, which is the only point at</span>
+<span class="sd">        which a reduction over the block is meaningful. `CheckConvergence` is the one that does</span>
+<span class="sd">        something here.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="k">pass</span></div>
+
+
 <div class="viewcode-block" id="ConvergenceController.post_spread_processing">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.post_spread_processing">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="s1">'Controller'</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="s1">'Step'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

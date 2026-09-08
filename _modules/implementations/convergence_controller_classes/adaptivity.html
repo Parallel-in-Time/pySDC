@@ -78,10 +78,6 @@
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogStepSize</span><span class="p">)</span>
 
-        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.check_convergence</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckConvergence</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">communicate_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">communicate_convergence</span>
-
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
 
@@ -326,7 +322,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">trigger_restart_upon_nonconvergence</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># borrow the reduction rather than storing it on the instance: an unbound function in an</span>
+            <span class="c1"># instance attribute shadows the hook of the same name, and needs an explicit `self` that</span>
+            <span class="c1"># nothing else in this API does</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.check_convergence</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckConvergence</span>
+
+            <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">res_last_iter</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">*</span> <span class="mf">1.0</span></div>
 

@@ -96,14 +96,21 @@ Test the residual and max. number of iterations as well as allowing overrides to
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.check_convergence.CheckConvergence.communicate_convergence">
-<span class="sig-name descname"><span class="pre">communicate_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/check_convergence.html#CheckConvergence.communicate_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.check_convergence.CheckConvergence.communicate_convergence" title="Link to this definition">¶</a></dt>
-<dd><p>Communicate the convergence status during <cite>check_iteration_status</cite> if MPI is used.</p>
+<span class="sig-name descname"><span class="pre">communicate_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/check_convergence.html#CheckConvergence.communicate_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.check_convergence.CheckConvergence.communicate_convergence" title="Link to this definition">¶</a></dt>
+<dd><p>Share convergence status across the block.</p>
+<p>Two ways to stop, and the same two whether the block is spread over ranks or sitting in one
+process. Either every step has to agree, which is a reduction, or each step waits on its
+predecessor, which is a cascade and is what lets an early step finish and drop out.</p>
+<p>The only difference between the transports is how the neighbour is reached: an <cite>allreduce</cite>
+and point-to-point messages with one step per rank, reading the other steps’ status directly
+when they are all here. Note the reduction is applied step by step in the second case rather
+than all at once as <cite>allreduce</cite> does – both operations are monotone, so the two agree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
 <li><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
-<li><p><strong>comm</strong> (<em>mpi4py.MPI.Comm</em>) – MPI communicator</p></li>
+<li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator, or None when the whole block is in one process</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

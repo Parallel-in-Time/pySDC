@@ -166,30 +166,56 @@
 
 <div class="viewcode-block" id="CheckConvergence.communicate_convergence">
 <a class="viewcode-back" href="../../pySDC/core.check_convergence.html#core.check_convergence.CheckConvergence.communicate_convergence">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">communicate_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Communicate the convergence status during `check_iteration_status` if MPI is used.</span>
+<span class="sd">        Share convergence status across the block.</span>
+
+<span class="sd">        Two ways to stop, and the same two whether the block is spread over ranks or sitting in one</span>
+<span class="sd">        process. Either every step has to agree, which is a reduction, or each step waits on its</span>
+<span class="sd">        predecessor, which is a cascade and is what lets an early step finish and drop out.</span>
+
+<span class="sd">        The only difference between the transports is how the neighbour is reached: an `allreduce`</span>
+<span class="sd">        and point-to-point messages with one step per rank, reading the other steps' status directly</span>
+<span class="sd">        when they are all here. Note the reduction is applied step by step in the second case rather</span>
+<span class="sd">        than all at once as `allreduce` does -- both operations are monotone, so the two agree.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">            S (pySDC.Step.step): The current step</span>
-<span class="sd">            comm (mpi4py.MPI.Comm): MPI communicator</span>
+<span class="sd">            comm (mpi4py.MPI.Intracomm): Communicator, or None when the whole block is in one process</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="c1"># Either gather information about all status or send forward own</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'MS'</span><span class="p">,</span> <span class="n">controller</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">all_to_done</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
                 <span class="n">hook</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_LAND</span><span class="p">)</span>
-            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_LOR</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="k">for</span> <span class="n">T</span> <span class="ow">in</span> <span class="n">block</span><span class="p">)</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="k">for</span> <span class="n">T</span> <span class="ow">in</span> <span class="n">block</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_LAND</span><span class="p">)</span>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MPI_LOR</span><span class="p">)</span>
+
             <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
                 <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="ow">or</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span>
 
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                        <span class="n">hook</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span>
+                    <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
+                        <span class="n">hook</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
             <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="n">controller</span><span class="o">.</span><span class="n">hooks</span><span class="p">:</span>
                 <span class="n">hook</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 

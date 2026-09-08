@@ -139,6 +139,26 @@ str: The error message</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.communicate_convergence">
+<span class="sig-name descname"><span class="pre">communicate_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.controller.html#core.controller.Controller" title="core.controller.Controller"><span class="pre">Controller</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.step.html#core.step.Step" title="core.step.Step"><span class="pre">Step</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.communicate_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.communicate_convergence" title="Link to this definition">¶</a></dt>
+<dd><p>Share convergence status across the block, however the block happens to be spread out.</p>
+<p>Called once per step after every step has decided for itself, which is the only point at
+which a reduction over the block is meaningful. <cite>CheckConvergence</cite> is the one that does
+something here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.convergence_control">
 <span class="sig-name descname"><span class="pre">convergence_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.controller.html#core.controller.Controller" title="core.controller.Controller"><span class="pre">Controller</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.step.html#core.step.Step" title="core.step.Step"><span class="pre">Step</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.convergence_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.convergence_control" title="Link to this definition">¶</a></dt>
 <dd><p>Call all the functions related to convergence control.
@@ -568,6 +588,7 @@ relevant information about the controller are known.</p>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.add_status_variable_to_step"><code class="docutils literal notranslate"><span class="pre">add_status_variable_to_step()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">check_iteration_status()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.communicate_convergence"><code class="docutils literal notranslate"><span class="pre">communicate_convergence()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.convergence_control"><code class="docutils literal notranslate"><span class="pre">convergence_control()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.debug"><code class="docutils literal notranslate"><span class="pre">debug()</span></code></a></li>
 <li><a class="reference internal" href="#core.convergence_controller.ConvergenceController.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
