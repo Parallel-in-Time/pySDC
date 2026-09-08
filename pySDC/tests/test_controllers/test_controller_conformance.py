@@ -103,10 +103,16 @@ def get_description(config):
         description['sweeper_params']['num_nodes'] = [3, 2]
         description['space_transfer_class'] = mesh_to_mesh
         description['space_transfer_params'] = {'rorder': 2, 'iorder': 6}
+    if config == 'gauss_seidel':
+        # tuned so the steps converge one after another and the running set drains 4, 3, 2, 1 --
+        # see ``test_gauss_seidel_mssdc_agrees`` for why reaching one matters
+        description['sweeper_params']['num_nodes'] = 2
+        description['level_params'] = {'restol': 1e-10, 'dt': 0.8}
+        description['step_params'] = {'maxiter': 99}
     return description
 
 
-def run(useMPI, config='single_level', probe=False, all_to_done=False, num_procs=NUM_PROCS):
+def run(useMPI, config='single_level', probe=False, all_to_done=False, mssdc_jac=True, num_procs=NUM_PROCS):
     """
     Run one configuration through one of the two transports and return everything the axes compare.
 
@@ -116,7 +122,7 @@ def run(useMPI, config='single_level', probe=False, all_to_done=False, num_procs
     from pySDC.helpers.stats_helper import get_sorted
 
     description = get_description(config)
-    controller_params = {'logger_level': 30, 'all_to_done': all_to_done}
+    controller_params = {'logger_level': 30, 'all_to_done': all_to_done, 'mssdc_jac': mssdc_jac}
     if probe:
         description['convergence_controllers'] = {RecursionProbe: {}}
 
@@ -136,7 +142,8 @@ def run(useMPI, config='single_level', probe=False, all_to_done=False, num_procs
         )
         P = controller.MS[0].levels[0].prob
 
-    uend, stats = controller.run(u0=P.u_exact(0.0), t0=0.0, Tend=num_procs * DT)
+    dt = description['level_params']['dt']
+    uend, stats = controller.run(u0=P.u_exact(0.0), t0=0.0, Tend=num_procs * dt)
 
     probes = [me for me in controller.convergence_controllers if type(me) == RecursionProbe]
     return {
@@ -180,6 +187,7 @@ CASES = {
     'baseline_multi': {'config': 'multi_level'},
     'probe': {'config': 'single_level', 'probe': True},
     'global_convergence': {'config': 'single_level', 'all_to_done': True},
+    'gauss_seidel': {'config': 'gauss_seidel', 'mssdc_jac': False},
 }
 
 
@@ -367,6 +375,54 @@ def test_global_convergence_stays_available(results):
     assert np.array_equal(serial['niter'], mpi['niter']), (
         f'`all_to_done` means different things in the two controllers: '
         f'{serial["niter"][:, 1].tolist()} vs {mpi["niter"][:, 1].tolist()}'
+    )
+
+
+@pytest.mark.mpi4py
+def test_gauss_seidel_mssdc_agrees(results):
+    """
+    Gauss-Seidel MSSDC has to be the same program in both transports too.
+
+    This is the only axis that runs ``mssdc_jac=False``, where a step takes its predecessor's
+    *current* iterate rather than the previous one, so the steps converge strictly in turn and the
+    running set drains one at a time. Nothing else here reaches that path: with Jacobi coupling the
+    block stays whole until the end, so ``it_coarse`` is never the iteration.
+
+    The second assertion is the point, and it is not an equality. When the running set reaches
+    exactly one, the two controllers used to route that last step differently --
+    ``controller_nonMPI`` asked ``len(local_MS_running) == 1``, which is knowledge no single rank
+    has, while ``controller_MPI`` asked ``num_procs == 1`` -- so one went to ``IT_FINE`` and the
+    other to ``IT_COARSE``. Both are now ``S.status.time_size == 1``, the block size either
+    transport can read locally.
+
+    Be clear about what that means for this axis: comparing the two transports would **not** have
+    found that divergence, and does not defend against its return. By the time the set is down to
+    one step, that step has no successor to send to and its predecessor is done, so ``IT_FINE`` and
+    ``IT_COARSE`` both come down to a single ``update_nodes`` -- the two controllers ran different
+    stages and got bit-identical answers. It is the same blind spot the module docstring describes
+    for the pipelining, in a third form: not a property both sides lose at once, but a difference
+    neither side expresses in its output.
+
+    What the axis does buy is the path. ``it_coarse`` as the iteration, and a running set that
+    drains one step at a time, are reached by nothing else in this file, so any *future* divergence
+    there -- one that does change an answer -- now has a test looking at it. The last assertion
+    keeps that true by pinning the configuration rather than the result: if the iteration counts
+    stop ending on a strict increase, the block no longer drains to a single step and this has
+    quietly stopped covering the case it was written for. Retune the problem; do not drop it.
+    """
+    serial, mpi = results['gauss_seidel']
+
+    assert np.array_equal(
+        serial['niter'], mpi['niter']
+    ), f'iteration counts differ: {serial["niter"].tolist()} vs {mpi["niter"].tolist()}'
+    assert np.allclose(
+        serial['uend'], mpi['uend'], atol=ATOL, rtol=RTOL
+    ), f'uend differs by {np.max(np.abs(serial["uend"] - mpi["uend"])):.3e} > {ATOL:.0e}'
+
+    counts = serial['niter'][:, 1]
+    assert counts[-1] > counts[-2], (
+        'the block no longer drains to a single running step, so this axis has stopped covering '
+        f'the routing it was written for -- iteration counts were {counts.tolist()}'
     )
 
 

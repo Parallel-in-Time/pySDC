@@ -1,6 +1,4 @@
 import numpy as np
-from mpi4py import MPI
-
 from pySDC.core.controller import Controller
 from pySDC.core.errors import ControllerError
 from pySDC.core.step import Step
@@ -76,6 +74,8 @@ class controller_MPI(Controller):
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.setup_status_variables(self, comm=comm)
 
+        self.stages = self.get_stages()
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
@@ -98,7 +98,7 @@ class controller_MPI(Controller):
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[: self.comm.rank])
 
-        active = time < Tend - 10 * np.finfo(float).eps
+        active = self.step_is_active(time, t0, Tend)
         comm_active = self.comm.Split(active)
         self.S.status.slot = comm_active.rank
 
@@ -150,7 +150,7 @@ class controller_MPI(Controller):
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[: self.S.status.slot])
 
-            active = time < Tend - 10 * np.finfo(float).eps
+            active = self.step_is_active(time, tend, Tend)
 
             # check if we need to split the communicator
             if tend + sum(all_dt[: comm_active.size - 1]) >= Tend - 10 * np.finfo(float).eps:
@@ -344,7 +344,20 @@ class controller_MPI(Controller):
 
         self.logger.debug(stage + ' - process ' + str(self.S.status.slot))
 
-        switcher = {
+        self.stages.get(stage, self.default)(comm, num_procs)
+
+    def get_stages(self):
+        """
+        The stages this controller can be in, and what to run in each.
+
+        A subclass that iterates differently replaces the iteration stages here and says which one
+        to enter in `next_iteration_stage`; everything around the iteration is the same for any
+        algorithm this controller runs.
+
+        Returns:
+            dict: stage name -> the method that runs it
+        """
+        return {
             'SPREAD': self.spread,
             'PREDICT': self.predict,
             'IT_CHECK': self.it_check,
@@ -354,7 +367,22 @@ class controller_MPI(Controller):
             'IT_UP': self.it_up,
         }
 
-        switcher.get(stage, self.default)(comm, num_procs)
+    def next_iteration_stage(self, S):
+        """
+        The stage that starts one iteration of the algorithm.
+
+        Args:
+            S (pySDC.Step.step): The current step
+
+        Returns:
+            str: name of the stage to enter
+        """
+        if len(S.levels) > 1:  # MLSDC or PFASST
+            return 'IT_DOWN'
+        elif S.status.time_size == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
+            return 'IT_FINE'
+        else:
+            return 'IT_COARSE'  # serial MSSDC (Gauss-like)
 
     def spread(self, comm, num_procs):
         """
@@ -367,6 +395,8 @@ class controller_MPI(Controller):
 
         # call predictor from sweeper
         self.S.levels[0].sweep.predict()
+
+        self.compute_residual_after_spread(self.S)
 
         # update stage
         if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
@@ -391,43 +421,6 @@ class controller_MPI(Controller):
         elif self.params.predict_type == 'fine_only':
             # do a fine sweep only
             self.S.levels[0].sweep.update_nodes()
-
-        # elif self.params.predict_type == 'libpfasst_style':
-        #
-        #     # restrict to coarsest level
-        #     for l in range(1, len(self.S.levels)):
-        #         self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
-        #
-        #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-        #     if not self.S.status.first:
-        #         self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
-        #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-        #                            self.S.status.iter))
-        #         self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-        #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
-        #
-        #     # do the sweep with new values
-        #     self.S.levels[-1].sweep.update_nodes()
-        #     self.S.levels[-1].sweep.compute_end_point()
-        #
-        #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-        #     if not self.S.status.last:
-        #         self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
-        #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-        #                            self.S.status.iter))
-        #         self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
-        #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
-        #
-        #     # go back to fine level, sweeping
-        #     for l in range(len(self.S.levels) - 1, 0, -1):
-        #         # prolong values
-        #         self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
-        #         # on middle levels: do sweep as usual
-        #         if l - 1 > 0:
-        #             self.S.levels[l - 1].sweep.update_nodes()
-        #
-        #     # end with a fine sweep
-        #     self.S.levels[0].sweep.update_nodes()
 
         elif self.params.predict_type == 'pfasst_burnin':
             # restrict to coarsest level
@@ -483,17 +476,7 @@ class controller_MPI(Controller):
         Key routine to check for convergence/termination
         """
 
-        # Update values to compute the residual
-        self.send_full(comm=comm, level=0)
-        if self.S.status.force_done:
-            return None
-
-        self.recv_full(comm=comm, level=0)
-        if self.S.status.force_done:
-            return None
-
-        # compute the residual
-        self.S.levels[0].sweep.compute_residual(stage='IT_CHECK')
+        self.prepare_convergence_check(comm)
 
         if self.S.status.force_done:
             return None
@@ -520,13 +503,7 @@ class controller_MPI(Controller):
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 C.pre_iteration_processing(self, self.S, comm=comm)
 
-            if len(self.S.levels) > 1:  # MLSDC or PFASST
-                self.S.status.stage = 'IT_DOWN'
-            else:
-                if num_procs == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
-                    self.S.status.stage = 'IT_FINE'
-                else:
-                    self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
+            self.S.status.stage = self.next_iteration_stage(self.S)
 
         else:
             # Need to finish all pending isend requests. These will occur for the first active process, since
@@ -540,6 +517,41 @@ class controller_MPI(Controller):
             for hook in self.hooks:
                 hook.post_step(step=self.S, level_number=0)
             self.S.status.stage = 'DONE'
+
+    def compute_residual_after_spread(self, S):
+        """
+        Make the residual current right after the initial guess, for algorithms that need it there.
+
+        This controller computes the residual at the top of `it_check` instead, so there is nothing
+        to do; an algorithm whose residual is not available at that point overrides this. Called
+        before `post_spread_processing`, because convergence controllers there may still change the
+        initial iterate.
+
+        Args:
+            S (pySDC.Step.step): The current step
+        """
+        pass
+
+    def prepare_convergence_check(self, comm):
+        """
+        Make current what `it_check` is about to read: the end point and the residual.
+
+        For a sweep-based algorithm both come out of the exchange with the neighbours, so this is
+        the send and receive plus the residual it enables. An algorithm that gets its residual from
+        the iteration instead overrides this, and still owes the end point.
+
+        Args:
+            comm: the communicator
+        """
+        self.send_full(comm=comm, level=0)
+        if self.S.status.force_done:
+            return None
+
+        self.recv_full(comm=comm, level=0)
+        if self.S.status.force_done:
+            return None
+
+        self.S.levels[0].sweep.compute_residual(stage='IT_CHECK')
 
     def it_fine(self, comm, num_procs):
         """
