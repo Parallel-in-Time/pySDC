@@ -242,27 +242,23 @@ class controller_nonMPI(Controller):
             S: the current step
             level: the level number
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
+
+        Note:
+            Computing the end point is this function's job, not the caller's, exactly as in
+            `controller_MPI.send_full`. It happens whether or not anyone is listening, because the
+            last step has no successor but its `uend` is still the block's result.
         """
-
-        def send(source, tag):
-            """
-            Send function
-
-            Args:
-                source: level which has the new values
-                tag: identifier for this message
-            """
-            # sending here means computing uend ("one-sided communication")
-            source.sweep.compute_end_point()
-            source.tag = cp.deepcopy(tag)
-
         for hook in self.hooks:
             hook.pre_comm(step=S, level_number=level)
+
+        # sending here means computing uend ("one-sided communication")
+        S.levels[level].sweep.compute_end_point()
+
         if not S.status.last:
             self.logger.debug(
                 'Process %2i provides data on level %2i with tag %s' % (S.status.slot, level, S.status.iter)
             )
-            send(S.levels[level], tag=(level, S.status.iter, S.status.slot))
+            S.levels[level].tag = cp.deepcopy((level, S.status.iter, S.status.slot))
 
         for hook in self.hooks:
             hook.post_comm(step=S, level_number=level, add_to_stats=add_to_stats)
@@ -509,7 +505,6 @@ class controller_nonMPI(Controller):
 
                 S.status.stage = self.next_iteration_stage(S)
             else:
-                S.levels[0].sweep.compute_end_point()
                 for hook in self.hooks:
                     hook.post_step(step=S, level_number=0)
                 S.status.stage = 'DONE'
