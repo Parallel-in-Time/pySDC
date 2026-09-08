@@ -51,32 +51,17 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">controller_ParaDiag_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ParaDiagController</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ParaDiag</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">controller_nonMPI</span></code></p>
 <p>ParaDiag controller, running serialized version.</p>
+<p>This is <cite>controller_nonMPI</cite> with a different iteration: where PFASST sweeps and cascades through
+the levels, ParaDiag diagonalizes across the steps. Everything around the iteration – blocks,
+windowing, restarts, convergence – is the driver it inherits, which is why the dispatcher it
+uses is still called <cite>pfasst</cite>.</p>
 <p>This controller uses the increment formulation. That is to say, we setup the residual of the all at once problem,
 put it on the right hand side, invert the ParaDiag preconditioner on the left-hand side to compute the increment
 and then add the increment onto the solution. For this reason, we need to replace the solution values in the steps
 with the residual values before the solves and then put the solution plus increment back into the steps. This is a
 bit counter to what you expect when you access the <cite>u</cite> variable in the levels, but it is mathematically advantageous.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.ParaDiag">
-<span class="sig-name descname"><span class="pre">ParaDiag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_active</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.ParaDiag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.ParaDiag" title="Link to this definition">¶</a></dt>
-<dd><p>Main function for ParaDiag</p>
-<p>For the workflow of this controller, see <a class="reference external" href="https://arxiv.org/abs/2103.12571">https://arxiv.org/abs/2103.12571</a></p>
-<p>This method changes self.MS directly by accessing active steps through local_MS_active.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>local_MS_active</strong> (<em>list</em>) – all active steps</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Whether all steps are done</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>boot</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.apply_matrix">
 <span class="sig-name descname"><span class="pre">apply_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.apply_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.apply_matrix" title="Link to this definition">¶</a></dt>
@@ -139,62 +124,17 @@ iteration will be done.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_check">
-<span class="sig-name descname"><span class="pre">it_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.it_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_check" title="Link to this definition">¶</a></dt>
-<dd><p>Key routine to check for convergence/termination</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians">
 <span class="sig-name descname"><span class="pre">prepare_Jacobians</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.prepare_Jacobians"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.restart_block">
-<span class="sig-name descname"><span class="pre">restart_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.restart_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.restart_block" title="Link to this definition">¶</a></dt>
-<dd><p>Helper routine to reset/restart block of (active) steps</p>
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.set_G_inv">
+<span class="sig-name descname"><span class="pre">set_G_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.set_G_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.set_G_inv" title="Link to this definition">¶</a></dt>
+<dd><p>Give every step the G^-1 that belongs to where it sits in the block.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>active_slots</strong> – list of active steps</p></li>
-<li><p><strong>time</strong> – list of new times</p></li>
-<li><p><strong>u0</strong> – initial value to distribute across the steps</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.run" title="Link to this definition">¶</a></dt>
-<dd><p>Main driver for running the serial version of ParaDiag</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u0</strong> – initial values</p></li>
-<li><p><strong>t0</strong> – starting time</p></li>
-<li><p><strong>Tend</strong> – ending time</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>end values on the last step
-stats object containing statistics for each step, each level and each iteration</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.spread">
-<span class="sig-name descname"><span class="pre">spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.spread" title="Link to this definition">¶</a></dt>
-<dd><p>Spreading phase</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+<dd class="field-odd"><p><strong>alpha</strong> (<em>float</em>) – the alpha this G^-1 is built from</p>
 </dd>
 </dl>
 </dd></dl>
@@ -237,15 +177,11 @@ stats object containing statistics for each step, each level and each iteration<
     <ul>
 <li><a class="reference internal" href="#">implementations.controller_classes.controller_ParaDiag_nonMPI module</a><ul>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI"><code class="docutils literal notranslate"><span class="pre">controller_ParaDiag_nonMPI</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.ParaDiag"><code class="docutils literal notranslate"><span class="pre">ParaDiag()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.apply_matrix"><code class="docutils literal notranslate"><span class="pre">apply_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.compute_all_at_once_residual"><code class="docutils literal notranslate"><span class="pre">compute_all_at_once_residual()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_ParaDiag"><code class="docutils literal notranslate"><span class="pre">it_ParaDiag()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_check"><code class="docutils literal notranslate"><span class="pre">it_check()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians"><code class="docutils literal notranslate"><span class="pre">prepare_Jacobians()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.restart_block"><code class="docutils literal notranslate"><span class="pre">restart_block()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.spread"><code class="docutils literal notranslate"><span class="pre">spread()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.set_G_inv"><code class="docutils literal notranslate"><span class="pre">set_G_inv()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_G_inv"><code class="docutils literal notranslate"><span class="pre">update_G_inv()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_solution"><code class="docutils literal notranslate"><span class="pre">update_solution()</span></code></a></li>
 </ul>

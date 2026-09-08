@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 2
 
+   implementations.controller_classes.ParaDiag
    implementations.controller_classes.controller_MPI
    implementations.controller_classes.controller_ParaDiag_MPI
    implementations.controller_classes.controller_ParaDiag_nonMPI

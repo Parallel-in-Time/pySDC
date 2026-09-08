@@ -54,12 +54,44 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Controller</span></code></p>
 <p>PFASST controller, running serialized version of PFASST in blocks (MG-style)</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.compute_residual_after_spread">
+<span class="sig-name descname"><span class="pre">compute_residual_after_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.compute_residual_after_spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.compute_residual_after_spread" title="Link to this definition">¶</a></dt>
+<dd><p>Make the residual current right after the initial guess, for algorithms that need it there.</p>
+<p>This controller computes the residual at the top of <cite>it_check</cite> instead, so there is nothing
+to do; an algorithm whose residual is not available at that point overrides this. Called
+before <cite>post_spread_processing</cite>, because convergence controllers there may still change the
+initial iterate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.default">
 <span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default" title="Link to this definition">¶</a></dt>
 <dd><p>Default routine to catch wrong status</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.get_stages">
+<span class="sig-name descname"><span class="pre">get_stages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.get_stages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.get_stages" title="Link to this definition">¶</a></dt>
+<dd><p>The stages this controller can be in, and what to run in each.</p>
+<p>A subclass that iterates differently replaces the iteration stages here and says which one
+to enter in <cite>next_iteration_stage</cite>; everything around the iteration is the same for any
+algorithm this controller runs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>stage name -&gt; the method that runs it</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -120,6 +152,23 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.next_iteration_stage">
+<span class="sig-name descname"><span class="pre">next_iteration_stage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.next_iteration_stage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.next_iteration_stage" title="Link to this definition">¶</a></dt>
+<dd><p>The stage that starts one iteration of the algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>name of the stage to enter</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst">
 <span class="sig-name descname"><span class="pre">pfasst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_active</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.pfasst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst" title="Link to this definition">¶</a></dt>
 <dd><p>Main function including the stages of SDC, MLSDC and PFASST (the “controller”)</p>
@@ -136,6 +185,20 @@
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict">
 <span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict" title="Link to this definition">¶</a></dt>
 <dd><p>Predictor phase</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.prepare_convergence_check">
+<span class="sig-name descname"><span class="pre">prepare_convergence_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.prepare_convergence_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.prepare_convergence_check" title="Link to this definition">¶</a></dt>
+<dd><p>Make current what <cite>it_check</cite> is about to read: the end point and the residual.</p>
+<p>For a sweep-based algorithm both come out of the exchange with the neighbours, so this is
+the send and receive plus the residual it enables. An algorithm that gets its residual from
+the iteration instead overrides this, and still owes the end point.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
@@ -205,6 +268,12 @@ stats object containing statistics for each step, each level and each iteration<
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Computing the end point is this function’s job, not the caller’s, exactly as in
+<cite>controller_MPI.send_full</cite>. It happens whether or not anyone is listening, because the
+last step has no successor but its <cite>uend</cite> is still the block’s result.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -234,14 +303,18 @@ stats object containing statistics for each step, each level and each iteration<
     <ul>
 <li><a class="reference internal" href="#">implementations.controller_classes.controller_nonMPI module</a><ul>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.compute_residual_after_spread"><code class="docutils literal notranslate"><span class="pre">compute_residual_after_spread()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default"><code class="docutils literal notranslate"><span class="pre">default()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.get_stages"><code class="docutils literal notranslate"><span class="pre">get_stages()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check"><code class="docutils literal notranslate"><span class="pre">it_check()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse"><code class="docutils literal notranslate"><span class="pre">it_coarse()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down"><code class="docutils literal notranslate"><span class="pre">it_down()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine"><code class="docutils literal notranslate"><span class="pre">it_fine()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up"><code class="docutils literal notranslate"><span class="pre">it_up()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.next_iteration_stage"><code class="docutils literal notranslate"><span class="pre">next_iteration_stage()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst"><code class="docutils literal notranslate"><span class="pre">pfasst()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict"><code class="docutils literal notranslate"><span class="pre">predict()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.prepare_convergence_check"><code class="docutils literal notranslate"><span class="pre">prepare_convergence_check()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full"><code class="docutils literal notranslate"><span class="pre">recv_full()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block"><code class="docutils literal notranslate"><span class="pre">restart_block()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>

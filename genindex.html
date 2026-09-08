@@ -224,10 +224,10 @@
         <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT_gpu.html#implementations.problem_classes.AllenCahn_2D_FFT_gpu.allencahn2d_imex_stab">(class in implementations.problem_classes.AllenCahn_2D_FFT_gpu)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">allencahn_front_finel (class in implementations.problem_classes.AllenCahn_1D_FD)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">allencahn_front_fullyimplicit (class in implementations.problem_classes.AllenCahn_1D_FD)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">allencahn_front_semiimplicit (class in implementations.problem_classes.AllenCahn_1D_FD)</a>
@@ -308,6 +308,8 @@
 
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.apply_matrix">(controller_ParaDiag_nonMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.apply_matrix">(ParaDiag method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK2">ARK2 (class in implementations.sweeper_classes.Runge_Kutta)</a>
@@ -700,6 +702,14 @@
         <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.compute_residual">(Sweeper method)</a>
 </li>
         <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.compute_residual">(SweeperMPI method)</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.compute_residual_after_spread">compute_residual_after_spread() (controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.compute_residual_after_spread">(controller_nonMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.compute_residual_after_spread">(ParaDiag method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.compute_residual_DAE">compute_residual_DAE() (in module implementations.problem_classes.generic_spectral)</a>
@@ -1668,7 +1678,7 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.fft_comm_backend">(SpectralHelper attribute)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController.FFT_in_time">FFT_in_time() (ParaDiagController method)</a>
+      <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.FFT_in_time">FFT_in_time() (ParaDiag method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.fft_lib">fft_lib (SpectralHelper attribute)</a>
 
@@ -1876,7 +1886,7 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_1dgrid">(SpectralHelper1D method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController.get_alpha">get_alpha() (ParaDiagController method)</a>
+      <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.get_alpha">get_alpha() (ParaDiag method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_basis_change_matrix">get_basis_change_matrix() (ChebychevHelper method)</a>
 
@@ -1966,7 +1976,7 @@
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_fft">get_fft() (SpectralHelper method)</a>
 </li>
-      <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController.get_FFT_matrices">get_FFT_matrices() (ParaDiagController method)</a>
+      <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.get_FFT_matrices">get_FFT_matrices() (ParaDiag method)</a>
 </li>
       <li><a href="pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_FFT_matrix">get_FFT_matrix() (in module helpers.ParaDiagHelper)</a>
 </li>
@@ -2046,8 +2056,6 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix">(UltrasphericalHelper method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integration_weights">get_integration_weights() (ChebychevHelper method)</a>
 
       <ul>
@@ -2056,6 +2064,8 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_integration_weights">(SpectralHelper1D method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">get_interactions() (penningtrap method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.get_interpolated_solution">get_interpolated_solution() (EstimatePolynomialError method)</a>
@@ -2156,6 +2166,14 @@
       </ul></li>
       <li><a href="pySDC/helpers.stats_helper.html#helpers.stats_helper.get_sorted">get_sorted() (in module helpers.stats_helper)</a>
 </li>
+      <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.get_stages">get_stages() (controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.get_stages">(controller_nonMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.get_stages">(ParaDiag method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise.get_step_from_which_to_spread">get_step_from_which_to_spread() (SpreadStepSizesBlockwise method)</a>
 
       <ul>
@@ -2498,7 +2516,7 @@
       </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.idctn">idctn() (vkFFT static method)</a>
 </li>
-      <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController.iFFT_in_time">iFFT_in_time() (ParaDiagController method)</a>
+      <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.iFFT_in_time">iFFT_in_time() (ParaDiag method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.vkFFT.ifftn">ifftn() (vkFFT static method)</a>
 </li>
@@ -2566,6 +2584,13 @@
 
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#module-implementations.controller_classes.controller_ParaDiag_nonMPI">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.controller_classes.ParaDiag
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#module-implementations.controller_classes.ParaDiag">module</a>
 </li>
       </ul></li>
       <li>
@@ -2981,6 +3006,8 @@
         <li><a href="pySDC/implementations.problem_classes.generic_ND_FD.html#module-implementations.problem_classes.generic_ND_FD">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.generic_spectral
 
@@ -2988,8 +3015,6 @@
         <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#module-implementations.problem_classes.generic_spectral">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_1D_FEniCS_implicit
 
@@ -3430,10 +3455,6 @@
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check">(controller_nonMPI method)</a>
 </li>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_MPI.html#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_check">(controller_ParaDiag_MPI method)</a>
-</li>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.it_check">(controller_ParaDiag_nonMPI method)</a>
-</li>
       </ul></li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.it_coarse">it_coarse() (controller_MPI method)</a>
 
@@ -3873,6 +3894,8 @@
 </li>
         <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#module-implementations.controller_classes.controller_ParaDiag_nonMPI">implementations.controller_classes.controller_ParaDiag_nonMPI</a>
 </li>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#module-implementations.controller_classes.ParaDiag">implementations.controller_classes.ParaDiag</a>
+</li>
         <li><a href="pySDC/implementations.convergence_controller_classes.html#module-implementations.convergence_controller_classes">implementations.convergence_controller_classes</a>
 </li>
         <li><a href="pySDC/implementations.convergence_controller_classes.adaptive_alpha.html#module-implementations.convergence_controller_classes.adaptive_alpha">implementations.convergence_controller_classes.adaptive_alpha</a>
@@ -4176,6 +4199,14 @@
 </li>
       <li><a href="pySDC/core.step.html#core.step.Step.next">next (Step property)</a>
 </li>
+      <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.next_iteration_stage">next_iteration_stage() (controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.next_iteration_stage">(controller_nonMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.next_iteration_stage">(ParaDiag method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors">next_neighbors() (in module helpers.transfer_helper)</a>
 </li>
       <li><a href="pySDC/helpers.transfer_helper.html#helpers.transfer_helper.next_neighbors_periodic">next_neighbors_periodic() (in module helpers.transfer_helper)</a>
@@ -4282,13 +4313,7 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_MPI.html#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.ParaDiag">ParaDiag() (controller_ParaDiag_MPI method)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.ParaDiag">(controller_ParaDiag_nonMPI method)</a>
-</li>
-      </ul></li>
-      <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController">ParaDiagController (class in core.controller)</a>
+      <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag">ParaDiag (class in implementations.controller_classes.ParaDiag)</a>
 </li>
       <li><a href="pySDC/core.errors.html#core.errors.ParameterError">ParameterError</a>
 </li>
@@ -4546,6 +4571,14 @@
       </ul></li>
       <li><a href="pySDC/core.timings.html#core.timings.Timings.prefix">prefix (Timings attribute)</a>
 </li>
+      <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.prepare_convergence_check">prepare_convergence_check() (controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.prepare_convergence_check">(controller_nonMPI method)</a>
+</li>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.prepare_convergence_check">(ParaDiag method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_MPI.html#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.prepare_Jacobians">prepare_Jacobians() (controller_ParaDiag_MPI method)</a>
 
       <ul>
@@ -4574,6 +4607,8 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtNan.prepare_next_block">(StopAtNan method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.prepare_ParaDiag_params">prepare_ParaDiag_params() (ParaDiag static method)</a>
+</li>
       <li><a href="pySDC/core.step.html#core.step.Step.prev">prev (Step property)</a>
 </li>
       <li><a href="pySDC/core.level.html#core.level.Level.prob">prob (Level property)</a>
@@ -4784,24 +4819,22 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.reset_status_variables">(EstimatePolynomialError method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.step.html#core.step.Step.reset_step">reset_step() (Step method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.step.html#core.step.Step.reset_step">reset_step() (Step method)</a>
+</li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.reshape">reshape() (FieldsIO method)</a>
 
       <ul>
         <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear.reshape">(Rectilinear method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.resolve_alpha">resolve_alpha() (ParaDiag static method)</a>
+</li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.restart_block">restart_block() (controller_MPI method)</a>
 
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block">(controller_nonMPI method)</a>
-</li>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_MPI.html#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.restart_block">(controller_ParaDiag_MPI method)</a>
-</li>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.restart_block">(controller_ParaDiag_nonMPI method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.transfer_classes.BaseTransfer_mass.html#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.restrict">restrict() (base_transfer_mass method)</a>
@@ -4871,10 +4904,6 @@
 </li>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.run">(controller_nonMPI method)</a>
 </li>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_MPI.html#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.run">(controller_ParaDiag_MPI method)</a>
-</li>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.run">(controller_ParaDiag_nonMPI method)</a>
-</li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">RungeKutta (class in implementations.sweeper_classes.Runge_Kutta)</a>
 </li>
@@ -4908,8 +4937,12 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full">(controller_nonMPI method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.set_G_inv">set_G_inv() (QDiagonalization method)</a>
+      <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.set_G_inv">set_G_inv() (controller_ParaDiag_nonMPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.set_G_inv">(QDiagonalization method)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.set_level_status_variable">set_level_status_variable() (ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter">set_maxiter() (NewtonInexactness method)</a>
@@ -5275,10 +5308,6 @@
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread">(controller_nonMPI method)</a>
 </li>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_MPI.html#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.spread">(controller_ParaDiag_MPI method)</a>
-</li>
-        <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.spread">(controller_ParaDiag_nonMPI method)</a>
-</li>
       </ul></li>
       <li><a href="pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise">SpreadStepSizesBlockwise (class in implementations.convergence_controller_classes.spread_step_sizes)</a>
 </li>
@@ -5300,6 +5329,12 @@
       </ul></li>
       <li><a href="pySDC/core.step.html#core.step.Step">Step (class in core.step)</a>
 </li>
+      <li><a href="pySDC/core.controller.html#core.controller.Controller.step_is_active">step_is_active() (Controller method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.step_is_active">(ParaDiag method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.controller.html#core.controller.Controller.steps">steps (Controller property)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter">StepSizeLimiter (class in implementations.convergence_controller_classes.step_size_limiter)</a>
@@ -5587,7 +5622,7 @@
       <ul>
         <li><a href="pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.update_G_inv">(controller_ParaDiag_nonMPI method)</a>
 </li>
-        <li><a href="pySDC/core.controller.html#core.controller.ParaDiagController.update_G_inv">(ParaDiagController method)</a>
+        <li><a href="pySDC/implementations.controller_classes.ParaDiag.html#implementations.controller_classes.ParaDiag.ParaDiag.update_G_inv">(ParaDiag method)</a>
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes">update_nodes() (boris_2nd_order method)</a>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.controller_classes.ParaDiag module &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.controller_classes.controller_MPI module" href="implementations.controller_classes.controller_MPI.html" />
+    <link rel="prev" title="implementations.controller_classes package" href="implementations.controller_classes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.controller_MPI.html" title="implementations.controller_classes.controller_MPI module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.html" title="implementations.controller_classes package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.controller_classes.html" accesskey="U">implementations.controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.controller_classes.ParaDiag module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.controller_classes.ParaDiag">
+<span id="implementations-controller-classes-paradiag-module"></span><h1>implementations.controller_classes.ParaDiag module<a class="headerlink" href="#module-implementations.controller_classes.ParaDiag" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ParaDiag</span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>What ParaDiag is, independently of how the block is spread over processes.</p>
+<p>Mixed into a controller, this replaces its iteration and leaves everything around it alone:</p>
+<blockquote>
+<div><p>class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI)
+class controller_ParaDiag_MPI(ParaDiag, controller_MPI)</p>
+</div></blockquote>
+<p>It deliberately has no <cite>__init__</cite> and no controller of its own to inherit from, so that it can
+be mixed into either transport’s controller without the two having to agree on a constructor
+signature. A concrete ParaDiag controller calls <cite>prepare_ParaDiag_params</cite> on the two
+dictionaries and then hands them to its controller’s initialisation.</p>
+<p>What stays with the concrete classes is everything whose implementation depends on where the
+other steps are: <cite>apply_matrix</cite>, <cite>prepare_Jacobians</cite>, <cite>compute_all_at_once_residual</cite>,
+<cite>update_G_inv</cite> and the block driver.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.FFT_in_time">
+<span class="sig-name descname"><span class="pre">FFT_in_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.FFT_in_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.FFT_in_time" title="Link to this definition">¶</a></dt>
+<dd><p>Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</p>
+<dl class="simple">
+<dt>Note: The implementation via matrix-vector multiplication may be inefficient and less stable compared to an FFT</dt><dd><p>with transposes!</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>str</em>) – the level attribute to transform</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – iteration index, for an iteration dependent alpha</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.apply_matrix">
+<span class="sig-name descname"><span class="pre">apply_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.apply_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.apply_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Apply a square matrix across the steps, in place.</p>
+<p>How this is done depends entirely on where the other steps are, so the concrete controllers
+implement it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> – square matrix with as many rows as there are steps</p></li>
+<li><p><strong>quantity</strong> (<em>str</em>) – ‘residual’ or ‘increment’, the level attribute to transform</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.compute_residual_after_spread">
+<span class="sig-name descname"><span class="pre">compute_residual_after_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.compute_residual_after_spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.compute_residual_after_spread" title="Link to this definition">¶</a></dt>
+<dd><p>ParaDiag’s residual is the one of the composite collocation problem, which <cite>it_ParaDiag</cite>
+computes as part of the iteration. The convergence check runs before the first iteration,
+so the initial guess needs its residual here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.get_FFT_matrices">
+<span class="sig-name descname"><span class="pre">get_FFT_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.get_FFT_matrices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.get_FFT_matrices" title="Link to this definition">¶</a></dt>
+<dd><p>Get the weighted FFT and iFFT matrices for iteration <cite>k</cite>, rebuilding them only when alpha
+actually changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – iteration index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the forward and backward weighted FFT matrices</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.get_alpha">
+<span class="sig-name descname"><span class="pre">get_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.get_alpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.get_alpha" title="Link to this definition">¶</a></dt>
+<dd><p>Get the ParaDiag alpha parameter for iteration <cite>k</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – iteration index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>alpha to use for this iteration</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.get_stages">
+<span class="sig-name descname"><span class="pre">get_stages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.get_stages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.get_stages" title="Link to this definition">¶</a></dt>
+<dd><p>ParaDiag has one iteration stage, and no predictor because it has no coarse level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>stage name -&gt; the method that runs it</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.iFFT_in_time">
+<span class="sig-name descname"><span class="pre">iFFT_in_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.iFFT_in_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.iFFT_in_time" title="Link to this definition">¶</a></dt>
+<dd><p>Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<em>str</em>) – the level attribute to transform</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – iteration index, for an iteration dependent alpha</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.next_iteration_stage">
+<span class="sig-name descname"><span class="pre">next_iteration_stage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.next_iteration_stage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.next_iteration_stage" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>name of the stage to enter</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.prepare_ParaDiag_params">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">prepare_ParaDiag_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.prepare_ParaDiag_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.prepare_ParaDiag_params" title="Link to this definition">¶</a></dt>
+<dd><p>Check and complete the parameters ParaDiag needs, in place.</p>
+<p>Call this <em>before</em> the controller’s own initialisation: it only reads and writes the two
+dictionaries, and must have run by the time the steps are built.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller_params</strong> (<em>dict</em>) – parameter set for the controller and the steps</p></li>
+<li><p><strong>description</strong> (<em>dict</em>) – all the parameters to set up the rest (levels, problems, …)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.prepare_convergence_check">
+<span class="sig-name descname"><span class="pre">prepare_convergence_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.prepare_convergence_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.prepare_convergence_check" title="Link to this definition">¶</a></dt>
+<dd><p>The residual is already current – <cite>it_ParaDiag</cite> computed it, and recomputing it the way a
+sweep-based algorithm does would need initial conditions that have not been communicated
+yet. The end point is not, because nothing sent it anywhere, so compute it here: <cite>it_check</cite>
+is what publishes <cite>uend</cite> when a step is done.</p>
+<p>Takes whatever its controller passes – a block of steps or a communicator – and needs
+none of it, because the steps to do this for are the ones this controller owns.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.resolve_alpha">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">resolve_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.resolve_alpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.resolve_alpha" title="Link to this definition">¶</a></dt>
+<dd><p>Read the alpha for iteration <cite>k</cite> out of whatever the user supplied.</p>
+<p><cite>alpha</cite> may be a single number, a sequence indexed by iteration (the last entry is reused once
+it runs out), or a callable taking the iteration index. Making it iteration dependent lets the
+outer iteration start with a well-conditioned alpha and tighten it later.</p>
+<p>Static because the steps need an alpha before the controller has parameters to read it from.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> – the alpha parameter as supplied by the user</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – iteration index</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>alpha to use for this iteration</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.step_is_active">
+<span class="sig-name descname"><span class="pre">step_is_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.step_is_active"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.step_is_active" title="Link to this definition">¶</a></dt>
+<dd><p>ParaDiag diagonalizes across the whole block, so it cannot drop a step out of one. A block
+that starts before <cite>Tend</cite> is run whole, past <cite>Tend</cite> if need be.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>float</em>) – when this step starts</p></li>
+<li><p><strong>block_start</strong> (<em>float</em>) – when the first step of this step’s block starts</p></li>
+<li><p><strong>Tend</strong> (<em>float</em>) – ending time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>whether this step takes part</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.ParaDiag.ParaDiag.update_G_inv">
+<span class="sig-name descname"><span class="pre">update_G_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/implementations/controller_classes/ParaDiag.html#ParaDiag.update_G_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.ParaDiag.ParaDiag.update_G_inv" title="Link to this definition">¶</a></dt>
+<dd><p>Rebuild G^-1 on the local step(s) when alpha changes with the iteration.</p>
+<p>G^-1 depends on alpha, so an iteration dependent alpha means the sweeper’s diagonalization has
+to be recomputed. Subclasses implement this because only they know which steps they own.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – iteration index</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.controller_classes.ParaDiag module</a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag"><code class="docutils literal notranslate"><span class="pre">ParaDiag</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.FFT_in_time"><code class="docutils literal notranslate"><span class="pre">FFT_in_time()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.apply_matrix"><code class="docutils literal notranslate"><span class="pre">apply_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.compute_residual_after_spread"><code class="docutils literal notranslate"><span class="pre">compute_residual_after_spread()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.get_FFT_matrices"><code class="docutils literal notranslate"><span class="pre">get_FFT_matrices()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.get_alpha"><code class="docutils literal notranslate"><span class="pre">get_alpha()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.get_stages"><code class="docutils literal notranslate"><span class="pre">get_stages()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.iFFT_in_time"><code class="docutils literal notranslate"><span class="pre">iFFT_in_time()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.next_iteration_stage"><code class="docutils literal notranslate"><span class="pre">next_iteration_stage()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.prepare_ParaDiag_params"><code class="docutils literal notranslate"><span class="pre">prepare_ParaDiag_params()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.prepare_convergence_check"><code class="docutils literal notranslate"><span class="pre">prepare_convergence_check()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.resolve_alpha"><code class="docutils literal notranslate"><span class="pre">resolve_alpha()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.step_is_active"><code class="docutils literal notranslate"><span class="pre">step_is_active()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.ParaDiag.ParaDiag.update_G_inv"><code class="docutils literal notranslate"><span class="pre">update_G_inv()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.controller_classes.html"
+                          title="previous chapter">implementations.controller_classes package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.controller_classes.controller_MPI.html"
+                          title="next chapter">implementations.controller_classes.controller_MPI module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.controller_classes.ParaDiag.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.controller_MPI.html" title="implementations.controller_classes.controller_MPI module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.html" title="implementations.controller_classes package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.controller_classes.html" >implementations.controller_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.controller_classes.ParaDiag module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

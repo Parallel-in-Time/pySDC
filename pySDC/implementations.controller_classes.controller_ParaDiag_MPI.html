@@ -51,8 +51,12 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">controller_ParaDiag_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ParaDiagController</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ParaDiag</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">controller_MPI</span></code></p>
 <p>ParaDiag controller with MPI parallelism across time steps: one step per rank.</p>
+<p>This is <cite>controller_MPI</cite> with a different iteration: where PFASST sweeps and cascades through
+the levels, ParaDiag diagonalizes across the steps. Everything around the iteration – blocks,
+windowing, restarts, convergence – is the driver it inherits, which is why the dispatcher it
+uses is still called <cite>pfasst</cite>.</p>
 <p>Everything here is written from a single processor’s point of view. A rank owns exactly one step
 and never inspects another rank’s data; the places where ParaDiag genuinely needs information
 from the whole block are expressed as communication:</p>
@@ -60,17 +64,16 @@ from the whole block are expressed as communication:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">prepare_Jacobians</span></code>          -&gt; Allreduce(SUM) over the step communicator</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">compute_all_at_once_residual</span></code> -&gt; point-to-point exchange with the previous/next rank</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">apply_matrix</span></code> (the weighted FFT/iFFT in time) -&gt; a ring reduction, see below</p></li>
-<li><p>convergence                   -&gt; allreduce(LAND), because ParaDiag converges collectively</p></li>
+<li><dl class="simple">
+<dt>convergence                   -&gt; the inherited <cite>it_check</cite>, which allreduces because</dt><dd><p><cite>all_to_done</cite> is forced on for ParaDiag</p>
+</dd>
+</dl>
+</li>
 </ul>
 <p>Note that ParaDiag steps can only converge together, so every rank always participates in every
 iteration. That is not a policy choice: a rank that stopped early would never enter the
-collectives below and the run would hang.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.ParaDiag">
-<span class="sig-name descname"><span class="pre">ParaDiag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.ParaDiag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.ParaDiag" title="Link to this definition">¶</a></dt>
-<dd><p>Dispatch on the current stage. All ranks are always in the same stage.</p>
-</dd></dl>
-
+collectives below and the run would hang. <cite>step_is_active</cite> says the same thing about blocks –
+a block is never run partially, so the driver’s windowing never splits one.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.apply_matrix">
 <span class="sig-name descname"><span class="pre">apply_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.apply_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.apply_matrix" title="Link to this definition">¶</a></dt>
@@ -104,40 +107,14 @@ point-to-point communication in a ParaDiag iteration.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_ParaDiag">
-<span class="sig-name descname"><span class="pre">it_ParaDiag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.it_ParaDiag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_ParaDiag" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">it_ParaDiag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.it_ParaDiag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_ParaDiag" title="Link to this definition">¶</a></dt>
 <dd><p>A single ParaDiag iteration, from this rank’s point of view.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_check">
-<span class="sig-name descname"><span class="pre">it_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.it_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_check" title="Link to this definition">¶</a></dt>
-<dd><p>Check for convergence. ParaDiag converges collectively, hence the allreduce.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.prepare_Jacobians">
 <span class="sig-name descname"><span class="pre">prepare_Jacobians</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.prepare_Jacobians"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.prepare_Jacobians" title="Link to this definition">¶</a></dt>
 <dd><p>Average the solution across all steps, for constructing average Jacobians.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.restart_block">
-<span class="sig-name descname"><span class="pre">restart_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.restart_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.restart_block" title="Link to this definition">¶</a></dt>
-<dd><p>Reset this rank’s step for a new block.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.run" title="Link to this definition">¶</a></dt>
-<dd><p>Main driver.</p>
-<p>ParaDiag always runs whole blocks – every rank participates in every iteration – so unlike
-the pipelined controllers there is no communicator splitting as steps finish.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.spread">
-<span class="sig-name descname"><span class="pre">spread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_MPI.html#controller_ParaDiag_MPI.spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.spread" title="Link to this definition">¶</a></dt>
-<dd><p>Spreading phase</p>
 </dd></dl>
 
 <dl class="py method">
@@ -173,15 +150,10 @@ the pipelined controllers there is no communicator splitting as steps finish.</p
     <ul>
 <li><a class="reference internal" href="#">implementations.controller_classes.controller_ParaDiag_MPI module</a><ul>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI"><code class="docutils literal notranslate"><span class="pre">controller_ParaDiag_MPI</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.ParaDiag"><code class="docutils literal notranslate"><span class="pre">ParaDiag()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.apply_matrix"><code class="docutils literal notranslate"><span class="pre">apply_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.compute_all_at_once_residual"><code class="docutils literal notranslate"><span class="pre">compute_all_at_once_residual()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_ParaDiag"><code class="docutils literal notranslate"><span class="pre">it_ParaDiag()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.it_check"><code class="docutils literal notranslate"><span class="pre">it_check()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.prepare_Jacobians"><code class="docutils literal notranslate"><span class="pre">prepare_Jacobians()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.restart_block"><code class="docutils literal notranslate"><span class="pre">restart_block()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.spread"><code class="docutils literal notranslate"><span class="pre">spread()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.update_G_inv"><code class="docutils literal notranslate"><span class="pre">update_G_inv()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_ParaDiag_MPI.controller_ParaDiag_MPI.update_solution"><code class="docutils literal notranslate"><span class="pre">update_solution()</span></code></a></li>
 </ul>

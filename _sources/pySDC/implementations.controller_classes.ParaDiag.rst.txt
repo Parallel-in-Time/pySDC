@@ -1,0 +1,7 @@
+implementations.controller\_classes.ParaDiag module
+===================================================
+
+.. automodule:: implementations.controller_classes.ParaDiag
+   :members:
+   :show-inheritance:
+   :undoc-members:

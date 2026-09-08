@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="implementations.controller_classes.controller_ParaDiag_MPI module" href="implementations.controller_classes.controller_ParaDiag_MPI.html" />
-    <link rel="prev" title="implementations.controller_classes package" href="implementations.controller_classes.html" /> 
+    <link rel="prev" title="implementations.controller_classes.ParaDiag module" href="implementations.controller_classes.ParaDiag.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -32,7 +32,7 @@
           <a href="implementations.controller_classes.controller_ParaDiag_MPI.html" title="implementations.controller_classes.controller_ParaDiag_MPI module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="implementations.controller_classes.html" title="implementations.controller_classes package"
+          <a href="implementations.controller_classes.ParaDiag.html" title="implementations.controller_classes.ParaDiag module"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
@@ -54,9 +54,41 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Controller</span></code></p>
 <p>PFASST controller, running parallel version of PFASST in blocks (MG-style)</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.compute_residual_after_spread">
+<span class="sig-name descname"><span class="pre">compute_residual_after_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.compute_residual_after_spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.compute_residual_after_spread" title="Link to this definition">¶</a></dt>
+<dd><p>Make the residual current right after the initial guess, for algorithms that need it there.</p>
+<p>This controller computes the residual at the top of <cite>it_check</cite> instead, so there is nothing
+to do; an algorithm whose residual is not available at that point overrides this. Called
+before <cite>post_spread_processing</cite>, because convergence controllers there may still change the
+initial iterate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.default">
 <span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.default" title="Link to this definition">¶</a></dt>
 <dd><p>Default routine to catch wrong status</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.get_stages">
+<span class="sig-name descname"><span class="pre">get_stages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.get_stages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.get_stages" title="Link to this definition">¶</a></dt>
+<dd><p>The stages this controller can be in, and what to run in each.</p>
+<p>A subclass that iterates differently replaces the iteration stages here and says which one
+to enter in <cite>next_iteration_stage</cite>; everything around the iteration is the same for any
+algorithm this controller runs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>stage name -&gt; the method that runs it</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -90,6 +122,23 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.next_iteration_stage">
+<span class="sig-name descname"><span class="pre">next_iteration_stage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.next_iteration_stage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.next_iteration_stage" title="Link to this definition">¶</a></dt>
+<dd><p>The stage that starts one iteration of the algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step.step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>name of the stage to enter</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.pfasst">
 <span class="sig-name descname"><span class="pre">pfasst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.pfasst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.pfasst" title="Link to this definition">¶</a></dt>
 <dd><p>Main function including the stages of SDC, MLSDC and PFASST (the “controller”)</p>
@@ -108,6 +157,20 @@
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.predict">
 <span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.predict" title="Link to this definition">¶</a></dt>
 <dd><p>Predictor phase</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.prepare_convergence_check">
+<span class="sig-name descname"><span class="pre">prepare_convergence_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.prepare_convergence_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.prepare_convergence_check" title="Link to this definition">¶</a></dt>
+<dd><p>Make current what <cite>it_check</cite> is about to read: the end point and the residual.</p>
+<p>For a sweep-based algorithm both come out of the exchange with the neighbours, so this is
+the send and receive plus the residual it enables. An algorithm that gets its residual from
+the iteration instead overrides this, and still owes the end point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>comm</strong> – the communicator</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -238,14 +301,18 @@ between stages – but nothing sets it <em>during</em> a wait any more.</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.controller_classes.controller_MPI module</a><ul>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI"><code class="docutils literal notranslate"><span class="pre">controller_MPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.compute_residual_after_spread"><code class="docutils literal notranslate"><span class="pre">compute_residual_after_spread()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.default"><code class="docutils literal notranslate"><span class="pre">default()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.get_stages"><code class="docutils literal notranslate"><span class="pre">get_stages()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_check"><code class="docutils literal notranslate"><span class="pre">it_check()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_coarse"><code class="docutils literal notranslate"><span class="pre">it_coarse()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_down"><code class="docutils literal notranslate"><span class="pre">it_down()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_fine"><code class="docutils literal notranslate"><span class="pre">it_fine()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_up"><code class="docutils literal notranslate"><span class="pre">it_up()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.next_iteration_stage"><code class="docutils literal notranslate"><span class="pre">next_iteration_stage()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.pfasst"><code class="docutils literal notranslate"><span class="pre">pfasst()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.predict"><code class="docutils literal notranslate"><span class="pre">predict()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.prepare_convergence_check"><code class="docutils literal notranslate"><span class="pre">prepare_convergence_check()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.recv"><code class="docutils literal notranslate"><span class="pre">recv()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.recv_full"><code class="docutils literal notranslate"><span class="pre">recv_full()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.restart_block"><code class="docutils literal notranslate"><span class="pre">restart_block()</span></code></a></li>
@@ -262,8 +329,8 @@ between stages – but nothing sets it <em>during</em> a wait any more.</p>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.controller_classes.html"
-                          title="previous chapter">implementations.controller_classes package</a></p>
+    <p class="topless"><a href="implementations.controller_classes.ParaDiag.html"
+                          title="previous chapter">implementations.controller_classes.ParaDiag module</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -304,7 +371,7 @@ between stages – but nothing sets it <em>during</em> a wait any more.</p>
           <a href="implementations.controller_classes.controller_ParaDiag_MPI.html" title="implementations.controller_classes.controller_ParaDiag_MPI module"
              >next</a> |</li>
         <li class="right" >
-          <a href="implementations.controller_classes.html" title="implementations.controller_classes package"
+          <a href="implementations.controller_classes.ParaDiag.html" title="implementations.controller_classes.ParaDiag module"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
