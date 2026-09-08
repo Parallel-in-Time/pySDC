@@ -98,7 +98,7 @@ class controller_MPI(Controller):
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[: self.comm.rank])
 
-        active = time < Tend - 10 * np.finfo(float).eps
+        active = self.step_is_active(time, t0, Tend)
         comm_active = self.comm.Split(active)
         self.S.status.slot = comm_active.rank
 
@@ -150,7 +150,7 @@ class controller_MPI(Controller):
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[: self.S.status.slot])
 
-            active = time < Tend - 10 * np.finfo(float).eps
+            active = self.step_is_active(time, tend, Tend)
 
             # check if we need to split the communicator
             if tend + sum(all_dt[: comm_active.size - 1]) >= Tend - 10 * np.finfo(float).eps:
@@ -476,7 +476,7 @@ class controller_MPI(Controller):
         Key routine to check for convergence/termination
         """
 
-        self.update_residual_for_check(comm)
+        self.prepare_convergence_check(comm)
 
         if self.S.status.force_done:
             return None
@@ -532,13 +532,13 @@ class controller_MPI(Controller):
         """
         pass
 
-    def update_residual_for_check(self, comm):
+    def prepare_convergence_check(self, comm):
         """
-        Refresh the residual that `it_check` is about to look at.
+        Make current what `it_check` is about to read: the end point and the residual.
 
-        For a sweep-based algorithm the residual depends on the initial condition, so the end points
-        have to be exchanged first. An algorithm that computes its residual as part of the iteration
-        overrides this and does nothing here.
+        For a sweep-based algorithm both come out of the exchange with the neighbours, so this is
+        the send and receive plus the residual it enables. An algorithm that gets its residual from
+        the iteration instead overrides this, and still owes the end point.
 
         Args:
             comm: the communicator

@@ -120,7 +120,7 @@ class controller_nonMPI(Controller):
         time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
 
         # determine which steps are still active (time < Tend)
-        active = self.get_active_steps(time, Tend, slots)
+        active = [self.step_is_active(time[p], time[0], Tend) for p in slots]
 
         if not any(active):
             raise ControllerError('Nothing to do, check t0, dt and Tend.')
@@ -171,7 +171,7 @@ class controller_nonMPI(Controller):
                 time[active_slots[i]] = time[active_slots[i] - 1] + self.MS[active_slots[i] - 1].dt
 
             # determine new set of active steps and compress slots accordingly
-            active = self.get_active_steps(time, Tend, slots)
+            active = [self.step_is_active(time[p], time[0], Tend) for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
             # restart active steps (reset all values and pass uend to u0)
@@ -187,23 +187,6 @@ class controller_nonMPI(Controller):
                 C.post_run_processing(self, S, MS=MS_active)
 
         return uend, self.return_stats()
-
-    def get_active_steps(self, time, Tend, slots):
-        """
-        Which steps still have work to do, as a mask over `slots`.
-
-        A step is active while it starts before `Tend`. An algorithm that can only advance whole
-        blocks overrides this and says so.
-
-        Args:
-            time (list): starting time of each slot
-            Tend (float): ending time
-            slots (list): all slot numbers
-
-        Returns:
-            list: one bool per slot
-        """
-        return [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
 
     def restart_block(self, active_slots, time, u0):
         """
@@ -497,7 +480,7 @@ class controller_nonMPI(Controller):
             local_MS_running (list): list of currently running steps
         """
 
-        self.update_residual_for_check(local_MS_running)
+        self.prepare_convergence_check(local_MS_running)
 
         for S in local_MS_running:
             if S.status.iter > 0:
@@ -548,13 +531,13 @@ class controller_nonMPI(Controller):
         """
         pass
 
-    def update_residual_for_check(self, local_MS_running):
+    def prepare_convergence_check(self, local_MS_running):
         """
-        Refresh the residual that `it_check` is about to look at.
+        Make current what `it_check` is about to read: the end point and the residual.
 
-        For a sweep-based algorithm the residual depends on the initial condition, so the end points
-        have to be exchanged first. An algorithm that computes its residual as part of the iteration
-        overrides this and does nothing here.
+        For a sweep-based algorithm both come out of the exchange with the neighbours, so this is
+        the send and receive plus the residual it enables. An algorithm that gets its residual from
+        the iteration instead overrides this, and still owes the end point.
 
         Args:
             local_MS_running (list): list of currently running steps

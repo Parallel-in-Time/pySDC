@@ -1,16 +1,20 @@
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.core.controller import ParaDiagController
 from pySDC.core.errors import ControllerError
-from pySDC.core.step import Step
 from pySDC.helpers.ParaDiagHelper import get_G_inv_matrix
-from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
+from pySDC.implementations.controller_classes.ParaDiag import ParaDiag
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
 
-class controller_ParaDiag_MPI(ParaDiagController):
+class controller_ParaDiag_MPI(ParaDiag, controller_MPI):
     """
     ParaDiag controller with MPI parallelism across time steps: one step per rank.
+
+    This is `controller_MPI` with a different iteration: where PFASST sweeps and cascades through
+    the levels, ParaDiag diagonalizes across the steps. Everything around the iteration -- blocks,
+    windowing, restarts, convergence -- is the driver it inherits, which is why the dispatcher it
+    uses is still called `pfasst`.
 
     Everything here is written from a single processor's point of view. A rank owns exactly one step
     and never inspects another rank's data; the places where ParaDiag genuinely needs information
@@ -19,11 +23,13 @@ class controller_ParaDiag_MPI(ParaDiagController):
     - ``prepare_Jacobians``          -> Allreduce(SUM) over the step communicator
     - ``compute_all_at_once_residual`` -> point-to-point exchange with the previous/next rank
     - ``apply_matrix`` (the weighted FFT/iFFT in time) -> a ring reduction, see below
-    - convergence                   -> allreduce(LAND), because ParaDiag converges collectively
+    - convergence                   -> the inherited `it_check`, which allreduces because
+                                       `all_to_done` is forced on for ParaDiag
 
     Note that ParaDiag steps can only converge together, so every rank always participates in every
     iteration. That is not a policy choice: a rank that stopped early would never enter the
-    collectives below and the run would hang.
+    collectives below and the run would hang. `step_is_active` says the same thing about blocks --
+    a block is never run partially, so the driver's windowing never splits one.
     """
 
     def __init__(self, controller_params, description, comm=None):
@@ -35,32 +41,21 @@ class controller_ParaDiag_MPI(ParaDiagController):
         """
         comm = MPI.COMM_WORLD if comm is None else comm
         self.prepare_ParaDiag_params(controller_params, description)
-        super().__init__(controller_params=controller_params, description=description, useMPI=True)
 
-        self.comm = comm
-        self.n_steps = comm.size
         self.sweeper_params = description['sweeper_params']
 
         # each step needs its own G^-1, determined by where it sits in the block
-        self._G_inv_alpha = self.get_alpha(0)
+        self._G_inv_alpha = self.resolve_alpha(controller_params['alpha'], 0)
         description['sweeper_params']['G_inv'] = get_G_inv_matrix(
             comm.rank, comm.size, self._G_inv_alpha, description['sweeper_params']
         )
-        self.S = Step(description)
-        self.S.status.time_size = comm.size
 
-        self.base_convergence_controllers += [BasicRestarting.get_implementation(useMPI=True)]
-        for convergence_controller in self.base_convergence_controllers:
-            self.add_convergence_controller(convergence_controller, description)
+        super().__init__(controller_params, description, comm)
+
+        self.n_steps = comm.size
 
         if len(self.S.levels) > 1:
             raise ControllerError('Multi-level SDC not implemented in ParaDiag!')
-
-        if self.params.dump_setup and comm.rank == 0:
-            self.dump_setup(step=self.S, controller_params=controller_params, description=description)
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.setup_status_variables(self, comm=comm)
 
     # ------------------------------------------------------------------ collectives
 
@@ -182,56 +177,9 @@ class controller_ParaDiag_MPI(ParaDiagController):
         for m in range(lvl.sweep.coll.num_nodes):
             lvl.u[m + 1] += lvl.increment[m]
 
-    # ------------------------------------------------------------------ stages
+    # ------------------------------------------------------------------ the ParaDiag iteration
 
-    def spread(self):
-        """Spreading phase"""
-        S = self.S
-        for hook in self.hooks:
-            hook.pre_step(step=S, level_number=0)
-
-        S.levels[0].sweep.predict()
-        S.levels[0].sweep.compute_residual()
-        S.status.stage = 'IT_CHECK'
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.post_spread_processing(self, S, comm=self.comm)
-
-    def it_check(self):
-        """Check for convergence. ParaDiag converges collectively, hence the allreduce."""
-        S, comm = self.S, self.comm
-
-        if S.status.iter > 0:
-            for hook in self.hooks:
-                hook.post_iteration(step=S, level_number=0)
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.post_iteration_processing(self, S, comm=comm)
-            C.convergence_control(self, S, comm=comm)
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.post_iteration_processing_block(self, comm=comm)
-
-        for hook in self.hooks:
-            hook.pre_comm(step=S, level_number=0)
-        S.status.done = comm.allreduce(S.status.done, op=MPI.LAND)
-        for hook in self.hooks:
-            hook.post_comm(step=S, level_number=0, add_to_stats=True)
-
-        if not S.status.done:
-            S.status.iter += 1
-            for hook in self.hooks:
-                hook.pre_iteration(step=S, level_number=0)
-            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.pre_iteration_processing(self, S, comm=comm)
-            S.status.stage = 'IT_PARADIAG'
-        else:
-            S.levels[0].sweep.compute_end_point()
-            for hook in self.hooks:
-                hook.post_step(step=S, level_number=0)
-            S.status.stage = 'DONE'
-
-    def it_ParaDiag(self):
+    def it_ParaDiag(self, comm, num_procs):
         """A single ParaDiag iteration, from this rank's point of view."""
         S = self.S
 
@@ -255,96 +203,3 @@ class controller_ParaDiag_MPI(ParaDiagController):
             hook.post_sweep(step=S, level_number=0)
 
         S.status.stage = 'IT_CHECK'
-
-    def ParaDiag(self):
-        """Dispatch on the current stage. All ranks are always in the same stage."""
-        stage = self.S.status.stage
-        self.logger.debug(stage)
-
-        switcher = {'SPREAD': self.spread, 'IT_CHECK': self.it_check, 'IT_PARADIAG': self.it_ParaDiag}
-        assert stage in switcher, f'Got unexpected stage {stage!r}'
-        switcher[stage]()
-
-        return self.S.status.done
-
-    # ------------------------------------------------------------------ driver
-
-    def restart_block(self, time, u0):
-        """Reset this rank's step for a new block."""
-        S, comm = self.S, self.comm
-
-        S.status.slot = comm.rank
-        S.reset_step()
-        S.status.first = comm.rank == 0
-        S.status.last = comm.rank == comm.size - 1
-        S.init_step(u0)
-        S.status.done = False
-        S.status.prev_done = False
-        S.status.iter = 0
-        S.status.stage = 'SPREAD'
-        S.status.force_done = False
-        S.status.time_size = comm.size
-
-        for lvl in S.levels:
-            lvl.tag = None
-            lvl.status.sweep = 1
-            lvl.status.time = time
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.reset_status_variables(self, comm=comm)
-
-    def run(self, u0, t0, Tend):
-        """
-        Main driver.
-
-        ParaDiag always runs whole blocks -- every rank participates in every iteration -- so unlike
-        the pipelined controllers there is no communicator splitting as steps finish.
-        """
-        comm = self.comm
-        for hook in self.hooks:
-            hook.reset_stats()
-
-        all_dt = comm.allgather(self.S.dt)
-        block_dt = sum(all_dt)
-        time = t0 + sum(all_dt[: comm.rank])
-        block_start = t0
-
-        if block_start >= Tend - 10 * np.finfo(float).eps:
-            raise ControllerError('Nothing to do, check t0, dt and Tend!')
-
-        if block_start + block_dt > Tend + 10 * np.finfo(float).eps and comm.rank == 0:
-            self.logger.warning(
-                'Warning: This controller will solve past your desired end time until the end of its block!'
-            )
-
-        self.restart_block(time, u0)
-        uend = u0
-
-        for hook in self.hooks:
-            hook.post_setup(step=None, level_number=None)
-        for hook in self.hooks:
-            hook.pre_run(step=self.S, level_number=0)
-
-        while block_start < Tend - 10 * np.finfo(float).eps:
-            while not self.ParaDiag():
-                pass
-
-            uend = self.S.levels[0].uend.bcast(root=comm.size - 1, comm=comm)
-            tend = comm.bcast(self.S.time + self.S.dt, root=comm.size - 1)
-
-            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.post_step_processing(self, self.S, comm=comm)
-                C.prepare_next_block(self, self.S, self.S.status.time_size, tend, Tend, comm=comm)
-
-            block_start = tend
-            if block_start < Tend - 10 * np.finfo(float).eps:
-                all_dt = comm.allgather(self.S.dt)
-                time = block_start + sum(all_dt[: comm.rank])
-                self.restart_block(time, uend)
-
-        for hook in self.hooks:
-            hook.post_run(step=self.S, level_number=0)
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.post_run_processing(self, self.S, comm=comm)
-
-        return uend, self.return_stats()

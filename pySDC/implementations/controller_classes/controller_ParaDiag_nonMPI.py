@@ -1,11 +1,11 @@
 import numpy as np
 
-from pySDC.core.controller import ParaDiagController
 from pySDC.helpers.ParaDiagHelper import get_G_inv_matrix
+from pySDC.implementations.controller_classes.ParaDiag import ParaDiag
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
-class controller_ParaDiag_nonMPI(ParaDiagController, controller_nonMPI):
+class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
     """
 
     ParaDiag controller, running serialized version.
@@ -50,75 +50,6 @@ class controller_ParaDiag_nonMPI(ParaDiagController, controller_nonMPI):
 
         # every step but the first still has the first one's G^-1
         self.set_G_inv(self._G_inv_alpha)
-
-    # ------------------------------------------------------------------ what makes this ParaDiag
-
-    def get_stages(self):
-        """
-        ParaDiag has one iteration stage, and no predictor because it has no coarse level.
-
-        Returns:
-            dict: stage name -> the method that runs it
-        """
-        return {
-            'SPREAD': self.spread,
-            'IT_CHECK': self.it_check,
-            'IT_PARADIAG': self.it_ParaDiag,
-        }
-
-    def next_iteration_stage(self, S):
-        """
-        Args:
-            S (pySDC.Step.step): The current step
-
-        Returns:
-            str: name of the stage to enter
-        """
-        return 'IT_PARADIAG'
-
-    def compute_residual_after_spread(self, S):
-        """
-        ParaDiag's residual is the one of the composite collocation problem, which `it_ParaDiag`
-        computes as part of the iteration. The convergence check runs before the first iteration,
-        so the initial guess needs its residual here.
-
-        Args:
-            S (pySDC.Step.step): The current step
-        """
-        S.levels[0].sweep.compute_residual()
-
-    def update_residual_for_check(self, local_MS_running):
-        """
-        Nothing to do: the residual is already current, and recomputing it the way a sweep-based
-        algorithm does would need the initial conditions this controller has not communicated yet.
-
-        Args:
-            local_MS_running (list): list of currently running steps
-        """
-        pass
-
-    def get_active_steps(self, time, Tend, slots):
-        """
-        ParaDiag diagonalizes across the whole block, so it cannot drop steps out of one. A block
-        that starts before `Tend` is run whole, past `Tend` if need be.
-
-        Args:
-            time (list): starting time of each slot
-            Tend (float): ending time
-            slots (list): all slot numbers
-
-        Returns:
-            list: one bool per slot
-        """
-        active = super().get_active_steps(time, Tend, slots)
-
-        if any(active) and not all(active):
-            self.logger.warning(
-                'Warning: This controller will solve past your desired end time until the end of its block!'
-            )
-            return [True] * len(active)
-
-        return active
 
     # ------------------------------------------------------------------ the ParaDiag iteration
 
