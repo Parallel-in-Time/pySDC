@@ -120,7 +120,7 @@ class controller_nonMPI(Controller):
         time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
 
         # determine which steps are still active (time < Tend)
-        active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+        active = self.get_active_steps(time, Tend, slots)
 
         if not any(active):
             raise ControllerError('Nothing to do, check t0, dt and Tend.')
@@ -171,7 +171,7 @@ class controller_nonMPI(Controller):
                 time[active_slots[i]] = time[active_slots[i] - 1] + self.MS[active_slots[i] - 1].dt
 
             # determine new set of active steps and compress slots accordingly
-            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+            active = self.get_active_steps(time, Tend, slots)
             active_slots = list(itertools.compress(slots, active))
 
             # restart active steps (reset all values and pass uend to u0)
@@ -187,6 +187,23 @@ class controller_nonMPI(Controller):
                 C.post_run_processing(self, S, MS=MS_active)
 
         return uend, self.return_stats()
+
+    def get_active_steps(self, time, Tend, slots):
+        """
+        Which steps still have work to do, as a mask over `slots`.
+
+        A step is active while it starts before `Tend`. An algorithm that can only advance whole
+        blocks overrides this and says so.
+
+        Args:
+            time (list): starting time of each slot
+            Tend (float): ending time
+            slots (list): all slot numbers
+
+        Returns:
+            list: one bool per slot
+        """
+        return [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
 
     def restart_block(self, active_slots, time, u0):
         """

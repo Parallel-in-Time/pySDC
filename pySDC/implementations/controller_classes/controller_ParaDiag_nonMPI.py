@@ -1,17 +1,19 @@
-import itertools
 import numpy as np
 
 from pySDC.core.controller import ParaDiagController
-from pySDC.core import step as stepclass
-from pySDC.core.errors import ControllerError
-from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestarting
 from pySDC.helpers.ParaDiagHelper import get_G_inv_matrix
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
-class controller_ParaDiag_nonMPI(ParaDiagController):
+class controller_ParaDiag_nonMPI(ParaDiagController, controller_nonMPI):
     """
 
     ParaDiag controller, running serialized version.
+
+    This is `controller_nonMPI` with a different iteration: where PFASST sweeps and cascades through
+    the levels, ParaDiag diagonalizes across the steps. Everything around the iteration -- blocks,
+    windowing, restarts, convergence -- is the driver it inherits, which is why the dispatcher it
+    uses is still called `pfasst`.
 
     This controller uses the increment formulation. That is to say, we setup the residual of the all at once problem,
     put it on the right hand side, invert the ParaDiag preconditioner on the left-hand side to compute the increment
@@ -29,68 +31,96 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
            controller_params: parameter set for the controller and the steps
            description: all the parameters to set up the rest (levels, problems, transfer, ...)
         """
-        super().__init__(controller_params, description, useMPI=False, n_steps=num_procs)
+        self.prepare_ParaDiag_params(controller_params, description)
 
-        self.MS = []
         self.sweeper_params = description['sweeper_params']
-        self._G_inv_alpha = self.get_alpha(0)
+        self._G_inv_alpha = self.resolve_alpha(controller_params['alpha'], 0)
 
-        for l in range(num_procs):
-            G_inv = get_G_inv_matrix(l, num_procs, self._G_inv_alpha, description['sweeper_params'])
-            description['sweeper_params']['G_inv'] = G_inv
+        # the steps are copies of the first one, so give that one its own G^-1 before they are built
+        description['sweeper_params']['G_inv'] = get_G_inv_matrix(
+            0, num_procs, self._G_inv_alpha, description['sweeper_params']
+        )
 
-            self.MS.append(stepclass.Step(description))
+        super().__init__(num_procs, controller_params, description)
 
-        self.base_convergence_controllers += [BasicRestarting.get_implementation(useMPI=False)]
-        for convergence_controller in self.base_convergence_controllers:
-            self.add_convergence_controller(convergence_controller, description)
-
-        if self.params.dump_setup:
-            self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)
+        self.n_steps = num_procs
 
         if len(self.MS[0].levels) > 1:
             raise NotImplementedError('This controller does not support multiple levels')
 
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.reset_buffers_nonMPI(self)
-            C.setup_status_variables(self, MS=self.MS)
+        # every step but the first still has the first one's G^-1
+        self.set_G_inv(self._G_inv_alpha)
 
-    def ParaDiag(self, local_MS_active):
+    # ------------------------------------------------------------------ what makes this ParaDiag
+
+    def get_stages(self):
         """
-        Main function for ParaDiag
-
-        For the workflow of this controller, see https://arxiv.org/abs/2103.12571
-
-        This method changes self.MS directly by accessing active steps through local_MS_active.
-
-        Args:
-            local_MS_active (list): all active steps
+        ParaDiag has one iteration stage, and no predictor because it has no coarse level.
 
         Returns:
-            boot: Whether all steps are done
+            dict: stage name -> the method that runs it
         """
-
-        # if all stages are the same (or DONE), continue, otherwise abort
-        stages = [S.status.stage for S in local_MS_active if S.status.stage != 'DONE']
-        if stages[1:] == stages[:-1]:
-            stage = stages[0]
-        else:
-            raise ControllerError('not all stages are equal')
-
-        self.logger.debug(stage)
-
-        MS_running = [S for S in local_MS_active if S.status.stage != 'DONE']
-
-        switcher = {
+        return {
             'SPREAD': self.spread,
             'IT_CHECK': self.it_check,
             'IT_PARADIAG': self.it_ParaDiag,
         }
 
-        assert stage in switcher.keys(), f'Got unexpected stage {stage!r}'
-        switcher[stage](MS_running)
+    def next_iteration_stage(self, S):
+        """
+        Args:
+            S (pySDC.Step.step): The current step
 
-        return all(S.status.done for S in local_MS_active)
+        Returns:
+            str: name of the stage to enter
+        """
+        return 'IT_PARADIAG'
+
+    def compute_residual_after_spread(self, S):
+        """
+        ParaDiag's residual is the one of the composite collocation problem, which `it_ParaDiag`
+        computes as part of the iteration. The convergence check runs before the first iteration,
+        so the initial guess needs its residual here.
+
+        Args:
+            S (pySDC.Step.step): The current step
+        """
+        S.levels[0].sweep.compute_residual()
+
+    def update_residual_for_check(self, local_MS_running):
+        """
+        Nothing to do: the residual is already current, and recomputing it the way a sweep-based
+        algorithm does would need the initial conditions this controller has not communicated yet.
+
+        Args:
+            local_MS_running (list): list of currently running steps
+        """
+        pass
+
+    def get_active_steps(self, time, Tend, slots):
+        """
+        ParaDiag diagonalizes across the whole block, so it cannot drop steps out of one. A block
+        that starts before `Tend` is run whole, past `Tend` if need be.
+
+        Args:
+            time (list): starting time of each slot
+            Tend (float): ending time
+            slots (list): all slot numbers
+
+        Returns:
+            list: one bool per slot
+        """
+        active = super().get_active_steps(time, Tend, slots)
+
+        if any(active) and not all(active):
+            self.logger.warning(
+                'Warning: This controller will solve past your desired end time until the end of its block!'
+            )
+            return [True] * len(active)
+
+        return active
+
+    # ------------------------------------------------------------------ the ParaDiag iteration
 
     def apply_matrix(self, mat, quantity):
         """
@@ -156,6 +186,17 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
             # compute residuals locally
             S.levels[0].sweep.compute_residual()
 
+    def set_G_inv(self, alpha):
+        """
+        Give every step the G^-1 that belongs to where it sits in the block.
+
+        Args:
+            alpha (float): the alpha this G^-1 is built from
+        """
+        L = len(self.MS)
+        for l, S in enumerate(self.MS):
+            S.levels[0].sweep.set_G_inv(get_G_inv_matrix(l, L, alpha, self.sweeper_params))
+
     def update_G_inv(self, k=0):
         """
         Rebuild G^-1 on every step if alpha changed with the iteration.
@@ -167,9 +208,7 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
         if alpha == self._G_inv_alpha:
             return
         self._G_inv_alpha = alpha
-        L = len(self.MS)
-        for l, S in enumerate(self.MS):
-            S.levels[0].sweep.set_G_inv(get_G_inv_matrix(l, L, alpha, self.sweeper_params))
+        self.set_G_inv(alpha)
 
     def update_solution(self, local_MS_running):
         """
@@ -251,245 +290,3 @@ class controller_ParaDiag_nonMPI(ParaDiagController):
         # update stage
         for S in local_MS_running:
             S.status.stage = 'IT_CHECK'
-
-    def it_check(self, local_MS_running):
-        """
-        Key routine to check for convergence/termination
-
-        Args:
-            local_MS_running (list): list of currently running steps
-        """
-
-        for S in local_MS_running:
-            if S.status.iter > 0:
-                for hook in self.hooks:
-                    hook.post_iteration(step=S, level_number=0)
-
-            # decide if the step is done, needs to be restarted and other things convergence related
-            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.post_iteration_processing(self, S, MS=local_MS_running)
-                C.convergence_control(self, S, MS=local_MS_running)
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.post_iteration_processing_block(self, MS=local_MS_running)
-
-        for S in local_MS_running:
-            if not S.status.first:
-                for hook in self.hooks:
-                    hook.pre_comm(step=S, level_number=0)
-                S.status.prev_done = S.prev.status.done  # "communicate"
-                for hook in self.hooks:
-                    hook.post_comm(step=S, level_number=0, add_to_stats=True)
-                S.status.done = S.status.done and S.status.prev_done
-
-            if self.params.all_to_done:
-                for hook in self.hooks:
-                    hook.pre_comm(step=S, level_number=0)
-                S.status.done = all(T.status.done for T in local_MS_running)
-                for hook in self.hooks:
-                    hook.post_comm(step=S, level_number=0, add_to_stats=True)
-
-            if not S.status.done:
-                # increment iteration count here (and only here)
-                S.status.iter += 1
-                for hook in self.hooks:
-                    hook.pre_iteration(step=S, level_number=0)
-                for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                    C.pre_iteration_processing(self, S, MS=local_MS_running)
-
-                # Do another ParaDiag iteration
-                S.status.stage = 'IT_PARADIAG'
-            else:
-                S.levels[0].sweep.compute_end_point()
-                for hook in self.hooks:
-                    hook.post_step(step=S, level_number=0)
-                S.status.stage = 'DONE'
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.reset_buffers_nonMPI(self)
-
-    def spread(self, local_MS_running):
-        """
-        Spreading phase
-
-        Args:
-            local_MS_running (list): list of currently running steps
-        """
-
-        for S in local_MS_running:
-
-            # first stage: spread values
-            for hook in self.hooks:
-                hook.pre_step(step=S, level_number=0)
-
-            # call predictor from sweeper
-            S.levels[0].sweep.predict()
-
-            # compute the residual
-            S.levels[0].sweep.compute_residual()
-
-            # update stage
-            S.status.stage = 'IT_CHECK'
-
-            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.post_spread_processing(self, S, MS=local_MS_running)
-
-    def run(self, u0, t0, Tend):
-        """
-        Main driver for running the serial version of ParaDiag
-
-        Args:
-           u0: initial values
-           t0: starting time
-           Tend: ending time
-
-        Returns:
-            end values on the last step
-            stats object containing statistics for each step, each level and each iteration
-        """
-
-        # some initializations and reset of statistics
-        uend = None
-        num_procs = len(self.MS)
-        for hook in self.hooks:
-            hook.reset_stats()
-
-        # initial ordering of the steps: 0,1,...,Np-1
-        slots = list(range(num_procs))
-
-        # initialize time variables of each step
-        time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
-
-        # determine which steps are still active (time < Tend)
-        active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
-        if not all(active) and any(active):
-            self.logger.warning(
-                'Warning: This controller will solve past your desired end time until the end of its block!'
-            )
-            active = [
-                True,
-            ] * len(active)
-
-        if not any(active):
-            raise ControllerError('Nothing to do, check t0, dt and Tend.')
-
-        # compress slots according to active steps, i.e. remove all steps which have times above Tend
-        active_slots = list(itertools.compress(slots, active))
-
-        # initialize block of steps with u0
-        self.restart_block(active_slots, time, u0)
-
-        for hook in self.hooks:
-            hook.post_setup(step=None, level_number=None)
-
-        # call pre-run hook
-        for S in self.MS:
-            for hook in self.hooks:
-                hook.pre_run(step=S, level_number=0)
-
-        # main loop: as long as at least one step is still active (time < Tend), do something
-        while any(active):
-            MS_active = [self.MS[p] for p in active_slots]
-            done = False
-            while not done:
-                done = self.ParaDiag(MS_active)
-
-            restarts = [S.status.restart for S in MS_active]
-            restart_at = np.where(restarts)[0][0] if True in restarts else len(MS_active)
-            if True in restarts:  # restart part of the block
-                # initial condition to next block is initial condition of step that needs restarting
-                uend = self.MS[restart_at].levels[0].u[0]
-                time[active_slots[0]] = time[restart_at]
-                self.logger.info(f'Starting next block with initial conditions from step {restart_at}')
-
-            else:  # move on to next block
-                # initial condition for next block is last solution of current block
-                uend = self.MS[active_slots[-1]].levels[0].uend
-                time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
-
-            for S in MS_active[:restart_at]:
-                for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                    C.post_step_processing(self, S, MS=MS_active)
-
-            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                [C.prepare_next_block(self, S, len(active_slots), time, Tend, MS=MS_active) for S in self.MS]
-
-            # setup the times of the steps for the next block
-            for i in range(1, len(active_slots)):
-                time[active_slots[i]] = time[active_slots[i] - 1] + self.MS[active_slots[i] - 1].dt
-
-            # determine new set of active steps and compress slots accordingly
-            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
-            if not all(active) and any(active):
-                self.logger.warning(
-                    'Warning: This controller will solve past your desired end time until the end of its block!'
-                )
-                active = [
-                    True,
-                ] * len(active)
-            active_slots = list(itertools.compress(slots, active))
-
-            # restart active steps (reset all values and pass uend to u0)
-            self.restart_block(active_slots, time, uend)
-
-        # call post-run hook
-        for S in self.MS:
-            for hook in self.hooks:
-                hook.post_run(step=S, level_number=0)
-
-        for S in self.MS:
-            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-                C.post_run_processing(self, S, MS=MS_active)
-
-        return uend, self.return_stats()
-
-    def restart_block(self, active_slots, time, u0):
-        """
-        Helper routine to reset/restart block of (active) steps
-
-        Args:
-            active_slots: list of active steps
-            time: list of new times
-            u0: initial value to distribute across the steps
-
-        """
-
-        for j in range(len(active_slots)):
-            # get slot number
-            p = active_slots[j]
-
-            # store current slot number for diagnostics
-            self.MS[p].status.slot = p
-            # store link to previous step
-            self.MS[p].prev = self.MS[active_slots[j - 1]]
-
-            self.MS[p].reset_step()
-
-            # determine whether I am the first and/or last in line
-            self.MS[p].status.first = active_slots.index(p) == 0
-            self.MS[p].status.last = active_slots.index(p) == len(active_slots) - 1
-
-            # initialize step with u0
-            self.MS[p].init_step(u0)
-
-            # setup G^{-1} for new number of active slots
-            # self.MS[j].levels[0].sweep.set_G_inv(get_G_inv_matrix(j, len(active_slots), self.params.alpha, self.description['sweeper_params']))
-
-            # reset some values
-            self.MS[p].status.done = False
-            self.MS[p].status.prev_done = False
-            self.MS[p].status.iter = 0
-            self.MS[p].status.stage = 'SPREAD'
-            self.MS[p].status.force_done = False
-            self.MS[p].status.time_size = len(active_slots)
-
-            for l in self.MS[p].levels:
-                l.tag = None
-                l.status.sweep = 1
-
-        for p in active_slots:
-            for lvl in self.MS[p].levels:
-                lvl.status.time = time[p]
-
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.reset_status_variables(self, active_slots=active_slots)

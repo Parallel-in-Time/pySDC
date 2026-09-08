@@ -434,23 +434,26 @@ class Controller(object):
 
 
 class ParaDiagController(Controller):
+    """
+    What a ParaDiag controller needs on top of the controller it inherits its driver from.
 
-    def __init__(
-        self,
-        controller_params: Dict[str, Any],
-        description: Dict[str, Any],
-        n_steps: int,
-        useMPI: Optional[bool] = None,
-    ) -> None:
+    This carries no `__init__` of its own. A concrete ParaDiag controller calls
+    `prepare_ParaDiag_params` on the two dictionaries and then hands them to the driver's
+    initialisation, so that ParaDiag can be mixed into either transport's controller without the
+    two having to agree on a constructor signature.
+    """
+
+    @staticmethod
+    def prepare_ParaDiag_params(controller_params: Dict[str, Any], description: Dict[str, Any]) -> None:
         """
-        Initialization routine for ParaDiag controllers
+        Check and complete the parameters ParaDiag needs, in place.
+
+        Call this *before* the controller's own initialisation: it only reads and writes the two
+        dictionaries, and must have run by the time the steps are built.
 
         Args:
-           num_procs: number of parallel time steps (still serial, though), can be 1
-           controller_params: parameter set for the controller and the steps
-           description: all the parameters to set up the rest (levels, problems, transfer, ...)
-           n_steps (int): Number of parallel steps
-           alpha (float): alpha parameter for ParaDiag
+            controller_params (dict): parameter set for the controller and the steps
+            description (dict): all the parameters to set up the rest (levels, problems, ...)
         """
         from pySDC.implementations.sweeper_classes.ParaDiagSweepers import QDiagonalization
 
@@ -471,17 +474,34 @@ class ParaDiagController(Controller):
         controller_params['average_jacobian'] = controller_params.get('average_jacobian', True)
 
         controller_params['all_to_done'] = True
-        super().__init__(controller_params=controller_params, description=description, useMPI=useMPI)
 
-        self.n_steps: int = n_steps
-
-    def get_alpha(self, k: int = 0) -> float:
+    @staticmethod
+    def resolve_alpha(alpha: Any, k: int = 0) -> float:
         """
-        Get the ParaDiag alpha parameter for iteration `k`.
+        Read the alpha for iteration `k` out of whatever the user supplied.
 
         `alpha` may be a single number, a sequence indexed by iteration (the last entry is reused once
         it runs out), or a callable taking the iteration index. Making it iteration dependent lets the
         outer iteration start with a well-conditioned alpha and tighten it later.
+
+        Static because the steps need an alpha before the controller has parameters to read it from.
+
+        Args:
+            alpha: the alpha parameter as supplied by the user
+            k (int): iteration index
+
+        Returns:
+            float: alpha to use for this iteration
+        """
+        if callable(alpha):
+            return float(alpha(k))
+        if hasattr(alpha, '__len__'):
+            return float(alpha[min(k, len(alpha) - 1)])
+        return float(alpha)
+
+    def get_alpha(self, k: int = 0) -> float:
+        """
+        Get the ParaDiag alpha parameter for iteration `k`.
 
         Args:
             k (int): iteration index
@@ -489,12 +509,7 @@ class ParaDiagController(Controller):
         Returns:
             float: alpha to use for this iteration
         """
-        alpha = self.params.alpha
-        if callable(alpha):
-            return float(alpha(k))
-        if hasattr(alpha, '__len__'):
-            return float(alpha[min(k, len(alpha) - 1)])
-        return float(alpha)
+        return self.resolve_alpha(self.params.alpha, k)
 
     def get_FFT_matrices(self, k: int = 0) -> Any:
         """

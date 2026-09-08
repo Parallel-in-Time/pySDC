@@ -34,9 +34,11 @@ class controller_ParaDiag_MPI(ParaDiagController):
             comm: MPI communicator, one rank per time step
         """
         comm = MPI.COMM_WORLD if comm is None else comm
-        super().__init__(controller_params=controller_params, description=description, n_steps=comm.size, useMPI=True)
+        self.prepare_ParaDiag_params(controller_params, description)
+        super().__init__(controller_params=controller_params, description=description, useMPI=True)
 
         self.comm = comm
+        self.n_steps = comm.size
         self.sweeper_params = description['sweeper_params']
 
         # each step needs its own G^-1, determined by where it sits in the block
