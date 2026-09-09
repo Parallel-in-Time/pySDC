@@ -53,6 +53,7 @@ Contents
 ``run_petsc.py``             PETSc entry point, called by the ``petsc``-marked test
 ``run_fenics.py``            FEniCS entry point, called by the ``fenics``-marked test
 ``run_mpi.py``               node-parallel driver, spawned by the ``mpi4py``-marked test
+``paradiag.py``              ParaDiag at reduced precision -- no reformulation needed
 ===========================  ====================================================================
 
 The optional-backend modules are imported separately so ``sweepers`` and ``problems`` stay usable
@@ -67,6 +68,7 @@ PFASST (multi-level, multi-step)  covered
 MSSDC (single level, multi-step)  covered
 Node-parallel sweeper        covered, spawns ``mpirun`` with one rank per node
 IMEX                         covered
+ParaDiag                     covered, reduced precision **genuine**, not emulated
 PETSc                        covered, reduced precision **emulated**
 FEniCS                       covered, linear via ``fenics_heat``, nonlinear via Gray-Scott
 ===========================  ====================================================================
@@ -93,6 +95,56 @@ Two limitations the FEniCS backend exposed:
 * ``correction_precision`` needs a datatype that can be built at another precision. A
   ``fenics_mesh`` is backed by a DOLFIN function and cannot be, so requesting it raises a clear
   ``NotImplementedError`` rather than failing obscurely.
+
+ParaDiag
+--------
+
+ParaDiag needs none of the above. It is already in the delta form, because the ParaDiag iteration
+*is* iterative refinement over the whole block:
+
+.. math::
+    r^k = b - \mathcal{C}u^k, \qquad
+    \delta^k = \mathcal{C}_\alpha^{-1} r^k, \qquad
+    u^{k+1} = u^k + \delta^k.
+
+The residual of the composite collocation problem is formed in working precision, handed to the
+diagonalised alpha-circulant preconditioner, and the result added back. So the quantity the
+node-local solver receives and returns is an increment whose magnitude falls with the iteration --
+which is exactly what ``solve_system_delta`` was written to arrange for a sweep. ``paradiag.py``
+therefore contains no reformulation, only two precision knobs and the tests that say what they cost.
+
+Measured on 8 steps of 1D heat, 3 nodes, :math:`\alpha = 10^{-4}`:
+
+==================================  ==============  ===========
+configuration                       residual floor  iterations
+==================================  ==============  ===========
+everything ``complex128``           6.3e-16         4
+node-local solve ``complex64``      6.1e-16         5
+weighted FFT ``complex64``          6.5e-16         5
+whole preconditioner ``complex64``  8.9e-16         5
+*solution storage* ``complex64``    **9.6e-08**     30 (stalls)
+==================================  ==============  ===========
+
+Everything inside the preconditioner is free; the last row is the control, and it is the only place
+precision binds. That row is what makes the other four mean anything, so it is a test rather than a
+remark.
+
+The FFT row is the surprising one. The weighted transform is deliberately ill-conditioned --
+``get_J_inv_matrix`` weights entry :math:`l` by :math:`\alpha^{l/L}`, so the inverse amplifies by up
+to :math:`\alpha^{-(L-1)/L} \approx 1/\alpha` -- and the textbook expectation is a floor near
+:math:`\varepsilon/\alpha`, about 1e-3 for ``complex64`` at this :math:`\alpha`. It does not
+happen, because the amplification acts on the increment, which is itself shrinking. The conditioning
+of the transform limits how small :math:`\alpha` may be for a given *state* precision; it does not
+limit the precision of the transform.
+
+The cost appears as rate, not accuracy: one extra iteration, and only at small :math:`\alpha`,
+which is the signature of a perturbed preconditioner.
+
+Two practical notes. ParaDiag diagonalises in time, so its working type is complex and reduced
+precision means ``complex64``, not ``float32`` -- half precision is not obviously available for
+complex on any hardware path. And unlike the PETSc and FEniCS routes, nothing here is emulated:
+SciPy's sparse solver and NumPy's matmul both carry ``complex64`` through, so these really are
+single-precision runs.
 
 Usage
 -----
