@@ -1,0 +1,19 @@
+pySDC/projects/DeltaSDC/paradiag.py
+  s_ec87534e9f630c::t_9033ed01a24c94 141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e5a3c851a64fae72efd65c53741fc9f12a8d0457",
+  "prompts": {},
+  "sessions": {
+    "s_ec87534e9f630c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1fd27863-dc3e-4592-9a01-889c508805b0",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
