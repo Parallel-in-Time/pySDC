@@ -138,7 +138,7 @@ class controller_ParaDiag_reduced_transform(controller_ParaDiag_nonMPI):
         L = len(self.MS)
         assert np.allclose(mat.shape, L)
 
-        fields = [S.levels[0].residual if quantity == 'residual' else S.levels[0].increment for S in self.MS]
+        fields = [getattr(S.levels[0], quantity) for S in self.MS]
         M = len(fields[0])
 
         # one (L, M * ndof) block, so the matvec is a single matmul at the reduced precision
