@@ -79,6 +79,10 @@ config = [
 ]
 
 
+# The reference solution depends only on nSteps, so compute it once per nSteps
+# instead of once per (qDelta, nSteps).
+uRefs = {nSteps: solutionExact(tEnd, nSteps, pName, **pParams) for nSteps in nStepsList}
+
 i = 0
 for qDeltaList in config:
     figNameConv = f"{SCRIPT}_conv_{i}"
@@ -97,7 +101,7 @@ for qDeltaList in config:
         costs = []
 
         for nSteps in nStepsList:
-            uRef = solutionExact(tEnd, nSteps, pName, **pParams)
+            uRef = uRefs[nSteps]
 
             uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, pName, **pParams)
 

@@ -111,35 +111,61 @@ class CheckConvergence(ConvergenceController):
 
         return None
 
-    def communicate_convergence(self, controller, S, comm):
+    def communicate_convergence(self, controller, S, comm=None, **kwargs):
         """
-        Communicate the convergence status during `check_iteration_status` if MPI is used.
+        Share convergence status across the block.
+
+        Two ways to stop, and the same two whether the block is spread over ranks or sitting in one
+        process. Either every step has to agree, which is a reduction, or each step waits on its
+        predecessor, which is a cascade and is what lets an early step finish and drop out.
+
+        The only difference between the transports is how the neighbour is reached: an `allreduce`
+        and point-to-point messages with one step per rank, reading the other steps' status directly
+        when they are all here. Note the reduction is applied step by step in the second case rather
+        than all at once as `allreduce` does -- both operations are monotone, so the two agree.
 
         Args:
             controller (pySDC.Controller): The controller
             S (pySDC.Step.step): The current step
-            comm (mpi4py.MPI.Comm): MPI communicator
+            comm (mpi4py.MPI.Intracomm): Communicator, or None when the whole block is in one process
 
         Returns:
             None
         """
-        # Either gather information about all status or send forward own
+        block = kwargs.get('MS', controller.steps)
+
         if controller.params.all_to_done:
             for hook in controller.hooks:
                 hook.pre_comm(step=S, level_number=0)
-            S.status.done = comm.allreduce(sendobj=S.status.done, op=self.MPI_LAND)
-            S.status.force_done = comm.allreduce(sendobj=S.status.force_done, op=self.MPI_LOR)
+
+            if comm is None:
+                S.status.done = all(T.status.done for T in block)
+                S.status.force_done = any(T.status.force_done for T in block)
+            else:
+                S.status.done = comm.allreduce(sendobj=S.status.done, op=self.MPI_LAND)
+                S.status.force_done = comm.allreduce(sendobj=S.status.force_done, op=self.MPI_LOR)
+
             for hook in controller.hooks:
                 hook.post_comm(step=S, level_number=0, add_to_stats=True)
 
             S.status.done = S.status.done or S.status.force_done
 
         else:
+            if comm is None:
+                if not S.status.first:
+                    for hook in controller.hooks:
+                        hook.pre_comm(step=S, level_number=0)
+                    S.status.prev_done = S.prev.status.done
+                    for hook in controller.hooks:
+                        hook.post_comm(step=S, level_number=0, add_to_stats=True)
+                    S.status.done = S.status.done and S.status.prev_done
+                return None
+
             for hook in controller.hooks:
                 hook.pre_comm(step=S, level_number=0)
 
             # check if an open request of the status send is pending
-            controller.wait_with_interrupt(request=controller.req_status)
+            controller.wait_for_request(request=controller.req_status)
             if S.status.force_done:
                 return None
 

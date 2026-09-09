@@ -1,10 +1,10 @@
 [build-system]
-requires = ["flit_core >=3.2,<5"]
-build-backend = "flit_core.buildapi"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = 'pySDC'
-version = '5.6'
+version = '5.8'
 description = 'A Python implementation of spectral deferred correction methods and the likes'
 license = {text = "BSD-2-Clause"}
 readme = 'README.md'
@@ -17,6 +17,8 @@ authors=[
     {name='Giacomo Rosilho De Souza', email='giacomo.rosilhodesouza@usi.ch'},
     {name='Jakob Fritz', email='j.fritz@fz-juelich.de'},
     {name='Jemma Shipton', email='j.shipton@exeter.ac.uk'},
+    {name='Abdelouahed Ouardghi', email='a.ouardghi@fz-juelich.de'},
+    {name='Gayatri Čaklović', email='caklovicka@gmail.com'},
     ]
 
 
@@ -55,6 +57,27 @@ dev = [
     'mypy',
     'pre-commit'
     ]
+
+# Scratch code, tests, retired projects and research artifacts stay in the
+# repository but are not shipped. playgrounds/, tests/ and projects/deprecated/
+# are already excluded from ruff, black and coverage below; the data/ directories
+# and figure files are precomputed results for reproducing paper plots, not
+# runtime data (core/, implementations/ and helpers/ contain no non-Python files).
+# CI runs pytest against the checkout (pySDC/tests), not the installed package.
+[tool.hatch.build]
+exclude = [
+    'pySDC/playgrounds/',
+    'pySDC/tests/',
+    'pySDC/projects/deprecated/',
+    '**/data/',
+    '*.png',
+    '*.pdf',
+    '*.ipynb',
+    '**/.DS_Store',
+    ]
+
+[tool.hatch.build.targets.wheel]
+packages = ['pySDC']
 
 [tool.pytest.ini_options]
 markers = [
