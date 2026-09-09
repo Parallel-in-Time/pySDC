@@ -1,0 +1,31 @@
+schema_version: 1.0.0
+project:
+  name: pySDC
+  repository: github.com/Parallel-in-Time/pySDC
+  version: '5.8'
+  license: BSD-2-Clause
+  content_type: software
+ai_usage:
+  used: true
+  level: moderate
+  scope:
+    code_generation: true
+    code_review: true
+    refactoring: true
+    debugging: true
+    testing: true
+  tools:
+    - name: Claude
+      type: agent
+      hosting: cloud
+      purpose: Primarily for deriving and adding new features
+    - name: GitHub Copilot
+      type: assistant
+      hosting: cloud
+      purpose: Reviewing PRs, but also adding new features
+  summary: >-
+    Reviewing PRs, adding new features, increased testing coverage, refactoring, code analysis and simplification,
+    removing code smell
+declaration:
+  declared_by: Robert Speck
+  date: '2026-09-09'
