@@ -3,10 +3,31 @@ from pySDC.core.sweeper import Sweeper
 
 class generic_implicit(Sweeper):
     """
-    Generic implicit sweeper, expecting lower triangular matrix type as input
+    Generic implicit sweeper, expecting lower triangular matrix type as input.
+    
+    This is the foundational sweeper for standard SDC methods with implicit time integration.
+    It uses a single lower triangular preconditioner (QI) to update collocation nodes.
+    
+    **When to use:**
+    - Standard SDC with implicit time integration
+    - As a starting point for understanding SDC sweepers
+    
+    **Key Parameters:**
+    - ``QI`` (str): Type of implicit preconditioner, default: 'IE' (Implicit Euler)
+        Common options: 'IE', 'LU', 'MIN', 'TRAP', etc. (see qmat documentation)
+    - ``num_nodes`` (int): Number of collocation nodes (required)
+    - ``quad_type`` (str): Quadrature type, default: 'RADAU-RIGHT'
+    
+    **Example:**
+        >>> sweeper_params = {
+        ...     'quad_type': 'RADAU-RIGHT',
+        ...     'num_nodes': 3,
+        ...     'QI': 'LU'
+        ... }
+        >>> description = {'sweeper_class': generic_implicit, 'sweeper_params': sweeper_params}
 
     Attributes:
-        QI: lower triangular matrix
+        QI (numpy.ndarray): Lower triangular preconditioner
     """
 
     def __init__(self, params, level):
