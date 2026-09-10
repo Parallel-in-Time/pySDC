@@ -1,0 +1,24 @@
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_FEniCS.py
+  s_f7abae475b06d6::t_1cac103c60c47f 9,158-176
+  s_f7abae475b06d6::t_60db0d9a9c34f5 200,203-204,206-209,212-215
+pySDC/projects/StroemungsRaum/problem_classes/newton_step.py
+  s_f7abae475b06d6::t_117a98c905ff41 1-50
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_FEniCS.py
+  s_f7abae475b06d6::t_93cdc9feb13804 8,207,242
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bd05ff4fe0142c948d68575a1554d6e204928640",
+  "prompts": {},
+  "sessions": {
+    "s_f7abae475b06d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286e22f6-e817-491d-96d0-af97966f39af",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
