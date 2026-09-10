@@ -1,0 +1,45 @@
+.github/workflows/ci_pipeline.yml
+  s_bb6a36615330b1::t_64aa9f168c88c0 66-68
+etc/aidecl_audit.py
+  s_bb6a36615330b1::t_779f3eb981c559 1-38,40-86,90-111,113,115,117-119,123-132,134-180,182-204
+  s_bb6a36615330b1::t_a1c085b9e937d2 89,116,120-122,133,181
+  s_bb6a36615330b1::t_fe8deca5aebf92 112,114
+  s_bb6a36615330b1::t_547a32b9de23f9 39
+  s_bb6a36615330b1::t_ebab4b11a28319 87-88
+CONTRIBUTING.md
+  s_bb6a36615330b1::t_6787209231420d 30-36
+  s_bb6a36615330b1::t_60bcec12ffed26 37
+README.md
+  s_bb6a36615330b1::t_20b2c8bd9e105f 10
+  s_bb6a36615330b1::t_cb6509241657ae 108
+.pre-commit-config.yaml
+  s_bb6a36615330b1::t_64aa9f168c88c0 19-22
+etc/environment-lint.yml
+  s_bb6a36615330b1::t_64aa9f168c88c0 9-12
+aidecl.yaml
+  s_bb6a36615330b1::t_d51c3af1231c77 32,34,42
+.github/workflows/git-ai.yaml
+  s_bb6a36615330b1::t_9406c767b1b629 1-2,9-10,12-14,16-32
+  s_bb6a36615330b1::t_b1c6f5af7682a7 3-8,11,15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4c0e638693d3350f7112105d73d95b0fc1d66efb",
+  "prompts": {},
+  "humans": {
+    "h_c659f0e92ef98d": {
+      "author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_bb6a36615330b1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f085e637-b7d1-4b8b-8e65-9cedf84ff672",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
