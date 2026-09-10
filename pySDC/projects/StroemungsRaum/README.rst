@@ -47,6 +47,12 @@ computed with time-dependent Dirichlet conditions in :math:`x` or with periodic
 ones, and the difference in the observed temporal order isolates the order
 reduction caused by the time-dependent boundary data alone.
 
+The number of collocation nodes decides whether the effect is visible: RADAU-RIGHT
+with :math:`M` nodes drops from its design order :math:`2M-1` to the stiff order
+:math:`M+1`, so the gap is :math:`M-2` and vanishes for :math:`M = 2`. With
+:math:`M = 4` the measured pressure orders are 7 with periodic and 5 with
+time-dependent Dirichlet conditions.
+
 Funding
 -------
 Funded by the **German Federal Ministry of Education and Research (BMBF)** under

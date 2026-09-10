@@ -94,45 +94,46 @@ def test_eval_f():
 
 @pytest.mark.fenics
 def test_order_reduction():
-    """
+    r"""
     The point of the whole benchmark: the same exact solution, computed with periodic
-    conditions in x, reaches the design order 2M-1 = 5 of RADAU-RIGHT with M = 3, while with
-    time-dependent Dirichlet conditions in x it does not.
+    conditions in x, reaches the design order 2M-1 of RADAU-RIGHT, while with time-dependent
+    Dirichlet conditions in x it drops to the stiff order M+1.
 
-    What is asserted here is the robust part of that. At a mesh resolution CI can afford, the
-    difference in observed *order* is modest (roughly 4.7 against 4.3 in the pressure, the
-    reduction Radau IIA is known for, 2M-1 down to M+1), and too small a margin to assert on.
-    The difference in the error *constant* is not: the time-dependent boundary data costs
-    close to an order of magnitude in the pressure at every step size tested. Refining the
-    mesh deepens both effects, because the reduction is driven by stiffness -- see the
-    docstring of ``order_study`` and the numbers printed by running the script directly.
+    M = 4 is deliberate. The gap the benchmark can show is (2M-1) - (M+1) = M-2, so it is
+    *identically zero for M = 2*, where both orders are 3 -- a setup with two nodes cannot
+    exhibit this phenomenon no matter what else is done. At M = 4 the two orders are 7 and 5
+    and the separation is unmistakable.
     """
     from pySDC.projects.StroemungsRaum.run_Navier_Stokes_TaylorGreen_FEniCS import (
         order_study,
         observed_order,
     )
 
-    Tend, dts = 0.2, [0.2, 0.1, 0.05]
+    Tend, dts, num_nodes = 0.2, [0.2, 0.1, 0.05, 0.025], 4
     errors, orders = {}, {}
     for periodic in (True, False):
-        dts_out, errors_u, errors_p = order_study(dts, Tend, periodic=periodic)
+        dts_out, errors_u, errors_p = order_study(dts, Tend, periodic=periodic, num_nodes=num_nodes)
         errors[periodic] = (errors_u, errors_p)
-        orders[periodic] = (observed_order(dts_out, errors_u)[0], observed_order(dts_out, errors_p)[0])
+        # the finest pair is the most asymptotic estimate
+        orders[periodic] = (observed_order(dts_out, errors_u)[-1], observed_order(dts_out, errors_p)[-1])
 
-    # with periodic conditions there is no time-dependent boundary data and the method
-    # attains (close to) its design order
-    assert orders[True][0] > 4.5, f"periodic velocity order {orders[True][0]:.2f} below design order"
+    design, stiff = 2 * num_nodes - 1, num_nodes + 1
 
-    # time-dependent Dirichlet data costs roughly an order of magnitude in the pressure
-    for i, dt in enumerate(dts[:-1]):
-        ratio = errors[False][1][i] / errors[True][1][i]
-        assert ratio > 3.0, f"pressure error ratio at dt={dt} is only {ratio:.1f}, expected a clear gap"
+    # without time-dependent boundary data the method attains its design order
+    assert (
+        orders[True][0] > design - 1.0
+    ), f"periodic velocity order {orders[True][0]:.2f} is not close to the design order {design}"
 
-    # and it does not reach the order the periodic variant does
-    assert orders[False][1] < orders[True][1], (
-        f"pressure order with Dirichlet data ({orders[False][1]:.2f}) is not below "
-        f"the periodic one ({orders[True][1]:.2f})"
-    )
+    # with it, the pressure drops towards the stiff order and stays well clear of the design one
+    assert (
+        orders[False][1] < (design + stiff) / 2
+    ), f"pressure order with Dirichlet data is {orders[False][1]:.2f}, expected near {stiff}"
+    gap = orders[True][1] - orders[False][1]
+    assert gap > 1.0, f"pressure order gap is only {gap:.2f}, expected close to {design - stiff}"
+
+    # and the accumulated error differs by more than an order of magnitude at the finest step
+    ratio = errors[False][1][-1] / errors[True][1][-1]
+    assert ratio > 10.0, f"pressure error ratio at the finest step size is only {ratio:.1f}"
 
 
 @pytest.mark.fenics

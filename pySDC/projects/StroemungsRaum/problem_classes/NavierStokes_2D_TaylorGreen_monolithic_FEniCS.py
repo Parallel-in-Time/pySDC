@@ -53,6 +53,12 @@ class fenics_NSE_2D_TaylorGreen(Problem):
     The only difference between the two runs is therefore the presence of time-dependent boundary
     data, which is what isolates the order reduction.
 
+    Note that the number of collocation nodes decides whether anything can be seen at all.
+    RADAU-RIGHT with :math:`M` nodes has design order :math:`2M-1` and falls back to the stiff
+    order :math:`M+1` in the presence of time-dependent boundary data, so the gap on offer is
+    :math:`M-2`: **zero for M = 2**, where both are 3. Use :math:`M \geq 4`; at :math:`M = 4`
+    the measured pressure orders are 7 (periodic) against 5 (Dirichlet).
+
     The problem is discretized in space with Taylor-Hood elements on a mixed velocity-pressure
     space and solved monolithically, so the semi-discrete system is the differential-algebraic
     system :math:`M \dot{w} = f(w, t)` with the singular mass matrix :math:`M = \mathrm{diag}(M_v, 0)`.

@@ -8,7 +8,7 @@ from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_m
 from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass import generic_implicit_mass
 
 
-def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=3, maxiter=40, restol=1e-12):
+def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxiter=40, restol=1e-12):
     """
     Helper routine to set up parameters
 
@@ -215,8 +215,14 @@ def observed_order(dts, errors):
 
 
 def main():
-    """
+    r"""
     Run the order study for both boundary condition variants and report the observed orders.
+
+    RADAU-RIGHT with M nodes has design order :math:`2M-1` and, on a stiff problem with
+    time-dependent boundary data, drops to the stiff order :math:`M+1`. The gap the benchmark
+    can show is therefore :math:`M-2`, and **nothing at all is visible for M = 2**, where the
+    two coincide at 3. M = 4 is used here because it is the cheapest setting that makes the
+    reduction unmistakable: order 7 against 5 in the pressure.
     """
     Tend = 0.2
     dts = [0.2, 0.1, 0.05, 0.025]
