@@ -2,7 +2,7 @@ StroemungsRaum
 ==============
 
 **StroemungsRaum** is a research software project developed within the
-BMBF-funded project
+BMFTR-funded project
 
 *“StrömungsRaum – Novel Exascale Architectures with Heterogeneous Hardware
 Components for Computational Fluid Dynamics Simulations”*
@@ -62,6 +62,6 @@ roughly an order of magnitude, to within a small factor of the periodic case.
 
 Funding
 -------
-Funded by the **German Federal Ministry of Education and Research (BMBF)** under
-grant number **16ME0708**.
+Funded by the **German Federal Ministry of Research, Technology and Space (BMFTR)**
+under grant number **16ME0708**.
 
