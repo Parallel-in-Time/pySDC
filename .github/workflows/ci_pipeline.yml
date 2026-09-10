@@ -63,6 +63,9 @@ jobs:
       - name: Linting with ruff
         run: |
           ruff check pySDC
+      - name: Validating the AI declaration with aidecl
+        run: |
+          aidecl --strict validate --output-format github-actions aidecl.yaml
 
   user_cpu_tests_linux:
     runs-on: ubuntu-latest

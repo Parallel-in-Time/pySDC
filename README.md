@@ -7,6 +7,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/pySDC?logo=pypi)](https://pypistats.org/packages/pysdc)
 [![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)](https://go.fzj.de/CodePromo)
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC)
+[![validated with aidecl](https://img.shields.io/badge/ai%20declaration%20format-aidecl-blue)](https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml)
 
 # Welcome to pySDC!
 
@@ -104,6 +105,7 @@ The current software release can be cited using Zenodo:
 and is now maintained and developed by a small community of scientists interested in SDC methods.
 Checkout the [Changelog](./CHANGELOG.md) to see pySDC's evolution since 2016. It has a
 software management plan (SWP), too, see [here](https://smw.dsw.elixir-europe.org/wizard/projects/c3dda921-b7b0-4f4d-b5dc-778b9780552d).
+Parts of the code have been co-authored by AI; see [`aidecl.yaml`](./aidecl.yaml) for details.
 
 Any contribution is dearly welcome! If you want to contribute, please take the time to read our [Contribution Guidelines](./CONTRIBUTING.md)
 (and don't forget to take a peek at our nice [Code of Conduct](./CODE_OF_CONDUCT.md) :wink:).

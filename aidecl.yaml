@@ -29,9 +29,9 @@ ai_usage:
         - 'Counts as AI-generated: PRs authored by the Copilot coding agent'
         - 'Counts as AI-assisted: human-authored PRs it reviewed'
   code_proportion:
-    ai_generated_percent: 7
+    ai_generated_percent: 8
     ai_assisted_percent: 2
-    human_only_percent: 91
+    human_only_percent: 90
     method: audit_estimated
     estimation_notes: >-
       Ballpark, from git blame over all tracked code files on master (~156k lines, .py/.sh/.yml/.toml/.cfg),
@@ -39,7 +39,7 @@ ai_usage:
       commits and PRs authored by the Copilot coding agent; AI-assisted counts human-authored PRs reviewed
       by Copilot. pySDC dates from 2014 and no AI was used before 2026, so the whole-repository figures are
       dominated by pre-2026 code. Restricted to code last touched in 2026 the split is roughly
-      55% AI-generated, 18% AI-assisted, 27% human-only.
+      73% AI-generated, 18% AI-assisted, 10% human-only. Reproduce with etc/aidecl_audit.py.
   components:
     - name: PINN and FNO playgrounds
       description: pySDC/playgrounds/PINN and pySDC/playgrounds/learned_qdelta (~7100 lines)
