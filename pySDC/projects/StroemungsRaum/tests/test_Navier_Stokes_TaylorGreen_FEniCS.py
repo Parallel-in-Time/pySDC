@@ -1,0 +1,181 @@
+import numpy as np
+import pytest
+
+
+@pytest.mark.fenics
+def test_exact_solution_is_periodic():
+    """
+    The benchmark compares time-dependent Dirichlet against periodic conditions in x using the
+    *same* manufactured solution. That is only meaningful because the solution is genuinely
+    one-periodic in x, and constant on the top and bottom boundary. Check both, since every
+    conclusion drawn from this benchmark rests on it.
+    """
+    import dolfin as df
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS import (
+        fenics_NSE_2D_TaylorGreen,
+    )
+
+    prob = fenics_NSE_2D_TaylorGreen(nelems=8, t0=0.0, order=2, nu=0.05)
+
+    for t in (0.0, 0.13, 0.4):
+        prob.u_ex.t = t
+        prob.p_ex.t = t
+        for y in np.linspace(-0.5, 0.5, 11):
+            left = np.hstack([prob.u_ex(-0.5, y), prob.p_ex(-0.5, y)])
+            right = np.hstack([prob.u_ex(0.5, y), prob.p_ex(0.5, y)])
+            assert np.allclose(left, right, atol=1e-12), f"solution is not periodic in x at t={t}, y={y}"
+
+        for x in np.linspace(-0.5, 0.5, 11):
+            for y in (-0.5, 0.5):
+                value = np.hstack([prob.u_ex(x, y), prob.p_ex(x, y)])
+                assert np.allclose(value, [1.0, 0.0, 1.0], atol=1e-12), f"top/bottom data varies at t={t}"
+
+    # the periodic function space must not lose anything when representing this solution
+    prob_periodic = fenics_NSE_2D_TaylorGreen(nelems=8, t0=0.0, order=2, nu=0.05, periodic=True)
+    assert prob_periodic.W.dim() < prob.W.dim(), "periodic space should have fewer dofs"
+
+    u, p = prob.u_exact(0.3).values.split(deepcopy=True)
+    up, pp = prob_periodic.u_exact(0.3).values.split(deepcopy=True)
+    assert abs(df.norm(u, 'L2') - df.norm(up, 'L2')) < 1e-12
+    assert abs(df.norm(p, 'L2') - df.norm(pp, 'L2')) < 1e-12
+
+
+@pytest.mark.fenics
+def test_eval_f():
+    """
+    Anchor ``eval_f`` on the analytical solution: the semi-discrete system is M u' = f(u, t),
+    so evaluating f at the exact solution must reproduce M du/dt on the interior dofs, and do
+    so with the second order expected from the interpolation of the data.
+
+    Compared against du/dt rather than against ``solve_system`` on purpose -- a sign error
+    shared by both would pass a consistency check between them.
+    """
+    import dolfin as df
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS import (
+        fenics_NSE_2D_TaylorGreen,
+    )
+
+    t, nu = 0.3, 0.05
+    errors = []
+    for nelems in (16, 32):
+        prob = fenics_NSE_2D_TaylorGreen(nelems=nelems, t0=0.0, order=2, nu=nu)
+
+        dudt = df.Expression(
+            (
+                '8*pi*pi*nu*exp(-8*pi*pi*nu*t)*sin(2*pi*(x[0] - t))*sin(pi*x[1])*cos(pi*x[1])'
+                ' + 2*pi*exp(-8*pi*pi*nu*t)*cos(2*pi*(x[0] - t))*sin(pi*x[1])*cos(pi*x[1])',
+                '8*pi*pi*nu*exp(-8*pi*pi*nu*t)*cos(2*pi*(x[0] - t))*cos(pi*x[1])*cos(pi*x[1])'
+                ' - 2*pi*exp(-8*pi*pi*nu*t)*sin(2*pi*(x[0] - t))*cos(pi*x[1])*cos(pi*x[1])',
+            ),
+            pi=np.pi,
+            nu=nu,
+            t=t,
+            degree=prob.order + 2,
+        )
+
+        ut = prob.dtype_u(prob.W)
+        df.assign(ut.values.sub(0), df.interpolate(dudt, prob.V))
+        expected = prob.apply_mass_matrix(ut)
+        f = prob.eval_f(prob.u_exact(t), t)
+
+        # eval_f integrates by parts, so the two can only agree away from the boundary
+        prob.fix_residual(f)
+        prob.fix_residual(expected)
+
+        velocity_dofs = np.array(prob.W.sub(0).dofmap().dofs())
+        a = f.values.vector()[velocity_dofs]
+        b = expected.values.vector()[velocity_dofs]
+        errors.append(np.linalg.norm(a - b) / np.linalg.norm(b))
+
+    assert errors[0] < 2e-2, f"eval_f does not match M du/dt: relative error {errors[0]:.3e}"
+    order = np.log2(errors[0] / errors[1])
+    assert order > 1.7, f"eval_f converges at order {order:.2f}, expected second order"
+
+
+@pytest.mark.fenics
+def test_order_reduction():
+    """
+    The point of the whole benchmark: the same exact solution, computed with periodic
+    conditions in x, reaches the design order 2M-1 = 5 of RADAU-RIGHT with M = 3, while with
+    time-dependent Dirichlet conditions in x it does not.
+
+    What is asserted here is the robust part of that. At a mesh resolution CI can afford, the
+    difference in observed *order* is modest (roughly 4.7 against 4.3 in the pressure, the
+    reduction Radau IIA is known for, 2M-1 down to M+1), and too small a margin to assert on.
+    The difference in the error *constant* is not: the time-dependent boundary data costs
+    close to an order of magnitude in the pressure at every step size tested. Refining the
+    mesh deepens both effects, because the reduction is driven by stiffness -- see the
+    docstring of ``order_study`` and the numbers printed by running the script directly.
+    """
+    from pySDC.projects.StroemungsRaum.run_Navier_Stokes_TaylorGreen_FEniCS import (
+        order_study,
+        observed_order,
+    )
+
+    Tend, dts = 0.2, [0.2, 0.1, 0.05]
+    errors, orders = {}, {}
+    for periodic in (True, False):
+        dts_out, errors_u, errors_p = order_study(dts, Tend, periodic=periodic)
+        errors[periodic] = (errors_u, errors_p)
+        orders[periodic] = (observed_order(dts_out, errors_u)[0], observed_order(dts_out, errors_p)[0])
+
+    # with periodic conditions there is no time-dependent boundary data and the method
+    # attains (close to) its design order
+    assert orders[True][0] > 4.5, f"periodic velocity order {orders[True][0]:.2f} below design order"
+
+    # time-dependent Dirichlet data costs roughly an order of magnitude in the pressure
+    for i, dt in enumerate(dts[:-1]):
+        ratio = errors[False][1][i] / errors[True][1][i]
+        assert ratio > 3.0, f"pressure error ratio at dt={dt} is only {ratio:.1f}, expected a clear gap"
+
+    # and it does not reach the order the periodic variant does
+    assert orders[False][1] < orders[True][1], (
+        f"pressure order with Dirichlet data ({orders[False][1]:.2f}) is not below "
+        f"the periodic one ({orders[True][1]:.2f})"
+    )
+
+
+@pytest.mark.fenics
+@pytest.mark.parametrize("periodic", [False, True])
+def test_run_benchmark(periodic):
+    """
+    End-to-end smoke test: a couple of SDC steps have to land close to the exact solution.
+    The tolerance is set by the spatial discretization error on this coarse mesh, not by the
+    time integration, so it says nothing about the temporal order -- see test_order_reduction.
+    """
+    from pySDC.projects.StroemungsRaum.run_Navier_Stokes_TaylorGreen_FEniCS import (
+        setup,
+        run_simulation,
+        run_postprocessing,
+    )
+
+    description, controller_params = setup(dt=0.05, periodic=periodic, nelems=16, nu=0.05, num_nodes=2)
+    P, _, uend = run_simulation(description, controller_params, Tend=0.1)
+    error_u, error_p = run_postprocessing(P, uend, Tend=0.1)
+
+    assert error_u < 1e-3, f"relative velocity error {error_u:.3e} exceeds tolerance"
+    assert error_p < 1e-2, f"relative pressure error {error_p:.3e} exceeds tolerance"
+
+
+@pytest.mark.fenics
+@pytest.mark.parametrize("periodic", [False, True])
+def test_solve_system(periodic):
+    """
+    ``solve_system`` solves M w - factor * f(w) = rhs, so feeding it the right-hand side built
+    from the exact solution must return the exact solution. Newton is started away from the
+    answer so this actually exercises the solve, the Jacobian and the boundary conditions.
+    """
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS import (
+        fenics_NSE_2D_TaylorGreen,
+    )
+
+    t, factor = 0.3, 0.01
+    prob = fenics_NSE_2D_TaylorGreen(nelems=16, t0=0.0, order=2, nu=0.05, periodic=periodic)
+
+    uex = prob.u_exact(t)
+    rhs = prob.apply_mass_matrix(uex) - factor * prob.eval_f(uex, t)
+
+    w = prob.solve_system(rhs, factor, prob.dtype_u(prob.W), t)
+
+    rel_err = abs(w - uex) / abs(uex)
+    assert rel_err < 1e-9, f"solve_system did not recover the exact solution: {rel_err:.3e}"
