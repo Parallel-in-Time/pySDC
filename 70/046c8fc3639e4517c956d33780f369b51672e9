@@ -1,0 +1,32 @@
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_TaylorGreen_FEniCS.py
+  s_f7abae475b06d6::t_a41306d2dd859c 227,232-234
+  s_f7abae475b06d6::t_6cabbca6fd4607 153-156,158-161,164,168,175-176,182,185-196,198
+  s_f7abae475b06d6::t_0b8f68fe6058bd 214
+  s_f7abae475b06d6::t_0686698c78612d 1-10,12-152,157,162-163,165-167,169-174,177-181,183-184,197,199-213,215-220,223-225,228-231,235-243
+  s_f7abae475b06d6::t_81950ff0e5d5c9 11,221-222,226
+pySDC/projects/StroemungsRaum/README.rst
+  s_f7abae475b06d6::t_f6c41a780e92e2 33,41-48
+  s_f7abae475b06d6::t_4b515b17488559 49
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_FEniCS.py
+  s_f7abae475b06d6::t_99731bf05a5883 1-368
+pySDC/projects/StroemungsRaum/tests/test_Navier_Stokes_TaylorGreen_FEniCS.py
+  s_f7abae475b06d6::t_509a437754bf0a 1-95,139,162-181
+  s_f7abae475b06d6::t_68fb017d68b901 96-138
+  s_f7abae475b06d6::t_32aa7581a213e6 140-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "70046c8fc3639e4517c956d33780f369b51672e9",
+  "prompts": {},
+  "sessions": {
+    "s_f7abae475b06d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286e22f6-e817-491d-96d0-af97966f39af",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
