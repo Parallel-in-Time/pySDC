@@ -5,6 +5,7 @@ import numpy as np
 
 from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
+from pySDC.projects.StroemungsRaum.problem_classes.newton_step import NewtonStep
 
 
 class _PeriodicX(df.SubDomain):
@@ -21,45 +22,6 @@ class _PeriodicX(df.SubDomain):
     def map(self, x, y):
         y[0] = x[0] - 1.0
         y[1] = x[1]
-
-
-class _NewtonStep(df.NonlinearProblem):
-    r"""
-    Newton problem for the node-to-node step :math:`M w + \Delta t_{QI} N(w) = rhs`.
-
-    ``rhs`` is kept as an assembled vector and subtracted from the residual here, rather
-    than being written into the variational form as :math:`\int_\Omega rhs \cdot v\,dx`.
-    That form would apply the mass matrix to it, which would then have to be undone by a
-    mass matrix solve beforehand -- an exact round trip that costs a solve per node per
-    sweep and caps the attainable accuracy at the tolerance of that solve.
-
-    Parameters
-    ----------
-    F : UFL form
-        Residual form, without the right-hand side term.
-    J : UFL form
-        Jacobian of ``F``.
-    bcs : list of DirichletBC
-        Boundary conditions, applied in residual form (``bc.apply(b, x)``).
-    """
-
-    def __init__(self, F, J, bcs):
-        super().__init__()
-        self.F_form = F
-        self.J_form = J
-        self.bcs = bcs
-        self.rhs = None
-
-    def F(self, b, x):
-        df.assemble(self.F_form, tensor=b)
-        b.axpy(-1.0, self.rhs)
-        for bc in self.bcs:
-            bc.apply(b, x)
-
-    def J(self, A, x):
-        df.assemble(self.J_form, tensor=A)
-        for bc in self.bcs:
-            bc.apply(A)
 
 
 class fenics_NSE_2D_TaylorGreen(Problem):
@@ -242,7 +204,7 @@ class fenics_NSE_2D_TaylorGreen(Problem):
         F -= self.factor * df.dot(self.g, self.v) * df.dx
         F -= self.factor * df.dot(df.div(u), self.q) * df.dx
 
-        self.step = _NewtonStep(F, df.derivative(F, self.w), self.bc)
+        self.step = NewtonStep(F, df.derivative(F, self.w))
         self.newton = df.NewtonSolver()
         self.newton.parameters['absolute_tolerance'] = Sol_tol
         self.newton.parameters['relative_tolerance'] = Sol_tol
@@ -277,6 +239,7 @@ class fenics_NSE_2D_TaylorGreen(Problem):
 
         self.w.vector()[:] = u0.values.vector()[:]
         self.step.rhs = rhs.values.vector()
+        self.step.bcs = self.bc
         self.newton.solve(self.step, self.w.vector())
 
         me = self.dtype_u(self.W)
