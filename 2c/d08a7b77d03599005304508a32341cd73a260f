@@ -1,0 +1,31 @@
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_TaylorGreen_FEniCS.py
+  s_f7abae475b06d6::t_c07dff83bd225f 8-11,14-24,35-37,77,87,247-252,254-256
+pySDC/projects/StroemungsRaum/tests/test_Navier_Stokes_TaylorGreen_FEniCS.py
+  s_f7abae475b06d6::t_4f92e9e0dd3352 183-237
+pySDC/projects/StroemungsRaum/README.rst
+  s_f7abae475b06d6::t_e83aae97f16ec7 56-62
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_FEniCS.py
+  s_f7abae475b06d6::t_aa9980b427fa82 127,250-292,309-352,380-386
+  s_f7abae475b06d6::t_2ff59f380310df 293-308
+  s_f7abae475b06d6::t_4587a2ef90f164 149-157,202-203,207,210-211,214-220
+  s_f7abae475b06d6::t_e83aae97f16ec7 62-66,91-93
+  s_f7abae475b06d6::t_b100c04c962faa 221,387
+pySDC/projects/StroemungsRaum/sweepers/generic_implicit_mass.py
+  s_f7abae475b06d6::t_dda9f8fa6ae2ce 147-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2cd08a7b77d03599005304508a32341cd73a260f",
+  "prompts": {},
+  "sessions": {
+    "s_f7abae475b06d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286e22f6-e817-491d-96d0-af97966f39af",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
