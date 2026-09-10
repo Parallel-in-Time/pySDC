@@ -59,6 +59,11 @@ class fenics_NSE_2D_TaylorGreen(Problem):
     and a roughly 20 times larger error, so the gap measured here understates what a setup
     without prescribed boundary pressure would show.
 
+    Setting ``differentiated_bc`` imposes the time-dependent data in differentiated form and
+    recovers most of the lost order, following the remedy explored for a time-dependent
+    *constraint* in pull request #641. It requires the ``generic_implicit_mass_diffbc`` sweeper.
+    See :meth:`prepare_step` for the construction and its measured effect.
+
     Note that the number of collocation nodes decides whether anything can be seen at all.
     RADAU-RIGHT with :math:`M` nodes has design order :math:`2M-1` and falls back to the stiff
     order :math:`M+1` in the presence of time-dependent boundary data, so the gap on offer is
@@ -83,6 +88,9 @@ class fenics_NSE_2D_TaylorGreen(Problem):
         Kinematic viscosity :math:`\nu`.
     periodic : bool, optional
         Use periodic instead of time-dependent Dirichlet conditions on :math:`x = \pm 0.5`.
+    differentiated_bc : bool, optional
+        Impose the time-dependent boundary data in differentiated form; needs ``periodic=False``
+        and the ``generic_implicit_mass_diffbc`` sweeper.
     Sol_tol : float, optional
         Absolute tolerance for the Newton solver.
 
@@ -116,7 +124,7 @@ class fenics_NSE_2D_TaylorGreen(Problem):
 
     df.set_log_active(False)
 
-    def __init__(self, nelems=32, t0=0.0, order=2, nu=0.02, periodic=False, Sol_tol=1e-10):
+    def __init__(self, nelems=32, t0=0.0, order=2, nu=0.02, periodic=False, differentiated_bc=False, Sol_tol=1e-10):
 
         # set logger level for FFC and dolfin
         logging.getLogger('FFC').setLevel(logging.WARNING)
@@ -138,7 +146,15 @@ class fenics_NSE_2D_TaylorGreen(Problem):
 
         super().__init__(self.W)
         self._makeAttributeAndRegister(
-            'nelems', 't0', 'order', 'nu', 'periodic', 'Sol_tol', localVars=locals(), readOnly=True
+            'nelems',
+            't0',
+            'order',
+            'nu',
+            'periodic',
+            'differentiated_bc',
+            'Sol_tol',
+            localVars=locals(),
+            readOnly=True,
         )
 
         self.logger.debug('DoFs on this level: %d', self.W.dim())
@@ -183,16 +199,25 @@ class fenics_NSE_2D_TaylorGreen(Problem):
 
         # on y = +-0.5 the exact solution is constant in space and time
         top_bottom = 'near(x[1], -0.5) || near(x[1], 0.5)'
-        left_right = 'near(x[0], -0.5) || near(x[0], 0.5)'
-        self.bc = [
+        self.left_right = 'near(x[0], -0.5) || near(x[0], 0.5)'
+        self.bc_fixed = [
             df.DirichletBC(self.W.sub(0), df.Constant((1.0, 0.0)), top_bottom),
             df.DirichletBC(self.W.sub(1), df.Constant(1.0), top_bottom),
         ]
+        self.bc = list(self.bc_fixed)
         if not periodic:
             self.bc += [
-                df.DirichletBC(self.W.sub(0), self.u_ex, left_right),
-                df.DirichletBC(self.W.sub(1), self.p_ex, left_right),
+                df.DirichletBC(self.W.sub(0), self.u_ex, self.left_right),
+                df.DirichletBC(self.W.sub(1), self.p_ex, self.left_right),
             ]
+
+        # boundary conditions per collocation node, filled in by prepare_step
+        self._node_times = None
+        self._node_bcs = None
+        if differentiated_bc:
+            if periodic:
+                raise ValueError('differentiated_bc has no effect without time-dependent boundary data')
+            self.u_dot, self.p_dot = self._boundary_derivatives(nu, order, t0)
 
         # the residual is meaningless where the solution is prescribed, but only there: with
         # periodicity the dofs on x = +-0.5 are unknowns and their residual has to be kept
@@ -222,6 +247,109 @@ class fenics_NSE_2D_TaylorGreen(Problem):
         self.newton.parameters['relative_tolerance'] = Sol_tol
         self.newton.parameters['maximum_iterations'] = 20
 
+    @staticmethod
+    def _boundary_derivatives(nu, order, t0):
+        r"""
+        Time derivatives of the boundary data, needed to impose it in differentiated form.
+
+        Returns
+        -------
+        u_dot, p_dot : Expression
+            :math:`\partial_t u` and :math:`\partial_t p` of the manufactured solution.
+        """
+        kwargs = dict(pi=np.pi, nu=nu, t=t0, degree=order + 2)
+        u_dot = df.Expression(
+            (
+                '8*pi*pi*nu*exp(-8*pi*pi*nu*t)*sin(2*pi*(x[0] - t))*sin(pi*x[1])*cos(pi*x[1])'
+                ' + 2*pi*exp(-8*pi*pi*nu*t)*cos(2*pi*(x[0] - t))*sin(pi*x[1])*cos(pi*x[1])',
+                '8*pi*pi*nu*exp(-8*pi*pi*nu*t)*cos(2*pi*(x[0] - t))*cos(pi*x[1])*cos(pi*x[1])'
+                ' - 2*pi*exp(-8*pi*pi*nu*t)*sin(2*pi*(x[0] - t))*cos(pi*x[1])*cos(pi*x[1])',
+            ),
+            **kwargs,
+        )
+        p_dot = df.Expression(
+            '(4.0/17.0)*cos(pi*x[1])*('
+            '-16*pi*pi*nu*exp(-16*pi*pi*nu*t)*cos(4*pi*(x[0] - t))'
+            ' + 4*pi*exp(-16*pi*pi*nu*t)*sin(4*pi*(x[0] - t)))',
+            **kwargs,
+        )
+        return u_dot, p_dot
+
+    def prepare_step(self, t0, dt, coll):
+        r"""
+        Build the differentiated boundary conditions for every collocation node of a step.
+
+        Rather than evaluating the boundary data pointwise at the node, :math:`u_B(\tau_m) =
+        g(\tau_m)`, the condition is imposed on the *derivative* and the stage value recovered
+        by the collocation quadrature,
+
+        .. math::
+            u_B(\tau_m) = g(t_0) + \Delta t \sum_j Q_{mj}\, \dot{g}(\tau_j).
+
+        The two differ by the quadrature error :math:`O(\Delta t^{M+1})`, but the second is
+        consistent with the collocation polynomial instead of pointwise exact, which is what
+        recovers the order lost to time-dependent boundary data.
+
+        Measured at :math:`M = 4`, ``nelems=24``, ``nu=0.1``, orders and errors in the pressure
+        taken from consecutive step sizes:
+
+        =========================  ==========  =====================
+        boundary condition         order       error at ``dt = 0.1``
+        =========================  ==========  =====================
+        periodic (best possible)   6.32        7.4e-08
+        pointwise                  5.74        9.7e-07
+        differentiated             6.30        1.3e-07
+        =========================  ==========  =====================
+
+        The remaining factor of 1.8 against the periodic case is a constant, not a rate. Note
+        that the observed orders here are pre-asymptotic -- the periodic reference does not
+        reach its design order 7 either -- so these numbers show that the remedy works, not
+        that it restores exactly :math:`2M-1`.
+
+        Called once per step by :class:`generic_implicit_mass_diffbc`; ``solve_system`` then
+        picks the condition belonging to the node it is asked to solve at.
+
+        Parameters
+        ----------
+        t0 : float
+            Left end of the step.
+        dt : float
+            Step size.
+        coll : pySDC.core.collocation.CollBase
+            Collocation rule of the sweeper, supplying the nodes and the matrix Q.
+        """
+        M = coll.num_nodes
+        Q = coll.Qmat[1:, 1:]
+        self._node_times = t0 + dt * np.asarray(coll.nodes)
+
+        u_rate, p_rate = [], []
+        for j in range(M):
+            self.u_dot.t = self._node_times[j]
+            self.p_dot.t = self._node_times[j]
+            u_rate.append(df.interpolate(self.u_dot, self.V))
+            p_rate.append(df.interpolate(self.p_dot, self.Q))
+
+        self.u_ex.t = t0
+        self.p_ex.t = t0
+        u_base = df.interpolate(self.u_ex, self.V)
+        p_base = df.interpolate(self.p_ex, self.Q)
+
+        self._node_bcs = []
+        for m in range(M):
+            gu, gp = df.Function(self.V), df.Function(self.Q)
+            gu.assign(u_base)
+            gp.assign(p_base)
+            for j in range(M):
+                gu.vector().axpy(dt * Q[m, j], u_rate[j].vector())
+                gp.vector().axpy(dt * Q[m, j], p_rate[j].vector())
+            self._node_bcs.append(
+                self.bc_fixed
+                + [
+                    df.DirichletBC(self.W.sub(0), gu, self.left_right),
+                    df.DirichletBC(self.W.sub(1), gp, self.left_right),
+                ]
+            )
+
     def solve_system(self, rhs, factor, u0, t):
         r"""
         Newton solver for :math:`M w + factor \cdot N(w, t) = rhs`, where :math:`N` collects the
@@ -248,6 +376,14 @@ class fenics_NSE_2D_TaylorGreen(Problem):
         self.u_ex.t = t
         self.p_ex.t = t
         self.g.t = t
+
+        if self.differentiated_bc:
+            if self._node_bcs is None:
+                raise RuntimeError(
+                    'differentiated_bc requires the generic_implicit_mass_diffbc sweeper, '
+                    'which calls prepare_step once per step'
+                )
+            self.bc = self._node_bcs[int(np.argmin(np.abs(self._node_times - t)))]
 
         self.w.vector()[:] = u0.values.vector()[:]
         self.step.rhs = rhs.values.vector()

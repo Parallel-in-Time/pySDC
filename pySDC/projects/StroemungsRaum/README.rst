@@ -53,6 +53,13 @@ with :math:`M` nodes drops from its design order :math:`2M-1` to the stiff order
 :math:`M = 4` the measured pressure orders are 7 with periodic and 5 with
 time-dependent Dirichlet conditions.
 
+The third variant, ``differentiated_bc``, imposes the boundary data on its time
+derivative and recovers the stage values by collocation quadrature instead of
+evaluating the data pointwise at the nodes. This is the boundary-condition
+analogue of the differentiated-constraint remedy explored in pull request #641,
+and it removes most of the penalty: at :math:`M = 4` the pressure error drops by
+roughly an order of magnitude, to within a small factor of the periodic case.
+
 Funding
 -------
 Funded by the **German Federal Ministry of Education and Research (BMBF)** under

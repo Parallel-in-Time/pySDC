@@ -5,10 +5,23 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS import (
     fenics_NSE_2D_TaylorGreen,
 )
-from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass import generic_implicit_mass
+from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass import (
+    generic_implicit_mass,
+    generic_implicit_mass_diffbc,
+)
 
 
-def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxiter=40, restol=1e-12):
+def setup(
+    t0=0.0,
+    dt=0.1,
+    periodic=False,
+    differentiated_bc=False,
+    nelems=24,
+    nu=0.1,
+    num_nodes=4,
+    maxiter=40,
+    restol=1e-12,
+):
     """
     Helper routine to set up parameters
 
@@ -19,6 +32,9 @@ def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxite
             time step size
         periodic: bool,
             use periodic instead of time-dependent Dirichlet conditions in x
+        differentiated_bc: bool,
+            impose the time-dependent boundary data in differentiated form, which recovers
+            the order it otherwise costs; requires periodic=False
         nelems: int,
             number of elements per spatial direction
         nu: float,
@@ -58,6 +74,7 @@ def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxite
     problem_params['order'] = 2
     problem_params['nu'] = nu
     problem_params['periodic'] = periodic
+    problem_params['differentiated_bc'] = differentiated_bc
     problem_params['Sol_tol'] = 1e-13
 
     # initialize controller parameters
@@ -67,7 +84,7 @@ def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxite
     # Fill description dictionary
     description = dict()
     description['problem_class'] = fenics_NSE_2D_TaylorGreen
-    description['sweeper_class'] = generic_implicit_mass
+    description['sweeper_class'] = generic_implicit_mass_diffbc if differentiated_bc else generic_implicit_mass
     description['problem_params'] = problem_params
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
@@ -227,12 +244,17 @@ def main():
     Tend = 0.2
     dts = [0.2, 0.1, 0.05, 0.025]
 
-    results = {}
-    for periodic in (True, False):
-        dts_out, errors_u, errors_p = order_study(dts, Tend, periodic=periodic)
-        results[periodic] = (dts_out, errors_u, errors_p)
+    cases = [
+        ('periodic', dict(periodic=True)),
+        ('time-dependent Dirichlet', dict(periodic=False)),
+        ('time-dependent Dirichlet, differentiated', dict(periodic=False, differentiated_bc=True)),
+    ]
 
-        label = 'periodic' if periodic else 'time-dependent Dirichlet'
+    results = {}
+    for label, kwargs in cases:
+        dts_out, errors_u, errors_p = order_study(dts, Tend, **kwargs)
+        results[label] = (dts_out, errors_u, errors_p)
+
         print(f'\n{label} boundary conditions in x:')
         print(f'{"dt":>10} {"err(u)":>12} {"order(u)":>9} {"err(p)":>12} {"order(p)":>9}')
         orders_u = [None] + observed_order(dts_out, errors_u)

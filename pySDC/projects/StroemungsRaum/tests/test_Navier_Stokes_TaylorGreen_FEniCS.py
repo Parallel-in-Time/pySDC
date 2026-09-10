@@ -180,3 +180,58 @@ def test_solve_system(periodic):
 
     rel_err = abs(w - uex) / abs(uex)
     assert rel_err < 1e-9, f"solve_system did not recover the exact solution: {rel_err:.3e}"
+
+
+@pytest.mark.fenics
+def test_differentiated_boundary_condition():
+    r"""
+    Imposing the time-dependent boundary data in differentiated form recovers most of the order
+    it otherwise costs.
+
+    Asserted on the error rather than on the observed order: the order estimates are not clean
+    enough on a mesh CI can afford. The *periodic* reference itself only reaches about 6.3 here
+    instead of its design order 7, and on finer step sizes it collapses to 5 against a solver
+    floor near 1e-10, so separating 2M-1 from 2M-2 is beyond what this benchmark resolves. The
+    error, on the other hand, is unambiguous: with the differentiated condition it lands close
+    to the periodic case, while the pointwise one is an order of magnitude away.
+    """
+    from pySDC.projects.StroemungsRaum.run_Navier_Stokes_TaylorGreen_FEniCS import order_study
+
+    Tend, dts = 0.4, [0.2, 0.1]
+    errors = {}
+    for label, kwargs in [
+        ('periodic', dict(periodic=True)),
+        ('pointwise', dict(periodic=False)),
+        ('differentiated', dict(periodic=False, differentiated_bc=True)),
+    ]:
+        _, _, errors_p = order_study(dts, Tend, num_nodes=4, restol=1e-13, **kwargs)
+        errors[label] = errors_p[0]
+
+    # the differentiated condition must be a clear improvement on the pointwise one ...
+    gain = errors['pointwise'] / errors['differentiated']
+    assert gain > 2.5, f"differentiated boundary condition only improves the error by {gain:.1f}x"
+
+    # ... and land near the periodic case, which is the best this discretization can do
+    remaining = errors['differentiated'] / errors['periodic']
+    assert remaining < 4.0, f"differentiated error is still {remaining:.1f}x the periodic one"
+
+    # sanity: the pointwise variant is the one that is far off
+    assert errors['pointwise'] / errors['periodic'] > 5.0, "pointwise variant unexpectedly accurate"
+
+
+@pytest.mark.fenics
+def test_differentiated_boundary_condition_needs_its_sweeper():
+    """
+    ``differentiated_bc`` silently doing nothing would be worse than failing, since the run
+    would look fine and just be less accurate. Check both guards.
+    """
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS import (
+        fenics_NSE_2D_TaylorGreen,
+    )
+
+    prob = fenics_NSE_2D_TaylorGreen(nelems=8, nu=0.05, differentiated_bc=True)
+    with pytest.raises(RuntimeError, match='prepare_step'):
+        prob.solve_system(prob.u_exact(0.0), 0.01, prob.dtype_u(prob.W), 0.0)
+
+    with pytest.raises(ValueError, match='time-dependent'):
+        fenics_NSE_2D_TaylorGreen(nelems=8, nu=0.05, periodic=True, differentiated_bc=True)
