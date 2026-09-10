@@ -53,6 +53,12 @@ class fenics_NSE_2D_TaylorGreen(Problem):
     The only difference between the two runs is therefore the presence of time-dependent boundary
     data, which is what isolates the order reduction.
 
+    On :math:`x = \pm 0.5` the *pressure* is prescribed from the exact solution as well. That is
+    not neutral: it acts as a partial lifting of the algebraic constraint, and it lifts the
+    observed pressure order from :math:`M` to :math:`M+1`. Dropping it gives order :math:`M`
+    and a roughly 20 times larger error, so the gap measured here understates what a setup
+    without prescribed boundary pressure would show.
+
     Note that the number of collocation nodes decides whether anything can be seen at all.
     RADAU-RIGHT with :math:`M` nodes has design order :math:`2M-1` and falls back to the stiff
     order :math:`M+1` in the presence of time-dependent boundary data, so the gap on offer is
