@@ -45,6 +45,11 @@
    :alt: SWH
 
 
+.. image:: https://img.shields.io/badge/ai%20declaration%20format-aidecl-blue
+   :target: https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml
+   :alt: validated with aidecl
+
+
 Welcome to pySDC!
 =================
 
@@ -154,6 +159,7 @@ Contributing
 and is now maintained and developed by a small community of scientists interested in SDC methods.
 Checkout the :doc:`Changelog <./CHANGELOG>` to see pySDC's evolution since 2016. It has a
 software management plan (SWP), too, see `here <https://smw.dsw.elixir-europe.org/wizard/projects/c3dda921-b7b0-4f4d-b5dc-778b9780552d>`_.
+Parts of the code have been co-authored by AI; see :doc:`\ ``aidecl.yaml`` <./aidecl>` for details.
 
 Any contribution is dearly welcome! If you want to contribute, please take the time to read our :doc:`Contribution Guidelines <./CONTRIBUTING>`
 (and don't forget to take a peek at our nice :doc:`Code of Conduct <./CODE_OF_CONDUCT>` |:wink:|).
