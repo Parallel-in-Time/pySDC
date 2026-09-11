@@ -1,0 +1,19 @@
+pySDC/projects/DeltaSDC/cascade.py
+  s_be32febf4aa3c8::t_ea907ddbd3b5de 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a536206e651503c18b38c5d8cbb356d8e2f3ec8a",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
