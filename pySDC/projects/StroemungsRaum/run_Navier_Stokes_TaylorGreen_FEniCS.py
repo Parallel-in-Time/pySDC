@@ -21,6 +21,7 @@ def setup(
     num_nodes=4,
     maxiter=40,
     restol=1e-12,
+    Sol_tol=None,
 ):
     """
     Helper routine to set up parameters
@@ -45,6 +46,9 @@ def setup(
             maximum number of SDC iterations
         restol: float,
             residual tolerance
+        Sol_tol: float,
+            absolute tolerance of the Newton solve at each node; defaults to one decade below
+            ``restol``, which SDC cannot converge past
 
     Returns:
         description: dict,
@@ -75,7 +79,7 @@ def setup(
     problem_params['nu'] = nu
     problem_params['periodic'] = periodic
     problem_params['differentiated_bc'] = differentiated_bc
-    problem_params['Sol_tol'] = 1e-13
+    problem_params['Sol_tol'] = restol / 10 if Sol_tol is None else Sol_tol
 
     # initialize controller parameters
     controller_params = dict()
@@ -140,8 +144,8 @@ def relative_errors(u, uref):
     ur, pr = uref.values.split(deepcopy=True)
 
     return (
-        df.errornorm(ur, un, 'L2') / df.norm(ur, 'L2'),
-        df.errornorm(pr, pn, 'L2') / df.norm(pr, 'L2'),
+        df.errornorm(ur, un, 'L2', degree_rise=0) / df.norm(ur, 'L2'),
+        df.errornorm(pr, pn, 'L2', degree_rise=0) / df.norm(pr, 'L2'),
     )
 
 
@@ -163,26 +167,21 @@ def run_postprocessing(P, uend, Tend):
     return relative_errors(uend, P.u_exact(Tend))
 
 
-def order_study(dts, Tend, dt_ref=None, periodic=False, **kwargs):
+def order_study(dts, Tend, periodic=False, **kwargs):
     r"""
     Measure the observed temporal order of convergence.
 
     Errors are *not* taken against the exact solution: the spatial discretization error
     dominates it for any affordable mesh, which hides the temporal order completely. Instead
-    two variants are offered, both of which cancel the spatial error exactly because every run
-    uses the same mesh:
-
-    - ``dt_ref`` given: compare against a reference run with that much smaller step size,
-    - ``dt_ref`` omitted: compare consecutive step sizes with each other (Richardson). This
-      needs no reference run and is therefore a lot cheaper, at the cost of one order estimate.
+    consecutive step sizes are compared with each other (Richardson), which cancels the spatial
+    error exactly because every run uses the same mesh and needs no reference run, at the cost
+    of one order estimate.
 
     Args:
         dts: list of float,
             Step sizes to run, largest first, each one half of the previous.
         Tend: float,
             Final simulation time; must be an integer multiple of every step size.
-        dt_ref: float,
-            Step size for the reference run, or ``None`` to compare consecutive step sizes.
         periodic: bool,
             Use periodic instead of time-dependent Dirichlet conditions in x.
         kwargs:
@@ -190,7 +189,7 @@ def order_study(dts, Tend, dt_ref=None, periodic=False, **kwargs):
 
     Returns:
         dts_out: list of float,
-            Step sizes the errors belong to; one shorter than ``dts`` without a reference.
+            Step sizes the errors belong to; one shorter than ``dts``.
         errors_u: list of float,
             Relative L2 velocity error per step size.
         errors_p: list of float,
@@ -201,18 +200,10 @@ def order_study(dts, Tend, dt_ref=None, periodic=False, **kwargs):
         description, controller_params = setup(dt=dt, periodic=periodic, **kwargs)
         solutions.append(run_simulation(description, controller_params, Tend)[2])
 
-    if dt_ref is None:
-        pairs = list(zip(solutions[:-1], solutions[1:], strict=True))
-        dts_out = dts[:-1]
-    else:
-        description, controller_params = setup(dt=dt_ref, periodic=periodic, **kwargs)
-        uref = run_simulation(description, controller_params, Tend)[2]
-        pairs = [(u, uref) for u in solutions]
-        dts_out = list(dts)
-
+    pairs = zip(solutions[:-1], solutions[1:], strict=True)
     errors = [relative_errors(u, ref) for u, ref in pairs]
 
-    return dts_out, [e[0] for e in errors], [e[1] for e in errors]
+    return dts[:-1], [e[0] for e in errors], [e[1] for e in errors]
 
 
 def observed_order(dts, errors):
@@ -250,10 +241,8 @@ def main():
         ('time-dependent Dirichlet, differentiated', dict(periodic=False, differentiated_bc=True)),
     ]
 
-    results = {}
     for label, kwargs in cases:
         dts_out, errors_u, errors_p = order_study(dts, Tend, **kwargs)
-        results[label] = (dts_out, errors_u, errors_p)
 
         print(f'\n{label} boundary conditions in x:')
         print(f'{"dt":>10} {"err(u)":>12} {"order(u)":>9} {"err(p)":>12} {"order(p)":>9}')
@@ -263,8 +252,6 @@ def main():
             su = '     --- ' if ou is None else f'{ou:9.2f}'
             sp = '     --- ' if op is None else f'{op:9.2f}'
             print(f'{dt:10.5f} {eu:12.4e} {su} {ep:12.4e} {sp}')
-
-    return results
 
 
 if __name__ == "__main__":

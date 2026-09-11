@@ -49,6 +49,10 @@ def test_eval_f():
 
     Compared against du/dt rather than against ``solve_system`` on purpose -- a sign error
     shared by both would pass a consistency check between them.
+
+    ``du/dt`` is taken from ``_boundary_derivatives`` rather than re-typed, so this also anchors
+    the velocity derivative the differentiated boundary condition is built from. Its pressure
+    half has no such anchor, so it is checked here against a finite difference of ``p_ex``.
     """
     import dolfin as df
     from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS import (
@@ -60,18 +64,7 @@ def test_eval_f():
     for nelems in (16, 32):
         prob = fenics_NSE_2D_TaylorGreen(nelems=nelems, t0=0.0, order=2, nu=nu)
 
-        dudt = df.Expression(
-            (
-                '8*pi*pi*nu*exp(-8*pi*pi*nu*t)*sin(2*pi*(x[0] - t))*sin(pi*x[1])*cos(pi*x[1])'
-                ' + 2*pi*exp(-8*pi*pi*nu*t)*cos(2*pi*(x[0] - t))*sin(pi*x[1])*cos(pi*x[1])',
-                '8*pi*pi*nu*exp(-8*pi*pi*nu*t)*cos(2*pi*(x[0] - t))*cos(pi*x[1])*cos(pi*x[1])'
-                ' - 2*pi*exp(-8*pi*pi*nu*t)*sin(2*pi*(x[0] - t))*cos(pi*x[1])*cos(pi*x[1])',
-            ),
-            pi=np.pi,
-            nu=nu,
-            t=t,
-            degree=prob.order + 2,
-        )
+        dudt, dpdt = prob._boundary_derivatives(nu, prob.order, t)
 
         ut = prob.dtype_u(prob.W)
         df.assign(ut.values.sub(0), df.interpolate(dudt, prob.V))
@@ -86,6 +79,16 @@ def test_eval_f():
         a = f.values.vector()[velocity_dofs]
         b = expected.values.vector()[velocity_dofs]
         errors.append(np.linalg.norm(a - b) / np.linalg.norm(b))
+
+        # p_dot feeds the differentiated pressure boundary condition and nothing else pins it
+        h = 1e-6
+        for x, y in ((0.5, 0.2), (-0.5, -0.35)):
+            prob.p_ex.t = t + h
+            fwd = prob.p_ex(x, y)
+            prob.p_ex.t = t - h
+            bwd = prob.p_ex(x, y)
+            fd = (fwd - bwd) / (2 * h)
+            assert abs(fd - dpdt(x, y)) < 1e-6, f"p_dot is not dp_ex/dt at ({x}, {y}): {fd} vs {dpdt(x, y)}"
 
     assert errors[0] < 2e-2, f"eval_f does not match M du/dt: relative error {errors[0]:.3e}"
     order = np.log2(errors[0] / errors[1])

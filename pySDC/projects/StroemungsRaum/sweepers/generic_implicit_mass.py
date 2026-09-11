@@ -159,9 +159,13 @@ class generic_implicit_mass_diffbc(generic_implicit_mass):
     The problem class must provide ``prepare_step(t0, dt, coll)``.
     """
 
-    def update_nodes(self):
+    def predict(self):
         """
-        Supply the collocation data of this step to the problem, then sweep as usual.
+        Supply the collocation data of this step to the problem, then predict as usual.
+
+        ``predict`` rather than ``update_nodes`` because the controller calls it exactly once
+        per step, while ``update_nodes`` runs once per sweep and would rebuild the same
+        boundary conditions on every iteration.
 
         Returns:
             None
@@ -169,4 +173,4 @@ class generic_implicit_mass_diffbc(generic_implicit_mass):
         L = self.level
         L.prob.prepare_step(L.time, L.dt, self.coll)
 
-        return super().update_nodes()
+        return super().predict()

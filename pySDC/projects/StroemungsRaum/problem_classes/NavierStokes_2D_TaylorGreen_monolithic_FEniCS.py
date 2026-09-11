@@ -244,8 +244,6 @@ class fenics_NSE_2D_TaylorGreen(Problem):
         self.step = NewtonStep(F, df.derivative(F, self.w))
         self.newton = df.NewtonSolver()
         self.newton.parameters['absolute_tolerance'] = Sol_tol
-        self.newton.parameters['relative_tolerance'] = Sol_tol
-        self.newton.parameters['maximum_iterations'] = 20
 
     @staticmethod
     def _boundary_derivatives(nu, order, t0):
@@ -318,6 +316,12 @@ class fenics_NSE_2D_TaylorGreen(Problem):
         coll : pySDC.core.collocation.CollBase
             Collocation rule of the sweeper, supplying the nodes and the matrix Q.
         """
+        if not self.differentiated_bc:
+            raise RuntimeError(
+                'prepare_step builds the differentiated boundary conditions, which this problem '
+                'was not set up for; use generic_implicit_mass or pass differentiated_bc=True'
+            )
+
         M = coll.num_nodes
         Q = coll.Qmat[1:, 1:]
         self._node_times = t0 + dt * np.asarray(coll.nodes)
@@ -383,7 +387,13 @@ class fenics_NSE_2D_TaylorGreen(Problem):
                     'differentiated_bc requires the generic_implicit_mass_diffbc sweeper, '
                     'which calls prepare_step once per step'
                 )
-            self.bc = self._node_bcs[int(np.argmin(np.abs(self._node_times - t)))]
+            node = np.flatnonzero(self._node_times == t)
+            if node.size != 1:
+                raise RuntimeError(
+                    f'no collocation node of the prepared step is at t = {t}; the prepared step '
+                    f'covers {self._node_times}'
+                )
+            self.bc = self._node_bcs[node[0]]
 
         self.w.vector()[:] = u0.values.vector()[:]
         self.step.rhs = rhs.values.vector()
