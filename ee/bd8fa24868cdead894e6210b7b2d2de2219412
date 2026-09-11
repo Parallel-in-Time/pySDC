@@ -1,0 +1,51 @@
+pySDC/projects/DeltaSDC/README.rst
+  s_be32febf4aa3c8::t_3175549f55c5bf 48-50,52-53,66-68,71-76,95-98
+  s_be32febf4aa3c8::t_165ea2a0b18ef9 165
+  s_be32febf4aa3c8::t_5b4477450ac2c8 103-164,166-253
+  s_be32febf4aa3c8::t_e056784e340375 254
+pySDC/projects/DeltaSDC/tests/test_problems.py
+  s_be32febf4aa3c8::t_bcb30244ba6215 161
+  s_be32febf4aa3c8::t_5c1e2933de0473 125,130-160
+pySDC/projects/DeltaSDC/run_demo.py
+  s_be32febf4aa3c8::t_f87b3193dcb7ad 23-28,157-169
+  s_be32febf4aa3c8::t_bcb30244ba6215 325-332
+  s_be32febf4aa3c8::t_89476aac3ef4d0 29,200-202,204-205,207-208,213-324,333-360,366
+  s_be32febf4aa3c8::t_d67e9a54738f91 147-149,152
+  s_be32febf4aa3c8::t_0c9a9ebc4c0b85 2,4-6,8-13,22,40-53,55-65,85-88,103-109,111-117,121,125-146,150-151,153-156,170-180,182-183,185-198,206,209
+  s_be32febf4aa3c8::t_92da779dbb275b 210-212
+pySDC/projects/DeltaSDC/run_petsc.py
+  s_bcaddbfdb19f31::t_408d07dad9df85 16-22,26-28,49-59,71-76,93,97-103,110-157,160,165,170-171,174-196
+pySDC/projects/DeltaSDC/run_mpi.py
+  s_be32febf4aa3c8::t_9aed5d7b15b63c 23-26,28-30,56,58,65-69,113-116,120-165,173-182
+  s_be32febf4aa3c8::t_bcb30244ba6215 166-172
+  s_be32febf4aa3c8::t_58e0d64a9d8789 183-184
+pySDC/projects/DeltaSDC/run_fenics.py
+  s_be32febf4aa3c8::t_bcb30244ba6215 243-273,329
+  s_be32febf4aa3c8::t_d62d81064c803e 36-45,75-84,100-105,113,120-125,136-139,154-165,183-185,189-190,196-206,209-214
+  s_be32febf4aa3c8::t_fdbe865019944d 328,330,332-336,338,341,343-353
+  s_be32febf4aa3c8::t_784a9025af3a44 30,217-218,221,223-242,274-280,285,290-291,294-308,310-327,331,337,339-340,342,354-395,401,406,413-415
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eebd8fa24868cdead894e6210b7b2d2de2219412",
+  "prompts": {},
+  "sessions": {
+    "s_bcaddbfdb19f31": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "70bff260-6dc7-4e10-9512-f73a521abc4d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
