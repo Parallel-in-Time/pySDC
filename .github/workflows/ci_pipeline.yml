@@ -346,8 +346,15 @@ jobs:
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
           sphinx-build -b html docs/source docs/build/html 2>&1 | tee sphinx_build.log
-          images_not_found=$(grep "WARNING: image file not readable:" < sphinx_build.log | wc -l)
-          if [ $images_not_found != "0" ] ; then echo "Some linked images were not found"; exit 1 ;fi
+          # pySDC/tests/README.rst links the coverage badge, which genbadge
+          # writes in the postprocess workflow just before it builds the site.
+          # It is legitimately absent here, so it is not a broken link.
+          images_not_found=$(grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg" | wc -l)
+          if [ $images_not_found != "0" ] ; then
+            echo "Some linked images were not found:"
+            grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg"
+            exit 1
+          fi
 
   coverage_comment_on_pr:
     runs-on: ubuntu-latest
