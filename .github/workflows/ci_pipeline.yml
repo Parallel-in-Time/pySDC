@@ -310,6 +310,45 @@ jobs:
             data_monodomain
             coverage_monodomain.dat
 
+  docs:
+    runs-on: ubuntu-latest
+    # The website itself is built and deployed by the postprocess workflow,
+    # from master only. This job runs the same build on every PR so that a
+    # change which breaks the docs fails here, on the PR that caused it,
+    # rather than silently on master at deploy time.
+    #
+    # It has to wait for the test jobs: several project READMEs embed plots
+    # that the tests themselves write into `data/` (which is gitignored), so
+    # the "image file not readable" check is meaningless on a bare checkout -
+    # every one of those images would be missing.
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: "etc/environment-postprocess.yml"
+      - name: Download the plots the tests produced
+        uses: actions/download-artifact@v8
+        with:
+          path: .
+          pattern: test-artifacts-*
+          merge-multiple: true
+      - name: Build the docs
+        # `pipefail` matters here: without it `tee` supplies the exit code and
+        # a failing sphinx-build would pass silently.
+        run: |
+          set -o pipefail
+          chmod u+x ./docs/update_apidocs.sh
+          ./docs/update_apidocs.sh
+          sphinx-build -b html docs/source docs/build/html 2>&1 | tee sphinx_build.log
+          images_not_found=$(grep "WARNING: image file not readable:" < sphinx_build.log | wc -l)
+          if [ $images_not_found != "0" ] ; then echo "Some linked images were not found"; exit 1 ;fi
+
   coverage_comment_on_pr:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && !cancelled()
