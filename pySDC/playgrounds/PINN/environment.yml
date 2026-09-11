@@ -1,0 +1,20 @@
+---
+
+name: pySDC_pinn
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10,<3.13
+  - numpy
+  - scipy>=0.17.1,<1.15
+  - matplotlib>=3.7
+  - dill>=0.2.6
+  - mpich
+  - mpi4py>=3.0.0
+  - pip
+  - pip:
+    - qmat>=0.1.8
+    - deepxde>=1.12
+    - torch>=2.2
+    - -e ../../..
+

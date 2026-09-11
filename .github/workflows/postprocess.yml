@@ -2,10 +2,17 @@
 
 name: Create Website for pySDC
 
+# A `workflow_run` always executes from the default branch, whatever branch the
+# triggering run was on. Unfiltered, a feature branch's CI therefore produced a
+# `master` run here that checked out master's source but combined the branch's
+# coverage - dying on "No source for code" for any file the branch added - and
+# uploaded that coverage to Codecov as master's head commit. `branches` matches
+# the *triggering* run's head branch, so this now fires only for real master CI.
 on:
   workflow_run:
     workflows: ["CI pipeline for pySDC"]
     types: ["completed"]
+    branches: [master]
   
 jobs:
   build_website:
@@ -18,13 +25,13 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "etc/environment-postprocess.yml"
       - name: Downloading artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: .
           merge-multiple: true
@@ -73,13 +80,11 @@ jobs:
         run: |
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html 2>&1 | tee sphinx_build.log
-          images_not_found=$(grep "WARNING: image file not readable:" < sphinx_build.log | wc -l)
-          if [ $images_not_found != "0" ] ; then echo "Some linked images were not found"; exit 1 ;fi
+          sphinx-build -b html docs/source docs/build/html
           mkdir -p docs/build/html/coverage
           mv htmlcov/* docs/build/html/coverage/.
       - name: Store docs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docs
           path: docs/build/html

@@ -1,7 +1,7 @@
 import numpy as np
 
 from qmat.lagrange import LagrangeApproximation
-from pySDC.core.convergence_controller import ConvergenceController, Status
+from pySDC.core.convergence_controller import ConvergenceController
 
 
 class AdaptiveCollocation(ConvergenceController):
@@ -124,13 +124,11 @@ class AdaptiveCollocation(ConvergenceController):
         """
 
         # generate dictionaries with the new parameters
-        new_params_sweeper = {
-            key: self.params.get(key)[self.status.active_coll] for key in self.params.vary_keys_sweeper
-        }
+        new_params_sweeper = {key: self.params.get(key)[S.status.active_coll] for key in self.params.vary_keys_sweeper}
         sweeper_params = self.params.sweeper_params.copy()
         update_params_sweeper = {**sweeper_params, **new_params_sweeper}
 
-        new_params_level = {key: self.params.get(key)[self.status.active_coll] for key in self.params.vary_keys_level}
+        new_params_level = {key: self.params.get(key)[S.status.active_coll] for key in self.params.vary_keys_level}
 
         # update sweeper for all levels
         for L in S.levels:
@@ -166,7 +164,7 @@ class AdaptiveCollocation(ConvergenceController):
                     L.f[i] = L.prob.eval_f(L.u[i], L.time)
 
         # log the new parameters
-        self.log(f'Switching to collocation {self.status.active_coll + 1} of {self.params.num_colls}', S, level=20)
+        self.log(f'Switching to collocation {S.status.active_coll + 1} of {self.params.num_colls}', S, level=20)
         msg = 'New quadrature:'
         for key in list(sweeper_params.keys()) + list(new_params_level.keys()):
             if key in self.params.vary_keys_sweeper:
@@ -181,13 +179,17 @@ class AdaptiveCollocation(ConvergenceController):
         """
         Add an index for which collocation method to use.
 
+        This lives on the step rather than on this object: every step walks through the collocation
+        methods on its own, and there is one instance of this class per controller, which is a whole
+        block of steps when running with more than one process.
+
         Args:
             controller (pySDC.Controller.controller): The controller
 
         Returns:
             None
         """
-        self.status = Status(['active_coll'])
+        self.add_status_variable_to_step('active_coll', 0)
 
     def reset_status_variables(self, controller, **kwargs):
         """
@@ -199,7 +201,7 @@ class AdaptiveCollocation(ConvergenceController):
         Returns:
             None
         """
-        self.status.active_coll = 0
+        self.set_step_status_variable('active_coll', 0)
 
     def post_iteration_processing(self, controller, S, **kwargs):
         """
@@ -212,8 +214,8 @@ class AdaptiveCollocation(ConvergenceController):
         Returns:
             None
         """
-        if (self.status.active_coll < self.params.num_colls - 1) and S.status.done:
-            self.status.active_coll += 1
+        if (S.status.active_coll < self.params.num_colls - 1) and S.status.done:
+            S.status.active_coll += 1
             S.status.done = False
             self.switch_sweeper(S)
 

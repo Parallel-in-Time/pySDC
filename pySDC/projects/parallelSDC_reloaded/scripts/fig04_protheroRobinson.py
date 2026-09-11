@@ -55,6 +55,10 @@ config = [
 ]
 
 
+# The reference solution depends only on nSteps, so compute it once per nSteps
+# instead of once per (qDelta, nSteps).
+uRefs = {nSteps: solutionExact(tEnd, nSteps, "PROTHERO-ROBINSON", epsilon=epsilon) for nSteps in nStepsList}
+
 i = 0
 for qDeltaList, nSweeps in config:
     figNameConv = f"{SCRIPT}_conv_{i}"
@@ -73,7 +77,7 @@ for qDeltaList, nSweeps in config:
         costs = []
 
         for nSteps in nStepsList:
-            uRef = solutionExact(tEnd, nSteps, "PROTHERO-ROBINSON", epsilon=epsilon)
+            uRef = uRefs[nSteps]
 
             uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, "PROTHERO-ROBINSON", epsilon=epsilon)
 

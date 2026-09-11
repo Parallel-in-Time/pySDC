@@ -201,16 +201,23 @@ def testRectilinear_MPI(tmpdir, dim, nProcs, dtypeIdx, algo, nSteps, nVar):
 
     import subprocess
 
-    fileName = f"{tmpdir}/testRectilinear{dim}D_MPI.pysdc"
+    allGridSizes = list(itertools.product(*[[61, 16]] * dim))
 
-    for gridSizes in itertools.product(*[[61, 16]] * dim):
+    # One mpirun for all grid sizes, not one each: an MPI launch plus interpreter
+    # startup costs ~2s on a CI runner while the actual IO here is microseconds,
+    # so the launches -- not the work -- were the runtime of this test.
+    fileNames = [f"{tmpdir}/testRectilinear{dim}D_MPI_{i}.pysdc" for i in range(len(allGridSizes))]
 
-        cmd = f"mpirun -np {nProcs} python {__file__} --fileName {fileName}"
-        cmd += f" --dtypeIdx {dtypeIdx} --algo {algo} --nSteps {nSteps} --nVar {nVar} --gridSizes {' '.join([str(n) for n in gridSizes])}"
+    cmd = f"mpirun -np {nProcs} python {__file__}"
+    cmd += f" --dtypeIdx {dtypeIdx} --algo {algo} --nSteps {nSteps} --nVar {nVar}"
+    for fileName, gridSizes in zip(fileNames, allGridSizes):
+        cmd += f" --run {fileName} {' '.join(str(n) for n in gridSizes)}"
 
-        p = subprocess.Popen(cmd.split(), cwd=".")
-        p.wait()
-        assert p.returncode == 0, f"MPI write with {nProcs} proc(s) did not return code 0, but {p.returncode}"
+    p = subprocess.Popen(cmd.split(), cwd=".")
+    p.wait()
+    assert p.returncode == 0, f"MPI write with {nProcs} proc(s) did not return code 0, but {p.returncode}"
+
+    for fileName, gridSizes in zip(fileNames, allGridSizes):
 
         from pySDC.helpers.fieldsIO import Rectilinear, initGrid
 
@@ -238,15 +245,28 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--fileName', type=str, help='fileName of the file')
     parser.add_argument('--dtypeIdx', type=int, help="dtype index", choices=DTYPES.keys())
     parser.add_argument('--algo', type=str, help="algorithm used for block decomposition")
     parser.add_argument('--nSteps', type=int, help="number of time-steps")
     parser.add_argument('--nVar', type=int, help="number of field variables")
-    parser.add_argument('--gridSizes', type=int, nargs='+', help="number of grid points in each dimensions")
+    parser.add_argument(
+        '--run',
+        action='append',
+        nargs='+',
+        metavar=('FILENAME', 'GRIDSIZE'),
+        help="a fileName followed by the number of grid points in each dimension; repeatable",
+    )
     args = parser.parse_args()
 
     from pySDC.helpers.fieldsIO import writeFields_MPI, compareFields_MPI
 
-    u0 = writeFields_MPI(**args.__dict__)
-    compareFields_MPI(args.fileName, u0, args.nSteps)
+    for fileName, *gridSizes in args.run:
+        u0 = writeFields_MPI(
+            fileName=fileName,
+            dtypeIdx=args.dtypeIdx,
+            algo=args.algo,
+            nSteps=args.nSteps,
+            nVar=args.nVar,
+            gridSizes=[int(n) for n in gridSizes],
+        )
+        compareFields_MPI(fileName, u0, args.nSteps)

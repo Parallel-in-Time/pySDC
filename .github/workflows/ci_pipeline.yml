@@ -2,11 +2,42 @@
 
 name: CI pipeline for pySDC
 
+# A bare `push:` trigger fires alongside `pull_request` for the same commit,
+# creating two runs of the ~42-job matrix. The `concurrency` group below
+# cancels the loser, but only after all its jobs have been dispatched - you
+# still see ~84 job entries. Restricting `push` to the branches that have no
+# PR of their own stops the duplicate from ever being created. Feature
+# branches get CI from `pull_request`; open a (draft) PR to run them.
 on:
   push:
+    branches:
+      - master
+      - 'v*'
   pull_request:
   schedule:
     - cron: '1 5 * * 1'
+
+# Successive pushes to an open PR supersede each other; cancel the stale run
+# rather than letting both finish. `head_ref` is only set on pull_request
+# events (the PR's source branch); `ref_name` is the plain branch name on
+# push events (unlike `ref`, which carries a `refs/heads/` prefix that would
+# never match `head_ref`).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  # Keep this: it is what proved the exit-143 deaths are silent. With stdout
+  # unbuffered there is still not one byte between "collecting ..." and the
+  # SIGTERM, so nothing inside the process is reporting an error - see the
+  # environment files for what the actual fix was.
+  PYTHONUNBUFFERED: 1
+  # OpenMPI refuses to oversubscribe by default, and PRRTE counts a "slot"
+  # as a physical core - so on a 4-vCPU runner (2 cores + hyperthreading)
+  # even `mpirun -np 3` fails with "not enough slots available". Several
+  # tests ask for 3 or 4 ranks and Monodomain's asks for 24. MPICH
+  # oversubscribed silently, which is why this only appeared after the swap.
+  PRTE_MCA_rmaps_default_mapping_policy: ':oversubscribe'
 
 jobs:
 
@@ -19,9 +50,9 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: ${{ env.YML }}
           create-args: >-
@@ -32,11 +63,15 @@ jobs:
       - name: Linting with ruff
         run: |
           ruff check pySDC
+      - name: Validating the AI declaration with aidecl
+        run: |
+          aidecl --strict validate --output-format github-actions aidecl.yaml
 
   user_cpu_tests_linux:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
         python: ['3.10', '3.11', '3.12', '3.13']
@@ -45,9 +80,9 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "etc/environment-${{ matrix.env }}.yml"
           create-args: >-
@@ -69,7 +104,7 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: matrix.python == '3.13'
         with:
           name: test-artifacts-cpu-${{ matrix.env }}
@@ -81,8 +116,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
-        env: 
+        env:
           - AllenCahn_Bayreuth
           - AsympConv
           - DAE
@@ -99,14 +135,15 @@ jobs:
           - Second_orderSDC
           - soft_failure
           - TOMS
+          - StroemungsRaum
     defaults:
       run:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
       - name: Install additional packages as needed
@@ -123,7 +160,7 @@ jobs:
           coverage combine
           mv .coverage coverage_${{ matrix.env }}.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-project-${{ matrix.env }}
           path: |
@@ -141,7 +178,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install pySDC and pytest
         run: |
           source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
@@ -160,7 +197,7 @@ jobs:
           coverage combine
           mv .coverage coverage_libpressio.dat
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-libpressio
           path: |
@@ -170,7 +207,7 @@ jobs:
   user_firedrake_tests:
     runs-on: ubuntu-latest
     container:
-      image: firedrakeproject/firedrake-vanilla-default:latest
+      image: firedrakeproject/firedrake-vanilla-default@sha256:455fabbe164276329a4cc91af54a05f56bf383dd3164195d0fa1182e981f6839
       options: --user root
       volumes:
         - ${{ github.workspace }}:/repositories
@@ -184,14 +221,16 @@ jobs:
         # (https://github.com/actions/runner/issues/863)
         run: echo "HOME=/home/firedrake" >> "$GITHUB_ENV"
       - name: Checkout pySDC
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with: 
           path: ./pySDC
       - name: Checkout gusto
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
+          # Last known passing Gusto commit in CI run 24328039993 / job 71027429748
+          ref: f11fba9ee858aa84281baf41baa09704431ac0ff
       - name: Create virtual environment
         # pass '--system-site-packages' so Firedrake can be found
         run: python3 -m venv --system-site-packages venv-pySDC
@@ -223,7 +262,7 @@ jobs:
           coverage combine
           mv .coverage ../coverage_firedrake.dat
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-firedrake
           path: |
@@ -237,9 +276,9 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "pySDC/projects/Monodomain/etc/environment-monodomain.yml"
           create-args: >-
@@ -264,9 +303,96 @@ jobs:
           coverage combine
           mv .coverage coverage_monodomain.dat
       - name: Uploading artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-monodomain
           path: |
             data_monodomain
             coverage_monodomain.dat
+
+  docs:
+    runs-on: ubuntu-latest
+    # The website itself is built and deployed by the postprocess workflow,
+    # from master only. This job runs the same build on every PR so that a
+    # change which breaks the docs fails here, on the PR that caused it,
+    # rather than silently on master at deploy time.
+    #
+    # It has to wait for the test jobs: several project READMEs embed plots
+    # that the tests themselves write into `data/` (which is gitignored), so
+    # the "image file not readable" check is meaningless on a bare checkout -
+    # every one of those images would be missing.
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: "etc/environment-postprocess.yml"
+      - name: Download the plots the tests produced
+        uses: actions/download-artifact@v8
+        with:
+          path: .
+          pattern: test-artifacts-*
+          merge-multiple: true
+      - name: Build the docs
+        # `pipefail` matters here: without it `tee` supplies the exit code and
+        # a failing sphinx-build would pass silently.
+        run: |
+          set -o pipefail
+          chmod u+x ./docs/update_apidocs.sh
+          ./docs/update_apidocs.sh
+          sphinx-build -b html docs/source docs/build/html 2>&1 | tee sphinx_build.log
+          # pySDC/tests/README.rst links the coverage badge, which genbadge
+          # writes in the postprocess workflow just before it builds the site.
+          # It is legitimately absent here, so it is not a broken link.
+          images_not_found=$(grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg" | wc -l)
+          if [ $images_not_found != "0" ] ; then
+            echo "Some linked images were not found:"
+            grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg"
+            exit 1
+          fi
+
+  coverage_comment_on_pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && !cancelled()
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    permissions:
+      contents: read
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: "etc/environment-postprocess.yml"
+      - name: Download all coverage artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: .
+          pattern: test-artifacts-*
+          merge-multiple: true
+      - name: Combine coverage reports
+        continue-on-error: true
+        run: |
+          python -m coverage combine coverage_*.dat
+          python -m coverage xml
+          python -m coverage report
+      - name: Post coverage comment on PR
+        uses: py-cov-action/python-coverage-comment-action@v3
+        # Non-blocking: this only posts an informational PR comment, not a
+        # correctness signal, and has been observed to fail on a transient
+        # GitHub API 504 unrelated to this workflow (see PR #659). Don't
+        # fail the whole PR's CI status over a comment.
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          MINIMUM_GREEN: 70
+          MINIMUM_ORANGE: 50

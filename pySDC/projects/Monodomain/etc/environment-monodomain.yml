@@ -4,7 +4,7 @@ name: pySDC_monodomain
 channels:
   - conda-forge
 dependencies:
-  - python
+  - python>=3.10,<3.14
   - numpy
   - scipy>=0.17.1
   - matplotlib>=3.0
@@ -20,7 +20,7 @@ dependencies:
   - numdifftools>=0.9.41
   - pybind11
   - mpi4py
-  - mpich
+  - openmpi
   - tqdm
   - pymp-pypi
   - pip

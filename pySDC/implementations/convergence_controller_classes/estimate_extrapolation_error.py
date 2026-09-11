@@ -421,7 +421,7 @@ class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
         Returns:
             dict: Updated parameters with default values
         """
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+        from pySDC.core.check_convergence import CheckConvergence
 
         num_nodes = description['sweeper_params']['num_nodes']
         self.comm = description['sweeper_params'].get('comm', None)

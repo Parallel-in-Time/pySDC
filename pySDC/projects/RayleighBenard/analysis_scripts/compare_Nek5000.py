@@ -159,9 +159,11 @@ def plot_T_rms_profile(ax):  # pragma: no cover
 def plot_verification():  # pragma: no cover
     from pySDC.projects.RayleighBenard.analysis_scripts.plotting_utils import savefig, figsize
 
-    fig, axs = plt.subplots(1, 2, figsize=figsize(scale=1, ratio=0.5))
+    fig, axs = plt.subplots(1, 2, figsize=figsize(scale=1, ratio=0.45))
     plot_Nu_scaling(axs[0])
     plot_T_profile(axs[1])
+    for ax in axs:
+        ax.set_box_aspect(1)
     fig.tight_layout()
     fig.savefig('plots/verification.pdf')
 

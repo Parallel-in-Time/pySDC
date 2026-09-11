@@ -2038,7 +2038,7 @@ class AdaptivityPolynomialError(InexactBaseStrategy):
         '''
         from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
         from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+        from pySDC.core.check_convergence import CheckConvergence
 
         base_params = super().get_custom_description(problem, num_procs)
         custom_description = {}

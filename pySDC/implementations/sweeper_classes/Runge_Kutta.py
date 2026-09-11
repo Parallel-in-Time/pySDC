@@ -432,7 +432,7 @@ class RungeKuttaIMEX(RungeKutta):
 
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            rhs = lvl.u[0]
+            rhs = lvl.prob.dtype_u(lvl.u[0])
             for j in range(1, m + 1):
                 rhs += lvl.dt * (self.QI[m + 1, j] * lvl.f[j].impl + self.QE[m + 1, j] * lvl.f[j].expl)
 
@@ -442,7 +442,7 @@ class RungeKuttaIMEX(RungeKutta):
                     rhs, lvl.dt * self.QI[m + 1, m + 1], lvl.u[m], lvl.time + lvl.dt * self.coll.nodes[m + 1]
                 )
             else:
-                lvl.u[m + 1] = rhs[:]
+                lvl.u[m + 1] = rhs
 
             # update function values
             if (

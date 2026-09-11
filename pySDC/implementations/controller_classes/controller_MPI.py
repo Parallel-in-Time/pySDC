@@ -1,6 +1,4 @@
 import numpy as np
-from mpi4py import MPI
-
 from pySDC.core.controller import Controller
 from pySDC.core.errors import ControllerError
 from pySDC.core.step import Step
@@ -52,13 +50,21 @@ class controller_MPI(Controller):
         self.req_status = None
         # add request handle container for isend
         self.req_send = [None] * num_levels
-        self.req_ibcast = None
-        self.req_diff = None
 
         if num_procs > 1 and num_levels > 1:
             for L in self.S.levels:
                 if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
                     raise ControllerError("For PFASST to work, we assume uend^k = u_M^k")
+
+        # `it_coarse` sweeps the coarsest level exactly once. Single-level Gauss-like MSSDC routes
+        # through it too. Check here rather than asserting mid-sweep: by then every rank has posted
+        # receives, so a failure hangs the job instead of raising. `mssdc_jac` only decides the
+        # routing when there is more than one step: a single step is plain SDC and always goes
+        # through `it_fine`, which honours nsweeps.
+        if self.S.levels[-1].params.nsweeps > 1 and (num_levels > 1 or (num_procs > 1 and not self.params.mssdc_jac)):
+            raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
+
+        self.check_variable_coefficients(num_procs)
 
         if num_levels == 1 and self.params.predict_type is not None:
             self.logger.warning(
@@ -67,6 +73,8 @@ class controller_MPI(Controller):
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.setup_status_variables(self, comm=comm)
+
+        self.stages = self.get_stages()
 
     def run(self, u0, t0, Tend):
         """
@@ -90,7 +98,7 @@ class controller_MPI(Controller):
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[: self.comm.rank])
 
-        active = time < Tend - 10 * np.finfo(float).eps
+        active = self.step_is_active(time, t0, Tend)
         comm_active = self.comm.Split(active)
         self.S.status.slot = comm_active.rank
 
@@ -142,7 +150,7 @@ class controller_MPI(Controller):
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[: self.S.status.slot])
 
-            active = time < Tend - 10 * np.finfo(float).eps
+            active = self.step_is_active(time, tend, Tend)
 
             # check if we need to split the communicator
             if tend + sum(all_dt[: comm_active.size - 1]) >= Tend - 10 * np.finfo(float).eps:
@@ -199,9 +207,6 @@ class controller_MPI(Controller):
         for l in self.S.levels:
             l.tag = None
         self.req_status = None
-        self.req_diff = None
-        self.req_ibcast = None
-        self.req_diff = None
         self.req_send = [None] * len(self.S.levels)
         self.S.status.prev_done = False
         self.S.status.force_done = False
@@ -226,7 +231,7 @@ class controller_MPI(Controller):
             comm: communicator
         """
         req = target.u[0].irecv(source=source, tag=tag, comm=comm)
-        self.wait_with_interrupt(request=req)
+        self.wait_for_request(request=req)
         if self.S.status.force_done:
             return None
         # re-evaluate f on left interval boundary
@@ -241,12 +246,16 @@ class controller_MPI(Controller):
             blocking: flag to indicate that we need blocking communication
             level: the level number
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
+
+        Note:
+            Computing the end point is this function's job, not the caller's. Callers must not do it
+            themselves.
         """
         for hook in self.hooks:
             hook.pre_comm(step=self.S, level_number=level)
 
         if not blocking:
-            self.wait_with_interrupt(request=self.req_send[level])
+            self.wait_for_request(request=self.req_send[level])
             if self.S.status.force_done:
                 return None
 
@@ -268,7 +277,7 @@ class controller_MPI(Controller):
                 dest=self.S.next, tag=level * 100 + self.S.status.iter, comm=comm
             )
             if blocking:
-                self.wait_with_interrupt(request=self.req_send[level])
+                self.wait_for_request(request=self.req_send[level])
                 if self.S.status.force_done:
                     return None
 
@@ -304,101 +313,21 @@ class controller_MPI(Controller):
         for hook in self.hooks:
             hook.post_comm(step=self.S, level_number=level, add_to_stats=add_to_stats)
 
-    def wait_with_interrupt(self, request):
+    def wait_for_request(self, request):
         """
-        Wrapper for waiting for the completion of a non-blocking communication, can be interrupted
+        Wait for a non-blocking communication to complete.
+
+        This used to poll for an interrupt while waiting, so that a rank could be told mid-wait that
+        the iteration estimator had decided everyone was done. That estimator has been removed, and
+        with it the only thing that could ever have interrupted a wait, so this is now a plain wait.
+        `force_done` is still honoured by the callers -- convergence controllers and hooks set it
+        between stages -- but nothing sets it *during* a wait any more.
 
         Args:
             request: request to wait for
         """
-        if request is not None and self.req_ibcast is not None:
-            while not request.Test():
-                if self.req_ibcast.Test():
-                    self.logger.debug(f'{self.S.status.slot} has been cancelled during {self.S.status.stage}..')
-                    self.S.status.stage = f'CANCELLED_{self.S.status.stage}'
-                    self.S.status.force_done = True
-                    return None
         if request is not None:
             request.Wait()
-
-    def check_iteration_estimate(self, comm):
-        """
-        Routine to compute and check error/iteration estimation
-
-        Args:
-            comm: time-communicator
-        """
-
-        # Compute diff between old and new values
-        diff_new = 0.0
-        L = self.S.levels[0]
-
-        for m in range(1, L.sweep.coll.num_nodes + 1):
-            diff_new = max(diff_new, abs(L.uold[m] - L.u[m]))
-
-        # Send forward diff
-        for hook in self.hooks:
-            hook.pre_comm(step=self.S, level_number=0)
-
-        self.wait_with_interrupt(request=self.req_diff)
-        if self.S.status.force_done:
-            return None
-
-        if not self.S.status.first:
-            prev_diff = np.empty(1, dtype=float)
-            req = comm.Irecv((prev_diff, MPI.DOUBLE), source=self.S.prev, tag=999)
-            self.wait_with_interrupt(request=req)
-            if self.S.status.force_done:
-                return None
-            self.logger.debug(
-                'recv diff: status %s, process %s, time %s, source %s, tag %s, iter %s'
-                % (prev_diff, self.S.status.slot, self.S.time, self.S.prev, 999, self.S.status.iter)
-            )
-            diff_new = max(prev_diff[0], diff_new)
-
-        if not self.S.status.last:
-            self.logger.debug(
-                'isend diff: status %s, process %s, time %s, target %s, tag %s, iter %s'
-                % (diff_new, self.S.status.slot, self.S.time, self.S.next, 999, self.S.status.iter)
-            )
-            tmp = np.array(diff_new, dtype=float)
-            self.req_diff = comm.Issend((tmp, MPI.DOUBLE), dest=self.S.next, tag=999)
-
-        for hook in self.hooks:
-            hook.post_comm(step=self.S, level_number=0)
-
-        # Store values from first iteration
-        if self.S.status.iter == 1:
-            self.S.status.diff_old_loc = diff_new
-            self.S.status.diff_first_loc = diff_new
-        # Compute iteration estimate
-        elif self.S.status.iter > 1:
-            Ltilde_loc = min(diff_new / self.S.status.diff_old_loc, 0.9)
-            self.S.status.diff_old_loc = diff_new
-            alpha = 1 / (1 - Ltilde_loc) * self.S.status.diff_first_loc
-            Kest_loc = np.log(self.S.params.errtol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
-            self.logger.debug(
-                f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
-                f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
-                f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}'
-            )
-            Kest_glob = Kest_loc
-            # If condition is met, send interrupt
-            if np.ceil(Kest_glob) <= self.S.status.iter:
-                if self.S.status.last:
-                    self.logger.debug(f'{self.S.status.slot} is done, broadcasting..')
-                    for hook in self.hooks:
-                        hook.pre_comm(step=self.S, level_number=0)
-                    comm.Ibcast((np.array([1]), MPI.INT), root=self.S.status.slot).Wait()
-                    for hook in self.hooks:
-                        hook.post_comm(step=self.S, level_number=0, add_to_stats=True)
-                    self.logger.debug(f'{self.S.status.slot} is done, broadcasting done')
-                    self.S.status.done = True
-                else:
-                    for hook in self.hooks:
-                        hook.pre_comm(step=self.S, level_number=0)
-                    for hook in self.hooks:
-                        hook.post_comm(step=self.S, level_number=0, add_to_stats=True)
 
     def pfasst(self, comm, num_procs):
         """
@@ -415,48 +344,45 @@ class controller_MPI(Controller):
 
         self.logger.debug(stage + ' - process ' + str(self.S.status.slot))
 
-        # Wait for interrupt, if iteration estimator is used
-        if self.params.use_iteration_estimator and stage == 'SPREAD' and not self.S.status.last:
-            done = np.empty(1)
-            self.req_ibcast = comm.Ibcast((done, MPI.INT), root=comm.Get_size() - 1)
+        self.stages.get(stage, self.default)(comm, num_procs)
 
-        # If interrupt is there, cleanup and finish
-        if self.params.use_iteration_estimator and not self.S.status.last and self.req_ibcast.Test():
-            self.logger.debug(f'{self.S.status.slot} is done..')
-            self.S.status.done = True
+    def get_stages(self):
+        """
+        The stages this controller can be in, and what to run in each.
 
-            if not stage == 'IT_CHECK':
-                self.logger.debug(f'Rewinding {self.S.status.slot} after {stage}..')
-                self.S.levels[0].u[1:] = self.S.levels[0].uold[1:]
+        A subclass that iterates differently replaces the iteration stages here and says which one
+        to enter in `next_iteration_stage`; everything around the iteration is the same for any
+        algorithm this controller runs.
 
-            for hook in self.hooks:
-                hook.post_iteration(step=self.S, level_number=0)
+        Returns:
+            dict: stage name -> the method that runs it
+        """
+        return {
+            'SPREAD': self.spread,
+            'PREDICT': self.predict,
+            'IT_CHECK': self.it_check,
+            'IT_FINE': self.it_fine,
+            'IT_DOWN': self.it_down,
+            'IT_COARSE': self.it_coarse,
+            'IT_UP': self.it_up,
+        }
 
-            for req in self.req_send:
-                if req is not None and req != MPI.REQUEST_NULL:
-                    req.Cancel()
-            if self.req_status is not None and self.req_status != MPI.REQUEST_NULL:
-                self.req_status.Cancel()
-            if self.req_diff is not None and self.req_diff != MPI.REQUEST_NULL:
-                self.req_diff.Cancel()
+    def next_iteration_stage(self, S):
+        """
+        The stage that starts one iteration of the algorithm.
 
-            self.S.status.stage = 'DONE'
-            for hook in self.hooks:
-                hook.post_step(step=self.S, level_number=0)
+        Args:
+            S (pySDC.Step.step): The current step
 
+        Returns:
+            str: name of the stage to enter
+        """
+        if len(S.levels) > 1:  # MLSDC or PFASST
+            return 'IT_DOWN'
+        elif S.status.time_size == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
+            return 'IT_FINE'
         else:
-            # Start cycling, if not interrupted
-            switcher = {
-                'SPREAD': self.spread,
-                'PREDICT': self.predict,
-                'IT_CHECK': self.it_check,
-                'IT_FINE': self.it_fine,
-                'IT_DOWN': self.it_down,
-                'IT_COARSE': self.it_coarse,
-                'IT_UP': self.it_up,
-            }
-
-            switcher.get(stage, self.default)(comm, num_procs)
+            return 'IT_COARSE'  # serial MSSDC (Gauss-like)
 
     def spread(self, comm, num_procs):
         """
@@ -470,9 +396,7 @@ class controller_MPI(Controller):
         # call predictor from sweeper
         self.S.levels[0].sweep.predict()
 
-        if self.params.use_iteration_estimator:
-            # store previous iterate to compute difference later on
-            self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
+        self.compute_residual_after_spread(self.S)
 
         # update stage
         if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
@@ -497,43 +421,6 @@ class controller_MPI(Controller):
         elif self.params.predict_type == 'fine_only':
             # do a fine sweep only
             self.S.levels[0].sweep.update_nodes()
-
-        # elif self.params.predict_type == 'libpfasst_style':
-        #
-        #     # restrict to coarsest level
-        #     for l in range(1, len(self.S.levels)):
-        #         self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
-        #
-        #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-        #     if not self.S.status.first:
-        #         self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
-        #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-        #                            self.S.status.iter))
-        #         self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-        #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
-        #
-        #     # do the sweep with new values
-        #     self.S.levels[-1].sweep.update_nodes()
-        #     self.S.levels[-1].sweep.compute_end_point()
-        #
-        #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-        #     if not self.S.status.last:
-        #         self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
-        #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-        #                            self.S.status.iter))
-        #         self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
-        #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
-        #
-        #     # go back to fine level, sweeping
-        #     for l in range(len(self.S.levels) - 1, 0, -1):
-        #         # prolong values
-        #         self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
-        #         # on middle levels: do sweep as usual
-        #         if l - 1 > 0:
-        #             self.S.levels[l - 1].sweep.update_nodes()
-        #
-        #     # end with a fine sweep
-        #     self.S.levels[0].sweep.update_nodes()
 
         elif self.params.predict_type == 'pfasst_burnin':
             # restrict to coarsest level
@@ -589,21 +476,7 @@ class controller_MPI(Controller):
         Key routine to check for convergence/termination
         """
 
-        # Update values to compute the residual
-        self.send_full(comm=comm, level=0)
-        if self.S.status.force_done:
-            return None
-
-        self.recv_full(comm=comm, level=0)
-        if self.S.status.force_done:
-            return None
-
-        # compute the residual
-        self.S.levels[0].sweep.compute_residual(stage='IT_CHECK')
-
-        if self.params.use_iteration_estimator:
-            # TODO: replace with convergence controller
-            self.check_iteration_estimate(comm=comm)
+        self.prepare_convergence_check(comm)
 
         if self.S.status.force_done:
             return None
@@ -617,6 +490,9 @@ class controller_MPI(Controller):
             C.post_iteration_processing(self, self.S, comm=comm)
             C.convergence_control(self, self.S, comm=comm)
 
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_iteration_processing_block(self, comm=comm)
+
         # if not ready, keep doing stuff
         if not self.S.status.done:
             # increment iteration count here (and only here)
@@ -627,41 +503,55 @@ class controller_MPI(Controller):
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 C.pre_iteration_processing(self, self.S, comm=comm)
 
-            if self.params.use_iteration_estimator:
-                # store previous iterate to compute difference later on
-                self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
-
-            if len(self.S.levels) > 1:  # MLSDC or PFASST
-                self.S.status.stage = 'IT_DOWN'
-            else:
-                if num_procs == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
-                    self.S.status.stage = 'IT_FINE'
-                else:
-                    self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
+            self.S.status.stage = self.next_iteration_stage(self.S)
 
         else:
-            if not self.params.use_iteration_estimator:
-                # Need to finish all pending isend requests. These will occur for the first active process, since
-                # in the last iteration the wait statement will not be called ("send and forget")
-                for req in self.req_send:
-                    if req is not None:
-                        req.Wait()
-                if self.req_status is not None:
-                    self.req_status.Wait()
-                if self.req_diff is not None:
-                    self.req_diff.Wait()
-            else:
-                for req in self.req_send:
-                    if req is not None:
-                        req.Cancel()
-                if self.req_status is not None:
-                    self.req_status.Cancel()
-                if self.req_diff is not None:
-                    self.req_diff.Cancel()
+            # Need to finish all pending isend requests. These will occur for the first active process, since
+            # in the last iteration the wait statement will not be called ("send and forget")
+            for req in self.req_send:
+                if req is not None:
+                    req.Wait()
+            if self.req_status is not None:
+                self.req_status.Wait()
 
             for hook in self.hooks:
                 hook.post_step(step=self.S, level_number=0)
             self.S.status.stage = 'DONE'
+
+    def compute_residual_after_spread(self, S):
+        """
+        Make the residual current right after the initial guess, for algorithms that need it there.
+
+        This controller computes the residual at the top of `it_check` instead, so there is nothing
+        to do; an algorithm whose residual is not available at that point overrides this. Called
+        before `post_spread_processing`, because convergence controllers there may still change the
+        initial iterate.
+
+        Args:
+            S (pySDC.Step.step): The current step
+        """
+        pass
+
+    def prepare_convergence_check(self, comm):
+        """
+        Make current what `it_check` is about to read: the end point and the residual.
+
+        For a sweep-based algorithm both come out of the exchange with the neighbours, so this is
+        the send and receive plus the residual it enables. An algorithm that gets its residual from
+        the iteration instead overrides this, and still owes the end point.
+
+        Args:
+            comm: the communicator
+        """
+        self.send_full(comm=comm, level=0)
+        if self.S.status.force_done:
+            return None
+
+        self.recv_full(comm=comm, level=0)
+        if self.S.status.force_done:
+            return None
+
+        self.S.levels[0].sweep.compute_residual(stage='IT_CHECK')
 
     def it_fine(self, comm, num_procs):
         """
@@ -746,17 +636,12 @@ class controller_MPI(Controller):
         # do the sweep
         for hook in self.hooks:
             hook.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-        assert self.S.levels[-1].params.nsweeps == 1, (
-            'ERROR: this controller can only work with one sweep on the coarse level, got %s'
-            % self.S.levels[-1].params.nsweeps
-        )
         self.S.levels[-1].sweep.update_nodes()
         self.S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
         for hook in self.hooks:
             hook.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-        self.S.levels[-1].sweep.compute_end_point()
 
-        # send to next step
+        # send to next step (`send_full` computes the end point itself)
         self.send_full(comm=comm, blocking=True, level=len(self.S.levels) - 1, add_to_stats=True)
         if self.S.status.force_done:
             return None

@@ -7,6 +7,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/pySDC?logo=pypi)](https://pypistats.org/packages/pysdc)
 [![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)](https://go.fzj.de/CodePromo)
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC)
+[![validated with aidecl](https://img.shields.io/badge/ai%20declaration%20format-aidecl-blue)](https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml)
 
 # Welcome to pySDC!
 
@@ -23,8 +24,8 @@ implemented.
     multi-level, diagonal, multi-step
 -   Variants of PFASST: virtually parallel or MPI-based parallel,
     classical or multigrid perspective
--   8 tutorials: from setting up a first collocation problem to SDC,
-    PFASST and advanced topics
+-   9 tutorials: from setting up a first collocation problem to SDC,
+    PFASST, advanced topics and ParaDiag
 -   Projects: many documented projects with defined and tested outcomes
 -   Many different examples, collocation types, data types already
     implemented
@@ -104,6 +105,7 @@ The current software release can be cited using Zenodo:
 and is now maintained and developed by a small community of scientists interested in SDC methods.
 Checkout the [Changelog](./CHANGELOG.md) to see pySDC's evolution since 2016. It has a
 software management plan (SWP), too, see [here](https://smw.dsw.elixir-europe.org/wizard/projects/c3dda921-b7b0-4f4d-b5dc-778b9780552d).
+Parts of the code have been co-authored by AI; see [`aidecl.yaml`](./aidecl.yaml) for details.
 
 Any contribution is dearly welcome! If you want to contribute, please take the time to read our [Contribution Guidelines](./CONTRIBUTING.md)
 (and don't forget to take a peek at our nice [Code of Conduct](./CODE_OF_CONDUCT.md) :wink:).
@@ -118,11 +120,11 @@ The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the [German Federal Ministry of
 Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html)
-(BMBF) grants  16HPC047 and 16ME0679K. Supported by the European Union - NextGenerationEU. 
+(BMBF) grants  16HPC047, 16ME0708 and 16ME0679K. Supported by the European Union - NextGenerationEU. 
 The project also received help from the [Joint Lab "Helmholtz Information -  Research Software Engineering" (HiRSE)](https://www.helmholtz-hirse.de/).
 
 <p align="center">
   <img src="./docs/img/EuroHPC.jpg" height="105"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="./docs/img/LogoTime-X.png" height="105" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="./docs/img/BMBF_gefoerdert_2017_en.jpg" height="105" />
+  <img src="./docs/img/Logo-BMFTR-768x512.png" height="105" />
 </p>

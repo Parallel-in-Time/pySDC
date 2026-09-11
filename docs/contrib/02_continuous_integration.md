@@ -9,40 +9,15 @@ Finally, the CI also build artifacts that are used to generate the documentation
 The CI pipeline is configured to avoid redundant runs. The workflow is triggered:
 
 - **On pull requests**: CI runs for all pull request events (opened, synchronized, reopened, etc.)
-- **On push to master**: CI runs when code is pushed directly to the `master` branch
+- **On push to `master`** (and to release branches matching `v*`): CI runs when code is pushed there directly
 - **On schedule**: CI runs weekly on Monday at 5:01 AM UTC (via cron schedule)
 
 This configuration ensures that when you push commits to a pull request branch, the CI runs only once for the pull request event, not twice (once for the PR and once for the push). Direct pushes to the master branch will still trigger the CI to ensure the main branch is always tested.
 
-### Automated Failure Handling
-
-When the weekly scheduled CI run fails, an automated workflow is triggered to help investigate and resolve the issues:
-
-1. **Automatic Detection**: The `auto_fix_failures.yml` workflow detects failures from the scheduled Monday morning runs
-2. **Failure Analysis**: The system analyzes failed jobs and extracts:
-   - Error messages and stack traces
-   - Links to failed workflow runs and job logs
-   - Summary of all failed jobs
-3. **Pull Request Creation**: A PR is automatically created with:
-   - Detailed failure analysis report
-   - Recommendations for investigation
-   - Instructions for applying fixes
-   - Labels: `automated`, `test-failure`, `needs-investigation`
-
-**How to Handle Automated Failure PRs:**
-
-When you receive an automated failure PR:
-
-1. Review the `failure_analysis.md` file attached to the PR
-2. Check the linked workflow run and job logs for full details
-3. Investigate the root cause (dependency issues, flaky tests, code bugs, etc.)
-4. Push fixes directly to the PR branch or close if it's a transient failure
-5. Test fixes locally or wait for CI to verify
-6. Merge when the issue is confirmed resolved
-
-For more details, see the [automated failure handling documentation](../../.github/scripts/README.md).
-
-> :bell: **Note:** These automated PRs are informational and require manual review. They help centralize failure information but don't automatically fix issues. If you can identify and fix the problem, push commits to the auto-generated branch.
+> :bell: **A branch with no open pull request gets no CI.** This is deliberate: a bare `push` trigger fires
+> alongside `pull_request` for the same commit and doubles the ~42-job matrix. Run the tests
+> [locally](#code-testing) while you work, and open a pull request (a draft one is enough) as soon as you want
+> the full matrix to run.
 
 ## Code linting
 

@@ -62,6 +62,10 @@ tEnd = 1.24
 nStepsList = np.array([2, 5, 10, 20, 50, 100, 200, 500, 1000])
 dtVals = tEnd / nStepsList
 
+# The reference solution depends only on nSteps, so compute it once per nSteps
+# instead of once per (qDelta, nSteps).
+uRefs = {nSteps: solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20)) for nSteps in nStepsList}
+
 
 def getError(uNum, uRef):
     if uNum is None:  # pragma: no cover
@@ -82,7 +86,7 @@ for qDelta, sym in zip(config, symList, strict=False):
         for nSteps in nStepsList:
             print(f' -- nSteps={nSteps} ...')
 
-            uRef = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
+            uRef = uRefs[nSteps]
 
             uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
 
@@ -145,7 +149,7 @@ for qDeltaList, nSweeps in config:
         costs = []
 
         for nSteps in nStepsList:
-            uRef = solutionExact(tEnd, nSteps, "LORENZ", u0=(5, -5, 20))
+            uRef = uRefs[nSteps]
 
             uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, "LORENZ", u0=(5, -5, 20))
 

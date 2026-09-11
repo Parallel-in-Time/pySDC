@@ -232,18 +232,14 @@ class GenericSpectralLinear(Problem):
             self.logger.debug(f'Setting up left preconditioner with {N} local degrees of freedom')
 
             # reverse Kronecker product
-            if self.spectral.useGPU:
-                import scipy.sparse as sp
-            else:
-                sp = self.spectral.sparse_lib
+            nc = self.ncomponents
 
-            R = sp.lil_matrix((self.ncomponents * N,) * 2, dtype=int)
+            rows = self.xp.arange(N * nc)
+            cols = (rows % nc) * N + rows // nc
 
-            for j in range(self.ncomponents):
-                for i in range(N):
-                    R[i * self.ncomponents + j, j * N + i] = 1
-
-            self.Pl = self.spectral.sparse_lib.csc_matrix(R, dtype=complex)
+            self.Pl = self.spectral.sparse_lib.csc_matrix(
+                (self.xp.ones(N * nc, dtype=complex), (rows, cols)), shape=(N * nc, N * nc)
+            )
 
             self.logger.debug('Finished setup of left preconditioner')
         else:
@@ -429,6 +425,9 @@ class GenericSpectralLinear(Problem):
         self.setUpFieldsIO()
 
         coords = [me.get_1dgrid() for me in self.spectral.axes]
+        if self.spectral.useGPU:
+            coords = [me.get() for me in coords]
+
         assert np.allclose([len(me) for me in coords], self.spectral.global_shape[1:])
 
         fOut = Rectilinear(np.float64, fileName=fileName)
@@ -438,9 +437,14 @@ class GenericSpectralLinear(Problem):
 
     def processSolutionForOutput(self, u):
         if self.spectral_space:
-            return np.array(self.itransform(u).real)
+            u = self.itransform(u).real
         else:
-            return np.array(u.real)
+            u = u.real
+
+        if self.spectral.useGPU:
+            u = u.get()
+
+        return np.ascontiguousarray(u.view(np.ndarray))
 
 
 def compute_residual_DAE(self, stage=''):

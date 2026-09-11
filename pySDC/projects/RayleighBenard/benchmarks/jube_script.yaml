@@ -1,0 +1,121 @@
+name: jobsystem
+outpath: "bench_run_${OUT}"
+comment: RBC benchmarks on JUSUF and JUWELS booster
+
+parameterset:
+  #benchmark configuration
+  - name: param_set
+    parameter:
+      - {name: procs, mode: python, type: int, _: "${ntasks_space}*${ntasks_time}"}
+      - {tag: 'JUSUF', name: useGPU, _: False}
+      - {tag: 'BOOSTER', name: useGPU, _: True}
+      - {tag: 'Euler', name: config, '_': 'RBC3DG4R4EulerRa1e5'}
+      - {tag: 'RK', name: config, '_': 'RBC3DG4R4RKRa1e5'}
+      - {tag: 'SDC23', name: config, '_': 'RBC3DG4R4SDC23Ra1e5'}
+      - {tag: 'SDC44', name: config, '_': 'RBC3DG4R4SDC44Ra1e5'}
+      - {tag: 'Ra1e5', name: res, type: int, '_': '32'}
+      - {tag: 'Ra1e6', name: res, type: int, '_': '64'}
+      - {tag: 'Ra1e7', name: res, type: int, '_': '128'}
+      - {tag: 'Ra1e8', name: res, type: int, '_': '256'}
+      - {tag: 'RK|Euler', name: ntasks_time, type: int, '_': '1'}
+      - {tag: 'SDC23', name: ntasks_time, type: int, '_': '1,2'}
+      - {tag: 'SDC44', name: ntasks_time, type: int, '_': '1,4'}
+      - {tag: 'JUSUF+Ra1e5', name: ntasks_space, type: int, '_': '1,2,4,8,16,32,64,128,256,512,1024,2048'}
+      - {tag: 'JUSUF+Ra1e6', name: ntasks_space, type: int, '_': '1,2,4,8,16,32,64,128,256,512,1024,2048,4096'}
+      - {tag: 'JUSUF+Ra1e7', name: ntasks_space, type: int, '_': '128,256,512,1024,2048,4096'}
+      - {tag: 'BOOSTER+Ra1e5', name: ntasks_space, type: int, '_': '1,2,4,8'}
+      - {tag: 'BOOSTER+Ra1e6', name: ntasks_space, type: int, '_': '1,2,4,8,16,32,64'}
+      - {tag: 'BOOSTER+Ra1e7', name: ntasks_space, type: int, '_': '32,64,128,256,512'}
+      - {tag: 'BOOSTER+Ra1e8', name: ntasks_space, type: int, '_': '256,512,1024,2048'}
+      - {name: binding, '_': 'time_first'}
+      - {tag: 'SDC44+(Ra1e6|Ra1e5)', name: binding, '_': 'time_first,space_first'}
+  #Job configuration
+  - name: executeset
+    parameter:
+      - {name: submit_cmd, "_": sbatch}
+      - {name: job_file, "_": jobscript.sh}
+      - {name: account, "_": cstma}
+      - {name: walltime, "_": "00:15:00"}
+      - {name: ready_file, "_": ready}
+      - {name: err_file, "_": stderr}
+      - {name: out_file, "_": stdout}
+      - {name: cpu_bind, "_": socket}
+      - {name: distribution, "_": "block:cyclic:cyclic"}
+      - {tag: '!(RK|Euler)+(Ra1e6|Ra1e5)', name: distribution, "_": "block:cyclic:cyclic,cyclic:cyclic:cyclic"}
+      - {name: exec, "_": 'srun --cpu-bind=${cpu_bind} --distribution=${distribution} ${gpus_per_task} -n ${procs} python ${jube_benchmark_home}/../run_experiment.py --res=${res} --config=${config} --procs=1/${ntasks_time}/${ntasks_space} --mode=benchmark --useGPU=${useGPU} --distribution=${binding}'}
+      - {tag: JUSUF, name: ppn, type: int, "_": 64}
+      - {tag: BOOSTER, name: ppn, type: int, "_": 4}
+      - {tag: JUSUF, name: partition, "_": batch}
+      - {tag: BOOSTER, name: partition, "_": booster}
+      - {tag: JUSUF, name: venvname, "_": venv_jusuf}
+      - {tag: BOOSTER, name: venvname, "_": venv_booster}
+      - {tag: BOOSTER, name: gpus_per_task, "_": "--gpus-per-task=1"}
+      - {tag: JUSUF, name: gpus_per_task, "_": ""}
+
+
+
+#Regex pattern
+patternset:
+- name: pattern_time
+  pattern:
+    - {name: pat_time, type: float, _: "CPU timing step: $jube_pat_fp"}
+- name: pattern_time_GPU
+  pattern:
+    - {name: pat_time_GPU, type: float, _: "GPU timing step: $jube_pat_fp"}
+
+#Load jobfile
+fileset:
+  name: files
+  copy: ${job_file}
+
+substituteset:
+  name: sub_job
+  iofile: {in: "${job_file}", out: $job_file} #attributes with {} must be quoted
+  sub:
+    - {source: "#PROCS#", dest: $procs} 
+    - {source: "#PROCS_PER_NODE#", dest: $ppn} 
+    - {source: "#PARTITION#", dest: $partition} 
+    - {source: "#ACCOUNT#", dest: $account} 
+    - {source: "#WALLTIME#", dest: $walltime}
+    - {source: "#ERROR_FILEPATH#", dest: $err_file}
+    - {source: "#OUT_FILEPATH#", dest: $out_file}
+    - {source: "#EXEC#", dest: $exec}
+    - {source: "#VENVNAME#", dest: $venvname}
+    - {source: "#READY#", _: $ready_file } # _ can be used here as well instead of dest (should be used for multiline output)
+
+#Operation
+step:
+  name: submit
+  work_dir: "${jube_benchmark_rundir}/jobsystem_bench_${jube_benchmark_id}_${jube_wp_id}"
+  use: [param_set,executeset,files,sub_job]
+  do:
+    done_file: $ready_file
+    _: $submit_cmd $job_file #shell command
+
+#Analyse
+analyser:
+- name: analyse
+  analyse:
+    step: submit
+    file:
+    - use: pattern_time
+      _: stdout
+    - use: pattern_time_GPU
+      _: stdout
+
+#Create result table
+result:
+  use: analyse
+  table:
+    name: result
+    style: csv
+    sort: res
+    column:
+    - res
+    - distribution
+    - procs
+    - ntasks_time
+    - ntasks_space
+    - binding
+    - { title: "time", _: pat_time_avg}
+    - { title: "time_GPU", _: pat_time_GPU_avg}

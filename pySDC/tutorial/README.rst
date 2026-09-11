@@ -1,4 +1,4 @@
-To flatten the steep learning curve of SDC and the likes, this tutorial contains eight steps to introduce, demonstrate and briefly discuss the main features of pySDC.
+To flatten the steep learning curve of SDC and the likes, this tutorial contains nine steps to introduce, demonstrate and briefly discuss the main features of pySDC.
 We start with a simple problem setup, add the collocation problem, solve this via SDC, MLSDC and finally PFASST and discuss further extensions.
 Along the way we highlight special features of pySDC and explain how different features or implementations can be used (or disabled).
 

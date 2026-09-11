@@ -167,7 +167,15 @@ def test_restart(tmpdir, ODE=True):
 
 @pytest.mark.mpi4py
 @pytest.mark.mpi(ranks=[1, 4])
-def test_loggingMPI(tmpdir, comm, mpi_ranks):
+def test_loggingMPI(comm, mpi_ranks):
     # `mpi_ranks` is a pytest fixture required by pytest-isolate-mpi. Do not remove.
-    tmpdir = comm.bcast(tmpdir)
-    test_logging(tmpdir, False, False)
+    import tempfile
+    import shutil
+
+    tmpdir = tempfile.mkdtemp() if comm.rank == 0 else None
+    tmpdir = comm.bcast(tmpdir, root=0)
+    try:
+        test_logging(tmpdir, False, False)
+    finally:
+        if comm.rank == 0:
+            shutil.rmtree(tmpdir, ignore_errors=True)

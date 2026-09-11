@@ -55,7 +55,7 @@ def run_experiment(args, config, **kwargs):
     controller_params = config.get_controller_params(logger_level=args['logger_level'])
 
     if args['useGPU']:
-        from pySDC.implementations.hooks.log_timings import GPUTimings
+        from pySDC.implementations.hooks.log_GPU_timings import GPUTimings
 
         controller_params['hook_class'].append(GPUTimings)
 

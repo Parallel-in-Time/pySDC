@@ -102,7 +102,7 @@ def single_test(**kwargs):
     nodes = np.append([0], level.sweep.coll.nodes)
 
     # initialize variables
-    cont.status.active_coll = 0
+    step.status.active_coll = 0
     step.status.slot = 0
     level.u[0] = prob.u_exact(t=0)
     level.status.time = 0.0
@@ -113,7 +113,7 @@ def single_test(**kwargs):
 
     # perform the interpolation
     cont.switch_sweeper(controller.MS[0])
-    cont.status.active_coll = 1
+    step.status.active_coll = 1
     cont.switch_sweeper(controller.MS[0])
     nodes = np.append([0], level.sweep.coll.nodes)
     error = max([abs(level.u[i] - prob.u_exact(nodes[i])) for i in range(len(level.u)) if level.u[i] is not None])
@@ -161,3 +161,57 @@ if __name__ == "__main__":
             'useMPI': True,
         }
     single_test(**kwargs)
+
+
+def run_block(num_procs, num_nodes=[2, 3]):
+    """
+    Run one block of `num_procs` steps and report the collocation method each step ended on.
+
+    Args:
+        num_procs (int): number of steps in the block
+        num_nodes (list): the collocation methods to walk through
+
+    Returns:
+        list: number of nodes each step finished with
+    """
+    from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+    description = {
+        'problem_class': polynomial_testequation,
+        'problem_params': {'degree': max(num_nodes)},
+        'sweeper_class': generic_implicit,
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': max(num_nodes), 'QI': 'LU'},
+        'level_params': {'dt': 1.0, 'restol': 1e-8},
+        'step_params': {'maxiter': 99},
+        'convergence_controllers': {
+            AdaptiveCollocation: {'num_nodes': num_nodes, 'quad_type': ['RADAU-RIGHT'] * len(num_nodes)}
+        },
+    }
+
+    controller = controller_nonMPI(num_procs=num_procs, controller_params={'logger_level': 30}, description=description)
+    P = controller.MS[0].levels[0].prob
+    controller.run(u0=P.u_exact(0), t0=0.0, Tend=num_procs * 1.0)
+
+    return [S.levels[0].sweep.coll.num_nodes for S in controller.MS]
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('num_procs', [1, 2, 4])
+def test_all_steps_switch_collocation(num_procs):
+    """
+    Every step has to walk through all collocation methods, however many steps share a block.
+
+    The index of the active collocation method used to live on the convergence controller, of which
+    there is one per controller and therefore one per block. The first step to converge advanced it
+    and switched itself, after which the guard stopped every other step from ever switching, so with
+    `num_procs > 1` the collocation adaptivity was silently inert for all but one step.
+    """
+    num_nodes = [2, 3]
+    nodes = run_block(num_procs, num_nodes=num_nodes)
+
+    assert (
+        nodes == [num_nodes[-1]] * num_procs
+    ), f'Not all steps ended on the last collocation method: expected {[num_nodes[-1]] * num_procs}, got {nodes}'

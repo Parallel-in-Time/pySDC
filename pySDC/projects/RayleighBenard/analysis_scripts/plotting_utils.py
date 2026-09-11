@@ -54,8 +54,12 @@ def get_plotting_style(config):  # pragma: no cover
 
 
 def savefig(fig, name, format='pdf', base_path='./plots', **kwargs):  # pragma: no cover
-    os.makedirs(base_path, exist_ok=True)
+    from pathlib import Path
 
-    path = f'{base_path}/{name}.{format}'
+    abs_base_path = f'{Path(__file__).parent.parent}/{base_path}'
+
+    os.makedirs(abs_base_path, exist_ok=True)
+
+    path = f'{abs_base_path}/{name}.{format}'
     fig.savefig(path, bbox_inches='tight', **kwargs)
     print(f'Saved figure {path!r}')

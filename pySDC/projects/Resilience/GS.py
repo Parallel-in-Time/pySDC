@@ -8,7 +8,7 @@ from pySDC.core.convergence_controller import ConvergenceController
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
     EstimateExtrapolationErrorNonMPI,
 )
-from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.core.check_convergence import CheckConvergence
 from pySDC.projects.Resilience.reachTendExactly import ReachTendExactly
 
 from pySDC.core.errors import ConvergenceError

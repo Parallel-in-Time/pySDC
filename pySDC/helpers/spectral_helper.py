@@ -235,12 +235,13 @@ class SpectralHelper1D:
         import cupy as cp
         import cupyx.scipy.sparse as sparse_lib
         import cupyx.scipy.sparse.linalg as linalg
+        import cupyx.scipy.fft as fft_lib
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
         cls.xp = cp
         cls.sparse_lib = sparse_lib
         cls.linalg = linalg
-        cls.fft_lib = vkFFT
+        cls.fft_lib = fft_lib
 
     @classmethod
     def setup_CPU(cls, useFFTW=False):

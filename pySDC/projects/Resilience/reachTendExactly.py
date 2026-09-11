@@ -1,6 +1,6 @@
 import numpy as np
 from pySDC.core.convergence_controller import ConvergenceController
-from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.core.check_convergence import CheckConvergence
 
 
 class ReachTendExactly(ConvergenceController):

@@ -4,7 +4,7 @@ from mpi4py import MPI
 from pySDC.core.controller import Controller
 from pySDC.core.errors import ControllerError
 from pySDC.core.step import Step
-from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.core.check_convergence import CheckConvergence
 
 import scorep.user as spu
 

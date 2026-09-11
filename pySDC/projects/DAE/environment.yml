@@ -4,10 +4,11 @@ name: pySDC
 channels:
   - conda-forge
 dependencies:
+  - python>=3.10,<3.14
   - numpy
   - scipy>=0.17.1,<1.15
   - dill>=0.2.6
-  - mpich
+  - openmpi
   - mpi4py>=3.0.0
   - pip
   - pip:
