@@ -1,0 +1,25 @@
+pySDC/projects/DeltaSDC/cascade.py
+  s_be32febf4aa3c8::t_1c13a73ae259e4 60-61,188-194
+pySDC/projects/DeltaSDC/run_demo.py
+  s_be32febf4aa3c8::t_65de8ee5a12843 321-324
+pySDC/projects/DeltaSDC/tests/test_cascade.py
+  s_be32febf4aa3c8::t_65de8ee5a12843 122-146
+pySDC/projects/DeltaSDC/README.rst
+  s_be32febf4aa3c8::t_b694e0c407230e 302-343
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b67bbe1d3ec8b6b591f33da297d48f950abcf32a",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
