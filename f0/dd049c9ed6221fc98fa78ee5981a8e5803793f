@@ -1,0 +1,53 @@
+pySDC/projects/DeltaSDC/run_fenics.py
+  s_be32febf4aa3c8::t_629918b555e3bc 46
+  s_be32febf4aa3c8::t_a08b9d129ce114 275
+  s_be32febf4aa3c8::t_f2f582acfd8d1b 243,246,253,268,280
+  s_be32febf4aa3c8::t_097d0e0d213b74 47
+pySDC/projects/DeltaSDC/README.rst
+  s_be32febf4aa3c8::t_ec2e4fb0eedab6 49,52,60,63-69,102-103
+  s_be32febf4aa3c8::t_097d0e0d213b74 440
+pySDC/projects/DeltaSDC/run_petsc.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 25
+pySDC/core/problem.py
+  s_be32febf4aa3c8::t_ef1b093af45fbe 44
+  s_be32febf4aa3c8::t_041078cc0f4182 60-90
+pySDC/projects/DeltaSDC/run_demo.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 31
+pySDC/projects/DeltaSDC/sweepers_MPI.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 25
+pySDC/projects/DeltaSDC/tests/test_problems.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 189,258
+pySDC/projects/DeltaSDC/tests/test_mlsdc.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 88,140,164,177
+pySDC/projects/DeltaSDC/problems_fenics.py
+  s_be32febf4aa3c8::t_629918b555e3bc 43,75,219,221,223-227,229-230,233-234,236-239,241
+pySDC/projects/DeltaSDC/tests/test_sweepers.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 61,74,88,109,121,137,164,187,202,222,248,282,295
+pySDC/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.py
+  s_be32febf4aa3c8::t_ed345c55954032 171-232
+pySDC/projects/DeltaSDC/mlsdc.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 59
+pySDC/projects/DeltaSDC/run_mpi.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 27
+  s_be32febf4aa3c8::t_afca6442994576 28
+pySDC/implementations/sweeper_classes/delta_form_MPI.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 1-79
+pySDC/implementations/sweeper_classes/delta_form.py
+  s_be32febf4aa3c8::t_097d0e0d213b74 1-332
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f0dd049c9ed6221fc98fa78ee5981a8e5803793f",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
