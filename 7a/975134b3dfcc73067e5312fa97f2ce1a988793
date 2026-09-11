@@ -1,0 +1,23 @@
+pySDC/projects/DeltaSDC/tests/inexact_problem.py
+  s_be32febf4aa3c8::t_ffb7f79676bf94 1-67
+pySDC/projects/DeltaSDC/README.rst
+  s_be32febf4aa3c8::t_3b4941f023ba73 165-167,397-461
+pySDC/projects/DeltaSDC/tests/test_mlsdc.py
+  s_be32febf4aa3c8::t_3924a1c0e68c41 278-330
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7a975134b3dfcc73067e5312fa97f2ce1a988793",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
