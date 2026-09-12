@@ -1,0 +1,21 @@
+pySDC/implementations/transfer_classes/BaseTransferDelta.py
+  s_be32febf4aa3c8::t_1c6127eab77d0d 11-18,20-22
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta.py
+  s_be32febf4aa3c8::t_356bcf241bdd66 287-335
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fdde7a8d061487fad6a0c28711adbe685025e365",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
