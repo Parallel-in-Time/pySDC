@@ -1,0 +1,21 @@
+pySDC/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.py
+  s_be32febf4aa3c8::t_2032bb525fb0c7 60-67,101-115,150-152,242-244
+pySDC/tests/test_problems/test_GrayScott_1D_FEniCS.py
+  s_be32febf4aa3c8::t_2032bb525fb0c7 77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0c43c37c017be9fa55c243963d3987795625c0cb",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
