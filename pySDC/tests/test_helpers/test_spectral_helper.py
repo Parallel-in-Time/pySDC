@@ -148,7 +148,10 @@ def test_matrix1D(N, base, type):
     helper.add_axis(base=base, N=N)
     helper.setup_fft()
 
-    x = helper.get_grid()
+    # np.asarray, because `get_grid` hands back a list of per-axis grids and NumPy 1's
+    # `Chebyshev.__call__` cannot multiply a list by a scalar. NumPy 2 converts it itself, so this
+    # is what NumPy 2 was already doing, spelled out for both.
+    x = np.asarray(helper.get_grid())
 
     if type == 'diff':
         D = helper.get_differentiation_matrix(axes=(-1,))
