@@ -146,6 +146,14 @@ class mesh_to_mesh(SpaceTransfer):
             for i in range(1, len(Rspace)):
                 self.Rspace = sp.kron(self.Rspace, Rspace[i], format='csc')
 
+        # Carry the operators at the precision of what they produce, rather than always at float64.
+        # A float64 operator applied to a reduced-precision vector upcasts, so the transfer would do
+        # its work in double and only round on the way into the destination, which is the one place
+        # a reduced-precision level would silently keep paying full freight. `promote_types` with
+        # float32 keeps it legal for SciPy, which has no half-precision sparse matrix.
+        self.Rspace = self.Rspace.astype(np.promote_types(self.coarse_prob.init[-1], np.float32))
+        self.Pspace = self.Pspace.astype(np.promote_types(self.fine_prob.init[-1], np.float32))
+
     def restrict(self, F):
         """
         Restriction implementation

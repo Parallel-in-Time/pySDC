@@ -73,9 +73,10 @@ class heatNd_unforced(GenericNDimFinDiff):
         solver_type='direct',
         bc='periodic',
         sigma=6e-2,
+        dtype='float64',
     ):
         """Initialization routine"""
-        super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, solver_type, bc)
+        super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, solver_type, bc, dtype=dtype)
         if solver_type == 'GMRES':
             self.logger.warning('GMRES is not usually used for heat equation')
         self._makeAttributeAndRegister('nu', localVars=locals(), readOnly=True)
