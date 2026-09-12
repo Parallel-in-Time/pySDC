@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=cd132f8b"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -76,6 +77,31 @@
 </dl>
 </dd></dl>
 
+<p class="rubric">Notes</p>
+<p>Two <strong>optional</strong> methods are recognised by the deferred-correction (“delta-form”) sweepers in
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">pySDC.implementations.sweeper_classes.delta_form</span></code>. Neither is required: a problem that
+defines neither still works, and the sweeper falls back to a route that is always correct. They
+exist because both fallbacks read quantities of size <span class="math notranslate nohighlight">\(|u|\)</span> or <span class="math notranslate nohighlight">\(|f|\)</span>, which is
+harmless at backend precision and is what binds first below it.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">solve_system_delta(rhs,</span> <span class="pre">factor,</span> <span class="pre">base,</span> <span class="pre">f_base,</span> <span class="pre">t)</span></code></dt><dd><p>Solve <span class="math notranslate nohighlight">\(\delta - factor\,[f(base+\delta) - f(base)] = rhs\)</span> and return the correction
+<span class="math notranslate nohighlight">\(\delta\)</span>. Needed only for a <strong>nonlinear</strong> implicit operator; for a linear or affine one
+the sweeper reaches the same equation through the stock <a class="reference internal" href="#core.problem.Problem.solve_system" title="core.problem.Problem.solve_system"><code class="xref py py-meth docutils literal notranslate"><span class="pre">solve_system()</span></code></a>. The unknown
+must be the correction, and the increment must be expanded analytically rather than formed as
+a difference of two <span class="math notranslate nohighlight">\(\mathcal{O}(|f|)\)</span> quantities.</p>
+<p>Without it the sweeper substitutes <span class="math notranslate nohighlight">\(y = u^k_m + \delta_m\)</span> and uses
+<a class="reference internal" href="#core.problem.Problem.solve_system" title="core.problem.Problem.solve_system"><code class="xref py py-meth docutils literal notranslate"><span class="pre">solve_system()</span></code></a>. That is exact, but the solver then sees an <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span>
+unknown.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">eval_f_increment(base,</span> <span class="pre">delta,</span> <span class="pre">t)</span></code></dt><dd><p>Return <span class="math notranslate nohighlight">\(f(base+\delta) - f(base)\)</span> with the same splitting as <a class="reference internal" href="#core.problem.Problem.eval_f" title="core.problem.Problem.eval_f"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eval_f()</span></code></a>, expanded
+so that every term carries an explicit factor <span class="math notranslate nohighlight">\(\delta\)</span>.</p>
+<p>Without it the sweeper subtracts two stored right-hand sides. That cancellation carries the
+operator norm: on the FEniCS heat equation, where <span class="math notranslate nohighlight">\(|M^{-1}Ku|\)</span> is of order
+<span class="math notranslate nohighlight">\(10^5\)</span>, it is already 7.7e-11 off in double precision.</p>
+</dd>
+</dl>
+<p>Both fallbacks are correct and neither fails loudly, which is the reason to document them here
+rather than to leave them to be discovered.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="core.problem.Problem.apply_mass_matrix">
 <span class="sig-name descname"><span class="pre">apply_mass_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/core/problem.html#Problem.apply_mass_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.problem.Problem.apply_mass_matrix" title="Link to this definition">¶</a></dt>

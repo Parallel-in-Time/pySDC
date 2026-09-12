@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.transfer_classes.BaseTransferDelta module &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.transfer_classes.BaseTransferDeltaMPI module" href="implementations.transfer_classes.BaseTransferDeltaMPI.html" />
+    <link rel="prev" title="implementations.transfer_classes package" href="implementations.transfer_classes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.BaseTransferDeltaMPI.html" title="implementations.transfer_classes.BaseTransferDeltaMPI module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.transfer_classes.html" accesskey="U">implementations.transfer_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.transfer_classes.BaseTransferDelta module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.transfer_classes.BaseTransferDelta">
+<span id="implementations-transfer-classes-basetransferdelta-module"></span><h1>implementations.transfer_classes.BaseTransferDelta module<a class="headerlink" href="#module-implementations.transfer_classes.BaseTransferDelta" title="Link to this heading">¶</a></h1>
+<p>Space-time transfer for the delta-form hierarchy.</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> makes a coarse level rebuild its own residual from <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span>
+coarse data and recovers the coarse-grid correction as <span class="math notranslate nohighlight">\(u_G - u_G^{\mathrm{old}}\)</span>. Both have
+exact algebraic replacements – <span class="math notranslate nohighlight">\(\varepsilon_G = R\varepsilon_F\)</span>, which is what the FAS
+<span class="math notranslate nohighlight">\(\tau\)</span> is <em>for</em>, and the correction is the sum of the sweep’s own increments – and this
+transfer uses those instead. It is what decides whether a level rebuilds its residual or is handed
+one: the delta-form sweepers do both, and this is what hands one down.</p>
+<p>The FAS <span class="math notranslate nohighlight">\(\tau\)</span> is <strong>substituted, not discarded</strong>. Writing
+<span class="math notranslate nohighlight">\(\tau = R(\Delta t\,Q_F f_F) - \Delta t\,Q_G f_G\)</span> and putting it into the coarse residual
+<span class="math notranslate nohighlight">\(\Delta t (Q_G f_G) + u_G[0] - u_G[m] + \tau\)</span> cancels the <span class="math notranslate nohighlight">\(\Delta t\,Q_G f_G\)</span> terms
+identically and leaves <span class="math notranslate nohighlight">\(R\varepsilon_F\)</span>. So a coarse level handed that residual is solving
+precisely the FAS-corrected problem – and must <em>not</em> also add <span class="math notranslate nohighlight">\(\tau\)</span>, which would count it
+twice. What is skipped is materialising <span class="math notranslate nohighlight">\(\tau\)</span> as an array, since the quantity it exists to
+produce arrives directly.</p>
+<p>Identical to <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> up to round-off at backend precision, verified for two, three and
+four levels and for PFASST – and against a control with <span class="math notranslate nohighlight">\(\tau\)</span> genuinely zeroed, which does
+not converge at all. It is also slightly cheaper, because nothing then reads <span class="math notranslate nohighlight">\(\tau\)</span> except
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_end_point()</span></code> in the quadrature-update case: see <a class="reference internal" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict" title="implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delta_transfer.restrict()</span></code></a>.</p>
+<p>What the reformulation buys is that every coarse-level quantity becomes proportional to the fine
+residual rather than to <span class="math notranslate nohighlight">\(|u|\)</span>. A coarse level is a preconditioner whose returned correction
+tends to zero, so once nothing on it is rebuilt out of <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> state, its arithmetic
+error is proportional to that correction rather than to the solution – which is what lets it run
+below backend precision without capping the accuracy of the iteration.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferDelta.delta_transfer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">delta_transfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.level.html#core.level.Level" title="core.level.Level"><span class="pre">Level</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.level.html#core.level.Level" title="core.level.Level"><span class="pre">Level</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_transfer_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferDelta.html#delta_transfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code></p>
+<p>Space-time transfer that passes a residual down and an accumulated correction up.</p>
+<p>Drop-in for <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code>, and identical to it up to round-off when every level is at
+backend precision. Falls back to the stock prolongation when the coarse level has banked no
+corrections, so a hierarchy mixing delta-form and stock sweepers still runs.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferDelta.delta_transfer.coarse_reads_tau">
+<span class="sig-name descname"><span class="pre">coarse_reads_tau</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferDelta.html#delta_transfer.coarse_reads_tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.coarse_reads_tau" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the coarse level reads the FAS <span class="math notranslate nohighlight">\(\tau\)</span> at all.</p>
+<p>The sweep does not – it is handed the restricted fine residual, which is what <span class="math notranslate nohighlight">\(\tau\)</span>
+exists to produce – and neither does <code class="xref py py-meth docutils literal notranslate"><span class="pre">DeltaFormMixin.compute_residual()</span></code>. The one
+remaining reader is <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_end_point()</span></code>, and only when the end point comes from the
+quadrature update rather than a copy of the last node. When nothing reads it, building it is
+a coarse <code class="docutils literal notranslate"><span class="pre">integrate()</span></code> and a restriction spent on a quantity that is then discarded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether <span class="math notranslate nohighlight">\(\tau\)</span> has to be built.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferDelta.delta_transfer.prolong">
+<span class="sig-name descname"><span class="pre">prolong</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferDelta.html#delta_transfer.prolong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.prolong" title="Link to this definition">¶</a></dt>
+<dd><p>Add the coarse level’s accumulated correction to the fine level.</p>
+<p>If the fine level is itself a coarse level of something above it, its residual and its own
+accumulated correction are advanced by the same update, so neither has to be rebuilt from
+<span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> state later in the V-cycle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict">
+<span class="sig-name descname"><span class="pre">restrict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferDelta.html#delta_transfer.restrict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict" title="Link to this definition">¶</a></dt>
+<dd><p>Restrict the state, then hand the coarse level the restricted fine residual.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict_state">
+<span class="sig-name descname"><span class="pre">restrict_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferDelta.html#delta_transfer.restrict_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict_state" title="Link to this definition">¶</a></dt>
+<dd><p>Restrict <code class="docutils literal notranslate"><span class="pre">u</span></code> and re-evaluate <code class="docutils literal notranslate"><span class="pre">f</span></code>, which is <code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseTransfer.restrict()</span></code> without
+<span class="math notranslate nohighlight">\(\tau\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="core.errors.html#core.errors.UnlockError" title="core.errors.UnlockError"><strong>UnlockError</strong></a> – If the fine level has not been unlocked yet.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.transfer_classes.BaseTransferDelta module</a><ul>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer"><code class="docutils literal notranslate"><span class="pre">delta_transfer</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.coarse_reads_tau"><code class="docutils literal notranslate"><span class="pre">coarse_reads_tau()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict_state"><code class="docutils literal notranslate"><span class="pre">restrict_state()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.transfer_classes.html"
+                          title="previous chapter">implementations.transfer_classes package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.transfer_classes.BaseTransferDeltaMPI.html"
+                          title="next chapter">implementations.transfer_classes.BaseTransferDeltaMPI module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.transfer_classes.BaseTransferDelta.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.BaseTransferDeltaMPI.html" title="implementations.transfer_classes.BaseTransferDeltaMPI module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.transfer_classes.html" >implementations.transfer_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.transfer_classes.BaseTransferDelta module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -95,6 +95,30 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f_increment">
+<span class="sig-name descname"><span class="pre">eval_f_increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_ND_FD.html#heatNd_forced.eval_f_increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f_increment" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate the right-hand side increment, split the way <a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f" title="implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eval_f()</span></code></a> splits it.</p>
+<p>The forcing does not depend on <code class="docutils literal notranslate"><span class="pre">u</span></code>, so the explicit part of the increment is zero. Without
+this override the linear one inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericNDimFinDiff</span></code> would return an
+unsplit right-hand side, which is the wrong type here and silently the wrong answer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – The base state, unused: the implicit part is linear.</p></li>
+<li><p><strong>delta</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – The correction.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time, accepted for interface compatibility.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The increment, with a zero explicit part.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dtype_f" title="implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dtype_f">dtype_f</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_ND_FD.html#heatNd_forced.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.u_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
@@ -209,6 +233,7 @@ consider several dimensions, e.g <code class="docutils literal notranslate"><spa
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced"><code class="docutils literal notranslate"><span class="pre">heatNd_forced</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f_increment"><code class="docutils literal notranslate"><span class="pre">eval_f_increment()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
 </li>

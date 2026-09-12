@@ -206,6 +206,36 @@
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
 
+<div class="viewcode-block" id="heatNd_forced.eval_f_increment">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f_increment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f_increment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right-hand side increment, split the way :meth:`eval_f` splits it.</span>
+
+<span class="sd">        The forcing does not depend on ``u``, so the explicit part of the increment is zero. Without</span>
+<span class="sd">        this override the linear one inherited from :class:`GenericNDimFinDiff` would return an</span>
+<span class="sd">        unsplit right-hand side, which is the wrong type here and silently the wrong answer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        base : dtype_u</span>
+<span class="sd">            The base state, unused: the implicit part is linear.</span>
+<span class="sd">        delta : dtype_u</span>
+<span class="sd">            The correction.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time, accepted for interface compatibility.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The increment, with a zero explicit part.</span>
+<span class="sd">        """</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
 <div class="viewcode-block" id="heatNd_forced.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>

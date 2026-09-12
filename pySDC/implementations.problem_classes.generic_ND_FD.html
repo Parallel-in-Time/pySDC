@@ -168,6 +168,32 @@ side.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f_increment">
+<span class="sig-name descname"><span class="pre">eval_f_increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff.eval_f_increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f_increment" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate <span class="math notranslate nohighlight">\(f(w + \delta) - f(w) = A\delta\)</span>, which carries an explicit factor
+<span class="math notranslate nohighlight">\(\delta\)</span>.</p>
+<p>The operator is linear, so the increment is the operator applied to the correction and the
+base state does not enter. Supplying it means a sweeper never has to form the increment by
+subtracting two stored right-hand sides, whose cancellation error carries
+<span class="math notranslate nohighlight">\(\varepsilon\|A\|\)</span> – see <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.problem.Problem</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> (<a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_u" title="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_u"><em>dtype_u</em></a>) – The base state, unused for a linear operator.</p></li>
+<li><p><strong>delta</strong> (<a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_u" title="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_u"><em>dtype_u</em></a>) – The correction.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time, accepted for interface compatibility.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>f</strong> – The increment.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_f" title="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_f">dtype_f</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_default_sweeper_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff.get_default_sweeper_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -229,6 +255,7 @@ side.</p>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.dx"><code class="docutils literal notranslate"><span class="pre">dx</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f_increment"><code class="docutils literal notranslate"><span class="pre">eval_f_increment()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class"><code class="docutils literal notranslate"><span class="pre">get_default_sweeper_class()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.grids"><code class="docutils literal notranslate"><span class="pre">grids</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim"><code class="docutils literal notranslate"><span class="pre">ndim</span></code></a></li>

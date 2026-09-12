@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.transfer_classes.BaseTransferDeltaMPI &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.transfer_classes.BaseTransferDeltaMPI</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.transfer_classes.BaseTransferDeltaMPI</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">Node-parallel counterpart of :mod:`pySDC.implementations.transfer_classes.BaseTransferDelta`.</span>
+
+<span class="sd">Same two identities -- the coarse residual is the restricted fine residual, and the coarse-grid</span>
+<span class="sd">correction is the sum of the sweep's own increments -- with every loop over collocation nodes</span>
+<span class="sd">written as the reduction the node-parallel layout needs, since one rank holds one node.</span>
+
+<span class="sd">One difference from the serial transfer: this one still builds the FAS :math:`\tau`, which the</span>
+<span class="sd">delta-form hierarchy then never reads. Skipping it is the saving</span>
+<span class="sd">:meth:`BaseTransferDelta.delta_transfer.restrict_state` takes, and it has not been written for the</span>
+<span class="sd">node-parallel layout yet.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.BaseTransferMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">base_transfer_MPI</span>
+
+
+<div class="viewcode-block" id="delta_transfer_MPI">
+<a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.BaseTransferDeltaMPI.html#implementations.transfer_classes.BaseTransferDeltaMPI.delta_transfer_MPI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">delta_transfer_MPI</span><span class="p">(</span><span class="n">base_transfer_MPI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Node-parallel counterpart of</span>
+<span class="sd">    :class:`~pySDC.implementations.transfer_classes.BaseTransferDelta.delta_transfer`.</span>
+
+<span class="sd">    Same two identities -- the coarse residual is the restricted fine residual, and the coarse-grid</span>
+<span class="sd">    correction is the sum of the sweep's own increments -- with the collocation transfer written as</span>
+<span class="sd">    a reduction, since each rank holds one node.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="delta_transfer_MPI.restrict">
+<a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.BaseTransferDeltaMPI.html#implementations.transfer_classes.BaseTransferDeltaMPI.delta_transfer_MPI.restrict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Restrict as usual, then hand the coarse level the restricted fine residual.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="n">SF</span><span class="p">,</span> <span class="n">SG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">sweep</span>
+        <span class="n">SF</span><span class="o">.</span><span class="n">_delta_setup</span><span class="p">()</span>
+        <span class="n">SG</span><span class="o">.</span><span class="n">_delta_setup</span><span class="p">()</span>
+        <span class="n">eps_F</span> <span class="o">=</span> <span class="n">SF</span><span class="o">.</span><span class="n">_residual_nodes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">restrict</span><span class="p">()</span>
+
+        <span class="n">CF</span><span class="p">,</span> <span class="n">CG</span><span class="p">,</span> <span class="n">PG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_fine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_coarse</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">prob</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">space_transfer</span><span class="o">.</span><span class="n">restrict</span><span class="p">(</span><span class="n">eps_F</span><span class="p">)</span>
+        <span class="n">received</span> <span class="o">=</span> <span class="n">PG</span><span class="o">.</span><span class="n">u_init</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">SG</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
+            <span class="n">CF</span><span class="o">.</span><span class="n">Reduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rcoll</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">CF</span><span class="o">.</span><span class="n">rank</span><span class="p">]</span> <span class="o">*</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">received</span> <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="n">CG</span><span class="o">.</span><span class="n">rank</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+
+        <span class="n">SG</span><span class="o">.</span><span class="n">eps_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">SG</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">PG</span><span class="p">,</span> <span class="n">received</span><span class="p">)]</span>
+        <span class="n">SG</span><span class="o">.</span><span class="n">delta_acc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">u0_reference</span> <span class="o">=</span> <span class="n">PG</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="delta_transfer_MPI.prolong">
+<a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.BaseTransferDeltaMPI.html#implementations.transfer_classes.BaseTransferDeltaMPI.delta_transfer_MPI.prolong">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add the coarse level's accumulated correction to the fine level.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">delta_acc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">prolong</span><span class="p">()</span>
+
+        <span class="n">F</span><span class="p">,</span> <span class="n">PF</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="o">.</span><span class="n">prob</span>
+        <span class="n">SF</span><span class="p">,</span> <span class="n">CF</span><span class="p">,</span> <span class="n">CG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_fine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_coarse</span>
+        <span class="n">SF</span><span class="o">.</span><span class="n">_delta_setup</span><span class="p">()</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">space_transfer</span><span class="o">.</span><span class="n">prolong</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">delta_acc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">correction</span> <span class="o">=</span> <span class="n">PF</span><span class="o">.</span><span class="n">u_init</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">SF</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
+            <span class="n">CG</span><span class="o">.</span><span class="n">Reduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pcoll</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">CG</span><span class="o">.</span><span class="n">rank</span><span class="p">]</span> <span class="o">*</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">correction</span> <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="n">CF</span><span class="o">.</span><span class="n">rank</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+        <span class="c1"># quantised, then back to backend units before it is applied -- see the serial transfer</span>
+        <span class="n">applied</span> <span class="o">=</span> <span class="n">SF</span><span class="o">.</span><span class="n">_to_backend</span><span class="p">(</span><span class="n">PF</span><span class="p">,</span> <span class="n">SF</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">PF</span><span class="p">,</span> <span class="n">correction</span><span class="p">))</span>
+        <span class="n">correction</span> <span class="o">=</span> <span class="n">SF</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">PF</span><span class="p">,</span> <span class="n">applied</span><span class="p">)</span>
+
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">CF</span><span class="o">.</span><span class="n">rank</span>
+        <span class="n">t_node</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">F</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">SF</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span>
+        <span class="n">u_old</span><span class="p">,</span> <span class="n">f_old</span> <span class="o">=</span> <span class="n">PF</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">PF</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">applied</span>
+        <span class="n">F</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">PF</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t_node</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">SF</span><span class="o">.</span><span class="n">eps_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># records into SF._dfs, which is what advance_residual reads</span>
+            <span class="n">SF</span><span class="o">.</span><span class="n">_f_increment</span><span class="p">(</span><span class="n">PF</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">f_old</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">applied</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+            <span class="n">SF</span><span class="o">.</span><span class="n">eps_in</span> <span class="o">=</span> <span class="n">SF</span><span class="o">.</span><span class="n">advance_residual</span><span class="p">(</span><span class="n">SF</span><span class="o">.</span><span class="n">eps_in</span><span class="p">,</span> <span class="p">[</span><span class="n">correction</span><span class="p">],</span> <span class="n">SF</span><span class="o">.</span><span class="n">_dfs</span><span class="p">)</span>
+            <span class="n">SF</span><span class="o">.</span><span class="n">accumulate</span><span class="p">([</span><span class="n">correction</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.transfer_classes.BaseTransferDeltaMPI</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

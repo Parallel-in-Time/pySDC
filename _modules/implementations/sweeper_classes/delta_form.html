@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.sweeper_classes.delta_form &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.delta_form</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.sweeper_classes.delta_form</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">Deferred-correction ("delta-form") SDC sweepers.</span>
+
+<span class="sd">A standard SDC sweep</span>
+
+<span class="sd">.. math::</span>
+<span class="sd">    u^{k+1}_m = u_0 + \tau_m + \Delta t (Q f^k)_m</span>
+<span class="sd">                + \Delta t \sum_j Q^\Delta_{mj}\,(f^{k+1}_j - f^k_j)</span>
+
+<span class="sd">is algebraically identical to, with :math:`\delta_m = u^{k+1}_m - u^k_m` and the collocation</span>
+<span class="sd">residual :math:`\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`,</span>
+
+<span class="sd">.. math::</span>
+<span class="sd">    \delta_m = \varepsilon_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,</span>
+<span class="sd">    \qquad \Delta f_j = f(u^k_j + \delta_j) - f(u^k_j).</span>
+
+<span class="sd">Written this way, every sweep is iterative refinement: a high-precision residual, a correction</span>
+<span class="sd">solve, and a high-precision update ``u &lt;- u + delta``. No Jacobian appears, so an IMEX splitting</span>
+<span class="sd">survives unchanged.</span>
+
+<span class="sd">The point of the reformulation is that the quantity handed to the node-local solver is a</span>
+<span class="sd">*correction*. Its magnitude tends to zero as the sweeps converge, so a reduced-precision solve</span>
+<span class="sd">introduces an error proportional to :math:`|\delta|` rather than to :math:`|u|` and therefore does</span>
+<span class="sd">not cap the attainable accuracy.</span>
+
+<span class="sd">Three node-local strategies are supported, selected automatically:</span>
+
+<span class="sd">``solve_system_delta``</span>
+<span class="sd">    Used when the problem provides it. Solves</span>
+<span class="sd">    :math:`\delta - \alpha[f(w+\delta) - f(w)] = r` for the correction directly. This is the only</span>
+<span class="sd">    option for a nonlinear implicit operator, and the only one that hands a reduced-precision</span>
+<span class="sd">    solver a small unknown.</span>
+
+<span class="sd">``linear_implicit=True``</span>
+<span class="sd">    For a linear or affine implicit operator, :math:`f(w+\delta) - f(w) = A\delta`, so the stock</span>
+<span class="sd">    ``solve_system`` already solves the correction equation once the affine part</span>
+<span class="sd">    :math:`\alpha f(0, t)` is removed from the right-hand side. No problem class needs changing.</span>
+
+<span class="sd">fallback</span>
+<span class="sd">    Otherwise the substitution :math:`y = u^k_m + \delta_m` reduces the correction equation to the</span>
+<span class="sd">    ordinary implicit solve. Always correct and identical to :class:`generic_implicit`, but the</span>
+<span class="sd">    solver sees an :math:`\mathcal{O}(1)` unknown, so there is no precision benefit.</span>
+
+<span class="sd">``correction_precision`` additionally stores the small quantities</span>
+<span class="sd">(:math:`\varepsilon`, :math:`\delta`, :math:`\Delta f`) in a reduced-precision datatype built from</span>
+<span class="sd">the problem's own ``init`` tuple, scaled by the residual's magnitude so the format's mantissa is</span>
+<span class="sd">used however small the correction gets.</span>
+
+<span class="sd">The increment :math:`\Delta f` is formed by subtracting two stored right-hand sides unless the</span>
+<span class="sd">problem provides ``eval_f_increment(base, delta, t)``, which expands it analytically. That</span>
+<span class="sd">subtraction is a cancellation carrying the operator norm, so it binds as soon as a level runs below</span>
+<span class="sd">backend precision.</span>
+
+<span class="sd">The same sweeper serves any number of levels, and which it is doing is decided by the transfer, not</span>
+<span class="sd">by the choice of sweeper. On the finest level it computes its own residual, which is where the</span>
+<span class="sd">accuracy of the whole iteration is set. Given a transfer that hands one down -- by setting</span>
+<span class="sd">``eps_in`` on the level's sweeper -- it uses that instead and advances it in place, so nothing is</span>
+<span class="sd">ever rebuilt out of :math:`\mathcal{O}(1)` coarse state. :class:`BaseTransfer` hands nothing down,</span>
+<span class="sd">so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
+
+
+<div class="viewcode-block" id="DeltaFormMixin">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.DeltaFormMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeltaFormMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Shared machinery for the delta-form sweepers."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_delta_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Read the optional sweeper parameters, and arm the per-sweep recorders."""</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="s1">'correction_precision'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_dtype</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linear_implicit</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="s1">'linear_implicit'</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_deltas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dfs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="n">eps_in</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">"""Residual handed down by the transfer, or ``None`` on the finest level."""</span>
+
+    <span class="n">delta_acc</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">"""Corrections this level has accumulated since the last restriction."""</span>
+
+<div class="viewcode-block" id="DeltaFormMixin.sync_initial_value">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.DeltaFormMixin.sync_initial_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sync_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Follow a change of :math:`u_0` made after the residual was handed down.</span>
+
+<span class="sd">        PFASST receives the initial value from the predecessor *after* the restriction, directly</span>
+<span class="sd">        into ``u[0]``. The residual depends on it additively, so following it is one addition:</span>
+<span class="sd">        :math:`\varepsilon_m \leftarrow \varepsilon_m + (u_0 - u_0^{\mathrm{ref}})`. Exactly zero</span>
+<span class="sd">        when nothing arrived, which is every serial run.</span>
+
+<span class="sd">        This is the one place the hierarchy still differences two :math:`\mathcal{O}(1)` values, and</span>
+<span class="sd">        it is the reason a reduced-precision coarse level buys less under PFASST than under MLSDC:</span>
+<span class="sd">        the difference is small -- it is the coarse-versus-fine discrepancy at the step interface,</span>
+<span class="sd">        and it converges to zero -- but it is *formed* by cancelling two values of size</span>
+<span class="sd">        :math:`|u|`. Putting the step-to-step exchange itself in delta form is what would remove it.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u0_reference</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">shift</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u0_reference</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">eps</span> <span class="o">+</span> <span class="n">shift</span> <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span><span class="p">]</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">u0_reference</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="DeltaFormMixin.compute_residual">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.DeltaFormMixin.compute_residual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s1">''</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Report the residual this level is already tracking, instead of rebuilding one.</span>
+
+<span class="sd">        A level with an inherited residual carries it forward through every sweep and prolongation,</span>
+<span class="sd">        so recomputing it from :math:`\mathcal{O}(1)` state would be both redundant and less</span>
+<span class="sd">        accurate. It is also what makes the :math:`\tau` term unnecessary: the only other reader is</span>
+<span class="sd">        :meth:`compute_end_point`, and only when the end point comes from the quadrature update.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        stage : str</span>
+<span class="sd">            The stage of the step this level belongs to.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">)</span>
+
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">skip_residual_computation</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">lvl</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="p">[</span><span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span> <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span><span class="p">]</span>
+        <span class="n">norms</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span> <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span><span class="p">]</span>
+        <span class="n">kind</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'full_abs'</span><span class="p">,</span> <span class="s1">'last_abs'</span><span class="p">,</span> <span class="s1">'full_rel'</span><span class="p">,</span> <span class="s1">'last_rel'</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'residual type "</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">" not implemented!'</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">norms</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">kind</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'last'</span><span class="p">)</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">norms</span><span class="p">)</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">kind</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'rel'</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="DeltaFormMixin.advance_residual">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.DeltaFormMixin.advance_residual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">advance_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">deltas</span><span class="p">,</span> <span class="n">dfs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Advance a residual by an update: :math:`\varepsilon \leftarrow \varepsilon - \delta</span>
+<span class="sd">        + \Delta t (Q \Delta f)`.</span>
+
+<span class="sd">        Every term is small, so this never cancels. It is exact for any update to the nodal values,</span>
+<span class="sd">        which is why it serves both a sweep and a prolongation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        eps : list</span>
+<span class="sd">            The residual, one entry per node.</span>
+<span class="sd">        deltas : list</span>
+<span class="sd">            The update applied to the nodal values, one entry per node.</span>
+<span class="sd">        dfs : list</span>
+<span class="sd">            The resulting right-hand side increments, one entry per node.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            The advanced residual.</span>
+<span class="sd">        """</span>
+        <span class="n">dt</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eps</span><span class="p">)):</span>
+            <span class="n">acc</span> <span class="o">=</span> <span class="n">eps</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">-</span> <span class="n">deltas</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dfs</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">Q</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">acc</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coeff</span><span class="p">(</span><span class="n">dt</span> <span class="o">*</span> <span class="n">Q</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">dfs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="DeltaFormMixin.accumulate">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.DeltaFormMixin.accumulate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">accumulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deltas</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Add one round of corrections to what this level owes upwards."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_acc</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">deltas</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta_acc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="n">a</span> <span class="o">+</span> <span class="n">d</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_acc</span><span class="p">,</span> <span class="n">deltas</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeltaFormMixin.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.DeltaFormMixin.update_nodes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Sweep, and keep the level's bookkeeping straight if it is part of a hierarchy.</span>
+
+<span class="sd">        The sweep itself is :meth:`_sweep_nodes`, which each concrete sweeper supplies. Around it:</span>
+<span class="sd">        follow any change of :math:`u_0` that arrived after the residual was handed down, advance</span>
+<span class="sd">        that residual by the update just applied, and bank the corrections for a transfer to prolong.</span>
+
+<span class="sd">        A level that computes its own residual has no bookkeeping to do, so on a single-level run</span>
+<span class="sd">        every line below the sweep is a no-op. That is why there is one sweeper rather than two.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sync_initial_value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_nodes</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">deltas</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deltas</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accumulate</span><span class="p">(</span><span class="n">deltas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">advance_residual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span><span class="p">,</span> <span class="n">deltas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dfs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="n">_work_scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Shared divisor applied to the correction quantities before they are stored."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_work_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prob</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build the problem's ``init`` tuple with the correction dtype substituted."""</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dtype</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_scales_corrections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Whether this sweeper may choose a scale for its correction quantities.</span>
+
+<span class="sd">        A level that computes its own residual may: everything it stores is derived from that</span>
+<span class="sd">        residual within the same sweep, so one divisor keeps them all commensurate and ordinary</span>
+<span class="sd">        arithmetic on them stays correct. A level that *inherits* a residual may not, because the</span>
+<span class="sd">        inherited value was scaled by whoever produced it and is carried across sweeps.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_work_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Choose the divisor for this sweep, from the residual the corrections will be built out of.</span>
+
+<span class="sd">        This is what lets a correction be stored below ``float16``'s smallest normal, 6.1e-5. The</span>
+<span class="sd">        delta form drives :math:`\varepsilon` and :math:`\delta` towards zero on purpose, and half</span>
+<span class="sd">        precision has almost no mantissa left down there -- 1.3e-2 relative at 1e-6, 1.9e-1 at 1e-7 --</span>
+<span class="sd">        so an unscaled correction turns to noise exactly when it starts to matter. Dividing by the</span>
+<span class="sd">        residual's own magnitude keeps the stored values at :math:`\mathcal{O}(1)`, which is block</span>
+<span class="sd">        floating point, and is what half-precision hardware does anyway.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : list</span>
+<span class="sd">            The residual at the collocation nodes, in backend units.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dtype</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scales_corrections</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_work_scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">return</span>
+        <span class="n">biggest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_work_scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">biggest</span><span class="p">)</span> <span class="k">if</span> <span class="n">biggest</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="mf">1.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_work</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Store a small correction quantity in a reduced-precision datatype.</span>
+
+<span class="sd">        Returns the value unchanged when no reduced precision was requested, so the default path</span>
+<span class="sd">        makes no assumption about the datatype and works with any pySDC backend.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If ``correction_precision`` was requested but the datatype cannot be built at another</span>
+<span class="sd">            precision, as is the case for datatypes not backed by a numpy array.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_init</span><span class="p">(</span><span class="n">prob</span><span class="p">))</span>
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_scale</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="n">value</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_scale</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">'correction_precision is not supported for </span><span class="si">{</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: it cannot be '</span>
+                <span class="sa">f</span><span class="s1">'built at a different precision from the problem init tuple (</span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s1">)'</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+        <span class="k">return</span> <span class="n">me</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Lift a possibly reduced-precision quantity back to backend precision.</span>
+
+<span class="sd">        A no-op when no reduced precision is in play, which keeps the default path datatype-agnostic.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_scale</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="c1"># widen first, scale second. The other order multiplies at the reduced precision, and a</span>
+            <span class="c1"># scale of 1e-8 then lands the result below float16's smallest subnormal on the way out</span>
+            <span class="c1"># -- the value is destroyed before it ever reaches the backend-precision array.</span>
+            <span class="n">me</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_scale</span>
+        <span class="k">return</span> <span class="n">me</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Cast a scalar coefficient so an accumulation stays at the precision it should.</span>
+
+<span class="sd">        The ``float`` matters. A coefficient taken out of a numpy array is an ``np.float64``, and</span>
+<span class="sd">        multiplying a reduced-precision level quantity by one of those upcasts the result to</span>
+<span class="sd">        ``float64`` under NEP 50 -- NumPy 2's rule -- which would quietly put the whole level back at</span>
+<span class="sd">        backend precision. A plain Python float is weak under both the old and the new rule, so the</span>
+<span class="sd">        array's own dtype wins.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_dtype</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_residual_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Compute :math:`\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`.</span>
+
+<span class="sd">        This is the high-precision residual of iterative refinement. It is a difference of</span>
+<span class="sd">        :math:`\mathcal{O}(1)` quantities and is therefore always formed in backend precision --</span>
+<span class="sd">        unless a transfer handed one down, in which case that one is already exact and small, and</span>
+<span class="sd">        rebuilding it here is what the delta-form hierarchy exists to avoid.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            One residual per collocation node.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps_in</span>
+
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
+            <span class="n">eps</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">eps</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">-=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">lvl</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">eps</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">eps</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_f_increment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">f_new</span><span class="p">,</span> <span class="n">f_old</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">t_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Form the right-hand side increment :math:`\Delta f = f(w+\delta) - f(w)`.</span>
+
+<span class="sd">        Formed by subtraction unless the problem can expand it analytically. The subtraction is a</span>
+<span class="sd">        cancellation of two :math:`\mathcal{O}(|f|)` quantities, so its absolute error is</span>
+<span class="sd">        :math:`\varepsilon |f|` in whatever precision the level stores ``f`` at, and :math:`|f|`</span>
+<span class="sd">        carries the operator norm. That is harmless while the level is at backend precision and</span>
+<span class="sd">        becomes the binding term as soon as it is not, which is why a problem living on a</span>
+<span class="sd">        reduced-precision level should provide ``eval_f_increment``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prob : pySDC.core.problem.Problem</span>
+<span class="sd">            The problem on this level.</span>
+<span class="sd">        f_new, f_old : dtype_f</span>
+<span class="sd">            ``f`` at :math:`w+\delta` and at :math:`w`, used by the subtraction fallback.</span>
+<span class="sd">        u_old : dtype_u</span>
+<span class="sd">            The base state :math:`w`.</span>
+<span class="sd">        delta : dtype_u</span>
+<span class="sd">            The correction :math:`\delta`.</span>
+<span class="sd">        t_node : float</span>
+<span class="sd">            Physical time of the collocation node.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dtype_f</span>
+<span class="sd">            The increment, with the same splitting as ``eval_f``.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="s1">'eval_f_increment'</span><span class="p">):</span>
+            <span class="n">increment</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f_increment</span><span class="p">(</span><span class="n">u_old</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">increment</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">f_new</span><span class="p">)</span>
+            <span class="n">increment</span> <span class="o">-=</span> <span class="n">f_old</span>
+        <span class="c1"># recorded for the residual recursion, so a transfer never recovers it by subtraction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_increment</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">increment</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">increment</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_solve_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs_corr</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">f_old</span><span class="p">,</span> <span class="n">t_node</span><span class="p">,</span> <span class="n">implicit_part</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Solve the node-local correction equation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs_corr : dtype_u</span>
+<span class="sd">            Right-hand side :math:`r` of the correction equation.</span>
+<span class="sd">        alpha : float</span>
+<span class="sd">            Implicit prefactor :math:`\alpha = \Delta t Q^\Delta_{mm}`.</span>
+<span class="sd">        u_old : dtype_u</span>
+<span class="sd">            Current nodal value :math:`u^k_m`, the base state of the correction.</span>
+<span class="sd">        f_old : dtype_f</span>
+<span class="sd">            ``f`` evaluated at ``u_old``; already stored on the level, so it costs nothing.</span>
+<span class="sd">        t_node : float</span>
+<span class="sd">            Physical time of the collocation node.</span>
+<span class="sd">        implicit_part : dtype_u, optional</span>
+<span class="sd">            The implicit component of ``f_old`` for IMEX problems. Defaults to ``f_old``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dtype_u</span>
+<span class="sd">            The correction :math:`\delta_m`.</span>
+<span class="sd">        """</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">prob</span>
+        <span class="n">f_impl_old</span> <span class="o">=</span> <span class="n">f_old</span> <span class="k">if</span> <span class="n">implicit_part</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">implicit_part</span>
+
+        <span class="n">rhs_phys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_backend</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">rhs_corr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">alpha</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># explicit node: the correction is the residual itself</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">rhs_phys</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="s1">'solve_system_delta'</span><span class="p">):</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system_delta</span><span class="p">(</span><span class="n">rhs_phys</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">f_old</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linear_implicit</span><span class="p">:</span>
+            <span class="c1"># f(w+d) - f(w) = A d, so solve_system already solves the correction equation once the</span>
+            <span class="c1"># affine part f(0, t) has been removed. f(0, t) vanishes for a homogeneous operator.</span>
+            <span class="n">zero</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">affine</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+            <span class="n">rhs_phys</span> <span class="o">-=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">affine</span> <span class="k">if</span> <span class="n">implicit_part</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">affine</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs_phys</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Fallback: substitute y = u_old + delta. Always correct, but the solver sees an O(1)</span>
+            <span class="c1"># unknown, so there is no precision benefit.</span>
+            <span class="n">rhs_phys</span> <span class="o">+=</span> <span class="n">u_old</span>
+            <span class="n">rhs_phys</span> <span class="o">-=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">f_impl_old</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs_phys</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+            <span class="n">delta</span> <span class="o">-=</span> <span class="n">u_old</span>
+        <span class="c1"># recorded so a transfer never has to recover the correction by subtraction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_deltas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">delta</span></div>
+
+
+
+<div class="viewcode-block" id="delta_implicit">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.delta_implicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">delta_implicit</span><span class="p">(</span><span class="n">DeltaFormMixin</span><span class="p">,</span> <span class="n">generic_implicit</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Delta-form counterpart of :class:`generic_implicit`.</span>
+
+<span class="sd">    Mathematically identical to the standard sweep; see the module docstring for the sweeper</span>
+<span class="sd">    parameters ``correction_precision`` and ``linear_implicit``.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sweep_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Perform one delta-form sweep over all collocation nodes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delta_setup</span><span class="p">()</span>
+
+        <span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residual_nodes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_work_scale</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">residual</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">):</span>
+            <span class="n">t_node</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+
+            <span class="n">rhs_corr</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">eps</span><span class="p">[</span><span class="n">m</span><span class="p">])(</span><span class="n">eps</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">rhs_corr</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coeff</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">u_old</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">f_old</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_correction</span><span class="p">(</span><span class="n">rhs_corr</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">f_old</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+
+            <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_old</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_backend</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">delta</span><span class="p">))</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t_node</span><span class="p">)</span>
+
+            <span class="n">increment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f_increment</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">f_old</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">increment</span><span class="p">)</span>
+
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="delta_imex_1st_order">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.delta_imex_1st_order">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">delta_imex_1st_order</span><span class="p">(</span><span class="n">DeltaFormMixin</span><span class="p">,</span> <span class="n">imex_1st_order</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Delta-form counterpart of :class:`imex_1st_order`.</span>
+
+<span class="sd">    The correction equation contains only differences of ``f``, never a Jacobian, so the</span>
+<span class="sd">    explicit/implicit splitting is untouched.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sweep_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Perform one delta-form IMEX sweep over all collocation nodes.</span>
+
+<span class="sd">        ``QE`` is strictly lower triangular, which :class:`imex_1st_order` already enforces, so the</span>
+<span class="sd">        explicit part never contributes to the node-local solve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span>
+        <span class="k">assert</span> <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span>
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delta_setup</span><span class="p">()</span>
+
+        <span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residual_nodes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_work_scale</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">residual</span><span class="p">]</span>
+        <span class="n">df_impl</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">df_expl</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">):</span>
+            <span class="n">t_node</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+
+            <span class="n">rhs_corr</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">eps</span><span class="p">[</span><span class="n">m</span><span class="p">])(</span><span class="n">eps</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">rhs_corr</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coeff</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">*</span> <span class="n">df_impl</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">QE</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="n">rhs_corr</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coeff</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QE</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">*</span> <span class="n">df_expl</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">u_old</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">f_old</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_correction</span><span class="p">(</span><span class="n">rhs_corr</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">f_old</span><span class="p">,</span> <span class="n">t_node</span><span class="p">,</span> <span class="n">implicit_part</span><span class="o">=</span><span class="n">f_old</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
+
+            <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_old</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_backend</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">delta</span><span class="p">))</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t_node</span><span class="p">)</span>
+
+            <span class="n">increment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f_increment</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">f_old</span><span class="p">,</span> <span class="n">u_old</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+            <span class="n">df_impl</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">increment</span><span class="o">.</span><span class="n">impl</span><span class="p">))</span>
+            <span class="n">df_expl</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_work</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">increment</span><span class="o">.</span><span class="n">expl</span><span class="p">))</span>
+
+        <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="total_increment">
+<a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.total_increment">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">total_increment</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">increment</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    The full right-hand side increment, recombining an IMEX splitting.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prob : pySDC.core.problem.Problem</span>
+<span class="sd">        The problem the increment belongs to.</span>
+<span class="sd">    increment : dtype_f</span>
+<span class="sd">        The increment, possibly split into ``impl`` and ``expl``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dtype_u</span>
+<span class="sd">        The sum of the parts.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">increment</span><span class="p">,</span> <span class="s1">'impl'</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">increment</span>
+    <span class="k">return</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">increment</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span> <span class="o">+</span> <span class="n">increment</span><span class="o">.</span><span class="n">expl</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.delta_form</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

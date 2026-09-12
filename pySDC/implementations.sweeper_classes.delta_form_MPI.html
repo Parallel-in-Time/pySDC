@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.sweeper_classes.delta_form_MPI module &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes.explicit module" href="implementations.sweeper_classes.explicit.html" />
+    <link rel="prev" title="implementations.sweeper_classes.delta_form module" href="implementations.sweeper_classes.delta_form.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.explicit.html" title="implementations.sweeper_classes.explicit module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.delta_form.html" title="implementations.sweeper_classes.delta_form module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" accesskey="U">implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.delta_form_MPI module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.sweeper_classes.delta_form_MPI">
+<span id="implementations-sweeper-classes-delta-form-mpi-module"></span><h1>implementations.sweeper_classes.delta_form_MPI module<a class="headerlink" href="#module-implementations.sweeper_classes.delta_form_MPI" title="Link to this heading">¶</a></h1>
+<p>Node-parallel delta-form sweeper.</p>
+<p>Kept in its own module because importing it requires <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code>, which
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">delta_form</span></code> does not.</p>
+<p>The MPI sweeper assigns one collocation node per rank and therefore uses only the <strong>diagonal</strong> of
+<span class="math notranslate nohighlight">\(Q^\Delta\)</span>. The delta form collapses accordingly: with
+<span class="math notranslate nohighlight">\(\varepsilon_r = u_0 + \tau_r + \Delta t (Q f^k)_r - u^k_r\)</span> for the rank’s own node,</p>
+<div class="math notranslate nohighlight">
+\[\delta_r = \varepsilon_r + \Delta t Q^\Delta_{rr}\,\big(f(u^k_r + \delta_r) - f(u^k_r)\big),\]</div>
+<p>with no accumulation over other nodes. The node-local piece is identical to the serial case, so
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">DeltaFormMixin._solve_correction()</span></code> is reused unchanged and all three strategies
+(<code class="docutils literal notranslate"><span class="pre">solve_system_delta</span></code>, <code class="docutils literal notranslate"><span class="pre">linear_implicit</span></code>, substitution fallback) work here too.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">delta_implicit_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form_MPI.html#delta_implicit_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DeltaFormMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit_MPI</span></code></p>
+<p>Delta-form counterpart of <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit_MPI</span></code>. One collocation node per rank.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI.advance_residual">
+<span class="sig-name descname"><span class="pre">advance_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form_MPI.html#delta_implicit_MPI.advance_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI.advance_residual" title="Link to this definition">¶</a></dt>
+<dd><p>Advance this rank’s residual by an update.</p>
+<p>The <span class="math notranslate nohighlight">\(Q\,\Delta f\)</span> term couples all collocation nodes, so it is a reduction here
+rather than a sum, in the same shape <code class="xref py py-meth docutils literal notranslate"><span class="pre">generic_implicit_MPI.integrate()</span></code> uses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eps</strong> (<em>list</em>) – This rank’s residual, as a single-element list.</p></li>
+<li><p><strong>deltas</strong> (<em>list</em>) – The update applied to this rank’s nodal value.</p></li>
+<li><p><strong>dfs</strong> (<em>list</em>) – The resulting right-hand side increment at this rank’s node.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The advanced residual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI.compute_residual">
+<span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form_MPI.html#delta_implicit_MPI.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI.compute_residual" title="Link to this definition">¶</a></dt>
+<dd><p>Report the tracked residual, reduced over the node communicator.</p>
+<p>The serial version takes a maximum over the nodes it holds; here each rank holds one, so the
+same quantity is an <code class="docutils literal notranslate"><span class="pre">allreduce</span></code>. Shaped after
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">generic_implicit_MPI.compute_residual()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – The stage of the step this level belongs to.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.sweeper_classes.delta_form_MPI module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI"><code class="docutils literal notranslate"><span class="pre">delta_implicit_MPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI.advance_residual"><code class="docutils literal notranslate"><span class="pre">advance_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form_MPI.delta_implicit_MPI.compute_residual"><code class="docutils literal notranslate"><span class="pre">compute_residual()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.delta_form.html"
+                          title="previous chapter">implementations.sweeper_classes.delta_form module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.explicit.html"
+                          title="next chapter">implementations.sweeper_classes.explicit module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.sweeper_classes.delta_form_MPI.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.explicit.html" title="implementations.sweeper_classes.explicit module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.delta_form.html" title="implementations.sweeper_classes.delta_form module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" >implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.delta_form_MPI module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

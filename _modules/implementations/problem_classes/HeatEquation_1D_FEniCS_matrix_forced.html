@@ -212,6 +212,74 @@
         <span class="k">return</span> <span class="n">u</span></div>
 
 
+<div class="viewcode-block" id="fenics_heat.eval_f_increment">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f_increment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f_increment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right-hand side increment.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        base : dtype_u</span>
+<span class="sd">            The base state, unused: the implicit part is linear.</span>
+<span class="sd">        delta : dtype_u</span>
+<span class="sd">            The correction.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Physical time, accepted for interface compatibility.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dtype_f</span>
+<span class="sd">            The increment, with a zero explicit part.</span>
+<span class="sd">        """</span>
+        <span class="n">increment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">increment</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">increment</span></div>
+
+
+<div class="viewcode-block" id="fenics_heat.solve_system_delta">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system_delta">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_delta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">f_base</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Solve :math:`\delta - factor\,[f(w+\delta) - f(w)] = r`, i.e.</span>
+<span class="sd">        :math:`(M - factor\,K)\,\delta = M r` with **zero** boundary data.</span>
+
+<span class="sd">        This is the piece ``linear_implicit=True`` cannot supply on this backend. That shortcut</span>
+<span class="sd">        reuses the stock ``solve_system``, which applies *inhomogeneous* Dirichlet data to whatever</span>
+<span class="sd">        right-hand side it is handed, and a correction must carry zero boundary data. Applying</span>
+<span class="sd">        ``bc_hom`` instead is the whole difference.</span>
+
+<span class="sd">        Without this the sweeper falls back to the substitution :math:`y = w + \delta`, which is</span>
+<span class="sd">        exact but reads the level's :math:`\mathcal{O}(1)` state. That is merely no benefit while</span>
+<span class="sd">        the level is at backend precision, and is a wrong answer once it is not -- measured here as</span>
+<span class="sd">        1.4e-05 with the coarse level at ``float32``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        r : dtype_u</span>
+<span class="sd">            Right-hand side of the correction equation.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Implicit prefactor assembled by the sweeper.</span>
+<span class="sd">        base : dtype_u</span>
+<span class="sd">            Base state, unused: the implicit operator is linear.</span>
+<span class="sd">        f_base : dtype_f</span>
+<span class="sd">            ``f`` evaluated at ``base``, unused for the same reason.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Physical time, accepted for interface compatibility.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dtype_u</span>
+<span class="sd">            The correction.</span>
+<span class="sd">        """</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc_hom</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">delta</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">delta</span></div>
+
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__eval_fexpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Helper routine to evaluate the explicit part of the right-hand side.</span>

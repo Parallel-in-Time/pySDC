@@ -88,7 +88,7 @@
 <div class="viewcode-block" id="Problem">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Problem</span><span class="p">(</span><span class="n">RegisterParams</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Prototype class for problems, just defines the attributes essential to get started.</span>
 
 <span class="sd">    Parameters</span>
@@ -104,6 +104,36 @@
 <span class="sd">    ----------</span>
 <span class="sd">    logger: logging.Logger</span>
 <span class="sd">        custom logger for problem-related logging.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Two **optional** methods are recognised by the deferred-correction ("delta-form") sweepers in</span>
+<span class="sd">    :mod:`pySDC.implementations.sweeper_classes.delta_form`. Neither is required: a problem that</span>
+<span class="sd">    defines neither still works, and the sweeper falls back to a route that is always correct. They</span>
+<span class="sd">    exist because both fallbacks read quantities of size :math:`|u|` or :math:`|f|`, which is</span>
+<span class="sd">    harmless at backend precision and is what binds first below it.</span>
+
+<span class="sd">    ``solve_system_delta(rhs, factor, base, f_base, t)``</span>
+<span class="sd">        Solve :math:`\delta - factor\,[f(base+\delta) - f(base)] = rhs` and return the correction</span>
+<span class="sd">        :math:`\delta`. Needed only for a **nonlinear** implicit operator; for a linear or affine one</span>
+<span class="sd">        the sweeper reaches the same equation through the stock :meth:`solve_system`. The unknown</span>
+<span class="sd">        must be the correction, and the increment must be expanded analytically rather than formed as</span>
+<span class="sd">        a difference of two :math:`\mathcal{O}(|f|)` quantities.</span>
+
+<span class="sd">        Without it the sweeper substitutes :math:`y = u^k_m + \delta_m` and uses</span>
+<span class="sd">        :meth:`solve_system`. That is exact, but the solver then sees an :math:`\mathcal{O}(1)`</span>
+<span class="sd">        unknown.</span>
+
+<span class="sd">    ``eval_f_increment(base, delta, t)``</span>
+<span class="sd">        Return :math:`f(base+\delta) - f(base)` with the same splitting as :meth:`eval_f`, expanded</span>
+<span class="sd">        so that every term carries an explicit factor :math:`\delta`.</span>
+
+<span class="sd">        Without it the sweeper subtracts two stored right-hand sides. That cancellation carries the</span>
+<span class="sd">        operator norm: on the FEniCS heat equation, where :math:`|M^{-1}Ku|` is of order</span>
+<span class="sd">        :math:`10^5`, it is already 7.7e-11 off in double precision.</span>
+
+<span class="sd">    Both fallbacks are correct and neither fails loudly, which is the reason to document them here</span>
+<span class="sd">    rather than to leave them to be discovered.</span>
 <span class="sd">    """</span>
 
     <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'problem'</span><span class="p">)</span>

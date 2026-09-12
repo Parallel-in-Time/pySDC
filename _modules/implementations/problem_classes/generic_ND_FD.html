@@ -252,6 +252,37 @@
         <span class="k">return</span> <span class="n">f</span></div>
 
 
+<div class="viewcode-block" id="GenericNDimFinDiff.eval_f_increment">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f_increment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f_increment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Evaluate :math:`f(w + \delta) - f(w) = A\delta`, which carries an explicit factor</span>
+<span class="sd">        :math:`\delta`.</span>
+
+<span class="sd">        The operator is linear, so the increment is the operator applied to the correction and the</span>
+<span class="sd">        base state does not enter. Supplying it means a sweeper never has to form the increment by</span>
+<span class="sd">        subtracting two stored right-hand sides, whose cancellation error carries</span>
+<span class="sd">        :math:`\varepsilon\|A\|` -- see :class:`pySDC.core.problem.Problem`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        base : dtype_u</span>
+<span class="sd">            The base state, unused for a linear operator.</span>
+<span class="sd">        delta : dtype_u</span>
+<span class="sd">            The correction.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time, accepted for interface compatibility.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The increment.</span>
+<span class="sd">        """</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
 <div class="viewcode-block" id="GenericNDimFinDiff.solve_system">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_ND_FD.html#implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.solve_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.sweeper_classes.delta_form module &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.sweeper_classes.delta_form_MPI module" href="implementations.sweeper_classes.delta_form_MPI.html" />
+    <link rel="prev" title="implementations.sweeper_classes.boris_2nd_order module" href="implementations.sweeper_classes.boris_2nd_order.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.delta_form_MPI.html" title="implementations.sweeper_classes.delta_form_MPI module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.boris_2nd_order.html" title="implementations.sweeper_classes.boris_2nd_order module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" accesskey="U">implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.delta_form module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.sweeper_classes.delta_form">
+<span id="implementations-sweeper-classes-delta-form-module"></span><h1>implementations.sweeper_classes.delta_form module<a class="headerlink" href="#module-implementations.sweeper_classes.delta_form" title="Link to this heading">¶</a></h1>
+<p>Deferred-correction (“delta-form”) SDC sweepers.</p>
+<p>A standard SDC sweep</p>
+<div class="math notranslate nohighlight">
+\[u^{k+1}_m = u_0 + \tau_m + \Delta t (Q f^k)_m
+            + \Delta t \sum_j Q^\Delta_{mj}\,(f^{k+1}_j - f^k_j)\]</div>
+<p>is algebraically identical to, with <span class="math notranslate nohighlight">\(\delta_m = u^{k+1}_m - u^k_m\)</span> and the collocation
+residual <span class="math notranslate nohighlight">\(\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\delta_m = \varepsilon_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,
+\qquad \Delta f_j = f(u^k_j + \delta_j) - f(u^k_j).\]</div>
+<p>Written this way, every sweep is iterative refinement: a high-precision residual, a correction
+solve, and a high-precision update <code class="docutils literal notranslate"><span class="pre">u</span> <span class="pre">&lt;-</span> <span class="pre">u</span> <span class="pre">+</span> <span class="pre">delta</span></code>. No Jacobian appears, so an IMEX splitting
+survives unchanged.</p>
+<p>The point of the reformulation is that the quantity handed to the node-local solver is a
+<em>correction</em>. Its magnitude tends to zero as the sweeps converge, so a reduced-precision solve
+introduces an error proportional to <span class="math notranslate nohighlight">\(|\delta|\)</span> rather than to <span class="math notranslate nohighlight">\(|u|\)</span> and therefore does
+not cap the attainable accuracy.</p>
+<p>Three node-local strategies are supported, selected automatically:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">solve_system_delta</span></code></dt><dd><p>Used when the problem provides it. Solves
+<span class="math notranslate nohighlight">\(\delta - \alpha[f(w+\delta) - f(w)] = r\)</span> for the correction directly. This is the only
+option for a nonlinear implicit operator, and the only one that hands a reduced-precision
+solver a small unknown.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">linear_implicit=True</span></code></dt><dd><p>For a linear or affine implicit operator, <span class="math notranslate nohighlight">\(f(w+\delta) - f(w) = A\delta\)</span>, so the stock
+<code class="docutils literal notranslate"><span class="pre">solve_system</span></code> already solves the correction equation once the affine part
+<span class="math notranslate nohighlight">\(\alpha f(0, t)\)</span> is removed from the right-hand side. No problem class needs changing.</p>
+</dd>
+<dt>fallback</dt><dd><p>Otherwise the substitution <span class="math notranslate nohighlight">\(y = u^k_m + \delta_m\)</span> reduces the correction equation to the
+ordinary implicit solve. Always correct and identical to <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code>, but the
+solver sees an <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> unknown, so there is no precision benefit.</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">correction_precision</span></code> additionally stores the small quantities
+(<span class="math notranslate nohighlight">\(\varepsilon\)</span>, <span class="math notranslate nohighlight">\(\delta\)</span>, <span class="math notranslate nohighlight">\(\Delta f\)</span>) in a reduced-precision datatype built from
+the problem’s own <code class="docutils literal notranslate"><span class="pre">init</span></code> tuple, scaled by the residual’s magnitude so the format’s mantissa is
+used however small the correction gets.</p>
+<p>The increment <span class="math notranslate nohighlight">\(\Delta f\)</span> is formed by subtracting two stored right-hand sides unless the
+problem provides <code class="docutils literal notranslate"><span class="pre">eval_f_increment(base,</span> <span class="pre">delta,</span> <span class="pre">t)</span></code>, which expands it analytically. That
+subtraction is a cancellation carrying the operator norm, so it binds as soon as a level runs below
+backend precision.</p>
+<p>The same sweeper serves any number of levels, and which it is doing is decided by the transfer, not
+by the choice of sweeper. On the finest level it computes its own residual, which is where the
+accuracy of the whole iteration is set. Given a transfer that hands one down – by setting
+<code class="docutils literal notranslate"><span class="pre">eps_in</span></code> on the level’s sweeper – it uses that instead and advances it in place, so nothing is
+ever rebuilt out of <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> coarse state. <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> hands nothing down,
+so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DeltaFormMixin</span></span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#DeltaFormMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Shared machinery for the delta-form sweepers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin.accumulate">
+<span class="sig-name descname"><span class="pre">accumulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deltas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#DeltaFormMixin.accumulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.accumulate" title="Link to this definition">¶</a></dt>
+<dd><p>Add one round of corrections to what this level owes upwards.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin.advance_residual">
+<span class="sig-name descname"><span class="pre">advance_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#DeltaFormMixin.advance_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.advance_residual" title="Link to this definition">¶</a></dt>
+<dd><p>Advance a residual by an update: <span class="math notranslate nohighlight">\(\varepsilon \leftarrow \varepsilon - \delta
++ \Delta t (Q \Delta f)\)</span>.</p>
+<p>Every term is small, so this never cancels. It is exact for any update to the nodal values,
+which is why it serves both a sweep and a prolongation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eps</strong> (<em>list</em>) – The residual, one entry per node.</p></li>
+<li><p><strong>deltas</strong> (<em>list</em>) – The update applied to the nodal values, one entry per node.</p></li>
+<li><p><strong>dfs</strong> (<em>list</em>) – The resulting right-hand side increments, one entry per node.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The advanced residual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin.compute_residual">
+<span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#DeltaFormMixin.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.compute_residual" title="Link to this definition">¶</a></dt>
+<dd><p>Report the residual this level is already tracking, instead of rebuilding one.</p>
+<p>A level with an inherited residual carries it forward through every sweep and prolongation,
+so recomputing it from <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> state would be both redundant and less
+accurate. It is also what makes the <span class="math notranslate nohighlight">\(\tau\)</span> term unnecessary: the only other reader is
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_end_point()</span></code>, and only when the end point comes from the quadrature update.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – The stage of the step this level belongs to.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin.delta_acc">
+<span class="sig-name descname"><span class="pre">delta_acc</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.delta_acc" title="Link to this definition">¶</a></dt>
+<dd><p>Corrections this level has accumulated since the last restriction.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin.eps_in">
+<span class="sig-name descname"><span class="pre">eps_in</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.eps_in" title="Link to this definition">¶</a></dt>
+<dd><p>Residual handed down by the transfer, or <code class="docutils literal notranslate"><span class="pre">None</span></code> on the finest level.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin.sync_initial_value">
+<span class="sig-name descname"><span class="pre">sync_initial_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#DeltaFormMixin.sync_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.sync_initial_value" title="Link to this definition">¶</a></dt>
+<dd><p>Follow a change of <span class="math notranslate nohighlight">\(u_0\)</span> made after the residual was handed down.</p>
+<p>PFASST receives the initial value from the predecessor <em>after</em> the restriction, directly
+into <code class="docutils literal notranslate"><span class="pre">u[0]</span></code>. The residual depends on it additively, so following it is one addition:
+<span class="math notranslate nohighlight">\(\varepsilon_m \leftarrow \varepsilon_m + (u_0 - u_0^{\mathrm{ref}})\)</span>. Exactly zero
+when nothing arrived, which is every serial run.</p>
+<p>This is the one place the hierarchy still differences two <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> values, and
+it is the reason a reduced-precision coarse level buys less under PFASST than under MLSDC:
+the difference is small – it is the coarse-versus-fine discrepancy at the step interface,
+and it converges to zero – but it is <em>formed</em> by cancelling two values of size
+<span class="math notranslate nohighlight">\(|u|\)</span>. Putting the step-to-step exchange itself in delta form is what would remove it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin.update_nodes">
+<span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#DeltaFormMixin.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.update_nodes" title="Link to this definition">¶</a></dt>
+<dd><p>Sweep, and keep the level’s bookkeeping straight if it is part of a hierarchy.</p>
+<p>The sweep itself is <code class="xref py py-meth docutils literal notranslate"><span class="pre">_sweep_nodes()</span></code>, which each concrete sweeper supplies. Around it:
+follow any change of <span class="math notranslate nohighlight">\(u_0\)</span> that arrived after the residual was handed down, advance
+that residual by the update just applied, and bank the corrections for a transfer to prolong.</p>
+<p>A level that computes its own residual has no bookkeeping to do, so on a single-level run
+every line below the sweep is a no-op. That is why there is one sweeper rather than two.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.delta_imex_1st_order">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">delta_imex_1st_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#delta_imex_1st_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.delta_imex_1st_order" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin" title="implementations.sweeper_classes.delta_form.DeltaFormMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeltaFormMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_1st_order</span></code></p>
+<p>Delta-form counterpart of <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_1st_order</span></code>.</p>
+<p>The correction equation contains only differences of <code class="docutils literal notranslate"><span class="pre">f</span></code>, never a Jacobian, so the
+explicit/implicit splitting is untouched.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.delta_implicit">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">delta_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#delta_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.delta_implicit" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin" title="implementations.sweeper_classes.delta_form.DeltaFormMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeltaFormMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
+<p>Delta-form counterpart of <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code>.</p>
+<p>Mathematically identical to the standard sweep; see the module docstring for the sweeper
+parameters <code class="docutils literal notranslate"><span class="pre">correction_precision</span></code> and <code class="docutils literal notranslate"><span class="pre">linear_implicit</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.total_increment">
+<span class="sig-name descname"><span class="pre">total_increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#total_increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.total_increment" title="Link to this definition">¶</a></dt>
+<dd><p>The full right-hand side increment, recombining an IMEX splitting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prob</strong> (<em>pySDC.core.problem.Problem</em>) – The problem the increment belongs to.</p></li>
+<li><p><strong>increment</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_f" title="core.problem.Problem.dtype_f"><em>dtype_f</em></a>) – The increment, possibly split into <code class="docutils literal notranslate"><span class="pre">impl</span></code> and <code class="docutils literal notranslate"><span class="pre">expl</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The sum of the parts.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.sweeper_classes.delta_form module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin"><code class="docutils literal notranslate"><span class="pre">DeltaFormMixin</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.accumulate"><code class="docutils literal notranslate"><span class="pre">accumulate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.advance_residual"><code class="docutils literal notranslate"><span class="pre">advance_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.compute_residual"><code class="docutils literal notranslate"><span class="pre">compute_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.delta_acc"><code class="docutils literal notranslate"><span class="pre">delta_acc</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.eps_in"><code class="docutils literal notranslate"><span class="pre">eps_in</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.sync_initial_value"><code class="docutils literal notranslate"><span class="pre">sync_initial_value()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.delta_imex_1st_order"><code class="docutils literal notranslate"><span class="pre">delta_imex_1st_order</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.delta_implicit"><code class="docutils literal notranslate"><span class="pre">delta_implicit</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.delta_form.total_increment"><code class="docutils literal notranslate"><span class="pre">total_increment()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.boris_2nd_order.html"
+                          title="previous chapter">implementations.sweeper_classes.boris_2nd_order module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.sweeper_classes.delta_form_MPI.html"
+                          title="next chapter">implementations.sweeper_classes.delta_form_MPI module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.sweeper_classes.delta_form.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.delta_form_MPI.html" title="implementations.sweeper_classes.delta_form_MPI module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.boris_2nd_order.html" title="implementations.sweeper_classes.boris_2nd_order module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.sweeper_classes.html" >implementations.sweeper_classes package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes.delta_form module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+implementations.transfer\_classes.BaseTransferDelta module
+==========================================================
+
+.. automodule:: implementations.transfer_classes.BaseTransferDelta
+   :members:
+   :show-inheritance:
+   :undoc-members:

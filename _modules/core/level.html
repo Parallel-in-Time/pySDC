@@ -97,6 +97,7 @@
 <span class="sd">        f (list of dtype_f): RHS values at the nodes</span>
 <span class="sd">        fold (list of dtype_f): copy of RHS values for saving data during restriction</span>
 <span class="sd">        tau (list of dtype_u): FAS correction, allocated via step class if necessary</span>
+<span class="sd">        u0_reference: copy of ``u[0]`` taken when a residual was handed down to this level</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -143,6 +144,17 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
 
+        <span class="c1"># Set by a transfer that hands this level a residual instead of letting it rebuild one, and</span>
+        <span class="c1"># read by the sweeper that carries that residual. PFASST overwrites `u[0]` with the</span>
+        <span class="c1"># predecessor's end value *after* the restriction, and the residual depends on `u[0]`</span>
+        <span class="c1"># additively, so a level carrying one has to be told what `u[0]` was when it arrived. It</span>
+        <span class="c1"># lives here, next to `tau`, because it is a copy of this level's own data and has to be</span>
+        <span class="c1"># dropped when the level is reset -- a stale one belongs to the previous step.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Temporary. Putting the step-to-step exchange itself in delta form, so the predecessor</span>
+        <span class="c1"># sends an increment rather than a state, removes the need for it entirely.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u0_reference</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__tag</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># freeze class, no further attributes allowed from this point</span>
@@ -171,7 +183,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">uold</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fold</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u0_reference</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
     <span class="nd">@property</span>

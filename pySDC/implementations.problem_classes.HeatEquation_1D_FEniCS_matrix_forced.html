@@ -202,6 +202,27 @@ Wells and others. Springer (2012).</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f_increment">
+<span class="sig-name descname"><span class="pre">eval_f_increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.eval_f_increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f_increment" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate the right-hand side increment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u"><em>dtype_u</em></a>) – The base state, unused: the implicit part is linear.</p></li>
+<li><p><strong>delta</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u"><em>dtype_u</em></a>) – The correction.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Physical time, accepted for interface compatibility.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The increment, with a zero explicit part.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_f" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_f">dtype_f</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Dolfin’s linear solver for <span class="math notranslate nohighlight">\((M - factor \cdot A) \vec{u} = \vec{rhs}\)</span>.</p>
@@ -216,6 +237,38 @@ Wells and others. Springer (2012).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>u</strong> – Solution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system_delta">
+<span class="sig-name descname"><span class="pre">solve_system_delta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.solve_system_delta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system_delta" title="Link to this definition">¶</a></dt>
+<dd><p>Solve <span class="math notranslate nohighlight">\(\delta - factor\,[f(w+\delta) - f(w)] = r\)</span>, i.e.
+<span class="math notranslate nohighlight">\((M - factor\,K)\,\delta = M r\)</span> with <strong>zero</strong> boundary data.</p>
+<p>This is the piece <code class="docutils literal notranslate"><span class="pre">linear_implicit=True</span></code> cannot supply on this backend. That shortcut
+reuses the stock <code class="docutils literal notranslate"><span class="pre">solve_system</span></code>, which applies <em>inhomogeneous</em> Dirichlet data to whatever
+right-hand side it is handed, and a correction must carry zero boundary data. Applying
+<code class="docutils literal notranslate"><span class="pre">bc_hom</span></code> instead is the whole difference.</p>
+<p>Without this the sweeper falls back to the substitution <span class="math notranslate nohighlight">\(y = w + \delta\)</span>, which is
+exact but reads the level’s <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> state. That is merely no benefit while
+the level is at backend precision, and is a wrong answer once it is not – measured here as
+1.4e-05 with the coarse level at <code class="docutils literal notranslate"><span class="pre">float32</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u"><em>dtype_u</em></a>) – Right-hand side of the correction equation.</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – Implicit prefactor assembled by the sweeper.</p></li>
+<li><p><strong>base</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u"><em>dtype_u</em></a>) – Base state, unused: the implicit operator is linear.</p></li>
+<li><p><strong>f_base</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_f" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_f"><em>dtype_f</em></a>) – <code class="docutils literal notranslate"><span class="pre">f</span></code> evaluated at <code class="docutils literal notranslate"><span class="pre">base</span></code>, unused for the same reason.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Physical time, accepted for interface compatibility.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The correction.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u">dtype_u</a></p>
@@ -609,7 +662,9 @@ Wells and others. Springer (2012).</p>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f_increment"><code class="docutils literal notranslate"><span class="pre">eval_f_increment()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system_delta"><code class="docutils literal notranslate"><span class="pre">solve_system_delta()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 </ul>
 </li>
