@@ -481,3 +481,45 @@ def test_stored_corrections_really_cost_the_format(precision, epsilon):
     median = float(np.median(losses))
     assert epsilon / 100 < median < epsilon, f'the round trip cost {median:.1e}, not the format epsilon'
     assert min(scales) < 1e-10 < max(scales), f'the scale did not follow the residual down: {min(scales):.1e}'
+
+
+@pytest.mark.base
+def test_a_handed_down_residual_is_used_and_advanced():
+    r"""
+    The sweeper computes its own residual unless a transfer hands one down.
+
+    A hierarchy that reformulates the coarse level hands one down instead of letting the level
+    rebuild it out of :math:`\mathcal{O}(1)` state -- that transfer is a separate thing, so the
+    handing down is stubbed here. What is under test is the sweeper's half of the contract: use
+    ``eps_in`` in place of the residual it would have computed, advance it by
+    :math:`\varepsilon \leftarrow \varepsilon - \delta + \Delta t (Q \Delta f)` after the sweep, and
+    bank the corrections for the transfer to take back.
+
+    The recursion is checked against the residual recomputed from scratch, which is the only thing
+    that says the advance is right rather than merely self-consistent.
+    """
+    import numpy as np
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+
+    drift, banked = [], []
+
+    class handed_down(delta_implicit):
+        def update_nodes(self):
+            if self.eps_in is None:
+                # stand in for a transfer: hand the level the residual it was about to compute
+                self.eps_in = self._residual_nodes()
+            super().update_nodes()
+            rebuilt = delta_implicit._residual_nodes(self)
+            drift.append(max(float(np.max(np.abs(np.asarray(a - b)))) for a, b in zip(rebuilt, self.eps_in)))
+            banked.append(self.delta_acc is not None)
+
+    args = (heatNd_unforced, HEAT_PARAMS, sweeper_params(linear_implicit=True), 1e-2, 1, 6)
+    reference, _, _ = run(args[0], args[1], delta_implicit, args[2], *args[3:])
+    uend, _, _ = run(args[0], args[1], handed_down, args[2], *args[3:])
+
+    assert len(drift) == 6, f'the sweep ran {len(drift)} times'
+    assert all(banked), 'the corrections were not banked for a transfer to take back'
+    assert max(drift) < 1e-13, f'the tracked residual drifted from the real one by {max(drift):.3e}'
+    assert abs(uend - reference) < 1e-13, f'carrying the residual moved the answer by {abs(uend - reference):.3e}'

@@ -51,10 +51,12 @@ problem provides ``eval_f_increment(base, delta, t)``, which expands it analytic
 subtraction is a cancellation carrying the operator norm, so it binds as soon as a level runs below
 backend precision.
 
-Multi-level and parallel-in-time runs work unchanged: the sweep is an algebraic rewrite, so a
-delta-form sweeper on a stock :class:`BaseTransfer` hierarchy reproduces MLSDC and PFASST exactly.
-Reformulating the *hierarchy* as well -- which is what lets a whole coarse level drop below backend
-precision -- is a separate thing and not in this module.
+The same sweeper serves any number of levels, and which it is doing is decided by the transfer, not
+by the choice of sweeper. On the finest level it computes its own residual, which is where the
+accuracy of the whole iteration is set. Given a transfer that hands one down -- by setting
+``eps_in`` on the level's sweeper -- it uses that instead and advances it in place, so nothing is
+ever rebuilt out of :math:`\mathcal{O}(1)` coarse state. :class:`BaseTransfer` hands nothing down,
+so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.
 """
 
 import numpy as np
@@ -67,10 +69,143 @@ class DeltaFormMixin:
     """Shared machinery for the delta-form sweepers."""
 
     def _delta_setup(self):
-        """Read the optional sweeper parameters controlling the delta form."""
+        """Read the optional sweeper parameters, and arm the per-sweep recorders."""
         token = getattr(self.params, 'correction_precision', None)
         self._work_dtype = None if token is None else np.dtype(token)
         self._linear_implicit = bool(getattr(self.params, 'linear_implicit', False))
+        self._deltas, self._dfs = [], []
+
+    eps_in = None
+    """Residual handed down by the transfer, or ``None`` on the finest level."""
+
+    delta_acc = None
+    """Corrections this level has accumulated since the last restriction."""
+
+    def sync_initial_value(self):
+        r"""
+        Follow a change of :math:`u_0` made after the residual was handed down.
+
+        PFASST receives the initial value from the predecessor *after* the restriction, directly
+        into ``u[0]``. The residual depends on it additively, so following it is one addition:
+        :math:`\varepsilon_m \leftarrow \varepsilon_m + (u_0 - u_0^{\mathrm{ref}})`. Exactly zero
+        when nothing arrived, which is every serial run.
+
+        This is the one place the hierarchy still differences two :math:`\mathcal{O}(1)` values, and
+        it is the reason a reduced-precision coarse level buys less under PFASST than under MLSDC:
+        the difference is small -- it is the coarse-versus-fine discrepancy at the step interface,
+        and it converges to zero -- but it is *formed* by cancelling two values of size
+        :math:`|u|`. Putting the step-to-step exchange itself in delta form is what would remove it.
+
+        Returns
+        -------
+        None
+        """
+        lvl = self.level
+        if self.eps_in is None or lvl.u0_reference is None:
+            return
+        shift = lvl.u[0] - lvl.u0_reference
+        self.eps_in = [eps + shift for eps in self.eps_in]
+        lvl.u0_reference = lvl.prob.dtype_u(lvl.u[0])
+        return None
+
+    def compute_residual(self, stage=''):
+        r"""
+        Report the residual this level is already tracking, instead of rebuilding one.
+
+        A level with an inherited residual carries it forward through every sweep and prolongation,
+        so recomputing it from :math:`\mathcal{O}(1)` state would be both redundant and less
+        accurate. It is also what makes the :math:`\tau` term unnecessary: the only other reader is
+        :meth:`compute_end_point`, and only when the end point comes from the quadrature update.
+
+        Parameters
+        ----------
+        stage : str
+            The stage of the step this level belongs to.
+
+        Returns
+        -------
+        None
+        """
+        if self.eps_in is None:
+            return super().compute_residual(stage=stage)
+
+        lvl = self.level
+        if stage in self.params.skip_residual_computation:
+            lvl.status.residual = 0.0 if lvl.status.residual is None else lvl.status.residual
+            return None
+
+        lvl.residual = [lvl.prob.dtype_u(eps) for eps in self.eps_in]
+        norms = [abs(eps) for eps in self.eps_in]
+        kind = lvl.params.residual_type
+        if kind not in ('full_abs', 'last_abs', 'full_rel', 'last_rel'):
+            raise NotImplementedError(f'residual type "{kind}" not implemented!')
+        value = norms[-1] if kind.startswith('last') else max(norms)
+        lvl.status.residual = value / abs(lvl.u[0]) if kind.endswith('rel') else value
+        lvl.status.updated = False
+        return None
+
+    def advance_residual(self, eps, deltas, dfs):
+        r"""
+        Advance a residual by an update: :math:`\varepsilon \leftarrow \varepsilon - \delta
+        + \Delta t (Q \Delta f)`.
+
+        Every term is small, so this never cancels. It is exact for any update to the nodal values,
+        which is why it serves both a sweep and a prolongation.
+
+        Parameters
+        ----------
+        eps : list
+            The residual, one entry per node.
+        deltas : list
+            The update applied to the nodal values, one entry per node.
+        dfs : list
+            The resulting right-hand side increments, one entry per node.
+
+        Returns
+        -------
+        list
+            The advanced residual.
+        """
+        dt, Q = self.level.dt, self.coll.Qmat
+        out = []
+        for m in range(len(eps)):
+            acc = eps[m] - deltas[m]
+            for j in range(len(dfs)):
+                if Q[m + 1, j + 1] != 0.0:
+                    acc += self._coeff(dt * Q[m + 1, j + 1]) * dfs[j]
+            out.append(acc)
+        return out
+
+    def accumulate(self, deltas):
+        """Add one round of corrections to what this level owes upwards."""
+        self.delta_acc = (
+            deltas if self.delta_acc is None else [a + d for a, d in zip(self.delta_acc, deltas, strict=True)]
+        )
+
+    def update_nodes(self):
+        r"""
+        Sweep, and keep the level's bookkeeping straight if it is part of a hierarchy.
+
+        The sweep itself is :meth:`_sweep_nodes`, which each concrete sweeper supplies. Around it:
+        follow any change of :math:`u_0` that arrived after the residual was handed down, advance
+        that residual by the update just applied, and bank the corrections for a transfer to prolong.
+
+        A level that computes its own residual has no bookkeeping to do, so on a single-level run
+        every line below the sweep is a no-op. That is why there is one sweeper rather than two.
+
+        Returns
+        -------
+        None
+        """
+        self.sync_initial_value()
+        self._sweep_nodes()
+        if self.eps_in is None:
+            return None
+
+        deltas = [self._to_work(self.level.prob, d) for d in self._deltas]
+        self.accumulate(deltas)
+        self.eps_in = self.advance_residual(self.eps_in, deltas, self._dfs)
+        return None
 
     _work_scale = 1.0
     r"""Shared divisor applied to the correction quantities before they are stored."""
@@ -88,7 +223,7 @@ class DeltaFormMixin:
         arithmetic on them stays correct. A level that *inherits* a residual may not, because the
         inherited value was scaled by whoever produced it and is carried across sweeps.
         """
-        return True
+        return self.eps_in is None
 
     def _set_work_scale(self, values):
         r"""
@@ -173,13 +308,18 @@ class DeltaFormMixin:
         Compute :math:`\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`.
 
         This is the high-precision residual of iterative refinement. It is a difference of
-        :math:`\mathcal{O}(1)` quantities and is therefore always formed in backend precision.
+        :math:`\mathcal{O}(1)` quantities and is therefore always formed in backend precision --
+        unless a transfer handed one down, in which case that one is already exact and small, and
+        rebuilding it here is what the delta-form hierarchy exists to avoid.
 
         Returns
         -------
         list
             One residual per collocation node.
         """
+        if self.eps_in is not None:
+            return self.eps_in
+
         lvl = self.level
         eps = self.integrate()
         for m in range(self.coll.num_nodes):
@@ -219,9 +359,12 @@ class DeltaFormMixin:
             The increment, with the same splitting as ``eval_f``.
         """
         if hasattr(prob, 'eval_f_increment'):
-            return prob.eval_f_increment(u_old, delta, t_node)
-        increment = prob.dtype_f(f_new)
-        increment -= f_old
+            increment = prob.eval_f_increment(u_old, delta, t_node)
+        else:
+            increment = prob.dtype_f(f_new)
+            increment -= f_old
+        # recorded for the residual recursion, so a transfer never recovers it by subtraction
+        self._dfs.append(total_increment(prob, increment))
         return increment
 
     def _solve_correction(self, rhs_corr, alpha, u_old, f_old, t_node, implicit_part=None):
@@ -251,29 +394,30 @@ class DeltaFormMixin:
         prob = self.level.prob
         f_impl_old = f_old if implicit_part is None else implicit_part
 
-        if alpha == 0:
-            return self._to_backend(prob, rhs_corr)
-
-        if hasattr(prob, 'solve_system_delta'):
-            return prob.solve_system_delta(self._to_backend(prob, rhs_corr), alpha, u_old, f_old, t_node)
-
         rhs_phys = self._to_backend(prob, rhs_corr)
-        zero = prob.dtype_u(prob.init, val=0.0)
 
-        if self._linear_implicit:
+        if alpha == 0:
+            # explicit node: the correction is the residual itself
+            delta = rhs_phys
+        elif hasattr(prob, 'solve_system_delta'):
+            delta = prob.solve_system_delta(rhs_phys, alpha, u_old, f_old, t_node)
+        elif self._linear_implicit:
             # f(w+d) - f(w) = A d, so solve_system already solves the correction equation once the
             # affine part f(0, t) has been removed. f(0, t) vanishes for a homogeneous operator.
+            zero = prob.dtype_u(prob.init, val=0.0)
             affine = prob.eval_f(zero, t_node)
             rhs_phys -= alpha * (affine if implicit_part is None else affine.impl)
-            return prob.solve_system(rhs_phys, alpha, zero, t_node)
-
-        # Fallback: substitute y = u_old + delta. Always correct, but the solver sees an O(1)
-        # unknown, so there is no precision benefit.
-        rhs_phys += u_old
-        rhs_phys -= alpha * f_impl_old
-        solution = prob.solve_system(rhs_phys, alpha, u_old, t_node)
-        delta = prob.dtype_u(solution)
-        delta -= u_old
+            delta = prob.solve_system(rhs_phys, alpha, zero, t_node)
+        else:
+            # Fallback: substitute y = u_old + delta. Always correct, but the solver sees an O(1)
+            # unknown, so there is no precision benefit.
+            rhs_phys += u_old
+            rhs_phys -= alpha * f_impl_old
+            solution = prob.solve_system(rhs_phys, alpha, u_old, t_node)
+            delta = prob.dtype_u(solution)
+            delta -= u_old
+        # recorded so a transfer never has to recover the correction by subtraction
+        self._deltas.append(delta)
         return delta
 
 
@@ -285,7 +429,7 @@ class delta_implicit(DeltaFormMixin, generic_implicit):
     parameters ``correction_precision`` and ``linear_implicit``.
     """
 
-    def update_nodes(self):
+    def _sweep_nodes(self):
         """
         Perform one delta-form sweep over all collocation nodes.
 
@@ -336,7 +480,7 @@ class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
     explicit/implicit splitting is untouched.
     """
 
-    def update_nodes(self):
+    def _sweep_nodes(self):
         """
         Perform one delta-form IMEX sweep over all collocation nodes.
 
@@ -384,3 +528,24 @@ class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
 
         lvl.status.updated = True
         return None
+
+
+def total_increment(prob, increment):
+    """
+    The full right-hand side increment, recombining an IMEX splitting.
+
+    Parameters
+    ----------
+    prob : pySDC.core.problem.Problem
+        The problem the increment belongs to.
+    increment : dtype_f
+        The increment, possibly split into ``impl`` and ``expl``.
+
+    Returns
+    -------
+    dtype_u
+        The sum of the parts.
+    """
+    if not hasattr(increment, 'impl'):
+        return increment
+    return prob.dtype_u(increment.impl) + increment.expl
