@@ -1,0 +1,21 @@
+pySDC/implementations/transfer_classes/BaseTransferDeltaMPI.py
+  s_be32febf4aa3c8::t_3f89a8f238a67e 21-22,84-86
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta_MPI.py
+  s_be32febf4aa3c8::t_3f89a8f238a67e 1-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fe722c0657ac31b62db794fcd8c9e3c65d80221e",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
