@@ -57,6 +57,14 @@ class fenics_grayscott(Problem):
         Feed rate for :math:`v`.
     B : float, optional
         Overall decay rate for :math:`u`.
+    newton_tol : float, optional
+        Absolute tolerance of the node-local Newton solve. It has to be tighter than the SDC residual
+        tolerance, otherwise the node-local solve, not the SDC iteration, sets the accuracy floor.
+    newton_rtol : float, optional
+        Relative tolerance of the node-local Newton solve. Dolfin stops on whichever bar is met first,
+        so this one has to be lowered alongside ``newton_tol`` to actually tighten the solve.
+    newton_maxiter : int, optional
+        Maximum number of node-local Newton iterations.
 
     Attributes
     ----------
@@ -90,7 +98,21 @@ class fenics_grayscott(Problem):
     dtype_u = fenics_mesh
     dtype_f = fenics_mesh
 
-    def __init__(self, c_nvars=256, t0=0.0, family='CG', order=4, refinements=None, Du=1.0, Dv=0.01, A=0.09, B=0.086):
+    def __init__(
+        self,
+        c_nvars=256,
+        t0=0.0,
+        family='CG',
+        order=4,
+        refinements=None,
+        Du=1.0,
+        Dv=0.01,
+        A=0.09,
+        B=0.086,
+        newton_tol=1e-9,
+        newton_rtol=1e-8,
+        newton_maxiter=100,
+    ):
         """Initialization routine"""
 
         if refinements is None:
@@ -124,6 +146,9 @@ class fenics_grayscott(Problem):
         super(fenics_grayscott, self).__init__(self.V)
         self._makeAttributeAndRegister(
             'c_nvars', 't0', 'family', 'order', 'refinements', 'Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True
+        )
+        self._makeAttributeAndRegister(
+            'newton_tol', 'newton_rtol', 'newton_maxiter', localVars=locals(), readOnly=False
         )
         # rhs in weak form
         self.w = df.Function(self.V)
@@ -214,9 +239,9 @@ class fenics_grayscott(Problem):
         solver = df.NonlinearVariationalSolver(problem)
 
         prm = solver.parameters
-        prm['newton_solver']['absolute_tolerance'] = 1e-09
-        prm['newton_solver']['relative_tolerance'] = 1e-08
-        prm['newton_solver']['maximum_iterations'] = 100
+        prm['newton_solver']['absolute_tolerance'] = self.newton_tol
+        prm['newton_solver']['relative_tolerance'] = self.newton_rtol
+        prm['newton_solver']['maximum_iterations'] = self.newton_maxiter
         prm['newton_solver']['relaxation_parameter'] = 1.0
 
         solver.solve()

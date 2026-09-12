@@ -74,9 +74,7 @@ def test_runs_in_sdc():
         'level_params': {'restol': -1, 'dt': 1.0},
         'step_params': {'maxiter': 4},
     }
-    controller = controller_nonMPI(
-        num_procs=1, controller_params={'logger_level': 30}, description=description
-    )
+    controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
     prob = controller.MS[0].levels[0].prob
     u0 = prob.u_exact(0.0)
     uend, _ = controller.run(u0=u0, t0=0.0, Tend=2.0)
