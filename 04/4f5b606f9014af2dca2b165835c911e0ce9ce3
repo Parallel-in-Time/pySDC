@@ -1,0 +1,19 @@
+pySDC/tests/test_helpers/test_spectral_helper.py
+  s_49cd64ba5df0ad::t_92ba2200283b8c 151-154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "044f5b606f9014af2dca2b165835c911e0ce9ce3",
+  "prompts": {},
+  "sessions": {
+    "s_49cd64ba5df0ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04d74de8-913f-4d9d-81b6-67c9503b5491",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
