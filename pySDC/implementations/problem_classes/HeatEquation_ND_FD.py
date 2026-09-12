@@ -159,6 +159,33 @@ class heatNd_forced(heatNd_unforced):
 
     dtype_f = imex_mesh
 
+    def eval_f_increment(self, base, delta, t):
+        """
+        Evaluate the right-hand side increment, split the way :meth:`eval_f` splits it.
+
+        The forcing does not depend on ``u``, so the explicit part of the increment is zero. Without
+        this override the linear one inherited from :class:`GenericNDimFinDiff` would return an
+        unsplit right-hand side, which is the wrong type here and silently the wrong answer.
+
+        Parameters
+        ----------
+        base : dtype_u
+            The base state, unused: the implicit part is linear.
+        delta : dtype_u
+            The correction.
+        t : float
+            Current time, accepted for interface compatibility.
+
+        Returns
+        -------
+        f : dtype_f
+            The increment, with a zero explicit part.
+        """
+        f = self.dtype_f(self.init)
+        f.impl[:] = self.A.dot(delta.flatten()).reshape(self.nvars)
+        f.expl[:] = 0.0
+        return f
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
