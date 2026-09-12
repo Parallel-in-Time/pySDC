@@ -1,0 +1,19 @@
+pySDC/implementations/sweeper_classes/delta_form.py
+  s_49cd64ba5df0ad::t_48bebdfc79278d 529-531
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c61de0a9736dc401618b28a5d2e633c42993bce4",
+  "prompts": {},
+  "sessions": {
+    "s_49cd64ba5df0ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04d74de8-913f-4d9d-81b6-67c9503b5491",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
