@@ -45,6 +45,12 @@ class GenericNDimFinDiff(Problem):
         Tolerance for spatial solver.
     liniter : int, optional
         Maximum number of iterations for linear solver.
+    dtype : dtype-like, optional
+        Precision the state is stored at. ``float64`` by default, which is what every caller got
+        before this existed. The operators follow at ``promote_types(dtype, float32)``, since SciPy
+        has no half-precision sparse matrix and hardware that stores half precision computes in
+        single anyway -- so ``float16`` here means genuinely half-precision *storage* with
+        single-precision arithmetic, which is the arrangement it has on real hardware too.
     solver_type : str, optional
         Type of solver. Can be ``'direct'``, ``'GMRES'`` or ``'CG'``.
     bc : str or tuple of 2 string, optional
@@ -94,6 +100,7 @@ class GenericNDimFinDiff(Problem):
         solver_type='direct',
         bc='periodic',
         bcParams=None,
+        dtype='float64',
     ):
         # make sure parameters have the correct types
         if type(nvars) not in [int, tuple]:
@@ -132,8 +139,14 @@ class GenericNDimFinDiff(Problem):
         if ndim > 1 and nvars[1:] != nvars[:-1]:
             raise ProblemError('need a square domain, got %s' % nvars)
 
-        # invoke super init, passing number of dofs
-        super().__init__(init=(nvars[0] if ndim == 1 else nvars, None, np.dtype('float64')))
+        # invoke super init, passing number of dofs and the precision to store them at
+        dtype = np.dtype(dtype)
+
+        # SciPy holds no float16 sparse matrix, and hardware that stores half precision computes in
+        # single anyway, so the operators sit at the smallest single-or-wider type that holds `dtype`
+        operator_dtype = np.promote_types(dtype, np.float32)
+
+        super().__init__(init=(nvars[0] if ndim == 1 else nvars, None, dtype))
 
         dx, xvalues = problem_helper.get_1d_grid(size=nvars[0], bc=bc, left_boundary=0.0, right_boundary=1.0)
 
@@ -148,12 +161,16 @@ class GenericNDimFinDiff(Problem):
         )
         self.A *= coeff
 
+        self.A = self.A.astype(operator_dtype)
+
         self.xvalues = xvalues
-        self.Id = sp.eye(np.prod(nvars), format='csc')
+        self.Id = sp.eye(np.prod(nvars), format='csc', dtype=operator_dtype)
 
         # store attribute and register them as parameters
         self._makeAttributeAndRegister('nvars', 'stencil_type', 'order', 'bc', localVars=locals(), readOnly=True)
         self._makeAttributeAndRegister('freq', 'lintol', 'liniter', 'solver_type', localVars=locals())
+        self.dtype = dtype
+        self.operator_dtype = operator_dtype
 
         if self.solver_type != 'direct':
             self.work_counters[self.solver_type] = WorkCounter()
