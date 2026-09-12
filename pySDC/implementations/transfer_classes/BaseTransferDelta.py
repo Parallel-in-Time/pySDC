@@ -8,9 +8,18 @@ exact algebraic replacements -- :math:`\varepsilon_G = R\varepsilon_F`, which is
 transfer uses those instead. It is what decides whether a level rebuilds its residual or is handed
 one: the delta-form sweepers do both, and this is what hands one down.
 
+The FAS :math:`\tau` is **substituted, not discarded**. Writing
+:math:`\tau = R(\Delta t\,Q_F f_F) - \Delta t\,Q_G f_G` and putting it into the coarse residual
+:math:`\Delta t (Q_G f_G) + u_G[0] - u_G[m] + \tau` cancels the :math:`\Delta t\,Q_G f_G` terms
+identically and leaves :math:`R\varepsilon_F`. So a coarse level handed that residual is solving
+precisely the FAS-corrected problem -- and must *not* also add :math:`\tau`, which would count it
+twice. What is skipped is materialising :math:`\tau` as an array, since the quantity it exists to
+produce arrives directly.
+
 Identical to :class:`BaseTransfer` up to round-off at backend precision, verified for two, three and
-four levels and for PFASST. It is also slightly cheaper, because :math:`\tau` is then never read:
-see :meth:`delta_transfer.restrict`.
+four levels and for PFASST -- and against a control with :math:`\tau` genuinely zeroed, which does
+not converge at all. It is also slightly cheaper, because nothing then reads :math:`\tau` except
+:meth:`compute_end_point` in the quadrature-update case: see :meth:`delta_transfer.restrict`.
 
 What the reformulation buys is that every coarse-level quantity becomes proportional to the fine
 residual rather than to :math:`|u|`. A coarse level is a preconditioner whose returned correction

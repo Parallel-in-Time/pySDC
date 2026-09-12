@@ -284,3 +284,52 @@ def test_lean_restriction_is_actually_taken():
     prob = with_update.MS[0].levels[0].prob
     with_update.run(u0=prob.u_exact(0.0), t0=0.0, Tend=1e-1)
     assert any(t is not None for t in with_update.MS[0].levels[1].tau), 'tau is needed here and was skipped'
+
+
+@pytest.mark.base
+def test_tau_is_substituted_not_discarded():
+    r"""
+    The control for :func:`test_matches_stock_mlsdc`, and the one that says what is going on.
+
+    This hierarchy never builds the FAS :math:`\tau`, which reads like MLSDC's defining term being
+    thrown away. It is not: :math:`\tau = R(\Delta t\,Q_F f_F) - \Delta t\,Q_G f_G` put into the
+    coarse residual cancels the :math:`\Delta t\,Q_G f_G` terms identically and leaves
+    :math:`R\varepsilon_F`, so a level handed that residual is solving the FAS-corrected problem and
+    would double-count if it added :math:`\tau` as well.
+
+    Agreeing with stock MLSDC proves that only if :math:`\tau` matters on this configuration, so the
+    third row throws it away for real. It does not converge at all.
+    """
+    import numpy as np
+    from pySDC.core.base_transfer import BaseTransfer
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+    from pySDC.implementations.transfer_classes.BaseTransferDelta import delta_transfer
+
+    sizes = []
+
+    class measuring(BaseTransfer):
+        def restrict(self):
+            super().restrict()
+            sizes.append(max(nrm(t) for t in self.coarse.tau))
+
+    class tau_zeroed(BaseTransfer):
+        """Stock MLSDC with the FAS correction discarded rather than substituted."""
+
+        def restrict(self):
+            super().restrict()
+            for m in range(len(self.coarse.tau)):
+                self.coarse.tau[m] *= 0.0
+
+    stock = floor([127, 63], delta_implicit, measuring, maxiter=25)
+    delta = floor([127, 63], delta_implicit, delta_transfer, maxiter=25)
+    zeroed = floor([127, 63], delta_implicit, tau_zeroed, maxiter=25)
+
+    reference = run([127, 63], delta_implicit, BaseTransfer, maxiter=25)
+    rewritten = run([127, 63], delta_implicit, delta_transfer, maxiter=25)
+
+    # tau is a real correction here, not a rounding-level one
+    assert max(sizes) > 1e-4, f'tau is only {max(sizes):.2e}, so discarding it would prove nothing'
+    assert stock < 1e-12 and delta < 1e-12, f'the converging rows did not converge: {stock:.2e}, {delta:.2e}'
+    assert abs(rewritten - reference) < 1e-13, f'the rewrite moved the answer by {abs(rewritten - reference):.3e}'
+    assert zeroed > 1e-8, f'discarding tau floored at {zeroed:.2e}, so this controls nothing'
+    assert not np.isclose(zeroed, delta), 'discarding tau and substituting it cannot be the same thing'
