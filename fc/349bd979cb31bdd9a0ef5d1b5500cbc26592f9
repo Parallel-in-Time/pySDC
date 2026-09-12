@@ -1,0 +1,22 @@
+pySDC/tests/test_reduced_precision.py
+  s_be32febf4aa3c8::t_e4a6cd8aaa4ce4 15-42,46-47,49-119,121-122,124-156,158-161,163-195,197-201,203-232,236-247,249-284,286-300,302-315
+  s_be32febf4aa3c8::t_f6d8dd28064bac 1-14,43-45,48,120,123,157,162,196,202,233-235,248,285,301
+pySDC/projects/DeltaSDC/tests/test_emulation.py
+  s_be32febf4aa3c8::t_86e3b79dc3cfe3 14,227-331
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fc349bd979cb31bdd9a0ef5d1b5500cbc26592f9",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
