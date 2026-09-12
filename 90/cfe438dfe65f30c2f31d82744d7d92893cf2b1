@@ -1,0 +1,58 @@
+pySDC/implementations/sweeper_classes/delta_form.py
+  s_be32febf4aa3c8::t_f99c75aeb329d6 54-61,187-211
+  s_be32febf4aa3c8::t_3ba95ad66ccec9 75,79-186,229,314-316,323-325,365-370
+  s_be32febf4aa3c8::t_35ea34015107e2 402-407,410
+  s_be32febf4aa3c8::t_f9cb08e327ce47 413-423,435,486
+pySDC/projects/DeltaSDC/run_mpi.py
+  s_be32febf4aa3c8::t_80d8dd48050532 25,31,150,158,181
+pySDC/projects/DeltaSDC/tests/test_emulation.py
+  s_be32febf4aa3c8::t_80d8dd48050532 84,86,89,115,127,129-130,144,151,154,179,186,233,239,309,315
+pySDC/core/level.py
+  s_be32febf4aa3c8::t_e66c1ea73a2510 59,106-116,144
+pySDC/tests/test_reduced_precision.py
+  s_be32febf4aa3c8::t_0b6f970a5a8ca6 44,50,157,162
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta.py
+  s_be32febf4aa3c8::t_0b6f970a5a8ca6 108,120,134,146,161,165,185,188,198,201,215,218-219,233,246,269,272,282
+pySDC/projects/DeltaSDC/mlsdc.py
+  s_be32febf4aa3c8::t_c1751ed749bc64 4-5
+  s_be32febf4aa3c8::t_878d06506f2091 145
+  s_be32febf4aa3c8::t_e365c9916644d4 17-20,162-167
+pySDC/implementations/sweeper_classes/delta_form_MPI.py
+  s_be32febf4aa3c8::t_cc0bb5faf1d407 52-53,60-62
+  s_be32febf4aa3c8::t_3679774c0a253f 22,71,153
+pySDC/projects/DeltaSDC/run_fenics.py
+  s_be32febf4aa3c8::t_80d8dd48050532 241,245,252,274,278,330-331,336,362
+pySDC/implementations/transfer_classes/BaseTransferDelta.py
+  s_be32febf4aa3c8::t_80142a6d1bda22 8-9,37,111
+  s_be32febf4aa3c8::t_63cc4ee1303f29 134,150-151,154
+pySDC/projects/DeltaSDC/sweepers_MPI.py
+  s_be32febf4aa3c8::t_c1751ed749bc64 11,17-18,34,50
+pySDC/implementations/transfer_classes/BaseTransferDeltaMPI.py
+  s_be32febf4aa3c8::t_80142a6d1bda22 51
+pySDC/projects/DeltaSDC/run_petsc.py
+  s_be32febf4aa3c8::t_80d8dd48050532 126-127,132,159
+pySDC/projects/DeltaSDC/run_demo.py
+  s_be32febf4aa3c8::t_47250db1b112b4 321-336
+  s_be32febf4aa3c8::t_80d8dd48050532 144-145,153,185,308-310,314,350,372
+pySDC/projects/DeltaSDC/cascade.py
+  s_be32febf4aa3c8::t_c1751ed749bc64 25,188
+pySDC/projects/DeltaSDC/README.rst
+  s_be32febf4aa3c8::t_a5b69a5e1bdfbf 80,88-91
+  s_be32febf4aa3c8::t_84c00bb4d2db50 98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "90cfe438dfe65f30c2f31d82744d7d92893cf2b1",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
