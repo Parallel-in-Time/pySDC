@@ -1,0 +1,19 @@
+pySDC/tests/test_reduced_precision.py
+  s_be32febf4aa3c8::t_9345363c4036cc 12-13,193-229
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "81155f17598c5bb54668944eb201d6e2170d5616",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
