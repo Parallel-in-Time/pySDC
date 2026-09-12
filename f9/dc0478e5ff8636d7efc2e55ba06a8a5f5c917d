@@ -1,0 +1,29 @@
+pySDC/implementations/transfer_classes/BaseTransferDelta.py
+  s_be32febf4aa3c8::t_2fd0c75e9aba48 1-12,20-159
+  s_be32febf4aa3c8::t_4de6ade02bbdbf 13-19
+pySDC/implementations/transfer_classes/BaseTransferDeltaMPI.py
+  s_be32febf4aa3c8::t_2fd0c75e9aba48 1-20,23-83,88
+  s_be32febf4aa3c8::t_16dfa7fe702d71 21-22,84-86
+  s_be32febf4aa3c8::t_799412be4a0dca 87
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta.py
+  s_be32febf4aa3c8::t_4de6ade02bbdbf 8-10
+  s_be32febf4aa3c8::t_2fd0c75e9aba48 1-7,11-286
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta_MPI.py
+  s_be32febf4aa3c8::t_400c8c2ac9c175 1-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f9dc0478e5ff8636d7efc2e55ba06a8a5f5c917d",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
