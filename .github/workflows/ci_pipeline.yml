@@ -75,6 +75,14 @@ jobs:
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
         python: ['3.10', '3.11', '3.12', '3.13']
+        numpy: ['', '=1']
+        # pySDC supports both NumPy majors, so every backend is run against both. NumPy 1 gets one
+        # python rather than four: 1.26 is the last 1.x release, it does not support 3.13 at all,
+        # and 3.12 is the newest python all five backends still have NumPy 1 builds for.
+        exclude:
+          - {numpy: '=1', python: '3.10'}
+          - {numpy: '=1', python: '3.11'}
+          - {numpy: '=1', python: '3.13'}
     defaults:
       run:
         shell: bash -l {0}
@@ -87,6 +95,7 @@ jobs:
           environment-file: "etc/environment-${{ matrix.env }}.yml"
           create-args: >-
               python=${{ matrix.python }}
+              numpy${{ matrix.numpy }}
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
@@ -136,6 +145,10 @@ jobs:
           - soft_failure
           - TOMS
           - StroemungsRaum
+        numpy: ['', '=1']
+        # Both NumPy majors here too. No python axis to exclude against: every project environment
+        # allows the whole 3.10-3.13 range, so `numpy=1` simply resolves the newest python that has
+        # NumPy 1 builds for that project's backends.
     defaults:
       run:
         shell: bash -l {0}
@@ -146,6 +159,8 @@ jobs:
         uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
+          create-args: >-
+              numpy${{ matrix.numpy }}
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
