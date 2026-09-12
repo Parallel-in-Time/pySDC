@@ -142,6 +142,22 @@ class RungeKuttaDAE(RungeKutta):
 
         M = self.coll.num_nodes
         for m in range(M):
+            # An explicit first stage (a_11 = 0, as in EDIRK4 and the trapezoidal rule) has no unknown to
+            # solve for: the stage value is just u_0, so the stage derivative is the du we came in with.
+            # Solving for it anyway is not merely wasteful, it is ill-posed. With a zero factor the
+            # algebraic part of F does not depend on the unknown at all, so the derivative of the algebraic
+            # variable is left completely undetermined and the solver returns whatever its trust region
+            # happened to wander to -- reporting success, since the residual is satisfied either way. That
+            # value feeds the following stages through u_approx and can pull them onto the wrong branch of
+            # the algebraic constraint, which for EDIRK4 on DiscontinuousTestDAE flipped the sign of z and
+            # cost six orders of magnitude of accuracy at one dt out of seven.
+            # Only the *first* stage can be short-circuited like this: a zero diagonal further down still
+            # has a non-empty sum below it, so its stage value is not u_0 and it needs solving some other way.
+            if self.QI[m + 1, m + 1] == 0:
+                assert m == 0, 'Only an explicit *first* stage is supported'
+                lvl.f[m + 1][:] = lvl.f[0][:]
+                continue
+
             u_approx = prob.dtype_u(lvl.u[0])
             for j in range(1, m + 1):
                 u_approx += lvl.dt * self.QI[m + 1, j] * lvl.f[j][:]
