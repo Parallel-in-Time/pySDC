@@ -1,0 +1,22 @@
+pySDC/projects/DeltaSDC/README.rst
+  s_49cd64ba5df0ad::t_4a8af25ff31237 408-410
+  s_49cd64ba5df0ad::t_92dd998e661ed4 405-407
+pySDC/projects/DeltaSDC/tests/test_emulation.py
+  s_49cd64ba5df0ad::t_92dd998e661ed4 274,285-288
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "72069a65d1f2e01fb08953b35bb4b6f5c2173cfd",
+  "prompts": {},
+  "sessions": {
+    "s_49cd64ba5df0ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04d74de8-913f-4d9d-81b6-67c9503b5491",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
