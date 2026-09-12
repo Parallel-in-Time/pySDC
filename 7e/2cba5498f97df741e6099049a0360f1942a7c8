@@ -1,0 +1,28 @@
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta.py
+  s_be32febf4aa3c8::t_d690a1218e9af0 222
+  s_be32febf4aa3c8::t_12b3b8f3608138 2-9,37,44
+  s_be32febf4aa3c8::t_9484c1a7d8435a 10-36,38-40,42-43,45-106,109-134,137-160,163-185,188-199,202-218,221,223-235,238-273,276-290
+  s_be32febf4aa3c8::t_736bc60f1b6962 1
+  s_be32febf4aa3c8::t_4c8516ea1720be 41,107-108,135-136,161-162,186-187,200-201,219-220,236-237,274-275
+pySDC/tests/test_sweepers/test_delta_form.py
+  s_be32febf4aa3c8::t_cf9281fe0c140a 1-261,274-277,291-292,294-360
+  s_be32febf4aa3c8::t_d6a1ec6e8ead82 262-273,278-290,293
+pySDC/projects/DeltaSDC/tests/test_emulation.py
+  s_be32febf4aa3c8::t_2985421479dc15 1-225
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7e2cba5498f97df741e6099049a0360f1942a7c8",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
