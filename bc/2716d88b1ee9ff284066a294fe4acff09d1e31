@@ -1,0 +1,19 @@
+pySDC/projects/compression/Docker/install_pySDC.sh
+  s_49cd64ba5df0ad::t_b176c8c1ff4b58 15-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bc2716d88b1ee9ff284066a294fe4acff09d1e31",
+  "prompts": {},
+  "sessions": {
+    "s_49cd64ba5df0ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04d74de8-913f-4d9d-81b6-67c9503b5491",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
