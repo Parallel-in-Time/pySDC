@@ -205,6 +205,34 @@ class GenericNDimFinDiff(Problem):
         f[:] = self.A.dot(u.flatten()).reshape(self.nvars)
         return f
 
+    def eval_f_increment(self, base, delta, t):
+        r"""
+        Evaluate :math:`f(w + \delta) - f(w) = A\delta`, which carries an explicit factor
+        :math:`\delta`.
+
+        The operator is linear, so the increment is the operator applied to the correction and the
+        base state does not enter. Supplying it means a sweeper never has to form the increment by
+        subtracting two stored right-hand sides, whose cancellation error carries
+        :math:`\varepsilon\|A\|` -- see :class:`pySDC.core.problem.Problem`.
+
+        Parameters
+        ----------
+        base : dtype_u
+            The base state, unused for a linear operator.
+        delta : dtype_u
+            The correction.
+        t : float
+            Current time, accepted for interface compatibility.
+
+        Returns
+        -------
+        f : dtype_f
+            The increment.
+        """
+        f = self.dtype_f(self.init)
+        f[:] = self.A.dot(delta.flatten()).reshape(self.nvars)
+        return f
+
     def solve_system(self, rhs, factor, u0, t):
         r"""
         Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
