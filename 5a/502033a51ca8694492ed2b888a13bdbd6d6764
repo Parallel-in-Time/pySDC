@@ -1,0 +1,19 @@
+.github/workflows/ci_pipeline.yml
+  s_49cd64ba5df0ad::t_b176c8c1ff4b58 78-85,98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5a502033a51ca8694492ed2b888a13bdbd6d6764",
+  "prompts": {},
+  "sessions": {
+    "s_49cd64ba5df0ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04d74de8-913f-4d9d-81b6-67c9503b5491",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
