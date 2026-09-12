@@ -1,0 +1,19 @@
+pySDC/tests/test_sweepers/test_delta_form_MPI.py
+  s_be32febf4aa3c8::t_b742b624e67ec6 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "82e9fbb9191229626967f722f1e9f9310e561e13",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
