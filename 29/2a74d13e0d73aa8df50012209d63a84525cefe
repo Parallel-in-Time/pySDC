@@ -1,0 +1,23 @@
+pySDC/projects/DAE/sweepers/rungeKuttaDAE.py
+  s_9b81d93c7a4817::t_e60c30e931dd05 156,158-160
+  s_9b81d93c7a4817::t_b935cfa2e4ba40 145-155
+  s_9b81d93c7a4817::t_24be8529ade947 157
+pySDC/projects/DAE/tests/test_problems.py
+  s_9b81d93c7a4817::t_e7d4a018081a92 519-538
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "292a74d13e0d73aa8df50012209d63a84525cefe",
+  "prompts": {},
+  "sessions": {
+    "s_9b81d93c7a4817": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "465903f7-6acb-4c24-a181-512262a0a7c1",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
