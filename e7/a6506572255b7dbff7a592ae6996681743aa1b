@@ -1,0 +1,26 @@
+pySDC/projects/DeltaSDC/README.rst
+  s_49cd64ba5df0ad::t_6046eca93fec62 479-481
+  s_49cd64ba5df0ad::t_1d915d43c90ef8 457-458,463-469,473,476-478
+  s_49cd64ba5df0ad::t_1fa3666ba25b6d 483-484
+  s_49cd64ba5df0ad::t_914e99ac6e9336 482
+pyproject.toml
+  s_49cd64ba5df0ad::t_5e41e41ec14607 30
+pySDC/projects/DeltaSDC/tests/test_genuine_precision.py
+  s_49cd64ba5df0ad::t_6046eca93fec62 120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e7a6506572255b7dbff7a592ae6996681743aa1b",
+  "prompts": {},
+  "sessions": {
+    "s_49cd64ba5df0ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04d74de8-913f-4d9d-81b6-67c9503b5491",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
