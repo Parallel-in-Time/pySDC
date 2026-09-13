@@ -131,6 +131,7 @@ jobs:
           - AllenCahn_Bayreuth
           - AsympConv
           - DAE
+          - DeltaSDC
           - FastWaveSlowWave
           - Hamiltonian
           - matrixPFASST
