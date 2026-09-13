@@ -1,0 +1,27 @@
+pySDC/implementations/problem_classes/HeatEquation_ND_FD.py
+  s_be32febf4aa3c8::t_07d1ff216e396c 76,79
+pySDC/implementations/problem_classes/generic_ND_FD.py
+  s_be32febf4aa3c8::t_07d1ff216e396c 48-53,103,142-149,164-165,167,172-173
+pySDC/tests/test_reduced_precision.py
+  s_be32febf4aa3c8::t_4f781b9d20cf69 12-13
+  s_be32febf4aa3c8::t_089b1d3fd66ff1 193-229
+  s_be32febf4aa3c8::t_07d1ff216e396c 1-11,14-192
+pySDC/implementations/transfer_classes/TransferMesh.py
+  s_be32febf4aa3c8::t_07d1ff216e396c 149-156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a63ad75aef3d8aac6c4482b9150166082896bdb3",
+  "prompts": {},
+  "sessions": {
+    "s_be32febf4aa3c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23bcdecf-a6f4-4e7d-bdf1-2d67d1442573",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
