@@ -18,6 +18,14 @@ pySDC/projects/DAE/tests/test_problems.py
         "model": "claude-opus-5"
       },
       "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_bcaddbfdb19f31": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "70bff260-6dc7-4e10-9512-f73a521abc4d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
     }
   }
 }
