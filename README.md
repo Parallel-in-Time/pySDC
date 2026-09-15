@@ -119,8 +119,8 @@ and grant agreement No 101118139.
 The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the [German Federal Ministry of
-Education and Research](https://www.bmbf.de/bmbf/en/home/home_node.html)
-(BMBF) grants  16HPC047, 16ME0708 and 16ME0679K. Supported by the European Union - NextGenerationEU. 
+Research, Technology and Space](https://www.bmftr.bund.de/EN/Home/home_node.html)
+(BMFTR) grants  16HPC047, 16ME0708 and 16ME0679K. Supported by the European Union - NextGenerationEU. 
 The project also received help from the [Joint Lab "Helmholtz Information -  Research Software Engineering" (HiRSE)](https://www.helmholtz-hirse.de/).
 
 <p align="center">

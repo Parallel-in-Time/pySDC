@@ -6,6 +6,7 @@ import numpy as np
 
 from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
+from pySDC.projects.StroemungsRaum.problem_classes.newton_step import NewtonStep
 
 
 class fenics_NSE_2D_Monolithic(Problem):
@@ -58,8 +59,6 @@ class fenics_NSE_2D_Monolithic(Problem):
         Defines the mixed function space for the coupled velocity-pressure system.
     M : scalar, vector, matrix or higher rank tensor
         Denotes the expression :math:`\int_\Omega u_t v\,dx`.
-    Mf : scalar, vector, matrix or higher rank tensor
-        Denotes the expression :math:`\int_\Omega u v\,dx + \int_\Omega p q\,dx`.
     g : Expression
         The forcing term :math:`f` in the Navier-Stokes momentum equation.
     bc : DirichletBC
@@ -120,10 +119,6 @@ class fenics_NSE_2D_Monolithic(Problem):
         a_M = df.inner(self.u, self.v) * df.dx
         self.M = df.assemble(a_M)
 
-        # full mass matrix
-        a_Mf = df.inner(self.u, self.v) * df.dx + df.inner(self.p, self.q) * df.dx
-        Mf = df.assemble(a_Mf)
-
         # define the time-dependent inflow profile as an Expression
         Uin = '4.0*1.5*sin(pi*t/8)*x[1]*(0.41 - x[1]) / pow(0.41, 2)'
         self.u_in = df.Expression((Uin, '0'), pi=np.pi, t=t0, degree=self.order)
@@ -160,9 +155,25 @@ class fenics_NSE_2D_Monolithic(Problem):
         self.xdmffile_p = None
         self.xdmffile_u = None
 
-        # set up linear solver for the inversion of the mass matrix
-        self.solver = df.LUSolver(Mf)
-        # self.solver.parameters['reuse_factorization'] = True
+        # interpolated forcing term referenced by the residual form
+        self.g_h = df.Function(self.V)
+
+        # residual form for a single node-to-node step, assembled once; the step size is a
+        # Constant and the boundary and forcing data carry the time dependence
+        self.factor = df.Constant(0.0)
+        self.w = df.Function(self.W)
+        u, p = df.split(self.w)
+
+        F = df.dot(u, self.v) * df.dx
+        F += self.factor * df.dot(df.dot(u, df.nabla_grad(u)), self.v) * df.dx
+        F += self.factor * self.nu * df.inner(df.nabla_grad(u), df.nabla_grad(self.v)) * df.dx
+        F -= self.factor * df.dot(p, df.div(self.v)) * df.dx
+        F -= self.factor * df.dot(self.g_h, self.v) * df.dx
+        F -= self.factor * df.dot(df.div(u), self.q) * df.dx
+
+        self.step = NewtonStep(F, df.derivative(F, self.w))
+        self.newton = df.NewtonSolver()
+        self.newton.parameters['absolute_tolerance'] = Sol_tol
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
@@ -186,33 +197,22 @@ class fenics_NSE_2D_Monolithic(Problem):
         w : dtype_u
             Solution.
         """
-        # introduce the coupled solution vector for velocity and pressure
-        w = self.dtype_u(u0)
-        u, p = df.split(w.values)
-
-        # get the SDC right-hand side
-        rhs = self.__invert_mass_matrix(rhs)
-        rhs_u, rhs_p = df.split(rhs.values)
-
-        # update time in boundary conditions
+        # update time in boundary conditions and in the forcing term
         self.u_in.t = t
-
-        # get the forcing term
         self.g.t = t
-        g = df.interpolate(self.g, self.V)
+        self.g_h.interpolate(self.g)
+        self.factor.assign(factor)
 
-        # build the variational form for the coupled system
-        F = df.dot(u, self.v) * df.dx
-        F += factor * df.dot(df.dot(u, df.nabla_grad(u)), self.v) * df.dx
-        F += factor * self.nu * df.inner(df.nabla_grad(u), df.nabla_grad(self.v)) * df.dx
-        F -= factor * df.dot(p, df.div(self.v)) * df.dx
-        F -= factor * df.dot(g, self.v) * df.dx
-        F -= factor * df.dot(df.div(u), self.q) * df.dx
-        F -= df.dot(rhs_u, self.v) * df.dx
-        F -= df.dot(rhs_p, self.q) * df.dx
+        # the SDC right-hand side enters the residual as a vector, no mass matrix involved
+        self.w.vector()[:] = u0.values.vector()[:]
+        self.step.rhs = rhs.values.vector()
+        self.step.bcs = self.bc
 
         # solve the nonlinear system using Newton's method
-        df.solve(F == 0, w.values, self.bc, solver_parameters={"newton_solver": {"absolute_tolerance": self.Sol_tol}})
+        self.newton.solve(self.step, self.w.vector())
+
+        w = self.dtype_u(self.W)
+        w.values.vector()[:] = self.w.vector()[:]
 
         return w
 
@@ -269,25 +269,6 @@ class fenics_NSE_2D_Monolithic(Problem):
         me = self.dtype_u(self.W)
         self.M.mult(w.values.vector(), me.values.vector())
 
-        return me
-
-    def __invert_mass_matrix(self, w):
-        r"""
-        Helper routine to invert the full mass matrix Mf.
-
-        Parameters
-        ----------
-        w : dtype_u
-            Current values of the numerical solution.
-
-        Returns
-        -------
-        me : dtype_u
-            The product :math:`Mf^{-1} \vec{w}`.
-        """
-
-        me = self.dtype_u(self.W)
-        self.solver.solve(me.values.vector(), w.values.vector())
         return me
 
     def u_exact(self, t):
