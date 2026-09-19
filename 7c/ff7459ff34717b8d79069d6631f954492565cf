@@ -1,0 +1,27 @@
+pySDC/implementations/problem_classes/AllenCahn_2D_FD.py
+  s_87bb659afc16ef::t_d3ed3ce07752b3 20-24,40,171-180,184-185,188-189,193,327-331,443-447,556-560,707-711
+pySDC/tests/test_problems/test_AllenCahn_conventions.py
+  s_87bb659afc16ef::t_15e5faeec5da73 117-121,123-153
+pySDC/implementations/problem_classes/AllenCahn_2D_FFT.py
+  s_87bb659afc16ef::t_14c1fc546b84b0 259
+  s_87bb659afc16ef::t_d3ed3ce07752b3 15-16,18-20,45,139-148,255-258,291
+  s_87bb659afc16ef::t_6813536177532b 280-284
+  s_87bb659afc16ef::t_e15f4d980dcb7d 21,261
+  s_87bb659afc16ef::t_073575e0bd3e9f 285
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7cff7459ff34717b8d79069d6631f954492565cf",
+  "prompts": {},
+  "sessions": {
+    "s_87bb659afc16ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98b2d13f-e25a-40c9-aaad-fad128f6a78a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
