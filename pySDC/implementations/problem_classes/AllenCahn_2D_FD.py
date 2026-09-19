@@ -17,7 +17,11 @@ class allencahn_fullyimplicit(Problem):
     phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
+
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
 
     Initial condition are circles of the form
 
@@ -33,7 +37,7 @@ class allencahn_fullyimplicit(Problem):
     nvars : tuple of int, optional
         Number of unknowns in the problem, e.g. ``nvars=(128, 128)``.
     nu : int, optional
-        Deprecated: only ``nu=2`` is supported, and anything else raises.
+        Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`.
     newton_maxiter : int, optional
@@ -120,12 +124,6 @@ class allencahn_fullyimplicit(Problem):
         if nvars[0] % 2 != 0:
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
-        if nu != 2:
-            raise ProblemError(
-                'the exponent nu is deprecated and only nu=2 is supported: the 0..1 form of Allen-Cahn '
-                f'that this class now solves has no analogue of it, got nu={nu}'
-            )
-
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
@@ -170,20 +168,29 @@ class allencahn_fullyimplicit(Problem):
         self.work_counters['linear'] = WorkCounter()
 
     def reaction(self, u):
-        r"""The reaction term :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`."""
-        return -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+        r"""
+        The reaction term, :math:`\frac{1}{2\varepsilon^2}(2u - 1)\left(1 - (2u - 1)^\nu\right)`.
+
+        The wells sit at :math:`u = 0` and :math:`u = 1`, so the double well is symmetric about
+        :math:`2u - 1`; writing the term in that variable is what lets :math:`\nu` keep the meaning
+        it has always had here. For the default :math:`\nu = 2` this is
+        :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+        """
+        v = 2.0 * u - 1.0
+        return 0.5 / self.eps**2 * v * (1.0 - v**self.nu)
 
     def reaction_prime(self, u):
         """Derivative of :meth:`reaction`, ready to go on the diagonal of a Jacobian."""
-        return -2.0 / self.eps**2 * ((1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)))
+        v = 2.0 * u - 1.0
+        return 1.0 / self.eps**2 * (1.0 - (self.nu + 1.0) * v**self.nu)
 
     def reaction_cubic(self, u):
-        r"""The stiff cubic part of :meth:`reaction`, :math:`-\frac{1}{2\varepsilon^2}(2u - 1)^3`."""
-        return -0.5 / self.eps**2 * (2.0 * u - 1.0) ** 3
+        r"""The stiff part of :meth:`reaction`, :math:`-\frac{1}{2\varepsilon^2}(2u - 1)^{\nu + 1}`."""
+        return -0.5 / self.eps**2 * (2.0 * u - 1.0) ** (self.nu + 1)
 
     def reaction_cubic_prime(self, u):
         """Derivative of :meth:`reaction_cubic`."""
-        return -3.0 / self.eps**2 * (2.0 * u - 1.0) ** 2
+        return -(self.nu + 1.0) / self.eps**2 * (2.0 * u - 1.0) ** self.nu
 
     def reaction_linear(self, u):
         r"""The rest of :meth:`reaction`, :math:`\frac{1}{2\varepsilon^2}(2u - 1)`, so the two sum back to it."""
@@ -317,7 +324,11 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
     phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
+
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
 
     Initial condition are circles of the form
 
@@ -429,7 +440,11 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
+
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
 
     Initial condition are circles of the form
 
@@ -538,7 +553,11 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
     phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
+
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
 
     Initial condition are circles of the form
 
@@ -685,7 +704,11 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
+
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
 
     The initial condition has the form of circles
 

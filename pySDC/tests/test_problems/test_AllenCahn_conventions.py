@@ -114,12 +114,43 @@ def test_the_initial_blob_runs_from_zero_to_one(cls_name):
 
 @pytest.mark.base
 @pytest.mark.parametrize('cls_name', FD_VARIANTS + FFT_VARIANTS)
-def test_nu_is_rejected(cls_name):
-    """nu belonged to the +-1 polynomial and has no analogue here, so it must not be ignored."""
-    from pySDC.core.errors import ProblemError
+@pytest.mark.parametrize('nu', [2, 4])
+def test_nu_still_sets_the_exponent(cls_name, nu):
+    """nu survived the change of variables: the term is the +-1 one written in 2u - 1, halved."""
+    P = build(cls_name, nu=nu)
+    u = np.linspace(-0.25, 1.25, 41)
 
-    with pytest.raises(ProblemError, match='nu'):
-        build(cls_name, nu=3)
+    v = 2.0 * u - 1.0
+    expected = 0.5 / EPS**2 * v * (1.0 - v**nu)
+    assert abs(P.reaction(u) - expected).max() < 1e-12, f'nu={nu} is not in the reaction term'
+
+    # and the wells stay where they are for any even nu
+    assert abs(P.reaction(np.array([0.0, 0.5, 1.0]))).max() < 1e-12, f'nu={nu} moved the wells'
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('nu', [2, 4])
+def test_the_jacobians_follow_nu(nu):
+    """The Newton solves would silently mis-converge if the derivative ignored nu."""
+    P = build('allencahn_fullyimplicit', nu=nu)
+    u = np.linspace(-0.25, 1.25, 41)
+    h = 1e-6
+
+    for which in ('reaction', 'reaction_cubic'):
+        f, df = getattr(P, which), getattr(P, which + '_prime')
+        numerical = (f(u + h) - f(u - h)) / (2 * h)
+        error = abs(df(u) - numerical).max() / abs(numerical).max()
+        assert error < 1e-7, f'{which}_prime ignores nu={nu}: relative error {error:.2e}'
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('nu', [2, 4])
+def test_the_split_halves_follow_nu(nu):
+    """The _v2 variants solve the halves separately, so they have to sum back for any nu."""
+    P = build('allencahn_semiimplicit_v2', nu=nu)
+    u = np.linspace(-0.25, 1.25, 41)
+
+    assert abs(P.reaction_cubic(u) + P.reaction_linear(u) - P.reaction(u)).max() < 1e-12
 
 
 @pytest.mark.base

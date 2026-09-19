@@ -12,9 +12,13 @@ class allencahn2d_imex(Problem):
     phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
 
-    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`. Different initial conditions
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+
+    On a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`. Different initial conditions
     can be used, for example, circles of the form
 
     .. math::
@@ -38,7 +42,7 @@ class allencahn2d_imex(Problem):
     nvars : List of int tuples, optional
         Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
     nu : int, optional
-        Deprecated: only ``nu=2`` is supported, and anything else raises.
+        Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`.
     radius : float, optional
@@ -108,12 +112,6 @@ class allencahn2d_imex(Problem):
         if nvars[0] % 2 != 0:
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
-        if nu != 2:
-            raise ProblemError(
-                'the exponent nu is deprecated and only nu=2 is supported: the 0..1 form of Allen-Cahn '
-                f'that this class now solves has no analogue of it, got nu={nu}'
-            )
-
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
@@ -138,8 +136,16 @@ class allencahn2d_imex(Problem):
         self.work_counters['rhs'] = WorkCounter()
 
     def reaction(self, u):
-        r"""The reaction term :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`."""
-        return -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+        r"""
+        The reaction term, :math:`\frac{1}{2\varepsilon^2}(2u - 1)\left(1 - (2u - 1)^\nu\right)`.
+
+        The wells sit at :math:`u = 0` and :math:`u = 1`, so the double well is symmetric about
+        :math:`2u - 1`; writing the term in that variable is what lets :math:`\nu` keep the meaning
+        it has always had here. For the default :math:`\nu = 2` this is
+        :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+        """
+        v = 2.0 * u - 1.0
+        return 0.5 / self.eps**2 * v * (1.0 - v**self.nu)
 
     def eval_f(self, u, t):
         """
@@ -244,12 +250,15 @@ class allencahn2d_imex_stab(allencahn2d_imex):
     r"""
     This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
-    with stabilized splitting
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u) + \frac{2}{\varepsilon^2}u
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
 
-    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`. Different initial conditions
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+
+    On a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`. Different initial conditions
     can be used here, for example, circles of the form
 
     .. math::
@@ -268,12 +277,18 @@ class allencahn2d_imex_stab(allencahn2d_imex):
     An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed
     by a ``SciPy`` routine.
 
+    Same equation as :class:`allencahn2d_imex`, split differently: :math:`-\frac{2}{\varepsilon^2}`
+    is folded into the implicit operator and :math:`\frac{2}{\varepsilon^2}u` added back to the
+    explicit part, which leaves the sum unchanged but flattens the explicit part at both wells,
+    since the reaction has derivative :math:`-\frac{2}{\varepsilon^2}` at each of them.
+
+
     Parameters
     ----------
     nvars : List of int tuples, optional
         Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
     nu : int, optional
-        Deprecated: only ``nu=2`` is supported, and anything else raises.
+        Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`.
     radius : float, optional
