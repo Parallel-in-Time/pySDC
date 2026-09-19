@@ -14,4 +14,8 @@ dependencies:
   - pip
   - pip:
     - qmat>=0.1.8
-    - pytest-isolate-mpi
+    # 0.4 does not tear down the module collector after the last isolated test in a module, so
+    # the next test in a different module dies at setup with "previous item was not torn down
+    # properly". Reproduced against unmodified test_helpers: 0.3 passes, 0.4 errors. Unpin once
+    # the plugin has a release with that fixed.
+    - pytest-isolate-mpi==0.3
