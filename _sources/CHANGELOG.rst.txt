@@ -8,66 +8,63 @@ Changelog
 
 |:arrow_left:| :doc:`Back to main page <./index>`
 
-
 * September 7, 2026: Version 5.8 makes ParaDiag actually parallel. The new MPI controller puts one time step per rank
   and circulates the diagonalization around a ring instead of gathering it, so the memory per rank no longer grows
   with the block, while ``alpha`` may now vary with the iteration, letting the outer loop start well-conditioned and
   tighten later. Tutorial step_9 gained parts D and E to go with it. We are happy to welcome
-  `\@caklovicka <https://github.com/caklovicka>`_ as an author: ParaDiag in pySDC grew out of her
+  `@caklovicka <https://github.com/caklovicka>`_ as an author: ParaDiag in pySDC grew out of her
   `pyParaDiag <https://github.com/caklovicka/pyParaDiag>`_ and the collocation-ParaDiag paper behind it. The rest is
   controller housekeeping, of which two guards are **not backward compatible**\ : iteration-dependent QDelta
   coefficients (MIN-SR-FLEX and the Jumpers) are now restricted to single-step, single-level SDC, and serial
   Gauss-Seidel MSSDC rejects ``nsweeps > 1`` from the constructor instead of quietly ignoring it.
 * September 4, 2026: Version 5.7 is dominated by spectral methods and Rayleigh-Bénard convection, thanks to
-  `\@brownbaerchen <https://github.com/brownbaerchen>`_. The spectral helper was largely rewritten and gained Neumann boundary
+  `@brownbaerchen <https://github.com/brownbaerchen>`_. The spectral helper was largely rewritten and gained Neumann boundary
   conditions in Chebychev and ultraspherical bases, a VkFFT backend and heterogeneous CPU/GPU computing, while Rayleigh-Bénard
   convection got a 3D problem class and its own project. ParaDiag arrived too, as a serial implementation for collocation methods.
-  `\@Ouardghi <https://github.com/Ouardghi>`_ contributed the new ``StroemungsRaum`` project, working up from FEniCS heat equation
+  `@Ouardghi <https://github.com/Ouardghi>`_ contributed the new ``StroemungsRaum`` project, working up from FEniCS heat equation
   examples to incompressible Navier-Stokes. Three changes are **not backward compatible**\ : sweepers now require the level at
   instantiation, Python 3.9 was dropped (3.13 added), and the framework defaults moved into ``core``\ , which no longer imports its
   own plugins.
-* April 11, 2025: Version 5.6 adds a framework for MPI-parallel I/O, developed by `\@tlunet <https://github.com/tlunet>`_\ , making it easier to visualize the data obtained with pySDC on HPC machines in software such as ParaView.
+* April 11, 2025: Version 5.6 adds a framework for MPI-parallel I/O, developed by `@tlunet <https://github.com/tlunet>`_\ , making it easier to visualize the data obtained with pySDC on HPC machines in software such as ParaView.
   Also, pySDC is now compatible with the finite element library `Firedrake <https://github.com/firedrakeproject/firedrake>`_ and the geophysical fluid dynamics library
-  `Gusto <https://github.com/firedrakeproject/gusto>`_\ , thanks to `\@jshipton <https://github.com/jshipton>`_ and `\@brownbaerchen <https://github.com/brownbaerchen>`_.
+  `Gusto <https://github.com/firedrakeproject/gusto>`_\ , thanks to `@jshipton <https://github.com/jshipton>`_ and `@brownbaerchen <https://github.com/brownbaerchen>`_.
   The former allows to setup PDEs with finite element discretizations in pySDC and then solve in time with SDC and PFASST, while the latter allows to setup a geophysical fluid dynamics problem and then use pySDC with any SDC setup as a timestepper in Gusto.
-* June 24, 2024: Major summer cleanup with Version 5.5. `\@tlunet <https://github.com/tlunet>`_ extracted all quadrature-related stuff into his new standalone code 
-  `qmat <https://github.com/Parallel-in-Time/qmat>`_\ , which makes pySDC much more focussed and both parts easier to maintain. 
-  `\@lisawim <https://github.com/lisawim>`_ worked a lot on the DAE sweepers (including an MPI-parallel version), while `\@brownbaerchen <https://github.com/brownbaerchen>`_ has fun with GPUs.
-  We also appreciate `\@jakob-fritz <https://github.com/jakob-fritz>`_ working hard on improving the CI pipeline.
-* January 24, 2024: Version 5.4.0 contains the code for the `second order SDC paper <https://arxiv.org/abs/2310.08352>`_ by `\@ikrom96git <https://github.com/ikrom96git>`_. It also has some changes to the FEniCS
+* June 24, 2024: Major summer cleanup with Version 5.5. `@tlunet <https://github.com/tlunet>`_ extracted all quadrature-related stuff into his new standalone code
+  `qmat <https://github.com/Parallel-in-Time/qmat>`_\ , which makes pySDC much more focussed and both parts easier to maintain.
+  `@lisawim <https://github.com/lisawim>`_ worked a lot on the DAE sweepers (including an MPI-parallel version), while `@brownbaerchen <https://github.com/brownbaerchen>`_ has fun with GPUs.
+  We also appreciate `@jakob-fritz <https://github.com/jakob-fritz>`_ working hard on improving the CI pipeline.
+* January 24, 2024: Version 5.4.0 contains the code for the `second order SDC paper <https://arxiv.org/abs/2310.08352>`_ by `@ikrom96git <https://github.com/ikrom96git>`_. It also has some changes to the FEniCS
   part, including correct treatment of boundary conditions and first steps with FEniCS-x.
-* July 28, 2023: For Version 5.3 a lot of pull requests got merged, thanks to `\@brownbaerchen <https://github.com/brownbaerchen>`_\ ,
-  `\@tlunet <https://github.com/tlunet>`_\ , `\@lisawim <https://github.com/lisawim>`_\ , `\@ikrom96git <https://github.com/ikrom96git>`_ for all the contributions.
+* July 28, 2023: For Version 5.3 a lot of pull requests got merged, thanks to `@brownbaerchen <https://github.com/brownbaerchen>`_\ ,
+  `@tlunet <https://github.com/tlunet>`_\ , `@lisawim <https://github.com/lisawim>`_\ , `@ikrom96git <https://github.com/ikrom96git>`_ for all the contributions.
   Besides the usual bugfixing and polishing, ``pySDC`` now comes with linear multistep methods, classical Runge Kutta methods, DAE sweepers, and more/improved projects.
   We have second-order SDC on board, the brand-new switch estimator, a testing ground for compression with `libpressio <https://github.com/robertu94/libpressio>`_\ , and more.
-* March 24, 2023: Version 5.2 is out and improves the code in multiple directions. The problem class can now define their 
+* March 24, 2023: Version 5.2 is out and improves the code in multiple directions. The problem class can now define their
   parameters explicitly with the constructor, and not with a dictionary. ``params`` is now a property of the problem class, that returns the problem parameters into a dictionary,
   and parameters are also automatically stored as problem attribute using the ``_makeAttributeAndRegister`` method, allowing to define readonly paramters
   (warning: **not backward compatible**\ ).
-  The resilience project now comes with the quench problem, resulting a collaboration between @brownbaerchen and @eschnaubelt during the 
+  The resilience project now comes with the quench problem, resulting a collaboration between @brownbaerchen and @eschnaubelt during the
   TIME-X Apps Hackathon at USI Lugano. Many of the other changes under the hood prepare ``pySDC`` for Version 6.
-* January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website. 
-  We revived the `codecov <https://app.codecov.io/gh/Parallel-in-Time/pySDC>`_ connection and started the 
-  `OpenSFF Best Practices <https://bestpractices.coreinfrastructure.org/en/projects/6909>`_ guide. 
-  The hook classes and the way they are handled has changed (without breaking the API, hooray), the battery model 
-  got quite an update and adaptivity plays a more prominent role now. Thanks to `\@brownbaerchen <https://github.com/brownbaerchen>`_\ ,
-  `\@tlunet <https://github.com/tlunet>`_\ , `\@lisawim <https://github.com/lisawim>`_\ !
-* 
-  October 7, 2022: Version 5 comes with many changes, both visible and
+* January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website.
+  We revived the `codecov <https://app.codecov.io/gh/Parallel-in-Time/pySDC>`_ connection and started the
+  `OpenSFF Best Practices <https://bestpractices.coreinfrastructure.org/en/projects/6909>`_ guide.
+  The hook classes and the way they are handled has changed (without breaking the API, hooray), the battery model
+  got quite an update and adaptivity plays a more prominent role now. Thanks to `@brownbaerchen <https://github.com/brownbaerchen>`_\ ,
+  `@tlunet <https://github.com/tlunet>`_\ , `@lisawim <https://github.com/lisawim>`_\ !
+* October 7, 2022: Version 5 comes with many changes, both visible and
   invisible ones. Some of those break the existing API, but if you are
   using tests, you should be fine. Major changes include:
-
 
   * **New convergence controllers**\ : Checking whether a step has
     converged can be tricky, so we made separate modules out of
     these checks. This makes features like adaptivity easier to
     implement. Also, the controllers have been streamlined a bit to
     make them more readable/digestible. Thanks to
-    `\@brownbaerchen <https://github.com/brownbaerchen>`_\ !
+    `@brownbaerchen <https://github.com/brownbaerchen>`_\ !
   * **Adaptivity and error estimators**\ : SDC now comes with
     adaptivity and error estimation, leveraging the new convergence
     controllers out of the box. Thanks to
-    `\@brownbaerchen <https://github.com/brownbaerchen>`_\ !
+    `@brownbaerchen <https://github.com/brownbaerchen>`_\ !
   * **New collocation classes**\ : We completely rewrote the way
     collocation nodes and weights are computed. It is now faster,
     more reliable, shorter, better. But: this **breaks the API**\ ,
@@ -75,18 +72,18 @@ Changelog
     projects, tutorials, tests and most of the playgrounds have been
     adapted, so have a look over there to see `what to
     change <https://github.com/Parallel-in-Time/pySDC/commit/01ffabf71a8d71d33b74809271e8ad5a7b03ac5e#diff-adf74297b6c64d320f4da0f1d5528eda6229803a6615baf5d54c418032543681>`_.
-    Thanks to `\@tlunet <https://github.com/tlunet>`_\ !
+    Thanks to `@tlunet <https://github.com/tlunet>`_\ !
   * **New projects**\ : Resilience and energy grid simulations are
     ready to play with and are waiting for more ideas! We used this
     effort to condense and clean up the problem classes a bit,
     reducing the number of files and classes with only marginal
     differences significantly. This could potentially **break your
     code**\ , too, if you rely on any of those affected ones. Thanks
-    to `\@brownbaerchen <https://github.com/brownbaerchen>`_ and
-    `\@lisawim <https://github.com/lisawim>`_\ !
+    to `@brownbaerchen <https://github.com/brownbaerchen>`_ and
+    `@lisawim <https://github.com/lisawim>`_\ !
   * **Toward GPU computing**\ : We included a new data type based on
     `CuPy <https://cupy.dev/>`_ making GPU computing possible. Thanks
-    to `\@timo2705 <https://github.com/timo2705>`_\ !
+    to `@timo2705 <https://github.com/timo2705>`_\ !
   * **Better testing**\ : The CI pipeline got a complete overhaul
     (again), now enabling simultaneous tests, faster/earlier
     linting, benchmarking (at least, in principal), separate
@@ -96,11 +93,10 @@ Changelog
     `black <https://black.readthedocs.io>`_ and
     `flakeheaven <https://flakeheaven.readthedocs.io>`_ for cleaner
     source code. After complaints here and there about linting
-    \"errors\" the recommended way now is to run ``black`` before
+    "errors" the recommended way now is to run ``black`` before
     submission.
 
-* 
-  December 13, 2021: Version 4.2 brings compatibility with Python 3.9,
+* December 13, 2021: Version 4.2 brings compatibility with Python 3.9,
   including some code cleanup. The CI test suite seems to run faster
   now, since sorting out the dependencies is faster. Tested
   `mamba <https://github.com/mamba-org/mamba>`_\ , which for now makes the
@@ -110,8 +106,7 @@ Changelog
   different platforms. And finally, a LaTeX installation is no longer
   needed use plotting (but recommended).
 
-* 
-  August 11, 2021: Version 4.1 has some more changes under the hood,
+* August 11, 2021: Version 4.1 has some more changes under the hood,
   most of them with no significant impact to users. The CI pipeline
   has been completely rewritten, porting the code to `Github
   Actions <https://github.com/features/actions>`_ (away from `Travis
@@ -122,17 +117,15 @@ Changelog
   the PETSc data structures are now much easier, removing a lot of
   unnecessary boilerplate code.
 
-* 
-  May 4, 2021: Long time, no see, but this major release 4.0 marks
+* May 4, 2021: Long time, no see, but this major release 4.0 marks
   some improvements under the hood:
 
-
-  * **Rewrote ``mesh`` and ``particle`` data type**\ :
+  * **Rewrote** ``mesh`` **and** ``particle`` **data type**\ :
     Creation of new arrays for each operation is now avoided by
-    directly subclassing Numpy\'s ``ndarray``. Somewhat faster,
+    directly subclassing Numpy's ``ndarray``. Somewhat faster,
     definitively better, less code, future-proof, but also breaking
     the API. If you use ``pySDC`` for your project, make
-    sure you adapt to the new data types (or don\'t upgrade).
+    sure you adapt to the new data types (or don't upgrade).
   * **Faster quadrature**\ : Thanks to
     `tlunet <https://github.com/tlunet>`_ the computation of the
     weights is now faster and (even) more reliable. No breaking of
@@ -145,8 +138,7 @@ Changelog
   This is not much (yet) and if it were not for the API changes, this
   would have been a minor release.
 
-* 
-  August 30, 2019: Version 3.1 adds many more examples like the
+* August 30, 2019: Version 3.1 adds many more examples like the
   nonlinear Schrödinger equation, more on Gray-Scott and in particular
   Allen-Cahn. Those are many implemented using the parallel FFT
   library
@@ -159,12 +151,10 @@ Changelog
   `Extrae <https://www.vi-hps.org/Tools/Extrae.html>`_. Finally: first
   steps towards error/iteration estimators are taken, too.
 
-* 
-  February 14, 2019: Released version 3 of ``pySDC``. This
+* February 14, 2019: Released version 3 of ``pySDC``. This
   release is accompanied by the **ACM TOMS paper**
   `"pySDC -- Prototyping spectral deferred corrections" <https://doi.org/10.1145/3310410>`_.
   It release contains some breaking changes to the API. In detail:
-
 
   * **Dropped Python 2 support**\ : Starting with this version,
     ``pySDC`` relies on Python 3. Various incompabilities
@@ -198,8 +188,7 @@ Changelog
     consistent throughout the code.
   * As usual, many bugs have been discovered and fixed.
 
-* 
-  May 23, 3018: Version 2.4 adds support for
+* May 23, 3018: Version 2.4 adds support for
   `petsc4py <https://bitbucket.org/petsc/petsc4py>`_\ ! You can now use
   `PETSc <http://www.mcs.anl.gov/petsc/>`_ data types
   (\ ``pySDC`` ships with DMDA for distributed structured
@@ -211,8 +200,7 @@ Changelog
   bindings. Downloading ``pySDC`` from PyPI does not include
   these packages.
 
-* 
-  February 8, 2018: Ever got annoyed at ``pySDC``\ \'s
+* February 8, 2018: Ever got annoyed at ``pySDC``\ 's
   incredibly slow setup phase when multiple time-steps are used?
   Version 2.3 changes this by copying the data structure of the first
   step to all other steps using the `dill
@@ -221,15 +209,13 @@ Changelog
   speed for certain calculations, in particular for the Penning trap
   example.
 
-* 
-  November 7, 2017: Version 2.2 contains matrix-based versions of
+* November 7, 2017: Version 2.2 contains matrix-based versions of
   PFASST within the project ``matrixPFASST``. This involved quite a few
   changes in more or less unexpected places, e.g. in the multigrid
   controller and the transfer base class. The impact of these changes
   on other projects should be negligible, though.
 
-* 
-  October 25, 2017: For the `6th Workshop on Parallel-in-Time
+* October 25, 2017: For the `6th Workshop on Parallel-in-Time
   Integration <https://www.ics.usi.ch/index.php/6th-workshop-on-parallel-in-time-methods>`_
   ``pySDC`` has been updated to version 2.1. It is now
   available on PyPI - the Python Package Index, see
@@ -239,10 +225,8 @@ Changelog
   has been changed again to meet the standards for Python packaging
   (at least a bit).
 
-* 
-  November 24, 2016: Released version 2 of ``pySDC``. This
+* November 24, 2016: Released version 2 of ``pySDC``. This
   release contains major changes to the code and its structure:
-
 
   * **Complete redesign of code structure**\ : The ``core`` part of
     ``pySDC`` only contains the core modules and classes,
@@ -252,7 +236,7 @@ Changelog
     transfer classes and so on. Most examples have been ported to
     either ``tutorials``\ , ``playgrounds`` or ``projects``.
   * **Introduction of tutorials**\ : We added a tutorial (see below)
-    to explain many of pySDC\'s features in a step-by-step fashion.
+    to explain many of pySDC's features in a step-by-step fashion.
     We start with a simple spatial discretization and collocation
     formulations and move step by step to SDC, MLSDC and PFASST. All
     tutorials are accompanied by tests.

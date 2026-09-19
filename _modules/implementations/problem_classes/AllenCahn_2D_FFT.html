@@ -40,7 +40,7 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProblemError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">WorkCounter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
 
 
@@ -49,23 +49,29 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn2d_imex</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`</span>
+<span class="sd">    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
+<span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \Delta u</span>
+<span class="sd">            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)</span>
 
-<span class="sd">    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions</span>
+<span class="sd">    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual</span>
+<span class="sd">    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.</span>
+
+<span class="sd">    On a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`. Different initial conditions</span>
 <span class="sd">    can be used, for example, circles of the form</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),</span>
+<span class="sd">        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}</span>
+<span class="sd">        {\sqrt{2}\varepsilon}\right)\right),</span>
 
 <span class="sd">    or *checker-board*</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),</span>
+<span class="sd">        u({\bf x}, 0) = \frac{1}{2}\left(1 + \sin(2 \pi x_i) \sin(2 \pi y_j)\right),</span>
 
-<span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of</span>
+<span class="sd">    or uniform distributed random numbers in :math:`[0, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of</span>
 <span class="sd">    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved by</span>
 <span class="sd">    Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.</span>
 
@@ -76,8 +82,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : List of int tuples, optional</span>
 <span class="sd">        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.</span>
-<span class="sd">    nu : float, optional</span>
-<span class="sd">        Problem parameter :math:`\nu`.</span>
+<span class="sd">    nu : int, optional</span>
+<span class="sd">        Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.</span>
 <span class="sd">    eps : float, optional</span>
 <span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
 <span class="sd">    radius : float, optional</span>
@@ -86,6 +92,8 @@
 <span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
 <span class="sd">    init_type : str, optional</span>
 <span class="sd">        Indicates which type of initial condition is used.</span>
+<span class="sd">    useGPU : bool, optional</span>
+<span class="sd">        Run on the GPU with CuPy instead of on the CPU with NumPy.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -95,10 +103,32 @@
 <span class="sd">        Mesh width.</span>
 <span class="sd">    lap : np.1darray</span>
 <span class="sd">        Spectral operator for Laplacian.</span>
+<span class="sd">    work_counters : WorkCounter</span>
+<span class="sd">        Counts the right-hand side evaluations.</span>
 <span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
+
+    <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
+
+<div class="viewcode-block" id="allencahn2d_imex.setup_GPU">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.setup_GPU">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Switch the array module and the datatypes over to CuPy.</span>
+
+<span class="sd">        This changes the class, not the instance, as everything else in pySDC that does this</span>
+<span class="sd">        does: once one instance of a class runs on the GPU, they all do.</span>
+<span class="sd">        """</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_cupy_mesh</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_cupy_mesh</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -108,8 +138,12 @@
         <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
         <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">init_type</span><span class="o">=</span><span class="s1">'circle'</span><span class="p">,</span>
+        <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Initialization routine"""</span>
+
+        <span class="k">if</span> <span class="n">useGPU</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_GPU</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">nvars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
@@ -125,23 +159,40 @@
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">'nvars'</span><span class="p">,</span> <span class="s1">'nu'</span><span class="p">,</span> <span class="s1">'eps'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">,</span> <span class="s1">'init_type'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s1">'nvars'</span><span class="p">,</span> <span class="s1">'nu'</span><span class="p">,</span> <span class="s1">'eps'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">,</span> <span class="s1">'init_type'</span><span class="p">,</span> <span class="s1">'useGPU'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># could be useful for hooks, too.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="mf">2.0</span>
 
-        <span class="n">kx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">ky</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">kx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ky</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">kx</span><span class="p">[:</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">kx</span><span class="p">[:</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">kx</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">ky</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ky</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">xv</span><span class="p">,</span> <span class="n">yv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">kx</span><span class="p">,</span> <span class="n">ky</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">'ij'</span><span class="p">)</span>
+        <span class="n">xv</span><span class="p">,</span> <span class="n">yv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">kx</span><span class="p">,</span> <span class="n">ky</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">'ij'</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">xv</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">yv</span><span class="o">**</span><span class="mi">2</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+
+<div class="viewcode-block" id="allencahn2d_imex.reaction">
+<a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.reaction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        The reaction term, :math:`\frac{1}{2\varepsilon^2}(2u - 1)\left(1 - (2u - 1)^\nu\right)`.</span>
+
+<span class="sd">        The wells sit at :math:`u = 0` and :math:`u = 1`, so the double well is symmetric about</span>
+<span class="sd">        :math:`2u - 1`; writing the term in that variable is what lets :math:`\nu` keep the meaning</span>
+<span class="sd">        it has always had here. For the default :math:`\nu = 2` this is</span>
+<span class="sd">        :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.</span>
+<span class="sd">        """</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">v</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="allencahn2d_imex.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.eval_f">[docs]</a>
@@ -163,10 +214,12 @@
 <span class="sd">        """</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 
@@ -195,8 +248,8 @@
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span><span class="p">)</span>
-        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">me</span></div>
 
@@ -226,13 +279,15 @@
 
         <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_type</span> <span class="o">==</span> <span class="s1">'circle'</span><span class="p">:</span>
-                <span class="n">xv</span><span class="p">,</span> <span class="n">yv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">'ij'</span><span class="p">)</span>
-                <span class="n">me</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">xv</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">yv</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span>
+                <span class="n">xv</span><span class="p">,</span> <span class="n">yv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">'ij'</span><span class="p">)</span>
+                <span class="n">me</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">xv</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">yv</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span>
+                <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_type</span> <span class="o">==</span> <span class="s1">'checkerboard'</span><span class="p">:</span>
-                <span class="n">xv</span><span class="p">,</span> <span class="n">yv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">)</span>
-                <span class="n">me</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">xv</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">yv</span><span class="p">)</span>
+                <span class="n">xv</span><span class="p">,</span> <span class="n">yv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xvalues</span><span class="p">)</span>
+                <span class="n">me</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">xv</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">yv</span><span class="p">))</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_type</span> <span class="o">==</span> <span class="s1">'random'</span><span class="p">:</span>
-                <span class="n">me</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+                <span class="n">me</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'type of initial value not implemented, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_type</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -252,36 +307,47 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn2d_imex_stab</span><span class="p">(</span><span class="n">allencahn2d_imex</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-0.5, 0.5]^2`</span>
-<span class="sd">    with stabilized splitting</span>
+<span class="sd">    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
+<span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu) + \frac{2}{\varepsilon^2}u</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \Delta u</span>
+<span class="sd">            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)</span>
 
-<span class="sd">    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions</span>
+<span class="sd">    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual</span>
+<span class="sd">    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.</span>
+
+<span class="sd">    On a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`. Different initial conditions</span>
 <span class="sd">    can be used here, for example, circles of the form</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),</span>
+<span class="sd">        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}</span>
+<span class="sd">        {\sqrt{2}\varepsilon}\right)\right),</span>
 
 <span class="sd">    or *checker-board*</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),</span>
+<span class="sd">        u({\bf x}, 0) = \frac{1}{2}\left(1 + \sin(2 \pi x_i) \sin(2 \pi y_j)\right),</span>
 
-<span class="sd">    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of</span>
+<span class="sd">    or uniform distributed random numbers in :math:`[0, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of</span>
 <span class="sd">    spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with</span>
 <span class="sd">    Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.</span>
 
 <span class="sd">    An exact solution is not known, but instead the numerical solution can be compared via a generated reference solution computed</span>
 <span class="sd">    by a ``SciPy`` routine.</span>
 
+<span class="sd">    Same equation as :class:`allencahn2d_imex`, split differently: :math:`-\frac{2}{\varepsilon^2}`</span>
+<span class="sd">    is folded into the implicit operator and :math:`\frac{2}{\varepsilon^2}u` added back to the</span>
+<span class="sd">    explicit part, which leaves the sum unchanged but flattens the explicit part at both wells,</span>
+<span class="sd">    since the reaction has derivative :math:`-\frac{2}{\varepsilon^2}` at each of them.</span>
+
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    nvars : List of int tuples, optional</span>
 <span class="sd">        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.</span>
-<span class="sd">    nu : float, optional</span>
-<span class="sd">        Problem parameter :math:`\nu`.</span>
+<span class="sd">    nu : int, optional</span>
+<span class="sd">        Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.</span>
 <span class="sd">    eps : float, optional</span>
 <span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
 <span class="sd">    radius : float, optional</span>
@@ -290,6 +356,8 @@
 <span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
 <span class="sd">    init_type : str, optional</span>
 <span class="sd">        Indicates which type of initial condition is used.</span>
+<span class="sd">    useGPU : bool, optional</span>
+<span class="sd">        Run on the GPU with CuPy instead of on the CPU with NumPy.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -299,15 +367,17 @@
 <span class="sd">        Mesh width.</span>
 <span class="sd">    lap : np.1darray</span>
 <span class="sd">        Spectral operator for Laplacian.</span>
+<span class="sd">    work_counters : WorkCounter</span>
+<span class="sd">        Counts the right-hand side evaluations.</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">init_type</span><span class="o">=</span><span class="s1">'circle'</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">init_type</span><span class="o">=</span><span class="s1">'circle'</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Initialization routine"""</span>
 
         <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">nvars</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">)]</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">init_type</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">init_type</span><span class="p">,</span> <span class="n">useGPU</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">-=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span>
 
 <div class="viewcode-block" id="allencahn2d_imex_stab.eval_f">
@@ -330,10 +400,12 @@
 <span class="sd">        """</span>
 
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">u</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">u</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]()</span>
         <span class="k">return</span> <span class="n">f</span></div>
 
 
@@ -362,8 +434,8 @@
 
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
 
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span><span class="p">)</span>
-        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft2</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft2</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">me</span></div>
 </div>

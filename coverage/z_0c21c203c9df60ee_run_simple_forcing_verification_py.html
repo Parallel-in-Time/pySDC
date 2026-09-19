@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_0c21c203c9df60ee_run_temp_forcing_benchmark_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-15 06:23 +0000
+            created at 2026-09-19 17:32 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -96,7 +96,7 @@
     <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">problem_classes</span><span class="op">.</span><span class="nam">AllenCahn_MPIFFT</span> <span class="key">import</span> <span class="nam">allencahn_imex</span><span class="op">,</span> <span class="nam">allencahn_imex_timeforcing</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">transfer_classes</span><span class="op">.</span><span class="nam">TransferMesh_MPIFFT</span> <span class="key">import</span> <span class="nam">fft_to_fft</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">AllenCahn_Bayreuth</span><span class="op">.</span><span class="nam">AllenCahn_monitor</span> <span class="key">import</span> <span class="nam">monitor</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">hooks</span><span class="op">.</span><span class="nam">AllenCahn_monitor</span> <span class="key">import</span> <span class="nam">AllenCahnMonitor</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t"><span class="key">def</span> <span class="nam">run_simulation</span><span class="op">(</span><span class="nam">name</span><span class="op">=</span><span class="str">&#x27;&#x27;</span><span class="op">,</span> <span class="nam">spectral</span><span class="op">=</span><span class="key">None</span><span class="op">,</span> <span class="nam">nprocs_space</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -159,7 +159,7 @@
     <p class="pln"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">    <span class="com"># initialize controller parameters</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">    <span class="nam">controller_params</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;logger_level&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="num">30</span> <span class="key">if</span> <span class="nam">space_rank</span> <span class="op">==</span> <span class="num">0</span> <span class="key">else</span> <span class="num">99</span>  <span class="com"># set level depending on rank</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;hook_class&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="nam">monitor</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;hook_class&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="nam">AllenCahnMonitor</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">    <span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;predict_type&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="str">&#x27;pfasst_burnin&#x27;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">    <span class="com"># fill description dictionary for easy step instantiation</span>&nbsp;</span><span class="r"></span></p>
@@ -390,7 +390,7 @@
             <a class="nav" href="z_0c21c203c9df60ee_run_temp_forcing_benchmark_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-15 06:23 +0000
+            created at 2026-09-19 17:32 +0000
         </p>
     </div>
 </footer>

@@ -125,7 +125,7 @@ MacOS.</p></li>
 <a class="reference external" href="https://black.readthedocs.io">black</a> and
 <a class="reference external" href="https://flakeheaven.readthedocs.io">flakeheaven</a> for cleaner
 source code. After complaints here and there about linting
-&quot;errors&quot; the recommended way now is to run <code class="docutils literal notranslate"><span class="pre">black</span></code> before
+“errors” the recommended way now is to run <code class="docutils literal notranslate"><span class="pre">black</span></code> before
 submission.</p></li>
 </ul>
 </li>
@@ -151,12 +151,12 @@ unnecessary boilerplate code.</p></li>
 <li><p>May 4, 2021: Long time, no see, but this major release 4.0 marks
 some improvements under the hood:</p>
 <ul class="simple">
-<li><p><strong>Rewrote ``mesh`` and ``particle`` data type</strong>:
+<li><p><strong>Rewrote</strong> <code class="docutils literal notranslate"><span class="pre">mesh</span></code> <strong>and</strong> <code class="docutils literal notranslate"><span class="pre">particle</span></code> <strong>data type</strong>:
 Creation of new arrays for each operation is now avoided by
-directly subclassing Numpy's <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>. Somewhat faster,
+directly subclassing Numpy’s <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>. Somewhat faster,
 definitively better, less code, future-proof, but also breaking
 the API. If you use <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> for your project, make
-sure you adapt to the new data types (or don't upgrade).</p></li>
+sure you adapt to the new data types (or don’t upgrade).</p></li>
 <li><p><strong>Faster quadrature</strong>: Thanks to
 <a class="reference external" href="https://github.com/tlunet">tlunet</a> the computation of the
 weights is now faster and (even) more reliable. No breaking of
@@ -230,7 +230,7 @@ space and time. Warning: in order to get this to work you need to
 install petsc4py and mpi4py first! Make sure both use MPICH3
 bindings. Downloading <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> from PyPI does not include
 these packages.</p></li>
-<li><p>February 8, 2018: Ever got annoyed at <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>'s
+<li><p>February 8, 2018: Ever got annoyed at <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>‘s
 incredibly slow setup phase when multiple time-steps are used?
 Version 2.3 changes this by copying the data structure of the first
 step to all other steps using the <a class="reference external" href="https://pypi.python.org/pypi/dill">dill
@@ -263,7 +263,7 @@ all collocation classes, as well as a collection of problems,
 transfer classes and so on. Most examples have been ported to
 either <code class="docutils literal notranslate"><span class="pre">tutorials</span></code>, <code class="docutils literal notranslate"><span class="pre">playgrounds</span></code> or <code class="docutils literal notranslate"><span class="pre">projects</span></code>.</p></li>
 <li><p><strong>Introduction of tutorials</strong>: We added a tutorial (see below)
-to explain many of pySDC's features in a step-by-step fashion.
+to explain many of pySDC’s features in a step-by-step fashion.
 We start with a simple spatial discretization and collocation
 formulations and move step by step to SDC, MLSDC and PFASST. All
 tutorials are accompanied by tests.</p></li>

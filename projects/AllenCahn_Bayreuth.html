@@ -79,8 +79,6 @@ It can be run serial/parallel in space and/or time.</p>
 <h2>Further/related files<a class="headerlink" href="#further-related-files" title="Link to this heading">¶</a></h2>
 <p>The following files are also listed under this project:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_monitor_and_dump.py</span></code>: computes the radii for the verification problems and dumps the solution via MPI I/O</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_monitor.py</span></code>: computes the radii for the verification problems</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_dump.py</span></code>: dumps the solution via MPI I/O</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">visualize.py</span></code>: simple script to turn field data from the dump routines into pngs</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">visualize_temp.py</span></code>: simple script to turn field and temperature data from the dump routines into pngs and movies</p></li>
@@ -88,6 +86,7 @@ It can be run serial/parallel in space and/or time.</p>
 </ul>
 <p>The project uses in particular these implementations from the <code class="docutils literal notranslate"><span class="pre">implementations</span></code> folder:</p>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_monitor.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">hooks</span></code>: computes the radii for the verification problems, shared with the other Allen-Cahn projects</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mesh.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">datatype_classes</span></code>: contains numpy-based data with a communicator</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_MPIFFT.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>: contains the implementation of the problem for simple forcing terms</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_Temp_MPIFFT.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>: contains the implementation of the problem for temperature-based forcing</p></li>

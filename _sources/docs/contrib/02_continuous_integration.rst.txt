@@ -17,9 +17,8 @@ CI Workflow Triggers
 
 The CI pipeline is configured to avoid redundant runs. The workflow is triggered:
 
-
 * **On pull requests**\ : CI runs for all pull request events (opened, synchronized, reopened, etc.)
-* **On push to ``master``\ ** (and to release branches matching ``v*``\ ): CI runs when code is pushed there directly
+* **On push to** ``master`` (and to release branches matching ``v*``\ ): CI runs when code is pushed there directly
 * **On schedule**\ : CI runs weekly on Monday at 5:01 AM UTC (via cron schedule)
 
 This configuration ensures that when you push commits to a pull request branch, the CI runs only once for the pull request event, not twice (once for the PR and once for the push). Direct pushes to the master branch will still trigger the CI to ensure the main branch is always tested.
@@ -60,7 +59,6 @@ Those tests are conducted for each commit (even for forks), but you can also run
 
 
 Some style rules that are automatically enforced :
-
 
 * lines should be not longer than 120 characters
 * arithmetic operators (\ ``+``\ , ``*``\ , ...) should be separated with variables by one empty space
@@ -114,6 +112,7 @@ To obtain this functionality, add the following to ``<pySDC-root-directory>/.git
                    git interpret-trailers --in-place --trailer "#!!!!!!!!!! WARNING: RUFF FAILED !!!!!!!!!!" "$COMMIT_MSG_FILE"
            fi
    fi
+
 
 Don't forget to assign execution rights.
 
@@ -192,7 +191,6 @@ By syncing the GitHub repository to a certain Gitlab instance, CI-Jobs can be ru
 
 For security and accounting reasons, a few extra steps are needed in order to run the contents of a pull request on HPC:
 
-
 * The pull request needs to have the tag "gitlab-mirror" assigned to it.
 * A person with write-permission for the Parallel-in-Time pySDC repository needs to trigger the workflow. Ask for someone with the required permissions to rerun the workflow if needed.
 * The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. In this case, please merge upstream changes, fix all conflicts, and rerun the workflow.
@@ -203,7 +201,6 @@ For security and accounting reasons, a few extra steps are needed in order to ru
 
 
 Regardless of why the Gitlab pipeline was triggered, the following holds true:
-
 
 * The return-state from Gitlab is transmitted to GitHub (Success/Failure) leading to the same result in GitHub
 * Logs from Gitlab are also transferred. The full logs of all jobs can be read from within GitHub. For better overview, these are folded, so unfolding is needed before reading.
@@ -224,7 +221,6 @@ In order to run tests on GPUs, please use the pytest marker ``cupy``.
 
 If you want to create a new HPC test environment, the following steps need to be completed:
 
-
 * Create a new slurm job-script in ``etc/juwels_*.sh``. The name and location of the file is important.
 * Adapt ``.gitlab-ci.yml`` to include the new job-script. For this, add a name in the job "test_JUWELS" in the section ``parallel: matrix: SHELL_SCRIPT``. The name there must match the name of the newly created file.
   As a starting point it is recommended to copy and adapt an existing file (e.g. ``etc/juwels_cupy.sh``\ ).
@@ -235,7 +231,6 @@ Code coverage
 -------------
 
 This stage allows to checks how much of the ``pySDC`` code is tested by the previous stage. It is based on the `coverage <https://pypi.org/project/coverage/>`_ library and currently applied to the following directories :
-
 
 * ``pySDC/core``
 * ``pySDC/projects``
@@ -250,34 +245,25 @@ Viewing Coverage Reports
 
 There are multiple ways to view test coverage for pySDC:
 
-
-#. 
-   **HTML Coverage Report** (recommended for detailed analysis)
-
+#. **HTML Coverage Report** (recommended for detailed analysis)
 
    * View the current `coverage report for the master branch <https://parallel-in-time.org/pySDC/coverage/index.html>`_
    * Shows line-by-line coverage with color coding
    * Updated automatically with each push to master
 
-#. 
-   **Codecov Dashboard** (for trends and PR analysis)
-
+#. **Codecov Dashboard** (for trends and PR analysis)
 
    * `Compare results with previous builds <https://app.codecov.io/gh/Parallel-in-Time/pySDC>`_
    * View coverage trends over time
    * See coverage impact of specific commits
    * Codecov automatically comments on pull requests with coverage changes
 
-#. 
-   **Coverage Badge** (quick status check)
-
+#. **Coverage Badge** (quick status check)
 
    * Displayed in the :doc:`README <../../README>`
    * Shows current coverage percentage for master branch
 
-#. 
-   **PR Coverage Comments** (for contributors)
-
+#. **PR Coverage Comments** (for contributors)
 
    * Codecov comments on each pull request
    * Shows coverage changes introduced by the PR
@@ -316,7 +302,6 @@ Coverage exceptions
 
 The coverage configuration is defined in two places:
 
-
 #. **Runtime configuration** (\ ``pyproject.toml``\ ) - Controls what coverage measures during test execution
 #. **Codecov configuration** (\ ``codecov.yml``\ ) - Controls how Codecov reports and displays coverage
 
@@ -337,7 +322,6 @@ Part of code (functions, conditionaly, for loops, etc ...) can be ignored by cov
        # all function code is ignored by coverage
 
 Accepted use of the ``# pragma: no cover`` are:
-
 
 #. Functions and code used for plotting
 #. Lines in one conditional preceding any ``raise`` statement

@@ -15,11 +15,10 @@ Naming convention are mostly inspired from the `PEP-8 guidelines <https://peps.p
 
 ..
 
-   *A Foolish Consistency is the Hobgoblin of Little Minds*
+   *A Foolish Consistency is the Hobgoblin of Little Minds*\
 
 
 The most important idea at the end is to find a optimal compromise between
-
 
 * readability : *Can someone else easily read and understand my code ?*
 * effectiveness : *Does my code avoid kilometers-long lines to do simple things ?*
@@ -32,7 +31,6 @@ First definitions
 -----------------
 
 Possible Naming formats :
-
 
 * all-lowercase : ``variablenamelikethis``
 * snake_case : ``variable_name_like_this``
@@ -89,7 +87,6 @@ Function (or method) and variable names should use camelCase formatting, and sam
            # ...
 
 |:scroll:| A few additional notes :
-
 
 #. In general, shorter name (eventually with abbreviations) should be favored, **as long as it does not deteriorate understandability**. For instance ``getOrthogPolyCoeffs`` rather than ``getOrthogonalPolynomialCoefficients``.
 #. Suffix ``s`` for plural should be used even with abbreviations for consistency (\ *e.g* ``nCoeffs``\ , ``nNodes``\ , ...).

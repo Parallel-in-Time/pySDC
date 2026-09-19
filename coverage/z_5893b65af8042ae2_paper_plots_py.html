@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_5893b65af8042ae2_piline_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-15 06:23 +0000
+            created at 2026-09-19 17:32 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -787,7 +787,7 @@
     <p class="pln"><span class="n"><a id="t705" href="#t705">705</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t706" href="#t706">706</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t707" href="#t707">707</a></span><span class="t"><span class="key">def</span> <span class="nam">plot_AC_solution</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>  <span class="com"># pragma: no cover</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t708" href="#t708">708</a></span><span class="t">    <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">projects</span><span class="op">.</span><span class="nam">Resilience</span><span class="op">.</span><span class="nam">AC</span> <span class="key">import</span> <span class="nam">monitor</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t708" href="#t708">708</a></span><span class="t">    <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">hooks</span><span class="op">.</span><span class="nam">AllenCahn_monitor</span> <span class="key">import</span> <span class="nam">AllenCahnMonitor</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t709" href="#t709">709</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t710" href="#t710">710</a></span><span class="t">    <span class="nam">my_setup_mpl</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t711" href="#t711">711</a></span><span class="t">    <span class="key">if</span> <span class="nam">JOURNAL</span> <span class="op">==</span> <span class="str">&#x27;JSC_beamer&#x27;</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -797,7 +797,7 @@
     <p class="exc show_exc"><span class="n"><a id="t715" href="#t715">715</a></span><span class="t">        <span class="nam">fig</span><span class="op">,</span> <span class="nam">axs</span> <span class="op">=</span> <span class="nam">plt</span><span class="op">.</span><span class="nam">subplots</span><span class="op">(</span><span class="num">1</span><span class="op">,</span> <span class="num">2</span><span class="op">,</span> <span class="nam">figsize</span><span class="op">=</span><span class="nam">figsize_by_journal</span><span class="op">(</span><span class="nam">JOURNAL</span><span class="op">,</span> <span class="num">1.0</span><span class="op">,</span> <span class="num">0.45</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t716" href="#t716">716</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t717" href="#t717">717</a></span><span class="t">    <span class="nam">description</span> <span class="op">=</span> <span class="op">{</span><span class="str">&#x27;problem_params&#x27;</span><span class="op">:</span> <span class="op">{</span><span class="str">&#x27;nvars&#x27;</span><span class="op">:</span> <span class="op">(</span><span class="num">256</span><span class="op">,</span> <span class="num">256</span><span class="op">)</span><span class="op">}</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t718" href="#t718">718</a></span><span class="t">    <span class="nam">stats</span><span class="op">,</span> <span class="nam">_</span><span class="op">,</span> <span class="nam">_</span> <span class="op">=</span> <span class="nam">run_AC</span><span class="op">(</span><span class="nam">Tend</span><span class="op">=</span><span class="num">0.032</span><span class="op">,</span> <span class="nam">hook_class</span><span class="op">=</span><span class="nam">monitor</span><span class="op">,</span> <span class="nam">custom_description</span><span class="op">=</span><span class="nam">description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t718" href="#t718">718</a></span><span class="t">    <span class="nam">stats</span><span class="op">,</span> <span class="nam">_</span><span class="op">,</span> <span class="nam">_</span> <span class="op">=</span> <span class="nam">run_AC</span><span class="op">(</span><span class="nam">Tend</span><span class="op">=</span><span class="num">0.032</span><span class="op">,</span> <span class="nam">hook_class</span><span class="op">=</span><span class="nam">AllenCahnMonitor</span><span class="op">,</span> <span class="nam">custom_description</span><span class="op">=</span><span class="nam">description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t719" href="#t719">719</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t720" href="#t720">720</a></span><span class="t">    <span class="nam">u</span> <span class="op">=</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">&#x27;u&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t721" href="#t721">721</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -1093,7 +1093,7 @@
             <a class="nav" href="z_5893b65af8042ae2_piline_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-15 06:23 +0000
+            created at 2026-09-19 17:32 +0000
         </p>
     </div>
 </footer>

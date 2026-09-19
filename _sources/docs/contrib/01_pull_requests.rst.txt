@@ -15,7 +15,6 @@ Contributing to the main branch
 
 The main version of ``pySDC`` is hosted in the ``master`` branch, on which any contributor can propose pull requests. Those can consist on :
 
-
 * bug fixes and code corrections (\ *e.g* solving one of the current `issues <https://github.com/Parallel-in-Time/pySDC/issues>`_\ )
 * addition or improvement of documentation
 * improvement of existing functionalities (performance, accuracy, usage, ...)
@@ -64,6 +63,9 @@ Such branches are merged to ``master`` when ready.
 
    |:scroll:| Pull request to those branches can be done from fork branches using the **same name** as the release branch.
 
+
+..
+
    |:bell:| **Never** merge modifications on the ``upstream/master`` branch into your own local release branch. If some commit on the master branch have to be taken into account in the release branch (for instance, v6), then first request a merge of ``upstream/master`` into ``upstream/v6``\ , merge ``upstream/v6`` into your local ``v6`` branch, then push into your own repository to update the pull request.
 
 
@@ -78,6 +80,9 @@ Those could eventually be merged into master if they don't break the API, or to 
 ..
 
    |:scroll:| Pull request to those branches can be done from fork branches using the **same name** as the feature branch.
+
+
+..
 
    |:bell:| **Never** merge modifications on ``upstream/master`` or any release branch into your own local development branch (same comment and solution as for the release branches above).
 

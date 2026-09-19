@@ -26,7 +26,6 @@ Implementing a custom problem class
 Any problem class inherit from the same base class, that is (currently) the ``ptype`` class from the module ``pySDC.code.Problem``.
 Each custom problem should inherit from this base class, like for the following example template :
 
-
 * right-hand side $f(u,t)=\lambda u +  ct$ with
 
   * $\lambda$ one or more complex values (in vector form)

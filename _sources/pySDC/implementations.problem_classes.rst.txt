@@ -21,9 +21,7 @@ Submodules
    implementations.problem_classes.AdvectionEquation_ND_FD
    implementations.problem_classes.AllenCahn_1D_FD
    implementations.problem_classes.AllenCahn_2D_FD
-   implementations.problem_classes.AllenCahn_2D_FD_gpu
    implementations.problem_classes.AllenCahn_2D_FFT
-   implementations.problem_classes.AllenCahn_2D_FFT_gpu
    implementations.problem_classes.AllenCahn_MPIFFT
    implementations.problem_classes.AllenCahn_Temp_MPIFFT
    implementations.problem_classes.Auzinger_implicit

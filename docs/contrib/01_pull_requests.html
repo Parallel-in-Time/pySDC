@@ -77,7 +77,9 @@ $<span class="w"> </span>git<span class="w"> </span>push<span class="w">  </span
 Such branches are merged to <code class="docutils literal notranslate"><span class="pre">master</span></code> when ready.</p>
 <blockquote>
 <div><p>📜 Pull request to those branches can be done from fork branches using the <strong>same name</strong> as the release branch.</p>
-<p>🔔 <strong>Never</strong> merge modifications on the <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> branch into your own local release branch. If some commit on the master branch have to be taken into account in the release branch (for instance, v6), then first request a merge of <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> into <code class="docutils literal notranslate"><span class="pre">upstream/v6</span></code>, merge <code class="docutils literal notranslate"><span class="pre">upstream/v6</span></code> into your local <code class="docutils literal notranslate"><span class="pre">v6</span></code> branch, then push into your own repository to update the pull request.</p>
+</div></blockquote>
+<blockquote>
+<div><p>🔔 <strong>Never</strong> merge modifications on the <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> branch into your own local release branch. If some commit on the master branch have to be taken into account in the release branch (for instance, v6), then first request a merge of <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> into <code class="docutils literal notranslate"><span class="pre">upstream/v6</span></code>, merge <code class="docutils literal notranslate"><span class="pre">upstream/v6</span></code> into your local <code class="docutils literal notranslate"><span class="pre">v6</span></code> branch, then push into your own repository to update the pull request.</p>
 </div></blockquote>
 </section>
 <section id="feature-development-branches">
@@ -86,7 +88,9 @@ Such branches are merged to <code class="docutils literal notranslate"><span cla
 Those could eventually be merged into master if they don’t break the API, or to the next release branch if they do.</p>
 <blockquote>
 <div><p>📜 Pull request to those branches can be done from fork branches using the <strong>same name</strong> as the feature branch.</p>
-<p>🔔 <strong>Never</strong> merge modifications on <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> or any release branch into your own local development branch (same comment and solution as for the release branches above).</p>
+</div></blockquote>
+<blockquote>
+<div><p>🔔 <strong>Never</strong> merge modifications on <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> or any release branch into your own local development branch (same comment and solution as for the release branches above).</p>
 </div></blockquote>
 <p>⬅️ <a class="reference internal" href="../../CONTRIBUTING.html"><span class="doc">Back to Contributing Summary</span></a> —
 ➡️ <a class="reference internal" href="02_continuous_integration.html"><span class="doc">Next to Continuous Integration</span></a></p>

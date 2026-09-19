@@ -48,7 +48,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_imex</span><span class="p">(</span><span class="n">IMEX_Laplacian_MPIFFT</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Example implementing the :math:`2`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`</span>
+<span class="sd">    Example implementing the :math:`2`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
+<span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)</span>
@@ -58,7 +59,8 @@
 <span class="sd">    conditions can be used, for example, circles of the form</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),</span>
+<span class="sd">        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}</span>
+<span class="sd">        {\sqrt{2}\varepsilon}\right)\right),</span>
 
 <span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
 <span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) and the nonlinear part in the right-hand</span>
@@ -110,6 +112,7 @@
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">'L'</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'L'</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">'x0'</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'x0'</span><span class="p">,</span> <span class="o">-</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'L'</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float'</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'eps'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">,</span> <span class="s1">'dw'</span><span class="p">,</span> <span class="s1">'init_type'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -177,7 +180,7 @@
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: u_exact only valid for t=0'</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_type</span> <span class="o">==</span> <span class="s1">'circle'</span><span class="p">:</span>
-            <span class="n">r2</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="n">r2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)))</span>
                 <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
@@ -197,7 +200,7 @@
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
                     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
                         <span class="c1"># build radius</span>
-                        <span class="n">r2</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="n">L</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span> <span class="o">-</span> <span class="n">L</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                        <span class="n">r2</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="n">L</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span> <span class="o">-</span> <span class="n">L</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
                         <span class="c1"># add this blob, shifted by 1 to avoid issues with adding up negative contributions</span>
                         <span class="n">tmp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">tanh</span><span class="p">((</span><span class="n">rand_radii</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
@@ -221,7 +224,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_imex_timeforcing</span><span class="p">(</span><span class="n">allencahn_imex</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`</span>
+<span class="sd">    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
+<span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 <span class="sd">    using time-dependent forcing</span>
 
 <span class="sd">    .. math::</span>
@@ -232,7 +236,8 @@
 <span class="sd">    conditions can be used, for example, circles of the form</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),</span>
+<span class="sd">        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}</span>
+<span class="sd">        {\sqrt{2}\varepsilon}\right)\right),</span>
 
 <span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated</span>
 <span class="sd">    *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) using ``mpi4py-fft`` [1]_ and the nonlinear part in the right-hand</span>

@@ -46,7 +46,7 @@ Finally, the CI also build artifacts that are used to generate the documentation
 <p>The CI pipeline is configured to avoid redundant runs. The workflow is triggered:</p>
 <ul class="simple">
 <li><p><strong>On pull requests</strong>: CI runs for all pull request events (opened, synchronized, reopened, etc.)</p></li>
-<li><p><a href="#id1"><span class="problematic" id="id2">**</span></a>On push to <code class="docutils literal notranslate"><span class="pre">master</span></code>** (and to release branches matching <code class="docutils literal notranslate"><span class="pre">v*</span></code>): CI runs when code is pushed there directly</p></li>
+<li><p><strong>On push to</strong> <code class="docutils literal notranslate"><span class="pre">master</span></code> (and to release branches matching <code class="docutils literal notranslate"><span class="pre">v*</span></code>): CI runs when code is pushed there directly</p></li>
 <li><p><strong>On schedule</strong>: CI runs weekly on Monday at 5:01 AM UTC (via cron schedule)</p></li>
 </ul>
 <p>This configuration ensures that when you push commits to a pull request branch, the CI runs only once for the pull request event, not twice (once for the PR and once for the push). Direct pushes to the master branch will still trigger the CI to ensure the main branch is always tested.</p>

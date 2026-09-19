@@ -8,7 +8,6 @@ Documenting Code
 
 When developing a new class or function, or improving current classes in ``pySDC``\ , adding Python docstring to document the code is important, in particular :
 
-
 * to help developer understanding how classes and functions work when reading the code
 * to help user understanding how classes and functions work when reading the `documentation <https://parallel-in-time.org/pySDC/#api-documentation>`_
 
@@ -94,6 +93,7 @@ for a class and a function :
                parameter) and :math:`n` columns.
            """
            pass  # Implementation ...
+
 
 A more detailed example is given `here ... <https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html>`_
 

@@ -77,9 +77,11 @@ same for GPU and CPU. Only the import for the problem_class changed.</p>
 </section>
 <section id="more-examples">
 <h2>More examples<a class="headerlink" href="#more-examples" title="Link to this heading">¶</a></h2>
-<p>Further examples can found with Allen-Cahn:
-* problem: [AllenCahn_2D_FD.py](../../implementations/problem_classes/AllenCahn_2D_FD.py) and [AllenCahn_2D_FD_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FD_gpu.py)
-* problem: [AllenCahn_2D_FFT.py](../../implementations/problem_classes/AllenCahn_2D_FFT.py) and [AllenCahn_2D_FFT_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FFT_gpu.py)</p>
+<p>Further examples can found with Allen-Cahn. These take the other route: rather than a separate
+<code class="docutils literal notranslate"><span class="pre">_gpu</span></code> module, one class serves both and a <code class="docutils literal notranslate"><span class="pre">useGPU</span></code> flag switches the array, sparse and solver
+modules and the datatypes over to CuPy.
+* problem: [AllenCahn_2D_FD.py](../../implementations/problem_classes/AllenCahn_2D_FD.py), with <code class="docutils literal notranslate"><span class="pre">useGPU=True</span></code>
+* problem: [AllenCahn_2D_FFT.py](../../implementations/problem_classes/AllenCahn_2D_FFT.py), with <code class="docutils literal notranslate"><span class="pre">useGPU=True</span></code></p>
 <blockquote>
 <div><ul class="simple">
 <li><p>Script to run pySDC: [ac-fft.py](ac-fft.py)</p></li>

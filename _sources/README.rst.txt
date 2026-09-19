@@ -1,54 +1,55 @@
 
-
-.. image:: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg?branch=master
+.. |m2r-image-0a52406f8d0caedbfdc6c29f8dbd5deb9a89b173ad71465295a2dd710eab1169| image:: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg?branch=master
    :target: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml
    :alt: badge-ga
 
-
-.. image:: https://bestpractices.coreinfrastructure.org/projects/6909/badge
+.. |m2r-image-42cb67e7863edca19b530688ddff8612f99172f3090fc4ca7f4ae68b0de22e30| image:: https://bestpractices.coreinfrastructure.org/projects/6909/badge
    :target: https://bestpractices.coreinfrastructure.org/projects/6909
    :alt: badge-ossf
 
-
-.. image:: https://codecov.io/gh/Parallel-in-Time/pySDC/branch/master/graph/badge.svg?token=hpP18dmtgS
+.. |m2r-image-f93f7388a20d69a2cecc5532b2c6a2073a16de40c0ebc5f6d1b40fa6d98ffac9| image:: https://codecov.io/gh/Parallel-in-Time/pySDC/branch/master/graph/badge.svg?token=hpP18dmtgS
    :target: https://codecov.io/gh/Parallel-in-Time/pySDC
    :alt: badge-cc
 
-
-.. image:: https://zenodo.org/badge/26165004.svg
+.. |m2r-image-06c49abaaed95f12770791630131eef37beb0052177929dc986ba4cede26ac95| image:: https://zenodo.org/badge/26165004.svg
    :target: https://zenodo.org/badge/latestdoi/26165004
    :alt: zenodo
 
-
-.. image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green
+.. |m2r-image-d0b2c09174717954dda7ab64d40221c503d01952c46d059f52eeafb453cc5be7| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green
    :target: https://fair-software.eu
    :alt: fair-software.eu
 
-
-.. image:: https://img.shields.io/badge/sqaaas%20software-silver-lightgrey
-   :target: https://api.eu.badgr.io/public/assertions/aS8J0NDTTjCyYP6iVufviQ "SQAaaS silver badge achieved"
+.. |m2r-image-7c3a37013b08bd9b0d4487be034bd29a9707bc739a9c26371e370c44af21edbf| image:: https://img.shields.io/badge/sqaaas%20software-silver-lightgrey
+   :target: https://api.eu.badgr.io/public/assertions/aS8J0NDTTjCyYP6iVufviQ
    :alt: SQAaaS badge shields.io
 
-
-.. image:: https://img.shields.io/pypi/dm/pySDC?logo=pypi
+.. |m2r-image-a82117459442fc59cf85f7c15e0448139b193f481667fda53bb8765ce7c418e3| image:: https://img.shields.io/pypi/dm/pySDC?logo=pypi
    :target: https://pypistats.org/packages/pysdc
    :alt: PyPI - Downloads
 
-
-.. image:: https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo
+.. |m2r-image-c3ff5b0093fcb2748625676fd46f6ccae1bc8bcddad5175a3106352630a53c04| image:: https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo
    :target: https://go.fzj.de/CodePromo
    :alt: HiRSE Code Promo Badge
 
-
-.. image:: https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/
+.. |m2r-image-ef48412abd47602426398c32c50020ff5ed27856b75de25b32fab6e4545be99e| image:: https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/
    :target: https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC
    :alt: SWH
 
-
-.. image:: https://img.shields.io/badge/ai%20declaration%20format-aidecl-blue
+.. |m2r-image-fb25d818deda63da7b3e6de4a248abd6e6ce3e8660eb49dae17a81f219177597| image:: https://img.shields.io/badge/ai%20declaration%20format-aidecl-blue
    :target: https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml
    :alt: validated with aidecl
 
+
+|m2r-image-0a52406f8d0caedbfdc6c29f8dbd5deb9a89b173ad71465295a2dd710eab1169|
+|m2r-image-42cb67e7863edca19b530688ddff8612f99172f3090fc4ca7f4ae68b0de22e30|
+|m2r-image-f93f7388a20d69a2cecc5532b2c6a2073a16de40c0ebc5f6d1b40fa6d98ffac9|
+|m2r-image-06c49abaaed95f12770791630131eef37beb0052177929dc986ba4cede26ac95|
+|m2r-image-d0b2c09174717954dda7ab64d40221c503d01952c46d059f52eeafb453cc5be7|
+|m2r-image-7c3a37013b08bd9b0d4487be034bd29a9707bc739a9c26371e370c44af21edbf|
+|m2r-image-a82117459442fc59cf85f7c15e0448139b193f481667fda53bb8765ce7c418e3|
+|m2r-image-c3ff5b0093fcb2748625676fd46f6ccae1bc8bcddad5175a3106352630a53c04|
+|m2r-image-ef48412abd47602426398c32c50020ff5ed27856b75de25b32fab6e4545be99e|
+|m2r-image-fb25d818deda63da7b3e6de4a248abd6e6ce3e8660eb49dae17a81f219177597|
 
 Welcome to pySDC!
 =================
@@ -122,7 +123,7 @@ example above). You may need to update your ``PYTHONPATH`` by running
 
 in particular if you want to run any of the playgrounds, projects or
 tutorials. All ``import`` statements there assume that the
-``pySDC``\ \'s base directory is part of ``PYTHONPATH``.
+``pySDC``\ 's base directory is part of ``PYTHONPATH``.
 
 For many examples, ``LaTeX`` is used for the plots, i.e. a
 decent installation of this is needed in order to run those examples.
@@ -146,11 +147,7 @@ can help you with this. Also, we would greatly appreciate a citation of
 
 
 The current software release can be cited using Zenodo:
-
-.. image:: https://zenodo.org/badge/26165004.svg
-   :target: https://zenodo.org/badge/latestdoi/26165004
-   :alt: zenodo
-
+|m2r-image-06c49abaaed95f12770791630131eef37beb0052177929dc986ba4cede26ac95|
 
 Contributing
 ------------
@@ -170,12 +167,12 @@ Acknowledgements
 This project has received funding from the `European High-Performance
 Computing Joint Undertaking <https://eurohpc-ju.europa.eu/>`_ (JU) under
 grant agreement No 955701 (\ `TIME-X <https://www.time-x-eurohpc.eu/>`_\ )
-and grant agreement No 101118139. 
+and grant agreement No 101118139.
 The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the `German Federal Ministry of
 Research, Technology and Space <https://www.bmftr.bund.de/EN/Home/home_node.html>`_
-(BMFTR) grants  16HPC047, 16ME0708 and 16ME0679K. Supported by the European Union - NextGenerationEU. 
+(BMFTR) grants  16HPC047, 16ME0708 and 16ME0679K. Supported by the European Union - NextGenerationEU.
 The project also received help from the `Joint Lab "Helmholtz Information -  Research Software Engineering" (HiRSE) <https://www.helmholtz-hirse.de/>`_.
 
 
