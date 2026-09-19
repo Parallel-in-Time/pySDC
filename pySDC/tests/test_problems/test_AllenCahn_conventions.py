@@ -143,6 +143,40 @@ def test_FD_variants_agree_on_the_rhs(cls_name):
     assert abs(f - reference).max() < 1e-12, f'{cls_name} sums to a different rhs'
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('cls_name', FD_VARIANTS + FFT_VARIANTS)
+def test_the_grid_is_centred(cls_name):
+    """Every class discretizes [-L/2, L/2), so the blob sits at the origin and diagnostics line up."""
+    x = np.asarray(build(cls_name).xvalues)
+    dx = L / NVARS[0]
+
+    assert x.min() == pytest.approx(-L / 2), f'grid starts at {x.min()}, not -L/2'
+    assert x.max() == pytest.approx(L / 2 - dx), f'grid ends at {x.max()}, not L/2 - dx'
+
+
+@pytest.mark.mpi4py
+def test_MPIFFT_shares_that_grid():
+    """It used to run [0, L) while its own docstring claimed otherwise."""
+    x = np.asarray(build('allencahn_imex').X[0])
+    dx = L / NVARS[0]
+
+    assert x.min() == pytest.approx(-L / 2), f'grid starts at {x.min()}, not -L/2'
+    assert x.max() == pytest.approx(L / 2 - dx), f'grid ends at {x.max()}, not L/2 - dx'
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parametrize('domain', [1.0, 2.0])
+def test_the_blob_sits_at_the_centre_for_any_L(domain):
+    """The circle used to be pinned at (0.5, 0.5) whatever L was, so it was off-centre unless L=1."""
+    from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex
+
+    n = 64
+    P = allencahn_imex(nvars=(n, n), eps=EPS, radius=RADIUS, L=domain, spectral=False, dw=0.0)
+    u = np.asarray(P.u_exact(0.0))
+
+    assert u[n // 2, n // 2] == u.max(), f'at L={domain} the blob peaks off centre'
+
+
 @pytest.mark.mpi4py
 def test_FFT_and_MPIFFT_are_now_the_same_problem():
     """Same equation, same convention, same spectral discretization: nothing may differ."""
