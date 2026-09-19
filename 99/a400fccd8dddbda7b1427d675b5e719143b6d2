@@ -1,0 +1,20 @@
+pySDC/tests/test_problems/test_AllenCahn_conventions.py
+  s_87bb659afc16ef::t_6d7090eb3d1700 1-61,68-155
+  s_87bb659afc16ef::t_9b8ddc0c14c64a 62-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "99a400fccd8dddbda7b1427d675b5e719143b6d2",
+  "prompts": {},
+  "sessions": {
+    "s_87bb659afc16ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98b2d13f-e25a-40c9-aaad-fad128f6a78a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
