@@ -71,10 +71,15 @@ FD_VARIANTS = [
 @pytest.mark.parametrize('cls_name', FD_VARIANTS + ['allencahn2d_imex'])
 def test_family_A_shares_one_initial_condition(cls_name):
     """The +-1 classes discretize differently but must start from the very same field."""
-    reference = family_A('allencahn_fullyimplicit').u_exact(0.0)
-    u = family_A(cls_name).u_exact(0.0)
+    reference = family_A('allencahn_fullyimplicit')
+    P = family_A(cls_name)
 
-    assert abs(np.asarray(u) - np.asarray(reference)).max() == 0.0, f'{cls_name} starts from a different field'
+    assert (
+        abs(np.asarray(P.u_exact(0.0)) - np.asarray(reference.u_exact(0.0))).max() == 0.0
+    ), f'{cls_name} starts from a different field'
+
+    # the monitoring hook takes no configuring, so each class has to say which wells it has
+    assert P.phase_thresh == 0.0, f'{cls_name} does not declare the +-1 convention'
 
 
 @pytest.mark.base
@@ -90,6 +95,12 @@ def test_FD_variants_agree_on_the_rhs(cls_name):
 def _eval_at_t0(cls_name):
     P = family_A(cls_name)
     return P.eval_f(P.u_exact(0.0), 0.0)
+
+
+@pytest.mark.mpi4py
+def test_family_B_declares_the_other_convention():
+    """The 0..1 classes say nothing, which is what the hook reads as "the field is the indicator"."""
+    assert getattr(family_B(), 'phase_thresh', None) is None, 'the 0..1 class claims the +-1 convention'
 
 
 @pytest.mark.mpi4py
@@ -172,36 +183,32 @@ def run_with_monitor(problem_class, problem_params, hook, dt=5e-4, nsteps=8):
 
 
 @pytest.mark.mpi4py
-def test_monitor_measures_the_same_blob_either_way():
-    """The monitor's two volume estimators, one per convention, must see one shrinking circle."""
+def test_one_monitor_serves_both_conventions():
+    """The monitor takes no configuring: the problem's own phase_thresh decides what it does."""
     from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
     from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
     from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex
 
-    class CountAbove(AllenCahnMonitor):
-        phase_thresh = 0.0
-        calibrate = True
-
-    class IntegrateField(AllenCahnMonitor):
-        calibrate = True
-
     counted = run_with_monitor(
-        allencahn2d_imex, {'nvars': NVARS, 'eps': EPS, 'radius': RADIUS, 'nu': 2, 'L': L}, CountAbove
+        allencahn2d_imex, {'nvars': NVARS, 'eps': EPS, 'radius': RADIUS, 'nu': 2, 'L': L}, AllenCahnMonitor
     )
     summed = run_with_monitor(
         allencahn_imex,
         {'nvars': NVARS, 'eps': EPS, 'radius': RADIUS, 'L': L, 'spectral': False, 'dw': 0.0},
-        IntegrateField,
+        AllenCahnMonitor,
     )
 
-    # calibration exists to make the diffuse interface drop out at t = 0
-    for name, out in (('counted', counted), ('summed', summed)):
-        assert out['computed_radius'][0] == RADIUS, f'{name} is not calibrated at t=0'
+    # integrating the 0..1 field picks up an O(eps) bias that no mesh refinement removes, so that
+    # estimator is calibrated against t = 0 and has to land on the initial radius exactly
+    assert summed['computed_radius'][0] == RADIUS, 'the integrating estimator is not calibrated'
 
-    # integrating the 0..1 field resolves the interface, so it should follow the analytic law closely
-    assert abs(summed['computed_radius'] - summed['exact_radius']).max() < 1e-3, 'the blob does not shrink as it should'
+    # counting cells above the threshold is consistent instead, so it is left alone -- and is
+    # therefore allowed to be off at t = 0, but only by the mesh
+    dx = L / NVARS[0]
+    assert 0 < abs(counted['computed_radius'][0] - RADIUS) < dx, 'the counting estimator drifted'
 
-    # counting cells quantizes the radius, so it is allowed to be coarser -- but not to disagree
+    # either way it is the same shrinking circle
+    assert abs(summed['computed_radius'] - summed['exact_radius']).max() < 1e-3, 'the blob shrinks wrongly'
     assert abs(counted['computed_radius'] - summed['computed_radius']).max() < 5e-3, 'the conventions disagree'
 
 
@@ -211,14 +218,11 @@ def test_monitor_in_3d():
     from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
     from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex
 
-    class IntegrateField(AllenCahnMonitor):
-        calibrate = True
-
     dt, nsteps = 2e-4, 4
     out = run_with_monitor(
         allencahn_imex,
         {'nvars': (32, 32, 32), 'eps': EPS, 'radius': RADIUS, 'L': L, 'spectral': False, 'dw': 0.0},
-        IntegrateField,
+        AllenCahnMonitor,
         dt=dt,
         nsteps=nsteps,
     )
@@ -232,10 +236,31 @@ def test_monitor_in_3d():
     assert abs(out['exact_radius'] - np.sqrt(RADIUS**2 - 4.0 * t)).max() < 1e-14, 'wrong shrinking law in 3D'
 
 
+@pytest.mark.mpi4py
+def test_interface_width_is_convention_independent():
+    """Measured relative to the wells, the interface is the same width in either spelling."""
+    from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
+    from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
+    from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex
+
+    def width(problem_class, problem_params):
+        prob = problem_class(**problem_params)
+        monitor = AllenCahnMonitor()
+        monitor.phase_thresh = getattr(prob, 'phase_thresh', None)
+        level = type('level', (), {'prob': prob})
+        return monitor.get_interface_width(level, np.asarray(prob.u_exact(0.0)))
+
+    counted = width(allencahn2d_imex, {'nvars': NVARS, 'eps': EPS, 'radius': RADIUS, 'nu': 2, 'L': L})
+    summed = width(allencahn_imex, {'nvars': NVARS, 'eps': EPS, 'radius': RADIUS, 'L': L, 'spectral': False, 'dw': 0.0})
+
+    assert counted == summed, f'interface width depends on the convention: {counted} vs {summed}'
+
+
 if __name__ == '__main__':
     test_FFT_and_MPIFFT_are_the_same_problem()
     test_FD_nonlinearity_matches_MPIFFT()
     test_the_map_survives_time_stepping()
-    test_monitor_measures_the_same_blob_either_way()
+    test_one_monitor_serves_both_conventions()
     test_monitor_in_3d()
+    test_interface_width_is_convention_independent()
     print('ok')

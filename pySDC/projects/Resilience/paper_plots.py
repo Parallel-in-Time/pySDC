@@ -705,7 +705,7 @@ def plot_Schroedinger_solution():  # pragma: no cover
 
 
 def plot_AC_solution():  # pragma: no cover
-    from pySDC.projects.Resilience.AC import monitor
+    from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 
     my_setup_mpl()
     if JOURNAL == 'JSC_beamer':
@@ -715,7 +715,7 @@ def plot_AC_solution():  # pragma: no cover
         fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45))
 
     description = {'problem_params': {'nvars': (256, 256)}}
-    stats, _, _ = run_AC(Tend=0.032, hook_class=monitor, custom_description=description)
+    stats, _, _ = run_AC(Tend=0.032, hook_class=AllenCahnMonitor, custom_description=description)
 
     u = get_sorted(stats, type='u')
 

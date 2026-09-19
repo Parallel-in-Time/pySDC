@@ -18,7 +18,7 @@ from pySDC.implementations.problem_classes.AllenCahn_2D_FD import (
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
-from pySDC.projects.TOMS.AllenCahn_monitor import monitor
+from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
@@ -68,7 +68,7 @@ def setup_parameters():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = monitor
+    controller_params['hook_class'] = AllenCahnMonitor
 
     # fill description dictionary for easy step instantiation
     description = dict()

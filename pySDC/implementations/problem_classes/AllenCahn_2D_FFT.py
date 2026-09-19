@@ -56,6 +56,8 @@ class allencahn2d_imex(Problem):
         Spectral operator for Laplacian.
     """
 
+    # this spelling of Allen-Cahn puts its wells at +-1, so the high phase is counted, not integrated
+    phase_thresh = 0.0
     dtype_u = mesh
     dtype_f = imex_mesh
 

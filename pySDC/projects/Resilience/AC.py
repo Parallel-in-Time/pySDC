@@ -2,7 +2,6 @@
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.hooks import Hooks
-from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
 import matplotlib.pyplot as plt
@@ -46,12 +45,6 @@ class allencahn_imex_timeforcing_adaptivity(allencahn2d_imex):
     @staticmethod
     def get_time_dep_fac(time_freq, time_dep_strength, t):
         return 1 - time_dep_strength * np.sin(time_freq * 2 * np.pi / 0.032 * t)
-
-
-class monitor(AllenCahnMonitor):
-    """The FFT problem used here puts the wells at +-1, so the high phase is counted, not summed."""
-
-    phase_thresh = 0.0
 
 
 def run_AC(

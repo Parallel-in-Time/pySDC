@@ -64,6 +64,8 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
         Number of calls of linear solver.
     """
 
+    # this spelling of Allen-Cahn puts its wells at +-1, so the high phase is counted, not integrated
+    phase_thresh = 0.0
     dtype_u = cupy_mesh
     dtype_f = cupy_mesh
 
