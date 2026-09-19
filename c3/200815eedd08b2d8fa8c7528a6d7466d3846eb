@@ -1,0 +1,19 @@
+etc/environment-mpi4py.yml
+  s_87bb659afc16ef::t_ab03d0059c7766 17-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c3200815eedd08b2d8fa8c7528a6d7466d3846eb",
+  "prompts": {},
+  "sessions": {
+    "s_87bb659afc16ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98b2d13f-e25a-40c9-aaad-fad128f6a78a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
