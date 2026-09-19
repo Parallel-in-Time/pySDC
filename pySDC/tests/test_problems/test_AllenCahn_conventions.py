@@ -148,8 +148,94 @@ def test_the_map_survives_time_stepping():
     assert error < 1e-10, f'the two spellings drift apart by {error:.3e} after {nsteps} steps'
 
 
+def run_with_monitor(problem_class, problem_params, hook, dt=5e-4, nsteps=8):
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+    from pySDC.helpers.stats_helper import get_sorted
+
+    description = {
+        'problem_class': problem_class,
+        'problem_params': problem_params,
+        'sweeper_class': imex_1st_order,
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'},
+        'level_params': {'restol': -1, 'dt': dt},
+        'step_params': {'maxiter': 6},
+    }
+    controller = controller_nonMPI(1, {'logger_level': 30, 'hook_class': hook}, description)
+    prob = controller.MS[0].levels[0].prob
+    _, stats = controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=nsteps * dt)
+
+    return {
+        key: np.array([value for _, value in get_sorted(stats, type=key, sortby='time')])
+        for key in ('computed_radius', 'exact_radius', 'computed_volume', 'exact_volume')
+    }
+
+
+@pytest.mark.mpi4py
+def test_monitor_measures_the_same_blob_either_way():
+    """The monitor's two volume estimators, one per convention, must see one shrinking circle."""
+    from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
+    from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
+    from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex
+
+    class CountAbove(AllenCahnMonitor):
+        phase_thresh = 0.0
+        calibrate = True
+
+    class IntegrateField(AllenCahnMonitor):
+        calibrate = True
+
+    counted = run_with_monitor(
+        allencahn2d_imex, {'nvars': NVARS, 'eps': EPS, 'radius': RADIUS, 'nu': 2, 'L': L}, CountAbove
+    )
+    summed = run_with_monitor(
+        allencahn_imex,
+        {'nvars': NVARS, 'eps': EPS, 'radius': RADIUS, 'L': L, 'spectral': False, 'dw': 0.0},
+        IntegrateField,
+    )
+
+    # calibration exists to make the diffuse interface drop out at t = 0
+    for name, out in (('counted', counted), ('summed', summed)):
+        assert out['computed_radius'][0] == RADIUS, f'{name} is not calibrated at t=0'
+
+    # integrating the 0..1 field resolves the interface, so it should follow the analytic law closely
+    assert abs(summed['computed_radius'] - summed['exact_radius']).max() < 1e-3, 'the blob does not shrink as it should'
+
+    # counting cells quantizes the radius, so it is allowed to be coarser -- but not to disagree
+    assert abs(counted['computed_radius'] - summed['computed_radius']).max() < 5e-3, 'the conventions disagree'
+
+
+@pytest.mark.mpi4py
+def test_monitor_in_3d():
+    """The 3D branch has no other coverage, and its shrinking law carries a different coefficient."""
+    from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
+    from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex
+
+    class IntegrateField(AllenCahnMonitor):
+        calibrate = True
+
+    dt, nsteps = 2e-4, 4
+    out = run_with_monitor(
+        allencahn_imex,
+        {'nvars': (32, 32, 32), 'eps': EPS, 'radius': RADIUS, 'L': L, 'spectral': False, 'dw': 0.0},
+        IntegrateField,
+        dt=dt,
+        nsteps=nsteps,
+    )
+
+    # radius and volume have to describe the same ball
+    ball = 4.0 / 3.0 * np.pi * out['computed_radius'] ** 3
+    assert abs(ball - out['computed_volume']).max() < 1e-12, 'radius and volume disagree in 3D'
+
+    # mean curvature flow in d dimensions: R^2 = R0^2 - 2 (d - 1) t, so 4t rather than 2t here
+    t = np.arange(nsteps + 1) * dt
+    assert abs(out['exact_radius'] - np.sqrt(RADIUS**2 - 4.0 * t)).max() < 1e-14, 'wrong shrinking law in 3D'
+
+
 if __name__ == '__main__':
     test_FFT_and_MPIFFT_are_the_same_problem()
     test_FD_nonlinearity_matches_MPIFFT()
     test_the_map_survives_time_stepping()
+    test_monitor_measures_the_same_blob_either_way()
+    test_monitor_in_3d()
     print('ok')

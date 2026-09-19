@@ -2,6 +2,7 @@
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.hooks import Hooks
+from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
 import matplotlib.pyplot as plt
@@ -47,102 +48,10 @@ class allencahn_imex_timeforcing_adaptivity(allencahn2d_imex):
         return 1 - time_dep_strength * np.sin(time_freq * 2 * np.pi / 0.032 * t)
 
 
-class monitor(Hooks):
-    phase_thresh = 0.0  # count everything above this threshold to the high phase.
+class monitor(AllenCahnMonitor):
+    """The FFT problem used here puts the wells at +-1, so the high phase is counted, not summed."""
 
-    def __init__(self):
-        """
-        Initialization of Allen-Cahn monitoring
-        """
-        super().__init__()
-
-        self.init_radius = None
-
-    def get_exact_radius(self, t):
-        return np.sqrt(max(self.init_radius**2 - 2.0 * t, 0))
-
-    @classmethod
-    def get_radius(cls, u, dx):
-        c = np.count_nonzero(u > cls.phase_thresh)
-        return np.sqrt(c / np.pi) * dx
-
-    @staticmethod
-    def get_interface_width(u, L):
-        # TODO: How does this generalize to different phase transitions?
-        rows1 = np.where(u[L.prob.init[0][0] // 2, : L.prob.init[0][0] // 2] > -0.99)
-        rows2 = np.where(u[L.prob.init[0][0] // 2, : L.prob.init[0][0] // 2] < 0.99)
-
-        return (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
-
-    def pre_run(self, step, level_number):
-        """
-        Record radius of the blob, exact radius and interface width.
-
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
-        """
-        super().pre_run(step, level_number)
-        L = step.levels[0]
-
-        radius = self.get_radius(L.u[0], L.prob.dx)
-        self.init_radius = L.prob.radius
-
-        if L.time == 0.0:
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time,
-                level=-1,
-                iter=step.status.iter,
-                sweep=L.status.sweep,
-                type='computed_radius',
-                value=radius,
-            )
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time,
-                level=-1,
-                iter=step.status.iter,
-                sweep=L.status.sweep,
-                type='exact_radius',
-                value=self.init_radius,
-            )
-
-    def post_step(self, step, level_number):
-        """
-        Record radius of the blob, exact radius and interface width.
-
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
-        """
-        super().post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[0]
-
-        radius = self.get_radius(L.uend, L.prob.dx)
-
-        exact_radius = self.get_exact_radius(L.time + L.dt)
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=-1,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='computed_radius',
-            value=radius,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=-1,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='exact_radius',
-            value=exact_radius,
-        )
+    phase_thresh = 0.0
 
 
 def run_AC(
@@ -318,8 +227,8 @@ class LivePlot(Hooks):  # pragma: no cover
 
             # plot radius
             self.axs[1].cla()
-            radius, _ = LogRadius.compute_radius(step.levels[level_number])
-            exact_radius = LogRadius.exact_radius(step.levels[level_number])
+            radius = np.sqrt(np.count_nonzero(L.uend > 0.0) / np.pi) * L.prob.dx
+            exact_radius = np.sqrt(max(L.prob.radius**2 - 2.0 * (L.time + L.dt), 0))
 
             self.radius += [radius]
             self.exact_radius += [exact_radius]
@@ -352,128 +261,6 @@ class LivePlot(Hooks):  # pragma: no cover
                     pass
 
         plt.pause(1e-9)
-
-
-class LogRadius(Hooks):
-    @staticmethod
-    def compute_radius(L):
-        c = np.count_nonzero(L.u[0] > 0.0)
-        radius = np.sqrt(c / np.pi) * L.prob.dx
-
-        rows, cols = np.where(L.u[0] > 0.0)
-
-        rows1 = np.where(L.u[0][int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] > -0.99)
-        rows2 = np.where(L.u[0][int((L.prob.init[0][0]) / 2), : int((L.prob.init[0][0]) / 2)] < 0.99)
-        interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
-
-        return radius, interface_width
-
-    @staticmethod
-    def exact_radius(L):
-        init_radius = L.prob.radius
-        return np.sqrt(max(init_radius**2 - 2.0 * (L.time + L.dt), 0))
-
-    def pre_run(self, step, level_number):
-        """
-        Overwrite standard pre run hook
-
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
-        """
-        super().pre_run(step, level_number)
-        L = step.levels[0]
-
-        radius, interface_width = self.compute_radius(L)
-        exact_radius = self.exact_radius(L)
-
-        if L.time == 0.0:
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time,
-                level=-1,
-                iter=step.status.iter,
-                sweep=L.status.sweep,
-                type='computed_radius',
-                value=radius,
-            )
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time,
-                level=-1,
-                iter=step.status.iter,
-                sweep=L.status.sweep,
-                type='exact_radius',
-                value=exact_radius,
-            )
-            self.add_to_stats(
-                process=step.status.slot,
-                time=L.time,
-                level=-1,
-                iter=step.status.iter,
-                sweep=L.status.sweep,
-                type='interface_width',
-                value=interface_width,
-            )
-
-    def post_run(self, step, level_number):
-        """
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
-        """
-        super().post_run(step, level_number)
-
-        L = step.levels[0]
-
-        exact_radius = self.exact_radius(L)
-        radius, interface_width = self.compute_radius(L)
-
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=-1,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='computed_radius',
-            value=radius,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=-1,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='exact_radius',
-            value=exact_radius,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=-1,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='interface_width',
-            value=interface_width,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=level_number,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='e_global_post_run',
-            value=abs(radius - exact_radius),
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=level_number,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='e_global_rel_post_run',
-            value=abs(radius - exact_radius) / abs(exact_radius),
-        )
 
 
 if __name__ == '__main__':
