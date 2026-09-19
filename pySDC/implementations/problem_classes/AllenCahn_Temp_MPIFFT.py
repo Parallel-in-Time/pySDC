@@ -2,7 +2,7 @@ import numpy as np
 from mpi4py_fft import PFFT
 
 from pySDC.core.errors import ProblemError
-from pySDC.core.problem import Problem
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 from mpi4py_fft import newDistArray
@@ -149,6 +149,8 @@ class allencahn_temp_imex(Problem):
         self.dx = self.L / nvars[0]
         self.dy = self.L / nvars[1]
 
+        self.work_counters['rhs'] = WorkCounter()
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -198,6 +200,7 @@ class allencahn_temp_imex(Problem):
             f.impl[..., 1] = self.fft.backward(lap_u_hat, f.impl[..., 1])
             f.expl[..., 1] = f.impl[..., 0] + f.expl[..., 0]
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):

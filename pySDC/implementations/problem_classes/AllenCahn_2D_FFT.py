@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.core.errors import ProblemError
-from pySDC.core.problem import Problem
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
@@ -37,8 +37,8 @@ class allencahn2d_imex(Problem):
     ----------
     nvars : List of int tuples, optional
         Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
-    nu : float, optional
-        Problem parameter :math:`\nu`.
+    nu : int, optional
+        Deprecated: only ``nu=2`` is supported, and anything else raises.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`.
     radius : float, optional
@@ -47,6 +47,8 @@ class allencahn2d_imex(Problem):
         Denotes the period of the function to be approximated for the Fourier transform.
     init_type : str, optional
         Indicates which type of initial condition is used.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
 
     Attributes
     ----------
@@ -56,6 +58,8 @@ class allencahn2d_imex(Problem):
         Mesh width.
     lap : np.1darray
         Spectral operator for Laplacian.
+    work_counters : WorkCounter
+        Counts the right-hand side evaluations.
     """
 
     dtype_u = mesh
@@ -131,6 +135,8 @@ class allencahn2d_imex(Problem):
         xv, yv = self.xp.meshgrid(kx, ky, indexing='ij')
         self.lap = -(xv**2) - yv**2
 
+        self.work_counters['rhs'] = WorkCounter()
+
     def reaction(self, u):
         r"""The reaction term :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`."""
         return -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
@@ -157,6 +163,8 @@ class allencahn2d_imex(Problem):
         f.impl[:] = self.xp.fft.irfft2(tmp)
         if self.eps > 0:
             f.expl[:] = self.reaction(u)
+
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -264,8 +272,8 @@ class allencahn2d_imex_stab(allencahn2d_imex):
     ----------
     nvars : List of int tuples, optional
         Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
-    nu : float, optional
-        Problem parameter :math:`\nu`.
+    nu : int, optional
+        Deprecated: only ``nu=2`` is supported, and anything else raises.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`.
     radius : float, optional
@@ -274,6 +282,8 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         Denotes the period of the function to be approximated for the Fourier transform.
     init_type : str, optional
         Indicates which type of initial condition is used.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
 
     Attributes
     ----------
@@ -283,6 +293,8 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         Mesh width.
     lap : np.1darray
         Spectral operator for Laplacian.
+    work_counters : WorkCounter
+        Counts the right-hand side evaluations.
     """
 
     def __init__(self, nvars=None, nu=2, eps=0.04, radius=0.25, L=1.0, init_type='circle', useGPU=False):
@@ -316,6 +328,8 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         f.impl[:] = self.xp.fft.irfft2(tmp)
         if self.eps > 0:
             f.expl[:] = self.reaction(u) + 2.0 / self.eps**2 * u
+
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):

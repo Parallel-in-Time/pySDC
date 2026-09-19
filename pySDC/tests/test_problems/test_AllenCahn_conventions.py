@@ -241,6 +241,44 @@ def _run(problem_class, problem_params, dt, nsteps, hook=None):
     return stats if hook else np.asarray(uend)
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('cls_name', FD_VARIANTS + FFT_VARIANTS)
+def test_the_work_counters_count(cls_name):
+    """Every class counts its right-hand sides, and every solver its iterations."""
+    P = build(cls_name)
+    u = P.u_exact(0.0)
+
+    assert P.work_counters['rhs'].niter == 0, 'the rhs counter did not start at zero'
+    P.eval_f(u, 0.0)
+    assert P.work_counters['rhs'].niter == 1, 'evaluating the rhs did not count'
+
+    # the FFT classes invert the Laplacian in one shot and have nothing to iterate
+    if not {'newton', 'linear'} & set(P.work_counters):
+        return
+
+    # the FD ones do. They still track how many times each solver was *called*, which the work
+    # counters do not, so use that: whenever a solver ran, its iterations have to have been
+    # counted. One of them is a closed-form solve and calls neither, which is why this is tied
+    # to the call counters rather than simply demanding that every solver iterate.
+    def state():
+        return (
+            P.newton_ncalls,
+            P.lin_ncalls,
+            P.work_counters['newton'].niter,
+            P.work_counters['linear'].niter,
+        )
+
+    for solver in ('solve_system', 'solve_system_1', 'solve_system_2'):
+        if not hasattr(P, solver):
+            continue
+        n0, l0, wn0, wl0 = state()
+        getattr(P, solver)(u, 1e-4, u, 0.0)
+        n1, l1, wn1, wl1 = state()
+
+        assert n1 == n0 or wn1 > wn0, f'{solver} ran a Newton solve without counting its iterations'
+        assert l1 == l0 or wl1 > wl0, f'{solver} ran a linear solve without counting its iterations'
+
+
 @pytest.mark.cupy
 @pytest.mark.parametrize('cls_name', FD_VARIANTS + FFT_VARIANTS)
 def test_the_GPU_path_matches_the_CPU_one(cls_name):

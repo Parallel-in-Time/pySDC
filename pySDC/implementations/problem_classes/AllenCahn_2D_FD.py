@@ -32,8 +32,8 @@ class allencahn_fullyimplicit(Problem):
     ----------
     nvars : tuple of int, optional
         Number of unknowns in the problem, e.g. ``nvars=(128, 128)``.
-    nu : float, optional
-        Problem parameter :math:`\nu`.
+    nu : int, optional
+        Deprecated: only ``nu=2`` is supported, and anything else raises.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`.
     newton_maxiter : int, optional
@@ -48,6 +48,8 @@ class allencahn_fullyimplicit(Problem):
         Radius of the circles.
     order : int, optional
         Order of the finite difference matrix.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
 
     Attributes
     ----------
@@ -57,14 +59,11 @@ class allencahn_fullyimplicit(Problem):
         Distance between two spatial nodes (same for both directions).
     xvalues : np.1darray
         Spatial grid points, here both dimensions have the same grid points.
-    newton_itercount : int
-        Number of iterations of Newton solver.
-    lin_itercount
-        Number of iterations of linear solver.
     newton_ncalls : int
-        Number of calls of Newton solver.
+        Number of calls of the Newton solver. The iterations themselves are counted in
+        ``work_counters['newton']``, and the linear ones in ``work_counters['linear']``.
     lin_ncalls : int
-        Number of calls of linear solver.
+        Number of calls of the linear solver.
     """
 
     dtype_u = mesh
@@ -163,8 +162,6 @@ class allencahn_fullyimplicit(Problem):
         )
         self.xvalues = self.xp.array([i * self.dx - 0.5 for i in range(self.nvars[0])])
 
-        self.newton_itercount = 0
-        self.lin_itercount = 0
         self.newton_ncalls = 0
         self.lin_ncalls = 0
 
@@ -257,7 +254,6 @@ class allencahn_fullyimplicit(Problem):
         me[:] = u.reshape(self.nvars)
 
         self.newton_ncalls += 1
-        self.newton_itercount += n
 
         return me
 
@@ -381,14 +377,6 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        class context:
-            num_iter = 0
-
-        def callback(xk):
-            context.num_iter += 1
-            self.work_counters['linear']()
-            return context.num_iter
-
         me = self.dtype_u(self.init)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
@@ -400,11 +388,10 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             rtol=self.lin_tol,
             maxiter=self.lin_maxiter,
             atol=0,
-            callback=callback,
+            callback=self.work_counters['linear'],
         )[0].reshape(self.nvars)
 
         self.lin_ncalls += 1
-        self.lin_itercount += context.num_iter
 
         return me
 
@@ -479,6 +466,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         f.impl[:] = (self.A.dot(v) + self.reaction_cubic(v)).reshape(self.nvars)
         f.expl[:] = self.reaction_linear(v).reshape(self.nvars)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -531,6 +519,8 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
             n += 1
             # print(n, res)
 
+            self.work_counters['newton']()
+
         # if n == self.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
@@ -538,7 +528,6 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         me[:] = u.reshape(self.nvars)
 
         self.newton_ncalls += 1
-        self.newton_itercount += n
 
         return me
 
@@ -586,6 +575,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         f.comp1[:] = self.A.dot(v).reshape(self.nvars)
         f.comp2[:] = self.reaction(v).reshape(self.nvars)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system_1(self, rhs, factor, u0, t):
@@ -609,13 +599,6 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        class context:
-            num_iter = 0
-
-        def callback(xk):
-            context.num_iter += 1
-            return context.num_iter
-
         me = self.dtype_u(self.init)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
@@ -627,11 +610,10 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             rtol=self.lin_tol,
             maxiter=self.lin_maxiter,
             atol=0,
-            callback=callback,
+            callback=self.work_counters['linear'],
         )[0].reshape(self.nvars)
 
         self.lin_ncalls += 1
-        self.lin_itercount += context.num_iter
 
         return me
 
@@ -684,6 +666,8 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             n += 1
             # print(n, res)
 
+            self.work_counters['newton']()
+
         # if n == self.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
@@ -691,7 +675,6 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         me[:] = u.reshape(self.nvars)
 
         self.newton_ncalls += 1
-        self.newton_itercount += n
 
         return me
 
@@ -740,6 +723,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         f.comp1[:] = (self.A.dot(v) + self.reaction_cubic(v)).reshape(self.nvars)
         f.comp2[:] = self.reaction_linear(v).reshape(self.nvars)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system_1(self, rhs, factor, u0, t):
@@ -797,6 +781,8 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
             n += 1
             # print(n, res)
 
+            self.work_counters['newton']()
+
         # if n == self.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
@@ -804,7 +790,6 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         me[:] = u.reshape(self.nvars)
 
         self.newton_ncalls += 1
-        self.newton_itercount += n
 
         return me
 
