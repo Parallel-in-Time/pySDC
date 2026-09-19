@@ -121,7 +121,7 @@ class allencahn2d_imex(Problem):
         )
 
         self.dx = self.L / self.nvars[0]  # could be useful for hooks, too.
-        self.xvalues = self.xp.array([i * self.dx - self.L / 2.0 for i in range(self.nvars[0])])
+        self.xvalues = self.xp.arange(self.nvars[0]) * self.dx - self.L / 2.0
 
         kx = self.xp.zeros(self.init[0][0])
         ky = self.xp.zeros(self.init[0][1] // 2 + 1)

@@ -160,7 +160,7 @@ class allencahn_fullyimplicit(Problem):
             bc='periodic',
             cupy=self.useGPU,
         )
-        self.xvalues = self.xp.array([i * self.dx - 0.5 for i in range(self.nvars[0])])
+        self.xvalues = self.xp.arange(self.nvars[0]) * self.dx - 0.5
 
         self.newton_ncalls = 0
         self.lin_ncalls = 0
@@ -503,7 +503,6 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
             g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            # res = self.xp.linalg.norm(g, self.xp.inf)
             res = self.xp.linalg.norm(g, self.xp.inf)
 
             if res < self.newton_tol:

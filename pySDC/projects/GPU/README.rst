@@ -31,7 +31,9 @@ same for GPU and CPU. Only the import for the problem_class changed.
 
 More examples
 -------------
-Further examples can found with Allen-Cahn:
+Further examples can found with Allen-Cahn. These take the other route: rather than a separate
+``_gpu`` module, one class serves both and a ``useGPU`` flag switches the array, sparse and solver
+modules and the datatypes over to CuPy.
 * problem: [AllenCahn_2D_FD.py](../../implementations/problem_classes/AllenCahn_2D_FD.py), with ``useGPU=True``
 * problem: [AllenCahn_2D_FFT.py](../../implementations/problem_classes/AllenCahn_2D_FFT.py), with ``useGPU=True``
   * Script to run pySDC: [ac-fft.py](ac-fft.py)

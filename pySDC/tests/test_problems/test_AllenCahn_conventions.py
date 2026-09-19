@@ -122,9 +122,38 @@ def test_nu_is_rejected(cls_name):
         build(cls_name, nu=3)
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('which', ['reaction', 'reaction_cubic'])
+def test_the_jacobians_are_the_derivatives_they_claim(which):
+    """The Newton solves stand or fall on these, and nothing else checks them."""
+    P = build('allencahn_fullyimplicit')
+    f = getattr(P, which)
+    df = getattr(P, which + '_prime')
+
+    u = np.linspace(-0.25, 1.25, 41)
+    h = 1e-6
+    numerical = (f(u + h) - f(u - h)) / (2 * h)
+
+    error = abs(df(u) - numerical).max() / abs(numerical).max()
+    assert error < 1e-8, f'{which}_prime is not the derivative of {which}: relative error {error:.2e}'
+
+
 # --------------------------------------------------------------------------------------------
 # the classes against each other
 # --------------------------------------------------------------------------------------------
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('cls_name', FD_VARIANTS[1:] + FFT_VARIANTS)
+def test_one_reaction_term_everywhere(cls_name):
+    """The term is spelled out once per file, so pin the classes to each other against drift.
+
+    Checking the roots is not enough: a wrong coefficient keeps them where they are.
+    """
+    u = np.linspace(-0.25, 1.25, 41)
+    reference = build('allencahn_fullyimplicit').reaction(u)
+
+    assert abs(build(cls_name).reaction(u) - reference).max() == 0.0, f'{cls_name} reacts differently'
 
 
 @pytest.mark.base
