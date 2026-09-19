@@ -1,0 +1,39 @@
+pySDC/projects/parallelSDC/AllenCahn_parallel.py
+  s_87bb659afc16ef::t_599ac7c8e727fb 13,59
+pySDC/implementations/problem_classes/AllenCahn_2D_FD.py
+  s_87bb659afc16ef::t_0f4d6a4c20656c 68-69
+pySDC/implementations/hooks/AllenCahn_monitor.py
+  s_87bb659afc16ef::t_81c7eba68d9b45 14-29,37,41-45,51,53-55,88-103,109,116-120,138,141-142
+pySDC/implementations/problem_classes/AllenCahn_2D_FFT.py
+  s_87bb659afc16ef::t_0f4d6a4c20656c 59-60
+pySDC/tests/test_problems/test_AllenCahn_conventions.py
+  s_87bb659afc16ef::t_2efe5a5cfab627 186-187,193,198,201-203,205-208,210-211,225,239-258,263,265
+  s_87bb659afc16ef::t_60c96ba6dddeb2 74-79,81-82,100-103
+  s_87bb659afc16ef::t_8932f1f0ff70ee 104-105
+pySDC/implementations/problem_classes/AllenCahn_2D_FFT_gpu.py
+  s_87bb659afc16ef::t_0f4d6a4c20656c 61-62
+pySDC/projects/TOMS/AllenCahn_contracting_circle.py
+  s_87bb659afc16ef::t_599ac7c8e727fb 21,71
+pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_verification.py
+  s_87bb659afc16ef::t_599ac7c8e727fb 17,80
+pySDC/projects/Resilience/paper_plots.py
+  s_87bb659afc16ef::t_599ac7c8e727fb 708,718
+pySDC/implementations/problem_classes/AllenCahn_2D_FD_gpu.py
+  s_87bb659afc16ef::t_0f4d6a4c20656c 67-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "44f061f2b201b29934ba36e46b38cdd675666018",
+  "prompts": {},
+  "sessions": {
+    "s_87bb659afc16ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98b2d13f-e25a-40c9-aaad-fad128f6a78a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
