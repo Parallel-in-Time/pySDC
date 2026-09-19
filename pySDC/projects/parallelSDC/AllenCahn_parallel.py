@@ -10,7 +10,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
-from pySDC.playgrounds.Allen_Cahn.AllenCahn_monitor import monitor
+from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 from pySDC.implementations.transfer_classes.BaseTransferMPI import base_transfer_MPI
 from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI
 
@@ -40,7 +40,6 @@ def run_variant(variant=None):
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 2
 
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 100
@@ -56,7 +55,7 @@ def run_variant(variant=None):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = monitor
+    controller_params['hook_class'] = AllenCahnMonitor
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -148,10 +147,12 @@ def run_variant(variant=None):
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         print(out)
 
-        print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
+        newton_iters = P.work_counters['newton'].niter
+        lin_iters = P.work_counters['linear'].niter
+        print('   Iteration count (nonlinear/linear): %i / %i' % (newton_iters, lin_iters))
         print(
             '   Mean Iteration count per call: %4.2f / %4.2f'
-            % (P.newton_itercount / max(P.newton_ncalls, 1), P.lin_itercount / max(P.lin_ncalls, 1))
+            % (newton_iters / max(P.newton_ncalls, 1), lin_iters / max(P.lin_ncalls, 1))
         )
 
         timing = get_sorted(stats, type='timing_run', sortby='time')

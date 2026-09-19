@@ -41,8 +41,6 @@ Further/related files
 
 The following files are also listed under this project:
 
-- ``AllenCahn_monitor_and_dump.py``: computes the radii for the verification problems and dumps the solution via MPI I/O
-- ``AllenCahn_monitor.py``: computes the radii for the verification problems
 - ``AllenCahn_dump.py``: dumps the solution via MPI I/O
 - ``visualize.py``: simple script to turn field data from the dump routines into pngs
 - ``visualize_temp.py``: simple script to turn field and temperature data from the dump routines into pngs and movies
@@ -50,6 +48,7 @@ The following files are also listed under this project:
 
 The project uses in particular these implementations from the ``implementations`` folder:
 
+- ``AllenCahn_monitor.py`` in the ``hooks``: computes the radii for the verification problems, shared with the other Allen-Cahn projects
 - ``mesh.py`` in the ``datatype_classes``: contains numpy-based data with a communicator
 - ``AllenCahn_MPIFFT.py`` in the ``problem_classes``: contains the implementation of the problem for simple forcing terms
 - ``AllenCahn_Temp_MPIFFT.py`` in the ``problem_classes``: contains the implementation of the problem for temperature-based forcing

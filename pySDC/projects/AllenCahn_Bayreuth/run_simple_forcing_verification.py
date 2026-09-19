@@ -14,7 +14,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex, allencahn_imex_timeforcing
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
-from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_monitor import monitor
+from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 
 
 def run_simulation(name='', spectral=None, nprocs_space=None):
@@ -77,7 +77,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30 if space_rank == 0 else 99  # set level depending on rank
-    controller_params['hook_class'] = monitor
+    controller_params['hook_class'] = AllenCahnMonitor
     controller_params['predict_type'] = 'pfasst_burnin'
 
     # fill description dictionary for easy step instantiation
