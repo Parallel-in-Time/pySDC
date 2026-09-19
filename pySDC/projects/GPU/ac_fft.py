@@ -1,5 +1,4 @@
-from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex as ac_fft_cpu
-from pySDC.implementations.problem_classes.AllenCahn_2D_FFT_gpu import allencahn2d_imex as ac_fft_gpu
+from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
 from pySDC.core.collocation import CollBase as Collocation
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -57,7 +56,7 @@ def main():
     controller_params, description, t0, Tend = set_parameter()
 
     # fill description dictionary with CPU problem
-    description['problem_class'] = ac_fft_cpu
+    description['problem_class'] = allencahn2d_imex
 
     # instantiate controller cpu
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -71,8 +70,8 @@ def main():
     timing_cpu = sort_stats(filter_stats(stats_cpu, type='timing_run'), sortby='time')
     print('Runtime CPU:', timing_cpu[0][1])
 
-    # change description dictionary with GPU problem
-    description['problem_class'] = ac_fft_gpu
+    # same problem again, this time on the GPU
+    description['problem_params'] = dict(description['problem_params'], useGPU=True)
 
     # instantiate controller cpu
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)

@@ -32,8 +32,8 @@ same for GPU and CPU. Only the import for the problem_class changed.
 More examples
 -------------
 Further examples can found with Allen-Cahn:
-* problem: [AllenCahn_2D_FD.py](../../implementations/problem_classes/AllenCahn_2D_FD.py) and [AllenCahn_2D_FD_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FD_gpu.py)
-* problem: [AllenCahn_2D_FFT.py](../../implementations/problem_classes/AllenCahn_2D_FFT.py) and [AllenCahn_2D_FFT_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FFT_gpu.py)
+* problem: [AllenCahn_2D_FD.py](../../implementations/problem_classes/AllenCahn_2D_FD.py), with ``useGPU=True``
+* problem: [AllenCahn_2D_FFT.py](../../implementations/problem_classes/AllenCahn_2D_FFT.py), with ``useGPU=True``
   * Script to run pySDC: [ac-fft.py](ac-fft.py)
 
 

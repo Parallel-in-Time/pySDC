@@ -50,22 +50,27 @@ def total_rhs(f):
     return np.asarray(f)
 
 
-def build(cls_name, **kwargs):
-    """One Allen-Cahn problem by name, at the shared parameters."""
-    params = dict(nvars=NVARS, eps=EPS, radius=RADIUS, **kwargs)
-
+def problem_class(cls_name):
+    """One Allen-Cahn class by name, with the extra arguments its constructor wants."""
     if cls_name in FFT_VARIANTS:
         import pySDC.implementations.problem_classes.AllenCahn_2D_FFT as FFT
 
-        return getattr(FFT, cls_name)(L=L, **params)
+        return getattr(FFT, cls_name), {'L': L}
     if cls_name == 'allencahn_imex':
         from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex
 
-        return allencahn_imex(L=L, spectral=False, dw=0.0, **params)
+        return allencahn_imex, {'L': L, 'spectral': False, 'dw': 0.0}
 
     import pySDC.implementations.problem_classes.AllenCahn_2D_FD as FD
 
-    return getattr(FD, cls_name)(**params)
+    return getattr(FD, cls_name), {}
+
+
+def build(cls_name, **kwargs):
+    """One Allen-Cahn problem by name, at the shared parameters."""
+    cls, extra = problem_class(cls_name)
+
+    return cls(nvars=NVARS, eps=EPS, radius=RADIUS, **extra, **kwargs)
 
 
 # --------------------------------------------------------------------------------------------
@@ -234,6 +239,32 @@ def _run(problem_class, problem_params, dt, nsteps, hook=None):
     uend, stats = controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=nsteps * dt)
 
     return stats if hook else np.asarray(uend)
+
+
+@pytest.mark.cupy
+@pytest.mark.parametrize('cls_name', FD_VARIANTS + FFT_VARIANTS)
+def test_the_GPU_path_matches_the_CPU_one(cls_name):
+    """These used to be separate files that drifted apart; now useGPU is the only difference."""
+    import cupy as cp
+
+    cls, extra = problem_class(cls_name)
+    params = dict(nvars=NVARS, eps=EPS, radius=RADIUS, **extra)
+
+    # setup_GPU switches the class rather than the instance, so run the GPU side on a throwaway
+    # subclass and leave the shared class on the CPU for the rest of the suite
+    cpu = cls(**params)
+    on_gpu = type(f'{cls_name}_on_GPU', (cls,), {})
+    gpu = on_gpu(useGPU=True, **params)
+
+    # a multilevel run builds one problem per level, so setup_GPU has to survive a second call
+    on_gpu(useGPU=True, **params)
+
+    u_cpu, u_gpu = np.asarray(cpu.u_exact(0.0)), cp.asnumpy(gpu.u_exact(0.0))
+    assert abs(u_cpu - u_gpu).max() < 1e-12, 'the two modes start from different fields'
+
+    f_cpu = total_rhs(cpu.eval_f(cpu.u_exact(0.0), 0.0))
+    f_gpu = cp.asnumpy(total_rhs(gpu.eval_f(gpu.u_exact(0.0), 0.0)))
+    assert abs(f_cpu - f_gpu).max() < 1e-10 * max(abs(f_cpu).max(), 1.0), 'the two modes disagree on the rhs'
 
 
 # --------------------------------------------------------------------------------------------
