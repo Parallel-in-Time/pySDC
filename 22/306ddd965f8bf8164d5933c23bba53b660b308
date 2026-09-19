@@ -1,0 +1,32 @@
+pySDC/tests/test_problems/test_AllenCahn_conventions.py
+  s_87bb659afc16ef::t_6f6abd0cea8cb2 151-234,239-240
+pySDC/projects/TOMS/AllenCahn_monitor.py
+  s_87bb659afc16ef::t_c700b95e651595 1-2
+pySDC/projects/Resilience/AC.py
+  s_87bb659afc16ef::t_b52e5020a98ae9 5,51-52,54,230-231
+pySDC/implementations/hooks/AllenCahn_monitor.py
+  s_87bb659afc16ef::t_2151a50f97536b 42
+  s_87bb659afc16ef::t_640d36297473da 1-41,43-52,54-76,84,86-94,96-120,122-150
+  s_87bb659afc16ef::t_f5654a2d1206e1 53,79,121
+  s_87bb659afc16ef::t_e56465099881b1 77-78,80-83,85,95
+pySDC/projects/AllenCahn_Bayreuth/AllenCahn_monitor.py
+  s_87bb659afc16ef::t_6bf417aa732fbd 1,4-5,7
+pySDC/projects/parallelSDC/AllenCahn_parallel.py
+  s_87bb659afc16ef::t_4a9e9009d52e00 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "22306ddd965f8bf8164d5933c23bba53b660b308",
+  "prompts": {},
+  "sessions": {
+    "s_87bb659afc16ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98b2d13f-e25a-40c9-aaad-fad128f6a78a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
