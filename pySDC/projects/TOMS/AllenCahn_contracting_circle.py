@@ -52,7 +52,6 @@ def setup_parameters():
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 2
     problem_params['nvars'] = [(128, 128)]
     problem_params['eps'] = [0.04]
     problem_params['newton_maxiter'] = 100

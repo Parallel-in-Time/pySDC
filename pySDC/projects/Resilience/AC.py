@@ -192,7 +192,7 @@ def plot_solution(stats):  # pragma: no cover
 
     u = get_sorted(stats, type='u', recomputed=False)
     for me in u:  # pun intended
-        ax.imshow(me[1], vmin=-1, vmax=1)
+        ax.imshow(me[1], vmin=0.0, vmax=1.0)
         ax.set_title(f't={me[0]:.2e}')
         plt.pause(1e-1)
 
@@ -220,7 +220,7 @@ class LivePlot(Hooks):  # pragma: no cover
 
             # plot radius
             self.axs[1].cla()
-            radius = np.sqrt(np.count_nonzero(L.uend > 0.0) / np.pi) * L.prob.dx
+            radius = np.sqrt(np.count_nonzero(L.uend > 0.5) / np.pi) * L.prob.dx
             exact_radius = np.sqrt(max(L.prob.radius**2 - 2.0 * (L.time + L.dt), 0))
 
             self.radius += [radius]

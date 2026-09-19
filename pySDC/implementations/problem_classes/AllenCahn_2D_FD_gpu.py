@@ -12,10 +12,11 @@ from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cup
 
 class allencahn_fullyimplicit(Problem):  # pragma: no cover
     r"""
-    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
 
     for constant parameter :math:`\nu`. Initial condition are circles of the form
 
@@ -64,8 +65,6 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
         Number of calls of linear solver.
     """
 
-    # this spelling of Allen-Cahn puts its wells at +-1, so the high phase is counted, not integrated
-    phase_thresh = 0.0
     dtype_u = cupy_mesh
     dtype_f = cupy_mesh
 
@@ -90,6 +89,12 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
+        if nu != 2:
+            raise ProblemError(
+                'the exponent nu is deprecated and only nu=2 is supported: the 0..1 form of Allen-Cahn '
+                f'that this class now solves has no analogue of it, got nu={nu}'
+            )
+
         super().__init__((nvars, None, cp.dtype('float64')))
         self._makeAttributeAndRegister(
             'nvars',
@@ -113,6 +118,26 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
         self.lin_itercount = 0
         self.newton_ncalls = 0
         self.lin_ncalls = 0
+
+    def reaction(self, u):
+        r"""The reaction term :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`."""
+        return -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+
+    def reaction_prime(self, u):
+        """Derivative of :meth:`reaction`, ready to go on the diagonal of a Jacobian."""
+        return -2.0 / self.eps**2 * ((1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)))
+
+    def reaction_cubic(self, u):
+        r"""The stiff cubic part of :meth:`reaction`, :math:`-\frac{1}{2\varepsilon^2}(2u - 1)^3`."""
+        return -0.5 / self.eps**2 * (2.0 * u - 1.0) ** 3
+
+    def reaction_cubic_prime(self, u):
+        """Derivative of :meth:`reaction_cubic`."""
+        return -3.0 / self.eps**2 * (2.0 * u - 1.0) ** 2
+
+    def reaction_linear(self, u):
+        r"""The rest of :meth:`reaction`, :math:`\frac{1}{2\varepsilon^2}(2u - 1)`, so the two sum back to it."""
+        return 0.5 / self.eps**2 * (2.0 * u - 1.0)
 
     @staticmethod
     def __get_A(N, dx):
@@ -167,8 +192,6 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
 
         u = self.dtype_u(u0).flatten()
         z = self.dtype_u(self.init, val=0.0).flatten()
-        nu = self.nu
-        eps2 = self.eps**2
 
         Id = csp.eye(self.nvars[0] * self.nvars[1])
 
@@ -177,7 +200,7 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + 1.0 / eps2 * u * (1.0 - u**nu)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction(u)) - rhs.flatten()
 
             # if g is close to 0, then we are done
             res = cp.linalg.norm(g, np.inf)
@@ -186,7 +209,7 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A + 1.0 / eps2 * csp.diags((1.0 - (nu + 1) * u**nu), offsets=0))
+            dg = Id - factor * (self.A + csp.diags(self.reaction_prime(u), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
@@ -224,7 +247,7 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
-        f[:] = (self.A.dot(v) + 1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
+        f[:] = (self.A.dot(v) + self.reaction(v)).reshape(self.nvars)
 
         return f
 
@@ -246,7 +269,7 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         mx, my = cp.meshgrid(self.xvalues, self.xvalues)
-        me[:] = cp.tanh((self.radius - cp.sqrt(mx**2 + my**2)) / (cp.sqrt(2) * self.eps))
+        me[:] = 0.5 * (1.0 + cp.tanh((self.radius - cp.sqrt(mx**2 + my**2)) / (cp.sqrt(2) * self.eps)))
         # print(type(me))
         return me
 
@@ -254,10 +277,11 @@ class allencahn_fullyimplicit(Problem):  # pragma: no cover
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
     r"""
-    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
 
     for constant parameter :math:`\nu`. Initial condition are circles of the form
 
@@ -292,7 +316,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         f = self.dtype_f(self.init)
         v = u.flatten()
         f.impl[:] = self.A.dot(v).reshape(self.nvars)
-        f.expl[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
+        f.expl[:] = self.reaction(v).reshape(self.nvars)
 
         return f
 
@@ -346,10 +370,11 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     r"""
-    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
 
     for constant parameter :math:`\nu`. Initial condition are circles of the form
 
@@ -357,8 +382,8 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
-    is used to get a *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
-    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is used to get a *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{2\varepsilon^2}(2u - 1)^3`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{2\varepsilon^2}(2u - 1)`
     is only evaluated at each time.
 
     This class is especially developed for solving it on GPUs using ``CuPy``.
@@ -384,8 +409,8 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
-        f.impl[:] = (self.A.dot(v) - 1.0 / self.eps**2 * v ** (self.nu + 1)).reshape(self.nvars)
-        f.expl[:] = (1.0 / self.eps**2 * v).reshape(self.nvars)
+        f.impl[:] = (self.A.dot(v) + self.reaction_cubic(v)).reshape(self.nvars)
+        f.expl[:] = self.reaction_linear(v).reshape(self.nvars)
 
         return f
 
@@ -412,8 +437,6 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
         u = self.dtype_u(u0).flatten()
         z = self.dtype_u(self.init, val=0.0).flatten()
-        nu = self.nu
-        eps2 = self.eps**2
 
         Id = csp.eye(self.nvars[0] * self.nvars[1])
 
@@ -422,7 +445,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
 
             # if g is close to 0, then we are done
             res = cp.linalg.norm(g, np.inf)
@@ -431,7 +454,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A - 1.0 / eps2 * csp.diags(((nu + 1) * u**nu), offsets=0))
+            dg = Id - factor * (self.A + csp.diags(self.reaction_cubic_prime(u), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
@@ -455,10 +478,11 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
     r"""
-    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
 
     for constant parameter :math:`\nu`. Initial condition are circles of the form
 
@@ -493,7 +517,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         f = self.dtype_f(self.init)
         v = u.flatten()
         f.comp1[:] = self.A.dot(v).reshape(self.nvars)
-        f.comp2[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
+        f.comp2[:] = self.reaction(v).reshape(self.nvars)
 
         return f
 
@@ -566,8 +590,6 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
         u = self.dtype_u(u0).flatten()
         z = self.dtype_u(self.init, val=0.0).flatten()
-        nu = self.nu
-        eps2 = self.eps**2
 
         Id = csp.eye(self.nvars[0] * self.nvars[1])
 
@@ -576,7 +598,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (1.0 / eps2 * u * (1.0 - u**nu)) - rhs.flatten()
+            g = u - factor * self.reaction(u) - rhs.flatten()
 
             # if g is close to 0, then we are done
             res = cp.linalg.norm(g, np.inf)
@@ -585,7 +607,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
                 break
 
             # assemble dg
-            dg = Id - factor * (1.0 / eps2 * csp.diags((1.0 - (nu + 1) * u**nu), offsets=0))
+            dg = Id - factor * csp.diags(self.reaction_prime(u), offsets=0)
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
@@ -609,10 +631,11 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     r"""
-    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
 
     for constant parameter :math:`\nu`. The initial condition has the form of circles
 
@@ -620,8 +643,8 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
-    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
-    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{2\varepsilon^2}(2u - 1)^3`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{2\varepsilon^2}(2u - 1)`
     is solved by a linear solver provided by a ``SciPy`` routine.
 
     This class is especially developed for solving it on GPUs using ``CuPy``.
@@ -647,8 +670,8 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
-        f.comp1[:] = (self.A.dot(v) - 1.0 / self.eps**2 * v ** (self.nu + 1)).reshape(self.nvars)
-        f.comp2[:] = (1.0 / self.eps**2 * v).reshape(self.nvars)
+        f.comp1[:] = (self.A.dot(v) + self.reaction_cubic(v)).reshape(self.nvars)
+        f.comp2[:] = self.reaction_linear(v).reshape(self.nvars)
 
         return f
 
@@ -675,8 +698,6 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
         u = self.dtype_u(u0).flatten()
         z = self.dtype_u(self.init, val=0.0).flatten()
-        nu = self.nu
-        eps2 = self.eps**2
 
         Id = csp.eye(self.nvars[0] * self.nvars[1])
 
@@ -685,7 +706,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
 
             # if g is close to 0, then we are done
             res = cp.linalg.norm(g, np.inf)
@@ -694,7 +715,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A - 1.0 / eps2 * csp.diags(((nu + 1) * u**nu), offsets=0))
+            dg = Id - factor * (self.A + csp.diags(self.reaction_cubic_prime(u), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
@@ -737,5 +758,5 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
         me = self.dtype_u(self.init)
 
-        me[:] = (1.0 / (1.0 - factor * 1.0 / self.eps**2) * rhs).reshape(self.nvars)
+        me[:] = ((rhs - 0.5 * factor / self.eps**2) / (1.0 - factor / self.eps**2)).reshape(self.nvars)
         return me

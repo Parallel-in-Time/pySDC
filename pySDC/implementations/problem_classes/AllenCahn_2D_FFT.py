@@ -8,23 +8,25 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class allencahn2d_imex(Problem):
     r"""
-    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)
 
-    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`. Different initial conditions
     can be used, for example, circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right),
 
     or *checker-board*
 
     .. math::
-        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \sin(2 \pi x_i) \sin(2 \pi y_j)\right),
 
-    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
+    or uniform distributed random numbers in :math:`[0, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
     spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved by
     Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.
 
@@ -56,8 +58,6 @@ class allencahn2d_imex(Problem):
         Spectral operator for Laplacian.
     """
 
-    # this spelling of Allen-Cahn puts its wells at +-1, so the high phase is counted, not integrated
-    phase_thresh = 0.0
     dtype_u = mesh
     dtype_f = imex_mesh
 
@@ -83,6 +83,12 @@ class allencahn2d_imex(Problem):
         if nvars[0] % 2 != 0:
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
+        if nu != 2:
+            raise ProblemError(
+                'the exponent nu is deprecated and only nu=2 is supported: the 0..1 form of Allen-Cahn '
+                f'that this class now solves has no analogue of it, got nu={nu}'
+            )
+
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
@@ -103,6 +109,10 @@ class allencahn2d_imex(Problem):
 
         xv, yv = np.meshgrid(kx, ky, indexing='ij')
         self.lap = -(xv**2) - yv**2
+
+    def reaction(self, u):
+        r"""The reaction term :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`."""
+        return -2.0 / self.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
 
     def eval_f(self, u, t):
         """
@@ -125,7 +135,7 @@ class allencahn2d_imex(Problem):
         tmp = self.lap * np.fft.rfft2(u)
         f.impl[:] = np.fft.irfft2(tmp)
         if self.eps > 0:
-            f.expl[:] = 1.0 / self.eps**2 * u * (1.0 - u**self.nu)
+            f.expl[:] = self.reaction(u)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -180,12 +190,12 @@ class allencahn2d_imex(Problem):
         if t == 0:
             if self.init_type == 'circle':
                 xv, yv = np.meshgrid(self.xvalues, self.xvalues, indexing='ij')
-                me[:, :] = np.tanh((self.radius - np.sqrt(xv**2 + yv**2)) / (np.sqrt(2) * self.eps))
+                me[:, :] = 0.5 * (1.0 + np.tanh((self.radius - np.sqrt(xv**2 + yv**2)) / (np.sqrt(2) * self.eps)))
             elif self.init_type == 'checkerboard':
                 xv, yv = np.meshgrid(self.xvalues, self.xvalues)
-                me[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
+                me[:, :] = 0.5 * (1.0 + np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv))
             elif self.init_type == 'random':
-                me[:, :] = np.random.uniform(-1, 1, self.init)
+                me[:, :] = np.random.uniform(0, 1, self.init)
             else:
                 raise NotImplementedError('type of initial value not implemented, got %s' % self.init_type)
         else:
@@ -201,24 +211,26 @@ class allencahn2d_imex(Problem):
 
 class allencahn2d_imex_stab(allencahn2d_imex):
     r"""
-    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-0.5, 0.5]^2`
+    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
     with stabilized splitting
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu) + \frac{2}{\varepsilon^2}u
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u) + \frac{2}{\varepsilon^2}u
 
-    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, and constant parameter :math:`\nu`. Different initial conditions
+    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`. Different initial conditions
     can be used here, for example, circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right),
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right),
 
     or *checker-board*
 
     .. math::
-        u({\bf x}, 0) = \sin(2 \pi x_i) \sin(2 \pi y_j),
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \sin(2 \pi x_i) \sin(2 \pi y_j)\right),
 
-    or uniform distributed random numbers in :math:`[-1, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
+    or uniform distributed random numbers in :math:`[0, 1]` for :math:`i, j=0,..,N-1`, where :math:`N` is the number of
     spatial grid points. For time-stepping, the problem is treated *semi-implicitly*, i.e., the diffusion part is solved with
     Fast-Fourier Transform (FFT) and the nonlinear term is treated explicitly.
 
@@ -280,7 +292,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         tmp = self.lap * np.fft.rfft2(u)
         f.impl[:] = np.fft.irfft2(tmp)
         if self.eps > 0:
-            f.expl[:] = 1.0 / self.eps**2 * u * (1.0 - u**self.nu) + 2.0 / self.eps**2 * u
+            f.expl[:] = self.reaction(u) + 2.0 / self.eps**2 * u
         return f
 
     def solve_system(self, rhs, factor, u0, t):

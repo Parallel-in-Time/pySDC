@@ -40,7 +40,6 @@ def run_variant(variant=None):
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 2
 
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 100

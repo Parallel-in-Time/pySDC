@@ -13,50 +13,36 @@ class AllenCahnMonitor(Hooks):
     ``exact_radius``, ``computed_volume`` and ``exact_volume`` at :math:`t = 0` and after every
     step, plus ``interface_width`` where that is well defined.
 
-    It needs no configuring: everything it does is decided by the problem's own
-    ``phase_thresh``, because pySDC spells Allen-Cahn two ways (see issue #434) and which one a
-    problem uses is a property of the problem, not of the person watching it.
+    The volume is the number of cells in the high phase times the cell volume. Counting is used
+    rather than integrating the field, even though pySDC's phase fields run from :math:`0` to
+    :math:`1` and so integrate straight to a volume: the integral also picks up the diffuse
+    interface, which biases it by :math:`O(\varepsilon)` no matter how fine the mesh, whereas
+    counting is consistent and its :math:`O(\Delta x)` bias refines away.
 
-    With wells at :math:`0` and :math:`1` (``phase_thresh = None``) the field *is* the indicator
-    of the high phase, so integrating it gives the volume. That resolves the diffuse interface but
-    also counts it, which biases the volume by :math:`O(\varepsilon)` -- a bias that does *not*
-    shrink under mesh refinement, so it has to be divided out by calibrating against
-    :math:`t = 0`.
-
-    With wells at :math:`\pm 1` (``phase_thresh`` a float, the midpoint of the two wells) that
-    integral would return the difference of the two phases instead, and the volume has to come
-    from counting cells above the threshold. That estimator is consistent -- its bias is
-    :math:`O(\Delta x)` and vanishes under refinement -- so it is left uncalibrated.
+    Attributes
+    ----------
+    phase_thresh : float
+        Cells above this count towards the high phase. Taken from the problem when it says, and
+        :math:`0.5` -- the midpoint of the two wells -- otherwise.
     """
+
+    default_phase_thresh = 0.5
 
     def __init__(self):
         super().__init__()
 
         self.init_radius = None
         self.ndim = None
-        self.phase_thresh = None
-        self.corr_rad = 1.0
-        self.corr_vol = 1.0
-
-    @property
-    def counts_cells(self):
-        """Whether the volume comes from counting cells rather than from integrating the field."""
-        return self.phase_thresh is not None
+        self.phase_thresh = self.default_phase_thresh
 
     @staticmethod
     def get_real_space(L, u):
         """Undo the transform if the problem carries its solution in spectral space."""
         return L.prob.fft.backward(u) if getattr(L.prob, 'spectral', False) else u[:]
 
-    def count_high_phase(self, u):
-        """Cells occupied by the high phase, in units of cells."""
-        if self.counts_cells:
-            return float(np.count_nonzero(u > self.phase_thresh))
-        return float(u[:].sum())
-
     def get_volume(self, L, u):
         """Volume of the high phase, summed over the space communicator if there is one."""
-        count = self.count_high_phase(self.get_real_space(L, u))
+        count = float(np.count_nonzero(self.get_real_space(L, u) > self.phase_thresh))
 
         comm = getattr(L.prob, 'comm', None)
         if comm is not None:
@@ -92,25 +78,21 @@ class AllenCahnMonitor(Hooks):
 
     def get_interface_width(self, L, u):
         """Width of the transition, in units of epsilon, along a cut through the middle."""
-        low, high = (-1.0, 1.0) if self.counts_cells else (0.0, 1.0)
-        margin = 0.005 * (high - low)
-
         n = L.prob.init[0][0]
-        rows1 = np.where(u[n // 2, : n // 2] > low + margin)
-        rows2 = np.where(u[n // 2, : n // 2] < high - margin)
+        rows1 = np.where(u[n // 2, : n // 2] > 0.005)
+        rows2 = np.where(u[n // 2, : n // 2] < 0.995)
 
         return (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.eps
 
     def get_diagnostics(self, L, u, t):
         """Everything worth recording about ``u``, as a dict of stats entries."""
         vol = self.get_volume(L, u)
-        exact_vol = self.exact_volume(t)
 
         diagnostics = {
-            'computed_radius': self.radius_from_volume(vol) * self.corr_rad,
+            'computed_radius': self.radius_from_volume(vol),
             'exact_radius': self.exact_radius(t),
-            'computed_volume': vol * self.corr_vol,
-            'exact_volume': exact_vol,
+            'computed_volume': vol,
+            'exact_volume': self.exact_volume(t),
         }
 
         if self.measures_interface_width(L):
@@ -135,14 +117,8 @@ class AllenCahnMonitor(Hooks):
         L = step.levels[0]
 
         self.init_radius = L.prob.radius
-        self.phase_thresh = getattr(L.prob, 'phase_thresh', None)
+        self.phase_thresh = getattr(L.prob, 'phase_thresh', self.default_phase_thresh)
         self.ndim = len(self.get_real_space(L, L.u[0]).shape)
-
-        # integrating the field counts the diffuse interface too, and that bias does not refine away
-        if not self.counts_cells:
-            vol = self.get_volume(L, L.u[0])
-            self.corr_rad = self.init_radius / self.radius_from_volume(vol)
-            self.corr_vol = self.exact_volume(0.0) / vol
 
         if L.time == 0.0:
             self.record(step, L, L.time, self.get_diagnostics(L, L.u[0], 0.0))

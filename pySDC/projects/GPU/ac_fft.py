@@ -9,7 +9,6 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 def set_parameter():
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 2
     problem_params['eps'] = 0.04
     problem_params['radius'] = 0.25
     problem_params['nvars'] = (512, 512)
