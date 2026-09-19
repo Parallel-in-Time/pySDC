@@ -1,0 +1,41 @@
+pySDC/implementations/problem_classes/AllenCahn_2D_FFT.py
+  s_87bb659afc16ef::t_c1239b048a94ff 4,40-41,138-139,166-167,275-276,331-332
+  s_87bb659afc16ef::t_4c8b9da8af4d6f 50-51,61-62,285-286,296-297
+pySDC/implementations/problem_classes/AllenCahn_Temp_MPIFFT.py
+  s_87bb659afc16ef::t_c1239b048a94ff 5,152
+  s_87bb659afc16ef::t_9cdf51c6dc899f 203
+  s_87bb659afc16ef::t_67a0deeeaad826 153
+pySDC/projects/TOMS/AllenCahn_contracting_circle.py
+  s_87bb659afc16ef::t_9bc627def34357 164-166,169
+pySDC/tests/test_problems/test_AllenCahn_conventions.py
+  s_87bb659afc16ef::t_c0607f56d35156 270,277
+  s_87bb659afc16ef::t_5e40dc3e048d0e 244-254,271,280-281
+  s_87bb659afc16ef::t_82dcf92bc7155d 256-258
+  s_87bb659afc16ef::t_8275ae1ef5545f 255,259-269,272-276,278-279
+pySDC/implementations/problem_classes/AllenCahn_2D_FD.py
+  s_87bb659afc16ef::t_2c4ee7fa7f8431 35-36,63-64,66,391,613
+  s_87bb659afc16ef::t_4c8b9da8af4d6f 51-52
+  s_87bb659afc16ef::t_82dcf92bc7155d 469,578,726
+  s_87bb659afc16ef::t_6b31150aba2728 522-523,669-670,784
+  s_87bb659afc16ef::t_c1d918934b21c2 785
+pySDC/playgrounds/Allen_Cahn/AllenCahn_contracting_circle_SDC.py
+  s_87bb659afc16ef::t_fa2b6a8117cf09 165-167,170
+pySDC/projects/parallelSDC/AllenCahn_parallel.py
+  s_87bb659afc16ef::t_fa2b6a8117cf09 150-152,155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dab42df47841461903ffa6cdaa4d3cce7c4e031b",
+  "prompts": {},
+  "sessions": {
+    "s_87bb659afc16ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98b2d13f-e25a-40c9-aaad-fad128f6a78a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
