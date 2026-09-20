@@ -102,6 +102,15 @@ jobs:
       - name: Install pySDC as a package in the current environment
         run: |
           pip install --no-deps -e .
+      # A smoke test only: `cupy` is swapped for `numpy`, so this checks that the `useGPU` code
+      # paths are wired up and import, NOT that they work on a GPU. See pySDC/tests/fake_cupy.py.
+      # Deliberately left out of the coverage report, so it cannot claim GPU code is covered.
+      - name: Run the GPU code paths against the CuPy stub
+        if: matrix.env == 'mpi4py'
+        env:
+          PYSDC_FAKE_GPU: '1'
+        run: |
+          pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')

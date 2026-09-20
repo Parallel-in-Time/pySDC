@@ -173,6 +173,26 @@ Regardless of why the Gitlab pipeline was triggered, the following holds true:
 
 In order to run tests on GPUs, please use the pytest marker `cupy`.
 
+#### Running the GPU tests without a GPU
+
+The `cupy`-marked tests can also be run on any machine, against a NumPy-backed stand-in for CuPy:
+
+```bash
+PYSDC_FAKE_GPU=1 pytest pySDC/tests -m cupy
+```
+
+This installs fake `cupy`, `cupyx` and `cupy_backends` modules that forward to NumPy and SciPy (see
+`pySDC/tests/fake_cupy.py`), so the `useGPU=True` branches really do get executed. Because nearly
+every `*_GPU` test is its CPU counterpart called with `useGPU=True`, this catches the usual
+regressions: a `setup_GPU` that forgets an attribute, a GPU class whose signature has drifted, an
+`xp` that should have been `sparse_lib`, an import that no longer resolves.
+
+> :warning: It is a smoke test, not a substitute for real hardware. Nothing CUDA-specific is
+> exercised: no kernels, no NCCL, no `DistArrayCuPy`, none of the `CuSparseError` fallbacks, and no
+> place where CuPy's behaviour genuinely differs from NumPy's. **A green stub run does not mean the
+> GPU code works.** It runs in the `mpi4py` leg of `user_cpu_tests_linux`, and is deliberately kept
+> out of the coverage report so that GPU-only lines are never reported as covered.
+
 If you want to create a new HPC test environment, the following steps need to be completed:
 
 - Create a new slurm job-script in `etc/juwels_*.sh`. The name and location of the file is important.

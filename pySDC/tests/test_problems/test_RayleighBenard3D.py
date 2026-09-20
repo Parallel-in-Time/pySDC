@@ -1,6 +1,8 @@
 import pytest
 import sys
 
+from pySDC.tests import fake_cupy
+
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('direction', ['x', 'y', 'z', 'mixed'])
@@ -274,6 +276,7 @@ def test_banded_matrix(preconditioning):
 
 
 @pytest.mark.cupy
+@pytest.mark.skipif(fake_cupy.ACTIVE, reason='wraps the communicator in an NCCLComm, which the CPU stub cannot fake')
 def test_heterogeneous_implementation(N=8, useGPU=True):
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 

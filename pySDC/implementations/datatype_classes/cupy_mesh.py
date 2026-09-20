@@ -56,7 +56,7 @@ class cupy_mesh(cp.ndarray):
                 args.append(input_.view(cp.ndarray))
             else:
                 args.append(input_)
-        results = super(cupy_mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(cupy_mesh)
+        results = super(cupy_mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
         return results
 
     def __abs__(self):
