@@ -7,8 +7,8 @@ property of the whole sweep, but each rank sees only its own node's residual, so
 reduced. Left un-reduced, every rank quantises against a different divisor and the run silently
 stops matching the serial one -- which is why the reduced-precision case is parametrised here.
 
-Follows the launch pattern of ``test_MPI_sweeper.py``: pytest re-executes this module under
-``mpirun``, and the ``__main__`` block below runs the comparison inside it.
+Follows the pattern of ``test_MPI_sweeper.py``: pytest itself is launched under
+``mpiexec``, and ``mpi-pytest`` runs the comparison on the ranks of that job.
 """
 
 import pytest
@@ -63,23 +63,8 @@ def run(use_MPI, num_nodes, correction_precision):
     return controller.MS[0].levels[0]
 
 
-def individual_test(num_nodes, correction_precision, launch=False):
-    """Compare the node-parallel delta form against the serial one, or launch mpirun to do so."""
-    if launch:
-        import os
-        import subprocess
-
-        my_env = os.environ.copy()
-        my_env['PYTHONPATH'] = '../../..:.'
-        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-        cmd = f'mpirun -np {num_nodes} python {__file__}'
-        cmd += f' --num_nodes={num_nodes} --correction_precision={correction_precision}'
-        p = subprocess.Popen(cmd.split(), env=my_env, cwd='.')
-        p.wait()
-        assert p.returncode == 0, f'got return code {p.returncode} with {num_nodes} processes'
-        return
-
+def individual_test(num_nodes, correction_precision):
+    """Compare the node-parallel delta form against the serial one."""
     parallel = run(True, num_nodes, correction_precision)
     serial = run(False, num_nodes, correction_precision)
 
@@ -90,23 +75,15 @@ def individual_test(num_nodes, correction_precision, launch=False):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_nodes', [2, 3])
+@pytest.mark.parallel([2, 3])
 @pytest.mark.parametrize('correction_precision', ['None', 'float32'])
-def test_matches_the_serial_delta_form(num_nodes, correction_precision):
+def test_matches_the_serial_delta_form(correction_precision):
     """
     The node-parallel sweep is the same sweep, so it must give the same answer.
 
     ``float32`` corrections are the case that needs the reduced scale: each rank holds one node and
     so sees only part of the residual the divisor is taken from.
     """
-    individual_test(num_nodes, correction_precision, launch=True)
+    from mpi4py import MPI
 
-
-if __name__ == '__main__':
-    import sys
-
-    kwargs = {}
-    for arg in sys.argv[1:]:
-        key, value = arg.split('=')
-        kwargs[key.removeprefix('--')] = value
-    individual_test(num_nodes=int(kwargs['num_nodes']), correction_precision=kwargs['correction_precision'])
+    individual_test(MPI.COMM_WORLD.size, correction_precision)
