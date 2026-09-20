@@ -133,6 +133,7 @@ jobs:
             return $rc
           }
           if [ "${{ matrix.env }}" = "mpi4py" ] || [ "${{ matrix.env }}" = "petsc" ]; then
+            bash etc/check_parallel_partition.sh pySDC/tests "${{ matrix.env }}" 2 3 4 5 || exit $?
             # mpi-pytest runs pytest itself under mpiexec and gives each `@pytest.mark.parallel(n)`
             # test COMM_WORLD of a right-sized job, so one launch per rank count covers every test
             # wanting that many ranks -- instead of one `mpirun` per test case.
@@ -220,6 +221,7 @@ jobs:
           }
           if [ "${{ matrix.env }}" = "RayleighBenard" ]; then
             # This project's sweeper tests use mpi-pytest; see the mpi4py job above for the shape.
+            bash etc/check_parallel_partition.sh pySDC/projects/${{ matrix.env }}/tests "" 2 3 || exit $?
             for n in 2 3; do
               run_pass mpiexec -n $n $PYTEST -m "parallel[$n]" || exit $?
             done
@@ -326,7 +328,14 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           firedrake-clean
-          cd ./pySDC
+          # `cd /repositories/pySDC`, not `./pySDC`: the container mounts the workspace at
+          # /repositories, so those are the same directory reached by two different paths. pySDC is
+          # installed editable from /repositories/pySDC, so that is the prefix its modules report,
+          # and `source = ['pySDC']` only matches when the working directory agrees -- sitting in
+          # ./pySDC is why this job has always measured nothing. `..` is the workspace either way,
+          # so the moves in the next step are unaffected.
+          cd /repositories/pySDC
+          bash etc/check_parallel_partition.sh pySDC/tests firedrake 2 3 4 || exit $?
           PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests"
           # See the mpi4py job for the shape and for why the exit status has to be checked by hand.
           run_pass () {
@@ -343,7 +352,7 @@ jobs:
       - name: Make coverage report
         run: |
 
-          cd ./pySDC
+          cd /repositories/pySDC
           mv data ../data_firedrake
           coverage combine
           mv .coverage ../coverage_firedrake.dat
