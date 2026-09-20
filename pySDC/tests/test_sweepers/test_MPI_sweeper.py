@@ -99,9 +99,9 @@ def individual_test(**kwargs):
     nonMPI = run(**kwargs, use_MPI=False)
 
     assert xp.allclose(
-        MPI.uend, nonMPI.uend, atol=1e-14
+        MPI.uend, nonMPI.uend, rtol=0, atol=1e-14
     ), f'Got different solutions at end point! {MPI.uend=} {nonMPI.uend=}'
-    assert xp.allclose(MPI.status.residual, nonMPI.status.residual, atol=1e-14), 'Got different residuals!'
+    assert xp.allclose(MPI.status.residual, nonMPI.status.residual, rtol=0, atol=1e-14), 'Got different residuals!'
 
 
 @pytest.mark.mpi4py

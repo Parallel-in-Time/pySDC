@@ -137,7 +137,7 @@ def test_alpha_does_not_change_the_solution():
     _, u_adaptive, _ = run_ParaDiag('adaptive')
 
     assert np.allclose(
-        u_fixed, u_adaptive, atol=1e-8
+        u_fixed, u_adaptive, rtol=0, atol=1e-8
     ), f'fixed and adaptive alpha give different answers, difference {abs(u_fixed - u_adaptive):.3e}'
 
 

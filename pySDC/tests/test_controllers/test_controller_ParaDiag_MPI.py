@@ -133,7 +133,7 @@ def test_variable_alpha_converges_nonMPI(L):
 
     assert max(niter_var) < 99, 'varying alpha did not converge'
     # both are converged to the same collocation problem, so they agree to the residual tolerance
-    assert np.allclose(fixed, varying, atol=1e-7), f'got {abs(fixed - varying).max():.2e}'
+    assert np.allclose(fixed, varying, rtol=0, atol=1e-7), f'got {abs(fixed - varying).max():.2e}'
 
 
 @pytest.mark.base
