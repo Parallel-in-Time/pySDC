@@ -46,27 +46,8 @@ def get_base_transfer(nvars, num_nodes, useMPI):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('nvars', [32, 16])
-@pytest.mark.parametrize('num_procs', [2, 3])
-def test_MPI_nonMPI_consistency(num_procs, nvars):
-    import os
-    import subprocess
-
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {num_procs} python {__file__} --nvars={nvars}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_procs,
-    )
-
-
-def _test_MPI_nonMPI_consistency(nvars):
+@pytest.mark.parallel([2, 3])
+def test_MPI_nonMPI_consistency(nvars):
     import numpy as np
     from mpi4py import MPI
 
@@ -110,13 +91,3 @@ def _test_MPI_nonMPI_consistency(nvars):
             me.__getattribute__(function)()
         assert_all_equal(function)
     print(f'Passed with {nvars=} and {CF.size=}')
-
-
-if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--nvars', type=int, nargs=1, help='Number of degrees of freedom in space')
-    args = parser.parse_args()
-
-    _test_MPI_nonMPI_consistency(args.nvars[0])
