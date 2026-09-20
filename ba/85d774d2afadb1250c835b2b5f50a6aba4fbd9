@@ -1,0 +1,25 @@
+pySDC/tests/test_convergence_controllers/test_basic_restarting.py
+  s_dbaa617c29a3c2::t_a78c3379174f28 174,176-182,291,293-299
+pySDC/tests/test_convergence_controllers/test_adaptive_collocation.py
+  s_dbaa617c29a3c2::t_2a30876b9ee01b 133,135
+pySDC/tests/test_convergence_controllers/test_polynomial_error.py
+  s_dbaa617c29a3c2::t_520d2a14ec9c7a 212,214-223
+pySDC/tests/test_convergence_controllers/test_extrapolation_within_Q.py
+  s_dbaa617c29a3c2::t_2a30876b9ee01b 201,203-212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ba85d774d2afadb1250c835b2b5f50a6aba4fbd9",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
