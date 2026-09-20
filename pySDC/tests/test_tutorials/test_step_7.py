@@ -1,5 +1,3 @@
-import os
-import subprocess
 import pytest
 
 
@@ -63,20 +61,11 @@ def test_E(ML):
 
 
 @pytest.mark.firedrake
+@pytest.mark.parallel(3)
 def test_E_MPI():
-    my_env = os.environ.copy()
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-    cwd = '.'
-    num_procs = 3
-    cmd = f'mpiexec -np {num_procs} --oversubscribe python pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py --useMPIsweeper'.split()
+    from pySDC.tutorial.step_7.E_pySDC_with_Firedrake import runHeatFiredrake
 
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    p.wait()
-    for line in p.stdout:
-        print(line)
-    for line in p.stderr:
-        print(line)
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
+    runHeatFiredrake(useMPIsweeper=True)
 
 
 @pytest.mark.firedrake

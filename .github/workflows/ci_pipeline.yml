@@ -306,6 +306,9 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           pip install -e /repositories/pySDC
+          # The Firedrake image ships mpi-pytest for its own suite, but don't depend on that:
+          # the MPI tests here are collected through its `parallel` marker.
+          pip install "mpi-pytest>=2026.0"
           # test installation
           python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto
@@ -319,7 +322,18 @@ jobs:
           . venv-pySDC/bin/activate
           firedrake-clean
           cd ./pySDC
-          python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
+          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests"
+          # See the mpi4py job for the shape and for why the exit status has to be checked by hand.
+          run_pass () {
+            "$@" && return 0
+            rc=$?
+            [ "$rc" -eq 5 ] && return 0
+            return $rc
+          }
+          for n in 2 3 4; do
+            run_pass mpiexec -n $n $PYTEST -m "firedrake and parallel[$n]" || exit $?
+          done
+          run_pass $PYTEST -m "firedrake and parallel[1]" || exit $?
         timeout-minutes: 45
       - name: Make coverage report
         run: |
