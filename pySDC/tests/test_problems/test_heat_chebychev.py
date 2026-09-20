@@ -44,7 +44,7 @@ def test_heat1d_chebychev(a, b, f, noise, use_ultraspherical, spectral_space, so
         tol = 1e-4
     else:
         tol = 1e-8
-    assert np.allclose(u0[0], u02[0], atol=tol), 'Error in eval_f'
+    assert np.allclose(u0[0], u02[0], rtol=0, atol=tol), 'Error in eval_f'
 
 
 @pytest.mark.base

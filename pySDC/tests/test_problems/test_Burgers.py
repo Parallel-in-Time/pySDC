@@ -175,7 +175,7 @@ def test_Burgers2D_solver(mode, nx=2**6, nz=2**6, plotting=False):
     for comp in ['u', 'v']:
         i = P.index(comp)
         assert np.allclose(
-            u[i], backward[i], atol=1e-8
+            u[i], backward[i], rtol=0, atol=1e-8
         ), f'Error without convection in component {comp}: {abs(u[i]-backward[i]):.2e}!'
 
     dt = 1e0
@@ -186,7 +186,9 @@ def test_Burgers2D_solver(mode, nx=2**6, nz=2**6, plotting=False):
 
     for comp in ['u', 'v']:
         i = P.index(comp)
-        assert np.allclose(u[i], backward[i], atol=1e-8), f'Error in component {comp}: {abs(u[i]-backward[i]):.2e}!'
+        assert np.allclose(
+            u[i], backward[i], rtol=0, atol=1e-8
+        ), f'Error in component {comp}: {abs(u[i]-backward[i]):.2e}!'
 
     if not plotting:
         return None
