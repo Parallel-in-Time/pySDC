@@ -55,6 +55,9 @@ def single_test(name, useMPI=False):
 
 
 def launch_test(name, useMPI, num_procs=1):
+    # Still needed for `test_PyTorch_dtype`: the pytorch CI job runs plain pytest in an environment
+    # without mpi-pytest, so that test cannot use the `parallel` marker and keeps launching its own
+    # `mpirun` -- which is also why the `__main__` block below has to stay.
     if useMPI:
         import os
         import subprocess
@@ -84,9 +87,10 @@ def test_PyTorch_dtype(useMPI):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 @pytest.mark.parametrize('name', ['mesh', 'imex_mesh'])
 def test_mesh_dtypes_MPI(name):
-    launch_test(name, useMPI=True, num_procs=4)
+    single_test(name, True)
 
 
 @pytest.mark.base
