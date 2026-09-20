@@ -1,0 +1,23 @@
+pySDC/tests/test_datatypes/test_datatypes.py
+  s_dbaa617c29a3c2::t_ba3a90c329ebaa 57-60,64-65,78
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_ba3a90c329ebaa 135-136
+etc/environment-pytorch.yml
+  s_dbaa617c29a3c2::t_ba3a90c329ebaa 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f1c5ecf4b6a322134ed90755d32ecbe78035b4f4",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
