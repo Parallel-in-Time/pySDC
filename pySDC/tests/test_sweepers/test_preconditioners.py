@@ -120,8 +120,8 @@ def test_FLEX_preconditioner_in_sweepers(imex, num_nodes, MPI=False):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('imex', [True, False])
-@pytest.mark.mpi(ranks=[3])
-def test_FLEX_preconditioner_in_MPI_sweepers(mpi_ranks, imex):
+@pytest.mark.parallel(3)
+def test_FLEX_preconditioner_in_MPI_sweepers(imex):
     from mpi4py import MPI
 
     test_FLEX_preconditioner_in_sweepers(imex, num_nodes=MPI.COMM_WORLD.size, MPI=True)
