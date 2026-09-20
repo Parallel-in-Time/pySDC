@@ -1,0 +1,19 @@
+pySDC/tests/test_problems/test_heat_chebychev.py
+  s_41cf6338e5f6cc::t_059990e67f7e12 145-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3aae58fd3b03ca809dc1f4424ea10b4c71034839",
+  "prompts": {},
+  "sessions": {
+    "s_41cf6338e5f6cc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85d4a73d-5f43-41b1-b8d7-4ef0aa4fcc11",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
