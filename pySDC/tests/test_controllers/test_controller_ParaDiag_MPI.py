@@ -1,9 +1,7 @@
-import os
-import subprocess
-import sys
-
 import numpy as np
 import pytest
+from mpi4py import MPI
+from pytest_mpi import parallel_assert
 
 
 def get_composite_collocation_problem(L, M, N, alpha=1e-4, dt=1e-1, problem='Dahlquist', useMPI=False, comm=None):
@@ -96,17 +94,6 @@ def run_ParaDiag(L, M, N, alpha, problem, useMPI, comm=None, Tend=None, dt=1e-1)
 # --------------------------------------------------------------------------------------- helpers
 
 
-def launch_MPI(num_procs, args):
-    """Run this file under mpirun with the given argv tail."""
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = os.getcwd()
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-    cmd = f'mpirun -np {num_procs} {sys.executable} {__file__} ' + ' '.join(str(a) for a in args)
-    p = subprocess.Popen(cmd.split(), env=my_env, cwd='.')
-    p.wait()
-    assert p.returncode == 0, f'ERROR: mpirun returned {p.returncode} with {num_procs} processes'
-
-
 # --------------------------------------------------------------------------------------- tests
 
 
@@ -184,9 +171,9 @@ def test_multilevel_is_rejected():
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('L', [1, 2, 4])
+@pytest.mark.parallel([1, 2, 4])
 @pytest.mark.parametrize('problem', ['Dahlquist', 'Dahlquist_IMEX', 'vdp'])
-def test_ParaDiag_MPI_matches_nonMPI(L, problem, tmp_path):
+def test_ParaDiag_MPI_matches_nonMPI(problem):
     """
     The MPI and the virtual ParaDiag controller must agree.
 
@@ -194,82 +181,77 @@ def test_ParaDiag_MPI_matches_nonMPI(L, problem, tmp_path):
     ring reduction -- so bit-identity is not expected. Measured agreement over 72 configurations is
     ~1e-16 relative, i.e. about one ulp, so 1e-14 leaves a wide margin while still catching a defect.
     """
+    comm = MPI.COMM_WORLD
+    L = comm.size
     M, N, alpha = 3, 2, 1e-4
-    out = tmp_path / 'mpi.npy'
-    launch_MPI(L, ['run', L, M, N, alpha, problem, str(out)])
 
-    mpi_uend = np.load(out)
-    mpi_niter = list(np.load(str(out).replace('.npy', '_niter.npy')))
+    mpi_uend, mpi_niter = run_ParaDiag(L, M, N, alpha, problem, useMPI=True, comm=comm)
     ref_uend, ref_niter = run_ParaDiag(L, M, N, alpha, problem, useMPI=False)
 
-    assert mpi_niter == ref_niter[-len(mpi_niter) :], f'iteration counts differ: {ref_niter} vs {mpi_niter}'
-    assert np.allclose(ref_uend, mpi_uend, rtol=1e-14, atol=0), (
-        f'MPI and nonMPI ParaDiag differ for {problem} on {L} processes by ' f'{abs(ref_uend - mpi_uend).max():.3e}'
+    # only the last rank holds the end of the block
+    last = comm.rank == comm.size - 1
+    parallel_assert(
+        (not last) or list(mpi_niter) == ref_niter[-len(mpi_niter) :],
+        f'iteration counts differ: {ref_niter} vs {list(mpi_niter)}',
+        participating=last,
+    )
+    parallel_assert(
+        (not last) or np.allclose(ref_uend, mpi_uend, rtol=1e-14, atol=0),
+        f'MPI and nonMPI ParaDiag differ for {problem} on {L} processes',
+        participating=last,
     )
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('L', [2, 4])
-def test_variable_alpha_MPI(L, tmp_path):
+@pytest.mark.parallel([2, 4])
+def test_variable_alpha_MPI():
     """An iteration dependent alpha works under MPI too, and agrees with the virtual controller."""
-    out = tmp_path / 'mpi_var.npy'
-    launch_MPI(L, ['run_variable_alpha', L, 3, 2, 0.0, 'Dahlquist', str(out)])
+    comm = MPI.COMM_WORLD
+    L = comm.size
 
-    mpi_uend = np.load(out)
+    mpi_uend, _ = run_ParaDiag(L, 3, 2, [1e-2, 1e-4, 1e-8], 'Dahlquist', useMPI=True, comm=comm)
     ref_uend, _ = run_ParaDiag(L, 3, 2, [1e-2, 1e-4, 1e-8], 'Dahlquist', useMPI=False)
-    assert np.allclose(
-        ref_uend, mpi_uend, rtol=1e-14, atol=0
-    ), f'variable alpha differs by {abs(ref_uend - mpi_uend).max():.3e}'
+
+    last = comm.rank == comm.size - 1
+    parallel_assert(
+        np.allclose(ref_uend, mpi_uend, rtol=1e-14, atol=0),
+        'variable alpha differs between the MPI and the virtual controller',
+        participating=last,
+    )
 
 
 @pytest.mark.mpi4py
-def test_multiple_blocks_MPI(tmp_path):
+@pytest.mark.parallel(2)
+def test_multiple_blocks_MPI():
     """Running more steps than ranks means several blocks in sequence."""
-    out = tmp_path / 'mpi_blocks.npy'
-    launch_MPI(2, ['run_two_blocks', 2, 3, 2, 1e-8, 'Dahlquist', str(out)])
+    comm = MPI.COMM_WORLD
+    uend, _ = run_ParaDiag(2, 3, 2, 1e-8, 'Dahlquist', useMPI=True, comm=comm, Tend=4 * 1e-1)
 
-    uend = np.load(out)
+    last = comm.rank == comm.size - 1
     # two blocks of two steps at dt=0.1 -> t = 0.4
-    assert abs(uend[0] - np.exp(-0.4)) < 1e-4, f'got {uend[0]}, expected ~{np.exp(-0.4)}'
+    parallel_assert(
+        abs(uend[0] - np.exp(-0.4)) < 1e-4 if last else True,
+        f'expected ~{np.exp(-0.4)} at t=0.4',
+        participating=last,
+    )
 
 
 @pytest.mark.mpi4py
-def test_solves_past_Tend_MPI(tmp_path):
+@pytest.mark.parallel(2)
+def test_solves_past_Tend_MPI():
     """
     ParaDiag always finishes the block it started.
 
     With Tend in the middle of a block it solves past it and says so, rather than truncating -- all
     steps of a block have to run, so there is no partial block to stop at.
     """
-    out = tmp_path / 'mpi_past.npy'
-    launch_MPI(2, ['run_past_Tend', 2, 3, 2, 1e-8, 'Dahlquist', str(out)])
-
-    uend = np.load(out)
-    # Tend=0.15 sits inside the first block of 2 x dt=0.1, so we land on t=0.2, not 0.15
-    assert abs(uend[0] - np.exp(-0.2)) < 1e-4, f'got {uend[0]}, expected ~{np.exp(-0.2)}'
-
-
-# --------------------------------------------------------------------------- MPI entry point
-
-if __name__ == '__main__':
-    from mpi4py import MPI
-
-    mode = sys.argv[1]
-    L, M, N = int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
-    alpha, problem, out = float(sys.argv[5]), sys.argv[6], sys.argv[7]
     comm = MPI.COMM_WORLD
+    uend, _ = run_ParaDiag(2, 3, 2, 1e-8, 'Dahlquist', useMPI=True, comm=comm, Tend=0.15)
 
-    if mode == 'run':
-        uend, niter = run_ParaDiag(L, M, N, alpha, problem, useMPI=True, comm=comm)
-    elif mode == 'run_variable_alpha':
-        uend, niter = run_ParaDiag(L, M, N, [1e-2, 1e-4, 1e-8], problem, useMPI=True, comm=comm)
-    elif mode == 'run_two_blocks':
-        uend, niter = run_ParaDiag(L, M, N, alpha, problem, useMPI=True, comm=comm, Tend=4 * 1e-1)
-    elif mode == 'run_past_Tend':
-        uend, niter = run_ParaDiag(L, M, N, alpha, problem, useMPI=True, comm=comm, Tend=0.15)
-    else:
-        raise NotImplementedError(mode)
-
-    if comm.rank == comm.size - 1:
-        np.save(out, uend)
-        np.save(out.replace('.npy', '_niter.npy'), np.array(niter))
+    last = comm.rank == comm.size - 1
+    # Tend=0.15 sits inside the first block of 2 x dt=0.1, so we land on t=0.2, not 0.15
+    parallel_assert(
+        abs(uend[0] - np.exp(-0.2)) < 1e-4 if last else True,
+        f'expected ~{np.exp(-0.2)} at t=0.2',
+        participating=last,
+    )

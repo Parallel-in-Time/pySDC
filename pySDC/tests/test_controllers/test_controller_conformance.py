@@ -39,10 +39,6 @@ convergence controller remains nonMPI-only, so the *feature* is still not symmet
 pins is that the two controllers no longer disagree in silence.
 """
 
-import os
-import subprocess
-import sys
-
 import numpy as np
 import pytest
 
@@ -192,33 +188,19 @@ CASES = {
 
 
 @pytest.fixture(scope='module')
-def results(tmp_path_factory):
+def results():
     """
-    Run every case through both transports, launching ``mpirun`` exactly once.
+    Run every case through both transports, in the ranks of the job pytest is already running in.
 
-    Starting an MPI job costs about a minute here and dominates everything this file does -- the
-    solves themselves are milliseconds. One launch that covers every case therefore costs what a
-    single test used to, which is the difference between a suite worth having in CI and one that
-    gets deleted the next time somebody trims the pipeline (cf. #675).
+    This used to launch ``mpirun`` once for the whole module and hand the results back through an
+    ``npz``, because starting an MPI job dominated everything the file does while the solves
+    themselves are milliseconds (cf. #675). Under ``mpi-pytest`` there is no launch left to amortise:
+    pytest is already running on ``NUM_PROCS`` ranks, so both transports run here directly.
     """
-    root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-    out = str(tmp_path_factory.mktemp('conformance') / 'mpi_results.npz')
-
-    env = os.environ.copy()
-    env['PYTHONPATH'] = root
-    env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f'mpirun -np {NUM_PROCS} {sys.executable} {__file__} {out}'
-    p = subprocess.Popen(cmd.split(), env=env, cwd=root)
-    p.wait()
-    assert p.returncode == 0, f'ERROR: mpirun returned {p.returncode}'
-
-    loaded = np.load(out, allow_pickle=True)
     out_dict = {}
     for name, kwargs in CASES.items():
-        mpi = {k.split('/', 1)[1]: loaded[k] for k in loaded.files if k.startswith(f'{name}/')}
-        out_dict[name] = (run(useMPI=False, **kwargs), mpi)
-    out_dict['estimator_rejected_mpi'] = bool(loaded['estimator/rejected'])
+        out_dict[name] = (run(useMPI=False, **kwargs), run(useMPI=True, **kwargs))
+    out_dict['estimator_rejected_mpi'] = bool(iteration_estimator_rejected(useMPI=True))
     return out_dict
 
 
@@ -248,6 +230,7 @@ def test_multilevel_visits_all_stages():
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 @pytest.mark.parametrize('case', ['baseline_single', 'baseline_multi'])
 def test_pfasst_baseline(case, results):
     """Same description, same answer, whichever transport ran it."""
@@ -262,6 +245,7 @@ def test_pfasst_baseline(case, results):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 def test_stats_emission_agrees(results):
     """A user's post-processing must not depend on which transport produced the stats."""
     serial, mpi = results['baseline_multi']
@@ -274,6 +258,7 @@ def test_stats_emission_agrees(results):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 def test_block_hook_fires_once_per_iteration(results):
     """
     ``post_iteration_processing_block`` must fire once per iteration, in both transports.
@@ -306,6 +291,7 @@ def test_block_hook_fires_once_per_iteration(results):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 def test_iteration_estimator_flag_treated_identically(results):
     """
     Both controllers must do the same thing with ``use_iteration_estimator``.
@@ -325,6 +311,7 @@ def test_iteration_estimator_flag_treated_identically(results):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 @pytest.mark.parametrize('case', ['baseline_single', 'baseline_multi'])
 def test_pipelining_is_preserved(case, results):
     """
@@ -354,6 +341,7 @@ def test_pipelining_is_preserved(case, results):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 def test_global_convergence_stays_available(results):
     """
     ``all_to_done`` must keep doing what it says, in both controllers.
@@ -379,6 +367,7 @@ def test_global_convergence_stays_available(results):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 def test_gauss_seidel_mssdc_agrees(results):
     """
     Gauss-Seidel MSSDC has to be the same program in both transports too.
@@ -424,17 +413,3 @@ def test_gauss_seidel_mssdc_agrees(results):
         'the block no longer drains to a single running step, so this axis has stopped covering '
         f'the routing it was written for -- iteration counts were {counts.tolist()}'
     )
-
-
-if __name__ == '__main__':
-    from mpi4py import MPI
-
-    _out = sys.argv[1]
-    _payload = {}
-    for _name, _kwargs in CASES.items():
-        _result = run(useMPI=True, **_kwargs)
-        _payload.update({f'{_name}/{_k}': _v for _k, _v in _result.items()})
-    _payload['estimator/rejected'] = iteration_estimator_rejected(useMPI=True)
-
-    if MPI.COMM_WORLD.rank == 0:
-        np.savez(_out, **_payload)
