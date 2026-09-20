@@ -1,0 +1,26 @@
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_dbaa617c29a3c2::t_273f279b8b304c 180,182-185,187,189-190,192,194-199
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_904c4c7e4d4bf8 309-311,325-336
+pySDC/tests/test_helpers/test_gusto_coupling.py
+  s_dbaa617c29a3c2::t_da97890b3135ab 644
+  s_dbaa617c29a3c2::t_ae46beae5fd615 624,626-628,630-643
+pySDC/tests/test_tutorials/test_step_7.py
+  s_dbaa617c29a3c2::t_273f279b8b304c 64,66-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cdf69d7aa8a1582f62bf47381b20ecb771412b19",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
