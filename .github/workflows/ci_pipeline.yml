@@ -122,7 +122,7 @@ jobs:
             # test COMM_WORLD of a right-sized job, so one launch per rank count covers every test
             # wanting that many ranks -- instead of one `mpirun` per test case.
             for n in 2 3 4 5; do
-              mpiexec -n $n --oversubscribe $PYTEST -m "${{ matrix.env }} and parallel[$n]"
+              mpiexec -n $n $PYTEST -m "${{ matrix.env }} and parallel[$n]"
             done
             # `parallel[1]` selects tests that are unmarked or explicitly serial: the serial tests
             # plus everything still spawning its own `mpirun`. Tests marked parallel(n>1) are not
@@ -196,7 +196,7 @@ jobs:
           if [ "${{ matrix.env }}" = "RayleighBenard" ]; then
             # This project's sweeper tests use mpi-pytest; see the mpi4py job above for the shape.
             for n in 2 3; do
-              mpiexec -n $n --oversubscribe $PYTEST -m "parallel[$n]"
+              mpiexec -n $n $PYTEST -m "parallel[$n]"
             done
             $PYTEST -m "parallel[1]"
           else

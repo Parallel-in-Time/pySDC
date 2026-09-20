@@ -1644,7 +1644,9 @@ class SpectralHelper:
     def get_pfft(self, axes=None, padding=None, grid=None):
         if self.ndim == 1 or self.comm is None:
             return None
-        from mpi4py_fft import PFFT, newDistArray
+        from mpi4py_fft import newDistArray
+
+        from pySDC.helpers.fft_helper import PFFT
 
         axes = tuple(i for i in range(self.ndim)) if axes is None else axes
         padding = list(padding if padding else [1.0 for _ in range(self.ndim)])
@@ -1719,7 +1721,7 @@ class SpectralHelper:
                     self.fft_cache[key] = None
             else:
                 if direction == 'object':
-                    from mpi4py_fft import PFFT
+                    from pySDC.helpers.fft_helper import PFFT
 
                     _fft = PFFT(
                         comm=self.comm,

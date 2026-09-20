@@ -1,6 +1,8 @@
 import numpy as np
 from mpi4py import MPI
-from mpi4py_fft import PFFT, newDistArray
+from mpi4py_fft import newDistArray
+
+from pySDC.helpers.fft_helper import PFFT
 
 from pySDC.core.errors import ProblemError
 from pySDC.core.problem import Problem, WorkCounter

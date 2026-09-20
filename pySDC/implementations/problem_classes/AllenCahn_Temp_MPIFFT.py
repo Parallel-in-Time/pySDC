@@ -1,5 +1,5 @@
 import numpy as np
-from mpi4py_fft import PFFT
+from pySDC.helpers.fft_helper import PFFT
 
 from pySDC.core.errors import ProblemError
 from pySDC.core.problem import Problem, WorkCounter
