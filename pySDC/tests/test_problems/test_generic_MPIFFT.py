@@ -50,7 +50,7 @@ def test_derivative(nx, ny, nz, f, spectral, direction):
     else:
         _u2 = u2
 
-    assert xp.allclose(_u2, _u, atol=1e-7), 'Got unexpected inverse derivative'
+    assert xp.allclose(_u2, _u, rtol=0, atol=1e-7), 'Got unexpected inverse derivative'
 
 
 if __name__ == '__main__':

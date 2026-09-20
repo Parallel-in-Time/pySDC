@@ -41,7 +41,7 @@ def test_integration_matrix2D(nx, nz, axes, useMPI=False, **kwargs):
     S_u_hat = (conv @ S @ u_hat.flatten()).reshape(u_hat.shape)
     S_u = helper.itransform(S_u_hat, axes=(-1, -2))
 
-    assert np.allclose(S_u, expect, atol=1e-12)
+    assert np.allclose(S_u, expect, rtol=0, atol=1e-12)
 
 
 @pytest.mark.mpi4py
@@ -96,7 +96,7 @@ def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, **kwargs):
     D_u_hat = (conv @ D @ u_hat.flatten()).reshape(u_hat.shape)
     D_u = helper.itransform(D_u_hat).real
 
-    assert np.allclose(D_u, expect, atol=1e-10)
+    assert np.allclose(D_u, expect, rtol=0, atol=1e-10)
 
 
 @pytest.mark.cupy
@@ -131,7 +131,7 @@ def test_identity_matrix2D(nx, nz, bx, **kwargs):
     I_u_hat = (conv @ I @ u_hat.flatten()).reshape(u_hat.shape)
     I_u = helper.itransform(I_u_hat, axes=(-1, -2))
 
-    assert np.allclose(I_u, u, atol=1e-12)
+    assert np.allclose(I_u, u, rtol=0, atol=1e-12)
 
 
 @pytest.mark.base
@@ -779,7 +779,7 @@ def test_identity_matrix_ND(nx, ny, nz, bx, useMPI=False, **kwargs):
     I_u_hat = (conv @ I @ u_hat.flatten()).reshape(u_hat.shape)
     I_u = helper.itransform(I_u_hat, axes=(-1, -2))
 
-    assert np.allclose(I_u, u, atol=1e-12)
+    assert np.allclose(I_u, u, rtol=0, atol=1e-12)
 
 
 @pytest.mark.base

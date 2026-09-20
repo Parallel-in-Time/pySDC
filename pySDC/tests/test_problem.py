@@ -39,7 +39,9 @@ def test_scipy_reference(init):
     assert (
         u_ref.shape == u_exact.shape
     ), "The shape of the scipy reference solution does not match the shape of the actual solution"
-    assert np.allclose(u_ref, u_exact, atol=1e-12), "The scipy solution deviates significantly from the exact solution"
+    assert np.allclose(
+        u_ref, u_exact, rtol=0, atol=1e-12
+    ), "The scipy solution deviates significantly from the exact solution"
 
 
 @pytest.mark.base
