@@ -12,10 +12,15 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
 
 
-def main():
+def main(num_procs_space=None, fname='step_7_C_out.txt'):
     """
     Program to demonstrate usage of PETSc data structures and spatial parallelization,
     combined with parallelization in time.
+
+    Args:
+        num_procs_space (int): number of ranks to give the space communicator. Defaults to the
+            first command line argument when run as a script, and to 1 otherwise.
+        fname (str): name of the output file written under ``data/``.
     """
     # set MPI communicator
     comm = MPI.COMM_WORLD
@@ -24,16 +29,16 @@ def main():
     world_size = comm.Get_size()
 
     # split world communicator to create space-communicators
-    if len(sys.argv) >= 2:
-        color = int(world_rank / int(sys.argv[1]))
+    if num_procs_space is not None:
+        color = int(world_rank / num_procs_space)
     else:
         color = int(world_rank / 1)
     space_comm = comm.Split(color=color)
     space_rank = space_comm.Get_rank()
 
     # split world communicator to create time-communicators
-    if len(sys.argv) >= 2:
-        color = int(world_rank % int(sys.argv[1]))
+    if num_procs_space is not None:
+        color = int(world_rank % num_procs_space)
     else:
         color = int(world_rank / world_size)
     time_comm = comm.Split(color=color)
@@ -112,10 +117,6 @@ def main():
 
     # limit output to space-rank 0 (as before when setting the logger level)
     if space_rank == 0:
-        if len(sys.argv) == 3:
-            fname = str(sys.argv[2])
-        else:
-            fname = 'step_7_C_out.txt'
         Path("data").mkdir(parents=True, exist_ok=True)
         f = open('data/' + fname, 'a+')
 
@@ -164,4 +165,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # still runnable straight from the shell, as the tutorial text describes:
+    #   mpirun -np 4 python C_pySDC_with_PETSc.py 2 step_7_C_out_2x2.txt
+    main(
+        num_procs_space=int(sys.argv[1]) if len(sys.argv) >= 2 else None,
+        fname=sys.argv[2] if len(sys.argv) == 3 else 'step_7_C_out.txt',
+    )

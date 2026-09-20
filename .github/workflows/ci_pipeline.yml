@@ -117,18 +117,18 @@ jobs:
           import coverage
           coverage.process_startup() " > sitecustomize.py
           PYTEST="coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests"
-          if [ "${{ matrix.env }}" = "mpi4py" ]; then
+          if [ "${{ matrix.env }}" = "mpi4py" ] || [ "${{ matrix.env }}" = "petsc" ]; then
             # mpi-pytest runs pytest itself under mpiexec and gives each `@pytest.mark.parallel(n)`
             # test COMM_WORLD of a right-sized job, so one launch per rank count covers every test
             # wanting that many ranks -- instead of one `mpirun` per test case. `-p no:pytest_isolate_mpi`
             # because 0.3 refuses to load inside an MPI environment; it goes when that plugin does.
             for n in 2 3 4 5; do
-              mpiexec -n $n --oversubscribe $PYTEST -p no:pytest_isolate_mpi -m "mpi4py and parallel[$n]"
+              mpiexec -n $n --oversubscribe $PYTEST -p no:pytest_isolate_mpi -m "${{ matrix.env }} and parallel[$n]"
             done
             # `parallel[1]` selects tests that are unmarked or explicitly serial: the serial tests
             # plus everything still spawning its own `mpirun`. Tests marked parallel(n>1) are not
             # selected here, so nothing runs twice and nothing falls back to forking mode.
-            $PYTEST -m "mpi4py and parallel[1]"
+            $PYTEST -m "${{ matrix.env }} and parallel[1]"
           else
             $PYTEST -m ${{ matrix.env }}
           fi
