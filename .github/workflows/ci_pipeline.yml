@@ -38,6 +38,11 @@ env:
   # tests ask for 3 or 4 ranks and Monodomain's asks for 24. MPICH
   # oversubscribed silently, which is why this only appeared after the swap.
   PRTE_MCA_rmaps_default_mapping_policy: ':oversubscribe'
+  # ...and the OpenMPI 4 spelling of the same thing, which PRRTE superseded. The conda envs resolve
+  # OpenMPI 5 and need the variable above; the Firedrake container ships OpenMPI 4 and needs this
+  # one, which is why `mpiexec -n 3` there failed with "not enough slots available" while the same
+  # command worked everywhere else. Each version ignores the other's variable.
+  OMPI_MCA_rmaps_base_oversubscribe: 'true'
 
 jobs:
 
