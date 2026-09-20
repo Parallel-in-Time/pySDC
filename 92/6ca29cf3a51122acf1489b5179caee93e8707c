@@ -1,0 +1,24 @@
+pySDC/projects/RayleighBenard/tests/test_sweeper.py
+  s_dbaa617c29a3c2::t_2c2d5dd6c60529 84-85
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_6ee9c3d8f80790 195-204
+  s_dbaa617c29a3c2::t_9a47d94fe90187 123,125
+pySDC/projects/RayleighBenard/environment.yml
+  s_dbaa617c29a3c2::t_2c2d5dd6c60529 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "926ca29cf3a51122acf1489b5179caee93e8707c",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
