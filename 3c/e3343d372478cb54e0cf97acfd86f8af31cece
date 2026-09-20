@@ -1,0 +1,25 @@
+pySDC/tests/test_tutorials/test_step_7.py
+  s_dbaa617c29a3c2::t_f672a42115d628 21,23-25,29,31-33,37,39-41
+etc/environment-petsc.yml
+  s_dbaa617c29a3c2::t_f672a42115d628 17
+pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
+  s_dbaa617c29a3c2::t_6c9f1ee20bdfce 15,19-23,32-33,40-41,168-173
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_84ae670fc1a891 120,126,131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3ce3343d372478cb54e0cf97acfd86f8af31cece",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
