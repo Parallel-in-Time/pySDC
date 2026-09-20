@@ -1,0 +1,37 @@
+pySDC/tests/test_problems/test_Burgers.py
+  s_41cf6338e5f6cc::t_d1c1b37a801498 178
+  s_41cf6338e5f6cc::t_eeb948cf434ce3 189-191
+pySDC/tests/test_controllers/test_controller_ParaDiag_MPI.py
+  s_41cf6338e5f6cc::t_d1c1b37a801498 149
+pySDC/tests/test_problem.py
+  s_41cf6338e5f6cc::t_eeb948cf434ce3 42-44
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_41cf6338e5f6cc::t_270ef58b208995 135,137
+pySDC/tests/test_convergence_controllers/test_adaptive_alpha.py
+  s_41cf6338e5f6cc::t_d1c1b37a801498 140
+pySDC/tests/test_helpers/test_spectral_helper.py
+  s_41cf6338e5f6cc::t_d1c1b37a801498 44,99,134,782
+pySDC/tests/test_helpers/test_spectral_helper_1d_fft.py
+  s_41cf6338e5f6cc::t_d1c1b37a801498 142
+pySDC/tests/test_problems/test_generic_MPIFFT.py
+  s_41cf6338e5f6cc::t_d1c1b37a801498 53
+pySDC/tests/test_problems/test_heat_chebychev.py
+  s_41cf6338e5f6cc::t_059990e67f7e12 147-148
+  s_41cf6338e5f6cc::t_a2cf5464ce9485 47-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "377f13edd9e268340bcbc4499d0bd35e1346bc39",
+  "prompts": {},
+  "sessions": {
+    "s_41cf6338e5f6cc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85d4a73d-5f43-41b1-b8d7-4ef0aa4fcc11",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
