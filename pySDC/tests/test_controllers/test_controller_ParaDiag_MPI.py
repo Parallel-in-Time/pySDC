@@ -1,7 +1,5 @@
 import numpy as np
 import pytest
-from mpi4py import MPI
-from pytest_mpi import parallel_assert
 
 
 def get_composite_collocation_problem(L, M, N, alpha=1e-4, dt=1e-1, problem='Dahlquist', useMPI=False, comm=None):
@@ -181,6 +179,9 @@ def test_ParaDiag_MPI_matches_nonMPI(problem):
     ring reduction -- so bit-identity is not expected. Measured agreement over 72 configurations is
     ~1e-16 relative, i.e. about one ulp, so 1e-14 leaves a wide margin while still catching a defect.
     """
+    from mpi4py import MPI
+    from pytest_mpi import parallel_assert
+
     comm = MPI.COMM_WORLD
     L = comm.size
     M, N, alpha = 3, 2, 1e-4
@@ -206,6 +207,9 @@ def test_ParaDiag_MPI_matches_nonMPI(problem):
 @pytest.mark.parallel([2, 4])
 def test_variable_alpha_MPI():
     """An iteration dependent alpha works under MPI too, and agrees with the virtual controller."""
+    from mpi4py import MPI
+    from pytest_mpi import parallel_assert
+
     comm = MPI.COMM_WORLD
     L = comm.size
 
@@ -224,6 +228,9 @@ def test_variable_alpha_MPI():
 @pytest.mark.parallel(2)
 def test_multiple_blocks_MPI():
     """Running more steps than ranks means several blocks in sequence."""
+    from mpi4py import MPI
+    from pytest_mpi import parallel_assert
+
     comm = MPI.COMM_WORLD
     uend, _ = run_ParaDiag(2, 3, 2, 1e-8, 'Dahlquist', useMPI=True, comm=comm, Tend=4 * 1e-1)
 
@@ -245,6 +252,9 @@ def test_solves_past_Tend_MPI():
     With Tend in the middle of a block it solves past it and says so, rather than truncating -- all
     steps of a block have to run, so there is no partial block to stop at.
     """
+    from mpi4py import MPI
+    from pytest_mpi import parallel_assert
+
     comm = MPI.COMM_WORLD
     uend, _ = run_ParaDiag(2, 3, 2, 1e-8, 'Dahlquist', useMPI=True, comm=comm, Tend=0.15)
 
