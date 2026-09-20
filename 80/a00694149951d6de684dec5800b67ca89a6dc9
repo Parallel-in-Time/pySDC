@@ -1,0 +1,23 @@
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_e0bf2e128efb42 119-134
+pySDC/tests/test_transfer_classes/test_base_transfer_MPI.py
+  s_dbaa617c29a3c2::t_86f323b6ca0fa2 49-50
+pySDC/tests/test_sweepers/test_compute_end_point.py
+  s_dbaa617c29a3c2::t_86f323b6ca0fa2 63-65,67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "80a00694149951d6de684dec5800b67ca89a6dc9",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
