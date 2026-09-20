@@ -1,0 +1,21 @@
+pySDC/tests/test_helpers/test_fieldsIO.py
+  s_dbaa617c29a3c2::t_6636e7be962011 194,200,202-203,205,207-208,210,232
+  s_dbaa617c29a3c2::t_a885d6e6d7b9e1 213-230
+  s_dbaa617c29a3c2::t_74154ff12712f9 211,231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e1917804bff3c8b5796875f34ca6065b103688cc",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
