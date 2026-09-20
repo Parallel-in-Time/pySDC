@@ -391,7 +391,7 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[1, 2])
+@pytest.mark.parallel([1, 2])
 @pytest.mark.parametrize('nx', [4, 8])
 @pytest.mark.parametrize('ny', [4, 8])
 @pytest.mark.parametrize('nz', [0, 8])
@@ -410,7 +410,7 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
 @pytest.mark.parametrize('bz', ['fft', 'cheby'])
 @pytest.mark.parametrize('axes', [(-1,), (-1, -2), (-2, -1, -3)])
 @pytest.mark.parametrize('padding', [1, 1.5])
-def test_transform_MPI(mpi_ranks, nx, ny, nz, bx, by, bz, axes, padding, **kwargs):
+def test_transform_MPI(nx, ny, nz, bx, by, bz, axes, padding, **kwargs):
     test_transform(nx=nx, ny=ny, nz=nz, bx=bx, by=by, bz=bz, axes=axes, padding=padding, useMPI=True, **kwargs)
 
 
@@ -619,12 +619,12 @@ def test_tau_method2D(nz, nx, bc_val, bc=-1, plotting=False, useMPI=False, **kwa
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[2])
+@pytest.mark.parallel([2])
 @pytest.mark.parametrize('nx', [4, 8])
 @pytest.mark.parametrize('nz', [4, 8])
 @pytest.mark.parametrize('bc_val', [-2])
 @pytest.mark.parametrize('num_procs', [2, 1])
-def test_tau_method2D_MPI(mpi_ranks, nz, nx, bc_val, num_procs, **kwargs):
+def test_tau_method2D_MPI(nz, nx, bc_val, num_procs, **kwargs):
     test_tau_method2D(nz=nz, nx=nx, bc_val=bc_val, num_procs=num_procs, test='tau', useMPI=True)
 
 
@@ -732,13 +732,13 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[2, 4])
+@pytest.mark.parallel([2, 4])
 @pytest.mark.parametrize('nx', [8])
 @pytest.mark.parametrize('ny', [16])
 @pytest.mark.parametrize('nz', [32])
 @pytest.mark.parametrize('bz', ['fft', 'cheby', 'ultraspherical'])
 @pytest.mark.parametrize('axes', [(-1,), (-2,), (-3,), (-1, -2), (-2, -3), (-1, -3), (-1, -2, -3)])
-def test_differentiation_matrix3DMPI(mpi_ranks, nx, ny, nz, bz, axes, useMPI=True, **kwargs):
+def test_differentiation_matrix3DMPI(nx, ny, nz, bz, axes, useMPI=True, **kwargs):
     test_differentiation_matrix3D(nx, ny, nz, bz, axes, p=1, **kwargs)
 
 
