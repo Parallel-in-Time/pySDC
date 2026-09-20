@@ -15,9 +15,3 @@ dependencies:
   - pip:
     - qmat>=0.1.8
     - mpi-pytest>=2026.0
-    # Only for the tests not yet ported to mpi-pytest. Pinned to 0.3 because 0.4 does not tear down
-    # the module collector after the last isolated test in a module, so the next test in a different
-    # module dies at setup with "previous item was not torn down properly". 0.3 in turn refuses to
-    # load inside an `mpiexec` session, so the mpi-pytest invocations pass `-p no:pytest_isolate_mpi`.
-    # Both the pin and that flag go away with the last ported test.
-    - pytest-isolate-mpi==0.3
