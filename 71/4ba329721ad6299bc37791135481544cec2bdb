@@ -1,0 +1,29 @@
+pySDC/helpers/spectral_helper.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 1647-1649,1724
+pySDC/implementations/problem_classes/generic_MPIFFT_Laplacian.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 3-5
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_9a07074a0c27ab 125,199
+pySDC/implementations/problem_classes/AllenCahn_Temp_MPIFFT.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 2
+pySDC/helpers/fft_helper.py
+  s_dbaa617c29a3c2::t_be609f68d743fa 1-29
+pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 3-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "714ba329721ad6299bc37791135481544cec2bdb",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
