@@ -1,0 +1,19 @@
+pySDC/tests/test_controllers/test_controller_ParaDiag_MPI.py
+  s_dbaa617c29a3c2::t_8c689865a06c2e 182-184,210-212,231-233,255-257
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "201f1ea95859e6a188fc36c64027be6e29394c10",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
