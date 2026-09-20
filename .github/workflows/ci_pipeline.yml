@@ -132,7 +132,8 @@ jobs:
             [ "$rc" -eq 5 ] && return 0
             return $rc
           }
-          if [ "${{ matrix.env }}" = "mpi4py" ] || [ "${{ matrix.env }}" = "petsc" ]; then
+          if [ "${{ matrix.env }}" = "mpi4py" ] || [ "${{ matrix.env }}" = "petsc" ] \
+             || [ "${{ matrix.env }}" = "pytorch" ]; then
             bash etc/check_parallel_partition.sh pySDC/tests "${{ matrix.env }}" 2 3 4 5 || exit $?
             # mpi-pytest runs pytest itself under mpiexec and gives each `@pytest.mark.parallel(n)`
             # test COMM_WORLD of a right-sized job, so one launch per rank count covers every test
