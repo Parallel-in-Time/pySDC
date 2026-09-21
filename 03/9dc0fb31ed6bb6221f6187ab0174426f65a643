@@ -1,0 +1,34 @@
+pySDC/tests/test_tutorials/test_step_9.py
+  s_dbaa617c29a3c2::t_ba1786947b1b48 4-21,56-57,62-63,65-69,73,75,78,82,92-93,95-96,99-100,102-103,105-106,108,111-114,121-122,126-128
+  s_dbaa617c29a3c2::t_0b558eb488d118 97,110
+  s_dbaa617c29a3c2::t_5e3b55821f84ce 117-120,123-125
+docs/source/tutorial/doc_step_9_D.rst
+  s_dbaa617c29a3c2::t_f981ba46b9eb81 1,3
+docs/source/tutorial/doc_step_9_E.rst
+  s_dbaa617c29a3c2::t_f981ba46b9eb81 1,3
+pySDC/tutorial/step_9/README.rst
+  s_dbaa617c29a3c2::t_f981ba46b9eb81 51,54,72-98,101
+pySDC/tutorial/step_9/E_paradiag_MPI.py
+  s_dbaa617c29a3c2::t_8a83132ee41ac9 1-20,32-84
+  s_dbaa617c29a3c2::t_5e3b55821f84ce 21-31
+pySDC/tutorial/step_9/D_adaptive_alpha.py
+  s_dbaa617c29a3c2::t_e9c657758926c8 1-171,173-179,181-182,184,186-210
+  s_dbaa617c29a3c2::t_6f612ea21aae3e 183,185
+  s_dbaa617c29a3c2::t_951e2c7aa3d257 172,180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "039dc0fb31ed6bb6221f6187ab0174426f65a643",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
