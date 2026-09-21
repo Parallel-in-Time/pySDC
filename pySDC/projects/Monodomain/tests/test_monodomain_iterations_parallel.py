@@ -143,12 +143,18 @@ def run_and_check_iterations(expected_avg_niters, **options):
     _, _, avg_niters, times, niters, residuals = setup_and_run(**options)
 
     from mpi4py import MPI
+    from pytest_mpi import parallel_assert
 
-    if MPI.COMM_WORLD.rank == 0:
+    # only rank 0 aggregates the iteration counts, so only it can check them -- but the whole job
+    # has to fail when they are wrong, not just the one rank that looked
+    root = MPI.COMM_WORLD.rank == 0
+    if root:
         print(f"Got average number of iterations {avg_niters}, expected was {expected_avg_niters}")
-        assert avg_niters == pytest.approx(
-            expected_avg_niters, rel=0.1
-        ), f"Average number of iterations {avg_niters} too different from the expected {expected_avg_niters}"
+    parallel_assert(
+        (not root) or avg_niters == pytest.approx(expected_avg_niters, rel=0.1),
+        f"Average number of iterations {avg_niters} too different from the expected {expected_avg_niters}",
+        participating=root,
+    )
 
     return {"avg_niters": avg_niters, "times": times, "niters": niters, "residuals": residuals}
 
@@ -177,9 +183,9 @@ def initial_value():
     """
     Every run below reads its initial value from file, so it has to be written first.
 
-    Once per session, not once per test -- and the 24-rank job is a session of its own, so it
-    cannot rely on the serial one having produced it. Rank 0 writes while the others wait, since
-    this is a serial computation and they would otherwise race on the same file.
+    Once per module rather than once per test -- and the 24-rank pass is a separate process from
+    the serial one, so it cannot rely on that one having produced it. Rank 0 writes while the
+    others wait, since this is a serial computation and they would otherwise race on the file.
     """
     from mpi4py import MPI
 
@@ -247,3 +253,44 @@ def test_plot_iterations():
             title=title,
             output_file_name=out,
         )
+
+
+@pytest.mark.monodomain
+def test_cli_matches_setup_and_run(monkeypatch):
+    """
+    The command line in the project README has to keep working.
+
+    Calling `setup_and_run` directly above is what took the CLI out of the test path, and it hands
+    that function two dozen *positional* arguments -- so renaming or reordering one of its
+    parameters would go unnoticed until someone ran the documented command. Binding the call
+    against the real signature catches that without running a simulation.
+    """
+    import inspect
+    import sys
+    from pySDC.projects.Monodomain.run_scripts import run_MonodomainODE_cli as cli
+    from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
+
+    recorded = {}
+
+    def fake_setup_and_run(*args, **kwargs):
+        recorded['bound'] = inspect.signature(setup_and_run).bind(*args, **kwargs)
+        return 0.0, 0.0, 0.0, [], [], []
+
+    monkeypatch.setattr(cli, 'setup_and_run', fake_setup_and_run)
+    # the command line the project README documents
+    monkeypatch.setattr(
+        sys,
+        'argv',
+        'run_MonodomainODE_cli.py --dt 0.05 --end_time 0.2 --num_nodes 6,3 --domain_name cube_1D '
+        '--refinements 0 --ionic_model_name TTP --truly_time_parallel --n_time_ranks 4'.split(),
+    )
+
+    cli.main()
+
+    args = recorded['bound'].arguments
+    assert args['num_nodes'] == [6, 3], args['num_nodes']
+    assert args['refinements'] == [0], args['refinements']
+    assert args['n_time_ranks'] == 4 and args['truly_time_parallel'] is True
+    assert args['dt'] == 0.05 and args['end_time'] == 0.2
+    # `--skip_res` is the command line's name for `skip_residual_computation`
+    assert 'skip_residual_computation' in args

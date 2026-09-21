@@ -44,7 +44,8 @@ def testVersions(residual_type, semi_implicit, index_case, initial_guess):
     from pySDC.projects.DAE.run.accuracy_check_MPI import run
     from pySDC.core.errors import ParameterError
 
-    semi_implicit = False if semi_implicit == 'False' else True
+    # `semi_implicit` used to arrive as a string through the command line and was coerced here;
+    # it is a real bool from `parametrize` now, and coercing it would force every case to True.
     num_nodes = MPI.COMM_WORLD.size
 
     dt = 0.1

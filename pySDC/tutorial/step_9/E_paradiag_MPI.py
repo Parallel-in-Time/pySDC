@@ -14,23 +14,9 @@ touching it. Run this the way you would run any MPI program::
 
 We always integrate the same total number of time-steps and only vary how many of them run in
 parallel, so the number of ranks is the block size: four steps in total with a block size of one, two
-or four means windowing through four, two or one block respectively.
-
-What that does and does not leave unchanged is worth being precise about:
-
-- Windowing does not change what is being solved. Where the iteration count comes out the same, the
-  answers are identical to the last bit.
-- The iteration count usually does come out the same, but it need not: a fixed alpha of 1e-2 is loose
-  enough that a block of two or four steps costs one extra iteration over a block of one, while 1e-4
-  and 1e-8 do not notice. Where that happens the two runs stop at slightly different residuals, so
-  their errors differ by ~2e-8 -- three orders inside the discretisation error of ~3e-5, and leftover
-  iteration error rather than a different solution.
-- Adaptive alpha does not notice the block size either, but for a more interesting reason: it picks a
-  *different* alpha for each one, because gamma scales with the number of steps in the block, and
-  still converges in the same number of iterations. That is the margin the adaptive strategy buys
-  you, made visible.
-- At a given block size the MPI and the virtually parallel controllers have to agree exactly. That is
-  the comparison against Part D.
+or four means windowing through four, two or one block respectively. The README discusses what that
+does and does not leave unchanged; the short version is that at a given block size this has to agree
+exactly with Part D, and across block sizes it solves the same problem either way.
 
 Two properties of ParaDiag are worth keeping in mind when going parallel, because they differ from
 PFASST:
@@ -67,7 +53,8 @@ def main(fname='step_9_E_out.txt'):
     lines = []
     for alpha in alpha_settings:
         uend, niter, error, final_alpha = run(alpha, comm.size, comm=comm)
-        lines.append(format_result('MPI', alpha, niter, error, final_alpha))
+        # the block size goes in the label: the tutorial's output file holds every block size
+        lines.append(format_result(f'MPI on {comm.size}', alpha, niter, error, final_alpha))
 
     # only the last rank holds the end point of the block, so only it writes the output
     if comm.rank == comm.size - 1:

@@ -56,8 +56,7 @@ def test_step_9_D():
     """Part D is serial: the alpha comparison with the virtually parallel controller."""
     from pySDC.tutorial.step_9.D_adaptive_alpha import alpha_settings, main as main_D
 
-    cwd = 'pySDC/tutorial/step_9'
-    main_D(cwd)
+    main_D()
 
     results = _parse(_read('step_9_D_out.txt'))
     assert len(results) == len(alpha_settings), 'ERROR: expected one line per alpha, got %s' % len(results)
@@ -107,7 +106,7 @@ def test_step_9_E():
 
     # alpha is a property of the method, so at the block size Part D used the two controllers must agree
     for alpha in alpha_settings:
-        mpi = per_block[num_steps_total][('MPI', str(alpha))]
+        mpi = per_block[num_steps_total][(f'MPI on {num_steps_total}', str(alpha))]
         virtual = reference[('virtual', str(alpha))]
         assert mpi['niter'] == virtual['niter'], 'ERROR: MPI and virtual differ in iterations for alpha %s' % alpha
         assert abs(mpi['error'] - virtual['error']) < 1e-12, (
@@ -119,8 +118,8 @@ def test_step_9_E():
     # -- they still agree far inside the discretisation error of ~3e-5, the difference being leftover
     # iteration error rather than a different solution.
     for alpha in alpha_settings:
-        errors = [per_block[n][('MPI', str(alpha))]['error'] for n in block_sizes]
-        iters = {per_block[n][('MPI', str(alpha))]['niter'] for n in block_sizes}
+        errors = [per_block[n][(f'MPI on {n}', str(alpha))]['error'] for n in block_sizes]
+        iters = {per_block[n][(f'MPI on {n}', str(alpha))]['niter'] for n in block_sizes}
         tol = 1e-12 if len(iters) == 1 else 1e-6
         assert max(errors) - min(errors) < tol, 'ERROR: errors differ between block sizes for alpha %s: %s' % (
             alpha,

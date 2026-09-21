@@ -28,6 +28,8 @@ Alpha is a property of the method, not of the parallelization, so this is the ri
 down; Part E then runs the same thing across MPI ranks and checks it comes out the same.
 """
 
+from pathlib import Path
+
 # we always do this many time-steps in total, no matter how many of them run in parallel
 num_steps_total = 4
 
@@ -106,7 +108,7 @@ def format_result(mode, alpha, niter, error, final_alpha):
     One line of output, in the same shape for both controllers so they can be compared.
 
     Args:
-        mode (str): 'MPI' or 'virtual'
+        mode (str): which controller produced it, e.g. 'virtual' or 'MPI on 4'
         alpha: the alpha setting used
         niter (int): number of iterations needed
         error (float): error against the exact solution
@@ -116,7 +118,7 @@ def format_result(mode, alpha, niter, error, final_alpha):
         str: the formatted line
     """
     return (
-        f'{mode:>7s}: alpha {str(alpha):>9s} -> {niter:2d} iterations, '
+        f'{mode:>11s}: alpha {str(alpha):>9s} -> {niter:2d} iterations, '
         f'error {error:.4e}, final alpha {final_alpha:.3e}'
     )
 
@@ -167,12 +169,12 @@ def run(alpha, block_size, comm=None):
     return uend, niter, abs(uend - P.u_exact(Tend)), controller.params.alpha
 
 
-def main(cwd):
+def main(fname='step_9_D_out.txt'):
     """
     Compare fixed and adaptive alpha with the virtually parallel controller.
 
     Args:
-        cwd (str): current working directory
+        fname (str): file under ``data/`` to write the results to
     """
 
     import numpy as np
@@ -180,17 +182,18 @@ def main(cwd):
     # one block holding every step; Part E runs the same settings across MPI ranks
     block_size = num_steps_total
 
-    fname = 'step_9_D_out.txt'
-
-    f = open(cwd + '/../../../data/' + fname, 'w')
     results = {}
+    lines = []
     for alpha in alpha_settings:
         uend, niter, error, final_alpha = run(alpha, block_size)
         results[alpha] = (uend, niter)
-        out = format_result('virtual', alpha, niter, error, final_alpha)
-        f.write(out + '\n')
-        print(out)
-    f.close()
+        lines.append(format_result('virtual', alpha, niter, error, final_alpha))
+
+    Path("data").mkdir(parents=True, exist_ok=True)
+    with open('data/' + fname, 'w') as f:
+        for line in lines:
+            f.write(line + '\n')
+            print(line)
 
     # the adaptive strategy should need no more iterations than the best fixed alpha we tried
     best_fixed = min(results[a][1] for a in alpha_settings if a != 'adaptive')
@@ -207,4 +210,4 @@ def main(cwd):
 
 
 if __name__ == "__main__":
-    main('.')
+    main()

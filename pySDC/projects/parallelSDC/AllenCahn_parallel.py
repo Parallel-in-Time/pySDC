@@ -165,8 +165,7 @@ def main():
 
     The parallel variants need a 3-rank job, so they are not run from here. Use
 
-        mpirun -np 3 python -c "from pySDC.projects.parallelSDC.AllenCahn_parallel import run_variant; \
-                                run_variant('sl_parallel')"
+        mpirun -np 3 python -c "from pySDC.projects.parallelSDC.AllenCahn_parallel import run_variant as r; r('sl_parallel')"
 
     or let the test do it -- `tests/test_AllenCahn_parallel.py` runs them through mpi-pytest.
     """

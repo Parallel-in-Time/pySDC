@@ -12,7 +12,9 @@ def test_stuff(test_name):
     if test_name == 'mpi_vs_nonMPI':
         mpi_vs_nonMPI(True, comm)
     else:
-        check_step_size_limiter(True, comm)
+        # `size` is the number of parallel steps, which is the size of the communicator. `vdp.py`'s
+        # `__main__` passed `MPI_ready` here, so this ran with `size=1` whatever the rank count.
+        check_step_size_limiter(comm.size, comm)
 
 
 @pytest.mark.mpi4py
