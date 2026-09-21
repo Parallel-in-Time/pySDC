@@ -1,10 +1,6 @@
-Full code: `pySDC/tutorial/step_9/D_paradiag_MPI.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/D_paradiag_MPI.py>`_
+Full code: `pySDC/tutorial/step_9/D_adaptive_alpha.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/D_adaptive_alpha.py>`_
 
-.. literalinclude:: ../../../pySDC/tutorial/step_9/D_paradiag_MPI.py
-
-The script running on each rank: `pySDC/tutorial/step_9/playground_ParaDiag_MPI.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_9/playground_ParaDiag_MPI.py>`_
-
-.. literalinclude:: ../../../pySDC/tutorial/step_9/playground_ParaDiag_MPI.py
+.. literalinclude:: ../../../pySDC/tutorial/step_9/D_adaptive_alpha.py
 
 Results:
 

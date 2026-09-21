@@ -36,87 +36,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_6/C_MPI_parallelization.py">pySDC/tutorial/step_6/C_MPI_parallelization.py</a> and
-<a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_6/playground_parallelization.py">pySDC/tutorial/step_6/playground_parallelization.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">cwd</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    A simple test program to test MPI-parallel PFASST controllers</span>
-<span class="sd">    Args:</span>
-<span class="sd">        cwd: current working directory</span>
-<span class="sd">    """</span>
-
-    <span class="c1"># try to import MPI here, will fail if things go wrong (and not in the subprocess part)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">mpi4py</span>
-
-        <span class="k">del</span> <span class="n">mpi4py</span>
-    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">'petsc tests need mpi4py'</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
-
-    <span class="c1"># Set python path once</span>
-    <span class="n">my_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">my_env</span><span class="p">[</span><span class="s1">'PYTHONPATH'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'../../..:.'</span>
-    <span class="n">my_env</span><span class="p">[</span><span class="s1">'COVERAGE_PROCESS_START'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'pyproject.toml'</span>
-
-    <span class="c1"># set list of number of parallel steps (even)</span>
-    <span class="n">num_procs_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
-
-    <span class="c1"># set up new/empty file for output</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="s1">'step_6_C1_out.txt'</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">'/../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="c1"># run code with different number of MPI processes</span>
-    <span class="k">for</span> <span class="n">num_procs</span> <span class="ow">in</span> <span class="n">num_procs_list</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'Running code with </span><span class="si">%2i</span><span class="s1"> processes...'</span> <span class="o">%</span> <span class="n">num_procs</span><span class="p">)</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s1">'mpirun -np '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_procs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' python playground_parallelization.py ../../../../data/'</span> <span class="o">+</span> <span class="n">fname</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span>
-        <span class="c1"># while True:</span>
-        <span class="c1">#     line = p.stdout.readline()</span>
-        <span class="c1">#     print(line)</span>
-        <span class="c1">#     if not line: break</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%2i</span><span class="s1"> processes'</span> <span class="o">%</span> <span class="p">(</span>
-            <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
-            <span class="n">num_procs</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="c1"># set list of number of parallel steps (odd)</span>
-    <span class="n">num_procs_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
-
-    <span class="c1"># set up new/empty file for output</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="s1">'step_6_C2_out.txt'</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">'/../../../data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="c1"># run code with different number of MPI processes</span>
-    <span class="k">for</span> <span class="n">num_procs</span> <span class="ow">in</span> <span class="n">num_procs_list</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'Running code with </span><span class="si">%2i</span><span class="s1"> processes...'</span> <span class="o">%</span> <span class="n">num_procs</span><span class="p">)</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s1">'mpirun -np '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_procs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' python playground_parallelization.py ../../../../data/'</span> <span class="o">+</span> <span class="n">fname</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span>
-        <span class="c1"># while True:</span>
-        <span class="c1">#     line = p.stdout.readline()</span>
-        <span class="c1">#     print(line)</span>
-        <span class="c1">#     if not line: break</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%2i</span><span class="s1"> processes'</span> <span class="o">%</span> <span class="p">(</span>
-            <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
-            <span class="n">num_procs</span><span class="p">,</span>
-        <span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span>
-</pre></div>
-</div>
+  <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_6/C_MPI_parallelization.py">pySDC/tutorial/step_6/C_MPI_parallelization.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
@@ -126,9 +46,20 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_MPI</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_6.A_run_non_MPI_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_parameters_ml</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s1">'step_6_C_out.txt'</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    A simple test program to do MPI-parallel PFASST runs</span>
+<span class="sd">    Run PFASST with the MPI-parallel controller, one step per rank.</span>
+
+<span class="sd">    Run it the way you would run any MPI program, with as many ranks as you want steps::</span>
+
+<span class="sd">        mpirun -np 4 python C_MPI_parallelization.py</span>
+
+<span class="sd">    The number of parallel steps is simply the size of ``MPI.COMM_WORLD``, so nothing in here has to</span>
+<span class="sd">    be told how many there are.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fname (str): file under ``data/`` to append the results to</span>
 <span class="sd">    """</span>
 
     <span class="c1"># set MPI communicator</span>
@@ -156,12 +87,6 @@
     <span class="n">size</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># we'd need to deal with variable file names here (for testing purpose only)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">fname</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">fname</span> <span class="o">=</span> <span class="s1">'step_6_B_out.txt'</span>
-
         <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/'</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">'Working with </span><span class="si">%2i</span><span class="s1"> processes...'</span> <span class="o">%</span> <span class="n">size</span>
@@ -190,6 +115,10 @@
         <span class="nb">print</span><span class="p">()</span>
 
         <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">8</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">),</span> <span class="s2">"ERROR: weird iteration counts, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">iter_counts</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">'step_6_C_out.txt'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Results:</p>
