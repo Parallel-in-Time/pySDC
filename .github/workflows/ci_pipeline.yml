@@ -121,33 +121,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          PYTEST="coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests"
-          # `shell: bash -l {0}` carries no `-e`, so a failing pass in the middle of the loop
-          # below would otherwise be swallowed and only the last command's status would count.
-          # pytest exits 5 when a selection matches nothing, which is expected for a rank count
-          # no test in this environment asks for.
-          run_pass () {
-            "$@" && return 0
-            rc=$?
-            [ "$rc" -eq 5 ] && return 0
-            return $rc
-          }
-          if [ "${{ matrix.env }}" = "mpi4py" ] || [ "${{ matrix.env }}" = "petsc" ] \
-             || [ "${{ matrix.env }}" = "pytorch" ]; then
-            bash etc/check_parallel_partition.sh pySDC/tests "${{ matrix.env }}" 2 3 4 5 || exit $?
-            # mpi-pytest runs pytest itself under mpiexec and gives each `@pytest.mark.parallel(n)`
-            # test COMM_WORLD of a right-sized job, so one launch per rank count covers every test
-            # wanting that many ranks -- instead of one `mpirun` per test case.
-            for n in 2 3 4 5; do
-              run_pass mpiexec -n $n $PYTEST -m "${{ matrix.env }} and parallel[$n]" || exit $?
-            done
-            # `parallel[1]` selects tests that are unmarked or explicitly serial: the serial tests
-            # plus everything still spawning its own `mpirun`. Tests marked parallel(n>1) are not
-            # selected here, so nothing runs twice and nothing falls back to forking mode.
-            run_pass $PYTEST -m "${{ matrix.env }} and parallel[1]" || exit $?
-          else
-            $PYTEST -m ${{ matrix.env }}
-          fi
+          bash etc/run_mpi_tests.sh pySDC/tests "${{ matrix.env }}"
       - name: Make coverage report
         run: |
           coverage combine
@@ -209,27 +183,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          PYTEST="coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests"
-          # `shell: bash -l {0}` carries no `-e`, so a failing pass in the middle of the loop
-          # below would otherwise be swallowed and only the last command's status would count.
-          # pytest exits 5 when a selection matches nothing, which is expected for a rank count
-          # no test in this environment asks for.
-          run_pass () {
-            "$@" && return 0
-            rc=$?
-            [ "$rc" -eq 5 ] && return 0
-            return $rc
-          }
-          if [ "${{ matrix.env }}" = "RayleighBenard" ]; then
-            # This project's sweeper tests use mpi-pytest; see the mpi4py job above for the shape.
-            bash etc/check_parallel_partition.sh pySDC/projects/${{ matrix.env }}/tests "" 2 3 || exit $?
-            for n in 2 3; do
-              run_pass mpiexec -n $n $PYTEST -m "parallel[$n]" || exit $?
-            done
-            run_pass $PYTEST -m "parallel[1]" || exit $?
-          else
-            $PYTEST
-          fi
+          bash etc/run_mpi_tests.sh pySDC/projects/${{ matrix.env }}/tests
       - name: Make coverage report
         run: |
           coverage combine
@@ -336,19 +290,8 @@ jobs:
           # ./pySDC is why this job has always measured nothing. `..` is the workspace either way,
           # so the moves in the next step are unaffected.
           cd /repositories/pySDC
-          bash etc/check_parallel_partition.sh pySDC/tests firedrake 2 3 4 || exit $?
-          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests"
-          # See the mpi4py job for the shape and for why the exit status has to be checked by hand.
-          run_pass () {
-            "$@" && return 0
-            rc=$?
-            [ "$rc" -eq 5 ] && return 0
-            return $rc
-          }
-          for n in 2 3 4; do
-            run_pass mpiexec -n $n $PYTEST -m "firedrake and parallel[$n]" || exit $?
-          done
-          run_pass $PYTEST -m "firedrake and parallel[1]" || exit $?
+          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0" \
+            bash etc/run_mpi_tests.sh /repositories/pySDC/pySDC/tests firedrake
         timeout-minutes: 45
       - name: Make coverage report
         run: |
