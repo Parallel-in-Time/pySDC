@@ -68,8 +68,12 @@ def test_step_9_D():
     ), 'ERROR: adaptive alpha needed more iterations than the best fixed one'
 
 
+# the block sizes Part E is run at; the marker and the comparison below must not drift apart
+BLOCK_SIZES = [1, 2, 4]
+
+
 @pytest.mark.mpi4py
-@pytest.mark.parallel([1, 2, 4])
+@pytest.mark.parallel(BLOCK_SIZES)
 def test_step_9_E_MPI():
     """One rank per time-step, so the communicator size is the block size."""
     from pathlib import Path
@@ -95,7 +99,7 @@ def test_step_9_E():
     """
     from pySDC.tutorial.step_9.D_adaptive_alpha import alpha_settings, num_steps_total
 
-    block_sizes = [1, 2, 4]
+    block_sizes = BLOCK_SIZES
     _collect_mpi_output('step_9_E', block_sizes)
 
     per_block = {n: _parse(_read(f'step_9_E_np{n}.txt')) for n in block_sizes}
