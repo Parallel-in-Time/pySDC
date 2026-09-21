@@ -1,0 +1,19 @@
+pySDC/projects/GPU/environment.yml
+  s_dbaa617c29a3c2::t_ab76ee544b20ea 3-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d8be0eb842ad64768b3168e0eddfb2be91e51536",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
