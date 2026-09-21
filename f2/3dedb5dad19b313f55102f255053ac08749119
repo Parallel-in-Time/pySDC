@@ -1,0 +1,23 @@
+pySDC/projects/parallelSDC/AllenCahn_parallel.py
+  s_dbaa617c29a3c2::t_0b3d1b6a0a79dc 164-166,168-171
+pySDC/projects/parallelSDC/tests/test_AllenCahn_parallel.py
+  s_dbaa617c29a3c2::t_0b3d1b6a0a79dc 6,9,12-23
+pyproject.toml
+  s_dbaa617c29a3c2::t_00f8e03a91e7bc 95-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f23dedb5dad19b313f55102f255053ac08749119",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
