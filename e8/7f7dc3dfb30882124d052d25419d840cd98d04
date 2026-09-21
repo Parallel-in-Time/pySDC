@@ -1,0 +1,19 @@
+pySDC/projects/parallelSDC/tests/test_preconditioner_MPI.py
+  s_dbaa617c29a3c2::t_1864d50350bab8 7-10,12-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e87f7dc3dfb30882124d052d25419d840cd98d04",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
