@@ -1,0 +1,220 @@
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_dbaa617c29a3c2::t_ebbe47160fcc63 88,93-94,96,98-99,101,103,108,114,124-125,127,139,144,154-155,157
+etc/environment-mpi4py.yml
+  s_dbaa617c29a3c2::t_ba649999739320 17
+pySDC/tests/test_transfer_classes/test_base_transfer_MPI.py
+  s_dbaa617c29a3c2::t_86f323b6ca0fa2 49-50
+pySDC/tests/test_sweepers/test_compute_end_point.py
+  s_dbaa617c29a3c2::t_86f323b6ca0fa2 63-65,67
+pySDC/tests/test_hooks/test_log_to_file.py
+  s_dbaa617c29a3c2::t_8b4d12fbc11fa5 169-170,173-175
+pySDC/tests/test_sweepers/test_preconditioners.py
+  s_dbaa617c29a3c2::t_8b4d12fbc11fa5 123-124
+pySDC/tests/test_problems/test_RayleighBenard3D.py
+  s_dbaa617c29a3c2::t_a1392195512900 92-93,359-360
+pySDC/tests/test_helpers/test_spectral_helper.py
+  s_dbaa617c29a3c2::t_a1392195512900 401,420,607,719,725
+  s_dbaa617c29a3c2::t_71cdb16d213c3a 425,429-431,435,438-440,611-612,616,620-621
+  s_dbaa617c29a3c2::t_26ce723c7aa380 53,56-63
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta_MPI.py
+  s_dbaa617c29a3c2::t_ea72a0bfda6e75 10,74-75,89-90,97,99
+  s_dbaa617c29a3c2::t_e4809ddb89549e 9
+pySDC/tests/test_sweepers/test_delta_form_MPI.py
+  s_dbaa617c29a3c2::t_ea72a0bfda6e75 11,66-67,78,80,87,89
+  s_dbaa617c29a3c2::t_29514050901068 10
+pySDC/tests/test_convergence_controllers/test_basic_restarting.py
+  s_dbaa617c29a3c2::t_a78c3379174f28 174,176-182,291,293-299
+pySDC/tests/test_convergence_controllers/test_adaptive_collocation.py
+  s_dbaa617c29a3c2::t_2a30876b9ee01b 133,135
+pySDC/tests/test_convergence_controllers/test_polynomial_error.py
+  s_dbaa617c29a3c2::t_520d2a14ec9c7a 212,214-223
+pySDC/tests/test_convergence_controllers/test_extrapolation_within_Q.py
+  s_dbaa617c29a3c2::t_2a30876b9ee01b 201,203-212
+pySDC/tests/test_hooks/test_entry_class.py
+  s_dbaa617c29a3c2::t_7ce04d38ee611d 133
+pySDC/tests/test_hooks/test_log_work.py
+  s_dbaa617c29a3c2::t_7ce04d38ee611d 100,103-110
+pySDC/tests/test_helpers/test_stats_helper.py
+  s_dbaa617c29a3c2::t_7ce04d38ee611d 126,128-129,131-132
+pySDC/tests/test_datatypes/test_datatypes.py
+  s_dbaa617c29a3c2::t_1ddfad7b924069 69,72
+  s_dbaa617c29a3c2::t_ba3a90c329ebaa 57-60,64-65,78
+pySDC/tests/test_controllers/test_controller_conformance.py
+  s_dbaa617c29a3c2::t_46109fe2eddcdb 191,193,195-198,202-203,233,248,261,294,314,344,370
+pySDC/tests/test_controllers/test_controller_ParaDiag_MPI.py
+  s_dbaa617c29a3c2::t_7f120ed73969e0 172,174,185-186,189,192-202,207-208,213-214,216,218-224,228-229,234-235,237,239-243,247-248,259,261-267
+  s_dbaa617c29a3c2::t_8c689865a06c2e 182-184,210-212,231-233,255-257
+pySDC/tests/test_helpers/test_fieldsIO.py
+  s_dbaa617c29a3c2::t_6636e7be962011 194,200,202-203,205,207-208,210,232
+  s_dbaa617c29a3c2::t_a885d6e6d7b9e1 213-230
+  s_dbaa617c29a3c2::t_74154ff12712f9 211,231
+pySDC/tests/test_tutorials/test_step_7.py
+  s_dbaa617c29a3c2::t_f672a42115d628 19,21-23,27,29-31,35,37-39
+  s_dbaa617c29a3c2::t_273f279b8b304c 64,66-68
+etc/environment-petsc.yml
+  s_dbaa617c29a3c2::t_f672a42115d628 17
+pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
+  s_dbaa617c29a3c2::t_6c9f1ee20bdfce 15,19-23,32-33,40-41,168-173
+pySDC/projects/RayleighBenard/tests/test_sweeper.py
+  s_dbaa617c29a3c2::t_2c2d5dd6c60529 84-85
+pySDC/projects/RayleighBenard/environment.yml
+  s_dbaa617c29a3c2::t_2c2d5dd6c60529 20
+pySDC/helpers/spectral_helper.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 1647-1649,1724
+pySDC/implementations/problem_classes/generic_MPIFFT_Laplacian.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 3-5
+pySDC/implementations/problem_classes/AllenCahn_Temp_MPIFFT.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 2
+pySDC/helpers/fft_helper.py
+  s_dbaa617c29a3c2::t_be609f68d743fa 1-29
+pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 3-5
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_dbaa617c29a3c2::t_273f279b8b304c 180,182-185,187,189-190,192,194-199
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_904c4c7e4d4bf8 285-287
+  s_dbaa617c29a3c2::t_559a43dc2956ea 41-45
+  s_dbaa617c29a3c2::t_4478e940be4fe5 300-306,313
+  s_dbaa617c29a3c2::t_9b09625ace0d80 124,307-308
+  s_dbaa617c29a3c2::t_bbb7c84bde36c1 124,307-308
+  s_dbaa617c29a3c2::t_4fc26e14b103f8 149
+  s_dbaa617c29a3c2::t_21bc6dbff30e24 189
+  s_dbaa617c29a3c2::t_f43d51c540f946 226-227,233
+  s_dbaa617c29a3c2::t_f7cc72af24423b 187-188,190-198
+  s_dbaa617c29a3c2::t_f70c3f63d58be9 352
+pySDC/tests/test_helpers/test_gusto_coupling.py
+  s_dbaa617c29a3c2::t_da97890b3135ab 644
+  s_dbaa617c29a3c2::t_ae46beae5fd615 624,626-628,630-643
+etc/environment-pytorch.yml
+  s_dbaa617c29a3c2::t_ba3a90c329ebaa 18
+etc/mpi_ranks.py
+  s_dbaa617c29a3c2::t_d3d1566ace364b 1-18,34-41
+  s_dbaa617c29a3c2::t_521129e06c35fe 19-21,33
+  s_dbaa617c29a3c2::t_af71f8857f0e9e 1-9,12-14,18,34-41
+  s_dbaa617c29a3c2::t_7f84ed944c8ea2 10-11,15-17
+  s_dbaa617c29a3c2::t_57b4aa1d051dc0 22-32
+etc/run_mpi_tests.sh
+  s_dbaa617c29a3c2::t_d3d1566ace364b 1-25,36,43-53,67-73,75-77
+  s_dbaa617c29a3c2::t_c5aefe4922e3d5 26-35,38,40-41
+  s_dbaa617c29a3c2::t_09bf74fd0659d7 54-66,74
+  s_dbaa617c29a3c2::t_f1751b7761d16e 1-25,36,43-53,67-73,75-77
+  s_dbaa617c29a3c2::t_d972daf60185f4 37,39,42
+pySDC/tests/test_ci/test_run_mpi_tests.py
+  s_dbaa617c29a3c2::t_6a1d4aa3b68763 38-45,51-55,61-62,111-118,120-121
+  s_dbaa617c29a3c2::t_6bf4c82ba714da 26,29-30,33,134,195-197
+  s_dbaa617c29a3c2::t_01b83cd3e9e9d4 1-25,27-28,31-32,34-37,46-50,56-60,63-110,119,122-133,135-141,188-194,198
+  s_dbaa617c29a3c2::t_3a833d901a5cdd 144-149,153,186-187
+  s_dbaa617c29a3c2::t_4d7c4a73a12589 142-143,150-152,154-185
+pySDC/projects/Resilience/environment.yml
+  s_dbaa617c29a3c2::t_eedeb5c0e3feae 17
+pySDC/projects/Resilience/tests/test_vdp.py
+  s_dbaa617c29a3c2::t_6babd1a03c6ed5 25,27
+  s_dbaa617c29a3c2::t_82d497cb53db54 5,7-9,11-14
+  s_dbaa617c29a3c2::t_b6e3b61a5dd468 15-20
+pySDC/projects/DAE/tests/test_MPI_sweepers.py
+  s_dbaa617c29a3c2::t_12d2f249ec4de4 43,51,53-55,65-74,76-84,86-87
+  s_dbaa617c29a3c2::t_512a9871bc89d9 10,17,22,41,44-45,49
+  s_dbaa617c29a3c2::t_230c61667a2e00 5-6,8-9,11,13
+  s_dbaa617c29a3c2::t_e16d8c96ad64a5 47-48
+pySDC/projects/DAE/environment.yml
+  s_dbaa617c29a3c2::t_eedeb5c0e3feae 16
+pySDC/projects/GPU/tests/test_configs.py
+  s_dbaa617c29a3c2::t_4fc26e14b103f8 5-9,11-13
+  s_dbaa617c29a3c2::t_9a820af441f2a6 41
+pySDC/tests/test_convergence_controllers/test_crash.py
+  s_dbaa617c29a3c2::t_c874b6ef527a97 148-155
+pySDC/projects/compression/tests/test_proof_of_concept.py
+  s_dbaa617c29a3c2::t_f43d51c540f946 5,7-8,10,13-18
+pySDC/projects/GPU/environment.yml
+  s_dbaa617c29a3c2::t_4fc26e14b103f8 1-2,14-17,19-23,25,28-31
+  s_dbaa617c29a3c2::t_3d986324c4cce7 18,24,26-27
+  s_dbaa617c29a3c2::t_ab76ee544b20ea 3-13
+pySDC/projects/AllenCahn_Bayreuth/tests/test_simple_forcing.py
+  s_dbaa617c29a3c2::t_c874b6ef527a97 22,24-34
+pySDC/projects/GPU/tests/conftest.py
+  s_dbaa617c29a3c2::t_4f5d2854cb904e 1-3
+pySDC/tests/fake_cupy.py
+  s_dbaa617c29a3c2::t_212c5c75d31733 78-89,151-156
+pySDC/projects/parallelSDC/tests/test_preconditioner_MPI.py
+  s_dbaa617c29a3c2::t_1864d50350bab8 7-10,12-27
+pySDC/projects/AllenCahn_Bayreuth/environment.yml
+  s_dbaa617c29a3c2::t_57b4aa1d051dc0 17
+pySDC/projects/parallelSDC/environment.yml
+  s_dbaa617c29a3c2::t_57b4aa1d051dc0 17
+pySDC/projects/Monodomain/etc/environment-monodomain.yml
+  s_dbaa617c29a3c2::t_f70c3f63d58be9 29
+pySDC/projects/Monodomain/tests/test_monodomain_iterations_parallel.py
+  s_dbaa617c29a3c2::t_9cff534d8179c8 94-96,100,102-108,110-122,136-137,140-141,143,145,152,158-159,162-177,198-199,201-203,206-208,211-213,216-225,227-255
+  s_dbaa617c29a3c2::t_f5bb86f50d8dcf 181-184,189-190,192-195
+  s_dbaa617c29a3c2::t_87fe3da56e7a9a 98-99,101
+  s_dbaa617c29a3c2::t_e2edec9c8d2779 146,148-151,153-157,186-188
+  s_dbaa617c29a3c2::t_2839c787f1dac9 256-296
+pySDC/projects/parallelSDC/AllenCahn_parallel.py
+  s_dbaa617c29a3c2::t_0b3d1b6a0a79dc 164-166,169-170
+  s_dbaa617c29a3c2::t_0af4e89ad390cd 168
+pySDC/projects/parallelSDC/tests/test_AllenCahn_parallel.py
+  s_dbaa617c29a3c2::t_0b3d1b6a0a79dc 6,9,12-23
+pyproject.toml
+  s_dbaa617c29a3c2::t_00f8e03a91e7bc 95-98
+docs/source/tutorial/doc_step_6_C.rst
+  s_dbaa617c29a3c2::t_0ac92b49817b60 1
+pySDC/tutorial/step_6/C_MPI_parallelization.py
+  s_dbaa617c29a3c2::t_0ac92b49817b60 1-2,4,6-11,13-21,23,26-78,82
+pySDC/tutorial/step_6/README.rst
+  s_dbaa617c29a3c2::t_0ac92b49817b60 44
+  s_dbaa617c29a3c2::t_294d8d1c70a101 40-43,45-46,51,53
+pySDC/tests/test_tutorials/test_step_6.py
+  s_dbaa617c29a3c2::t_0ac92b49817b60 36
+  s_dbaa617c29a3c2::t_6a371142495f80 27-35,37-45,47-55,57-60
+  s_dbaa617c29a3c2::t_4078af80c2f541 19-24,26,56
+pySDC/tests/test_tutorials/test_step_9.py
+  s_dbaa617c29a3c2::t_c2277c3558be71 22-34,60,84,87,90-92
+  s_dbaa617c29a3c2::t_b8b8fc09423d41 75,77,79-80,82-83,86,88-89
+  s_dbaa617c29a3c2::t_57effec1ac4f25 97
+  s_dbaa617c29a3c2::t_ba1786947b1b48 4-21,56-57,61-62,64-68,78,81,85,95-96,98-99,103,105-106,108-109,111,114-117,124,129-131
+  s_dbaa617c29a3c2::t_0b558eb488d118 100
+  s_dbaa617c29a3c2::t_5e3b55821f84ce 120-123,127-128
+  s_dbaa617c29a3c2::t_c616d2bc51d952 59
+  s_dbaa617c29a3c2::t_8d03bebb795e31 113,125-126
+  s_dbaa617c29a3c2::t_a60627490ef7f1 71-74,76,102
+docs/source/tutorial/doc_step_9_D.rst
+  s_dbaa617c29a3c2::t_f981ba46b9eb81 1,3
+docs/source/tutorial/doc_step_9_E.rst
+  s_dbaa617c29a3c2::t_f981ba46b9eb81 1,3
+pySDC/tutorial/step_9/README.rst
+  s_dbaa617c29a3c2::t_f981ba46b9eb81 51,54,72-98,101
+pySDC/tutorial/step_9/E_paradiag_MPI.py
+  s_dbaa617c29a3c2::t_8a83132ee41ac9 1-16,20-55,58-71
+  s_dbaa617c29a3c2::t_d996f9753c6cda 56-57
+  s_dbaa617c29a3c2::t_5148a4b793f0a3 17-19
+pySDC/tutorial/step_9/D_adaptive_alpha.py
+  s_dbaa617c29a3c2::t_e9c657758926c8 1-30,33-110,112-120,122-171,173,175-176,178-181,183-184,185,187-189,197-212
+  s_dbaa617c29a3c2::t_951e2c7aa3d257 174,182
+  s_dbaa617c29a3c2::t_d996f9753c6cda 111,121
+  s_dbaa617c29a3c2::t_8f6d6d0cdc2d54 31-32,172,177,186,190-196,213
+aidecl.yaml
+  s_dbaa617c29a3c2::t_e32651fa99647b 32,34,37,42,66-75,83,90
+pySDC/projects/Resilience/vdp.py
+  s_dbaa617c29a3c2::t_e80a0726f96661 552-556,559
+etc/environment-cupy.yml
+  s_dbaa617c29a3c2::t_b0e4e1bb102505 3-9,14,20-25
+pySDC/projects/GPU/README.rst
+  s_dbaa617c29a3c2::t_d725ccdabeae71 6-8,10-12,14-24,29-30,32-33,37,41-42,49-53
+  s_dbaa617c29a3c2::t_2572b9e8cb6859 34-36,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dd03d97c7b6eb7c5713fd0b512ca5ce44619a9bf",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
