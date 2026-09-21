@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/problem_classes/RayleighBenard.py: 75%</title>
+    <title>Coverage for pySDC/implementations/problem_classes/RayleighBenard.py: 81%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
-    <script src="coverage_html_cb_dd2e7eb5.js" defer></script>
+    <script src="coverage_html_cb_15cffcd0.js" defer></script>
 </head>
 <body class="pyfile">
 <header>
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>implementations<span class="sep">/</span>problem_classes<span class="sep">/</span>RayleighBenard.py</b>:
-            <span class="pc_cov">75%</span>
+            <span class="pc_cov">81%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">255 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">190<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">65<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">206<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">49<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">60<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_RayleighBenard3D_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-20 11:51 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
+            created at 2026-09-21 10:19 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -355,7 +355,7 @@
     <p class="run"><span class="n"><a id="t273" href="#t273">273</a></span><span class="t">            <span class="nam">me_hat</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">transform</span><span class="op">(</span><span class="nam">me</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t274" href="#t274">274</a></span><span class="t">            <span class="key">return</span> <span class="nam">me_hat</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t275" href="#t275">275</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t276" href="#t276">276</a></span><span class="t">            <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t276" href="#t276">276</a></span><span class="t">            <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t277" href="#t277">277</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t278" href="#t278">278</a></span><span class="t">    <span class="key">def</span> <span class="nam">apply_BCs</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">sol</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t279" href="#t279">279</a></span><span class="t">        <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
@@ -471,30 +471,30 @@
     <p class="run"><span class="n"><a id="t389" href="#t389">389</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">itransform</span><span class="op">(</span><span class="nam">vorticity_hat</span><span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">real</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t390" href="#t390">390</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t391" href="#t391">391</a></span><span class="t">    <span class="key">def</span> <span class="nam">getOutputFile</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">fileName</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t392" href="#t392">392</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">helpers</span><span class="op">.</span><span class="nam">fieldsIO</span> <span class="key">import</span> <span class="nam">Rectilinear</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t392" href="#t392">392</a></span><span class="t">        <span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">helpers</span><span class="op">.</span><span class="nam">fieldsIO</span> <span class="key">import</span> <span class="nam">Rectilinear</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t393" href="#t393">393</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t394" href="#t394">394</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">setUpFieldsIO</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t394" href="#t394">394</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">setUpFieldsIO</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t395" href="#t395">395</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t396" href="#t396">396</a></span><span class="t">        <span class="nam">coords</span> <span class="op">=</span> <span class="op">[</span><span class="nam">me</span><span class="op">.</span><span class="nam">get_1dgrid</span><span class="op">(</span><span class="op">)</span> <span class="key">for</span> <span class="nam">me</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">spectral</span><span class="op">.</span><span class="nam">axes</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t397" href="#t397">397</a></span><span class="t">        <span class="key">assert</span> <span class="nam">np</span><span class="op">.</span><span class="nam">allclose</span><span class="op">(</span><span class="op">[</span><span class="nam">len</span><span class="op">(</span><span class="nam">me</span><span class="op">)</span> <span class="key">for</span> <span class="nam">me</span> <span class="key">in</span> <span class="nam">coords</span><span class="op">]</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">spectral</span><span class="op">.</span><span class="nam">global_shape</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t396" href="#t396">396</a></span><span class="t">        <span class="nam">coords</span> <span class="op">=</span> <span class="op">[</span><span class="nam">me</span><span class="op">.</span><span class="nam">get_1dgrid</span><span class="op">(</span><span class="op">)</span> <span class="key">for</span> <span class="nam">me</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">spectral</span><span class="op">.</span><span class="nam">axes</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t397" href="#t397">397</a></span><span class="t">        <span class="key">assert</span> <span class="nam">np</span><span class="op">.</span><span class="nam">allclose</span><span class="op">(</span><span class="op">[</span><span class="nam">len</span><span class="op">(</span><span class="nam">me</span><span class="op">)</span> <span class="key">for</span> <span class="nam">me</span> <span class="key">in</span> <span class="nam">coords</span><span class="op">]</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">spectral</span><span class="op">.</span><span class="nam">global_shape</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t398" href="#t398">398</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t399" href="#t399">399</a></span><span class="t">        <span class="nam">fOut</span> <span class="op">=</span> <span class="nam">Rectilinear</span><span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">,</span> <span class="nam">fileName</span><span class="op">=</span><span class="nam">fileName</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t400" href="#t400">400</a></span><span class="t">        <span class="nam">fOut</span><span class="op">.</span><span class="nam">setHeader</span><span class="op">(</span><span class="nam">nVar</span><span class="op">=</span><span class="nam">len</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">components</span><span class="op">)</span> <span class="op">+</span> <span class="num">1</span><span class="op">,</span> <span class="nam">coords</span><span class="op">=</span><span class="nam">coords</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t401" href="#t401">401</a></span><span class="t">        <span class="nam">fOut</span><span class="op">.</span><span class="nam">initialize</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t402" href="#t402">402</a></span><span class="t">        <span class="key">return</span> <span class="nam">fOut</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t399" href="#t399">399</a></span><span class="t">        <span class="nam">fOut</span> <span class="op">=</span> <span class="nam">Rectilinear</span><span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">,</span> <span class="nam">fileName</span><span class="op">=</span><span class="nam">fileName</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t400" href="#t400">400</a></span><span class="t">        <span class="nam">fOut</span><span class="op">.</span><span class="nam">setHeader</span><span class="op">(</span><span class="nam">nVar</span><span class="op">=</span><span class="nam">len</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">components</span><span class="op">)</span> <span class="op">+</span> <span class="num">1</span><span class="op">,</span> <span class="nam">coords</span><span class="op">=</span><span class="nam">coords</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t401" href="#t401">401</a></span><span class="t">        <span class="nam">fOut</span><span class="op">.</span><span class="nam">initialize</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t402" href="#t402">402</a></span><span class="t">        <span class="key">return</span> <span class="nam">fOut</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t403" href="#t403">403</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t404" href="#t404">404</a></span><span class="t">    <span class="key">def</span> <span class="nam">processSolutionForOutput</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t405" href="#t405">405</a></span><span class="t">        <span class="nam">vorticity</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">compute_vorticity</span><span class="op">(</span><span class="nam">u</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t405" href="#t405">405</a></span><span class="t">        <span class="nam">vorticity</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">compute_vorticity</span><span class="op">(</span><span class="nam">u</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t406" href="#t406">406</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t407" href="#t407">407</a></span><span class="t">        <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">spectral_space</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t407" href="#t407">407</a></span><span class="t">        <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">spectral_space</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t408" href="#t408">408</a></span><span class="t">            <span class="nam">u_real</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">itransform</span><span class="op">(</span><span class="nam">u</span><span class="op">)</span><span class="op">.</span><span class="nam">real</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t409" href="#t409">409</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t410" href="#t410">410</a></span><span class="t">            <span class="nam">u_real</span> <span class="op">=</span> <span class="nam">u</span><span class="op">.</span><span class="nam">real</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t410" href="#t410">410</a></span><span class="t">            <span class="nam">u_real</span> <span class="op">=</span> <span class="nam">u</span><span class="op">.</span><span class="nam">real</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t411" href="#t411">411</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t412" href="#t412">412</a></span><span class="t">        <span class="nam">me</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">empty</span><span class="op">(</span><span class="nam">shape</span><span class="op">=</span><span class="op">(</span><span class="nam">u_real</span><span class="op">.</span><span class="nam">shape</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">+</span> <span class="num">1</span><span class="op">,</span> <span class="op">*</span><span class="nam">vorticity</span><span class="op">.</span><span class="nam">shape</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t413" href="#t413">413</a></span><span class="t">        <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">-</span><span class="num">1</span><span class="op">]</span> <span class="op">=</span> <span class="nam">u_real</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t414" href="#t414">414</a></span><span class="t">        <span class="nam">me</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span> <span class="op">=</span> <span class="nam">vorticity</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t415" href="#t415">415</a></span><span class="t">        <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t412" href="#t412">412</a></span><span class="t">        <span class="nam">me</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">empty</span><span class="op">(</span><span class="nam">shape</span><span class="op">=</span><span class="op">(</span><span class="nam">u_real</span><span class="op">.</span><span class="nam">shape</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">+</span> <span class="num">1</span><span class="op">,</span> <span class="op">*</span><span class="nam">vorticity</span><span class="op">.</span><span class="nam">shape</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t413" href="#t413">413</a></span><span class="t">        <span class="nam">me</span><span class="op">[</span><span class="op">:</span><span class="op">-</span><span class="num">1</span><span class="op">]</span> <span class="op">=</span> <span class="nam">u_real</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t414" href="#t414">414</a></span><span class="t">        <span class="nam">me</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span> <span class="op">=</span> <span class="nam">vorticity</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t415" href="#t415">415</a></span><span class="t">        <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t416" href="#t416">416</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t417" href="#t417">417</a></span><span class="t">    <span class="key">def</span> <span class="nam">compute_Nusselt_numbers</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t418" href="#t418">418</a></span><span class="t">        <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
@@ -731,8 +731,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_91faa57f8583c837_RayleighBenard3D_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.16.0">coverage.py v7.16.0</a>,
-            created at 2026-09-20 11:51 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
+            created at 2026-09-21 10:19 +0000
         </p>
     </div>
 </footer>

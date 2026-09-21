@@ -1,0 +1,7 @@
+helpers.fft\_helper module
+==========================
+
+.. automodule:: helpers.fft_helper
+   :members:
+   :show-inheritance:
+   :undoc-members:

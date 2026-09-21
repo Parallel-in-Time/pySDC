@@ -10,6 +10,7 @@ Submodules
    helpers.NCCL_communicator
    helpers.ParaDiagHelper
    helpers.blocks
+   helpers.fft_helper
    helpers.fieldsIO
    helpers.firedrake_ensemble_communicator
    helpers.plot_helper
