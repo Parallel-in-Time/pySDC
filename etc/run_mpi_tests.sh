@@ -23,12 +23,23 @@ marker=${2:-}
 
 : "${PYTEST:=coverage run -m pytest --continue-on-collection-errors -v --durations=0}"
 
-marker_args=()
-[ -n "$marker" ] && marker_args=(-m "$marker")
+# No arrays: bash 3.2 (still the system bash on macOS) treats "${empty[@]}" as an unbound variable
+# under `set -u`, which silently emptied the discovery below and skipped every MPI pass.
+discover() {
+    export PYTHONPATH="$(dirname "$0")${PYTHONPATH:+:$PYTHONPATH}"
+    if [ -n "$marker" ]; then
+        python -m pytest --collect-only -q -p mpi_ranks -m "$marker" "$tests"
+    else
+        python -m pytest --collect-only -q -p mpi_ranks "$tests"
+    fi
+}
 
-ranks=$(PYTHONPATH="$(dirname "$0")${PYTHONPATH:+:$PYTHONPATH}" \
-    python -m pytest --collect-only -q -p mpi_ranks "${marker_args[@]}" "$tests" |
-    sed -n 's/^MPI_RANKS //p')
+ranks=$(discover | sed -n 's/^MPI_RANKS //p')
+if [ -z "$ranks" ] && ! discover >/dev/null 2>&1; then
+    echo "::error::Could not collect $tests to discover its rank counts." >&2
+    discover >&2
+    exit 1
+fi
 
 echo "Rank counts declared by the tests: ${ranks:-<none>}"
 
