@@ -16,7 +16,12 @@ _ranks = set()
 # collected item.
 @pytest.hookimpl(trylast=True)
 def pytest_collection_modifyitems(config, items):
-    from pytest_mpi.plugin import _extract_nprocs_for_single_test
+    try:
+        from pytest_mpi.plugin import _extract_nprocs_for_single_test
+    except ImportError:
+        # No mpi-pytest in this environment, so nothing can carry a `parallel` marker and there are
+        # no rank counts to report. Most project environments are in this position.
+        return
 
     for item in items:
         if item.get_closest_marker("parallel"):

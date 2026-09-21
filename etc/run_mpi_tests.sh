@@ -51,6 +51,19 @@ run_pass() {
     return $rc
 }
 
+# Nothing here declares MPI ranks -- either the tree has no MPI tests, or mpi-pytest is not
+# installed in this environment, which is the case for most project environments. Run one ordinary
+# pass, exactly as before this runner existed. Selecting `parallel[1]` instead would deselect
+# everything wherever the marker is unknown, and the job would pass having run nothing.
+if [ -z "$ranks" ]; then
+    if [ -n "$marker" ]; then
+        $PYTEST -m "$marker" "$tests"
+    else
+        $PYTEST "$tests"
+    fi
+    exit $?
+fi
+
 for n in $ranks; do
     [ "$n" -eq 1 ] && continue
     sel="parallel[$n]"
@@ -58,6 +71,7 @@ for n in $ranks; do
     run_pass mpiexec -n "$n" $PYTEST -m "$sel" "$tests" || exit $?
 done
 
+# `parallel[1]` claims everything unmarked or explicitly serial
 sel="parallel[1]"
 [ -n "$marker" ] && sel="$marker and $sel"
 run_pass $PYTEST -m "$sel" "$tests" || exit $?
