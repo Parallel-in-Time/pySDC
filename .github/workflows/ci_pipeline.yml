@@ -184,9 +184,18 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          # `not cupy`: these runners have no GPU, and the GPU project's other tests are
-          # cupy-marked. Every other project is unaffected -- none of them has such a test.
+          # `not cupy`: these runners have no GPU. The GPU project's cupy-marked tests are run
+          # against the NumPy stub in the step below instead; no other project has such a test.
           bash etc/run_mpi_tests.sh pySDC/projects/${{ matrix.env }}/tests "not cupy"
+      - name: Run the GPU code paths against the CuPy stub
+        if: matrix.env == 'GPU'
+        env:
+          PYSDC_FAKE_GPU: '1'
+        # A smoke test only, exactly as for pySDC/tests: `cupy` is swapped for `numpy`, so this
+        # checks the `useGPU` paths are wired up and import, NOT that they work on a GPU.
+        # Deliberately outside the coverage run, so it cannot claim GPU code is covered.
+        run: |
+          pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/GPU/tests -m cupy
       - name: Make coverage report
         run: |
           coverage combine
