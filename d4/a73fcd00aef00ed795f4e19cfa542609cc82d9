@@ -1,0 +1,41 @@
+docs/source/tutorial/doc_step_6_C.rst
+  s_dbaa617c29a3c2::t_0ac92b49817b60 1
+pySDC/tutorial/step_6/C_MPI_parallelization.py
+  s_dbaa617c29a3c2::t_0ac92b49817b60 1-2,4,6-11,13-21,23,26-78,82
+pySDC/tutorial/step_6/README.rst
+  s_dbaa617c29a3c2::t_0ac92b49817b60 44
+  s_dbaa617c29a3c2::t_294d8d1c70a101 40-43,45-46,51,53
+pySDC/tutorial/step_9/D_paradiag_MPI.py
+  s_dbaa617c29a3c2::t_88d14fa3698ba0 153-155,162
+pySDC/tutorial/step_9/playground_adaptive_alpha.py
+  s_dbaa617c29a3c2::t_2fa896d3172d0c 8-9,32-37
+pySDC/tests/test_tutorials/test_step_6.py
+  s_dbaa617c29a3c2::t_0ac92b49817b60 30
+  s_dbaa617c29a3c2::t_6a371142495f80 20-29,31-39,41-54
+pySDC/tests/test_tutorials/test_step_9.py
+  s_dbaa617c29a3c2::t_c2277c3558be71 4-16,45-46,48,51,58-59,100,103,106-108,113
+  s_dbaa617c29a3c2::t_b8b8fc09423d41 36-44,47,49-50,52-53,91-99,101-102,104-105
+  s_dbaa617c29a3c2::t_57effec1ac4f25 114
+pySDC/tutorial/step_9/E_adaptive_alpha.py
+  s_dbaa617c29a3c2::t_693136c7da0150 140-142
+docs/convert_markdown.py
+  s_dbaa617c29a3c2::t_ee46c7dba775a7 8
+pySDC/tutorial/step_9/playground_ParaDiag_MPI.py
+  s_dbaa617c29a3c2::t_2fa896d3172d0c 16-17,61-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d4a73fcd00aef00ed795f4e19cfa542609cc82d9",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
