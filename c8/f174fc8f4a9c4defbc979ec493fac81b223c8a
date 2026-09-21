@@ -1,0 +1,32 @@
+pySDC/projects/GPU/tests/test_configs.py
+  s_dbaa617c29a3c2::t_4fc26e14b103f8 5-9,11-13
+  s_dbaa617c29a3c2::t_9a820af441f2a6 41
+pySDC/tests/test_convergence_controllers/test_crash.py
+  s_dbaa617c29a3c2::t_c874b6ef527a97 148-155
+pySDC/projects/compression/tests/test_proof_of_concept.py
+  s_dbaa617c29a3c2::t_f43d51c540f946 5,7-8,10,13-18
+pySDC/projects/GPU/environment.yml
+  s_dbaa617c29a3c2::t_4fc26e14b103f8 1-16
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_4fc26e14b103f8 149
+  s_dbaa617c29a3c2::t_21bc6dbff30e24 187-189
+  s_dbaa617c29a3c2::t_f43d51c540f946 217-218,224
+pySDC/projects/AllenCahn_Bayreuth/tests/test_simple_forcing.py
+  s_dbaa617c29a3c2::t_c874b6ef527a97 22,24-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c8f174fc8f4a9c4defbc979ec493fac81b223c8a",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
