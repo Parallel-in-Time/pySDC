@@ -25,9 +25,6 @@ from PFASST:
   solves past it rather than truncating, and says so.
 """
 
-import os
-import subprocess
-
 # we always do this many time-steps in total, no matter how many of them run in parallel
 num_steps_total = 4
 
@@ -151,41 +148,18 @@ def main(cwd):
         cwd (str): current working directory
     """
 
-    # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
-    try:
-        import mpi4py
-
-        del mpi4py
-    except ImportError as e:
-        raise ImportError('ParaDiag with MPI needs mpi4py') from e
-
     import numpy as np
 
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
+    # the MPI runs are driven by `playground_ParaDiag_MPI.py`, one rank per time-step:
+    #     mpirun -np 4 python playground_ParaDiag_MPI.py
+    # the test for this part runs it on each block size through mpi-pytest.
 
     # one time-step per rank, so the number of ranks is the block size
     block_sizes = [1, 2, 4]
 
-    # set up new/empty file for output
     fname = 'step_9_D_out.txt'
-    f = open(cwd + '/../../../data/' + fname, 'w')
-    f.close()
 
-    # run the MPI controller with different block sizes, always doing num_steps_total steps in total
-    for block_size in block_sizes:
-        print('Running ParaDiag with block size %2i...' % block_size)
-        cmd = ('mpirun -np ' + str(block_size) + ' python playground_ParaDiag_MPI.py ../../../../data/' + fname).split()
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-        p.wait()
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-            p.returncode,
-            block_size,
-        )
-
-    # now do the same with the virtually parallel controller and append the results
+    # the virtually parallel controller, appended to whatever the MPI runs wrote
     f = open(cwd + '/../../../data/' + fname, 'a')
     virtual = {}
     for block_size in block_sizes:

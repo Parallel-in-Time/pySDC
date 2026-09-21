@@ -17,11 +17,41 @@ def test_B():
 
 
 @pytest.mark.mpi4py
-def test_C():
-    from pySDC.tutorial.step_6.C_MPI_parallelization import main as main_C
+@pytest.mark.parallel([1, 2, 3, 4, 5, 7, 8, 9])
+def test_C_run():
+    """
+    Run Part C's playground on as many ranks as the marker asks for.
 
-    cwd = 'pySDC/tutorial/step_6'
-    main_C(cwd)
+    One file per rank count, so the passes do not have to agree on who truncates what; `test_C`
+    below stitches them into the two files the tutorial shows.
+    """
+    from pathlib import Path
+    from mpi4py import MPI
+    from pySDC.tutorial.step_6.C_MPI_parallelization import main
+
+    comm = MPI.COMM_WORLD
+    fname = f'step_6_C_np{comm.size}.txt'
+    if comm.rank == 0:
+        Path('data').mkdir(parents=True, exist_ok=True)
+        open('data/' + fname, 'w').close()
+    comm.Barrier()
+
+    main(fname)
+
+
+@pytest.mark.mpi4py
+def test_C():
+    """
+    Compare the MPI controller against the non-MPI one, per Parts A and B.
+
+    Runs after `test_C_run` and after Parts A and B: the rank counts above are launched in their own
+    passes first, and within this one pytest keeps to file order.
+    """
+    for out, sizes in (('step_6_C1_out.txt', [1, 2, 4, 8]), ('step_6_C2_out.txt', [3, 5, 7, 9])):
+        with open('data/' + out, 'w') as f:
+            for n in sizes:
+                with open(f'data/step_6_C_np{n}.txt') as part:
+                    f.write(part.read())
 
     with open('data/step_6_C1_out.txt', 'r') as file1:
         with open('data/step_6_A_ml_out.txt', 'r') as file2:

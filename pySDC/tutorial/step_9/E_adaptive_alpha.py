@@ -27,9 +27,6 @@ Since alpha is a property of the method and not of the parallelization, the adap
 give the same answer whether ParaDiag runs virtually or across MPI ranks. We check that too.
 """
 
-import os
-import subprocess
-
 from pySDC.tutorial.step_9.D_paradiag_MPI import get_description, num_steps_total
 
 # the fixed values we compare against, plus the adaptive strategy
@@ -138,33 +135,16 @@ def main(cwd):
         cwd (str): current working directory
     """
 
-    try:
-        import mpi4py
-
-        del mpi4py
-    except ImportError as e:
-        raise ImportError('ParaDiag with MPI needs mpi4py') from e
-
     import numpy as np
 
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
+    # the MPI run is driven by `playground_adaptive_alpha.py`, one rank per time-step:
+    #     mpirun -np 4 python playground_adaptive_alpha.py
+    # the test for this part runs it through mpi-pytest.
 
     block_size = num_steps_total
 
     fname = 'step_9_E_out.txt'
-    f = open(cwd + '/../../../data/' + fname, 'w')
-    f.close()
 
-    # the MPI controller, one rank per time-step, all alpha settings in one run
-    print('Running ParaDiag with %2i ranks...' % block_size)
-    cmd = ('mpirun -np ' + str(block_size) + ' python playground_adaptive_alpha.py ../../../../data/' + fname).split()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % p.returncode
-
-    # and the same with the virtually parallel controller
     f = open(cwd + '/../../../data/' + fname, 'a')
     results = {}
     for alpha in alpha_settings:

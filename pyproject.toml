@@ -126,7 +126,6 @@ ignore = ["E203", # Whitespace before punctuation
 # W504 is not supported by ruff and does not need to be excluded
 
 [tool.ruff.lint.per-file-ignores]
-"pySDC/tutorial/step_6/C_MPI_parallelization.py" = ["F401"]
 "pySDC/projects/Hamiltonian/solar_system.py" = ["F401"]
 
 [tool.black]

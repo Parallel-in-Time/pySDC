@@ -1,6 +1,19 @@
 import pytest
 
 
+def _collect_mpi_output(stem, sizes):
+    """
+    Stitch the per-rank-count files the MPI runs wrote into the one the tutorial documents.
+
+    Each run writes its own file so the passes never have to agree on which of them truncates --
+    they are separate processes, and the serial one runs last.
+    """
+    with open(f'data/{stem}_out.txt', 'w') as out:
+        for n in sizes:
+            with open(f'data/{stem}_np{n}.txt') as part:
+                out.write(part.read())
+
+
 @pytest.mark.base
 def test_step_9_A():
     import pySDC.tutorial.step_9.A_paradiag_for_linear_problems
@@ -21,8 +34,28 @@ def test_step_9_C(problem):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel([1, 2, 4])
+def test_step_9_D_MPI():
+    """One rank per time-step, so the block size is the size of the communicator."""
+    from pathlib import Path
+    from mpi4py import MPI
+    from pySDC.tutorial.step_9.playground_ParaDiag_MPI import main
+
+    comm = MPI.COMM_WORLD
+    fname = f'step_9_D_np{comm.size}.txt'
+    if comm.rank == 0:
+        Path('data').mkdir(parents=True, exist_ok=True)
+        open('data/' + fname, 'w').close()
+    comm.Barrier()
+
+    main(fname)
+
+
+@pytest.mark.mpi4py
 def test_step_9_D():
     from pySDC.tutorial.step_9.D_paradiag_MPI import main as main_D
+
+    _collect_mpi_output('step_9_D', [1, 2, 4])
 
     cwd = 'pySDC/tutorial/step_9'
     main_D(cwd)
@@ -56,8 +89,28 @@ def test_step_9_D():
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
+def test_step_9_E_MPI():
+    """`num_steps_total` steps in one block, so one rank each."""
+    from pathlib import Path
+    from mpi4py import MPI
+    from pySDC.tutorial.step_9.playground_adaptive_alpha import main
+
+    comm = MPI.COMM_WORLD
+    fname = f'step_9_E_np{comm.size}.txt'
+    if comm.rank == 0:
+        Path('data').mkdir(parents=True, exist_ok=True)
+        open('data/' + fname, 'w').close()
+    comm.Barrier()
+
+    main(fname)
+
+
+@pytest.mark.mpi4py
 def test_step_9_E():
     from pySDC.tutorial.step_9.E_adaptive_alpha import alpha_settings, main as main_E
+
+    _collect_mpi_output('step_9_E', [4])
 
     cwd = 'pySDC/tutorial/step_9'
     main_E(cwd)

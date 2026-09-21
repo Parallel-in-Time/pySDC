@@ -5,7 +5,8 @@ from mpi4py import MPI
 
 from pySDC.tutorial.step_9.E_adaptive_alpha import alpha_settings, format_result, run
 
-if __name__ == "__main__":
+
+def main(fname='step_9_E_out.txt'):
     """
     Compare fixed and adaptive alpha with the MPI-parallel ParaDiag controller.
 
@@ -23,9 +24,14 @@ if __name__ == "__main__":
 
     # only the last rank has the end point of the block, so only it writes the output
     if comm.rank == comm.size - 1:
-        fname = sys.argv[1] if len(sys.argv) == 2 else 'step_9_E_out.txt'
         Path("data").mkdir(parents=True, exist_ok=True)
         with open('data/' + fname, 'a') as f:
             for line in lines:
                 f.write(line + '\n')
                 print(line)
+
+
+if __name__ == "__main__":
+    # Run it as you would any MPI program, one rank per time-step:
+    #     mpirun -np 4 python playground_adaptive_alpha.py
+    main(sys.argv[1] if len(sys.argv) == 2 else 'step_9_E_out.txt')

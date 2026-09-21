@@ -13,7 +13,8 @@ from pySDC.tutorial.step_9.D_paradiag_MPI import (
     num_steps_total,
 )
 
-if __name__ == "__main__":
+
+def main(fname='step_9_D_out.txt'):
     """
     A simple test program to do MPI-parallel ParaDiag runs
 
@@ -51,10 +52,15 @@ if __name__ == "__main__":
 
     # only the last rank has the end point of the block, so only it writes the output
     if comm.rank == comm.size - 1:
-        fname = sys.argv[1] if len(sys.argv) == 2 else 'step_9_D_out.txt'
         Path("data").mkdir(parents=True, exist_ok=True)
         f = open('data/' + fname, 'a')
         out = format_result('MPI', block_size, niter, abs(uend - P.u_exact(Tend)))
         f.write(out + '\n')
         print(out)
         f.close()
+
+
+if __name__ == "__main__":
+    # Run it as you would any MPI program, one rank per time-step:
+    #     mpirun -np 4 python playground_ParaDiag_MPI.py
+    main(sys.argv[1] if len(sys.argv) == 2 else 'step_9_D_out.txt')
