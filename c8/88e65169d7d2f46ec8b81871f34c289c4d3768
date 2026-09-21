@@ -1,0 +1,21 @@
+etc/mpi_ranks.py
+  s_dbaa617c29a3c2::t_521129e06c35fe 19-24
+etc/run_mpi_tests.sh
+  s_dbaa617c29a3c2::t_09bf74fd0659d7 54-66,74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c888e65169d7d2f46ec8b81871f34c289c4d3768",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
