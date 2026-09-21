@@ -1,0 +1,19 @@
+pySDC/projects/Monodomain/tests/test_monodomain_iterations_parallel.py
+  s_dbaa617c29a3c2::t_87fe3da56e7a9a 98-99,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d05a0761af07f724fbd7c3119649497a440e3e08",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
