@@ -1,0 +1,22 @@
+etc/environment-cupy.yml
+  s_dbaa617c29a3c2::t_b0e4e1bb102505 3-9,14,20-25
+pySDC/projects/GPU/README.rst
+  s_dbaa617c29a3c2::t_d725ccdabeae71 6-8,10-12,14-24,29-30,32-33,37,41-42,49-53
+  s_dbaa617c29a3c2::t_2572b9e8cb6859 34-36,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1470934832104e51fccfe28bafce1bea9989efe5",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
