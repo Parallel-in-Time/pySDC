@@ -1,6 +1,3 @@
-import subprocess
-import os
-
 import numpy as np
 from mpi4py import MPI
 
@@ -164,41 +161,20 @@ def run_variant(variant=None):
 
 def main():
     """
-    Main driver
+    Main driver: the serial variants.
 
+    The parallel variants need a 3-rank job, so they are not run from here. Use
+
+        mpirun -np 3 python -c "from pySDC.projects.parallelSDC.AllenCahn_parallel import run_variant; \
+                                run_variant('sl_parallel')"
+
+    or let the test do it -- `tests/test_AllenCahn_parallel.py` runs them through mpi-pytest.
     """
 
     run_variant(variant='sl_serial')
     print()
     run_variant(variant='ml_serial')
     print()
-
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-    cmd = (
-        "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "
-        "run_variant(\'sl_parallel\');\""
-    )
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
-    p.wait()
-    for line in p.stdout:
-        print(line)
-    for line in p.stderr:
-        print(line)
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % (p.returncode)
-
-    cmd = (
-        "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "
-        "run_variant(\'ml_parallel\');\""
-    )
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
-    p.wait()
-    for line in p.stdout:
-        print(line)
-    for line in p.stderr:
-        print(line)
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % (p.returncode)
 
 
 if __name__ == "__main__":
