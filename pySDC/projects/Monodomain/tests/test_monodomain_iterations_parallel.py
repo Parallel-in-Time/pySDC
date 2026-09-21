@@ -95,8 +95,10 @@ def _data_file(options):
     """Where `setup_and_run` puts the database for a given set of options."""
     from pathlib import Path
 
+    # parents[4] is the repository root: this file sits at pySDC/projects/Monodomain/tests/.
+    # `setup_and_run` builds the same location as `<run_scripts>/../../../../data`.
     return (
-        Path(__file__).resolve().parents[3]
+        Path(__file__).resolve().parents[4]
         / "data"
         / options["output_root"]
         / options["domain_name"]
