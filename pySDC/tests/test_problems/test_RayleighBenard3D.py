@@ -89,8 +89,8 @@ def test_eval_f(nx, nz, direction, spectral_space):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('direction', ['x', 'y', 'z', 'mixed'])
-@pytest.mark.mpi(ranks=[2, 4])
-def test_eval_f_parallel(mpi_ranks, direction):
+@pytest.mark.parallel([2, 4])
+def test_eval_f_parallel(direction):
     test_eval_f(nx=4, nz=4, direction=direction, spectral_space=False)
 
 
@@ -356,8 +356,8 @@ def test_Nusselt_number_computation(c, N=6):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[1, 2, 5])
-def test_spectrum_computation(mpi_ranks):
+@pytest.mark.parallel([1, 2, 5])
+def test_spectrum_computation():
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 
     N = 5

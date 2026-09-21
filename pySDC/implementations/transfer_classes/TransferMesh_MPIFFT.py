@@ -1,6 +1,8 @@
 from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
-from mpi4py_fft import PFFT, newDistArray
+from mpi4py_fft import newDistArray
+
+from pySDC.helpers.fft_helper import PFFT
 
 
 class fft_to_fft(SpaceTransfer):

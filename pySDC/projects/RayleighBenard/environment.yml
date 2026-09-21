@@ -17,4 +17,4 @@ dependencies:
   - pip
   - pip:
     - qmat>=0.1.8
-    - pytest-isolate-mpi
+    - mpi-pytest>=2026.0

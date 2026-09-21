@@ -130,37 +130,9 @@ def test_adaptive_collocation():
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(3)
 def test_adaptive_collocation_MPI():
-    import subprocess
-    import os
-
-    num_nodes = 3
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {num_nodes} python {__file__} MPI".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_nodes,
-    )
-
-
-if __name__ == "__main__":
-    import sys
-
-    kwargs = {}
-    if len(sys.argv) > 1:
-        kwargs = {
-            'useMPI': True,
-        }
-    single_test(**kwargs)
+    single_test(useMPI=True)
 
 
 def run_block(num_procs, num_nodes=[2, 3]):

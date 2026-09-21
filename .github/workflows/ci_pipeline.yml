@@ -38,6 +38,11 @@ env:
   # tests ask for 3 or 4 ranks and Monodomain's asks for 24. MPICH
   # oversubscribed silently, which is why this only appeared after the swap.
   PRTE_MCA_rmaps_default_mapping_policy: ':oversubscribe'
+  # ...and the OpenMPI 4 spelling of the same thing, which PRRTE superseded. The conda envs resolve
+  # OpenMPI 5 and need the variable above; the Firedrake container ships OpenMPI 4 and needs this
+  # one, which is why `mpiexec -n 3` there failed with "not enough slots available" while the same
+  # command worked everywhere else. Each version ignores the other's variable.
+  OMPI_MCA_rmaps_base_oversubscribe: 'true'
 
 jobs:
 
@@ -116,7 +121,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+          bash etc/run_mpi_tests.sh pySDC/tests "${{ matrix.env }}"
       - name: Make coverage report
         run: |
           coverage combine
@@ -178,7 +183,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests
+          bash etc/run_mpi_tests.sh pySDC/projects/${{ matrix.env }}/tests
       - name: Make coverage report
         run: |
           coverage combine
@@ -263,6 +268,9 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           pip install -e /repositories/pySDC
+          # The Firedrake image ships mpi-pytest for its own suite, but don't depend on that:
+          # the MPI tests here are collected through its `parallel` marker.
+          pip install "mpi-pytest>=2026.0"
           # test installation
           python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto
@@ -275,13 +283,20 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           firedrake-clean
-          cd ./pySDC
-          python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
+          # `cd /repositories/pySDC`, not `./pySDC`: the container mounts the workspace at
+          # /repositories, so those are the same directory reached by two different paths. pySDC is
+          # installed editable from /repositories/pySDC, so that is the prefix its modules report,
+          # and `source = ['pySDC']` only matches when the working directory agrees -- sitting in
+          # ./pySDC is why this job has always measured nothing. `..` is the workspace either way,
+          # so the moves in the next step are unaffected.
+          cd /repositories/pySDC
+          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0" \
+            bash etc/run_mpi_tests.sh /repositories/pySDC/pySDC/tests firedrake
         timeout-minutes: 45
       - name: Make coverage report
         run: |
 
-          cd ./pySDC
+          cd /repositories/pySDC
           mv data ../data_firedrake
           coverage combine
           mv .coverage ../coverage_firedrake.dat

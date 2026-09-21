@@ -85,137 +85,80 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
     return controller.MS[0].levels[0]
 
 
-def individual_test(launch=False, **kwargs):
+def individual_test(**kwargs):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
-
-    Args:
-        launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
-    num_nodes = kwargs['num_nodes']
-    useNCCL = kwargs['useNCCL']
-
-    if launch:
-        import os
-        import subprocess
-
-        # Set python path once
-        my_env = os.environ.copy()
-        my_env['PYTHONPATH'] = '../../..:.'
-        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-        cmd = f"mpirun -np {num_nodes} python {__file__}"
-
-        for key, value in kwargs.items():
-            cmd += f' --{key}={value}'
-        p = subprocess.Popen(cmd.split(), env=my_env, cwd=".")
-
-        p.wait()
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-            p.returncode,
-            num_nodes,
-        )
+    if kwargs['useNCCL']:
+        import cupy as xp
     else:
-        if useNCCL:
-            import cupy as xp
-        else:
-            import numpy as xp
+        import numpy as xp
 
-        MPI = run(
-            **kwargs,
-            use_MPI=True,
-        )
-        nonMPI = run(
-            **kwargs,
-            use_MPI=False,
-        )
+    MPI = run(**kwargs, use_MPI=True)
+    nonMPI = run(**kwargs, use_MPI=False)
 
-        assert xp.allclose(
-            MPI.uend, nonMPI.uend, rtol=0, atol=1e-14
-        ), f'Got different solutions at end point! {MPI.uend=} {nonMPI.uend=}'
-        assert xp.allclose(MPI.status.residual, nonMPI.status.residual, rtol=0, atol=1e-14), 'Got different residuals!'
+    assert xp.allclose(
+        MPI.uend, nonMPI.uend, rtol=0, atol=1e-14
+    ), f'Got different solutions at end point! {MPI.uend=} {nonMPI.uend=}'
+    assert xp.allclose(MPI.status.residual, nonMPI.status.residual, rtol=0, atol=1e-14), 'Got different residuals!'
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize("num_nodes", [2])
+@pytest.mark.parallel(2)
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [True, False])
 @pytest.mark.parametrize("init_guess", ['spread', 'copy', 'zero'])
 @pytest.mark.parametrize("ML", [1, 2, 3])
-def test_sweeper(num_nodes, quad_type, residual_type, imex, init_guess, ML, launch=True):
+def test_sweeper(quad_type, residual_type, imex, init_guess, ML):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
 
     Args:
-        num_nodes (int): The number of nodes to use
         quad_type (str): Type of nodes
         residual_type (str): Type of residual computation
         imex (bool): Use IMEX sweeper or not
-        launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
+    from mpi4py import MPI
+
     individual_test(
-        num_nodes=num_nodes,
+        num_nodes=MPI.COMM_WORLD.size,
         quad_type=quad_type,
         residual_type=residual_type,
         imex=imex,
         init_guess=init_guess,
         useNCCL=False,
         ML=ML,
-        launch=launch,
     )
 
 
 @pytest.mark.cupy
 @pytest.mark.skip(reason="We haven\'t figured out how to run tests on the cluster with multiple processes yet.")
-@pytest.mark.parametrize("num_nodes", [2])
+@pytest.mark.parallel(2)
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [False])
 @pytest.mark.parametrize("init_guess", ['spread', 'copy', 'zero'])
-def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, init_guess, launch=True):
+def test_sweeper_NCCL(quad_type, residual_type, imex, init_guess):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
 
     Args:
-        num_nodes (int): The number of nodes to use
         quad_type (str): Type of nodes
         residual_type (str): Type of residual computation
         imex (bool): Use IMEX sweeper or not
-        launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
+    from mpi4py import MPI
+
     individual_test(
-        num_nodes=num_nodes,
+        num_nodes=MPI.COMM_WORLD.size,
         quad_type=quad_type,
         residual_type=residual_type,
         imex=imex,
         init_guess=init_guess,
         useNCCL=True,
         ML=1,
-        launch=launch,
     )
-
-
-if __name__ == '__main__':
-    str_to_bool = lambda me: False if me == 'False' else True
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--ML', type=int, help='Number of levels in space')
-    parser.add_argument('--num_nodes', type=int, help='Number of collocation nodes')
-    parser.add_argument('--quad_type', type=str, help='Quadrature rule', choices=['GAUSS', 'RADAU-RIGHT', 'RADAU-LEFT'])
-    parser.add_argument(
-        '--residual_type',
-        type=str,
-        help='Way of computing the residual',
-        choices=['full_rel', 'last_abs', 'full_abs', 'last_rel'],
-    )
-    parser.add_argument('--imex', type=str_to_bool, help='Toggle for IMEX', choices=[True, False])
-    parser.add_argument('--useNCCL', type=str_to_bool, help='Toggle for NCCL communicator', choices=[True, False])
-    parser.add_argument('--init_guess', type=str, help='Initial guess', choices=['spread', 'copy', 'zero'])
-    args = parser.parse_args()
-
-    individual_test(**vars(args))

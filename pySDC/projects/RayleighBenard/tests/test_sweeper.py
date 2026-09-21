@@ -81,8 +81,8 @@ def test_RK_sweeper(sweeper_name):
 
 
 @pytest.mark.parametrize('nsweeps', [1, 2, 3])
-@pytest.mark.mpi(ranks=[1, 2, 3])
-def test_parallel_sweeper(mpi_ranks, nsweeps):
+@pytest.mark.parallel([1, 2, 3])
+def test_parallel_sweeper(nsweeps):
     import numpy as np
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI

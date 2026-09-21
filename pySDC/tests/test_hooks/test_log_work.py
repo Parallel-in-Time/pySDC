@@ -97,34 +97,17 @@ def run_Lorenz(useMPI, maxiter=4, newton_maxiter=5, num_procs=1):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize("num_procs", [1, 3])
+@pytest.mark.parallel([1, 3])
 @pytest.mark.parametrize("maxiter", [0, 3])
 @pytest.mark.parametrize("newton_maxiter", [1, 3])
-def test_LogWork_MPI(num_procs, newton_maxiter, maxiter):
-    import os
-    import subprocess
+def test_LogWork_MPI(newton_maxiter, maxiter):
+    from mpi4py import MPI
 
-    kwargs = {}
-    kwargs['useMPI'] = 1
-    kwargs['num_procs'] = num_procs
-    kwargs['newton_maxiter'] = newton_maxiter
-    kwargs['maxiter'] = maxiter
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    # run code with different number of MPI processes
-    kwargs_str = "".join([f"{key}:{item} " for key, item in kwargs.items()])
-    cmd = f"mpirun -np {num_procs} python {__file__} {kwargs_str}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_procs,
+    run_Lorenz(
+        useMPI=1,
+        num_procs=MPI.COMM_WORLD.size,
+        newton_maxiter=newton_maxiter,
+        maxiter=maxiter,
     )
 
 
@@ -138,11 +121,4 @@ def test_LogWork_nonMPI(num_procs, newton_maxiter, maxiter):
     kwargs['num_procs'] = num_procs
     kwargs['newton_maxiter'] = newton_maxiter
     kwargs['maxiter'] = maxiter
-    run_Lorenz(**kwargs)
-
-
-if __name__ == "__main__":
-    import sys
-
-    kwargs = {me.split(':')[0]: int(me.split(':')[1]) for me in sys.argv[1:]}
     run_Lorenz(**kwargs)

@@ -209,25 +209,18 @@ def test_interpolation_error_GPU(num_nodes, quad_type):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_nodes', [2, 5])
+@pytest.mark.parallel([2, 5])
 @pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
-def test_interpolation_error_MPI(num_nodes, quad_type):
-    import subprocess
-    import os
+def test_interpolation_error_MPI(quad_type):
+    import numpy as np
+    from mpi4py import MPI
 
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {num_nodes} python {__file__} {num_nodes} {quad_type}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_nodes,
+    check_order(
+        np.logspace(-1, -4, 20),
+        useMPI=True,
+        num_nodes=MPI.COMM_WORLD.size,
+        quad_type=quad_type,
+        rel_error=False,
     )
 
 
@@ -300,20 +293,3 @@ def test_polynomial_error_firedrake(dt=1.0, num_nodes=3, useMPI=False):
     u_inter = cont.get_interpolated_solution(L)
     error = abs(u_inter - L.u[estimate_on_node])
     assert np.isclose(error, 0)
-
-
-if __name__ == "__main__":
-    import sys
-    import numpy as np
-
-    steps = np.logspace(-1, -4, 20)
-
-    if len(sys.argv) > 1:
-        kwargs = {
-            'num_nodes': int(sys.argv[1]),
-            'quad_type': sys.argv[2],
-            'rel_error': False,
-        }
-        check_order(steps, useMPI=True, **kwargs)
-    else:
-        check_order(steps, useMPI=False, num_nodes=3, quad_type='RADAU-RIGHT', rel_error=False)
