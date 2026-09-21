@@ -1,0 +1,23 @@
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_9b09625ace0d80 124,186,293-294
+etc/mpi_ranks.py
+  s_dbaa617c29a3c2::t_d3d1566ace364b 1-27
+etc/run_mpi_tests.sh
+  s_dbaa617c29a3c2::t_d3d1566ace364b 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "784d947d771269302238301c0e80a295a0167843",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
