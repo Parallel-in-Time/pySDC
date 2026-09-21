@@ -1,0 +1,126 @@
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_dbaa617c29a3c2::t_ebbe47160fcc63 88,93-94,96,98-99,101,103,108,114,124-125,127,139,144,154-155,157
+  s_dbaa617c29a3c2::t_dc625736e7bb0f 102,104
+etc/environment-mpi4py.yml
+  s_dbaa617c29a3c2::t_ba649999739320 17
+pySDC/tests/test_transfer_classes/test_base_transfer_MPI.py
+  s_dbaa617c29a3c2::t_86f323b6ca0fa2 49-50
+pySDC/tests/test_sweepers/test_compute_end_point.py
+  s_dbaa617c29a3c2::t_86f323b6ca0fa2 63-65,67
+pySDC/tests/test_hooks/test_log_to_file.py
+  s_dbaa617c29a3c2::t_8b4d12fbc11fa5 169-170,173-175
+pySDC/tests/test_sweepers/test_preconditioners.py
+  s_dbaa617c29a3c2::t_8b4d12fbc11fa5 123-124
+pySDC/tests/test_problems/test_RayleighBenard3D.py
+  s_dbaa617c29a3c2::t_a1392195512900 92-93,359-360
+pySDC/tests/test_helpers/test_spectral_helper.py
+  s_dbaa617c29a3c2::t_a1392195512900 401,420,607,719,725
+  s_dbaa617c29a3c2::t_71cdb16d213c3a 425,429-431,435,438-440,611-612,616,620-621
+  s_dbaa617c29a3c2::t_26ce723c7aa380 53,56-63
+  s_dbaa617c29a3c2::t_a5f18cfca9a3f8 44,106,141,766
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta_MPI.py
+  s_dbaa617c29a3c2::t_ea72a0bfda6e75 10,74-75,89-90,97,99
+  s_dbaa617c29a3c2::t_e4809ddb89549e 9
+pySDC/tests/test_sweepers/test_delta_form_MPI.py
+  s_dbaa617c29a3c2::t_ea72a0bfda6e75 11,66-67,78,80,87,89
+  s_dbaa617c29a3c2::t_29514050901068 10
+pySDC/tests/test_convergence_controllers/test_basic_restarting.py
+  s_dbaa617c29a3c2::t_a78c3379174f28 174,176-182,291,293-299
+pySDC/tests/test_convergence_controllers/test_adaptive_collocation.py
+  s_dbaa617c29a3c2::t_2a30876b9ee01b 133,135
+pySDC/tests/test_convergence_controllers/test_polynomial_error.py
+  s_dbaa617c29a3c2::t_520d2a14ec9c7a 212,214-223
+pySDC/tests/test_convergence_controllers/test_extrapolation_within_Q.py
+  s_dbaa617c29a3c2::t_2a30876b9ee01b 201,203-212
+pySDC/tests/test_hooks/test_entry_class.py
+  s_dbaa617c29a3c2::t_7ce04d38ee611d 133
+pySDC/tests/test_hooks/test_log_work.py
+  s_dbaa617c29a3c2::t_7ce04d38ee611d 100,103-110
+pySDC/tests/test_helpers/test_stats_helper.py
+  s_dbaa617c29a3c2::t_7ce04d38ee611d 126,128-129,131-132
+pySDC/tests/test_datatypes/test_datatypes.py
+  s_dbaa617c29a3c2::t_1ddfad7b924069 69,72
+  s_dbaa617c29a3c2::t_ba3a90c329ebaa 57-60,64-65,78
+pySDC/tests/test_controllers/test_controller_conformance.py
+  s_dbaa617c29a3c2::t_46109fe2eddcdb 191,193,195-198,202-203,233,248,261,294,314,344,370
+pySDC/tests/test_controllers/test_controller_ParaDiag_MPI.py
+  s_dbaa617c29a3c2::t_7f120ed73969e0 172,174,185-186,189,192-202,207-208,213-214,216,218-224,228-229,234-235,237,239-243,247-248,259,261-267
+  s_dbaa617c29a3c2::t_a5f18cfca9a3f8 134
+  s_dbaa617c29a3c2::t_8c689865a06c2e 182-184,210-212,231-233,255-257
+pySDC/tests/test_helpers/test_fieldsIO.py
+  s_dbaa617c29a3c2::t_6636e7be962011 194,200,202-203,205,207-208,210,232
+  s_dbaa617c29a3c2::t_a885d6e6d7b9e1 213-230
+  s_dbaa617c29a3c2::t_74154ff12712f9 211,231
+pySDC/tests/test_tutorials/test_step_7.py
+  s_dbaa617c29a3c2::t_f672a42115d628 19,21-23,27,29-31,35,37-39
+  s_dbaa617c29a3c2::t_273f279b8b304c 64,66-68
+etc/environment-petsc.yml
+  s_dbaa617c29a3c2::t_f672a42115d628 17
+pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
+  s_dbaa617c29a3c2::t_6c9f1ee20bdfce 15,19-23,32-33,40-41,168-173
+pySDC/projects/RayleighBenard/tests/test_sweeper.py
+  s_dbaa617c29a3c2::t_2c2d5dd6c60529 84-85
+pySDC/projects/RayleighBenard/environment.yml
+  s_dbaa617c29a3c2::t_2c2d5dd6c60529 20
+pySDC/helpers/spectral_helper.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 1647-1649,1724
+pySDC/implementations/problem_classes/generic_MPIFFT_Laplacian.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 3-5
+pySDC/implementations/problem_classes/AllenCahn_Temp_MPIFFT.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 2
+pySDC/helpers/fft_helper.py
+  s_dbaa617c29a3c2::t_be609f68d743fa 1-29
+pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py
+  s_dbaa617c29a3c2::t_b14f085a0d4dd4 3-5
+pySDC/tests/test_helpers/test_spectral_helper_1d_fft.py
+  s_dbaa617c29a3c2::t_a5f18cfca9a3f8 142
+pySDC/tests/test_problem.py
+  s_dbaa617c29a3c2::t_a5f18cfca9a3f8 42-44
+pySDC/tests/test_problems/test_heat_chebychev.py
+  s_dbaa617c29a3c2::t_a5f18cfca9a3f8 47-49,147-148
+pySDC/tests/test_convergence_controllers/test_adaptive_alpha.py
+  s_dbaa617c29a3c2::t_a5f18cfca9a3f8 140
+pySDC/tests/test_problems/test_generic_MPIFFT.py
+  s_dbaa617c29a3c2::t_a5f18cfca9a3f8 53
+pySDC/tests/test_problems/test_Burgers.py
+  s_dbaa617c29a3c2::t_a5f18cfca9a3f8 178,189-191
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_dbaa617c29a3c2::t_273f279b8b304c 180,182-185,187,189-190,192,194-199
+.github/workflows/ci_pipeline.yml
+  s_dbaa617c29a3c2::t_904c4c7e4d4bf8 271-273
+  s_dbaa617c29a3c2::t_559a43dc2956ea 41-45
+  s_dbaa617c29a3c2::t_4478e940be4fe5 286-292,299
+  s_dbaa617c29a3c2::t_9b09625ace0d80 124,186,293-294
+pySDC/tests/test_helpers/test_gusto_coupling.py
+  s_dbaa617c29a3c2::t_da97890b3135ab 644
+  s_dbaa617c29a3c2::t_ae46beae5fd615 624,626-628,630-643
+etc/environment-pytorch.yml
+  s_dbaa617c29a3c2::t_ba3a90c329ebaa 18
+etc/mpi_ranks.py
+  s_dbaa617c29a3c2::t_d3d1566ace364b 1-18,25-32
+  s_dbaa617c29a3c2::t_521129e06c35fe 19-24
+etc/run_mpi_tests.sh
+  s_dbaa617c29a3c2::t_d3d1566ace364b 1-25,36,43-53,67-73,75-77
+  s_dbaa617c29a3c2::t_c5aefe4922e3d5 26-35,37-42
+  s_dbaa617c29a3c2::t_09bf74fd0659d7 54-66,74
+pySDC/tests/test_ci/test_run_mpi_tests.py
+  s_dbaa617c29a3c2::t_6a1d4aa3b68763 38-45,51-55,61-62,111-118,120-121
+  s_dbaa617c29a3c2::t_6bf4c82ba714da 26,29-30,33,134,149-151
+  s_dbaa617c29a3c2::t_01b83cd3e9e9d4 1-25,27-28,31-32,34-37,46-50,56-60,63-110,119,122-133,135-148,152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c82ac9590eff2811e573c0bfdb6628fc0e667cfc",
+  "prompts": {},
+  "sessions": {
+    "s_dbaa617c29a3c2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5642274-3e48-4df2-8dfa-c7837b0746a2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
