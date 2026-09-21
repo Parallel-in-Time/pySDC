@@ -29,17 +29,17 @@ ai_usage:
         - 'Counts as AI-generated: PRs authored by the Copilot coding agent'
         - 'Counts as AI-assisted: human-authored PRs it reviewed'
   code_proportion:
-    ai_generated_percent: 8
+    ai_generated_percent: 12
     ai_assisted_percent: 2
-    human_only_percent: 90
+    human_only_percent: 86
     method: audit_estimated
     estimation_notes: >-
-      Ballpark, from git blame over all tracked code files on master (~156k lines, .py/.sh/.yml/.toml/.cfg),
+      Ballpark, from git blame over all tracked code files on master (~158k lines, .py/.sh/.yml/.toml/.cfg),
       attributing each surviving line to the commit that last touched it. AI-generated counts Claude Code
       commits and PRs authored by the Copilot coding agent; AI-assisted counts human-authored PRs reviewed
       by Copilot. pySDC dates from 2014 and no AI was used before 2026, so the whole-repository figures are
       dominated by pre-2026 code. Restricted to code last touched in 2026 the split is roughly
-      73% AI-generated, 18% AI-assisted, 10% human-only. Reproduce with etc/aidecl_audit.py.
+      79% AI-generated, 13% AI-assisted, 8% human-only. Reproduce with etc/aidecl_audit.py.
   components:
     - name: PINN and FNO playgrounds
       description: pySDC/playgrounds/PINN and pySDC/playgrounds/learned_qdelta (~7100 lines)
@@ -63,6 +63,16 @@ ai_usage:
       tools_used:
         - Claude
         - GitHub Copilot
+    - name: MPI test harness
+      description: >-
+        etc/run_mpi_tests.sh and etc/mpi_ranks.py, and the MPI tests across pySDC/tests, the projects
+        and tutorial steps 6 and 9 that they run (~1300 lines)
+      ai_involvement: significant
+      tools_used:
+        - Claude
+      notes: >-
+        Replaced one mpirun per test case with mpi-pytest, moving the rank counts onto the tests
+        themselves. Tutorial step 6 part C and step 9 parts D and E were rewritten along with it.
     - name: StroemungsRaum and Rayleigh-Benard projects
       description: FEniCS flow examples and RBC project (~3100 lines)
       ai_involvement: minimal
@@ -70,11 +80,11 @@ ai_usage:
         - GitHub Copilot
       notes: Human-written; Copilot only reviewed the pull requests.
     - name: SDC core, sweepers, problem classes, remaining projects
-      description: The bulk of the library, written 2014-2025
+      description: The bulk of the library, written 2014-2025, less the files the components above name
       ai_involvement: none
   summary: >-
     Reviewing PRs, adding new features, increased testing coverage, refactoring, code analysis and simplification,
     removing code smell
 declaration:
   declared_by: Robert Speck
-  date: '2026-09-10'
+  date: '2026-09-21'

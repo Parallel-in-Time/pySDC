@@ -549,8 +549,11 @@ if __name__ == "__main__":
     elif 'mpi_vs_nonMPI' in sys.argv:
         mpi_vs_nonMPI(MPI_ready, comm)
     elif 'check_step_size_limiter' in sys.argv:
-        check_step_size_limiter(MPI_ready, comm)
-    elif 'check_adaptivity_with_avoid_restarts' and size == 1:
+        # `size` is the number of parallel steps; this passed `MPI_ready`, so it always ran on one
+        check_step_size_limiter(size, comm)
+    elif 'check_adaptivity_with_avoid_restarts' in sys.argv and size == 1:
+        # the `in sys.argv` was missing, and a non-empty string is truthy, so every unrecognised
+        # argument landed here instead of raising below
         check_adaptivity_with_avoid_restarts(comm=None, size=1)
     else:
-        raise NotImplementedError('Your test is not implemented!')
+        raise NotImplementedError(f'Cannot run {sys.argv[1:]} on {size} rank(s)!')

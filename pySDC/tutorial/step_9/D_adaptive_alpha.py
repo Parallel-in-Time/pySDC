@@ -18,19 +18,58 @@ with L the block size, eps machine precision, tau the inner solver tolerance, r_
 e_k a running bound on the error. Gamma is an accuracy floor: there is no point pushing alpha below
 the level at which round-off and the inner solver dominate anyway.
 
-We compare a few fixed alphas against the adaptive one on the same advection problem used in part D.
+We compare a few fixed alphas against the adaptive one on the advection problem from Part C.
 The interesting result is not that adaptive wins on iteration count -- it ties with the best fixed
 value -- but that it gets there without being told, and while keeping alpha orders of magnitude
 larger, which is exactly the margin that protects you once the inner solves are inexact.
 
-Since alpha is a property of the method and not of the parallelization, the adaptive controller has to
-give the same answer whether ParaDiag runs virtually or across MPI ranks. We check that too.
+Everything here runs with the "virtually parallel" controller, which keeps all steps in one process.
+Alpha is a property of the method, not of the parallelization, so this is the right place to pin it
+down; Part E then runs the same thing across MPI ranks and checks it comes out the same.
 """
 
-import os
-import subprocess
+from pathlib import Path
 
-from pySDC.tutorial.step_9.D_paradiag_MPI import get_description, num_steps_total
+# we always do this many time-steps in total, no matter how many of them run in parallel
+num_steps_total = 4
+
+
+def get_description():
+    """
+    Set up the same advection problem as in Part C.
+
+    Returns:
+        dict: the description for the ParaDiag controller
+    """
+    from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
+    from pySDC.implementations.sweeper_classes.ParaDiagSweepers import QDiagonalization
+
+    level_params = {}
+    level_params['dt'] = 0.1
+    level_params['restol'] = 1e-6
+
+    sweeper_params = {}
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['num_nodes'] = 3
+    sweeper_params['initial_guess'] = 'copy'
+
+    # Part C uses GMRES here to count linear solver work. We only care about the parallelism, and the
+    # complex shifted systems ParaDiag produces are hard for GMRES, so we solve them directly instead.
+    problem_params = {'nvars': 64, 'order': 8, 'c': 1, 'solver_type': 'direct'}
+
+    step_params = {}
+    step_params['maxiter'] = 99
+
+    description = {}
+    description['problem_class'] = advectionNd
+    description['problem_params'] = problem_params
+    description['sweeper_class'] = QDiagonalization
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+
+    return description
+
 
 # the fixed values we compare against, plus the adaptive strategy
 alpha_settings = [1e-2, 1e-4, 1e-8, 'adaptive']
@@ -69,7 +108,7 @@ def format_result(mode, alpha, niter, error, final_alpha):
     One line of output, in the same shape for both controllers so they can be compared.
 
     Args:
-        mode (str): 'MPI' or 'virtual'
+        mode (str): which controller produced it, e.g. 'virtual' or 'MPI on 4'
         alpha: the alpha setting used
         niter (int): number of iterations needed
         error (float): error against the exact solution
@@ -79,14 +118,14 @@ def format_result(mode, alpha, niter, error, final_alpha):
         str: the formatted line
     """
     return (
-        f'{mode:>7s}: alpha {str(alpha):>9s} -> {niter:2d} iterations, '
+        f'{mode:>11s}: alpha {str(alpha):>9s} -> {niter:2d} iterations, '
         f'error {error:.4e}, final alpha {final_alpha:.3e}'
     )
 
 
 def run(alpha, block_size, comm=None):
     """
-    Run the advection problem from part D with one alpha setting.
+    Run the advection problem with one alpha setting.
 
     Args:
         alpha: a number, or the string 'adaptive'
@@ -130,50 +169,31 @@ def run(alpha, block_size, comm=None):
     return uend, niter, abs(uend - P.u_exact(Tend)), controller.params.alpha
 
 
-def main(cwd):
+def main(fname='step_9_D_out.txt'):
     """
-    Compare fixed and adaptive alpha, with both controllers.
+    Compare fixed and adaptive alpha with the virtually parallel controller.
 
     Args:
-        cwd (str): current working directory
+        fname (str): file under ``data/`` to write the results to
     """
-
-    try:
-        import mpi4py
-
-        del mpi4py
-    except ImportError as e:
-        raise ImportError('ParaDiag with MPI needs mpi4py') from e
 
     import numpy as np
 
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
+    # one block holding every step; Part E runs the same settings across MPI ranks
     block_size = num_steps_total
 
-    fname = 'step_9_E_out.txt'
-    f = open(cwd + '/../../../data/' + fname, 'w')
-    f.close()
-
-    # the MPI controller, one rank per time-step, all alpha settings in one run
-    print('Running ParaDiag with %2i ranks...' % block_size)
-    cmd = ('mpirun -np ' + str(block_size) + ' python playground_adaptive_alpha.py ../../../../data/' + fname).split()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % p.returncode
-
-    # and the same with the virtually parallel controller
-    f = open(cwd + '/../../../data/' + fname, 'a')
     results = {}
+    lines = []
     for alpha in alpha_settings:
         uend, niter, error, final_alpha = run(alpha, block_size)
         results[alpha] = (uend, niter)
-        out = format_result('virtual', alpha, niter, error, final_alpha)
-        f.write(out + '\n')
-        print(out)
-    f.close()
+        lines.append(format_result('virtual', alpha, niter, error, final_alpha))
+
+    Path("data").mkdir(parents=True, exist_ok=True)
+    with open('data/' + fname, 'w') as f:
+        for line in lines:
+            f.write(line + '\n')
+            print(line)
 
     # the adaptive strategy should need no more iterations than the best fixed alpha we tried
     best_fixed = min(results[a][1] for a in alpha_settings if a != 'adaptive')
@@ -190,4 +210,4 @@ def main(cwd):
 
 
 if __name__ == "__main__":
-    main('.')
+    main()

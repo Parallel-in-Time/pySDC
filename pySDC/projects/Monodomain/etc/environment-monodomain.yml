@@ -26,3 +26,4 @@ dependencies:
   - pip
   - pip:
     - qmat>=0.1.8
+    - mpi-pytest>=2026.0

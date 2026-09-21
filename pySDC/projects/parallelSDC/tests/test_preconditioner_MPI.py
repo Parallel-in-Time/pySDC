@@ -1,33 +1,27 @@
-import os
-import subprocess
 import pytest
 
 
 @pytest.mark.slow
 @pytest.mark.mpi4py
 @pytest.mark.timeout(600)
-@pytest.mark.parametrize('num_procs', [3, 5])
-def test_preconditioner_playground_MPI(num_procs):
+@pytest.mark.parallel([3, 5])
+def test_preconditioner_playground_MPI():
+    """
+    The sweeper takes one node per rank, so `num_nodes` is the size of the communicator.
 
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-    my_env['OPENBLAS_NUM_THREADS'] = '1'
-    my_env['MKL_NUM_THREADS'] = '1'
-    cwd = '.'
-    cmd = (
-        'mpirun -np '
-        + str(num_procs)
-        + ' python -u pySDC/projects/parallelSDC/preconditioner_playground_MPI.py simulate'
-    ).split()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    p.wait()
-    for line in p.stdout:
-        print(line)
-    for line in p.stderr:
-        print(line)
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
-    subprocess.run(
-        'python pySDC/projects/parallelSDC/preconditioner_playground_MPI.py plot'.split(), cwd=cwd, env=my_env
-    )
+    The plot is produced here rather than in a second process: the docs job collects
+    `test-artifacts-*`, so the figure has to exist by the end of this job. That is what the script's
+    own `__main__` does with no action argument.
+
+    `OPENBLAS_NUM_THREADS` and `MKL_NUM_THREADS` used to be pinned to 1 in the child environment
+    against a threaded BLAS oversubscribing the ranks. Measured on 8 cores, it makes no difference:
+    4.97 s against 4.95 s on 3 ranks and 153.1 s against 154.9 s on 5, both inside the noise.
+    """
+    from mpi4py import MPI
+    from pySDC.projects.parallelSDC.preconditioner_playground_MPI import main, plot_iterations
+
+    comm = MPI.COMM_WORLD
+    main(comm=comm)
+
+    if comm.rank == 0:
+        plot_iterations()

@@ -2,29 +2,15 @@ import pytest
 
 
 @pytest.mark.mpi4py
-def test_get_comms(launch=True):
-    if launch:
-        import subprocess
-        import os
+@pytest.mark.parallel(24)
+def test_get_comms():
+    """The three nested splits need 2 * 3 * 4 ranks between them."""
+    from pySDC.projects.GPU.configs.base_config import get_comms
+    import numpy as np
 
-        # Set python path once
-        my_env = os.environ.copy()
-        my_env['PYTHONPATH'] = '../../..:.'
-        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-        cmd = f"mpirun -np 24 python {__file__} --test=get_comms".split()
-
-        p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-        p.wait()
-        assert p.returncode == 0, f'ERROR: did not get return code 0, got {p.returncode}'
-    else:
-        from pySDC.projects.GPU.configs.base_config import get_comms
-        import numpy as np
-
-        n_procs_list = [2, 3, 4]
-        comms = get_comms(n_procs_list=n_procs_list)
-        assert np.allclose([me.size for me in comms], n_procs_list)
+    n_procs_list = [2, 3, 4]
+    comms = get_comms(n_procs_list=n_procs_list)
+    assert np.allclose([me.size for me in comms], n_procs_list)
 
 
 def create_directories():
@@ -52,6 +38,7 @@ def test_run(tmpdir):
         'o': tmpdir,
         'logger_level': 15,
         'restart_idx': 0,
+        'dt': None,
     }
     config = get_config(args)
     type(config).base_path = args['o']
@@ -98,17 +85,3 @@ def test_run(tmpdir):
 
     assert len(dts) == len(data.times) - 1
     assert np.allclose(data.times, 0.1 * np.arange(5)), 'Did not record solutions at expected times after restart'
-
-
-if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--test', type=str)
-
-    args = parser.parse_args()
-
-    if args.test == 'get_comms':
-        test_get_comms(False)
-    else:
-        raise NotImplementedError

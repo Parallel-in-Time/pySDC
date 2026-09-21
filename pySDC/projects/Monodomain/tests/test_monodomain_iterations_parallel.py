@@ -1,6 +1,4 @@
 import pytest
-import os
-import subprocess
 
 
 def plot_iter_info(iters_info_list, labels_list, key1, key2, logy, xlabel, ylabel, ymin, ymax, title, output_file_name):
@@ -42,28 +40,6 @@ def plot_iter_info(iters_info_list, labels_list, key1, key2, logy, xlabel, ylabe
     plt_helper.plt.title(title)
     plt_helper.plt.grid()
     plt_helper.savefig("data/" + output_file_name, save_pdf=False, save_pgf=False, save_png=True)
-
-
-def options_command(options):
-    cmd = ""
-    for key, val in options.items():
-        if type(val) is list:
-            opt = key
-            if type(val[0]) is int:
-                arg = ",".join([str(v).replace("-", "_") for v in val])
-            else:
-                arg = ",".join([map(str, val)])
-        elif type(val) is bool:
-            if not val:
-                opt = "no-" + key
-            else:
-                opt = key
-            arg = ""
-        else:
-            opt = key
-            arg = str(val)
-        cmd = cmd + " --" + opt + (" " + arg if arg != "" else "")
-    return cmd
 
 
 def generate_initial_value(ionic_model_name):
@@ -115,21 +91,39 @@ def generate_initial_value(ionic_model_name):
     err, rel_err, avg_niters, times, niters, residuals = setup_and_run(**opts)
 
 
-def check_iterations_parallel(expected_avg_niters, **options):
-    # define sweeper parameters
+def _data_file(options):
+    """Where `setup_and_run` puts the database for a given set of options."""
+    from pathlib import Path
+
+    # parents[4] is the repository root: this file sits at pySDC/projects/Monodomain/tests/.
+    # `setup_and_run` builds the same location as `<run_scripts>/../../../../data`.
+    return (
+        Path(__file__).resolve().parents[4]
+        / "data"
+        / options["output_root"]
+        / options["domain_name"]
+        / f"ref_{options['refinements'][0]}"
+        / options["ionic_model_name"]
+        / options["output_file_name"]
+    )
+
+
+def run_and_check_iterations(expected_avg_niters, **options):
+    """
+    Run one configuration and check the iteration count it reports.
+
+    This used to serialise `options` into a command line, launch `run_MonodomainODE_cli.py` under
+    `mpirun`, and then recover the iteration count by reading the database the run had written --
+    while `setup_and_run` returns it directly. Both round trips are gone; `generate_initial_value`
+    above was already calling the same function this way.
+    """
+    from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
 
     options["num_sweeps"] = [1]
-
-    # set step parameters
     options["max_iter"] = 100
     options["dt"] = 0.025
-
-    # set level parameters
     options["restol"] = 5e-8
-
     options["end_time"] = 0.6
-
-    # set problem parameters
     options["domain_name"] = "cuboid_1D_small"
     options["refinements"] = [0]
     options["order"] = 4
@@ -138,136 +132,165 @@ def check_iterations_parallel(expected_avg_niters, **options):
     options["enable_output"] = False
     options["write_as_reference_solution"] = False
     options["write_all_variables"] = False
-    options["output_file_name"] = "monodomain"
     options["output_root"] = "results_iterations_parallel"
-    options["skip_res"] = True
+    # `skip_res` was the command line's name for it
+    options["skip_residual_computation"] = True
     options["finter"] = False
     options["write_database"] = True
+    # never set by this test: the command line was supplying its own default
+    options["ref_sol"] = "ref_sol"
 
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '.:../../../..'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-    cwd = "pySDC/projects/Monodomain/run_scripts"
+    _, _, avg_niters, times, niters, residuals = setup_and_run(**options)
 
-    # base_python_command = "coverage run -p run_MonodomainODE_cli.py"
-    base_python_command = "coverage run -p " + cwd + "/run_MonodomainODE_cli.py"
-    cmd = f"mpirun -n {options['n_time_ranks']} " + base_python_command + " " + options_command(options)
+    from mpi4py import MPI
+    from pytest_mpi import parallel_assert
 
-    print(f"Running command: {cmd}")
-
-    process = subprocess.Popen(
-        args=cmd.split(),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        env=my_env,
-        cwd=".",
+    # only rank 0 aggregates the iteration counts, so only it can check them -- but the whole job
+    # has to fail when they are wrong, not just the one rank that looked
+    root = MPI.COMM_WORLD.rank == 0
+    if root:
+        print(f"Got average number of iterations {avg_niters}, expected was {expected_avg_niters}")
+    parallel_assert(
+        (not root) or avg_niters == pytest.approx(expected_avg_niters, rel=0.1),
+        f"Average number of iterations {avg_niters} too different from the expected {expected_avg_niters}",
+        participating=root,
     )
 
-    while True:
-        output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
-            break
-        if output:
-            print(output.strip())
+    return {"avg_niters": avg_niters, "times": times, "niters": niters, "residuals": residuals}
 
-    process.wait()
 
-    assert (
-        process.returncode == 0
-    ), f"ERROR: did not get return code 0, got {process.returncode} with {options['n_time_ranks']} processes"
+# Each configuration writes under its own name, so the three databases coexist for the plot below.
+CASES = {
+    "ESDC": dict(num_nodes=[8], n_time_ranks=1, expected_avg_niters=3.58333),
+    "MLESDC": dict(num_nodes=[8, 4], n_time_ranks=1, expected_avg_niters=2.0),
+    "PFASST": dict(num_nodes=[8, 4], n_time_ranks=24, expected_avg_niters=3.0),
+}
 
-    # read the generated data
-    executed_file_dir = os.path.dirname(os.path.realpath(__file__))
-    file_name = (
-        executed_file_dir
-        + "/../../../../data/"
-        + options["output_root"]
-        + "/"
-        + options["domain_name"]
-        + "/ref_"
-        + str(options["refinements"][0])
-        + "/"
-        + options["ionic_model_name"]
-        + "/"
-        + options["output_file_name"]
+
+def _run_case(name):
+    case = dict(CASES[name])
+    return run_and_check_iterations(
+        integrator="IMEXEXP_EXPRK",
+        ionic_model_name="TTP",
+        truly_time_parallel=True,
+        output_file_name=f"monodomain_{name}",
+        **case,
     )
-    from pySDC.projects.Monodomain.utils.data_management import database
 
-    data_man = database(file_name)
-    # errors = data_man.read_dictionary("errors")
-    iters_info = data_man.read_dictionary("iters_info")
 
-    print(f"Got average number of iterations {iters_info['avg_niters']}, expected was {expected_avg_niters}")
+@pytest.fixture(scope="module", autouse=True)
+def initial_value():
+    """
+    Every run below reads its initial value from file, so it has to be written first.
 
-    assert iters_info['avg_niters'] == pytest.approx(
-        expected_avg_niters, rel=0.1
-    ), f"Average number of iterations {iters_info['avg_niters']} too different from the expected {expected_avg_niters}"
+    Once per module rather than once per test -- and the 24-rank pass is a separate process from
+    the serial one, so it cannot rely on that one having produced it. Rank 0 writes while the
+    others wait, since this is a serial computation and they would otherwise race on the file.
+    """
+    from mpi4py import MPI
 
-    return iters_info
+    comm = MPI.COMM_WORLD
+    if comm.rank == 0:
+        generate_initial_value(ionic_model_name="TTP")
+    comm.Barrier()
+
+
+# PFASST first, so a plain `pytest` run (where mpi-pytest forks per test) produces its data before
+# the plot below. Under `etc/run_mpi_tests.sh` the rank passes run before the serial pass anyway.
+@pytest.mark.monodomain
+@pytest.mark.parallel(24)
+def test_monodomain_iterations_PFASST():
+    _run_case("PFASST")
 
 
 @pytest.mark.monodomain
-def test_monodomain_iterations_ESDC_MLESDC_PFASST():
+def test_monodomain_iterations_ESDC():
+    _run_case("ESDC")
 
-    generate_initial_value(ionic_model_name="TTP")
 
-    ESDC_iters_info = check_iterations_parallel(
-        integrator="IMEXEXP_EXPRK",
-        num_nodes=[8],
-        ionic_model_name="TTP",
-        truly_time_parallel=True,
-        n_time_ranks=1,
-        expected_avg_niters=3.58333,
+@pytest.mark.monodomain
+def test_monodomain_iterations_MLESDC():
+    _run_case("MLESDC")
+
+
+@pytest.mark.monodomain
+def test_plot_iterations():
+    """
+    Draw the figures the website shows, from the databases the three runs above wrote.
+
+    They cannot be passed in memory: PFASST runs in a 24-rank job of its own, so the database is
+    how its result reaches this process. That is the one round trip through storage that is
+    actually load-bearing.
+    """
+    from pySDC.projects.Monodomain.utils.data_management import database
+
+    iters_info_list = []
+    for name in CASES:
+        options = dict(
+            CASES[name],
+            output_root="results_iterations_parallel",
+            domain_name="cuboid_1D_small",
+            refinements=[0],
+            ionic_model_name="TTP",
+            output_file_name=f"monodomain_{name}",
+        )
+        iters_info_list.append(database(str(_data_file(options))).read_dictionary("iters_info"))
+
+    for key2, logy, ylabel, title, out in [
+        ("niters", False, r"\# iter", "Number of iterations", "niter_VS_time"),
+        ("residuals", True, "residual", "Residual over time", "res_VS_time"),
+    ]:
+        plot_iter_info(
+            iters_info_list,
+            list(CASES),
+            key1="times",
+            key2=key2,
+            logy=logy,
+            xlabel="$t$",
+            ylabel=ylabel,
+            ymin=None,
+            ymax=None,
+            title=title,
+            output_file_name=out,
+        )
+
+
+@pytest.mark.monodomain
+def test_cli_matches_setup_and_run(monkeypatch):
+    """
+    The command line in the project README has to keep working.
+
+    Calling `setup_and_run` directly above is what took the CLI out of the test path, and it hands
+    that function two dozen *positional* arguments -- so renaming or reordering one of its
+    parameters would go unnoticed until someone ran the documented command. Binding the call
+    against the real signature catches that without running a simulation.
+    """
+    import inspect
+    import sys
+    from pySDC.projects.Monodomain.run_scripts import run_MonodomainODE_cli as cli
+    from pySDC.projects.Monodomain.run_scripts.run_MonodomainODE import setup_and_run
+
+    recorded = {}
+
+    def fake_setup_and_run(*args, **kwargs):
+        recorded['bound'] = inspect.signature(setup_and_run).bind(*args, **kwargs)
+        return 0.0, 0.0, 0.0, [], [], []
+
+    monkeypatch.setattr(cli, 'setup_and_run', fake_setup_and_run)
+    # the command line the project README documents
+    monkeypatch.setattr(
+        sys,
+        'argv',
+        'run_MonodomainODE_cli.py --dt 0.05 --end_time 0.2 --num_nodes 6,3 --domain_name cube_1D '
+        '--refinements 0 --ionic_model_name TTP --truly_time_parallel --n_time_ranks 4'.split(),
     )
 
-    MLESDC_iters_info = check_iterations_parallel(
-        integrator="IMEXEXP_EXPRK",
-        num_nodes=[8, 4],
-        ionic_model_name="TTP",
-        truly_time_parallel=True,
-        n_time_ranks=1,
-        expected_avg_niters=2.0,
-    )
+    cli.main()
 
-    PFASST_iters_info = check_iterations_parallel(
-        integrator="IMEXEXP_EXPRK",
-        num_nodes=[8, 4],
-        ionic_model_name="TTP",
-        truly_time_parallel=True,
-        n_time_ranks=24,
-        expected_avg_niters=3.0,
-    )
-
-    iters_info_list = [ESDC_iters_info, MLESDC_iters_info, PFASST_iters_info]
-    labels_list = ["ESDC", "MLESDC", "PFASST"]
-    plot_iter_info(
-        iters_info_list,
-        labels_list,
-        key1='times',
-        key2='niters',
-        logy=False,
-        xlabel="$t$",
-        ylabel=r"\# iter",
-        ymin=None,
-        ymax=None,
-        title="Number of iterations",
-        output_file_name="niter_VS_time",
-    )
-    plot_iter_info(
-        iters_info_list,
-        labels_list,
-        key1='times',
-        key2='residuals',
-        logy=True,
-        xlabel="$t$",
-        ylabel="residual",
-        ymin=None,
-        ymax=None,
-        title="Residual over time",
-        output_file_name="res_VS_time",
-    )
-
-
-if __name__ == "__main__":
-    test_monodomain_iterations_ESDC_MLESDC_PFASST()
+    args = recorded['bound'].arguments
+    assert args['num_nodes'] == [6, 3], args['num_nodes']
+    assert args['refinements'] == [0], args['refinements']
+    assert args['n_time_ranks'] == 4 and args['truly_time_parallel'] is True
+    assert args['dt'] == 0.05 and args['end_time'] == 0.2
+    # `--skip_res` is the command line's name for `skip_residual_computation`
+    assert 'skip_residual_computation' in args

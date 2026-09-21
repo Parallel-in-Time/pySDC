@@ -34,12 +34,12 @@ discover() {
     fi
 }
 
-ranks=$(discover | sed -n 's/^MPI_RANKS //p')
-if [ -z "$ranks" ] && ! discover >/dev/null 2>&1; then
+if ! collected=$(discover 2>&1); then
     echo "::error::Could not collect $tests to discover its rank counts." >&2
-    discover >&2
+    echo "$collected" >&2
     exit 1
 fi
+ranks=$(printf '%s\n' "$collected" | sed -n 's/^MPI_RANKS //p')
 
 echo "Rank counts declared by the tests: ${ranks:-<none>}"
 

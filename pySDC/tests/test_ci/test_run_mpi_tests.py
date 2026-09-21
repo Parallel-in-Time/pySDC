@@ -140,6 +140,52 @@ def test_marker_is_combined_with_the_rank_selection(tmp_path):
 
 
 @pytest.mark.base
+def test_parallel_marker_without_mpi_pytest_is_an_error(monkeypatch):
+    """
+    A `parallel` marker in an environment without mpi-pytest must fail loudly.
+
+    pytest ignores the unknown marker, so the test would run on one rank: passing while testing
+    nothing parallel, or failing somewhere confusing. That is how a project whose environment was
+    missing the plugin ran its 3-and-5-rank test on one rank and died inside qmat.
+
+    The hook is exercised directly: a real environment without the plugin also has no entry point
+    for it, which cannot be simulated by making the import fail.
+    """
+    import builtins
+    import importlib
+
+    sys.path.insert(0, str(REPO / 'etc'))
+    mpi_ranks = importlib.import_module('mpi_ranks')
+
+    real_import = builtins.__import__
+
+    def no_mpi_pytest(name, *args, **kwargs):
+        if name.startswith('pytest_mpi'):
+            raise ImportError('mpi-pytest is not installed in this environment')
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, '__import__', no_mpi_pytest)
+
+    class _Marker:
+        name = 'parallel'
+
+    class _Item:
+        nodeid = 'tests/test_thing.py::test_on_two_ranks'
+        own_markers = [_Marker()]
+
+    with pytest.raises(BaseException) as excinfo:
+        mpi_ranks.pytest_collection_modifyitems(None, [_Item()])
+    assert 'mpi-pytest is not installed' in str(excinfo.value)
+
+    # ...and it stays quiet when nothing declares ranks
+    class _Plain:
+        nodeid = 'tests/test_thing.py::test_plain'
+        own_markers = []
+
+    mpi_ranks.pytest_collection_modifyitems(None, [_Plain()])
+
+
+@pytest.mark.base
 def test_runner_is_posix_sh_compatible_enough_for_bash_3():
     """
     macOS still ships bash 3.2, where `"${empty[@]}"` is an unbound variable under `set -u`.
