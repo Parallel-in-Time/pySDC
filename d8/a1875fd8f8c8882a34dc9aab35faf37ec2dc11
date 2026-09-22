@@ -1,0 +1,31 @@
+pySDC/implementations/transfer_classes/TransferFenicsMesh.py
+  s_6af776c1c538c7::t_56b0efdb2d0faf 31-36,87-88,91-92,100,125-127,129
+pySDC/projects/FEM_with_FEniCS/README.rst
+  s_6af776c1c538c7::t_41ce3c5588768d 35
+pySDC/projects/FEM_with_FEniCS/problem_classes/DG_1D_FEniCS.py
+  s_6af776c1c538c7::t_3711b1f9f9f494 2,4-6,8-11,39
+pySDC/projects/FEM_with_FEniCS/run_examples.py
+  s_6af776c1c538c7::t_ba003454e408bd 2-3,121
+pySDC/projects/FEM_with_FEniCS/setups.py
+  s_6af776c1c538c7::t_6fe30507548efb 2-4,129-134,137-142,147,152,157,160-162,165-167
+pySDC/projects/FEM_with_FEniCS/tests/test_examples.py
+  s_6af776c1c538c7::t_12eada6dcb5dcd 190
+pySDC/tests/test_transfer_classes/test_fenics_transfer.py
+  s_6af776c1c538c7::t_eab24151e8b39b 111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d8a1875fd8f8c8882a34dc9aab35faf37ec2dc11",
+  "prompts": {},
+  "sessions": {
+    "s_6af776c1c538c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ee2a1d-432f-49a4-ab0e-7b0ff64347a6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
