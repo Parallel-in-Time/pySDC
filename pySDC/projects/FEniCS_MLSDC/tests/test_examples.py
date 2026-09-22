@@ -33,9 +33,9 @@ def test_mlsdc_beats_sdc(example, family):
             f'{example} [{family}]: MLSDC with {nlevels} levels needed {res["niter"]} iterations, '
             f'SDC only {sdc["niter"]}'
         )
-        assert abs(res['uend'] - sdc['uend']) < get_tolerance(example), (
-            f'{example} [{family}]: {nlevels}-level MLSDC disagrees with SDC'
-        )
+        assert abs(res['uend'] - sdc['uend']) < get_tolerance(
+            example
+        ), f'{example} [{family}]: {nlevels}-level MLSDC disagrees with SDC'
         assert res['work'] < sdc['work'], f'{example} [{family}]: {nlevels} levels cost more than SDC'
 
     assert len(results[3]['dofs']) == 3 and results[3]['dofs'][-1] < results[3]['dofs'][0]
@@ -59,9 +59,9 @@ def test_h_coarsening_beats_p_coarsening(example, family):
     assert h[1]['work'] == pytest.approx(p[1]['work']), 'SDC must not depend on the coarsening'
 
     for nlevels in (2, 3):
-        assert abs(p[nlevels]['uend'] - h[1]['uend']) < get_tolerance(example), (
-            f'{example} [{family}]: {nlevels}-level p-coarsening disagrees with SDC'
-        )
+        assert abs(p[nlevels]['uend'] - h[1]['uend']) < get_tolerance(
+            example
+        ), f'{example} [{family}]: {nlevels}-level p-coarsening disagrees with SDC'
         assert h[nlevels]['work'] <= p[nlevels]['work'], (
             f'{example} [{family}]: p-coarsening cost {p[nlevels]["work"]} against {h[nlevels]["work"]} '
             f'for h-coarsening on {nlevels} levels'
@@ -141,9 +141,9 @@ def test_pfasst_iterations_stay_bounded(example, family):
             f'{example} [{family}]: PFASST on {p} steps needed {res["niter"]} iterations against '
             f'{serial["niter"]} in serial'
         )
-        assert abs(res['uend'] - serial['uend']) < get_tolerance(example), (
-            f'{example} [{family}]: PFASST on {p} steps disagrees with the serial run'
-        )
+        assert abs(res['uend'] - serial['uend']) < get_tolerance(
+            example
+        ), f'{example} [{family}]: PFASST on {p} steps disagrees with the serial run'
 
 
 @pytest.mark.fenics
@@ -240,6 +240,6 @@ def test_a_coarse_level_that_does_not_pay_still_converges(example):
     sdc = run(example, nlevels=1, **SHORT)
     for nlevels in (2, 3):
         res = run(example, nlevels=nlevels, **SHORT)
-        assert abs(res['uend'] - sdc['uend']) < get_tolerance(example), (
-            f'{example}: {nlevels}-level MLSDC disagrees with SDC'
-        )
+        assert abs(res['uend'] - sdc['uend']) < get_tolerance(
+            example
+        ), f'{example}: {nlevels}-level MLSDC disagrees with SDC'

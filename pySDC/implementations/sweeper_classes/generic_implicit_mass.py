@@ -4,7 +4,6 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 class generic_implicit_mass(generic_implicit):
     """Fully implicit SDC sweeper for the mass-matrix formulation (no M^-1 anywhere)."""
 
-
     def update_nodes(self):
         """
         Fully implicit sweep for problems posed in mass-matrix form, M u' = f(u), where eval_f
