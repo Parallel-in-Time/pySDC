@@ -81,6 +81,10 @@ class fft_to_fft(SpaceTransfer):
                     tmpF = self.fine_prob.fft.backward(fine)
                     tmpG = tmpF[self.injection]
                     coarse[:] = self.coarse_prob.fft.forward(tmpG, coarse)
+            elif hasattr(self.fine_prob, 'ncomp') and fine.shape[0] == self.fine_prob.ncomp:
+                # the component axis comes first here, so inject on the spatial axes behind it. A
+                # trailing component axis needs no special case: the slice simply does not reach it.
+                coarse[:] = fine[(slice(None),) + self.injection]
             else:
                 coarse[:] = fine[self.injection]
 
@@ -122,8 +126,14 @@ class fft_to_fft(SpaceTransfer):
             else:
                 if hasattr(self.fine_prob, 'ncomp'):
                     for i in range(self.fine_prob.ncomp):
-                        G_hat = self.coarse_prob.fft.forward(coarse[..., i])
-                        fine[..., i] = self.fft_pad.backward(G_hat, fine[..., i])
+                        if coarse.shape[-1] == self.fine_prob.ncomp:
+                            G_hat = self.coarse_prob.fft.forward(coarse[..., i])
+                            fine[..., i] = self.fft_pad.backward(G_hat, fine[..., i])
+                        elif coarse.shape[0] == self.fine_prob.ncomp:
+                            G_hat = self.coarse_prob.fft.forward(coarse[i, ...])
+                            fine[i, ...] = self.fft_pad.backward(G_hat, fine[i, ...])
+                        else:
+                            raise TransferError('Don\'t know how to prolong for this problem with multiple components')
                 else:
                     G_hat = self.coarse_prob.fft.forward(coarse)
                     fine[:] = self.fft_pad.backward(G_hat, fine)

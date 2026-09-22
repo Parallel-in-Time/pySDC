@@ -127,6 +127,41 @@ def test_fft_to_fft_dimensions(ndim, spectral):
         ), f'Restriction does not undo prolongation of {function_name} in {ndim}d'
 
 
+@pytest.mark.mpi4py
+@pytest.mark.parametrize('spectral', [True, False])
+def test_fft_to_fft_component_axis(spectral):
+    """
+    Problems that declare `ncomp` keep their components in the first axis (Gray-Scott) or in the last
+    one (the temperature-coupled Allen-Cahn). Either way each component has to come out exactly as a
+    single-component problem of the same resolution would.
+    """
+    import numpy as xp
+    from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
+    from pySDC.implementations.problem_classes.GrayScott_MPIFFT import grayscott_imex_diffusion
+
+    nvars_fine, nvars_coarse = (32, 32), (16, 16)
+    fine = grayscott_imex_diffusion(nvars=nvars_fine, spectral=spectral)
+    coarse = grayscott_imex_diffusion(nvars=nvars_coarse, spectral=spectral)
+    assert fine.u_exact(0).shape[0] == fine.ncomp, 'Expected Gray-Scott to keep its components in the first axis'
+    transfer = get_transfer_class('fft_to_fft')(fine, coarse, {})
+
+    # the same transfer, but for a problem with a single component
+    ref_fine = IMEX_Laplacian_MPIFFT(nvars=nvars_fine, spectral=spectral)
+    ref_coarse = IMEX_Laplacian_MPIFFT(nvars=nvars_coarse, spectral=spectral)
+    ref_transfer = get_transfer_class('fft_to_fft')(ref_fine, ref_coarse, {})
+
+    for direction, source, ref_source in [('restrict', fine, ref_fine), ('prolong', coarse, ref_coarse)]:
+        u = source.u_exact(0)
+        transferred = getattr(transfer, direction)(u)
+
+        for i in range(fine.ncomp):
+            single = ref_source.u_init
+            single[:] = u[i]
+            assert xp.allclose(
+                transferred[i], getattr(ref_transfer, direction)(single)
+            ), f'Component {i} of the {direction}ion does not match the single-component problem'
+
+
 @pytest.mark.cupy
 @pytest.mark.parametrize('L', [1.0, 6.283185307179586])
 @pytest.mark.parametrize('spectral', [True, False])
