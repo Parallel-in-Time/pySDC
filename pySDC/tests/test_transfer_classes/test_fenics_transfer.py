@@ -118,5 +118,35 @@ def test_fenics_rejects_unknown_types(direction):
         getattr(transfer, direction)(np.zeros(3))
 
 
+@pytest.mark.fenics
+@pytest.mark.parametrize('refinements, order', NESTED_SPACES)
+def test_fenics_project_is_the_l2_projection(refinements, order):
+    """
+    Pin what `project` computes, against the projection assembled independently: the coarse mass
+    matrix, and a right hand side integrated on the fine mesh where both functions live.
+
+    Comparing `project` against `restrict`, or round-tripping a coarse function through it, is not
+    enough -- point sampling satisfies both, which is how `df.project` passed for so long. Given a
+    fine function and a coarse space it returns the nodal interpolant when the two share an element
+    degree, and an inexact projection when they do not.
+    """
+    import dolfin as df
+
+    transfer, fine, coarse = get_transfer(refinements=refinements, order=order)
+    Vc, Vf = coarse.init, fine.init
+    u = fine.u_exact(0.0)
+
+    trial, test = df.TrialFunction(Vc), df.TestFunction(Vc)
+    mass = df.assemble(trial * test * df.dx).array()
+    rhs = []
+    for j in range(Vc.dim()):
+        basis = df.Function(Vc)
+        basis.vector()[j] = 1.0
+        rhs.append(df.assemble(u.values * df.interpolate(basis, Vf) * df.dx))
+
+    expected = np.linalg.solve(mass, np.array(rhs))
+    assert np.allclose(transfer.project(u).values.vector()[:], expected), 'project is not the L2 projection'
+
+
 if __name__ == '__main__':
     test_fenics_restriction_is_nodal_injection((1, 0), (1, 1))
