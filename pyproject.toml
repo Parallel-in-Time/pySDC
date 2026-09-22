@@ -131,7 +131,11 @@ ignore = ["E203", # Whitespace before punctuation
 [tool.black]
 line-length = 120
 skip-string-normalization = true
+# `exclude` is only consulted while black walks a directory, so `black pySDC` skips playgrounds but
+# anything passing file paths explicitly -- pre-commit, editors -- does not. `force-exclude` applies
+# either way, which is what keeps the two agreeing.
 exclude = '''playgrounds/'''
+force-exclude = '''playgrounds/'''
 
 [tool.coverage.run]
 omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*', '*/pySDC/projects/*/tests/*']
