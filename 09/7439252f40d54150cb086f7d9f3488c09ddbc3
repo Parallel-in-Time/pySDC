@@ -1,0 +1,21 @@
+.pre-commit-config.yaml
+  s_6af776c1c538c7::t_a841f4782be959 3-6,9,16
+pyproject.toml
+  s_6af776c1c538c7::t_a2f3d28f7005e1 134-136,138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "097439252f40d54150cb086f7d9f3488c09ddbc3",
+  "prompts": {},
+  "sessions": {
+    "s_6af776c1c538c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ee2a1d-432f-49a4-ab0e-7b0ff64347a6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
