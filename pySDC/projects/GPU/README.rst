@@ -3,38 +3,54 @@ pySDC using GPUs
 
 Installation
 ------------
-In order to start playing on GPU, install `pySDC` and its dependencies, ideally in developer mode.
-First start by setting up a virtual environment, e.g. by using [Miniconda](https://docs.conda.io/en/latest/miniconda.html).
-Then also add the CuPy Package (the cuda-toolkit will be installed automatically):
+In order to start playing on GPU, install ``pySDC`` and its dependencies, ideally in developer mode.
+``etc/environment-cupy.yml`` in the repository root is the CPU dependencies plus CuPy, which brings
+the CUDA toolkit with it, so creating that environment is the whole setup:
 
-    conda create -n pySDC
+.. code-block:: bash
+
+    conda env create -f etc/environment-cupy.yml
     conda activate pySDC
-    conda install -c conda-forge --file requirements.txt
-    conda install -c conda-forge cupy
-When this is done (and it can take a while), you have your setup to run `pySDC` on the GPU.
+
+This can take a while. When it is done you are ready to run ``pySDC`` on the GPU.
+
+.. note::
+
+   ``environment.yml`` in *this* directory is for testing only and deliberately has no CuPy. The
+   GitHub runners have no GPU, so the ``cupy``-marked tests run there against a NumPy stub (see
+   ``pySDC/tests/fake_cupy.py``) and everything else runs with ``-m "not cupy"``. It will not run
+   anything on a GPU -- use ``etc/environment-cupy.yml`` above. The real GPU tests run on JUWELS,
+   driven by ``.gitlab-ci.yml``; the machine setups live in ``etc/venv_booster`` and
+   ``etc/venv_jusuf`` next to this README.
 
 Changes in the problem_classes
 ------------------------------
 Now you have to change a little bit in the problem_classes. The first and easy step is to change the datatype.
-To use pySDC on the GPU with CuPy you must use the [cupy-datatype](../../implementations/datatype_classes/cupy_mesh.py).
+To use pySDC on the GPU with CuPy you must use the
+`cupy-datatype <../../implementations/datatype_classes/cupy_mesh.py>`_.
 The next step is to import cupy in the problem_class. In the following you have to exchange the NumPy/SciPy functions with the CuPy functions.
-A [Comparison Table](https://docs.cupy.dev/en/latest/reference/comparison.html) is given from CuPy to do that.
-For example: The above steps can be traced using the files 
-[HeatEquation_ND_FD_forced_periodic.py](../../implementations/problem_classes/HeatEquation_ND_FD_forced_periodic.py) 
-and [HeatEquation_ND_FD_forced_periodic_gpu.py](../../implementations/problem_classes/HeatEquation_ND_FD_forced_periodic.py)
-Now you are ready to run `pySDC` on the GPU. 
+A `comparison table <https://docs.cupy.dev/en/latest/reference/comparison.html>`_ is given from CuPy to do that.
+For example, the above steps can be traced using the files
+`HeatEquation_ND_FD.py <../../implementations/problem_classes/HeatEquation_ND_FD.py>`_
+and `HeatEquation_ND_FD_CuPy.py <../../implementations/problem_classes/HeatEquation_ND_FD_CuPy.py>`_,
+which are the pair ``heat.py`` imports.
+Now you are ready to run ``pySDC`` on the GPU.
 
 Run pySDC on the GPU
 --------------------
-You have to configure a script to run it. You can see at the file [heat.py](heat.py) that the parameters are the 
-same for GPU and CPU. Only the import for the problem_class changed.  
+You have to configure a script to run it. You can see at the file `heat.py <heat.py>`_ that the
+parameters are the same for GPU and CPU. Only the import for the problem_class changed.
 
 More examples
 -------------
-Further examples can found with Allen-Cahn:
-* problem: [AllenCahn_2D_FD.py](../../implementations/problem_classes/AllenCahn_2D_FD.py) and [AllenCahn_2D_FD_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FD_gpu.py)
-* problem: [AllenCahn_2D_FFT.py](../../implementations/problem_classes/AllenCahn_2D_FFT.py) and [AllenCahn_2D_FFT_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FFT_gpu.py)
-  * Script to run pySDC: [ac-fft.py](ac-fft.py)
+Further examples can found with Allen-Cahn. These take the other route: rather than a separate
+``_gpu`` module, one class serves both and a ``useGPU`` flag switches the array, sparse and solver
+modules and the datatypes over to CuPy.
+
+* problem: `AllenCahn_2D_FD.py <../../implementations/problem_classes/AllenCahn_2D_FD.py>`_, with ``useGPU=True``
+* problem: `AllenCahn_2D_FFT.py <../../implementations/problem_classes/AllenCahn_2D_FFT.py>`_, with ``useGPU=True``
+
+  * Script to run pySDC: `ac_fft.py <ac_fft.py>`_
 
 
 Running large problems on GPU
@@ -45,7 +61,7 @@ For instance, use
 
 .. code-block:: bash
  
-    srun -n 4 python run_experiment.pyy --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=run
+    srun -n 4 python run_experiment.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=run
     mpirun -np 8 python run_experiment.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=plot
     python run_experiment.py --config=GS_USkate --procs=1/1/4 --useGPU=True --mode=video
 

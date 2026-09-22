@@ -168,6 +168,68 @@ class fenics_heat(Problem):
 
         return u
 
+    def eval_f_increment(self, base, delta, t):
+        """
+        Evaluate the right-hand side increment.
+
+        Parameters
+        ----------
+        base : dtype_u
+            The base state, unused: the implicit part is linear.
+        delta : dtype_u
+            The correction.
+        t : float
+            Physical time, accepted for interface compatibility.
+
+        Returns
+        -------
+        dtype_f
+            The increment, with a zero explicit part.
+        """
+        increment = self.eval_f(delta, t)
+        increment.expl = self.dtype_u(self.V, val=0.0)
+        return increment
+
+    def solve_system_delta(self, r, factor, base, f_base, t):
+        r"""
+        Solve :math:`\delta - factor\,[f(w+\delta) - f(w)] = r`, i.e.
+        :math:`(M - factor\,K)\,\delta = M r` with **zero** boundary data.
+
+        This is the piece ``linear_implicit=True`` cannot supply on this backend. That shortcut
+        reuses the stock ``solve_system``, which applies *inhomogeneous* Dirichlet data to whatever
+        right-hand side it is handed, and a correction must carry zero boundary data. Applying
+        ``bc_hom`` instead is the whole difference.
+
+        Without this the sweeper falls back to the substitution :math:`y = w + \delta`, which is
+        exact but reads the level's :math:`\mathcal{O}(1)` state. That is merely no benefit while
+        the level is at backend precision, and is a wrong answer once it is not -- measured here as
+        1.4e-05 with the coarse level at ``float32``.
+
+        Parameters
+        ----------
+        r : dtype_u
+            Right-hand side of the correction equation.
+        factor : float
+            Implicit prefactor assembled by the sweeper.
+        base : dtype_u
+            Base state, unused: the implicit operator is linear.
+        f_base : dtype_f
+            ``f`` evaluated at ``base``, unused for the same reason.
+        t : float
+            Physical time, accepted for interface compatibility.
+
+        Returns
+        -------
+        dtype_u
+            The correction.
+        """
+        b = self.apply_mass_matrix(r)
+        delta = self.dtype_u(self.V, val=0.0)
+        system = self.M - factor * self.K
+        self.bc_hom.apply(system, b.values.vector())
+        df.solve(system, delta.values.vector(), b.values.vector())
+        return delta
+
     def __eval_fexpl(self, u, t):
         """
         Helper routine to evaluate the explicit part of the right-hand side.

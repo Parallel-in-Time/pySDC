@@ -56,6 +56,7 @@ class Level(FrozenClass):
         f (list of dtype_f): RHS values at the nodes
         fold (list of dtype_f): copy of RHS values for saving data during restriction
         tau (list of dtype_u): FAS correction, allocated via step class if necessary
+        u0_reference: copy of ``u[0]`` taken when a residual was handed down to this level
     """
 
     def __init__(
@@ -102,6 +103,17 @@ class Level(FrozenClass):
 
         self.tau: List[Optional[Any]] = [None] * self.sweep.coll.num_nodes
 
+        # Set by a transfer that hands this level a residual instead of letting it rebuild one, and
+        # read by the sweeper that carries that residual. PFASST overwrites `u[0]` with the
+        # predecessor's end value *after* the restriction, and the residual depends on `u[0]`
+        # additively, so a level carrying one has to be told what `u[0]` was when it arrived. It
+        # lives here, next to `tau`, because it is a copy of this level's own data and has to be
+        # dropped when the level is reset -- a stale one belongs to the previous step.
+        #
+        # Temporary. Putting the step-to-step exchange itself in delta form, so the predecessor
+        # sends an increment rather than a state, removes the need for it entirely.
+        self.u0_reference: Optional[Any] = None
+
         self.__tag: Optional[Any] = None
 
         # freeze class, no further attributes allowed from this point
@@ -129,6 +141,7 @@ class Level(FrozenClass):
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
         self.tau = [None] * self.sweep.coll.num_nodes
+        self.u0_reference = None
 
     @property
     def sweep(self) -> Sweeper:

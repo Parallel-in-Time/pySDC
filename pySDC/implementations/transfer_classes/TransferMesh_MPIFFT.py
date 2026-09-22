@@ -1,6 +1,8 @@
 from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
-from mpi4py_fft import PFFT, newDistArray
+from mpi4py_fft import newDistArray
+
+from pySDC.helpers.fft_helper import PFFT
 
 
 class fft_to_fft(SpaceTransfer):
@@ -30,6 +32,8 @@ class fft_to_fft(SpaceTransfer):
         Nf = list(self.fine_prob.fft.global_shape())
         Nc = list(self.coarse_prob.fft.global_shape())
         self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc, strict=True)]
+        # slice for injection, one entry per dimension rather than hardcoded for 2d
+        self.injection = tuple(slice(None, None, r) for r in self.ratio)
         axes = tuple(range(len(Nf)))
 
         fft_args = {}
@@ -64,21 +68,25 @@ class fft_to_fft(SpaceTransfer):
                         if fine.shape[-1] == self.fine_prob.ncomp:
                             tmpF = newDistArray(self.fine_prob.fft, False)
                             tmpF = self.fine_prob.fft.backward(fine[..., i], tmpF)
-                            tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                            tmpG = tmpF[self.injection]
                             coarse[..., i] = self.coarse_prob.fft.forward(tmpG, coarse[..., i])
                         elif fine.shape[0] == self.fine_prob.ncomp:
                             tmpF = newDistArray(self.fine_prob.fft, False)
                             tmpF = self.fine_prob.fft.backward(fine[i, ...], tmpF)
-                            tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                            tmpG = tmpF[self.injection]
                             coarse[i, ...] = self.coarse_prob.fft.forward(tmpG, coarse[i, ...])
                         else:
                             raise TransferError('Don\'t know how to restrict for this problem with multiple components')
                 else:
                     tmpF = self.fine_prob.fft.backward(fine)
-                    tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                    tmpG = tmpF[self.injection]
                     coarse[:] = self.coarse_prob.fft.forward(tmpG, coarse)
+            elif hasattr(self.fine_prob, 'ncomp') and fine.shape[0] == self.fine_prob.ncomp:
+                # the component axis comes first here, so inject on the spatial axes behind it. A
+                # trailing component axis needs no special case: the slice simply does not reach it.
+                coarse[:] = fine[(slice(None),) + self.injection]
             else:
-                coarse[:] = fine[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                coarse[:] = fine[self.injection]
 
         if hasattr(type(F), 'components'):
             for comp in F.components:
@@ -118,8 +126,14 @@ class fft_to_fft(SpaceTransfer):
             else:
                 if hasattr(self.fine_prob, 'ncomp'):
                     for i in range(self.fine_prob.ncomp):
-                        G_hat = self.coarse_prob.fft.forward(coarse[..., i])
-                        fine[..., i] = self.fft_pad.backward(G_hat, fine[..., i])
+                        if coarse.shape[-1] == self.fine_prob.ncomp:
+                            G_hat = self.coarse_prob.fft.forward(coarse[..., i])
+                            fine[..., i] = self.fft_pad.backward(G_hat, fine[..., i])
+                        elif coarse.shape[0] == self.fine_prob.ncomp:
+                            G_hat = self.coarse_prob.fft.forward(coarse[i, ...])
+                            fine[i, ...] = self.fft_pad.backward(G_hat, fine[i, ...])
+                        else:
+                            raise TransferError('Don\'t know how to prolong for this problem with multiple components')
                 else:
                     G_hat = self.coarse_prob.fft.forward(coarse)
                     fine[:] = self.fft_pad.backward(G_hat, fine)

@@ -5,6 +5,7 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.10,<3.14
+  - openmpi
   - fenics>=2019.1.0
   - numpy
   - scipy>=0.17.1

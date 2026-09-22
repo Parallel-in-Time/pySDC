@@ -139,7 +139,7 @@ def test_integral_whole_interval(x0, x1, N):
     integral = weights @ u_hat
     integral_ref = coeffs[0, 0] * helper.L
 
-    assert np.isclose(integral, integral_ref, atol=1e-7), abs(integral_ref - integral)
+    assert np.isclose(integral, integral_ref, rtol=0, atol=1e-7), abs(integral_ref - integral)
 
 
 @pytest.mark.base

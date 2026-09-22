@@ -135,11 +135,11 @@ class fenics_grayscott(Problem):
         for _ in range(num_refinements):
             mesh = df.refine(mesh)
 
-        # define function space for future reference
+        # define mixed function space for future reference. `V * V` was removed in DOLFIN 2019.1,
+        # so the mixed space is built from a MixedElement instead.
         element = df.FiniteElement(family, mesh.ufl_cell(), order)
         self.V = df.FunctionSpace(mesh, df.MixedElement([element, element]))
 
-        # invoke super init, passing number of dofs
         super().__init__(self.V)
         self._makeAttributeAndRegister(
             'c_nvars', 't0', 'family', 'order', 'refinements', 'Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True
@@ -147,7 +147,6 @@ class fenics_grayscott(Problem):
         self._makeAttributeAndRegister(
             'newton_tol', 'newton_rtol', 'newton_maxiter', localVars=locals(), readOnly=False
         )
-
         # rhs in weak form
         self.w = df.Function(self.V)
         q1, q2 = df.TestFunctions(self.V)
@@ -311,11 +310,12 @@ class fenics_grayscott(Problem):
             Exact solution (only at :math:`t_0 = 0.0`).
         """
 
+        # subclassing df.Expression was removed in DOLFIN 2018.1; UserExpression is the
+        # replacement and requires the base initialiser to run.
         class InitialConditions(df.UserExpression):
             def __init__(self, **kwargs):
-                super().__init__(**kwargs)
-                # fixme: why do we need this?
                 random.seed(2)
+                super().__init__(**kwargs)
 
             def eval(self, values, x):
                 values[0] = 1 - 0.5 * np.power(np.sin(np.pi * x[0] / 100), 100)
@@ -326,7 +326,7 @@ class fenics_grayscott(Problem):
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
 
-        uinit = InitialConditions(degree=max(1, self.order))
+        uinit = InitialConditions(degree=self.order)
 
         me = self.dtype_u(self.V)
         me.values = df.interpolate(uinit, self.V)

@@ -35,10 +35,6 @@ class AdaptivityBase(ConvergenceController):
 
         controller.add_hook(LogStepSize)
 
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
-
-        self.communicate_convergence = CheckConvergence.communicate_convergence
-
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def dependencies(self, controller, description, **kwargs):
@@ -253,7 +249,12 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
             self.trigger_restart_upon_nonconvergence(S)
 
         if self.params.useMPI:
-            self.communicate_convergence(self, controller, S, **kwargs)
+            # borrow the reduction rather than storing it on the instance: an unbound function in an
+            # instance attribute shadows the hook of the same name, and needs an explicit `self` that
+            # nothing else in this API does
+            from pySDC.core.check_convergence import CheckConvergence
+
+            CheckConvergence.communicate_convergence(self, controller, S, **kwargs)
 
         self.res_last_iter = S.levels[0].status.residual * 1.0
 
@@ -746,7 +747,7 @@ class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
     """
 
     def setup(self, controller, params, description, **kwargs):
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+        from pySDC.core.check_convergence import CheckConvergence
 
         defaults = {
             'high_Taylor_order': False,
@@ -837,7 +838,7 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
     """
 
     def setup(self, controller, params, description, **kwargs):
-        from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+        from pySDC.core.check_convergence import CheckConvergence
 
         defaults = {
             'control_order': -50,

@@ -171,33 +171,15 @@ def run_problem(
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_procs', [1, 4, 3])
+@pytest.mark.parallel([1, 3, 4])
 @pytest.mark.parametrize('spread_from_first_restarted', [0, 1])
-def test_SpreadStepSizesMPI(num_procs, spread_from_first_restarted):
-    import os
-    import subprocess
+def test_SpreadStepSizesMPI(spread_from_first_restarted):
+    from mpi4py import MPI
 
-    kwargs = {}
-    kwargs['useMPI'] = 1
-    kwargs['num_procs'] = num_procs
-    kwargs['spread_from_first_restarted'] = spread_from_first_restarted
-    kwargs['test'] = 1
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    # run code with different number of MPI processes
-    kwargs_str = "".join([f"{key}:{item} " for key, item in kwargs.items()])
-    cmd = f"mpirun -np {num_procs} python {__file__} {kwargs_str}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_procs,
+    spread_step_sizes_single_test(
+        useMPI=1,
+        num_procs=MPI.COMM_WORLD.size,
+        spread_from_first_restarted=spread_from_first_restarted,
     )
 
 
@@ -306,33 +288,15 @@ def spread_step_sizes_single_test(**kwargs):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_procs', [1, 4, 3])
+@pytest.mark.parallel([1, 3, 4])
 @pytest.mark.parametrize('restart_from_first_step', [0, 1])
-def test_basic_restarting_MPI(num_procs, restart_from_first_step):
-    import os
-    import subprocess
+def test_basic_restarting_MPI(restart_from_first_step):
+    from mpi4py import MPI
 
-    kwargs = {}
-    kwargs['useMPI'] = 1
-    kwargs['num_procs'] = num_procs
-    kwargs['restart_from_first_step'] = restart_from_first_step
-    kwargs['test'] = 0
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    # run code with different number of MPI processes
-    kwargs_str = "".join([f"{key}:{item} " for key, item in kwargs.items()])
-    cmd = f"mpirun -np {num_procs} python {__file__} {kwargs_str}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_procs,
+    basic_restarting_single_test(
+        useMPI=1,
+        num_procs=MPI.COMM_WORLD.size,
+        restart_from_first_step=restart_from_first_step,
     )
 
 
@@ -415,19 +379,3 @@ def basic_restarting_single_test(**kwargs):
         np.isclose(times_restarted[i], expected_restarts[i], atol=arguments['dt'] / 10)
         for i in range(len(expected_restarts))
     ), f"Didn\'t get the restarts we expected! Got {times_restarted}, expected {expected_restarts}"
-
-
-def single_test(test, **kwargs):
-    if test == 0:
-        basic_restarting_single_test(**kwargs)
-    elif test == 1:
-        spread_step_sizes_single_test(**kwargs)
-    else:
-        raise NotImplementedError
-
-
-if __name__ == "__main__":
-    import sys
-
-    kwargs = {me.split(':')[0]: int(me.split(':')[1]) for me in sys.argv[1:]}
-    single_test(**kwargs)

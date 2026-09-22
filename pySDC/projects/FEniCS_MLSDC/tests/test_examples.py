@@ -1,14 +1,19 @@
 import pytest
 
-from pySDC.projects.FEniCS_MLSDC.setups import EXAMPLES, FAMILIES
+from pySDC.projects.FEniCS_MLSDC.setups import EXAMPLES, get_coarsenings, get_families, pays_off
+
+#: Every example/family an example has a problem class for, and the subsets each claim applies to.
+CASES = [(e, f) for e in EXAMPLES for f in get_families(e)]
+SAVINGS = [(e, f) for e, f in CASES if pays_off(e)]
+BOTH_COARSENINGS = [(e, f) for e, f in CASES if len(get_coarsenings(e)) > 1]
+DG_EXAMPLES = [e for e in EXAMPLES if 'DG' in get_families(e)]
 
 #: keep the runs small enough for CI; the physics is unchanged, only the number of steps
 SHORT = {'nsteps': 4}
 
 
 @pytest.mark.fenics
-@pytest.mark.parametrize('example', EXAMPLES)
-@pytest.mark.parametrize('family', FAMILIES)
+@pytest.mark.parametrize('example, family', SAVINGS)
 def test_mlsdc_beats_sdc(example, family):
     """MLSDC on a coarser mesh must cost less than SDC, with 'work' charging each level for its dofs.
 
@@ -37,8 +42,7 @@ def test_mlsdc_beats_sdc(example, family):
 
 
 @pytest.mark.fenics
-@pytest.mark.parametrize('example', EXAMPLES)
-@pytest.mark.parametrize('family', FAMILIES)
+@pytest.mark.parametrize('example, family', BOTH_COARSENINGS)
 def test_h_coarsening_beats_p_coarsening(example, family):
     """Coarsen the mesh, not the element order.
 
@@ -95,7 +99,7 @@ def test_prolongation_preserves_jumps(coarsening):
 
 
 @pytest.mark.fenics
-@pytest.mark.parametrize('example', EXAMPLES)
+@pytest.mark.parametrize('example', DG_EXAMPLES)
 def test_dg_and_cg_solve_the_same_problem(example):
     """The DG forms are a discretisation, not a different model: at order 4 the two agree closely.
 
@@ -117,8 +121,7 @@ def test_dg_and_cg_solve_the_same_problem(example):
 
 
 @pytest.mark.fenics
-@pytest.mark.parametrize('example', EXAMPLES)
-@pytest.mark.parametrize('family', FAMILIES)
+@pytest.mark.parametrize('example, family', CASES)
 def test_pfasst_iterations_stay_bounded(example, family):
     """PFASST must converge and agree with serial over the step counts each example supports.
 
@@ -167,8 +170,9 @@ def test_main_writes_a_report(tmp_path, monkeypatch):
     compare_mlsdc, check_pfasst = run_examples.compare_mlsdc, run_examples.check_pfasst
 
     monkeypatch.setattr(run_examples, 'EXAMPLES', ('heat',))
-    monkeypatch.setattr(run_examples, 'FAMILIES', ('DG',))
-    monkeypatch.setattr(run_examples, 'COARSENINGS', ('h',))
+    monkeypatch.setattr(run_examples, 'get_families', lambda example: ('DG',))
+    monkeypatch.setattr(run_examples, 'get_coarsenings', lambda example: ('h',))
+    monkeypatch.setattr(run_examples, 'get_order_study', lambda example: ())
     monkeypatch.setattr(
         run_examples,
         'compare_mlsdc',
@@ -221,3 +225,21 @@ def test_prolongation_on_a_periodic_space():
     points = rng.uniform(1e-6, 1 - 1e-6, size=(200, 2))
     err = max(abs(prolonged.values(*x) - u.values(*x)) for x in points)
     assert err < 1e-12, f'periodic prolongation is not the inclusion: off by {err:.3e}'
+
+
+@pytest.mark.fenics
+@pytest.mark.parametrize('example', [e for e in EXAMPLES if not pays_off(e)])
+def test_a_coarse_level_that_does_not_pay_still_converges(example):
+    """
+    Not every example is here to save work. The ones that are not still have to reach the same
+    answer with a coarse level as without, which is what makes them worth running.
+    """
+    from pySDC.projects.FEniCS_MLSDC.run_examples import run
+    from pySDC.projects.FEniCS_MLSDC.setups import get_tolerance
+
+    sdc = run(example, nlevels=1, **SHORT)
+    for nlevels in (2, 3):
+        res = run(example, nlevels=nlevels, **SHORT)
+        assert abs(res['uend'] - sdc['uend']) < get_tolerance(example), (
+            f'{example}: {nlevels}-level MLSDC disagrees with SDC'
+        )

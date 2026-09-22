@@ -27,6 +27,14 @@ for more details. Additional guideline are also given on how to
 > Checkout its own [contributing guide](https://qmat.readthedocs.io/en/latest/contributing.html)
 > to add any new coefficient / feature on this part.
 
+> 🤖 `pySDC` declares how much of its code was written with AI help in
+> [`aidecl.yaml`](./aidecl.yaml), checked on every CI run. Two things help keep that honest:
+> please keep the `Co-authored-by:` trailer that agents add to their commits (this mostly
+> means not stripping it when squashing), and, if you contribute regularly, consider
+> installing [Git AI](https://github.com/git-ai-project/git-ai). It records which lines an
+> agent wrote, needs no workflow changes, and is strongly recommended but entirely optional
+> — without it your commits simply count as human-written.
+
 1. [GitHub Forks and Pull Requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models)
 2. [Pull Requests Recommendations](./docs/contrib/01_pull_requests.md)
 3. [Continuous Integration](./docs/contrib/02_continuous_integration.md)

@@ -65,6 +65,10 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals, strict=True)):
 
     dtVals = tEnd / nStepsList
 
+    # The reference solution depends only on nSteps, so compute it once per nSteps
+    # instead of once per (qDelta, nSweeps, nSteps).
+    uRefs = {nSteps: solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu) for nSteps in nStepsList}
+
     i = 0
     for qDelta in qDeltaList:
         for nSweeps in nSweepList:
@@ -87,7 +91,7 @@ for j, (mu, tEnd) in enumerate(zip(muVals, tEndVals, strict=True)):
             for nSteps in nStepsList:
                 print(f' -- nSteps={nSteps} ...')
 
-                uRef = solutionExact(tEnd, nSteps, "VANDERPOL", mu=mu)
+                uRef = uRefs[nSteps]
 
                 uSDC, counters, parallel = solutionSDC(tEnd, nSteps, params, "VANDERPOL", mu=mu)
 

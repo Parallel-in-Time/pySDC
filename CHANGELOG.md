@@ -2,6 +2,23 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   September 7, 2026: Version 5.8 makes ParaDiag actually parallel. The new MPI controller puts one time step per rank
+    and circulates the diagonalization around a ring instead of gathering it, so the memory per rank no longer grows
+    with the block, while `alpha` may now vary with the iteration, letting the outer loop start well-conditioned and
+    tighten later. Tutorial step_9 gained parts D and E to go with it. We are happy to welcome
+    [\@caklovicka](https://github.com/caklovicka) as an author: ParaDiag in pySDC grew out of her
+    [pyParaDiag](https://github.com/caklovicka/pyParaDiag) and the collocation-ParaDiag paper behind it. The rest is
+    controller housekeeping, of which two guards are **not backward compatible**: iteration-dependent QDelta
+    coefficients (MIN-SR-FLEX and the Jumpers) are now restricted to single-step, single-level SDC, and serial
+    Gauss-Seidel MSSDC rejects `nsweeps > 1` from the constructor instead of quietly ignoring it.
+-   September 4, 2026: Version 5.7 is dominated by spectral methods and Rayleigh-Bénard convection, thanks to
+    [\@brownbaerchen](https://github.com/brownbaerchen). The spectral helper was largely rewritten and gained Neumann boundary
+    conditions in Chebychev and ultraspherical bases, a VkFFT backend and heterogeneous CPU/GPU computing, while Rayleigh-Bénard
+    convection got a 3D problem class and its own project. ParaDiag arrived too, as a serial implementation for collocation methods.
+    [\@Ouardghi](https://github.com/Ouardghi) contributed the new `StroemungsRaum` project, working up from FEniCS heat equation
+    examples to incompressible Navier-Stokes. Three changes are **not backward compatible**: sweepers now require the level at
+    instantiation, Python 3.9 was dropped (3.13 added), and the framework defaults moved into `core`, which no longer imports its
+    own plugins.
 -   April 11, 2025: Version 5.6 adds a framework for MPI-parallel I/O, developed by [\@tlunet](https://github.com/tlunet), making it easier to visualize the data obtained with pySDC on HPC machines in software such as ParaView.
     Also, pySDC is now compatible with the finite element library [Firedrake](https://github.com/firedrakeproject/firedrake) and the geophysical fluid dynamics library
     [Gusto](https://github.com/firedrakeproject/gusto), thanks to [\@jshipton](https://github.com/jshipton) and [\@brownbaerchen](https://github.com/brownbaerchen).

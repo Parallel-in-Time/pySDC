@@ -191,28 +191,47 @@ def testToVTR(tmpdir, nVar, nX, nY, nZ, nSteps):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel([2, 4])
 @pytest.mark.parametrize("nVar", [1, 4])
 @pytest.mark.parametrize("nSteps", [1, 10])
 @pytest.mark.parametrize("algo", ["ChatGPT", "Hybrid"])
 @pytest.mark.parametrize("dtypeIdx", [0, 1])
-@pytest.mark.parametrize("nProcs", [2, 4])
 @pytest.mark.parametrize("dim", [2, 3])
-def testRectilinear_MPI(tmpdir, dim, nProcs, dtypeIdx, algo, nSteps, nVar):
+def testRectilinear_MPI(tmpdir, dim, dtypeIdx, algo, nSteps, nVar):
 
-    import subprocess
+    from mpi4py import MPI
+    from pySDC.helpers.fieldsIO import Rectilinear, initGrid, writeFields_MPI, compareFields_MPI
 
-    fileName = f"{tmpdir}/testRectilinear{dim}D_MPI.pysdc"
+    comm = MPI.COMM_WORLD
 
-    for gridSizes in itertools.product(*[[61, 16]] * dim):
+    # `tmpdir` is per-rank, but every rank writes into the same files
+    tmpdir = comm.bcast(str(tmpdir), root=0)
 
-        cmd = f"mpirun -np {nProcs} python {__file__} --fileName {fileName}"
-        cmd += f" --dtypeIdx {dtypeIdx} --algo {algo} --nSteps {nSteps} --nVar {nVar} --gridSizes {' '.join([str(n) for n in gridSizes])}"
+    allGridSizes = list(itertools.product(*[[61, 16]] * dim))
+    fileNames = [f"{tmpdir}/testRectilinear{dim}D_MPI_{i}.pysdc" for i in range(len(allGridSizes))]
 
-        p = subprocess.Popen(cmd.split(), cwd=".")
-        p.wait()
-        assert p.returncode == 0, f"MPI write with {nProcs} proc(s) did not return code 0, but {p.returncode}"
+    try:
+        for fileName, gridSizes in zip(fileNames, allGridSizes):
+            u0 = writeFields_MPI(
+                fileName=fileName,
+                dtypeIdx=dtypeIdx,
+                algo=algo,
+                nSteps=nSteps,
+                nVar=nVar,
+                gridSizes=list(gridSizes),
+            )
+            compareFields_MPI(fileName, u0, nSteps)
+    finally:
+        # `setupMPI` is class-level state, so after the writes above every `Rectilinear` in this
+        # interpreter reads back only its local block. The old subprocess model got the global read
+        # for free because the checks ran in the parent process, which had never called `setupMPI`;
+        # sharing one session means putting the class back into serial mode ourselves -- in a
+        # `finally`, so a failing write cannot leave it that way for every later test.
+        Rectilinear.setupMPI(None, None, None)
 
-        from pySDC.helpers.fieldsIO import Rectilinear, initGrid
+    comm.Barrier()
+
+    for fileName, gridSizes in zip(fileNames, allGridSizes):
 
         f2: Rectilinear = FieldsIO.fromFile(fileName)
 
@@ -232,21 +251,3 @@ def testRectilinear_MPI(tmpdir, dim, nProcs, dtypeIdx, algo, nSteps, nVar):
             assert t2 == t, f"fields[{idx}] in {f2} has incorrect time ({t2} instead of {t})"
             assert u2.shape == u1.shape, f"{idx}'s fields in {f2} has incorrect shape"
             assert np.allclose(u2, u1), f"{idx}'s fields in {f2} has incorrect values"
-
-
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--fileName', type=str, help='fileName of the file')
-    parser.add_argument('--dtypeIdx', type=int, help="dtype index", choices=DTYPES.keys())
-    parser.add_argument('--algo', type=str, help="algorithm used for block decomposition")
-    parser.add_argument('--nSteps', type=int, help="number of time-steps")
-    parser.add_argument('--nVar', type=int, help="number of field variables")
-    parser.add_argument('--gridSizes', type=int, nargs='+', help="number of grid points in each dimensions")
-    args = parser.parse_args()
-
-    from pySDC.helpers.fieldsIO import writeFields_MPI, compareFields_MPI
-
-    u0 = writeFields_MPI(**args.__dict__)
-    compareFields_MPI(args.fileName, u0, args.nSteps)

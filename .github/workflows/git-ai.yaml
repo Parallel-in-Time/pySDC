@@ -1,0 +1,32 @@
+name: Git AI
+
+# Attribution notes survive every local git operation on their own, and travel to the
+# remote when a branch is pushed. Only a server-side rewrite loses them, so this runs at
+# merge, where "Squash and merge" and "Rebase and merge" rewrite history.
+# `git ai ci github install` also adds a `synchronize` trigger, for PR heads that GitHub
+# rebases server-side. That needs the "Update branch" button, which is disabled on this
+# repository, so it would no-op on every push. Restore it if that setting ever changes.
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  git-ai:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Install git-ai
+        run: |
+          curl -fsSL https://usegitai.com/install.sh | bash
+          echo "$HOME/.git-ai/bin" >> $GITHUB_PATH
+      - name: Run git-ai
+        id: run-git-ai
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git-ai ci github run

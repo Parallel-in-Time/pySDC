@@ -1,7 +1,4 @@
 import pytest
-import subprocess
-import os
-import warnings
 
 
 @pytest.mark.mpi4py
@@ -22,34 +19,16 @@ def test_visualize_radii():
 
 @pytest.mark.slow
 @pytest.mark.mpi4py
+@pytest.mark.parallel([2, 4])
 def test_main_parallel():
-    # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
-    try:
-        import mpi4py
+    """
+    The benchmark has to run on several ranks in space.
 
-        del mpi4py
-    except ImportError:
-        raise ImportError('petsc tests need mpi4py')
+    This used to launch two `mpirun`s and only warn on whatever they wrote to stderr -- its one
+    assertion was commented out -- so it could not fail. Running the script here means an exception
+    in it fails the test.
+    """
+    from mpi4py import MPI
+    from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_benchmark import run_simulation
 
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    nprocs = 2
-    cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); export HWLOC_HIDE_ERRORS=2; mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
-    p.wait()
-    output, err = p.communicate()
-    print(output)
-    if err:
-        warnings.warn(err)
-    # assert err == '', err
-
-    nprocs = 4
-    cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); export HWLOC_HIDE_ERRORS=2; mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
-    p.wait()
-    output, err = p.communicate()
-    print(output)
-    if err:
-        warnings.warn(err)
+    run_simulation(name='AC-bench-noforce', nprocs_space=MPI.COMM_WORLD.size)

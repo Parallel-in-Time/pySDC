@@ -6,6 +6,25 @@ from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
 
 
+def _unit_grid(nvars, periodic):
+    """
+    Grid of one spatial dimension, scaled to a domain of length one.
+
+    The interpolation weights depend only on ratios of distances, so building the grids on the unit
+    domain instead of on the problem's own ``dx`` gives the same operator for any domain length.
+    For periodic grids it is also what makes the operator correct at all: the helpers in
+    ``transfer_helper`` hardcode a period of one.
+
+    Args:
+        nvars (int): number of degrees of freedom in this dimension
+        periodic (bool): whether this dimension is periodic
+
+    Returns:
+        np.ndarray: the grid, within [0, 1)
+    """
+    return np.arange(nvars) / nvars if periodic else (np.arange(nvars) + 1) / (nvars + 1)
+
+
 class mesh_to_mesh(SpaceTransfer):
     """
     Custom base_transfer class, implements Transfer.py
@@ -56,12 +75,8 @@ class mesh_to_mesh(SpaceTransfer):
                 self.Pspace = sp.eye(self.fine_prob.nvars)
             # assemble restriction as transpose of interpolation
             else:
-                if not self.params.periodic:
-                    fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(self.fine_prob.nvars)])
-                    coarse_grid = np.array([(i + 1) * self.coarse_prob.dx for i in range(self.coarse_prob.nvars)])
-                else:
-                    fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.nvars)])
-                    coarse_grid = np.array([i * self.coarse_prob.dx for i in range(self.coarse_prob.nvars)])
+                fine_grid = _unit_grid(self.fine_prob.nvars, self.params.periodic)
+                coarse_grid = _unit_grid(self.coarse_prob.nvars, self.params.periodic)
 
                 self.Pspace = th.interpolation_matrix_1d(
                     fine_grid,
@@ -101,14 +116,8 @@ class mesh_to_mesh(SpaceTransfer):
                     Pspace.append(sp.eye(self.fine_prob.nvars[i]))
                 # assemble restriction as transpose of interpolation
                 else:
-                    if not self.params.periodic:
-                        fine_grid = np.array([(j + 1) * self.fine_prob.dx for j in range(self.fine_prob.nvars[i])])
-                        coarse_grid = np.array(
-                            [(j + 1) * self.coarse_prob.dx for j in range(self.coarse_prob.nvars[i])]
-                        )
-                    else:
-                        fine_grid = np.array([j * self.fine_prob.dx for j in range(self.fine_prob.nvars[i])])
-                        coarse_grid = np.array([j * self.coarse_prob.dx for j in range(self.coarse_prob.nvars[i])])
+                    fine_grid = _unit_grid(self.fine_prob.nvars[i], self.params.periodic)
+                    coarse_grid = _unit_grid(self.coarse_prob.nvars[i], self.params.periodic)
 
                     Pspace.append(
                         th.interpolation_matrix_1d(
@@ -145,6 +154,14 @@ class mesh_to_mesh(SpaceTransfer):
             self.Rspace = Rspace[0]
             for i in range(1, len(Rspace)):
                 self.Rspace = sp.kron(self.Rspace, Rspace[i], format='csc')
+
+        # Carry the operators at the precision of what they produce, rather than always at float64.
+        # A float64 operator applied to a reduced-precision vector upcasts, so the transfer would do
+        # its work in double and only round on the way into the destination, which is the one place
+        # a reduced-precision level would silently keep paying full freight. `promote_types` with
+        # float32 keeps it legal for SciPy, which has no half-precision sparse matrix.
+        self.Rspace = self.Rspace.astype(np.promote_types(self.coarse_prob.init[-1], np.float32))
+        self.Pspace = self.Pspace.astype(np.promote_types(self.fine_prob.init[-1], np.float32))
 
     def restrict(self, F):
         """

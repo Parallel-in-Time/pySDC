@@ -6,3 +6,7 @@ channels:
 dependencies:
   - black
   - ruff
+  - pip
+  - pip:
+      # aidecl is not on PyPI and upstream has no tags, so pin the commit
+      - git+https://github.com/ai-declaration/cli.git@8c3eb30170b459e2e19a87f821f299de55dadfda

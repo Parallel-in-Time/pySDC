@@ -133,6 +133,7 @@ _SETUPS = {
         # savings, and this example has none to buy. Its base order is 2 anyway, so the CG4
         # rung would need a negative refinement.
         'order_study': (),
+        'pays_off': False,
         # 8 steps used to report convergence and return an O(1) wrong answer here. That was the
         # point sampling: with it the error against serial is 1.21e+00 at 22 iterations, with the
         # L2 projection 3.9e-08 at 11.25.
@@ -167,6 +168,13 @@ def get_coarsenings(example):
     if example not in _SETUPS:
         raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
     return _SETUPS[example].get('coarsenings', COARSENINGS)
+
+
+def pays_off(example):
+    """Whether the coarse level is expected to cost less than it saves on this example."""
+    if example not in _SETUPS:
+        raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
+    return _SETUPS[example].get('pays_off', True)
 
 
 def get_order_study(example):

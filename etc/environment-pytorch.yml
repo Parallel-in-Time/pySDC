@@ -10,8 +10,9 @@ dependencies:
   - pytorch
   - matplotlib>=3.0
   - dill
-  - mpich
+  - openmpi
   - mpi4py>=3.0.0
   - pip
   - pip:
     - qmat>=0.1.8
+    - mpi-pytest>=2026.0

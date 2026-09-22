@@ -5,7 +5,7 @@ from pySDC.implementations.problem_classes.generic_spectral import GenericSpectr
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.core.convergence_controller import ConvergenceController
 from pySDC.core.hooks import Hooks
-from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
+from pySDC.core.check_convergence import CheckConvergence
 from pySDC.core.problem import WorkCounter
 
 

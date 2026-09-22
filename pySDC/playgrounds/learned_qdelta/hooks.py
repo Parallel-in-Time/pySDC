@@ -1,4 +1,4 @@
-from pySDC.implementations.hooks.default_hook import DefaultHooks
+from pySDC.core.default_hook import DefaultHooks
 
 
 class LearnedQDeltaHook(DefaultHooks):

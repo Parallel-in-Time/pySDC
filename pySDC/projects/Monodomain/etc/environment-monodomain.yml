@@ -20,9 +20,10 @@ dependencies:
   - numdifftools>=0.9.41
   - pybind11
   - mpi4py
-  - mpich
+  - openmpi
   - tqdm
   - pymp-pypi
   - pip
   - pip:
     - qmat>=0.1.8
+    - mpi-pytest>=2026.0

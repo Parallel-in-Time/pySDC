@@ -1,8 +1,8 @@
 import numpy as np
-from mpi4py_fft import PFFT
+from pySDC.helpers.fft_helper import PFFT
 
 from pySDC.core.errors import ProblemError
-from pySDC.core.problem import Problem
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 from mpi4py_fft import newDistArray
@@ -10,7 +10,8 @@ from mpi4py_fft import newDistArray
 
 class allencahn_temp_imex(Problem):
     r"""
-    This class implements the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
+    This class implements the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
         \frac{\partial u}{\partial t} = D \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
@@ -20,7 +21,8 @@ class allencahn_temp_imex(Problem):
     :math:`T_M` are fixed parameters. Different initial conditions can be used, for example, circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right),
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
     *semi-implicitly*, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand
@@ -126,7 +128,7 @@ class allencahn_temp_imex(Problem):
         X = list(np.ogrid[self.fft.local_slice(False)])
         N = self.fft.global_shape()
         for i in range(len(N)):
-            X[i] = X[i] * L[i] / N[i]
+            X[i] = X[i] * L[i] / N[i] - L[i] / 2.0
         self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
 
         # get local wavenumbers and Laplace operator
@@ -146,6 +148,8 @@ class allencahn_temp_imex(Problem):
         # Need this for diagnostics
         self.dx = self.L / nvars[0]
         self.dy = self.L / nvars[1]
+
+        self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, t):
         """
@@ -196,6 +200,7 @@ class allencahn_temp_imex(Problem):
             f.impl[..., 1] = self.fft.backward(lap_u_hat, f.impl[..., 1])
             f.expl[..., 1] = f.impl[..., 0] + f.expl[..., 0]
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -252,7 +257,7 @@ class allencahn_temp_imex(Problem):
 
         def circle():
             tmp_me = newDistArray(self.fft, self.spectral)
-            r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
+            r2 = self.X[0] ** 2 + self.X[1] ** 2
             if self.spectral:
                 tmp = 0.5 * (1.0 + np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps)))
                 tmp_me[:] = self.fft.forward(tmp)
@@ -275,7 +280,7 @@ class allencahn_temp_imex(Problem):
                 for i in range(0, L):
                     for j in range(0, L):
                         # build radius
-                        r2 = (self.X[0] + i - L + 0.5) ** 2 + (self.X[1] + j - L + 0.5) ** 2
+                        r2 = (self.X[0] + i - L / 2 + 0.5) ** 2 + (self.X[1] + j - L / 2 + 0.5) ** 2
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
                         tmp += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.eps)) + 1
             # normalize to [0,1]

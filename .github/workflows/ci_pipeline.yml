@@ -2,22 +2,47 @@
 
 name: CI pipeline for pySDC
 
+# A bare `push:` trigger fires alongside `pull_request` for the same commit,
+# creating two runs of the ~42-job matrix. The `concurrency` group below
+# cancels the loser, but only after all its jobs have been dispatched - you
+# still see ~84 job entries. Restricting `push` to the branches that have no
+# PR of their own stops the duplicate from ever being created. Feature
+# branches get CI from `pull_request`; open a (draft) PR to run them.
 on:
   push:
+    branches:
+      - master
+      - 'v*'
   pull_request:
   schedule:
     - cron: '1 5 * * 1'
 
-# Pushing to a branch with an open PR fires both `push` and `pull_request`
-# for the same commit, doubling the ~80-job matrix. Cancel the older,
-# now-stale run instead of letting both run to completion. `head_ref` is
-# only set on pull_request events (the PR's source branch); `ref_name` is
-# the plain branch name on push events (unlike `ref`, which carries a
-# `refs/heads/` prefix that would never match `head_ref`) - so both events
-# for the same branch land in the same group.
+# Successive pushes to an open PR supersede each other; cancel the stale run
+# rather than letting both finish. `head_ref` is only set on pull_request
+# events (the PR's source branch); `ref_name` is the plain branch name on
+# push events (unlike `ref`, which carries a `refs/heads/` prefix that would
+# never match `head_ref`).
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
+
+env:
+  # Keep this: it is what proved the exit-143 deaths are silent. With stdout
+  # unbuffered there is still not one byte between "collecting ..." and the
+  # SIGTERM, so nothing inside the process is reporting an error - see the
+  # environment files for what the actual fix was.
+  PYTHONUNBUFFERED: 1
+  # OpenMPI refuses to oversubscribe by default, and PRRTE counts a "slot"
+  # as a physical core - so on a 4-vCPU runner (2 cores + hyperthreading)
+  # even `mpirun -np 3` fails with "not enough slots available". Several
+  # tests ask for 3 or 4 ranks and Monodomain's asks for 24. MPICH
+  # oversubscribed silently, which is why this only appeared after the swap.
+  PRTE_MCA_rmaps_default_mapping_policy: ':oversubscribe'
+  # ...and the OpenMPI 4 spelling of the same thing, which PRRTE superseded. The conda envs resolve
+  # OpenMPI 5 and need the variable above; the Firedrake container ships OpenMPI 4 and needs this
+  # one, which is why `mpiexec -n 3` there failed with "not enough slots available" while the same
+  # command worked everywhere else. Each version ignores the other's variable.
+  OMPI_MCA_rmaps_base_oversubscribe: 'true'
 
 jobs:
 
@@ -43,6 +68,9 @@ jobs:
       - name: Linting with ruff
         run: |
           ruff check pySDC
+      - name: Validating the AI declaration with aidecl
+        run: |
+          aidecl --strict validate --output-format github-actions aidecl.yaml
 
   user_cpu_tests_linux:
     runs-on: ubuntu-latest
@@ -52,6 +80,14 @@ jobs:
       matrix:
         env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
         python: ['3.10', '3.11', '3.12', '3.13']
+        numpy: ['', '=1']
+        # pySDC supports both NumPy majors, so every backend is run against both. NumPy 1 gets one
+        # python rather than four: 1.26 is the last 1.x release, it does not support 3.13 at all,
+        # and 3.12 is the newest python all five backends still have NumPy 1 builds for.
+        exclude:
+          - {numpy: '=1', python: '3.10'}
+          - {numpy: '=1', python: '3.11'}
+          - {numpy: '=1', python: '3.13'}
     defaults:
       run:
         shell: bash -l {0}
@@ -64,18 +100,28 @@ jobs:
           environment-file: "etc/environment-${{ matrix.env }}.yml"
           create-args: >-
               python=${{ matrix.python }}
+              numpy${{ matrix.numpy }}
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
       - name: Install pySDC as a package in the current environment
         run: |
           pip install --no-deps -e .
+      # A smoke test only: `cupy` is swapped for `numpy`, so this checks that the `useGPU` code
+      # paths are wired up and import, NOT that they work on a GPU. See pySDC/tests/fake_cupy.py.
+      # Deliberately left out of the coverage report, so it cannot claim GPU code is covered.
+      - name: Run the GPU code paths against the CuPy stub
+        if: matrix.env == 'mpi4py'
+        env:
+          PYSDC_FAKE_GPU: '1'
+        run: |
+          pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+          bash etc/run_mpi_tests.sh pySDC/tests "${{ matrix.env }}"
       - name: Make coverage report
         run: |
           coverage combine
@@ -100,6 +146,7 @@ jobs:
           - AsympConv
           - DAE
           - FastWaveSlowWave
+          - GPU
           - Hamiltonian
           - matrixPFASST
           - parallelSDC
@@ -114,6 +161,10 @@ jobs:
           - TOMS
           - StroemungsRaum
           - FEniCS_MLSDC
+        numpy: ['', '=1']
+        # Both NumPy majors here too. No python axis to exclude against: every project environment
+        # allows the whole 3.10-3.13 range, so `numpy=1` simply resolves the newest python that has
+        # NumPy 1 builds for that project's backends.
     defaults:
       run:
         shell: bash -l {0}
@@ -124,6 +175,8 @@ jobs:
         uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: "pySDC/projects/${{ matrix.env }}/environment.yml"
+          create-args: >-
+              numpy${{ matrix.numpy }}
       - name: Install additional packages as needed
         run: |
           micromamba install -y --file etc/environment-tests.yml --freeze-installed
@@ -132,7 +185,18 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests
+          # `not cupy`: these runners have no GPU. The GPU project's cupy-marked tests are run
+          # against the NumPy stub in the step below instead; no other project has such a test.
+          bash etc/run_mpi_tests.sh pySDC/projects/${{ matrix.env }}/tests "not cupy"
+      - name: Run the GPU code paths against the CuPy stub
+        if: matrix.env == 'GPU'
+        env:
+          PYSDC_FAKE_GPU: '1'
+        # A smoke test only, exactly as for pySDC/tests: `cupy` is swapped for `numpy`, so this
+        # checks the `useGPU` paths are wired up and import, NOT that they work on a GPU.
+        # Deliberately outside the coverage run, so it cannot claim GPU code is covered.
+        run: |
+          pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/GPU/tests -m cupy
       - name: Make coverage report
         run: |
           coverage combine
@@ -160,12 +224,14 @@ jobs:
       - name: Install pySDC and pytest
         run: |
           source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
+          # the compression tests are collected through mpi-pytest's `parallel` marker
+          pip install "mpi-pytest>=2026.0"
       - name: Run pytest
         run: |
           source /opt/spack/share/spack/setup-env.sh
           spack load libpressio
            
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/compression/tests -m libpressio
+          bash etc/run_mpi_tests.sh pySDC/projects/compression/tests libpressio
       - name: Make coverage report
         run: |
           source /opt/spack/share/spack/setup-env.sh
@@ -217,6 +283,9 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           pip install -e /repositories/pySDC
+          # The Firedrake image ships mpi-pytest for its own suite, but don't depend on that:
+          # the MPI tests here are collected through its `parallel` marker.
+          pip install "mpi-pytest>=2026.0"
           # test installation
           python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto
@@ -229,13 +298,20 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           firedrake-clean
-          cd ./pySDC
-          python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
+          # `cd /repositories/pySDC`, not `./pySDC`: the container mounts the workspace at
+          # /repositories, so those are the same directory reached by two different paths. pySDC is
+          # installed editable from /repositories/pySDC, so that is the prefix its modules report,
+          # and `source = ['pySDC']` only matches when the working directory agrees -- sitting in
+          # ./pySDC is why this job has always measured nothing. `..` is the workspace either way,
+          # so the moves in the next step are unaffected.
+          cd /repositories/pySDC
+          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0" \
+            bash etc/run_mpi_tests.sh /repositories/pySDC/pySDC/tests firedrake
         timeout-minutes: 45
       - name: Make coverage report
         run: |
 
-          cd ./pySDC
+          cd /repositories/pySDC
           mv data ../data_firedrake
           coverage combine
           mv .coverage ../coverage_firedrake.dat
@@ -274,7 +350,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/Monodomain/tests -m monodomain
+          bash etc/run_mpi_tests.sh pySDC/projects/Monodomain/tests monodomain
       - name: Make coverage report
         run: |
           mv data data_monodomain
@@ -287,6 +363,52 @@ jobs:
           path: |
             data_monodomain
             coverage_monodomain.dat
+
+  docs:
+    runs-on: ubuntu-latest
+    # The website itself is built and deployed by the postprocess workflow,
+    # from master only. This job runs the same build on every PR so that a
+    # change which breaks the docs fails here, on the PR that caused it,
+    # rather than silently on master at deploy time.
+    #
+    # It has to wait for the test jobs: several project READMEs embed plots
+    # that the tests themselves write into `data/` (which is gitignored), so
+    # the "image file not readable" check is meaningless on a bare checkout -
+    # every one of those images would be missing.
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: "etc/environment-postprocess.yml"
+      - name: Download the plots the tests produced
+        uses: actions/download-artifact@v8
+        with:
+          path: .
+          pattern: test-artifacts-*
+          merge-multiple: true
+      - name: Build the docs
+        # `pipefail` matters here: without it `tee` supplies the exit code and
+        # a failing sphinx-build would pass silently.
+        run: |
+          set -o pipefail
+          chmod u+x ./docs/update_apidocs.sh
+          ./docs/update_apidocs.sh
+          sphinx-build -b html docs/source docs/build/html 2>&1 | tee sphinx_build.log
+          # pySDC/tests/README.rst links the coverage badge, which genbadge
+          # writes in the postprocess workflow just before it builds the site.
+          # It is legitimately absent here, so it is not a broken link.
+          images_not_found=$(grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg" | wc -l)
+          if [ $images_not_found != "0" ] ; then
+            echo "Some linked images were not found:"
+            grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg"
+            exit 1
+          fi
 
   coverage_comment_on_pr:
     runs-on: ubuntu-latest

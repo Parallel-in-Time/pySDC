@@ -41,7 +41,7 @@ class WorkCounter(object):
 
 
 class Problem(RegisterParams):
-    """
+    r"""
     Prototype class for problems, just defines the attributes essential to get started.
 
     Parameters
@@ -57,6 +57,36 @@ class Problem(RegisterParams):
     ----------
     logger: logging.Logger
         custom logger for problem-related logging.
+
+    Notes
+    -----
+    Two **optional** methods are recognised by the deferred-correction ("delta-form") sweepers in
+    :mod:`pySDC.implementations.sweeper_classes.delta_form`. Neither is required: a problem that
+    defines neither still works, and the sweeper falls back to a route that is always correct. They
+    exist because both fallbacks read quantities of size :math:`|u|` or :math:`|f|`, which is
+    harmless at backend precision and is what binds first below it.
+
+    ``solve_system_delta(rhs, factor, base, f_base, t)``
+        Solve :math:`\delta - factor\,[f(base+\delta) - f(base)] = rhs` and return the correction
+        :math:`\delta`. Needed only for a **nonlinear** implicit operator; for a linear or affine one
+        the sweeper reaches the same equation through the stock :meth:`solve_system`. The unknown
+        must be the correction, and the increment must be expanded analytically rather than formed as
+        a difference of two :math:`\mathcal{O}(|f|)` quantities.
+
+        Without it the sweeper substitutes :math:`y = u^k_m + \delta_m` and uses
+        :meth:`solve_system`. That is exact, but the solver then sees an :math:`\mathcal{O}(1)`
+        unknown.
+
+    ``eval_f_increment(base, delta, t)``
+        Return :math:`f(base+\delta) - f(base)` with the same splitting as :meth:`eval_f`, expanded
+        so that every term carries an explicit factor :math:`\delta`.
+
+        Without it the sweeper subtracts two stored right-hand sides. That cancellation carries the
+        operator norm: on the FEniCS heat equation, where :math:`|M^{-1}Ku|` is of order
+        :math:`10^5`, it is already 7.7e-11 off in double precision.
+
+    Both fallbacks are correct and neither fails loudly, which is the reason to document them here
+    rather than to leave them to be discovered.
     """
 
     logger: logging.Logger = logging.getLogger('problem')

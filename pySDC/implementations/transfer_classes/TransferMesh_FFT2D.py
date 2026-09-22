@@ -1,8 +1,7 @@
-import numpy as np
+from scipy.signal import resample
 
 from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
-from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class mesh_to_mesh_fft2d(SpaceTransfer):
@@ -12,8 +11,7 @@ class mesh_to_mesh_fft2d(SpaceTransfer):
     This implementation can restrict and prolong between 2d meshes with FFT for periodic boundaries
 
     Attributes:
-        Rspace: spatial restriction matrix, dim. Nf x Nc
-        Pspace: spatial prolongation matrix, dim. Nc x Nf
+        ratio: refinement factor between the two meshes
     """
 
     def __init__(self, fine_prob, coarse_prob, params):
@@ -28,7 +26,6 @@ class mesh_to_mesh_fft2d(SpaceTransfer):
         # invoke super initialization
         super(mesh_to_mesh_fft2d, self).__init__(fine_prob, coarse_prob, params)
 
-        # TODO: cleanup and move to real-valued FFT
         assert len(self.fine_prob.nvars) == 2
         assert len(self.coarse_prob.nvars) == 2
         assert self.fine_prob.nvars[0] == self.fine_prob.nvars[1]
@@ -43,13 +40,18 @@ class mesh_to_mesh_fft2d(SpaceTransfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, mesh):
-            G = mesh(self.coarse_prob.init, val=0.0)
-            G[:] = F[:: self.ratio, :: self.ratio]
-        elif isinstance(F, imex_mesh):
-            G = imex_mesh(self.coarse_prob.init, val=0.0)
-            G.impl[:] = F.impl[:: self.ratio, :: self.ratio]
-            G.expl[:] = F.expl[:: self.ratio, :: self.ratio]
+        G = type(F)(self.coarse_prob.init, val=0.0)
+
+        def _restrict(fine, coarse):
+            coarse[:] = fine[:: self.ratio, :: self.ratio]
+
+        # note that a `MultiComponentMesh` is also an instance of `mesh`, so ask for the components
+        # rather than for the type
+        if hasattr(type(F), 'components'):
+            for comp in F.components:
+                _restrict(F.__getattr__(comp), G.__getattr__(comp))
+        elif type(F).__name__ == 'mesh':
+            _restrict(F, G)
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
         return G
@@ -61,38 +63,19 @@ class mesh_to_mesh_fft2d(SpaceTransfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, mesh):
-            F = mesh(self.fine_prob.init)
-            tmpG = np.fft.fft2(G)
-            tmpF = np.zeros(self.fine_prob.init[0], dtype=np.complex128)
-            halfG = int(self.coarse_prob.init[0][0] / 2)
-            tmpF[0:halfG, 0:halfG] = tmpG[0:halfG, 0:halfG]
-            tmpF[self.fine_prob.init[0][0] - halfG :, 0:halfG] = tmpG[halfG:, 0:halfG]
-            tmpF[0:halfG, self.fine_prob.init[0][0] - halfG :] = tmpG[0:halfG, halfG:]
-            tmpF[self.fine_prob.init[0][0] - halfG :, self.fine_prob.init[0][0] - halfG :] = tmpG[halfG:, halfG:]
-            F[:] = np.real(np.fft.ifft2(tmpF)) * self.ratio * 2
-        elif isinstance(G, imex_mesh):
-            F = imex_mesh(G)
-            tmpG_impl = np.fft.fft2(G.impl)
-            tmpF_impl = np.zeros(self.fine_prob.init, dtype=np.complex128)
-            halfG = int(self.coarse_prob.init[0][0] / 2)
-            tmpF_impl[0:halfG, 0:halfG] = tmpG_impl[0:halfG, 0:halfG]
-            tmpF_impl[self.fine_prob.init[0][0] - halfG :, 0:halfG] = tmpG_impl[halfG:, 0:halfG]
-            tmpF_impl[0:halfG, self.fine_prob.init[0][0] - halfG :] = tmpG_impl[0:halfG, halfG:]
-            tmpF_impl[self.fine_prob.init[0][0] - halfG :, self.fine_prob.init[0][0] - halfG :] = tmpG_impl[
-                halfG:, halfG:
-            ]
-            F.impl[:] = np.real(np.fft.ifft2(tmpF_impl)) * self.ratio * 2
-            tmpG_expl = np.fft.fft2(G.expl) / (self.coarse_prob.init[0] * self.coarse_prob.init[1])
-            tmpF_expl = np.zeros(self.fine_prob.init[0], dtype=np.complex128)
-            halfG = int(self.coarse_prob.init[0][0] / 2)
-            tmpF_expl[0:halfG, 0:halfG] = tmpG_expl[0:halfG, 0:halfG]
-            tmpF_expl[self.fine_prob.init[0][0] - halfG :, 0:halfG] = tmpG_expl[halfG:, 0:halfG]
-            tmpF_expl[0:halfG, self.fine_prob.init[0][0] - halfG :] = tmpG_expl[0:halfG, halfG:]
-            tmpF_expl[self.fine_prob.init[0][0] - halfG :, self.fine_prob.init[0][0] - halfG :] = tmpG_expl[
-                halfG:, halfG:
-            ]
-            F.expl[:] = np.real(np.fft.ifft2(tmpF_expl)) * self.ratio * 2
+        F = type(G)(self.fine_prob.init, val=0.0)
+
+        def _prolong(coarse, fine):
+            # Fourier interpolation along both axes. `resample` also gets the normalisation and the
+            # splitting of the Nyquist mode right, which hand-rolled zero padding of the spectrum
+            # only did for a refinement factor of two.
+            fine[:] = resample(resample(coarse, fine.shape[0], axis=0), fine.shape[1], axis=1)
+
+        if hasattr(type(G), 'components'):
+            for comp in G.components:
+                _prolong(G.__getattr__(comp), F.__getattr__(comp))
+        elif type(G).__name__ == 'mesh':
+            _prolong(G, F)
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         return F

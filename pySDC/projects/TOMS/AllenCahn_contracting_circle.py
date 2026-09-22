@@ -18,7 +18,7 @@ from pySDC.implementations.problem_classes.AllenCahn_2D_FD import (
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
-from pySDC.projects.TOMS.AllenCahn_monitor import monitor
+from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
@@ -52,7 +52,6 @@ def setup_parameters():
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 2
     problem_params['nvars'] = [(128, 128)]
     problem_params['eps'] = [0.04]
     problem_params['newton_maxiter'] = 100
@@ -68,7 +67,7 @@ def setup_parameters():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = monitor
+    controller_params['hook_class'] = AllenCahnMonitor
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -162,10 +161,12 @@ def run_SDC_variant(variant=None, inexact=False):
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
-    print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
+    newton_iters = P.work_counters['newton'].niter
+    lin_iters = P.work_counters['linear'].niter
+    print('   Iteration count (nonlinear/linear): %i / %i' % (newton_iters, lin_iters))
     print(
         '   Mean Iteration count per call: %4.2f / %4.2f'
-        % (P.newton_itercount / max(P.newton_ncalls, 1), P.lin_itercount / max(P.lin_ncalls, 1))
+        % (newton_iters / max(P.newton_ncalls, 1), lin_iters / max(P.lin_ncalls, 1))
     )
 
     timing = get_sorted(stats, type='timing_run', sortby='time')

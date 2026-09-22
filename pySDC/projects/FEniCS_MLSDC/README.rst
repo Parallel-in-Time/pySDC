@@ -69,16 +69,17 @@ fine-level dof counts, with only the element order changed:
 =============  =============  =============  =============
 example        CG1            CG2            CG4
 =============  =============  =============  =============
-``heat``       0.92x / 1.05x  1.22x / 1.05x  1.22x / 1.57x
-``burgers``    0.89x / 0.76x  0.94x / 0.81x  1.26x / 1.94x
-``grayscott``  0.87x / 0.74x  0.87x / 0.74x  1.24x / 1.24x
+``heat``       0.93x / 1.05x  1.24x / 1.05x  1.24x / 1.57x
+``burgers``    0.87x / 0.73x  0.89x / 0.75x  1.26x / 2.00x
+``grayscott``  0.83x / 0.70x  0.84x / 0.71x  1.16x / 1.14x
 =============  =============  =============  =============
 
 (speed-up at 2 / 3 levels; below 1.00x means MLSDC costs more than SDC)
 
-At CG1 every example *loses*. The coarse level exists to approximate the smooth part of the error,
-and for smooth solutions a high-order space on a coarser mesh does that far better than a low-order
-space on a finer one at the same cost.
+At CG1 nothing pays: every example loses on two levels, and only ``heat`` scrapes past 1.00x on
+three. The coarse level exists to approximate the smooth part of the error, and for smooth solutions
+a high-order space on a coarser mesh does that far better than a low-order space on a finer one at
+the same cost.
 
 This is the finite-element form of a result already known for finite differences, where MLSDC needs
 high-order *interpolation* -- orders 4 to 6, with restriction left at order 2 (see ``tutorial/step_4``).
@@ -99,17 +100,18 @@ means 5/3/2 dofs per cell, so p-coarsening is charged more there as well.)
 config          SDC (work)  MLSDC 2 levels  MLSDC 3 levels
 ==============  ==========  ==============  ==============
 heat CG h       5.75        4.62 (1.24x)    3.66 (1.57x)
-heat DG h       5.75        4.62 (1.24x)    3.66 (1.57x)
 heat CG p       5.75        4.62 (1.24x)    5.49 (1.05x)
+heat DG h       5.75        4.62 (1.24x)    3.66 (1.57x)
 heat DG p       5.75        4.92 (1.17x)    6.24 (0.92x)
 burgers CG h    4.12        3.27 (1.26x)    2.06 (2.00x)
-burgers DG h    4.12        3.27 (1.26x)    2.06 (2.00x)
 burgers CG p    4.12        4.62 (0.89x)    5.49 (0.75x)
+burgers DG h    4.12        3.27 (1.26x)    2.06 (2.00x)
 burgers DG p    4.12        4.92 (0.84x)    6.24 (0.66x)
 grayscott CG h  6.50        5.58 (1.16x)    5.72 (1.14x)
-grayscott DG h  6.50        5.58 (1.16x)    5.72 (1.14x)
 grayscott CG p  6.50        7.70 (0.84x)    9.16 (0.71x)
+grayscott DG h  6.50        5.58 (1.16x)    5.72 (1.14x)
 grayscott DG p  6.50        8.20 (0.79x)    10.40 (0.62x)
+vortex CG h     5.75        7.90 (0.73x)    8.53 (0.67x)
 ==============  ==========  ==============  ==============
 
 (work = iterations x [summed dof ratio + the solution restrictions], so every level is charged
@@ -165,23 +167,24 @@ on Gray-Scott. Expect less from a multilevel hierarchy the more nonlinear the pr
 to the tolerance of the example:
 
 ==============  ======  ====  ====  =====
-config          1 step  2     4     8
+config          1 step  2      4     8
 ==============  ======  ====  ====  =====
 heat CG h       3.00    3.38  3.88  4.62
-heat DG h       3.00    3.38  3.88  4.62
 heat CG p       3.00    3.50  4.00  4.75
+heat DG h       3.00    3.38  3.88  4.62
 heat DG p       3.00    3.50  4.00  4.75
 burgers CG h    2.12    2.62  3.25  4.12
-burgers DG h    2.12    2.62  3.25  4.12
 burgers CG p    3.00    3.00  3.38  4.12
+burgers DG h    2.12    2.62  3.25  4.12
 burgers DG p    3.00    3.00  3.38  4.12
-grayscott CG h  3.62    3.88  4.50  6.00
-grayscott DG h  3.62    4.00  4.75  6.75
-grayscott CG p  5.00    5.62  6.88  9.25
-grayscott DG p  5.00    6.00  8.12  12.12
+grayscott CG h  3.62    3.75  4.50  5.38
+grayscott CG p  5.00    5.12  5.38  5.88
+grayscott DG h  3.62    3.75  4.50  5.38
+grayscott DG p  5.00    5.12  5.38  5.75
+vortex CG h     6.12    6.75  8.38  11.25
 ==============  ======  ====  ====  =====
 
-Growth out to 8 parallel steps is GROWTH_RANGE, which is what PFASST is supposed to do.
+Growth out to 8 parallel steps is 1.1-1.9x, which is what PFASST is supposed to do.
 
 PFASST is the direction that is sensitive to the solution restriction: ``base_transfer_mass``
 restricts ``u`` by L2 projection rather than by sampling, which the MLSDC table above cannot tell
