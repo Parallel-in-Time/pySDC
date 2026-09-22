@@ -32,6 +32,8 @@ class fft_to_fft(SpaceTransfer):
         Nf = list(self.fine_prob.fft.global_shape())
         Nc = list(self.coarse_prob.fft.global_shape())
         self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc, strict=True)]
+        # slice for injection, one entry per dimension rather than hardcoded for 2d
+        self.injection = tuple(slice(None, None, r) for r in self.ratio)
         axes = tuple(range(len(Nf)))
 
         fft_args = {}
@@ -66,21 +68,21 @@ class fft_to_fft(SpaceTransfer):
                         if fine.shape[-1] == self.fine_prob.ncomp:
                             tmpF = newDistArray(self.fine_prob.fft, False)
                             tmpF = self.fine_prob.fft.backward(fine[..., i], tmpF)
-                            tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                            tmpG = tmpF[self.injection]
                             coarse[..., i] = self.coarse_prob.fft.forward(tmpG, coarse[..., i])
                         elif fine.shape[0] == self.fine_prob.ncomp:
                             tmpF = newDistArray(self.fine_prob.fft, False)
                             tmpF = self.fine_prob.fft.backward(fine[i, ...], tmpF)
-                            tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                            tmpG = tmpF[self.injection]
                             coarse[i, ...] = self.coarse_prob.fft.forward(tmpG, coarse[i, ...])
                         else:
                             raise TransferError('Don\'t know how to restrict for this problem with multiple components')
                 else:
                     tmpF = self.fine_prob.fft.backward(fine)
-                    tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                    tmpG = tmpF[self.injection]
                     coarse[:] = self.coarse_prob.fft.forward(tmpG, coarse)
             else:
-                coarse[:] = fine[:: int(self.ratio[0]), :: int(self.ratio[1])]
+                coarse[:] = fine[self.injection]
 
         if hasattr(type(F), 'components'):
             for comp in F.components:
