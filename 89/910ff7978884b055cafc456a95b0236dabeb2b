@@ -1,0 +1,32 @@
+pySDC/implementations/transfer_classes/TransferMesh_FFT.py
+  s_6af776c1c538c7::t_a186e414a68e8d 1,60-63
+pySDC/implementations/transfer_classes/TransferMesh_NoCoarse.py
+  s_6af776c1c538c7::t_a186e414a68e8d 8,18,27
+pySDC/tests/test_transfer_classes/test_transfer_order.py
+  s_6af776c1c538c7::t_a186e414a68e8d 4,12,65,94,108-127
+  s_6af776c1c538c7::t_376cca467ddbb1 128-129
+pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py
+  s_6af776c1c538c7::t_a186e414a68e8d 35-36,71,76,82,85
+pySDC/implementations/transfer_classes/TransferMesh.py
+  s_6af776c1c538c7::t_a186e414a68e8d 9-27,78-79,119-120
+pySDC/implementations/transfer_classes/TransferMesh_FFT2D.py
+  s_6af776c1c538c7::t_a186e414a68e8d 1,14,43-54,66-78
+pySDC/tests/test_transfer_classes/test_space_transfer_properties.py
+  s_6af776c1c538c7::t_90aefeb872ecda 1-191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "89910ff7978884b055cafc456a95b0236dabeb2b",
+  "prompts": {},
+  "sessions": {
+    "s_6af776c1c538c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ee2a1d-432f-49a4-ab0e-7b0ff64347a6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
