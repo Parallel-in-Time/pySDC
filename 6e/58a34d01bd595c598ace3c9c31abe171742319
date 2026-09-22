@@ -1,0 +1,37 @@
+.github/workflows/ci_pipeline.yml
+  s_6af776c1c538c7::t_f496f90973832b 163
+docs/source/index.rst
+  s_6af776c1c538c7::t_f6871f7bc9ee21 58
+docs/source/projects/FEM_with_FEniCS.rst
+  s_6af776c1c538c7::t_883372598313e3 1
+pySDC/implementations/transfer_classes/TransferFenicsMesh.py
+  s_6af776c1c538c7::t_7864c3df1f7ec6 140
+pySDC/projects/FEM_with_FEniCS/README.rst
+  s_6af776c1c538c7::t_f3fa1f0e814154 45-46
+pySDC/projects/FEM_with_FEniCS/problem_classes/DG_1D_FEniCS.py
+  s_6af776c1c538c7::t_b4d5f5bcb58881 42
+pySDC/projects/FEM_with_FEniCS/run_examples.py
+  s_6af776c1c538c7::t_89aefdac6a462d 21
+pySDC/projects/FEM_with_FEniCS/setups.py
+  s_6af776c1c538c7::t_c6f422406050bd 28-29
+pySDC/projects/FEM_with_FEniCS/tests/test_examples.py
+  s_6af776c1c538c7::t_c679c6b0b45f6b 3,24-25,53-54,84,111,131-132,151,168,237-238
+pySDC/projects/FEM_with_FEniCS/tests/test_setups.py
+  s_6af776c1c538c7::t_f40c0ccb98dafd 3,27,51,72-73,84,94,110,118,128,144,153,169,186
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6e58a34d01bd595c598ace3c9c31abe171742319",
+  "prompts": {},
+  "sessions": {
+    "s_6af776c1c538c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ee2a1d-432f-49a4-ab0e-7b0ff64347a6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
