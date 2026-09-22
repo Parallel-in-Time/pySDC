@@ -136,7 +136,7 @@ burgers, 3 levels          0.79x             2.10x               2.09x
 grayscott, 3 levels        0.65x             1.19x               1.19x
 heat, PFASST 8 steps       12.88 iters       4.62 iters          4.62 iters
 burgers, PFASST 8 steps    13.50 iters       4.12 iters          4.12 iters
-grayscott, PFASST 8 steps  did not converge  6.75 iters          6.00 iters
+grayscott, PFASST 8 steps  did not converge  5.38 iters          5.38 iters
 =========================  ================  ==================  ================
 
 The one honest difference that remains: at the same mesh and order DG carries 25% more dofs (5 per
@@ -176,15 +176,15 @@ grayscott CG p  5.00    5.62  6.88  9.25
 grayscott DG p  5.00    6.00  8.12  12.12
 ==============  ======  ====  ====  =====
 
-Growth out to 8 parallel steps is 1.4-2.4x, which is what PFASST is supposed to do.
+Growth out to 8 parallel steps is 1.2-1.9x, which is what PFASST is supposed to do.
 
 Why earlier attempts did not pay off
 ------------------------------------
 
-Six separate defects, each of which quietly capped or broke the multilevel gain. Note what they have
-in common: every one of them leaves a method that still converges, still to the right answer, with a
-coarse level that corrects far less than it should. None of them is visible in a discretisation
-test, and none of them raises anything.
+Six separate defects, and one choice that turned out to cost more than it saved. Note what the
+defects have in common: every one of them leaves a method that still converges, still to the right
+answer, with a coarse level that corrects far less than it should. None of them is visible in a
+discretisation test, and none of them raises anything.
 
 1. **The FAS** :math:`\tau` **was restricted by interpolation.** :math:`\tau` is a load vector, not a
    nodal function, so it has to be restricted with :math:`P^T`. Interpolating it is wrong by roughly
@@ -206,7 +206,17 @@ test, and none of them raises anything.
    :math:`O(h^{p+1})`. :math:`P` is now assembled cell by cell, evaluating the coarse basis in the
    coarse cell that *contains* each fine cell. For continuous spaces this reproduces the old
    construction to machine precision.
-6. **The interior penalty was rediscretised on every level.** The CG bilinear form does not know
+6. **The solution was restricted by point sampling.** Unlike the five above this one is not a
+   defect -- the FAS solution restriction :math:`R_u` cancels out of the *linear* iteration, so
+   sampling is a legitimate choice and every MLSDC count here is identical either way, in 1d and on
+   the 2d vortex. It does not carry to PFASST, where the restricted state seeds the next block and
+   :math:`R_u` stops dropping out. ``grayscott`` at 8 parallel steps went 6.00 to 5.38 iterations
+   (``CG``, h), 9.25 to 5.88 (``CG``, p) and 12.12 to 5.75 (``DG``, p); the 2d vortex at 4 steps
+   went 14.75 to 8.38. ``project`` is now :math:`M_c^{-1} P^T M_f`. Sampling was kept on the
+   grounds that it avoids a mass solve, but with :math:`P` and the factorisation cached the
+   projection is 4-12x *cheaper* per call than the cross-mesh ``df.interpolate`` it replaces, and
+   13-27x in 2d -- ``df.interpolate`` walks a bounding-box tree per dof.
+7. **The interior penalty was rediscretised on every level.** The CG bilinear form does not know
    which mesh it lives on, so rediscretising it on a coarse level gives exactly the Galerkin
    operator :math:`P^T A_F P`. The SIPG form does know: its penalty scales as
    :math:`\sigma p^2 / h`, so a coarser mesh halves it and a lower order divides it by

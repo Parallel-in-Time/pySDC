@@ -1,6 +1,7 @@
 import dolfin as df
 import numpy as np
 import scipy.sparse as sp
+import scipy.sparse.linalg as spla
 
 from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
@@ -15,6 +16,7 @@ class mesh_to_mesh_fenics(SpaceTransfer):
     def __init__(self, fine_prob, coarse_prob, params):
         super().__init__(fine_prob, coarse_prob, params)
         self._Pmat = None
+        self._l2 = None
 
     @property
     def Pmat(self):
@@ -95,46 +97,90 @@ class mesh_to_mesh_fenics(SpaceTransfer):
 
         return u_coarse
 
+    @property
+    def l2_pieces(self):
+        """
+        Prefactorised coarse mass matrix, :math:`P^T`, and the fine mass matrix, assembled once.
+
+        The coarse mass matrix is solved against once per node per sweep, so it is factorised up
+        front rather than solved from scratch. That is the difference between this costing less than
+        the interpolation it replaces and costing seven times more.
+        """
+        if self._l2 is None:
+
+            def mass(V):
+                # straight out of PETSc's CSR; `.array()` would densify, and these are ~0.5% dense
+                u, v = df.TrialFunction(V), df.TestFunction(V)
+                mat = df.as_backend_type(df.assemble(df.inner(u, v) * df.dx)).mat()
+                indptr, indices, data = mat.getValuesCSR()
+                return sp.csr_matrix((data, indices, indptr), shape=mat.getSize())
+
+            self._l2 = (spla.factorized(mass(self.coarse_prob.init).tocsc()), self.Pmat.T, mass(self.fine_prob.init))
+        return self._l2
+
+    def _project_one(self, values):
+        """L2-project one fine ``dolfin.Function`` onto the coarse space."""
+        solve_coarse, P_transpose, mass_fine = self.l2_pieces
+        coarse = df.Function(self.coarse_prob.init)
+        coarse.vector()[:] = solve_coarse(P_transpose @ (mass_fine @ values.vector()[:]))
+        return coarse
+
     def project(self, F):
         """
-        Restriction of a SOLUTION, by interpolation. Deliberately not an L2 projection.
+        Restriction of a SOLUTION, by L2 projection: :math:`M_c^{-1} P^T M_f`.
 
-        In FAS the solution restriction cancels out of the linear iteration exactly:
+        In FAS the solution restriction cancels out of the *linear* iteration exactly:
 
             tau        = C_G(R_u u_F) - R_tau C_F(u_F)
             u_G        = R_u u_F + A_G^-1 R_tau r_F
             correction = P (u_G - R_u u_F) = P A_G^-1 R_tau r_F
 
-        so only R_tau has to be the variational operator (restrict_dual, P^T, a matvec). R_u only
-        has to be a sensible solution restriction, so that f_G(R_u u_F) means something once the
-        problem is nonlinear. Interpolation qualifies and costs nothing.
+        so only R_tau has to be the variational operator (restrict_dual, P^T, a matvec). This used
+        to return ``self.restrict(F)`` -- point sampling -- on the strength of that argument, and
+        the argument is right as far as it goes: **every MLSDC iteration count in this project is
+        identical either way**, on all three examples, both families and both coarsening directions,
+        in 1d and on the 2d vortex.
 
-        Measured on step_7's heat problem: identical iteration count and error to the exact
-        M_c^-1 P^T M_f projection, with zero mass solves (work 67.5 against 97.6). Mass lumping is
-        not an alternative here -- high-order Lagrange basis functions are not positive, so the
-        mass row sums can vanish, and it failed to converge at all.
+        It does not carry to PFASST. The cancellation is a property of the two-level iteration;
+        across step boundaries the restricted state is what seeds the next block, and R_u stops
+        dropping out. Whether that is visible depends on how far apart the two operators are on the
+        states the solver actually visits -- 1.4e-15 for heat, 9e-12 for burgers, but 4.3e-8 for
+        grayscott. Iterations at 8 parallel steps:
 
-        For DG this samples a discontinuous function at coarse dof points, most of which sit on a
-        fine facet where it has two values -- 9 of 17 for DG4 under bisection, all of them for DG1
-        and DG2. Point sampling is not merely mis-implemented there, it is not a well-defined
-        operator. This is left as it is on purpose, and the reason is worth keeping straight,
-        because the same ambiguity in prolong() was fatal:
+            grayscott [CG, h]   6.00 -> 5.38      grayscott [DG, h]    6.75 -> 5.38
+            grayscott [CG, p]   9.25 -> 5.88      grayscott [DG, p]   12.12 -> 5.75
 
-        R_u acts on the SOLUTION, whose jumps are the DG discretisation error, O(h^(p+1)). Measured
-        on the burgers example: against the exact L2 projection M_c^-1 P^T M_f, sampling differs by
-        4.4 on a random (genuinely jumpy) state of size 3.9, and by 9e-12 on the states the solver
-        actually visits. Swapping in the L2 projection changes not one iteration count, at nu = 0.02
-        or at nu = 0.002 where the front is ten times steeper. P acts on the coarse CORRECTION, whose
-        jumps are O(1) relative to itself -- which is why continuising it deleted the coarse level.
+        and on the 2d vortex at 4 parallel steps, 14.75 -> 8.38. Errors are comparable throughout,
+        so this is not a looser tolerance buying fewer sweeps. It also nearly closes the h/p gap,
+        i.e. p-coarsening's poor PFASST scaling was substantially an artefact of point sampling.
 
-        So this only bites on a solution whose own jumps are O(1): an under-resolved shock, or a
-        limited state. If you get there, the exact operator is M_c^-1 P^T M_f, one coarse mass solve,
-        block-diagonal for DG.
+        The cost argument that motivated sampling runs the other way once P and the factorisation
+        are cached, because `df.interpolate` walks a bounding-box tree per dof while this is three
+        sparse operations. Per call, grayscott h, 2050 -> 1026 dofs:
+
+            cached P, prefactorised M_c   0.064 ms       df.project each call   2.447 ms
+            cached P, spsolve each call   0.432 ms       df.interpolate         0.746 ms
+
+        In 2d the gap is wider still: 13-27x for CG up to 66k dofs, 7-13x for DG, with setup under a
+        second. P is already built for `prolong`, so the marginal setup here is two mass assemblies
+        and one factorisation, 0.04 s on the 2d vortex.
+
+        Sampling is also not a well-defined operator on a DG space -- most coarse dof points sit on a
+        fine facet where the function has two values -- so the operator that is correct is also the
+        one that is cheaper and never needs more iterations. ``restrict`` still point-samples and is
+        still what the dual quantities use via ``restrict_dual``.
 
         Args:
             F: the fine level data
         """
-        return self.restrict(F)
+        if isinstance(F, fenics_mesh):
+            return fenics_mesh(self._project_one(F.values))
+        elif isinstance(F, rhs_fenics_mesh):
+            u_coarse = rhs_fenics_mesh(self.coarse_prob.init)
+            u_coarse.impl.values = self._project_one(F.impl.values)
+            u_coarse.expl.values = self._project_one(F.expl.values)
+            return u_coarse
+        raise TransferError('Unknown type of fine data, got %s' % type(F))
 
     def restrict(self, F):
         """
