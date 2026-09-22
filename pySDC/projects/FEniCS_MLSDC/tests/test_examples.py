@@ -145,11 +145,18 @@ def test_pfasst_iterations_stay_bounded(example, family):
 
 @pytest.mark.fenics
 def test_run_reports_dofs_and_work():
-    from pySDC.projects.FEniCS_MLSDC.run_examples import run
+    from pySDC.projects.FEniCS_MLSDC.run_examples import RESTRICTION_COST, run
 
     res = run('heat', nlevels=2, **SHORT)
     assert res['dofs'][1] < res['dofs'][0]
-    assert res['work'] == pytest.approx(res['niter'] * sum(n / res['dofs'][0] for n in res['dofs']))
+
+    # work charges the sweeps on every level plus the solution restrictions, which are one per
+    # coarse level per iteration, over the M node values and u0
+    num_nodes = 3
+    restrictions = (num_nodes + 1) * (len(res['dofs']) - 1) * RESTRICTION_COST
+    expected = res['niter'] * (sum(n / res['dofs'][0] for n in res['dofs']) + restrictions)
+    assert res['work'] == pytest.approx(expected)
+    assert res['work'] > res['niter'] * sum(n / res['dofs'][0] for n in res['dofs']), 'transfer charged nothing'
 
 
 @pytest.mark.fenics

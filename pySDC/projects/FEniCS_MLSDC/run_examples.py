@@ -20,6 +20,11 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.FEniCS_MLSDC.setups import COARSENINGS, EXAMPLES, FAMILIES, get_description, get_pfasst_procs
 
+#: Cost of one solution restriction as a fraction of one fine-level sweep. Measured across the
+#: examples as 0.006-0.014 for the L2 projection and 0.023-0.037 for point sampling, so it is a
+#: 1-10%% correction either way -- small, but not zero, and the metric used to assume it was zero.
+RESTRICTION_COST = 0.01
+
 
 def run(example, nlevels=1, num_procs=1, **kwargs):
     """
@@ -29,7 +34,8 @@ def run(example, nlevels=1, num_procs=1, **kwargs):
     -------
     dict
         ``niter`` (mean over the steps), ``uend``, ``dofs`` per level and ``work``, the number of
-        fine-level sweep equivalents: iterations times the summed dof ratio of the hierarchy.
+        fine-level sweep equivalents: iterations times the summed dof ratio of the hierarchy, plus
+        the solution restrictions, which are not free -- see :data:`RESTRICTION_COST`.
     """
     description, controller_params, t0, Tend = get_description(example, nlevels=nlevels, **kwargs)
     controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
@@ -41,11 +47,15 @@ def run(example, nlevels=1, num_procs=1, **kwargs):
     uend, stats = controller.run(u0=prob.u_exact(t0), t0=t0, Tend=Tend)
     niter = np.mean([item[1] for item in get_sorted(stats, type='niter', sortby='time')])
 
+    # one restriction per coarse level per iteration, projecting the M node values and u0
+    num_nodes = step.levels[0].sweep.coll.num_nodes
+    restrictions = (num_nodes + 1) * (len(dofs) - 1) * RESTRICTION_COST
+
     return {
         'niter': niter,
         'uend': uend,
         'dofs': dofs,
-        'work': niter * sum(n / dofs[0] for n in dofs),
+        'work': niter * (sum(n / dofs[0] for n in dofs) + restrictions),
     }
 
 
@@ -93,7 +103,10 @@ def main():
             f.write(str(line) + '\n')
 
         out('FEniCS + pySDC, mass-matrix formulation throughout (no mass inverse anywhere).')
-        out('work = iterations x sum(dofs_l / dofs_0), i.e. fine-level sweep equivalents.')
+        out(
+            f'work = iterations x [sum(dofs_l / dofs_0) + (M+1)(nlevels-1) x {RESTRICTION_COST}], '
+            'i.e. fine-level sweep equivalents including the solution restrictions.'
+        )
         out('[family, coarsening]: CG/DG elements, h = coarser mesh, p = lower element order.')
         for example in EXAMPLES:
             for family in FAMILIES:

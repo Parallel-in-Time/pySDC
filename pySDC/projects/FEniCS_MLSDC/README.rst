@@ -94,21 +94,22 @@ means 5/3/2 dofs per cell, so p-coarsening is charged more there as well.)
 ==============  ==========  ==============  ==============
 config          SDC (work)  MLSDC 2 levels  MLSDC 3 levels
 ==============  ==========  ==============  ==============
-heat CG h       5.75        4.50 (1.28x)    3.50 (1.64x)
-heat DG h       5.75        4.50 (1.28x)    3.50 (1.64x)
-heat CG p       5.75        4.50 (1.28x)    5.25 (1.09x)
-heat DG p       5.75        4.80 (1.20x)    6.00 (0.96x)
-burgers CG h    4.12        3.19 (1.29x)    1.97 (2.09x)
-burgers DG h    4.12        3.19 (1.29x)    1.97 (2.10x)
-burgers CG p    4.12        4.50 (0.92x)    5.25 (0.79x)
-burgers DG p    4.12        4.80 (0.86x)    6.00 (0.69x)
-grayscott CG h  6.50        5.44 (1.20x)    5.47 (1.19x)
-grayscott DG h  6.50        5.44 (1.20x)    5.47 (1.19x)
-grayscott CG p  6.50        7.50 (0.87x)    8.76 (0.74x)
-grayscott DG p  6.50        8.00 (0.81x)    10.00 (0.65x)
+heat CG h       5.75        4.62 (1.24x)    3.66 (1.57x)
+heat DG h       5.75        4.62 (1.24x)    3.66 (1.57x)
+heat CG p       5.75        4.62 (1.24x)    5.49 (1.05x)
+heat DG p       5.75        4.92 (1.17x)    6.24 (0.92x)
+burgers CG h    4.12        3.27 (1.26x)    2.06 (2.00x)
+burgers DG h    4.12        3.27 (1.26x)    2.06 (2.00x)
+burgers CG p    4.12        4.62 (0.89x)    5.49 (0.75x)
+burgers DG p    4.12        4.92 (0.84x)    6.24 (0.66x)
+grayscott CG h  6.50        5.58 (1.16x)    5.72 (1.14x)
+grayscott DG h  6.50        5.58 (1.16x)    5.72 (1.14x)
+grayscott CG p  6.50        7.70 (0.84x)    9.16 (0.71x)
+grayscott DG p  6.50        8.20 (0.79x)    10.40 (0.62x)
 ==============  ==========  ==============  ==============
 
-(work = iterations x summed dof ratio, so every level is charged for what it costs)
+(work = iterations x [summed dof ratio + the solution restrictions], so every level is charged
+for what it costs, and so is the transfer -- see ``RESTRICTION_COST`` in ``run_examples.py``)
 
 h-coarsening wins in every one of the six cases. The reason is the one above: dropping from ``CG4``
 to ``CG2`` to ``CG1`` on a fixed mesh leaves a coarse space with :math:`O(h^2)` approximation error,
@@ -131,9 +132,9 @@ dead end:
 =========================  ================  ==================  ================
 DG, h-coarsening           broken hierarchy  Galerkin hierarchy  CG for reference
 =========================  ================  ==================  ================
-heat, 3 levels             1.10x             1.64x               1.64x
-burgers, 3 levels          0.79x             2.10x               2.09x
-grayscott, 3 levels        0.65x             1.19x               1.19x
+heat, 3 levels             1.10x             1.57x               1.57x
+burgers, 3 levels          0.79x             2.00x               2.00x
+grayscott, 3 levels        0.65x             1.14x               1.14x
 heat, PFASST 8 steps       12.88 iters       4.62 iters          4.62 iters
 burgers, PFASST 8 steps    13.50 iters       4.12 iters          4.12 iters
 grayscott, PFASST 8 steps  did not converge  5.38 iters          5.38 iters
