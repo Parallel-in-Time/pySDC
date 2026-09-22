@@ -28,16 +28,12 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         the enclosing coarse cell is found from the fine cell's midpoint, which is never on a coarse
         facet, and the coarse basis is evaluated in *that* cell.
 
-        Going through df.interpolate instead, as this used to, is wrong for discontinuous spaces. A
-        fine dof sitting on a coarse facet has two coarse values there, and dolfin's cross-mesh
-        interpolate takes whichever cell the bounding-box tree returns first -- silently continuising
-        the coarse function. The error is O(1) in the size of the jump and invisible for smooth data,
-        but it deletes exactly the part of the coarse correction a DG hierarchy exists to carry. For
-        continuous spaces the two constructions agree to machine precision.
+        Not df.interpolate: across meshes that is point evaluation, and a fine dof on a coarse facet
+        has two coarse values there, so a discontinuous coarse function comes back continuised. For
+        continuous spaces the two agree to machine precision.
 
-        Costs one basis evaluation per fine dof. dolfin 2019.1.0's
-        PETScDMCollection.create_transfer_matrix segfaults, and going through scipy has the side
-        benefit that P^T is then free.
+        Costs one basis evaluation per fine dof; dolfin 2019.1.0's
+        PETScDMCollection.create_transfer_matrix segfaults.
         """
         if self._Pmat is None:
             Vc, Vf = self.coarse_prob.init, self.fine_prob.init
@@ -88,17 +84,12 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         Args:
             F: the fine level data
         """
-        PT = self.Pmat.T
-        if isinstance(F, fenics_mesh):
-            u_coarse = fenics_mesh(self.coarse_prob.init)
-            u_coarse.values.vector()[:] = PT.dot(F.values.vector()[:])
-        elif isinstance(F, rhs_fenics_mesh):
-            u_coarse = rhs_fenics_mesh(self.coarse_prob.init)
-            u_coarse.impl.values.vector()[:] = PT.dot(F.impl.values.vector()[:])
-            u_coarse.expl.values.vector()[:] = PT.dot(F.expl.values.vector()[:])
-        else:
+        if not isinstance(F, fenics_mesh):
+            # tau and u0 are the only dual quantities, and both are meshes
             raise TransferError('Unknown type of fine data, got %s' % type(F))
 
+        u_coarse = fenics_mesh(self.coarse_prob.init)
+        u_coarse.values.vector()[:] = self.Pmat.T.dot(F.values.vector()[:])
         return u_coarse
 
     @property
@@ -106,8 +97,7 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         """
         Prefactorised coarse mass matrix, :math:`P^T`, and the fine mass matrix, assembled once.
 
-        Factorised up front because it is solved against once per node per sweep; solving from
-        scratch each time costs about seven times more.
+        Factorised up front: it is solved against once per node per sweep.
         """
         if self._l2 is None:
 
@@ -132,16 +122,11 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         """
         Restriction of a SOLUTION, by L2 projection: :math:`M_c^{-1} P^T M_f`.
 
-        Point sampling would also do: :math:`R_u` cancels out of the linear FAS iteration, and every
-        MLSDC count here is identical either way. It does not cancel across step boundaries, where
-        the restricted state seeds the next block, so PFASST is sensitive to it -- on ``grayscott``
-        and on the 2d vortex, by up to a factor of two in iterations, and on the vortex at 8 steps by
-        an O(1) error in the answer. Sampling is also not well defined on a DG space, where most
-        coarse dof points sit on a fine facet. See ``projects/FEM_with_FEniCS`` for the numbers.
+        Not point sampling, which is cheaper to reach for but is not well defined on a DG space and
+        costs PFASST iterations even on a CG one -- :math:`R_u` cancels out of the linear FAS
+        iteration but not across step boundaries. See ``projects/FEM_with_FEniCS`` for the numbers.
 
-        Costs one coarse mass solve, prefactorised in :attr:`l2_pieces`, which is cheaper than the
-        cross-mesh ``df.interpolate`` that ``restrict`` uses. The dual quantities go through
-        :meth:`restrict_dual` instead.
+        Dual quantities go through :meth:`restrict_dual` instead.
 
         Args:
             F: the fine level data

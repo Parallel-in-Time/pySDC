@@ -1,15 +1,6 @@
 """
-Run the three FEniCS examples with SDC, MLSDC (2 and 3 levels) and PFASST.
-
-Each example is run with continuous (``CG``) and discontinuous (``DG``) elements, and each of those
-with h-coarsening (coarser mesh, same element order) and p-coarsening (same mesh, lower element
-order). Per example and family this produces:
-
-* iterations for SDC against MLSDC with 2 and 3 levels, once per coarsening direction, plus the work
-  each costs, to show which hierarchy actually pays;
-* iterations for PFASST over a growing number of parallel steps, to show they stay bounded.
-
-Run with ``python run_examples.py``; results are written to ``data/fenics_mlsdc_out.txt``.
+Run every declared combination and write the tables the README quotes to
+``data/fem_with_fenics_out.txt``.
 """
 
 from pathlib import Path
@@ -127,7 +118,7 @@ def compare_orders(example, orders, family='CG', out=print, **kwargs):
 
 def main():
     Path('data').mkdir(parents=True, exist_ok=True)
-    with open('data/fenics_mlsdc_out.txt', 'w') as f:
+    with open('data/fem_with_fenics_out.txt', 'w') as f:
 
         def out(line=''):
             print(line)

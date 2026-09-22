@@ -108,7 +108,7 @@ def test_fenics_rhs_components(direction):
 
 
 @pytest.mark.fenics
-@pytest.mark.parametrize('direction', ['restrict', 'prolong', 'project'])
+@pytest.mark.parametrize('direction', ['restrict', 'prolong', 'project', 'restrict_dual'])
 def test_fenics_rejects_unknown_types(direction):
     """Anything that is not a FEniCS datatype has to be refused."""
     from pySDC.core.errors import TransferError

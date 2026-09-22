@@ -1,23 +1,7 @@
 """
-Problem setups for the FEniCS mass-matrix reference project.
-
-Every setup here takes the **mass-matrix route only**: ``eval_f`` returns the assembled weak form (a
-load vector), ``solve_system`` takes a right-hand side that is already in the dual space, and
-``base_transfer_mass`` restricts the FAS ``tau`` and ``u0`` with :math:`P^T`. Nothing anywhere
-inverts the mass matrix.
-
-Three examples, two element families and two coarsening directions:
-
-* ``family='CG'`` -- continuous Lagrange elements, Dirichlet data imposed strongly.
-* ``family='DG'`` -- discontinuous Lagrange elements, diffusion by interior penalty and Dirichlet
-  data imposed weakly, see :mod:`problem_classes.DG_1D_FEniCS`.
-* ``coarsening='h'`` -- coarsen the mesh, keep the element order.
-* ``coarsening='p'`` -- keep the mesh, drop the element order.
-
-Both directions give nested spaces for both families, so the same
-:class:`mesh_to_mesh_fenics` transfer serves all four combinations. The collocation nodes are
-deliberately kept on every level: a coarse level with fewer nodes is asymptotically inert at best,
-and actively harmful in between.
+Problem setups. Every one takes the mass-matrix route: ``eval_f`` returns the assembled weak form,
+``solve_system`` takes a right-hand side already in the dual space, and the mass matrix is never
+inverted. See the README for what the combinations are for.
 """
 
 import math
@@ -142,46 +126,45 @@ _SETUPS = {
 }
 
 
-def get_tolerance(example):
-    """Tolerance for comparing solutions of the same example across configurations."""
+#: Marks a key every example must define, as opposed to one with a default.
+_REQUIRED = object()
+
+
+def _setting(example, key, default=_REQUIRED):
+    """One per-example entry from :data:`_SETUPS`."""
     if example not in _SETUPS:
         raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
-    return _SETUPS[example]['utol']
+    return _SETUPS[example][key] if default is _REQUIRED else _SETUPS[example].get(key, default)
+
+
+def get_tolerance(example):
+    """Tolerance for comparing solutions of the same example across configurations."""
+    return _setting(example, 'utol')
 
 
 def get_pfasst_procs(example):
     """Process counts PFASST is known to be reliable for on this example."""
-    if example not in _SETUPS:
-        raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
-    return _SETUPS[example]['pfasst_procs']
+    return _setting(example, 'pfasst_procs')
 
 
 def get_families(example):
     """Element families this example has a problem class for. Not every example has both."""
-    if example not in _SETUPS:
-        raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
-    return _SETUPS[example].get('families', FAMILIES)
+    return _setting(example, 'families', FAMILIES)
 
 
 def get_coarsenings(example):
     """Coarsening directions this example is set up for."""
-    if example not in _SETUPS:
-        raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
-    return _SETUPS[example].get('coarsenings', COARSENINGS)
+    return _setting(example, 'coarsenings', COARSENINGS)
+
+
+def get_order_study(example):
+    """Element orders to compare at equal dof counts, or empty where that has no meaning."""
+    return _setting(example, 'order_study', (1, 2, 4))
 
 
 def pays_off(example):
     """Whether the coarse level is expected to cost less than it saves on this example."""
-    if example not in _SETUPS:
-        raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
-    return _SETUPS[example].get('pays_off', True)
-
-
-def get_order_study(example):
-    """Element orders to compare at equal dof counts, or an empty tuple where that has no meaning."""
-    if example not in _SETUPS:
-        raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
-    return _SETUPS[example].get('order_study', (1, 2, 4))
+    return _setting(example, 'pays_off', True)
 
 
 def get_description(

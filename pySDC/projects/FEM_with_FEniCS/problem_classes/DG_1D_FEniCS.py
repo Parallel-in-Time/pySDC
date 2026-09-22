@@ -1,38 +1,14 @@
 r"""
-Discontinuous-Galerkin counterparts of the three examples, in mass-matrix form.
+Discontinuous-Galerkin counterparts of the three CG examples, in mass-matrix form.
 
-Same three problems as the continuous-Galerkin setups and the same mass-matrix contract --
-``eval_f`` returns the assembled weak form, ``solve_system`` takes a right-hand side that is
-already in the dual space, ``apply_mass_matrix`` exists, and the mass matrix is never inverted.
-Only the discretisation changes:
+Each class is its CG parent with the weak form replaced: interior penalty for diffusion, Nitsche for
+Dirichlet data, local Lax-Friedrichs for the Burgers advection. The Newton loop, mass matrix, initial
+conditions and solver interface are inherited.
 
-* diffusion becomes a symmetric interior penalty (SIPG) form,
-* Dirichlet data is imposed weakly by Nitsche terms instead of by ``DirichletBC``,
-* Burgers' advection becomes a conservative flux with local Lax-Friedrichs upwinding.
-
-Each class is its CG parent with the weak form replaced. The Newton loop, the mass matrix, the
-initial conditions and the solver interface are inherited unchanged.
-
-Why bother with DG here: a DG space is defined cell by cell, with no global continuity constraint
-to keep consistent, so the *element order* becomes a coarsening direction in its own right.
-:math:`DG_1 \subset DG_2 \subset DG_4` on a fixed mesh is nested exactly as
-:math:`DG_p(\text{coarse mesh}) \subset DG_p(\text{fine mesh})` is, so one and the same transfer
-operator serves both h- and p-coarsening -- see ``setups.py``.
-
-Two things have to be right for a DG hierarchy that a CG one gets for free, and both were wrong
-here at first:
-
-1. **The prolongation has to be the inclusion.** A fine dof on a coarse facet has two coarse values,
-   and dolfin's cross-mesh ``interpolate`` picks one arbitrarily, quietly continuising the coarse
-   function. :class:`mesh_to_mesh_fenics` now builds ``P`` cell by cell instead.
-2. **The penalty has to be the same on every level.** Unlike the CG form, the SIPG form depends on
-   the mesh it lives on: rediscretising it on a coarser mesh, or at a lower order, changes the
-   penalty by :math:`h` or :math:`p^2` and the coarse operator stops being the Galerkin operator
-   :math:`P^T A_F P` of the fine one -- in the *dominant* term, since the penalty outweighs the
-   volume term by :math:`\sigma p^2`. Pass ``penalty`` to pin it to the fine level's value; with
-   that and an exact ``P``, :math:`A_G = P^T A_F P` holds to machine precision.
-
-``setups.py`` builds the pinned ladder for you.
+The ``penalty`` argument must be pinned to the fine level's value scaled by :math:`h_l / h_0`. The
+SIPG form depends on the mesh and order it is built on, so rediscretising it per level changes the
+penalty -- the dominant term -- and the coarse operator stops being :math:`P^T A_F P`. ``setups.py``
+builds the pinned ladder.
 """
 
 import dolfin as df
@@ -60,10 +36,7 @@ def sipg(u, v, kappa, mesh, alpha):
     mesh : Mesh
         Mesh the form lives on.
     alpha : float
-        Penalty coefficient, entering as :math:`\alpha \kappa / h`. Normally
-        :math:`\sigma p^2` with :math:`\sigma` past the coercivity threshold, but on a coarse level
-        it has to be the *fine* level's value scaled by :math:`h_{coarse}/h_{fine}` -- see the module
-        docstring.
+        Penalty coefficient, entering as :math:`\alpha \kappa / h`. See the module docstring.
 
     Returns
     -------

@@ -187,7 +187,7 @@ def test_main_writes_a_report(tmp_path, monkeypatch):
 
     run_examples.main()
 
-    report = tmp_path / 'data' / 'fenics_mlsdc_out.txt'
+    report = tmp_path / 'data' / 'fem_with_fenics_out.txt'
     assert report.exists()
     text = report.read_text()
     assert 'heat' in text and 'PFASST' in text and 'mass-matrix' in text and '[DG, h]' in text

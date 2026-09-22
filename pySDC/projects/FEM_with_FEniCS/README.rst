@@ -32,7 +32,7 @@ What is here
 ``run_examples.py``
     Runs every declared combination with SDC, MLSDC on 2 and 3 levels, and PFASST on up to 8
     parallel steps, then the element-order comparison. Every table below comes from it. Results go
-    to ``data/fenics_mlsdc_out.txt``.
+    to ``data/fem_with_fenics_out.txt``.
 
 ``tests/``
     Asserts the claims below, so they stay true.
