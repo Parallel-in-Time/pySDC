@@ -6,8 +6,6 @@ PROBLEM_PARAMS = {'c_nvars': 32, 't0': 0.0, 'family': 'CG', 'nu': 0.1, 'c': 1.0}
 # Levels can differ in mesh refinement, in polynomial degree, or in both.
 NESTED_SPACES = [((1, 0), (1, 1)), ((2, 0), (1, 1)), ((1, 0), (4, 1)), ((1, 1), (4, 1))]
 
-# `project` assembles a form over the coarse mesh out of a function living on the fine one, which
-# only means anything when the two share a mesh. See the note in `test_fenics_project_*`.
 SAME_MESH = {'refinements': (1, 1), 'order': (4, 1)}
 
 
@@ -57,15 +55,13 @@ def test_fenics_restriction_is_nodal_injection(refinements, order):
 
 
 @pytest.mark.fenics
-def test_fenics_project_recovers_the_coarse_space():
+@pytest.mark.parametrize('refinements, order', NESTED_SPACES)
+def test_fenics_project_recovers_the_coarse_space(refinements, order):
     """
     `project` is the other way down, used by `BaseTransfer_mass`. On a function that came from the
-    coarse space it has to return that function.
-
-    Both levels share a mesh here on purpose: `project` assembles a form over the coarse mesh out of
-    a function defined on the fine one, which is only well defined when the meshes agree.
+    coarse space it has to return that function, however the two levels differ.
     """
-    transfer, _, coarse = get_transfer(**SAME_MESH)
+    transfer, _, coarse = get_transfer(refinements=refinements, order=order)
 
     u_coarse = coarse.u_exact(0.0)
 
@@ -73,13 +69,14 @@ def test_fenics_project_recovers_the_coarse_space():
 
 
 @pytest.mark.fenics
-def test_fenics_project_differs_from_restrict():
+@pytest.mark.parametrize('refinements, order', [((1, 1), (4, 1)), ((1, 0), (4, 1))])
+def test_fenics_project_differs_from_restrict(refinements, order):
     """
     `project` is an L2 projection and `restrict` is interpolation, so on a function the coarse space
     cannot represent they have to differ. Otherwise `BaseTransfer_mass`, the only caller of
     `project`, would be getting interpolation by accident.
     """
-    transfer, fine, _ = get_transfer(**SAME_MESH)
+    transfer, fine, _ = get_transfer(refinements=refinements, order=order)
 
     u_fine = fine.u_exact(0.0)
 
@@ -123,3 +120,32 @@ def test_fenics_rejects_unknown_types(direction):
 
 if __name__ == '__main__':
     test_fenics_restriction_is_nodal_injection((1, 0), (1, 1))
+
+
+@pytest.mark.fenics
+@pytest.mark.parametrize('refinements, order', NESTED_SPACES)
+def test_fenics_project_is_the_l2_projection(refinements, order):
+    """
+    Pin what `project` actually computes, against the projection assembled independently: the coarse
+    mass matrix, and a right hand side integrated on the fine mesh where both functions live.
+
+    `df.project` passes neither half of this. Given a fine function and a coarse space it silently
+    returns the nodal interpolant when the two share an element degree, and an inexact projection
+    when they do not.
+    """
+    import dolfin as df
+
+    transfer, fine, coarse = get_transfer(refinements=refinements, order=order)
+    Vc, Vf = coarse.init, fine.init
+    u = fine.u_exact(0.0)
+
+    trial, test = df.TrialFunction(Vc), df.TestFunction(Vc)
+    mass = df.assemble(trial * test * df.dx).array()
+    rhs = []
+    for j in range(Vc.dim()):
+        basis = df.Function(Vc)
+        basis.vector()[j] = 1.0
+        rhs.append(df.assemble(u.values * df.interpolate(basis, Vf) * df.dx))
+
+    expected = np.linalg.solve(mass, np.array(rhs))
+    assert np.allclose(transfer.project(u).values.vector()[:], expected), 'project is not the L2 projection'
