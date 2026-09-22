@@ -55,7 +55,7 @@ Projects
    projects/second_order.rst
    projects/monodomain.rst
    projects/GPU.rst
-   projects/FEniCS_MLSDC.rst
+   projects/FEM_with_FEniCS.rst
 
 
 API documentation

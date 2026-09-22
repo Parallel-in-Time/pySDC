@@ -1,6 +1,6 @@
 import pytest
 
-from pySDC.projects.FEniCS_MLSDC.setups import EXAMPLES, get_coarsenings, get_families, pays_off
+from pySDC.projects.FEM_with_FEniCS.setups import EXAMPLES, get_coarsenings, get_families, pays_off
 
 #: Every example/family an example has a problem class for, and the subsets each claim applies to.
 CASES = [(e, f) for e in EXAMPLES for f in get_families(e)]
@@ -21,8 +21,8 @@ def test_mlsdc_beats_sdc(example, family):
     and an interior penalty pinned across levels. Get either wrong and DG still converges to the
     right answer, just with a coarse level that corrects almost nothing.
     """
-    from pySDC.projects.FEniCS_MLSDC.run_examples import compare_mlsdc
-    from pySDC.projects.FEniCS_MLSDC.setups import get_tolerance
+    from pySDC.projects.FEM_with_FEniCS.run_examples import compare_mlsdc
+    from pySDC.projects.FEM_with_FEniCS.setups import get_tolerance
 
     results = compare_mlsdc(example, family=family, coarsening='h', out=lambda *a: None, **SHORT)
     sdc = results[1]
@@ -50,8 +50,8 @@ def test_h_coarsening_beats_p_coarsening(example, family):
     space that approximates the smooth part of the error far worse, so it buys fewer iterations.
     This is 'use high-order elements' again, now pointed at the coarsening direction.
     """
-    from pySDC.projects.FEniCS_MLSDC.run_examples import compare_mlsdc
-    from pySDC.projects.FEniCS_MLSDC.setups import get_tolerance
+    from pySDC.projects.FEM_with_FEniCS.run_examples import compare_mlsdc
+    from pySDC.projects.FEM_with_FEniCS.setups import get_tolerance
 
     h = compare_mlsdc(example, family=family, coarsening='h', out=lambda *a: None, **SHORT)
     p = compare_mlsdc(example, family=family, coarsening='p', out=lambda *a: None, **SHORT)
@@ -81,7 +81,7 @@ def test_prolongation_preserves_jumps(coarsening):
     import numpy as np
 
     from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     problem_class = get_description('heat', family='DG')[0]['problem_class']
     params = dict(c_nvars=16, family='DG', order=4, t0=0.0)
@@ -108,7 +108,7 @@ def test_dg_and_cg_solve_the_same_problem(example):
     """
     import dolfin as df
 
-    from pySDC.projects.FEniCS_MLSDC.run_examples import run
+    from pySDC.projects.FEM_with_FEniCS.run_examples import run
 
     cg, dg = (run(example, family=f, **SHORT)['uend'] for f in ('CG', 'DG'))
 
@@ -128,8 +128,8 @@ def test_pfasst_iterations_stay_bounded(example, family):
     The bound is loose on purpose: the examples grow by 1.3-1.9x out to 8 parallel steps, with DG
     within a whisker of CG.
     """
-    from pySDC.projects.FEniCS_MLSDC.run_examples import check_pfasst
-    from pySDC.projects.FEniCS_MLSDC.setups import get_pfasst_procs, get_tolerance
+    from pySDC.projects.FEM_with_FEniCS.run_examples import check_pfasst
+    from pySDC.projects.FEM_with_FEniCS.setups import get_pfasst_procs, get_tolerance
 
     procs = tuple(p for p in get_pfasst_procs(example) if p <= 4)
     results = check_pfasst(example, family=family, procs=procs, out=lambda *a: None, **SHORT)
@@ -148,7 +148,7 @@ def test_pfasst_iterations_stay_bounded(example, family):
 
 @pytest.mark.fenics
 def test_run_reports_dofs_and_work():
-    from pySDC.projects.FEniCS_MLSDC.run_examples import RESTRICTION_COST, run
+    from pySDC.projects.FEM_with_FEniCS.run_examples import RESTRICTION_COST, run
 
     res = run('heat', nlevels=2, **SHORT)
     assert res['dofs'][1] < res['dofs'][0]
@@ -165,7 +165,7 @@ def test_run_reports_dofs_and_work():
 @pytest.mark.fenics
 def test_main_writes_a_report(tmp_path, monkeypatch):
     """Cover main() end to end, shrunk to the cheapest example."""
-    import pySDC.projects.FEniCS_MLSDC.run_examples as run_examples
+    import pySDC.projects.FEM_with_FEniCS.run_examples as run_examples
 
     compare_mlsdc, check_pfasst = run_examples.compare_mlsdc, run_examples.check_pfasst
 
@@ -234,8 +234,8 @@ def test_a_coarse_level_that_does_not_pay_still_converges(example):
     Not every example is here to save work. The ones that are not still have to reach the same
     answer with a coarse level as without, which is what makes them worth running.
     """
-    from pySDC.projects.FEniCS_MLSDC.run_examples import run
-    from pySDC.projects.FEniCS_MLSDC.setups import get_tolerance
+    from pySDC.projects.FEM_with_FEniCS.run_examples import run
+    from pySDC.projects.FEM_with_FEniCS.setups import get_tolerance
 
     sdc = run(example, nlevels=1, **SHORT)
     for nlevels in (2, 3):

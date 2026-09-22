@@ -42,8 +42,8 @@ How to run it
 
 .. code-block:: bash
 
-    micromamba env create -f pySDC/projects/FEniCS_MLSDC/environment.yml
-    python pySDC/projects/FEniCS_MLSDC/run_examples.py
+    micromamba env create -f pySDC/projects/FEM_with_FEniCS/environment.yml
+    python pySDC/projects/FEM_with_FEniCS/run_examples.py
 
 To build your own setup, copy one from ``setups.py``. The three pieces that matter are:
 

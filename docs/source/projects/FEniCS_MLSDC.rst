@@ -1,1 +1,0 @@
-.. include:: /../../pySDC/projects/FEniCS_MLSDC/README.rst

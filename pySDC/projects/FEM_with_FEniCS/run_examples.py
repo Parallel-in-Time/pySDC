@@ -18,7 +18,7 @@ import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.FEniCS_MLSDC.setups import (
+from pySDC.projects.FEM_with_FEniCS.setups import (
     EXAMPLES,
     get_coarsenings,
     get_description,

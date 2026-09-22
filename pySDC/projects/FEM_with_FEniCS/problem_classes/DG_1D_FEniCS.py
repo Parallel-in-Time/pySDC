@@ -39,7 +39,7 @@ import dolfin as df
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass
 from pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit import fenics_grayscott_mass
-from pySDC.projects.FEniCS_MLSDC.problem_classes.Burgers_1D_FEniCS import fenics_burgers_mass
+from pySDC.projects.FEM_with_FEniCS.problem_classes.Burgers_1D_FEniCS import fenics_burgers_mass
 
 
 def sipg(u, v, kappa, mesh, alpha):

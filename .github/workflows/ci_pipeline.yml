@@ -160,7 +160,7 @@ jobs:
           - soft_failure
           - TOMS
           - StroemungsRaum
-          - FEniCS_MLSDC
+          - FEM_with_FEniCS
         numpy: ['', '=1']
         # Both NumPy majors here too. No python axis to exclude against: every project environment
         # allows the whole 3.10-3.13 range, so `numpy=1` simply resolves the newest python that has

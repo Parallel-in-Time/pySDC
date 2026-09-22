@@ -25,8 +25,8 @@ import math
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass
 from pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit import fenics_grayscott_mass
 from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d_mass
-from pySDC.projects.FEniCS_MLSDC.problem_classes.Burgers_1D_FEniCS import fenics_burgers_mass
-from pySDC.projects.FEniCS_MLSDC.problem_classes.DG_1D_FEniCS import (
+from pySDC.projects.FEM_with_FEniCS.problem_classes.Burgers_1D_FEniCS import fenics_burgers_mass
+from pySDC.projects.FEM_with_FEniCS.problem_classes.DG_1D_FEniCS import (
     fenics_heat_dg_mass,
     fenics_burgers_dg_mass,
     fenics_grayscott_dg_mass,

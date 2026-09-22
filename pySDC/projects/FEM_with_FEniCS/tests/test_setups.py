@@ -1,6 +1,6 @@
 import pytest
 
-from pySDC.projects.FEniCS_MLSDC.setups import (
+from pySDC.projects.FEM_with_FEniCS.setups import (
     COARSENINGS,
     EXAMPLES,
     FAMILIES,
@@ -24,7 +24,7 @@ def test_description_is_mass_only(example, family, coarsening, nlevels):
     from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
     from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     description, controller_params, t0, Tend = get_description(
         example, nlevels=nlevels, family=family, coarsening=coarsening
@@ -48,7 +48,7 @@ def test_description_is_mass_only(example, family, coarsening, nlevels):
 @pytest.mark.parametrize('nlevels', [1, 2, 3])
 def test_only_the_chosen_direction_coarsens(example, family, nlevels):
     """h-coarsening steps down the mesh at fixed order, p-coarsening the other way round."""
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     h_params = get_description(example, nlevels=nlevels, family=family, coarsening='h')[0]['problem_params']
     p_params = get_description(example, nlevels=nlevels, family=family, coarsening='p')[0]['problem_params']
@@ -69,8 +69,8 @@ def test_only_the_chosen_direction_coarsens(example, family, nlevels):
 @pytest.mark.fenics
 @pytest.mark.parametrize('example', HAS_DG)
 def test_dg_picks_the_dg_problem_class(example):
-    from pySDC.projects.FEniCS_MLSDC.problem_classes import DG_1D_FEniCS
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.problem_classes import DG_1D_FEniCS
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     cg = get_description(example, family='CG')[0]['problem_class']
     dg = get_description(example, family='DG')[0]['problem_class']
@@ -81,7 +81,7 @@ def test_dg_picks_the_dg_problem_class(example):
 
 @pytest.mark.fenics
 def test_overrides():
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     description, _, t0, Tend = get_description('heat', nlevels=2, dt=0.5, restol=1e-5, maxiter=7, nsteps=3)
     assert description['level_params'] == {'restol': 1e-5, 'dt': 0.5}
@@ -91,7 +91,7 @@ def test_overrides():
 
 @pytest.mark.fenics
 def test_tolerance_lookup():
-    from pySDC.projects.FEniCS_MLSDC.setups import get_tolerance
+    from pySDC.projects.FEM_with_FEniCS.setups import get_tolerance
 
     assert all(get_tolerance(e) > 0 for e in EXAMPLES)
 
@@ -107,7 +107,7 @@ def test_tolerance_lookup():
     ],
 )
 def test_bad_input_raises(kwargs, match):
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     with pytest.raises(ValueError, match=match):
         get_description(**kwargs)
@@ -115,7 +115,7 @@ def test_bad_input_raises(kwargs, match):
 
 @pytest.mark.fenics
 def test_pfasst_procs_lookup():
-    from pySDC.projects.FEniCS_MLSDC.setups import get_pfasst_procs
+    from pySDC.projects.FEM_with_FEniCS.setups import get_pfasst_procs
 
     for example in EXAMPLES:
         procs = get_pfasst_procs(example)
@@ -125,7 +125,7 @@ def test_pfasst_procs_lookup():
 @pytest.mark.fenics
 @pytest.mark.parametrize('lookup', ['get_tolerance', 'get_pfasst_procs', 'get_families', 'get_coarsenings'])
 def test_unknown_example_lookup_raises(lookup):
-    import pySDC.projects.FEniCS_MLSDC.setups as setups
+    import pySDC.projects.FEM_with_FEniCS.setups as setups
 
     with pytest.raises(ValueError, match='unknown example'):
         getattr(setups, lookup)('nope')
@@ -141,7 +141,7 @@ def test_unknown_example_lookup_raises(lookup):
 )
 def test_unsupported_combination_raises(kwargs, match):
     """An example without a problem class for the combination has to say so, not build a broken one."""
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     with pytest.raises(ValueError, match=match):
         get_description(**kwargs)
@@ -150,7 +150,7 @@ def test_unsupported_combination_raises(kwargs, match):
 @pytest.mark.fenics
 def test_every_case_is_buildable():
     """Whatever an example declares it supports, `get_description` has to produce."""
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     for example, family, coarsening in CASES:
         for nlevels in (1, 2, 3):
@@ -166,7 +166,7 @@ def test_order_study_holds_the_dof_count(example):
     otherwise it measures the size of the coarse space rather than its quality.
     """
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     dofs = {}
     for order in get_order_study(example):
@@ -183,7 +183,7 @@ def test_order_study_holds_the_dof_count(example):
 @pytest.mark.fenics
 def test_order_override_refuses_a_negative_refinement():
     """A shift past zero would silently give two identical levels, because dolfin skips the loop."""
-    from pySDC.projects.FEniCS_MLSDC.setups import get_description
+    from pySDC.projects.FEM_with_FEniCS.setups import get_description
 
     with pytest.raises(ValueError, match='negative refinement'):
         get_description('vortex', nlevels=3, order=4)

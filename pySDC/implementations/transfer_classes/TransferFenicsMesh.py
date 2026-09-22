@@ -137,7 +137,7 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         the restricted state seeds the next block, so PFASST is sensitive to it -- on ``grayscott``
         and on the 2d vortex, by up to a factor of two in iterations, and on the vortex at 8 steps by
         an O(1) error in the answer. Sampling is also not well defined on a DG space, where most
-        coarse dof points sit on a fine facet. See ``projects/FEniCS_MLSDC`` for the numbers.
+        coarse dof points sit on a fine facet. See ``projects/FEM_with_FEniCS`` for the numbers.
 
         Costs one coarse mass solve, prefactorised in :attr:`l2_pieces`, which is cheaper than the
         cross-mesh ``df.interpolate`` that ``restrict`` uses. The dual quantities go through
