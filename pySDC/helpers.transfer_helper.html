@@ -99,7 +99,7 @@
 <li><p><strong>fine_grid</strong> (<em>np.ndarray</em>) – a one dimensional 1d array containing the nodes of the fine grid</p></li>
 <li><p><strong>coarse_grid</strong> (<em>np.ndarray</em>) – a one dimensional 1d array containing the nodes of the coarse grid</p></li>
 <li><p><strong>k</strong> (<em>int</em>) – order of the restriction</p></li>
-<li><p><strong>periodic</strong> (<em>bool</em>) – flag to indicate periodicity</p></li>
+<li><p><strong>periodic</strong> (<em>bool</em>) – flag to indicate periodicity, which assumes a grid of period one</p></li>
 <li><p><strong>pad</strong> (<em>int</em>) – padding parameter for boundaries</p></li>
 <li><p><strong>equidist_nested</strong> (<em>bool</em>) – shortcut possible, if nodes are equidistant and nested</p></li>
 </ul>
@@ -142,6 +142,9 @@ in the vector ps</p>
 <dd><p>Function to find the next neighbors for a periodic setup</p>
 <p>This function gives for a value p the k points next to it which are found in
 in the vector ps and the points which are found periodically.</p>
+<p>Note that the period is hardcoded to one, here and in the periodic branches of the two matrix
+constructors below. Normalise the grid before you pass it in; the interpolation weights only
+depend on ratios of distances, so nothing is lost by doing so.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -169,7 +172,7 @@ in the vector ps and the points which are found periodically.</p>
 <li><p><strong>fine_grid</strong> (<em>np.ndarray</em>) – a one dimensional 1d array containing the nodes of the fine grid</p></li>
 <li><p><strong>coarse_grid</strong> (<em>np.ndarray</em>) – a one dimensional 1d array containing the nodes of the coarse grid</p></li>
 <li><p><strong>k</strong> (<em>int</em>) – order of the restriction</p></li>
-<li><p><strong>periodic</strong> (<em>bool</em>) – flag to indicate periodicity</p></li>
+<li><p><strong>periodic</strong> (<em>bool</em>) – flag to indicate periodicity, which assumes a grid of period one</p></li>
 <li><p><strong>pad</strong> (<em>int</em>) – padding parameter for boundaries</p></li>
 </ul>
 </dd>

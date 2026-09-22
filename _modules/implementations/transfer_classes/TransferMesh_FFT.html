@@ -37,7 +37,7 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.transfer_classes.TransferMesh_FFT</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">resample</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransferError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.space_transfer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaceTransfer</span>
@@ -103,12 +103,10 @@
         <span class="n">F</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_prolong</span><span class="p">(</span><span class="n">coarse</span><span class="p">):</span>
-            <span class="n">coarse_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">coarse</span><span class="p">)</span>
-            <span class="n">fine_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
-            <span class="n">half_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
-            <span class="n">fine_hat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">half_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">coarse_hat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">half_idx</span><span class="p">]</span>
-            <span class="n">fine_hat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">coarse_hat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">fine_hat</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio</span>
+            <span class="c1"># Fourier interpolation. `resample` also gets the normalisation and the splitting of the</span>
+            <span class="c1"># Nyquist mode right; zero-padding the spectrum by hand placed the coarse Nyquist mode at</span>
+            <span class="c1"># the *fine* Nyquist wavenumber, which is a different function entirely.</span>
+            <span class="k">return</span> <span class="n">resample</span><span class="p">(</span><span class="n">coarse</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'mesh'</span><span class="p">:</span>
             <span class="n">F</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">_prolong</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>

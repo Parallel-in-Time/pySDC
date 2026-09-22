@@ -55,15 +55,9 @@
 <p>Custon base_transfer class, implements Transfer.py</p>
 <p>This implementation can restrict and prolong between 2d meshes with FFT for periodic boundaries</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Rspace">
-<span class="sig-name descname"><span class="pre">Rspace</span></span><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Rspace" title="Link to this definition">¶</a></dt>
-<dd><p>spatial restriction matrix, dim. Nf x Nc</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Pspace">
-<span class="sig-name descname"><span class="pre">Pspace</span></span><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Pspace" title="Link to this definition">¶</a></dt>
-<dd><p>spatial prolongation matrix, dim. Nc x Nf</p>
+<dt class="sig sig-object py" id="implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.ratio">
+<span class="sig-name descname"><span class="pre">ratio</span></span><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.ratio" title="Link to this definition">¶</a></dt>
+<dd><p>refinement factor between the two meshes</p>
 </dd></dl>
 
 <dl class="py method">
@@ -104,8 +98,7 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.transfer_classes.TransferMesh_FFT2D module</a><ul>
 <li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d"><code class="docutils literal notranslate"><span class="pre">mesh_to_mesh_fft2d</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Rspace"><code class="docutils literal notranslate"><span class="pre">Rspace</span></code></a></li>
-<li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Pspace"><code class="docutils literal notranslate"><span class="pre">Pspace</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.ratio"><code class="docutils literal notranslate"><span class="pre">ratio</span></code></a></li>
 <li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
 </ul>

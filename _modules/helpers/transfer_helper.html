@@ -52,6 +52,10 @@
 <span class="sd">    This function gives for a value p the k points next to it which are found in</span>
 <span class="sd">    in the vector ps and the points which are found periodically.</span>
 
+<span class="sd">    Note that the period is hardcoded to one, here and in the periodic branches of the two matrix</span>
+<span class="sd">    constructors below. Normalise the grid before you pass it in; the interpolation weights only</span>
+<span class="sd">    depend on ratios of distances, so nothing is lost by doing so.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        p: the current point</span>
 <span class="sd">        ps (np.ndarray): the grid with the potential neighbors</span>
@@ -146,7 +150,7 @@
 <span class="sd">        fine_grid (np.ndarray): a one dimensional 1d array containing the nodes of the fine grid</span>
 <span class="sd">        coarse_grid (np.ndarray): a one dimensional 1d array containing the nodes of the coarse grid</span>
 <span class="sd">        k (int): order of the restriction</span>
-<span class="sd">        periodic (bool): flag to indicate periodicity</span>
+<span class="sd">        periodic (bool): flag to indicate periodicity, which assumes a grid of period one</span>
 <span class="sd">        pad (int): padding parameter for boundaries</span>
 
 <span class="sd">    Returns:</span>
@@ -197,7 +201,7 @@
 <span class="sd">        fine_grid (np.ndarray): a one dimensional 1d array containing the nodes of the fine grid</span>
 <span class="sd">        coarse_grid (np.ndarray): a one dimensional 1d array containing the nodes of the coarse grid</span>
 <span class="sd">        k (int): order of the restriction</span>
-<span class="sd">        periodic (bool): flag to indicate periodicity</span>
+<span class="sd">        periodic (bool): flag to indicate periodicity, which assumes a grid of period one</span>
 <span class="sd">        pad (int): padding parameter for boundaries</span>
 <span class="sd">        equidist_nested (bool): shortcut possible, if nodes are equidistant and nested</span>
 
