@@ -2,33 +2,37 @@ Finite elements with pySDC: the mass-matrix route
 =================================================
 
 This is the reference for combining pySDC with finite elements. It shows SDC, MLSDC and PFASST on
-three FEniCS problems, using the **mass-matrix formulation throughout** -- the mass matrix is never
+four FEniCS problems, using the **mass-matrix formulation throughout** -- the mass matrix is never
 inverted, anywhere.
 
-Each problem comes with continuous (``CG``) and discontinuous (``DG``) elements, and each hierarchy
-can be coarsened in either direction: a coarser mesh at fixed element order (**h**), or a lower
-element order on the same mesh (**p**).
+The 1d problems come with continuous (``CG``) and discontinuous (``DG``) elements, and each
+hierarchy can be coarsened in either direction: a coarser mesh at fixed element order (**h**), or a
+lower element order on the same mesh (**p**). Each example declares the combinations it has a
+problem class for; ``get_families`` and ``get_coarsenings`` report them.
 
 What is here
 ------------
 
 ``setups.py``
-    Descriptions for the three examples. One linear, two nonlinear:
+    Descriptions for the four examples:
 
     - ``heat`` -- forced heat equation in 1D, IMEX.
     - ``burgers`` -- viscous Burgers in 1D, fully implicit with a node-local Newton.
     - ``grayscott`` -- Gray-Scott reaction-diffusion in 1D, fully implicit with a node-local Newton.
+    - ``vortex`` -- vorticity-velocity in 2D, periodic, IMEX. The coarse level does not pay for
+      itself here (0.73x); it is the 2d and periodic case, not a savings case. CG and h only.
 
-    ``get_description(example, nlevels, family, coarsening)`` builds any of the twelve combinations.
+    ``get_description(example, nlevels, family, coarsening)`` builds any declared combination.
 
 ``problem_classes/DG_1D_FEniCS.py``
-    The DG counterparts of all three: interior penalty for diffusion, Nitsche for Dirichlet data,
+    The DG counterparts of the three 1d problems: interior penalty for diffusion, Nitsche for Dirichlet data,
     a Lax-Friedrichs flux for the Burgers advection. Each is its CG parent with the weak form
     replaced -- the Newton loop, the mass matrix and the solver interface are inherited unchanged.
 
 ``run_examples.py``
-    Runs every example, family and coarsening direction with SDC, MLSDC on 2 and 3 levels, and
-    PFASST on up to 8 parallel steps. Takes about four minutes.
+    Runs every declared combination with SDC, MLSDC on 2 and 3 levels, and PFASST on up to 8
+    parallel steps, then the element-order comparison. Every table below comes from it. Results go
+    to ``data/fenics_mlsdc_out.txt``.
 
 ``tests/``
     Asserts the claims below, so they stay true.
@@ -46,7 +50,7 @@ To build your own setup, copy one from ``setups.py``. The three pieces that matt
 .. code-block:: python
 
     description['sweeper_class'] = generic_implicit_mass      # or imex_1st_order_mass
-    description['base_transfer_class'] = base_transfer_mass   # restricts tau and u0 with P^T
+    description['base_transfer_class'] = base_transfer_mass   # tau and u0 by P^T, u by L2 projection
     description['base_transfer_params'] = {'finter': False}
 
 and a problem class whose ``eval_f`` returns the assembled weak form rather than
@@ -123,7 +127,7 @@ CG or DG
 --------
 
 Identical, once the DG hierarchy is built correctly. Same iteration counts, same speed-ups, same
-PFASST growth, on all three examples -- read the table above in pairs.
+PFASST growth, on all three 1d examples -- read the table above in pairs.
 
 That took two fixes, both of which CG gets for free and neither of which shows up in a
 discretisation test. Both are in the defect list below, items 5 and 6. Before them, DG looked like a
@@ -177,15 +181,19 @@ grayscott CG p  5.00    5.62  6.88  9.25
 grayscott DG p  5.00    6.00  8.12  12.12
 ==============  ======  ====  ====  =====
 
-Growth out to 8 parallel steps is 1.2-1.9x, which is what PFASST is supposed to do.
+Growth out to 8 parallel steps is GROWTH_RANGE, which is what PFASST is supposed to do.
+
+PFASST is the direction that is sensitive to the solution restriction: ``base_transfer_mass``
+restricts ``u`` by L2 projection rather than by sampling, which the MLSDC table above cannot tell
+apart but which is worth up to a factor of two here, and on the vortex at 8 steps the difference
+between a converged answer and an O(1) wrong one.
 
 Why earlier attempts did not pay off
 ------------------------------------
 
-Six separate defects, and one choice that turned out to cost more than it saved. Note what the
-defects have in common: every one of them leaves a method that still converges, still to the right
-answer, with a coarse level that corrects far less than it should. None of them is visible in a
-discretisation test, and none of them raises anything.
+Six separate defects. Note what they have in common: every one of them leaves a method that still
+converges, still to the right answer, with a coarse level that corrects far less than it should.
+None of them is visible in a discretisation test, and none of them raises anything.
 
 1. **The FAS** :math:`\tau` **was restricted by interpolation.** :math:`\tau` is a load vector, not a
    nodal function, so it has to be restricted with :math:`P^T`. Interpolating it is wrong by roughly
@@ -209,17 +217,7 @@ discretisation test, and none of them raises anything.
    ``tabulate_dof_coordinates``, which reports one point per master dof and so places a constrained
    dof on the far side of a periodic domain. For continuous spaces, periodic ones included, this
    reproduces the old construction to machine precision.
-6. **The solution was restricted by point sampling.** Unlike the five above this one is not a
-   defect -- the FAS solution restriction :math:`R_u` cancels out of the *linear* iteration, so
-   sampling is a legitimate choice and every MLSDC count here is identical either way, in 1d and on
-   the 2d vortex. It does not carry to PFASST, where the restricted state seeds the next block and
-   :math:`R_u` stops dropping out. ``grayscott`` at 8 parallel steps went 6.00 to 5.38 iterations
-   (``CG``, h), 9.25 to 5.88 (``CG``, p) and 12.12 to 5.75 (``DG``, p); the 2d vortex at 4 steps
-   went 14.75 to 8.38. ``project`` is now :math:`M_c^{-1} P^T M_f`. Sampling was kept on the
-   grounds that it avoids a mass solve, but with :math:`P` and the factorisation cached the
-   projection is 4-12x *cheaper* per call than the cross-mesh ``df.interpolate`` it replaces, and
-   13-27x in 2d -- ``df.interpolate`` walks a bounding-box tree per dof.
-7. **The interior penalty was rediscretised on every level.** The CG bilinear form does not know
+6. **The interior penalty was rediscretised on every level.** The CG bilinear form does not know
    which mesh it lives on, so rediscretising it on a coarse level gives exactly the Galerkin
    operator :math:`P^T A_F P`. The SIPG form does know: its penalty scales as
    :math:`\sigma p^2 / h`, so a coarser mesh halves it and a lower order divides it by

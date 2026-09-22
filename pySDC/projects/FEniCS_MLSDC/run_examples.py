@@ -18,7 +18,14 @@ import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.FEniCS_MLSDC.setups import COARSENINGS, EXAMPLES, FAMILIES, get_description, get_pfasst_procs
+from pySDC.projects.FEniCS_MLSDC.setups import (
+    EXAMPLES,
+    get_coarsenings,
+    get_description,
+    get_families,
+    get_order_study,
+    get_pfasst_procs,
+)
 
 #: Cost of one solution restriction as a fraction of one fine-level sweep. Measured across the
 #: examples as 0.006-0.014 for the L2 projection and 0.023-0.037 for point sampling, so it is a
@@ -94,6 +101,30 @@ def check_pfasst(example, nlevels=2, family='CG', coarsening='h', procs=None, ou
     return results
 
 
+def compare_orders(example, orders, family='CG', out=print, **kwargs):
+    """
+    MLSDC speed-up against the element order, at identical dof counts on every level.
+
+    This is the table behind "use high-order elements": the refinement ladder is shifted so that
+    ``CG1``, ``CG2`` and ``CG4`` all give the same dofs per level, which leaves the *quality* of the
+    coarse space as the only thing that varies. Returns the speed-ups keyed by (order, nlevels).
+    """
+    speedups = {}
+    for order in orders:
+        results = {
+            nlevels: run(example, nlevels=nlevels, family=family, coarsening='h', order=order, **kwargs)
+            for nlevels in (1, 2, 3)
+        }
+        for nlevels in (2, 3):
+            speedups[(order, nlevels)] = results[1]['work'] / results[nlevels]['work']
+
+    out(f'\n{example} [{family}]: MLSDC speed-up against element order, at equal dofs per level')
+    out(f'  {"levels":>7s}' + ''.join(f'{"CG%d" % o:>12s}' for o in orders))
+    for nlevels in (2, 3):
+        out(f'  {nlevels:7d}' + ''.join(f'{speedups[(o, nlevels)]:11.2f}x' for o in orders))
+    return speedups
+
+
 def main():
     Path('data').mkdir(parents=True, exist_ok=True)
     with open('data/fenics_mlsdc_out.txt', 'w') as f:
@@ -109,10 +140,12 @@ def main():
         )
         out('[family, coarsening]: CG/DG elements, h = coarser mesh, p = lower element order.')
         for example in EXAMPLES:
-            for family in FAMILIES:
-                for coarsening in COARSENINGS:
+            for family in get_families(example):
+                for coarsening in get_coarsenings(example):
                     compare_mlsdc(example, family=family, coarsening=coarsening, out=out)
                     check_pfasst(example, family=family, coarsening=coarsening, out=out)
+            if get_order_study(example):
+                compare_orders(example, orders=get_order_study(example), out=out)
 
 
 if __name__ == '__main__':

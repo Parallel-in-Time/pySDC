@@ -57,11 +57,9 @@ class mesh_to_mesh_fenics(SpaceTransfer):
                 cell_c = df.Cell(Vc.mesh(), tree.compute_first_entity_collision(cell_f.midpoint()))
                 coords, orientation = cell_c.get_vertex_coordinates(), cell_c.orientation()
                 dofs_c = dofmap_c.cell_dofs(cell_c.index())
-                # dof coordinates come per cell rather than from the global table. On a constrained
-                # space -- periodic boundaries -- a master dof stands for two points on opposite
-                # sides of the domain and the global table reports only one of them, which puts the
-                # evaluation point outside the coarse cell and extrapolates. That produced entries
-                # of 1e3 where a Lagrange basis inside its own cell cannot exceed 1.
+                # per cell, not from tabulate_dof_coordinates: that reports one point per master
+                # dof, which on a periodic space is the wrong side of the domain for half the cells
+                # and evaluates the coarse basis outside the cell
                 x_local = element_f.tabulate_dof_coordinates(cell_f)
                 for k, dof_f in enumerate(Vf.dofmap().cell_dofs(cell_f.index())):
                     # a continuous space shares dofs between cells; the second visit is redundant
@@ -108,9 +106,8 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         """
         Prefactorised coarse mass matrix, :math:`P^T`, and the fine mass matrix, assembled once.
 
-        The coarse mass matrix is solved against once per node per sweep, so it is factorised up
-        front rather than solved from scratch. That is the difference between this costing less than
-        the interpolation it replaces and costing seven times more.
+        Factorised up front because it is solved against once per node per sweep; solving from
+        scratch each time costs about seven times more.
         """
         if self._l2 is None:
 
@@ -135,46 +132,16 @@ class mesh_to_mesh_fenics(SpaceTransfer):
         """
         Restriction of a SOLUTION, by L2 projection: :math:`M_c^{-1} P^T M_f`.
 
-        In FAS the solution restriction cancels out of the *linear* iteration exactly:
+        Point sampling would also do: :math:`R_u` cancels out of the linear FAS iteration, and every
+        MLSDC count here is identical either way. It does not cancel across step boundaries, where
+        the restricted state seeds the next block, so PFASST is sensitive to it -- on ``grayscott``
+        and on the 2d vortex, by up to a factor of two in iterations, and on the vortex at 8 steps by
+        an O(1) error in the answer. Sampling is also not well defined on a DG space, where most
+        coarse dof points sit on a fine facet. See ``projects/FEniCS_MLSDC`` for the numbers.
 
-            tau        = C_G(R_u u_F) - R_tau C_F(u_F)
-            u_G        = R_u u_F + A_G^-1 R_tau r_F
-            correction = P (u_G - R_u u_F) = P A_G^-1 R_tau r_F
-
-        so only R_tau has to be the variational operator (restrict_dual, P^T, a matvec). This used
-        to return ``self.restrict(F)`` -- point sampling -- on the strength of that argument, and
-        the argument is right as far as it goes: **every MLSDC iteration count in this project is
-        identical either way**, on all three examples, both families and both coarsening directions,
-        in 1d and on the 2d vortex.
-
-        It does not carry to PFASST. The cancellation is a property of the two-level iteration;
-        across step boundaries the restricted state is what seeds the next block, and R_u stops
-        dropping out. Whether that is visible depends on how far apart the two operators are on the
-        states the solver actually visits -- 1.4e-15 for heat, 9e-12 for burgers, but 4.3e-8 for
-        grayscott. Iterations at 8 parallel steps:
-
-            grayscott [CG, h]   6.00 -> 5.38      grayscott [DG, h]    6.75 -> 5.38
-            grayscott [CG, p]   9.25 -> 5.88      grayscott [DG, p]   12.12 -> 5.75
-
-        and on the 2d vortex at 4 parallel steps, 14.75 -> 8.38. Errors are comparable throughout,
-        so this is not a looser tolerance buying fewer sweeps. It also nearly closes the h/p gap,
-        i.e. p-coarsening's poor PFASST scaling was substantially an artefact of point sampling.
-
-        The cost argument that motivated sampling runs the other way once P and the factorisation
-        are cached, because `df.interpolate` walks a bounding-box tree per dof while this is three
-        sparse operations. Per call, grayscott h, 2050 -> 1026 dofs:
-
-            cached P, prefactorised M_c   0.064 ms       df.project each call   2.447 ms
-            cached P, spsolve each call   0.432 ms       df.interpolate         0.746 ms
-
-        In 2d the gap is wider still: 13-27x for CG up to 66k dofs, 7-13x for DG, with setup under a
-        second. P is already built for `prolong`, so the marginal setup here is two mass assemblies
-        and one factorisation, 0.04 s on the 2d vortex.
-
-        Sampling is also not a well-defined operator on a DG space -- most coarse dof points sit on a
-        fine facet where the function has two values -- so the operator that is correct is also the
-        one that is cheaper and never needs more iterations. ``restrict`` still point-samples and is
-        still what the dual quantities use via ``restrict_dual``.
+        Costs one coarse mass solve, prefactorised in :attr:`l2_pieces`, which is cheaper than the
+        cross-mesh ``df.interpolate`` that ``restrict`` uses. The dual quantities go through
+        :meth:`restrict_dual` instead.
 
         Args:
             F: the fine level data
