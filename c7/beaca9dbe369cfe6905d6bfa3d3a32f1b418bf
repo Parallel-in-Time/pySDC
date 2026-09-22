@@ -1,0 +1,21 @@
+pySDC/tests/test_transfer_classes/test_fenics_transfer.py
+  s_6af776c1c538c7::t_dfc0d6e2bbd7da 58-59,62,64,72-73,79,123-151
+pySDC/implementations/transfer_classes/TransferFenicsMesh.py
+  s_6af776c1c538c7::t_fa770d0f48d707 2-4,16-33,35-68,74,77-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c7beaca9dbe369cfe6905d6bfa3d3a32f1b418bf",
+  "prompts": {},
+  "sessions": {
+    "s_6af776c1c538c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ee2a1d-432f-49a4-ab0e-7b0ff64347a6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
