@@ -2,8 +2,8 @@
 # See https://pre-commit.com/hooks.html for more hooks
 # This runs the same two checks as the CI pipeline, over the same directory:
 # black pySDC --check --diff --color and ruff check pySDC.
-# The versions cannot match automatically: etc/environment-lint.yml leaves both unpinned, so CI
-# installs whatever is current, while pre-commit needs a rev. Bump these when CI disagrees.
+# The revs here must match the versions pinned in etc/environment-lint.yml, which is what the CI
+# lint job installs. Bump both together.
 repos:
   - repo: https://github.com/psf/black
     rev: 26.5.1
@@ -13,7 +13,7 @@ repos:
         language_version: python3
         files: ^pySDC/
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.8
+    rev: v0.16.7
     hooks:
       - id: ruff
         files: ^pySDC/
