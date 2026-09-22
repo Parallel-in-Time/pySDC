@@ -1,0 +1,21 @@
+pySDC/tests/test_transfer_classes/test_transfer_order.py
+  s_6af776c1c538c7::t_1d17060c411ba1 130-164
+pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py
+  s_6af776c1c538c7::t_d06c620f869678 84-87,129-136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b3e8e5c7e9ebd0f9e1347a0939f7b5161ebfed29",
+  "prompts": {},
+  "sessions": {
+    "s_6af776c1c538c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ee2a1d-432f-49a4-ab0e-7b0ff64347a6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
