@@ -43,7 +43,7 @@ class mesh_to_mesh_fenics(SpaceTransfer):
             Vc, Vf = self.coarse_prob.init, self.fine_prob.init
             tree = Vc.mesh().bounding_box_tree()
             element, dofmap_c = Vc.element(), Vc.dofmap()
-            x_f = Vf.tabulate_dof_coordinates().reshape(Vf.dim(), -1)
+            element_f = Vf.element()
 
             # which component of a mixed space each fine dof belongs to; scalar spaces are all zero
             ncomp = max(Vf.num_sub_spaces(), 1)
@@ -57,12 +57,18 @@ class mesh_to_mesh_fenics(SpaceTransfer):
                 cell_c = df.Cell(Vc.mesh(), tree.compute_first_entity_collision(cell_f.midpoint()))
                 coords, orientation = cell_c.get_vertex_coordinates(), cell_c.orientation()
                 dofs_c = dofmap_c.cell_dofs(cell_c.index())
-                for dof_f in Vf.dofmap().cell_dofs(cell_f.index()):
+                # dof coordinates come per cell rather than from the global table. On a constrained
+                # space -- periodic boundaries -- a master dof stands for two points on opposite
+                # sides of the domain and the global table reports only one of them, which puts the
+                # evaluation point outside the coarse cell and extrapolates. That produced entries
+                # of 1e3 where a Lagrange basis inside its own cell cannot exceed 1.
+                x_local = element_f.tabulate_dof_coordinates(cell_f)
+                for k, dof_f in enumerate(Vf.dofmap().cell_dofs(cell_f.index())):
                     # a continuous space shares dofs between cells; the second visit is redundant
                     if dof_f in seen:
                         continue
                     seen.add(dof_f)
-                    basis = np.asarray(element.evaluate_basis_all(x_f[dof_f], coords, orientation))
+                    basis = np.asarray(element.evaluate_basis_all(x_local[k], coords, orientation))
                     col = basis.reshape(-1, ncomp)[:, component[dof_f]]
                     nz = np.nonzero(np.abs(col) > 1e-13)[0]
                     rows.extend([dof_f] * len(nz))

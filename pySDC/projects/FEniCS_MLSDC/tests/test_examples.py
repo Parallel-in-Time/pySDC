@@ -187,3 +187,37 @@ def test_main_writes_a_report(tmp_path, monkeypatch):
     assert report.exists()
     text = report.read_text()
     assert 'heat' in text and 'PFASST' in text and 'mass-matrix' in text and '[DG, h]' in text
+
+
+@pytest.mark.fenics
+def test_prolongation_on_a_periodic_space():
+    """The prolongation must be the inclusion on a constrained space too.
+
+    ``tabulate_dof_coordinates`` reports one point per master dof, but on a periodic space a master
+    stands for two points on opposite sides of the domain. Evaluating the coarse basis of a cell at
+    the wrong one of the two extrapolates across the whole domain: entries of 1e3 where a Lagrange
+    basis inside its own cell is bounded by 1, and every multilevel run returning nan. The vortex is
+    the only periodic example, and it left the suite one commit before that construction landed.
+    """
+    import numpy as np
+
+    from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d_mass
+    from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
+
+    params = dict(nu=0.01, delta=0.05, rho=50, c_nvars=(8, 8), family='CG', order=2)
+    fine = fenics_vortex_2d_mass(refinements=1, **params)
+    coarse = fenics_vortex_2d_mass(refinements=0, **params)
+    transfer = mesh_to_mesh_fenics(fine_prob=fine, coarse_prob=coarse, params={})
+
+    P = transfer.Pmat
+    assert abs(P).max() <= 1.0 + 1e-12, f'P extrapolates outside the coarse cell, max entry {abs(P).max():.3e}'
+    assert np.allclose(P @ np.ones(P.shape[1]), 1.0), 'P does not reproduce a constant'
+
+    u = coarse.dtype_u(coarse.init)
+    u.values.vector()[:] = np.random.default_rng(0).normal(size=coarse.init.dim())
+    prolonged = transfer.prolong(u)
+
+    rng = np.random.default_rng(1)
+    points = rng.uniform(1e-6, 1 - 1e-6, size=(200, 2))
+    err = max(abs(prolonged.values(*x) - u.values(*x)) for x in points)
+    assert err < 1e-12, f'periodic prolongation is not the inclusion: off by {err:.3e}'

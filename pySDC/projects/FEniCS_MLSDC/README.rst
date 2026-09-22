@@ -205,8 +205,10 @@ discretisation test, and none of them raises anything.
    the whole point of a DG space, are deleted. The error is :math:`O(1)` in the jump and exactly
    zero for smooth data, which is why it survived a convergence test at
    :math:`O(h^{p+1})`. :math:`P` is now assembled cell by cell, evaluating the coarse basis in the
-   coarse cell that *contains* each fine cell. For continuous spaces this reproduces the old
-   construction to machine precision.
+   coarse cell that *contains* each fine cell, at dof coordinates taken per cell rather than from
+   ``tabulate_dof_coordinates``, which reports one point per master dof and so places a constrained
+   dof on the far side of a periodic domain. For continuous spaces, periodic ones included, this
+   reproduces the old construction to machine precision.
 6. **The solution was restricted by point sampling.** Unlike the five above this one is not a
    defect -- the FAS solution restriction :math:`R_u` cancels out of the *linear* iteration, so
    sampling is a legitimate choice and every MLSDC count here is identical either way, in 1d and on
