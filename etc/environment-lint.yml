@@ -4,8 +4,10 @@ name: pySDC
 channels:
   - conda-forge
 dependencies:
-  - black
-  - ruff
+  # Pinned so that the lint CI and .pre-commit-config.yaml cannot drift apart: pre-commit needs a
+  # rev, and an unpinned CI would silently move past it on the next release. Bump both together.
+  - black=26.5.1
+  - ruff=0.16.7
   - pip
   - pip:
       # aidecl is not on PyPI and upstream has no tags, so pin the commit
