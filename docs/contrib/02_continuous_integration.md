@@ -226,9 +226,12 @@ In CI it runs:
   the job says so rather than failing obscurely.
 
 > :bell: The pipeline does not listen for label changes, so adding the `gpu` label to an existing
-> pull request does not start anything by itself. Either apply the label when opening the pull
-> request (`gh pr create --label gpu`), or push a commit after labelling it. Listening for
-> `labeled` would re-run all ~40 jobs every time anyone touched any label.
+> pull request does not start anything by itself: **label it, then push**, and the job runs with
+> the push. Closing and reopening the pull request works too, since `reopened` is one of the
+> events the pipeline does listen for. Applying the label as the pull request is created is *not*
+> reliable -- `gh pr create --label gpu` has been observed both to work and to leave the pull
+> request with no labels at all, in which case the job silently skips. Listening for `labeled`
+> would re-run all ~40 jobs every time anyone touched any label on any pull request.
 
 It needs `MODAL_TOKEN_ID` and `MODAL_TOKEN_SECRET` as repository secrets. A run costs a few cents
 and takes about three minutes; the free tier covers several hundred of them a month.
