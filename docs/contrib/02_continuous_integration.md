@@ -191,7 +191,49 @@ regressions: a `setup_GPU` that forgets an attribute, a GPU class whose signatur
 > exercised: no kernels, no NCCL, no `DistArrayCuPy`, none of the `CuSparseError` fallbacks, and no
 > place where CuPy's behaviour genuinely differs from NumPy's. **A green stub run does not mean the
 > GPU code works.** It runs in the `mpi4py` leg of `user_cpu_tests_linux`, and is deliberately kept
-> out of the coverage report so that GPU-only lines are never reported as covered.
+> out of the coverage report so that GPU-only lines are never reported as covered. The job below is
+> what actually runs them.
+
+#### Running the GPU tests on a real GPU
+
+The `gpu_hardware_tests` job rents two NVIDIA T4s per run from [Modal](https://modal.com) and runs
+the same `cupy`-marked selection on them, through `etc/run_mpi_tests.sh` as every other leg does.
+Unlike the stub, **this one counts towards the coverage report**, because it really executes the
+lines it reports.
+
+Two GPUs rather than one because `test_sweeper_NCCL` asks for two ranks and NCCL wants a GPU per
+rank. Nothing in pySDC selects a device -- on a batch system the scheduler gives each task its own,
+so every rank taking device 0 is correct -- and `etc/bind_gpu_to_rank.sh` reproduces that inside
+one container.
+
+You can run it yourself against your own Modal account, which is the fastest way to iterate:
+
+```bash
+modal token new                      # once
+modal run etc/modal_gpu_tests.py     # from the repository root
+```
+
+In CI it runs:
+
+- on **every push to master**, which is where the coverage badge, Codecov and the website get
+  their numbers;
+- on a **pull request carrying the `gpu` label**, which only someone with write permission can
+  set, and only for branches in this repository -- a pull request from a fork gets no secrets and
+  the job says so rather than failing obscurely.
+
+> :bell: The pipeline does not listen for label changes, so adding the `gpu` label to an existing
+> pull request does not start anything by itself. Either apply the label when opening the pull
+> request (`gh pr create --label gpu`), or push a commit after labelling it. Listening for
+> `labeled` would re-run all ~40 jobs every time anyone touched any label.
+
+It needs `MODAL_TOKEN_ID` and `MODAL_TOKEN_SECRET` as repository secrets. A run costs a few cents
+and takes about three minutes; the free tier covers several hundred of them a month.
+
+> :warning: The GPU spectral code needs an mpi4py-fft that no release provides -- the `cupy` and
+> `cupyx-scipy` FFT backends, `DistArrayCuPy` and the NCCL `comm_backend` only exist on the
+> `cupy_implementation` branch of https://github.com/brownbaerchen/mpi4py-fft, which
+> `etc/modal_gpu_tests.py` installs at a pinned commit. `etc/environment-cupy.yml` on its own is
+> not enough to run that code.
 
 If you want to create a new HPC test environment, the following steps need to be completed:
 
