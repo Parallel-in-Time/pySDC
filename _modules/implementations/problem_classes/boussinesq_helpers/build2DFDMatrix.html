@@ -43,8 +43,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">getMatrix</span><span class="p">,</span>
     <span class="n">getUpwindMatrix</span><span class="p">,</span>
-    <span class="n">getBCLeft</span><span class="p">,</span>
-    <span class="n">getBCRight</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -118,55 +116,6 @@
     <span class="n">Dz</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">Az</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csr"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Dx</span><span class="p">,</span> <span class="n">Dz</span></div>
-
-
-
-<span class="c1">#</span>
-<span class="c1"># NOTE: So far only constant dirichlet values can be prescribed, i.e. one fixed value for a whole segment</span>
-<span class="c1">#</span>
-
-
-<div class="viewcode-block" id="getBCHorizontal">
-<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCHorizontal">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">getBCHorizontal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-    <span class="p">),</span> <span class="s1">'Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary'</span>
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'</span>
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'dx must be a scalar'</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">bc_hor</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-    <span class="p">),</span> <span class="s1">'bc_hor must have two entries, bc_hor[0] specifying the BC at the left, bc_hor[1] at the right boundary'</span>
-
-    <span class="n">bl</span> <span class="o">=</span> <span class="n">getBCLeft</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">bl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">bl</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-
-    <span class="n">br</span> <span class="o">=</span> <span class="n">getBCRight</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_hor</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">br</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">br</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-
-    <span class="k">return</span> <span class="n">bl</span><span class="p">,</span> <span class="n">br</span></div>
-
-
-
-<div class="viewcode-block" id="getBCVertical">
-<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCVertical">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">getBCVertical</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-    <span class="p">),</span> <span class="s1">'Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary'</span>
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'</span>
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dz</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'dx must be a scalar'</span>
-    <span class="k">assert</span> <span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">bc_ver</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-    <span class="p">),</span> <span class="s1">'bc_hor must have two entries, bc_hor[0] specifying the BC at the left, bc_hor[1] at the right boundary'</span>
-
-    <span class="n">bd</span> <span class="o">=</span> <span class="n">getBCLeft</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dz</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">bd</span><span class="p">)</span>
-
-    <span class="n">bu</span> <span class="o">=</span> <span class="n">getBCRight</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dz</span><span class="p">,</span> <span class="n">bc_ver</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">bu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">bu</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">bd</span><span class="p">,</span> <span class="n">bu</span></div>
 
 </pre></div>
 

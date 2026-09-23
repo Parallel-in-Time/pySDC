@@ -50,19 +50,19 @@
   <section id="module-implementations.problem_classes.boussinesq_helpers.buildFDMatrix">
 <span id="implementations-problem-classes-boussinesq-helpers-buildfdmatrix-module"></span><h1>implementations.problem_classes.boussinesq_helpers.buildFDMatrix module<a class="headerlink" href="#module-implementations.problem_classes.boussinesq_helpers.buildFDMatrix" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCLeft">
-<span class="sig-name descname"><span class="pre">getBCLeft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildFDMatrix.html#getBCLeft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCLeft" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCRight">
-<span class="sig-name descname"><span class="pre">getBCRight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildFDMatrix.html#getBCRight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCRight" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getMatrix">
 <span class="sig-name descname"><span class="pre">getMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildFDMatrix.html#getMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getMatrix" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Centered first derivative matrix for homogeneous boundary conditions.</p>
+<p>For periodic boundaries this is just the generic finite difference matrix. For Neumann and
+Dirichlet boundaries only the interior stencil is taken from the generic helper, while the
+rows next to the boundary keep the closures that were derived for this problem.</p>
+<p>These closures are <em>not</em> interchangeable with the ones the generic helper builds, even though
+the generic ones are more accurate: the Boussinesq operator differentiates the pressure with
+the Neumann closure and the vertical velocity with the Dirichlet closure, and neutral stability
+of the resulting wave operator depends on how those two closures relate to each other. Building
+each of them in isolation, as the generic helper does, gives a discretisation whose spectrum has
+positive real parts and which therefore grows exponentially in time. See #233.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getUpwindMatrix">
@@ -82,8 +82,6 @@
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.boussinesq_helpers.buildFDMatrix module</a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCLeft"><code class="docutils literal notranslate"><span class="pre">getBCLeft()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCRight"><code class="docutils literal notranslate"><span class="pre">getBCRight()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getMatrix"><code class="docutils literal notranslate"><span class="pre">getMatrix()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getUpwindMatrix"><code class="docutils literal notranslate"><span class="pre">getUpwindMatrix()</span></code></a></li>
 </ul>
