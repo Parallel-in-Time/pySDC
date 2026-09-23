@@ -188,9 +188,15 @@ class GenericNDimFinDiff(Problem):
 
         self.A = self.A.astype(operator_dtype)
 
+        # SciPy's sparse direct solver wants CSC and CuPy's wants CSR. Whichever one is handed the
+        # wrong layout converts the whole matrix on every call -- that is what cupyx's
+        # `SparseEfficiencyWarning: CSR format is required` is reporting, once per solve. CSR is
+        # also the better layout for the matrix-vector product in `eval_f`.
+        self.A = self.A.tocsr() if useGPU else self.A.tocsc()
+
         # the grid feeds every `u_exact`, so it has to live where the solution does
         self.xvalues = self.xp.asarray(xvalues)
-        self.Id = self.xsp.eye(np.prod(nvars), format='csc', dtype=operator_dtype)
+        self.Id = self.xsp.eye(np.prod(nvars), format='csr' if useGPU else 'csc', dtype=operator_dtype)
 
         # store attribute and register them as parameters
         self._makeAttributeAndRegister('nvars', 'stencil_type', 'order', 'bc', localVars=locals(), readOnly=True)
