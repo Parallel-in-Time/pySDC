@@ -16,23 +16,12 @@ dependencies:
   - scipy>=0.17.1
   - matplotlib>=3.0
   - dill>=0.2.6
-  # >=14 for `rtol`: CuPy renamed the iterative solvers' `tol` argument in 14, following the
-  # same rename in SciPy, and `HeatEquation_ND_FD_CuPy` passes the new spelling.
-  - cupy>=14
-  # conda-forge's `cupy` does not depend on NCCL, but `pySDC/helpers/NCCL_communicator.py`
-  # imports `cupy.cuda.nccl`, which is an empty shim unless libnccl is there. Without this,
-  # building an `NCCLComm` fails with a bare `module 'cupy.cuda.nccl' has no attribute
-  # 'get_unique_id'`, which says nothing about the missing library.
-  - nccl
+  - cupy>=14  # 14 renamed the iterative solvers' `tol` argument to `rtol`
+  - nccl  # `cupy.cuda.nccl` is an empty shim without it, and conda-forge's cupy does not pull it
   # the GPU project's configs go through `spectral_helper`, and its runs are MPI-decomposed
   - openmpi
-  # NOT ENOUGH ON ITS OWN for the GPU spectral code, which asks mpi4py-fft for a `cupy` /
-  # `cupyx-scipy` FFT backend, for `DistArrayCuPy` and for the NCCL `comm_backend`. None of the
-  # three is in any release: upstream declined the approach in mpi4py/mpi4py-fft#14, since
-  # `cupy.ndarray` cannot be subclassed the way `DistArray` needs. They live on the
-  # `cupy_implementation` branch of https://github.com/brownbaerchen/mpi4py-fft, which has to be
-  # installed over this one -- see etc/modal_gpu_tests.py for the exact pinned command. This
-  # entry stays because everything else here needs a working mpi4py-fft to build against.
+  # not enough on its own for the GPU spectral code, which needs the fork installed over it;
+  # see docs/contrib/02_continuous_integration.md
   - mpi4py-fft>=2.0.2
   - mpi4py>=3.0.0
   - tqdm
