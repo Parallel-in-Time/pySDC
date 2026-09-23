@@ -91,6 +91,11 @@ image = (
             # file gds_shmem2.c` and then a dead launcher, before pytest prints anything. The hash
             # store keeps the data in process memory instead and needs nothing from the host.
             'PMIX_MCA_gds': 'hash',
+            # conda-forge's OpenMPI is built with CUDA awareness and ships it switched off. The
+            # time-parallel controller sends device buffers point to point, so without this MPI is
+            # handed a device pointer it will not read. NCCL covers the collectives but has no
+            # tags, and those sends are tagged -- see `NCCLComm.Send`.
+            'OMPI_MCA_opal_cuda_support': 'true',
             # A slot is a physical core, and this container has fewer of those than it has GPUs to
             # drive; same reasoning as the main CI pipeline's copy of these.
             'PRTE_MCA_rmaps_default_mapping_policy': ':oversubscribe',
