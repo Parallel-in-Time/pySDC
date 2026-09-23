@@ -1,0 +1,56 @@
+---
+
+name: GPU tests on real hardware
+
+# The main pipeline runs the `cupy`-marked tests against the NumPy stub (`PYSDC_FAKE_GPU=1`),
+# which never touches a GPU. This workflow runs the same tests on an actual T4, rented per job
+# from Modal. It is deliberately *not* part of the required checks: it needs a secret, so it
+# cannot work on pull requests from forks, and renting hardware for every push is not worth it.
+#
+# It fires when a maintainer puts the `gpu` label on a pull request (and on every push to that
+# pull request afterwards, while the label is on), when someone starts it by hand, and once a
+# week so that GPU breakage on master gets noticed without anyone remembering to look.
+on:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+  workflow_dispatch:
+  schedule:
+    - cron: '1 5 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+
+  gpu_tests:
+    # Only labelled pull requests, so an unlabelled one never rents a GPU. Labels can only be
+    # set by people with write access, which is what keeps this from being triggerable by
+    # drive-by pull requests.
+    if: >-
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.labels.*.name, 'gpu')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install the Modal client
+        run: |
+          pip install modal
+      # Secrets are withheld from pull requests opened from a fork, so labelling one of those
+      # would otherwise fail several minutes in with an unhelpful traceback from `modal run`.
+      - name: Check that the Modal credentials are present
+        run: |
+          if [ -z "${{ secrets.MODAL_TOKEN_ID }}" ]; then
+            echo "::error::No Modal credentials. Pull requests from a fork cannot get them;" \
+                 "run this workflow by hand on a branch in this repository instead."
+            exit 1
+          fi
+      # This only rents the GPU: the container runs pytest and its output is streamed back here,
+      # so the log below is an ordinary pytest log. See etc/modal_gpu_tests.py.
+      - name: Run the cupy-marked tests on a T4
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: |
+          modal run etc/modal_gpu_tests.py
