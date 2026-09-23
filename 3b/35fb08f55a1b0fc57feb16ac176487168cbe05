@@ -1,0 +1,21 @@
+etc/bind_gpu_to_rank.sh
+  s_9af5c84054669f::t_45a8c46789d696 5-7,9-10
+etc/environment-cupy.yml
+  s_9af5c84054669f::t_752538ed620738 19-20,23-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3b35fb08f55a1b0fc57feb16ac176487168cbe05",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
