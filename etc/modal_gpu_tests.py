@@ -42,10 +42,14 @@ image = (
     # since the fork's setup.py falls back to `sys.prefix` and conda-forge put it there. No
     # build isolation, so the build sees the environment's own NumPy and setuptools, and
     # `--no-deps` so pip does not pull PyPI wheels over the conda-forge NumPy and mpi4py.
+    #
+    # The source archive rather than `git+https://...`: the image has no `git`, and GitHub serves
+    # the same commit as a tarball, so this pins exactly as tightly without installing one.
     .micromamba_install('c-compiler', channels=['conda-forge'])
     .run_commands(
         'python -m pip install --no-deps --no-build-isolation '
-        'git+https://github.com/brownbaerchen/mpi4py-fft.git@a7aeec6ace99dd49561625c866c605ed0b337c18'
+        'https://github.com/brownbaerchen/mpi4py-fft/archive/'
+        'a7aeec6ace99dd49561625c866c605ed0b337c18.tar.gz'
     )
     .env({'PYTHONUNBUFFERED': '1', 'PYTHONPATH': REMOTE})
     # `copy=False` attaches the checkout at container start instead of baking it into the image,
