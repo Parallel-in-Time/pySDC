@@ -9,6 +9,17 @@ class NCCLComm(object):
     Wraps an MPI communicator and performs some calls to NCCL functions instead.
     """
 
+    #: One NCCL communicator per MPI communicator, keyed by the MPI handle.
+    #:
+    #: Creating one costs about 17 MB of device memory that is never released: NCCL has no
+    #: reference counting, and destroying a communicator is itself collective, so a `__del__`
+    #: would have ranks tearing them down whenever their garbage collectors happened to run --
+    #: in different orders, which deadlocks. Making them once and sharing them avoids both.
+    #:
+    #: The MPI communicator is kept alongside so it cannot be freed and have its handle reused
+    #: for a different one, which would hand out the wrong NCCL communicator.
+    _communicators = {}
+
     def __init__(self, comm):
         """
         Args:
@@ -16,8 +27,15 @@ class NCCLComm(object):
         """
         self.commMPI = comm
 
-        uid = comm.bcast(nccl.get_unique_id(), root=0)
-        self.commNCCL = nccl.NcclCommunicator(comm.size, uid, comm.rank)
+        # `py2f` rather than the communicator itself: mpi4py defines `__eq__` without `__hash__`,
+        # so a communicator cannot be a dictionary key, and the handle is the same for any two
+        # Python wrappers around one communicator.
+        key = comm.py2f()
+        if key not in NCCLComm._communicators:
+            uid = comm.bcast(nccl.get_unique_id(), root=0)
+            NCCLComm._communicators[key] = (comm, nccl.NcclCommunicator(comm.size, uid, comm.rank))
+
+        self.commNCCL = NCCLComm._communicators[key][1]
 
     def __getattr__(self, name):
         """
