@@ -38,10 +38,14 @@ image = (
     # build installed above. Pinned to a commit rather than to the branch, so that the image is
     # reproducible and does not silently move under us.
     #
-    # `c-compiler` because the FFTW extension is built from source; it finds FFTW on its own,
-    # since the fork's setup.py falls back to `sys.prefix` and conda-forge put it there. No
-    # build isolation, so the build sees the environment's own NumPy and setuptools, and
-    # `--no-deps` so pip does not pull PyPI wheels over the conda-forge NumPy and mpi4py.
+    # `c-compiler` and `cython` because the FFTW extension is built from source and its sources
+    # are `.pyx`: the GitHub archive carries no pre-generated C, unlike a PyPI sdist. Without
+    # Cython, setuptools quietly rewrites `utilities.pyx` to `utilities.c` and hands gcc a file
+    # nothing ever generated. They are installed here rather than left to the fork's
+    # `build-system.requires`, because `--no-build-isolation` is what keeps the build inside this
+    # environment -- where its setup.py finds FFTW by falling back to `sys.prefix`, and where the
+    # NumPy headers are the ones pySDC will run against. `--no-deps` so pip does not pull PyPI
+    # wheels over the conda-forge NumPy and mpi4py.
     #
     # The source archive rather than `git+https://...`: the image has no `git`, and GitHub serves
     # the same commit as a tarball, so this pins exactly as tightly without installing one.
@@ -51,7 +55,7 @@ image = (
     # successfully having done nothing -- a green build and an unchanged environment. The import
     # afterwards fails the build loudly if that ever happens again: `distarrayCuPy` exists only in
     # the fork, so it is a direct check that these files, and not conda's, are installed.
-    .micromamba_install('c-compiler', channels=['conda-forge'])
+    .micromamba_install('c-compiler', 'cython', channels=['conda-forge'])
     .run_commands(
         'python -m pip install --no-deps --no-build-isolation --force-reinstall '
         'https://github.com/brownbaerchen/mpi4py-fft/archive/'
