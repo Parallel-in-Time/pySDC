@@ -102,7 +102,13 @@ class EstimatePolynomialError(ConvergenceController):
                 res[i] += buf
             return res
         else:
-            return A @ xp.asarray(b)
+            # `asarray` stacks the vector into a single array, and CuPy builds that through
+            # `copy`, which asserts -- with no message -- when it is handed back an `ndarray`
+            # subclass instead of the base type. `cupy_mesh.copy` returns `type(self)` on
+            # purpose, so that a copied mesh stays a mesh, which makes every datatype here such a
+            # subclass. NumPy has no such restriction, but dropping the wrapper is right either
+            # way: what this wants is the numbers, not the datatype.
+            return A @ xp.asarray([entry.view(xp.ndarray) for entry in b])
 
     def get_interpolated_solution(self, L, xp):
         """
