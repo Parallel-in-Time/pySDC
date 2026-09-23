@@ -73,27 +73,33 @@ class allencahn_delta(allencahn_fullyimplicit):
             If ``nu`` is not 2, for which the analytic increment below is derived.
     """
 
-    def __init__(self, solve_precision=None, **kwargs):
+    def __init__(self, solve_precision=None, normalize=True, **kwargs):
         """Initialization routine"""
         super().__init__(**kwargs)
         if self.nu != 2:
             raise NotImplementedError('allencahn_delta derives its analytic increment for nu=2 only!')
 
         self.solve_precision = None if solve_precision is None else np.dtype(solve_precision)
+        self.normalize = normalize
         dtype = np.dtype('float64') if self.solve_precision is None else self.solve_precision
+        # What the solve *stores* is ``solve_precision``; what it computes in is at least float32,
+        # because SciPy holds no float16 sparse matrix and fp16 hardware accumulates in fp32 anyway.
+        # Same convention the genuinely reduced-precision levels use for their operators.
+        compute = np.promote_types(dtype, np.float32)
         size = self.nvars[0] * self.nvars[1]
         self._work_dtype = dtype
-        self._A_work = self.A.astype(dtype).tocsr()
-        self._Id_work = sp.eye(size, dtype=dtype, format='csr')
-        self._inv_eps2 = dtype.type(1.0 / self.eps**2)
+        self._compute_dtype = compute
+        self._A_work = self.A.astype(compute).tocsr()
+        self._Id_work = sp.eye(size, dtype=compute, format='csr')
+        self._inv_eps2 = compute.type(1.0 / self.eps**2)
 
         # Bound on ||J||_inf, used to make the tolerance floor conditioning-aware. The reaction
         # term contributes |1 - (nu+1) u^nu| <= nu for u in [-1, 1].
         self._operator_norm = float(abs(self.A).sum(axis=1).max()) + self.nu / self.eps**2
 
-    def _increment(self, base, delta, matrix=None, inv_eps2=None):
+    def _increment(self, base, delta, matrix=None, inv_eps2=None, scale=1.0):
         r"""
-        Evaluate :math:`f(w+\delta) - f(w)` without cancellation.
+        Evaluate :math:`s^{-1}[f(w+s\delta) - f(w)]` without cancellation.
 
         Parameters
         ----------
@@ -107,15 +113,20 @@ class allencahn_delta(allencahn_fullyimplicit):
             between the two callers -- the expansion is the same and lives here once.
         inv_eps2 : float, optional
             :math:`\varepsilon^{-2}`, likewise.
+        scale : float, optional
+            Normalisation :math:`s` applied to the unknown, so ``delta`` is
+            :math:`\delta/s`. The expansion stays exact -- the quadratic and cubic terms simply
+            pick up :math:`s` and :math:`s^2` -- which is what lets the whole solve run on an
+            :math:`\mathcal{O}(1)` unknown. Defaults to 1, the unnormalised increment.
 
         Returns
         -------
         numpy.ndarray
-            The increment.
+            The increment, divided by ``scale``.
         """
         matrix = self._A_work if matrix is None else matrix
         inv_eps2 = self._inv_eps2 if inv_eps2 is None else inv_eps2
-        cubic = 3.0 * base * base * delta + 3.0 * base * delta * delta + delta**3
+        cubic = 3.0 * base * base * delta + 3.0 * scale * base * delta * delta + scale**2 * delta**3
         return matrix.dot(delta) + inv_eps2 * (delta - cubic)
 
     def eval_f_increment(self, base, delta, t):
@@ -162,7 +173,7 @@ class allencahn_delta(allencahn_fullyimplicit):
         scipy.sparse.csr_matrix
             The system matrix, at working precision.
         """
-        dtype = self._work_dtype
+        dtype = self._compute_dtype
         diagonal = (dtype.type(1.0) - dtype.type(self.nu + 1) * state**self.nu).astype(dtype)
         jacobian = self._A_work + self._inv_eps2 * sp.diags(diagonal, offsets=0, format='csr')
         return (self._Id_work - alpha * jacobian).astype(dtype).tocsr()
@@ -193,10 +204,18 @@ class allencahn_delta(allencahn_fullyimplicit):
         dtype_u
             The correction, in backend precision.
         """
-        dtype = self._work_dtype
+        store, dtype = self._work_dtype, self._compute_dtype
         alpha = dtype.type(factor)
         base_work = np.asarray(base, dtype=dtype).reshape(-1)
-        rhs_work = np.asarray(r, dtype=dtype).reshape(-1)
+        rhs64 = np.asarray(r, dtype=np.float64).reshape(-1)
+        rhs_scale = max(float(np.linalg.norm(rhs64, np.inf)), 1e-300)
+
+        # Normalise the unknown to O(1). The delta form hands the solver a correction that shrinks
+        # with the sweeps, and float16's smallest normal is 6.1e-5 -- so without this the unknown
+        # itself underflows to zero after a handful of iterations and the solve returns noise.
+        # Exact here as well as in the linear case, because the increment carries the scale.
+        scale = rhs_scale if self.normalize else 1.0
+        rhs_work = np.asarray((rhs64 / scale).astype(store), dtype=dtype)
         delta = np.zeros_like(rhs_work)
 
         # Raise the inherited tolerances to what this working precision can actually deliver.
@@ -205,21 +224,20 @@ class allencahn_delta(allencahn_fullyimplicit):
         # answer. The floor scales with alpha*||J|| because forming the correction residual involves
         # alpha*J*delta, so its rounding error is O(eps * alpha*||J|| * |delta|); alpha is only
         # known here, which is why this cannot be decided in the frontend.
-        floor = np.finfo(dtype).eps * max(
-            TOLERANCE_SAFETY, CONDITIONING_SAFETY * (1.0 + float(factor) * self._operator_norm)
-        )
-        krylov_tol = max(float(self.lin_tol), floor)
-        scale = max(float(np.linalg.norm(rhs_work, np.inf)), 1e-300)
-        bar = max(float(self.newton_tol), floor * scale)
+        conditioning = max(TOLERANCE_SAFETY, CONDITIONING_SAFETY * (1.0 + float(factor) * self._operator_norm))
+        # The Krylov solve runs at the compute type, the Newton bar is on a correction *stored* at
+        # the reduced one -- so the two floors come from different epsilons when the pair differs.
+        krylov_tol = max(float(self.lin_tol), np.finfo(dtype).eps * conditioning)
+        bar = max(float(self.newton_tol), np.finfo(store).eps * conditioning * rhs_scale)
 
         converged = False
         for _ in range(self.newton_maxiter):
-            residual = delta - alpha * self._increment(base_work, delta) - rhs_work
-            if float(np.linalg.norm(residual, np.inf)) < bar:
+            residual = delta - alpha * self._increment(base_work, delta, scale=scale) - rhs_work
+            if float(np.linalg.norm(residual, np.inf)) * scale < bar:
                 converged = True
                 break
             step = cg(
-                self._jacobian(base_work + delta, alpha),
+                self._jacobian(base_work + scale * delta, alpha),
                 residual,
                 x0=np.zeros_like(residual),
                 rtol=krylov_tol,
@@ -227,7 +245,7 @@ class allencahn_delta(allencahn_fullyimplicit):
                 atol=0,
                 callback=self.work_counters['linear'],
             )[0]
-            delta = delta - step.astype(dtype)
+            delta = np.asarray((delta - step).astype(store), dtype=dtype)
             self.work_counters['newton']()
 
         if not converged:
@@ -236,12 +254,12 @@ class allencahn_delta(allencahn_fullyimplicit):
                 'The tolerance is probably below what this working precision can deliver; raise '
                 'newton_tol.',
                 self.newton_maxiter,
-                dtype,
+                store,
                 bar,
             )
 
         me = self.dtype_u(self.init)
-        me[:] = delta.reshape(self.nvars)
+        me[:] = (scale * delta.astype(np.float64)).reshape(self.nvars)
         return me
 
 

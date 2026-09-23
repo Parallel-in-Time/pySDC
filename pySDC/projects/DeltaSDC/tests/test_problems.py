@@ -290,3 +290,40 @@ def test_relative_and_absolute_inner_tolerances_behave_differently():
 
     # a loose absolute bar caps the achievable accuracy
     assert abs(loose_absolute - tight) > 1e-7, 'a loose absolute newton_tol must cap the accuracy'
+
+
+@pytest.mark.base
+def test_nonlinear_half_precision_solve_needs_normalisation():
+    """
+    Half precision on the nonlinear correction solve works, but only with the unknown normalised.
+
+    The control is the point: the same solve handed the right-hand side as it comes stalls where
+    the correction falls below float16's smallest normal, 6.1e-5. Without it "float16 converges"
+    says nothing, because it would also hold if the emulation were quietly doing nothing.
+    """
+    import numpy as np
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+    from pySDC.projects.DeltaSDC.problems import allencahn_delta
+
+    def floor(**extra):
+        description = {
+            'problem_class': allencahn_delta,
+            'problem_params': dict(AC_PARAMS, lin_tol=1e-2, **extra),
+            'sweeper_class': delta_implicit,
+            'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'node_type': 'LEGENDRE', 'num_nodes': 3, 'QI': 'LU'},
+            'level_params': {'restol': -1, 'dt': 4e-3},
+            'step_params': {'maxiter': 16},
+        }
+        controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 40}, description=description)
+        prob = controller.MS[0].levels[0].prob
+        _, stats = controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=4e-3)
+        return min(value for _, value in get_sorted(stats, type='residual_post_iteration'))
+
+    exact = floor()
+    normalised = floor(solve_precision=np.float16)
+    naive = floor(solve_precision=np.float16, normalize=False)
+
+    assert normalised < 10 * exact, f'normalised float16 floored at {normalised:.2e} against {exact:.2e}'
+    assert naive > 1e4 * exact, f'the unnormalised control reached {naive:.2e}, so it is not controlling'

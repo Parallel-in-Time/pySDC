@@ -144,9 +144,10 @@ def configurations():
         ('deltaMLSDC', allencahn_delta, {}, delta_implicit_rounded, {}, delta_ml),
         ('fp32-deltaMLSDC', allencahn_delta, {'solve_precision': np.float32}, delta_implicit_rounded, {}, delta_ml),
         (
-            # the coarse *solve* stays fp32 here: SciPy holds no float16 sparse matrix, and a
-            # nonlinear correction solve in half precision additionally needs the unknown rescaled
-            # to O(1), since fp16's smallest subnormal is 6e-8. The linear ladder below shows that.
+            # the coarse *solve* stays fp32 here, so that this row isolates the coarse *level*.
+            # A half-precision solve is reachable on this nonlinear problem too -- see
+            # plot_mixed_precision.py -- but unlike fp32 it is not free, so it does not belong in a
+            # table whose rows all reproduce their full-precision counterpart exactly.
             'fp16-coarse-deltaMLSDC',
             allencahn_delta,
             {'solve_precision': [np.float32, np.float32]},
@@ -290,9 +291,10 @@ def heat_configurations():
     """
     The precision ladder on a linear problem, where every format is reachable.
 
-    Half precision only shows up here: SciPy holds no ``float16`` sparse matrix, so the nonlinear
-    Newton-CG route above cannot reach it without rescaling its unknown, while this direct solve can
-    be emulated at any format.
+    This direct solve can be emulated at any format outright, so the whole ladder -- level,
+    correction and solve precision, genuine dtypes, the cascade -- is reachable here. The nonlinear
+    Newton-CG route above reaches half precision too, but only as fp16 *storage* with fp32
+    arithmetic, because SciPy holds no ``float16`` sparse matrix.
 
     Returns
     -------
