@@ -1,0 +1,23 @@
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_9af5c84054669f::t_f7ff139fa91feb 149-150,169
+pySDC/implementations/transfer_classes/TransferMesh.py
+  s_9af5c84054669f::t_b95b5d82dde40d 166-175,205,241
+etc/modal_gpu_tests.py
+  s_9af5c84054669f::t_460c33d2348c06 108-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d5359519d7ebd784f77e4ae1eb52e47803dbf465",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
