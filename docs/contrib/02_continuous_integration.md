@@ -210,7 +210,11 @@ You can run it yourself against your own Modal account, which is the fastest way
 
 ```bash
 modal token new                      # once
-modal run etc/modal_gpu_tests.py     # from the repository root
+modal run etc/modal_gpu_tests.py     # from the repository root, the whole selection
+
+# narrow it while developing -- the full run is around three minutes
+modal run etc/modal_gpu_tests.py --tests pySDC/tests/test_sweepers/test_MPI_sweeper.py
+modal run etc/modal_gpu_tests.py --k NCCL
 ```
 
 In CI it runs:
