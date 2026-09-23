@@ -1,5 +1,3 @@
-import numpy as np
-
 from pySDC.implementations.problem_classes.generic_ND_FD import GenericNDimFinDiff
 
 
@@ -112,21 +110,21 @@ class advectionNd(GenericNDimFinDiff):
         if ndim == 1:
             x = self.grids
             if freq[0] >= 0:
-                sol[:] = np.sin(np.pi * freq[0] * (x - c * t))
+                sol[:] = self.xp.sin(self.xp.pi * freq[0] * (x - c * t))
             elif freq[0] == -1:
                 # Gaussian initial solution
-                sol[:] = np.exp(-0.5 * (((x - (c * t)) % 1.0 - 0.5) / sigma) ** 2)
+                sol[:] = self.xp.exp(-0.5 * (((x - (c * t)) % 1.0 - 0.5) / sigma) ** 2)
 
         elif ndim == 2:
             x, y = self.grids
-            sol[:] = np.sin(np.pi * freq[0] * (x - c * t)) * np.sin(np.pi * freq[1] * (y - c * t))
+            sol[:] = self.xp.sin(self.xp.pi * freq[0] * (x - c * t)) * self.xp.sin(self.xp.pi * freq[1] * (y - c * t))
 
         elif ndim == 3:
             x, y, z = self.grids
             sol[:] = (
-                np.sin(np.pi * freq[0] * (x - c * t))
-                * np.sin(np.pi * freq[1] * (y - c * t))
-                * np.sin(np.pi * freq[2] * (z - c * t))
+                self.xp.sin(self.xp.pi * freq[0] * (x - c * t))
+                * self.xp.sin(self.xp.pi * freq[1] * (y - c * t))
+                * self.xp.sin(self.xp.pi * freq[2] * (z - c * t))
             )
 
         return sol

@@ -6,7 +6,7 @@ Created on Sat Feb 11 22:39:30 2023
 
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import gmres, spsolve, cg
+import scipy.sparse.linalg as spla
 
 from pySDC.core.errors import ProblemError
 from pySDC.core.problem import Problem, WorkCounter
@@ -86,6 +86,26 @@ class GenericNDimFinDiff(Problem):
 
     dtype_u = mesh
     dtype_f = mesh
+    xp = np
+    xsp = sp
+    linalg = spla
+
+    @classmethod
+    def setup_GPU(cls):
+        """
+        Switch to GPU modules
+        """
+        import cupy as cp
+        import cupyx.scipy.sparse as csp
+        import cupyx.scipy.sparse.linalg as cspla
+
+        from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+
+        cls.xp = cp
+        cls.xsp = csp
+        cls.linalg = cspla
+        cls.dtype_u = cupy_mesh
+        cls.dtype_f = cupy_mesh
 
     def __init__(
         self,
@@ -101,7 +121,11 @@ class GenericNDimFinDiff(Problem):
         bc='periodic',
         bcParams=None,
         dtype='float64',
+        useGPU=False,
     ):
+        if useGPU:
+            self.setup_GPU()
+
         # make sure parameters have the correct types
         if type(nvars) not in [int, tuple]:
             raise ProblemError('nvars should be either tuple or int')
@@ -158,13 +182,15 @@ class GenericNDimFinDiff(Problem):
             size=nvars[0],
             dim=ndim,
             bc=bc,
+            cupy=useGPU,
         )
         self.A *= coeff
 
         self.A = self.A.astype(operator_dtype)
 
-        self.xvalues = xvalues
-        self.Id = sp.eye(np.prod(nvars), format='csc', dtype=operator_dtype)
+        # the grid feeds every `u_exact`, so it has to live where the solution does
+        self.xvalues = self.xp.asarray(xvalues)
+        self.Id = self.xsp.eye(np.prod(nvars), format='csc', dtype=operator_dtype)
 
         # store attribute and register them as parameters
         self._makeAttributeAndRegister('nvars', 'stencil_type', 'order', 'bc', localVars=locals(), readOnly=True)
@@ -281,9 +307,9 @@ class GenericNDimFinDiff(Problem):
         )
 
         if solver_type == 'direct':
-            sol[:] = spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
+            sol[:] = self.linalg.spsolve(Id - factor * A, rhs.flatten()).reshape(nvars)
         elif solver_type == 'GMRES':
-            sol[:] = gmres(
+            sol[:] = self.linalg.gmres(
                 Id - factor * A,
                 rhs.flatten(),
                 x0=u0.flatten(),
@@ -294,7 +320,7 @@ class GenericNDimFinDiff(Problem):
                 callback_type='legacy',
             )[0].reshape(nvars)
         elif solver_type == 'CG':
-            sol[:] = cg(
+            sol[:] = self.linalg.cg(
                 Id - factor * A,
                 rhs.flatten(),
                 x0=u0.flatten(),
