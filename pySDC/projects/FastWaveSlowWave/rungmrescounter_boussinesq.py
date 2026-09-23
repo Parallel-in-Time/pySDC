@@ -6,23 +6,23 @@ from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussine
 from pySDC.implementations.problem_classes.boussinesq_helpers.standard_integrators import SplitExplicit, dirk, rk_imex
 from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import unflatten
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.projects.FastWaveSlowWave.HookClass_boussinesq import gmres_tolerance
 
 
-def main(cwd=''):
+def main(cwd='', nvars=(4, 300, 30), Tend=3000, Nsteps=100):
     """
     Example running/comparing SDC and different standard integrators for the 2D Boussinesq equation
 
     Args:
         cwd (string): current working directory
+        nvars (tuple): number of degrees of freedom, reduced by the test to keep it cheap
+        Tend (float): end time
+        Nsteps (int): number of time steps
     """
 
     num_procs = 1
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 3000
-    Nsteps = 100
     dt = Tend / float(Nsteps)
 
     # initialize level parameters
@@ -42,11 +42,10 @@ def main(cwd=''):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
-    controller_params['hook_class'] = gmres_tolerance
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nvars'] = [(4, 300, 30)]
+    problem_params['nvars'] = [nvars]
     problem_params['u_adv'] = 0.02
     problem_params['c_s'] = 0.3
     problem_params['Nfreq'] = 0.01
@@ -57,7 +56,6 @@ def main(cwd=''):
     problem_params['gmres_maxiter'] = [500]
     problem_params['gmres_restart'] = [10]
     problem_params['gmres_tol_limit'] = [1e-05]
-    problem_params['gmres_tol_factor'] = [0.1]
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -77,9 +75,9 @@ def main(cwd=''):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    cfl_advection = P.params.u_adv * dt / P.h[0]
-    cfl_acoustic_hor = P.params.c_s * dt / P.h[0]
-    cfl_acoustic_ver = P.params.c_s * dt / P.h[1]
+    cfl_advection = P.u_adv * dt / P.h[0]
+    cfl_acoustic_hor = P.c_s * dt / P.h[0]
+    cfl_acoustic_ver = P.c_s * dt / P.h[1]
     print("Horizontal resolution: %4.2f" % P.h[0])
     print("Vertical resolution:   %4.2f" % P.h[1])
     print("CFL number of advection: %4.2f" % cfl_advection)
