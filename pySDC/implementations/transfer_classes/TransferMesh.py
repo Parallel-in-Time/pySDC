@@ -163,6 +163,16 @@ class mesh_to_mesh(SpaceTransfer):
         self.Rspace = self.Rspace.astype(np.promote_types(self.coarse_prob.init[-1], np.float32))
         self.Pspace = self.Pspace.astype(np.promote_types(self.fine_prob.init[-1], np.float32))
 
+        # Which side of the PCI bus this runs on is a property of the problem, not something the
+        # transfer is told -- the same way `TransferMesh_MPIFFT` decides it. The operators are
+        # assembled with SciPy either way, since that work is small, one-off and full of host-side
+        # index arithmetic; only the finished matrices move.
+        if 'cupy' in self.fine_prob.dtype_u.__name__.lower():
+            import cupyx.scipy.sparse as csp
+
+            self.Rspace = csp.csr_matrix(self.Rspace)
+            self.Pspace = csp.csr_matrix(self.Pspace)
+
     def restrict(self, F):
         """
         Restriction implementation
@@ -192,7 +202,7 @@ class mesh_to_mesh(SpaceTransfer):
         if hasattr(type(F), 'components'):
             for comp in F.components:
                 _restrict(getattr(F, comp), getattr(G, comp))
-        elif type(F).__name__ == 'mesh':
+        elif type(F).__name__ in ['mesh', 'cupy_mesh']:
             _restrict(F, G)
         else:
             raise TransferError('Wrong data type for restriction, got %s' % type(F))
@@ -228,7 +238,7 @@ class mesh_to_mesh(SpaceTransfer):
         if hasattr(type(F), 'components'):
             for comp in G.components:
                 _prolong(getattr(G, comp), getattr(F, comp))
-        elif type(G).__name__ == 'mesh':
+        elif type(G).__name__ in ['mesh', 'cupy_mesh']:
             F[:] = _prolong(G, F)
         else:
             raise TransferError('Wrong data type for prolongation, got %s' % type(G))

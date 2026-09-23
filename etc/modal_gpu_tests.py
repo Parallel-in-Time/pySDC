@@ -28,6 +28,9 @@ REMOTE = '/root/pySDC'
 #: Where the coverage data lands on the machine that runs this, for the pipeline to pick up.
 COVERAGE_OUT = 'coverage_GPU_hardware.dat'
 
+#: The whole `cupy`-marked selection, which is what CI runs.
+DEFAULT_TREES = ['pySDC/tests', 'pySDC/projects/GPU/tests']
+
 #: Two of them, because `test_sweeper_NCCL` asks for two ranks and NCCL wants a GPU per rank.
 #: Everything else needs one, and pays for two while it runs -- which is still a couple of cents.
 GPUS = 'T4:2'
@@ -98,12 +101,19 @@ image = (
     # so a commit that touches only Python code reuses the cached image. The image is rebuilt
     # only when one of the two environment files changes -- which takes several minutes, because
     # conda-forge's `cupy` brings the CUDA runtime with it.
-    .add_local_dir('.', REMOTE, ignore=['.git', '.claude', '**/__pycache__'])
+    # `.coverage*` because this does not consult `.gitignore`: a local `modal run` or pytest leaves
+    # data files in the working directory, and they would be uploaded and then found by `coverage
+    # combine` in the container -- a hundred of them, from other machines, on every run.
+    .add_local_dir('.', REMOTE, ignore=['.git', '.claude', '**/__pycache__', '.coverage*'])
 )
 
 
-@app.function(image=image, gpu=GPUS, timeout=3600)
-def run_cupy_tests():
+# `timeout` is a wall clock limit on the container, and it is the only thing that stops a hung run
+# renting two GPUs until Modal's own maximum expires. A full run is about three minutes, so this is
+# generous even with a cold image, and still kills a stuck one quickly. pytest's own 300 s
+# per-test timeout does not help here: a deadlocked collective hangs outside any single test.
+@app.function(image=image, gpu=GPUS, timeout=900)
+def run_cupy_tests(trees, selection):
     """Run the GPU test suite in the container, and hand back pytest's exit code and coverage.
 
     Under coverage, unlike the stub runs in the main pipeline: those are excluded on purpose, so
@@ -121,10 +131,10 @@ def run_cupy_tests():
     env = {
         **os.environ,
         'PYTEST': f'bash {REMOTE}/etc/bind_gpu_to_rank.sh coverage run -m pytest'
-        ' --continue-on-collection-errors -v --durations=0',
+        ' --continue-on-collection-errors -v --durations=0' + (f' -k {selection}' if selection else ''),
     }
     returncode = 0
-    for tree in ('pySDC/tests', 'pySDC/projects/GPU/tests'):
+    for tree in trees:
         returncode = (
             subprocess.run(['bash', 'etc/run_mpi_tests.sh', tree, 'cupy'], cwd=REMOTE, env=env).returncode or returncode
         )
@@ -137,9 +147,35 @@ def run_cupy_tests():
     return returncode, measured.read_bytes() if measured.exists() else b''
 
 
+@app.function(image=image, gpu=GPUS, timeout=900)
+def run_script(path):
+    """Run one script on the GPU. For profiling and one-off checks, not for CI."""
+    import subprocess
+
+    return subprocess.run(['python', path], cwd=REMOTE).returncode
+
+
 @app.local_entrypoint()
-def main():
-    returncode, measured = run_cupy_tests.remote()
+def main(tests: str = ' '.join(DEFAULT_TREES), k: str = '', script: str = ''):
+    """Run the GPU tests. Narrow them while developing; run the lot before pushing.
+
+    modal run etc/modal_gpu_tests.py
+    modal run etc/modal_gpu_tests.py --tests pySDC/tests/test_sweepers/test_MPI_sweeper.py
+    modal run etc/modal_gpu_tests.py --k NCCL
+    """
+    if script:
+        raise SystemExit(run_script.remote(script))
+
+    trees = tests.split()
+    returncode, measured = run_cupy_tests.remote(trees, k)
+
+    # A narrowed run measures a fraction of the code, so its data would understate coverage rather
+    # than add to it. Only a full run is worth keeping.
+    if trees != DEFAULT_TREES or k:
+        print('narrowed run: no coverage written')
+        if returncode != 0:
+            raise SystemExit(returncode)
+        return
 
     # Coverage is measured inside the container, so it has to be carried back out as bytes; there
     # is no shared filesystem. `relative_files = true` in pyproject.toml is what makes it combine

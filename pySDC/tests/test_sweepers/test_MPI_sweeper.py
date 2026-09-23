@@ -146,7 +146,8 @@ def test_sweeper(quad_type, residual_type, imex, init_guess, ML):
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [False])
 @pytest.mark.parametrize("init_guess", ['spread', 'copy', 'zero'])
-def test_sweeper_NCCL(quad_type, residual_type, imex, init_guess):
+@pytest.mark.parametrize("ML", [1, 2, 3])
+def test_sweeper_NCCL(quad_type, residual_type, imex, init_guess, ML):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
@@ -165,5 +166,5 @@ def test_sweeper_NCCL(quad_type, residual_type, imex, init_guess):
         imex=imex,
         init_guess=init_guess,
         useNCCL=True,
-        ML=1,
+        ML=ML,
     )
