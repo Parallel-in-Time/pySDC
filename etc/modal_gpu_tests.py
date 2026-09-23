@@ -17,10 +17,15 @@ The paths below are resolved relative to the working directory, so the repositor
 only place this works from.
 """
 
+import pathlib
+
 import modal
 
 #: Where the checkout is mounted inside the container.
 REMOTE = '/root/pySDC'
+
+#: Where the coverage data lands on the machine that runs this, for the pipeline to pick up.
+COVERAGE_OUT = 'coverage_GPU_hardware.dat'
 
 app = modal.App('pySDC-gpu-tests')
 
@@ -73,13 +78,21 @@ image = (
 
 @app.function(image=image, gpu='T4', timeout=1800)
 def run_cupy_tests():
-    """Run the GPU test suite in the container and hand back pytest's exit code."""
+    """Run the GPU test suite in the container, and hand back pytest's exit code and coverage.
+
+    Under coverage, unlike the stub runs in the main pipeline: those are excluded on purpose, so
+    that lines only a GPU can reach are never reported as covered. This one really does reach
+    them, so its measurement is honest and belongs in the combined report.
+    """
     import subprocess
 
     # `PYSDC_FAKE_GPU` is deliberately *not* set: this is the run that uses the real thing.
-    return subprocess.run(
+    returncode = subprocess.run(
         [
             'python',
+            '-m',
+            'coverage',
+            'run',
             '-m',
             'pytest',
             '-v',
@@ -93,9 +106,30 @@ def run_cupy_tests():
         cwd=REMOTE,
     ).returncode
 
+    # `concurrency = ['multiprocessing']` in pyproject.toml makes coverage write one suffixed file
+    # per process, so there is no `.coverage` to read until they are combined. Not fatal if it
+    # finds nothing: the test failures are the interesting output in that case, not this.
+    subprocess.run(['python', '-m', 'coverage', 'combine'], cwd=REMOTE)
+    measured = pathlib.Path(REMOTE, '.coverage')
+    return returncode, measured.read_bytes() if measured.exists() else b''
+
 
 @app.local_entrypoint()
 def main():
-    returncode = run_cupy_tests.remote()
+    returncode, measured = run_cupy_tests.remote()
+
+    # Coverage is measured inside the container, so it has to be carried back out as bytes; there
+    # is no shared filesystem. `relative_files = true` in pyproject.toml is what makes it combine
+    # with the other runners' data despite being recorded under a different absolute path.
+    #
+    # The name has to stay within `coverage_*.dat`, which is what the pipeline's combine steps
+    # glob for, and has to differ from `coverage_GPU.dat` -- the GPU *project's* CPU test leg
+    # already writes that one.
+    if measured:
+        pathlib.Path(COVERAGE_OUT).write_bytes(measured)
+        print(f'wrote {COVERAGE_OUT} ({len(measured)} bytes)')
+    else:
+        print(f'no coverage data came back, so no {COVERAGE_OUT} was written')
+
     if returncode != 0:
         raise SystemExit(returncode)

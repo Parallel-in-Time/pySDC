@@ -208,6 +208,56 @@ jobs:
             data
             coverage_${{ matrix.env }}.dat
 
+  gpu_hardware_tests:
+    # The `cupy`-marked tests on an actual GPU, rented per job from Modal for a few cents; see
+    # etc/modal_gpu_tests.py. Everywhere else in this pipeline they run against the NumPy stub
+    # (`PYSDC_FAKE_GPU=1`), which shows the `useGPU` paths are wired up but never executes a CUDA
+    # kernel, an NCCL call or `DistArrayCuPy` -- and those stub runs are kept out of the coverage
+    # report for exactly that reason. This one measures coverage, because this one really runs it.
+    #
+    # It needs a secret, so it cannot work on a pull request from a fork, and renting hardware on
+    # every push is not worth it. On master it always runs, since that is the coverage the badge,
+    # Codecov and the website publish; on a pull request it takes the `gpu` label, which only
+    # someone with write access can set.
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name != 'pull_request' ||
+      (contains(github.event.pull_request.labels.*.name, 'gpu')
+       && github.event.pull_request.head.repo.full_name == github.repository)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install the Modal client
+        run: |
+          pip install modal
+      # Secrets are withheld from pull requests opened from a fork, so labelling one of those
+      # would otherwise fail several minutes in with an unhelpful traceback from `modal run`.
+      - name: Check that the Modal credentials are present
+        run: |
+          if [ -z "${{ secrets.MODAL_TOKEN_ID }}" ]; then
+            echo "::error::No Modal credentials. Add MODAL_TOKEN_ID and MODAL_TOKEN_SECRET as" \
+                 "repository secrets, or run 'modal run etc/modal_gpu_tests.py' locally."
+            exit 1
+          fi
+      # This step only rents the GPU: the container runs pytest under coverage and its output is
+      # streamed back here, so the log below is an ordinary pytest log.
+      - name: Run the cupy-marked tests on a T4
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: |
+          modal run etc/modal_gpu_tests.py
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-artifacts-gpu-hardware
+          path: |
+            coverage_GPU_hardware.dat
+
   user_libpressio_tests:
     runs-on: ubuntu-latest
     container:
@@ -412,7 +462,7 @@ jobs:
   coverage_comment_on_pr:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && !cancelled()
-    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux, gpu_hardware_tests]
     permissions:
       contents: read
       pull-requests: write
