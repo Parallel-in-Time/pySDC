@@ -125,6 +125,29 @@ class mesh(np.ndarray):
         return self
 
 
+def _component_property(index, name):
+    """
+    Make a property that reads and writes the ``index``-th component of a ``MultiComponentMesh``.
+
+    Args:
+        index (int): position of the component along the first axis
+        name (str): name of the component, used in error messages
+
+    Returns:
+        property: gives a view on the component, and writes into it on assignment
+    """
+
+    def getter(self):
+        if self.shape[0] != len(self.components):
+            raise AttributeError(f'Cannot access {name!r} in {type(self)!r} because the shape is unexpected.')
+        return self[index].view(mesh)
+
+    def setter(self, value):
+        getter(self)[:] = value
+
+    return property(getter, setter, doc=f'View on the {name!r} component of the mesh')
+
+
 class MultiComponentMesh(mesh):
     r"""
     Generic mesh with multiple components.
@@ -147,21 +170,33 @@ class MultiComponentMesh(mesh):
     f.expl.shape  # (100,)
     ```
 
-    Note that the components are not attributes of the mesh: ``"expl" in dir(f)`` will return False! Rather, the
-    components are handled in ``__getattr__``. This function is called if an attribute is not found and returns a view
-    on to the component if appropriate. Importantly, this means that you cannot name a component like something that
-    is already an attribute of ``mesh`` or ``numpy.ndarray`` because this will not result in calls to ``__getattr__``.
+    The components are properties, generated when the subclass is created. Both ``f.expl[:] = ...`` and
+    ``f.expl = ...`` write into the mesh; the component is never replaced by an unrelated object. Because the
+    properties live on the class, you cannot name a component like something that is already an attribute of ``mesh``
+    or ``numpy.ndarray`` -- doing so raises an ``AttributeError`` when the class is created rather than silently
+    shadowing the component.
 
     There are a couple more things to keep in mind:
      - Because a ``MultiComponentMesh`` is just a ``numpy.ndarray`` with one more dimension, all components must have
        the same shape.
      - You can use the entire ``MultiComponentMesh`` like a ``numpy.ndarray`` in operations that accept arrays, but make
        sure that you really want to apply the same operation on all components if you do.
-     - If you omit the assignment operator ``[:]`` during assignment, you will not change the mesh at all. Omitting this
-       leads to all kinds of trouble throughout the code. But here you really cannot get away without.
     """
 
     components = []
+
+    def __init_subclass__(cls, **kwargs):
+        """
+        Turn the names listed in ``components`` into properties giving a view on the corresponding slice of the mesh.
+        """
+        super().__init_subclass__(**kwargs)
+        for index, name in enumerate(cls.components):
+            if hasattr(mesh, name):
+                raise AttributeError(
+                    f'Cannot use {name!r} as a component of {cls.__name__} because it is already an attribute of '
+                    f'{mesh.__name__}!'
+                )
+            setattr(cls, name, _component_property(index, name))
 
     def __new__(cls, init, *args, **kwargs):
         if isinstance(init, tuple):
@@ -171,15 +206,6 @@ class MultiComponentMesh(mesh):
             obj = super().__new__(cls, init, *args, **kwargs)
 
         return obj
-
-    def __getattr__(self, name):
-        if name in self.components:
-            if self.shape[0] == len(self.components):
-                return self[self.components.index(name)].view(mesh)
-            else:
-                raise AttributeError(f'Cannot access {name!r} in {type(self)!r} because the shape is unexpected.')
-        else:
-            raise AttributeError(f"{type(self)!r} does not have attribute {name!r}!")
 
 
 class imex_mesh(MultiComponentMesh):

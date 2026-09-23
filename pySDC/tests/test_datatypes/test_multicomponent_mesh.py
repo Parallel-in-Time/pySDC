@@ -73,5 +73,59 @@ def single_test(shape, xp, MultiComponentMeshClass):
     assert xp.allclose(A.b, zero)
 
 
+@pytest.mark.base
+def test_component_assignment_writes_into_the_mesh():
+    """Assigning a component without ``[:]`` must write into the mesh rather than shadow it with a new attribute."""
+    from pySDC.implementations.datatype_classes.mesh import MultiComponentMesh
+    import numpy as np
+    import copy
+
+    class TestMesh(MultiComponentMesh):
+        components = ['a', 'b']
+
+    A = TestMesh(((4,), None, np.dtype('d')))
+    A.a = 1.0
+    A.b[:] = 2.0
+
+    assert np.allclose(np.asarray(A)[0], 1.0), 'Assignment without `[:]` did not reach the mesh!'
+    assert np.shares_memory(A, A.a)
+
+    # the value has to survive anything that drops instance attributes
+    for B in [copy.deepcopy(A), 1.0 * A, TestMesh(A)]:
+        assert np.allclose(B.a, 1.0) and np.allclose(B.b, 2.0), f'Lost the components in {type(B)}!'
+
+    A.a -= 1.0
+    assert np.allclose(np.asarray(A)[0], 0.0), 'In-place operation on a component did not reach the mesh!'
+
+
+@pytest.mark.base
+def test_component_name_clash_is_caught():
+    """A component that shadows an attribute of the base class has to be refused when the class is made."""
+    from pySDC.implementations.datatype_classes.mesh import MultiComponentMesh
+
+    with pytest.raises(AttributeError):
+
+        class ClashingMesh(MultiComponentMesh):
+            components = ['T', 'u']
+
+
+@pytest.mark.base
+def test_component_access_with_unexpected_shape():
+    """Components may only be accessed if the leading axis still counts the components."""
+    from pySDC.implementations.datatype_classes.mesh import MultiComponentMesh
+    import numpy as np
+
+    class TestMesh(MultiComponentMesh):
+        components = ['a', 'b']
+
+    A = TestMesh(((4,), None, np.dtype('d')))
+
+    with pytest.raises(AttributeError):
+        A[:1].a
+
+    with pytest.raises(AttributeError):
+        A.not_a_component
+
+
 if __name__ == '__main__':
     test_MultiComponentMesh(1)
