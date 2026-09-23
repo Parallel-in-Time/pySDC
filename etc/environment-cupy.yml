@@ -26,4 +26,3 @@ dependencies:
   - pip
   - pip:
     - qmat>=0.1.8
-    - pyvkfft
