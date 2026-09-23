@@ -144,14 +144,25 @@ def run_cupy_tests(trees, selection):
     return returncode, measured.read_bytes() if measured.exists() else b''
 
 
+@app.function(image=image, gpu=GPUS, timeout=900)
+def run_script(path):
+    """Run one script on the GPU. For profiling and one-off checks, not for CI."""
+    import subprocess
+
+    return subprocess.run(['python', path], cwd=REMOTE).returncode
+
+
 @app.local_entrypoint()
-def main(tests: str = ' '.join(DEFAULT_TREES), k: str = ''):
+def main(tests: str = ' '.join(DEFAULT_TREES), k: str = '', script: str = ''):
     """Run the GPU tests. Narrow them while developing; run the lot before pushing.
 
     modal run etc/modal_gpu_tests.py
     modal run etc/modal_gpu_tests.py --tests pySDC/tests/test_sweepers/test_MPI_sweeper.py
     modal run etc/modal_gpu_tests.py --k NCCL
     """
+    if script:
+        raise SystemExit(run_script.remote(script))
+
     trees = tests.split()
     returncode, measured = run_cupy_tests.remote(trees, k)
 
