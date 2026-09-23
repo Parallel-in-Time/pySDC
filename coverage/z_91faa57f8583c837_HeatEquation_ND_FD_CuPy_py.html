@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/problem_classes/HeatEquation_ND_FD_CuPy.py: 0%</title>
+    <title>Coverage for pySDC/implementations/problem_classes/HeatEquation_ND_FD_CuPy.py: 46%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_15cffcd0.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>implementations<span class="sep">/</span>problem_classes<span class="sep">/</span>HeatEquation_ND_FD_CuPy.py</b>:
-            <span class="pc_cov">0%</span>
+            <span class="pc_cov">46%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">26 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">0<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">26<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">12<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">14<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">265<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_HeatFiredrake_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-23 16:13 +0000
+            created at 2026-09-23 16:46 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -80,15 +80,15 @@
     </div>
 </header>
 <main id="source">
-    <p class="mis show_mis"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">import</span> <span class="nam">numpy</span> <span class="key">as</span> <span class="nam">np</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">import</span> <span class="nam">cupy</span> <span class="key">as</span> <span class="nam">cp</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">import</span> <span class="nam">cupyx</span><span class="op">.</span><span class="nam">scipy</span><span class="op">.</span><span class="nam">sparse</span> <span class="key">as</span> <span class="nam">csp</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">cupyx</span><span class="op">.</span><span class="nam">scipy</span><span class="op">.</span><span class="nam">sparse</span><span class="op">.</span><span class="nam">linalg</span> <span class="key">import</span> <span class="nam">spsolve</span><span class="op">,</span> <span class="nam">cg</span>  <span class="com"># , gmres, minres</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">import</span> <span class="nam">numpy</span> <span class="key">as</span> <span class="nam">np</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">import</span> <span class="nam">cupy</span> <span class="key">as</span> <span class="nam">cp</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">import</span> <span class="nam">cupyx</span><span class="op">.</span><span class="nam">scipy</span><span class="op">.</span><span class="nam">sparse</span> <span class="key">as</span> <span class="nam">csp</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">cupyx</span><span class="op">.</span><span class="nam">scipy</span><span class="op">.</span><span class="nam">sparse</span><span class="op">.</span><span class="nam">linalg</span> <span class="key">import</span> <span class="nam">spsolve</span><span class="op">,</span> <span class="nam">cg</span>  <span class="com"># , gmres, minres</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">errors</span> <span class="key">import</span> <span class="nam">ProblemError</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">problem</span> <span class="key">import</span> <span class="nam">Problem</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">helpers</span> <span class="key">import</span> <span class="nam">problem_helper</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">datatype_classes</span><span class="op">.</span><span class="nam">cupy_mesh</span> <span class="key">import</span> <span class="nam">cupy_mesh</span><span class="op">,</span> <span class="nam">imex_cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">errors</span> <span class="key">import</span> <span class="nam">ProblemError</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">core</span><span class="op">.</span><span class="nam">problem</span> <span class="key">import</span> <span class="nam">Problem</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">helpers</span> <span class="key">import</span> <span class="nam">problem_helper</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">pySDC</span><span class="op">.</span><span class="nam">implementations</span><span class="op">.</span><span class="nam">datatype_classes</span><span class="op">.</span><span class="nam">cupy_mesh</span> <span class="key">import</span> <span class="nam">cupy_mesh</span><span class="op">,</span> <span class="nam">imex_cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">class</span> <span class="nam">heatNd_forced</span><span class="op">(</span><span class="nam">Problem</span><span class="op">)</span><span class="op">:</span>  <span class="com"># pragma: no cover</span>&nbsp;</span><span class="r"></span></p>
@@ -319,7 +319,7 @@
     <p class="exc show_exc"><span class="n"><a id="t237" href="#t237">237</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">Id</span> <span class="op">-</span> <span class="nam">factor</span> <span class="op">*</span> <span class="nam">self</span><span class="op">.</span><span class="nam">A</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t238" href="#t238">238</a></span><span class="t">                <span class="nam">rhs</span><span class="op">.</span><span class="nam">flatten</span><span class="op">(</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t239" href="#t239">239</a></span><span class="t">                <span class="nam">x0</span><span class="op">=</span><span class="nam">u0</span><span class="op">.</span><span class="nam">flatten</span><span class="op">(</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t240" href="#t240">240</a></span><span class="t">                <span class="nam">tol</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">lintol</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t240" href="#t240">240</a></span><span class="t">                <span class="nam">rtol</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">lintol</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t241" href="#t241">241</a></span><span class="t">                <span class="nam">maxiter</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">liniter</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t242" href="#t242">242</a></span><span class="t">                <span class="nam">atol</span><span class="op">=</span><span class="num">0</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t243" href="#t243">243</a></span><span class="t">            <span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">reshape</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">nvars</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -358,7 +358,7 @@
     <p class="exc show_exc"><span class="n"><a id="t276" href="#t276">276</a></span><span class="t">        <span class="key">return</span> <span class="nam">me</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t277" href="#t277">277</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t278" href="#t278">278</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t279" href="#t279">279</a></span><span class="t"><span class="key">class</span> <span class="nam">heatNd_unforced</span><span class="op">(</span><span class="nam">heatNd_forced</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t279" href="#t279">279</a></span><span class="t"><span class="key">class</span> <span class="nam">heatNd_unforced</span><span class="op">(</span><span class="nam">heatNd_forced</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t280" href="#t280">280</a></span><span class="t">    <span class="str">r&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t281" href="#t281">281</a></span><span class="t"><span class="str">    This class implements the forced :math:`N`-dimensional heat equation with periodic boundary conditions</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t282" href="#t282">282</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -385,9 +385,9 @@
     <p class="pln"><span class="n"><a id="t303" href="#t303">303</a></span><span class="t"><span class="str">    The implementation is this class uses the ``CuPy`` package in order to make ``pySDC`` available for GPUs.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t304" href="#t304">304</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t305" href="#t305">305</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t306" href="#t306">306</a></span><span class="t">    <span class="nam">dtype_f</span> <span class="op">=</span> <span class="nam">cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t306" href="#t306">306</a></span><span class="t">    <span class="nam">dtype_f</span> <span class="op">=</span> <span class="nam">cupy_mesh</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t307" href="#t307">307</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t308" href="#t308">308</a></span><span class="t">    <span class="key">def</span> <span class="nam">eval_f</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">u</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t308" href="#t308">308</a></span><span class="t">    <span class="key">def</span> <span class="nam">eval_f</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">u</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t309" href="#t309">309</a></span><span class="t">        <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t310" href="#t310">310</a></span><span class="t"><span class="str">        Routine to evaluate the right-hand side of the problem.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t311" href="#t311">311</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -409,7 +409,7 @@
     <p class="pln"><span class="n"><a id="t327" href="#t327">327</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t328" href="#t328">328</a></span><span class="t">        <span class="key">return</span> <span class="nam">f</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t329" href="#t329">329</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t330" href="#t330">330</a></span><span class="t">    <span class="key">def</span> <span class="nam">u_exact</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t330" href="#t330">330</a></span><span class="t">    <span class="key">def</span> <span class="nam">u_exact</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">t</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t331" href="#t331">331</a></span><span class="t">        <span class="str">r&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t332" href="#t332">332</a></span><span class="t"><span class="str">        Routine to compute the exact solution at time :math:`t`.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t333" href="#t333">333</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -462,7 +462,7 @@
             <a class="nav" href="z_91faa57f8583c837_HeatFiredrake_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-23 16:13 +0000
+            created at 2026-09-23 16:46 +0000
         </p>
     </div>
 </footer>

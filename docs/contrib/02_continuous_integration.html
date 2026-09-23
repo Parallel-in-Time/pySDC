@@ -214,7 +214,47 @@ regressions: a <code class="docutils literal notranslate"><span class="pre">setu
 exercised: no kernels, no NCCL, no <code class="docutils literal notranslate"><span class="pre">DistArrayCuPy</span></code>, none of the <code class="docutils literal notranslate"><span class="pre">CuSparseError</span></code> fallbacks, and no
 place where CuPy’s behaviour genuinely differs from NumPy’s. <strong>A green stub run does not mean the
 GPU code works.</strong> It runs in the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> leg of <code class="docutils literal notranslate"><span class="pre">user_cpu_tests_linux</span></code>, and is deliberately kept
-out of the coverage report so that GPU-only lines are never reported as covered.</p>
+out of the coverage report so that GPU-only lines are never reported as covered. The job below is
+what actually runs them.</p>
+</div></blockquote>
+</section>
+<section id="running-the-gpu-tests-on-a-real-gpu">
+<h4>Running the GPU tests on a real GPU<a class="headerlink" href="#running-the-gpu-tests-on-a-real-gpu" title="Link to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">gpu_hardware_tests</span></code> job rents two NVIDIA T4s per run from <a class="reference external" href="https://modal.com">Modal</a> and runs
+the same <code class="docutils literal notranslate"><span class="pre">cupy</span></code>-marked selection on them, through <code class="docutils literal notranslate"><span class="pre">etc/run_mpi_tests.sh</span></code> as every other leg does.
+Unlike the stub, <strong>this one counts towards the coverage report</strong>, because it really executes the
+lines it reports.</p>
+<p>Two GPUs rather than one because <code class="docutils literal notranslate"><span class="pre">test_sweeper_NCCL</span></code> asks for two ranks and NCCL wants a GPU per
+rank. Nothing in pySDC selects a device – on a batch system the scheduler gives each task its own,
+so every rank taking device 0 is correct – and <code class="docutils literal notranslate"><span class="pre">etc/bind_gpu_to_rank.sh</span></code> reproduces that inside
+one container.</p>
+<p>You can run it yourself against your own Modal account, which is the fastest way to iterate:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>modal<span class="w"> </span>token<span class="w"> </span>new<span class="w">                      </span><span class="c1"># once</span>
+modal<span class="w"> </span>run<span class="w"> </span>etc/modal_gpu_tests.py<span class="w">     </span><span class="c1"># from the repository root</span>
+</pre></div>
+</div>
+<p>In CI it runs:</p>
+<ul class="simple">
+<li><p>on <strong>every push to master</strong>, which is where the coverage badge, Codecov and the website get
+their numbers;</p></li>
+<li><p>on a <strong>pull request carrying the</strong> <code class="docutils literal notranslate"><span class="pre">gpu</span></code> <strong>label</strong>, which only someone with write permission can
+set, and only for branches in this repository – a pull request from a fork gets no secrets and
+the job says so rather than failing obscurely.</p></li>
+</ul>
+<blockquote>
+<div><p>🔔 The pipeline does not listen for label changes, so adding the <code class="docutils literal notranslate"><span class="pre">gpu</span></code> label to an existing
+pull request does not start anything by itself. Either apply the label when opening the pull
+request (<code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">pr</span> <span class="pre">create</span> <span class="pre">--label</span> <span class="pre">gpu</span></code>), or push a commit after labelling it. Listening for
+<code class="docutils literal notranslate"><span class="pre">labeled</span></code> would re-run all ~40 jobs every time anyone touched any label.</p>
+</div></blockquote>
+<p>It needs <code class="docutils literal notranslate"><span class="pre">MODAL_TOKEN_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">MODAL_TOKEN_SECRET</span></code> as repository secrets. A run costs a few cents
+and takes about three minutes; the free tier covers several hundred of them a month.</p>
+<blockquote>
+<div><p>⚠️ The GPU spectral code needs an mpi4py-fft that no release provides – the <code class="docutils literal notranslate"><span class="pre">cupy</span></code> and
+<code class="docutils literal notranslate"><span class="pre">cupyx-scipy</span></code> FFT backends, <code class="docutils literal notranslate"><span class="pre">DistArrayCuPy</span></code> and the NCCL <code class="docutils literal notranslate"><span class="pre">comm_backend</span></code> only exist on the
+<code class="docutils literal notranslate"><span class="pre">cupy_implementation</span></code> branch of <a class="reference external" href="https://github.com/brownbaerchen/mpi4py-fft">https://github.com/brownbaerchen/mpi4py-fft</a>, which
+<code class="docutils literal notranslate"><span class="pre">etc/modal_gpu_tests.py</span></code> installs at a pinned commit. <code class="docutils literal notranslate"><span class="pre">etc/environment-cupy.yml</span></code> on its own is
+not enough to run that code.</p>
 </div></blockquote>
 <p>If you want to create a new HPC test environment, the following steps need to be completed:</p>
 <ul class="simple">
@@ -359,6 +399,7 @@ This approach can be considered for local testing of your contribution when it d
 <li><a class="reference internal" href="#running-ci-on-hpc-from-pull-requests">Running CI on HPC from pull requests</a><ul>
 <li><a class="reference internal" href="#hpc-test-environments">HPC test environments</a><ul>
 <li><a class="reference internal" href="#running-the-gpu-tests-without-a-gpu">Running the GPU tests without a GPU</a></li>
+<li><a class="reference internal" href="#running-the-gpu-tests-on-a-real-gpu">Running the GPU tests on a real GPU</a></li>
 </ul>
 </li>
 </ul>
