@@ -88,9 +88,9 @@ def test_multicomponent_mesh(name, direction):
 
     for component in imex_mesh.components:
         single = mesh(source.init)
-        single[:] = u.__getattr__(component)
+        single[:] = getattr(u, component)
         assert np.allclose(
-            transferred.__getattr__(component), transfer_func(single)
+            getattr(transferred, component), transfer_func(single)
         ), f'Component {component!r} was not treated like a plain mesh'
 
     # a transfer that hits the wrong branch can still return the right shape by accident, so make

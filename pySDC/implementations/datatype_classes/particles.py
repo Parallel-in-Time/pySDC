@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, MultiComponentMesh
 from pySDC.core.errors import DataError
 
 try:
@@ -211,7 +211,7 @@ class acceleration(mesh):
     pass
 
 
-class fields(object):
+class fields(MultiComponentMesh):
     """
     Field data type for 3 dimensions
 
@@ -222,104 +222,4 @@ class fields(object):
         magn: contains the magnetic field
     """
 
-    class electric(mesh):
-        pass
-
-    class magnetic(mesh):
-        pass
-
-    def __init__(self, init=None, val=None):
-        """
-        Initialization routine
-
-        Args:
-            init: can either be a number or another fields object
-            val: initial tuple of values for electric and magnetic (default: (None,None))
-        Raises:
-            DataError: if init is none of the types above
-        """
-
-        # if init is another fields object, do a copy (init by copy)
-        if isinstance(init, type(self)):
-            self.elec = fields.electric(init.elec)
-            self.magn = fields.magnetic(init.magn)
-        # if init is a number, create fields object and pick the corresponding initial values
-        elif (
-            isinstance(init, tuple)
-            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
-            and isinstance(init[2], np.dtype)
-        ):
-            if isinstance(val, int) or isinstance(val, float) or val is None:
-                self.elec = fields.electric(init, val=val)
-                self.magn = fields.magnetic(init, val=val)
-            elif isinstance(val, tuple) and len(val) == 2:
-                self.elec = fields.electric(init, val=val[0])
-                self.magn = fields.magnetic(init, val=val[1])
-            else:
-                raise DataError('wrong type of val, got %s' % val)
-        # something is wrong, if none of the ones above hit
-        else:
-            raise DataError('something went wrong during %s initialization' % type(self))
-
-    def __add__(self, other):
-        """
-        Overloading the addition operator for fields types
-
-        Args:
-            other (fields): fields object to be added
-        Raises:
-            DataError: if other is not a fields object
-        Returns:
-            fields: sum of caller and other values (self+other)
-        """
-
-        if isinstance(other, type(self)):
-            # always create new fields, since otherwise c = a - b changes a as well!
-            p = fields(self)
-            p.elec[:] = self.elec + other.elec
-            p.magn[:] = self.magn + other.magn
-            return p
-        else:
-            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
-
-    def __sub__(self, other):
-        """
-        Overloading the subtraction operator for fields types
-
-        Args:
-            other (fields): fields object to be subtracted
-        Raises:
-            DataError: if other is not a fields object
-        Returns:
-            fields: differences between caller and other values (self-other)
-        """
-
-        if isinstance(other, type(self)):
-            # always create new fields, since otherwise c = a - b changes a as well!
-            p = fields(self)
-            p.elec[:] = self.elec - other.elec
-            p.magn[:] = self.magn - other.magn
-            return p
-        else:
-            raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
-
-    def __rmul__(self, other):
-        """
-        Overloading the multiply with factor from right operator for fields types
-
-        Args:
-            other (float): factor
-        Raises:
-            DataError: if other is not a fields object
-        Returns:
-            fields: scaled fields
-        """
-
-        if isinstance(other, float):
-            # always create new fields, since otherwise c = a - b changes a as well!
-            p = fields(self)
-            p.elec[:] = other * self.elec
-            p.magn[:] = other * self.magn
-            return p
-        else:
-            raise DataError("Type error: cannot multiply %s with %s" % (type(other), type(self)))
+    components = ['elec', 'magn']

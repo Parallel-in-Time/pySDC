@@ -58,6 +58,20 @@ class _DeviceArray(numpy.ndarray):
     def get(self):
         return numpy.asarray(self).view(numpy.ndarray)
 
+    def copy(self, *args, **kwargs):
+        """Degrade to the base array, the way CuPy does.
+
+        CuPy's `ndarray` is a Cython extension type whose `copy` returns the base class rather
+        than `type(self)`, so a copy of a subclass silently stops being one. NumPy preserves the
+        subclass, so this has to be imitated deliberately or the stub would be more forgiving
+        than the hardware.
+        """
+        return numpy.ndarray.copy(self, *args, **kwargs).view(_DeviceArray)
+
+    def __deepcopy__(self, memo=None):
+        """CuPy routes `copy.deepcopy` through `copy`, and so loses the subclass there too."""
+        return self.copy()
+
 
 def _as_device(obj):
     return obj.view(_DeviceArray) if type(obj) is numpy.ndarray else obj
