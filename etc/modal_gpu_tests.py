@@ -45,11 +45,18 @@ image = (
     #
     # The source archive rather than `git+https://...`: the image has no `git`, and GitHub serves
     # the same commit as a tarball, so this pins exactly as tightly without installing one.
+    #
+    # `--force-reinstall` is what makes this take at all. The fork reports the same version as the
+    # conda-forge build it replaces, so without it pip calls the requirement satisfied and exits
+    # successfully having done nothing -- a green build and an unchanged environment. The import
+    # afterwards fails the build loudly if that ever happens again: `distarrayCuPy` exists only in
+    # the fork, so it is a direct check that these files, and not conda's, are installed.
     .micromamba_install('c-compiler', channels=['conda-forge'])
     .run_commands(
-        'python -m pip install --no-deps --no-build-isolation '
+        'python -m pip install --no-deps --no-build-isolation --force-reinstall '
         'https://github.com/brownbaerchen/mpi4py-fft/archive/'
-        'a7aeec6ace99dd49561625c866c605ed0b337c18.tar.gz'
+        'a7aeec6ace99dd49561625c866c605ed0b337c18.tar.gz',
+        'python -c "import mpi4py_fft.distarrayCuPy"',
     )
     .env({'PYTHONUNBUFFERED': '1', 'PYTHONPATH': REMOTE})
     # `copy=False` attaches the checkout at container start instead of baking it into the image,
