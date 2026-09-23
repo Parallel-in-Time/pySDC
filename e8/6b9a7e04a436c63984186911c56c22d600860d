@@ -1,0 +1,19 @@
+pySDC/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.py
+  s_1c3161f345de6b::t_8871598c8b93ee 4,9-20,24-25,34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e86b9a7e04a436c63984186911c56c22d600860d",
+  "prompts": {},
+  "sessions": {
+    "s_1c3161f345de6b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6c01d563-eee0-4753-b09f-3f1a064d4ab3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
