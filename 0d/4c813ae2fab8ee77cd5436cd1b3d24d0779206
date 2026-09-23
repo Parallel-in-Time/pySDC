@@ -1,0 +1,27 @@
+pySDC/projects/DeltaSDC/plot_delivered_accuracy.py
+  s_a8be709fa420a3::t_ef623782b9a6f0 1-203
+pySDC/projects/DeltaSDC/plot_mixed_precision.py
+  s_a8be709fa420a3::t_a798ff8ed76f85 1-179
+pySDC/projects/DeltaSDC/problems.py
+  s_a8be709fa420a3::t_9b9474d2fcd2c4 76,83,85-88,91-94,100,102,116-120,125,129,176,207,210-218,227-231,235-236,240,248,257,262
+pySDC/projects/DeltaSDC/run_demo.py
+  s_a8be709fa420a3::t_de62d8cec9ca43 147-150,294-297
+pySDC/projects/DeltaSDC/tests/test_problems.py
+  s_a8be709fa420a3::t_d9e6983c4fd5d1 293-329
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0d4c813ae2fab8ee77cd5436cd1b3d24d0779206",
+  "prompts": {},
+  "sessions": {
+    "s_a8be709fa420a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "24c358b1-7444-42a2-86c1-b23312a241e0",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
