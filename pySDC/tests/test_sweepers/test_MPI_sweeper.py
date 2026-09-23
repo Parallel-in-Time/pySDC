@@ -165,7 +165,5 @@ def test_sweeper_NCCL(quad_type, residual_type, imex, init_guess):
         imex=imex,
         init_guess=init_guess,
         useNCCL=True,
-        # not `ML=1`: a truthy `ML` selects `heatNd_unforced`, which has no `useGPU` argument and
-        # would raise before NCCL was reached. `0` selects `testequation0d`, which has one.
-        ML=0,
+        ML=1,
     )

@@ -25,15 +25,18 @@ This can take a while. When it is done you are ready to run ``pySDC`` on the GPU
 
 Changes in the problem_classes
 ------------------------------
-Now you have to change a little bit in the problem_classes. The first and easy step is to change the datatype.
-To use pySDC on the GPU with CuPy you must use the
-`cupy-datatype <../../implementations/datatype_classes/cupy_mesh.py>`_.
-The next step is to import cupy in the problem_class. In the following you have to exchange the NumPy/SciPy functions with the CuPy functions.
-A `comparison table <https://docs.cupy.dev/en/latest/reference/comparison.html>`_ is given from CuPy to do that.
-For example, the above steps can be traced using the files
-`HeatEquation_ND_FD.py <../../implementations/problem_classes/HeatEquation_ND_FD.py>`_
-and `HeatEquation_ND_FD_CuPy.py <../../implementations/problem_classes/HeatEquation_ND_FD_CuPy.py>`_,
-which are the pair ``heat.py`` imports.
+A problem class does not need a GPU twin. It keeps one implementation and takes a ``useGPU``
+argument, and a ``setup_GPU`` classmethod swaps what the class computes with: ``xp`` from NumPy to
+CuPy, ``xsp`` and ``linalg`` from SciPy's sparse modules to ``cupyx``'s, and the datatypes to
+`cupy_mesh <../../implementations/datatype_classes/cupy_mesh.py>`_. The body of the class then
+calls ``self.xp.sin`` where it used to call ``numpy.sin``, and works either way.
+
+A `comparison table <https://docs.cupy.dev/en/latest/reference/comparison.html>`_ is given by CuPy
+for translating the calls themselves.
+
+`generic_ND_FD.py <../../implementations/problem_classes/generic_ND_FD.py>`_ is the example to
+copy: every finite-difference problem derived from it -- the heat equation that ``heat.py`` runs,
+and advection -- became GPU-capable when the base class was ported, without a line of their own.
 Now you are ready to run ``pySDC`` on the GPU.
 
 Run pySDC on the GPU
