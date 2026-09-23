@@ -1,6 +1,7 @@
 import firedrake as fd
 
 from pySDC.core.errors import DataError
+from pySDC.implementations.datatype_classes.container import MultiComponentContainer
 from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 
 
@@ -130,7 +131,7 @@ class firedrake_mesh(object):
         return self
 
 
-class IMEX_firedrake_mesh(object):
+class IMEX_firedrake_mesh(MultiComponentContainer):
     """
     Datatype for IMEX integration with firedrake data.
 
@@ -139,28 +140,5 @@ class IMEX_firedrake_mesh(object):
         expl (firedrake_mesh): explicit part
     """
 
-    def __init__(self, init, val=0.0):
-        if type(init) == type(self):
-            self.impl = firedrake_mesh(init.impl)
-            self.expl = firedrake_mesh(init.expl)
-        else:
-            self.impl = firedrake_mesh(init, val=val)
-            self.expl = firedrake_mesh(init, val=val)
-
-    def __add__(self, other):
-        me = IMEX_firedrake_mesh(self)
-        me.impl = self.impl + other.impl
-        me.expl = self.expl + other.expl
-        return me
-
-    def __sub__(self, other):
-        me = IMEX_firedrake_mesh(self)
-        me.impl = self.impl - other.impl
-        me.expl = self.expl - other.expl
-        return me
-
-    def __rmul__(self, other):
-        me = IMEX_firedrake_mesh(self)
-        me.impl = other * self.impl
-        me.expl = other * self.expl
-        return me
+    components = ['impl', 'expl']
+    component_type = firedrake_mesh
