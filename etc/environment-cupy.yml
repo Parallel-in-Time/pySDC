@@ -26,6 +26,13 @@ dependencies:
   - nccl
   # the GPU project's configs go through `spectral_helper`, and its runs are MPI-decomposed
   - openmpi
+  # NOT ENOUGH ON ITS OWN for the GPU spectral code, which asks mpi4py-fft for a `cupy` /
+  # `cupyx-scipy` FFT backend, for `DistArrayCuPy` and for the NCCL `comm_backend`. None of the
+  # three is in any release: upstream declined the approach in mpi4py/mpi4py-fft#14, since
+  # `cupy.ndarray` cannot be subclassed the way `DistArray` needs. They live on the
+  # `cupy_implementation` branch of https://github.com/brownbaerchen/mpi4py-fft, which has to be
+  # installed over this one -- see etc/modal_gpu_tests.py for the exact pinned command. This
+  # entry stays because everything else here needs a working mpi4py-fft to build against.
   - mpi4py-fft>=2.0.2
   - mpi4py>=3.0.0
   - tqdm

@@ -31,6 +31,22 @@ image = (
     # spectral helper's `cupy`-marked tests go through them even on a single rank.
     .micromamba_install(spec_file='etc/environment-cupy.yml', channels=['conda-forge'])
     .micromamba_install(spec_file='etc/environment-tests.yml', channels=['conda-forge'])
+    # Released mpi4py-fft has no `cupy`/`cupyx-scipy` FFT backend, no `DistArrayCuPy` and no
+    # NCCL `comm_backend` -- upstream declined the approach in mpi4py/mpi4py-fft#14, because
+    # `cupy.ndarray` cannot be subclassed the way `DistArray` needs. pySDC's GPU spectral code
+    # asks for all three, so it can only run against this fork, which replaces the conda-forge
+    # build installed above. Pinned to a commit rather than to the branch, so that the image is
+    # reproducible and does not silently move under us.
+    #
+    # `c-compiler` because the FFTW extension is built from source; it finds FFTW on its own,
+    # since the fork's setup.py falls back to `sys.prefix` and conda-forge put it there. No
+    # build isolation, so the build sees the environment's own NumPy and setuptools, and
+    # `--no-deps` so pip does not pull PyPI wheels over the conda-forge NumPy and mpi4py.
+    .micromamba_install('c-compiler', channels=['conda-forge'])
+    .run_commands(
+        'python -m pip install --no-deps --no-build-isolation '
+        'git+https://github.com/brownbaerchen/mpi4py-fft.git@a7aeec6ace99dd49561625c866c605ed0b337c18'
+    )
     .env({'PYTHONUNBUFFERED': '1', 'PYTHONPATH': REMOTE})
     # `copy=False` attaches the checkout at container start instead of baking it into the image,
     # so a commit that touches only Python code reuses the cached image. The image is rebuilt
