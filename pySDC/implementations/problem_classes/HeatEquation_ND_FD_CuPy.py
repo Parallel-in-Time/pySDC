@@ -237,7 +237,7 @@ class heatNd_forced(Problem):  # pragma: no cover
                 self.Id - factor * self.A,
                 rhs.flatten(),
                 x0=u0.flatten(),
-                tol=self.lintol,
+                rtol=self.lintol,
                 maxiter=self.liniter,
                 atol=0,
             )[0].reshape(self.nvars)

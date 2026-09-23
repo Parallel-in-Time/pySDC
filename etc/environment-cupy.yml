@@ -16,7 +16,9 @@ dependencies:
   - scipy>=0.17.1
   - matplotlib>=3.0
   - dill>=0.2.6
-  - cupy
+  # >=14 for `rtol`: CuPy renamed the iterative solvers' `tol` argument in 14, following the
+  # same rename in SciPy, and `HeatEquation_ND_FD_CuPy` passes the new spelling.
+  - cupy>=14
   # conda-forge's `cupy` does not depend on NCCL, but `pySDC/helpers/NCCL_communicator.py`
   # imports `cupy.cuda.nccl`, which is an empty shim unless libnccl is there. Without this,
   # building an `NCCLComm` fails with a bare `module 'cupy.cuda.nccl' has no attribute

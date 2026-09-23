@@ -75,18 +75,6 @@ def _wrap(func):
     return wrapper
 
 
-def _accept_tol(func):
-    """Take CuPy's `tol=` and hand SciPy the `rtol=` it wants."""
-
-    def wrapper(*args, **kwargs):
-        if 'tol' in kwargs:
-            kwargs.setdefault('rtol', kwargs.pop('tol'))
-        return func(*args, **kwargs)
-
-    wrapper.__name__ = getattr(func, '__name__', 'wrapped')
-    return wrapper
-
-
 def _mirror(name, source):
     """Register a module under `name` exposing everything in `source`, functions wrapped.
 
@@ -148,12 +136,6 @@ def install():
     # against ones SciPy made, so the types have to stay identical.
     sparse = _module('cupyx.scipy.sparse', **scipy.sparse.__dict__)
     sparse.linalg = _mirror('cupyx.scipy.sparse.linalg', scipy.sparse.linalg)
-    # CuPy's iterative solvers still take `tol=`, which SciPy renamed to `rtol` and then removed.
-    # The stub is impersonating CuPy, so it has to accept CuPy's spelling.
-    for _name in ('cg', 'gmres', 'bicgstab', 'minres', 'cgs', 'qmr'):
-        _solver = getattr(sparse.linalg, _name, None)
-        if _solver is not None:
-            setattr(sparse.linalg, _name, _accept_tol(_solver))
     cupyx.scipy.sparse = sparse
 
     backends = _module('cupy_backends')
