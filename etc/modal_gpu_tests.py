@@ -105,7 +105,11 @@ image = (
 )
 
 
-@app.function(image=image, gpu=GPUS, timeout=3600)
+# `timeout` is a wall clock limit on the container, and it is the only thing that stops a hung run
+# renting two GPUs until Modal's own maximum expires. A full run is about three minutes, so this is
+# generous even with a cold image, and still kills a stuck one quickly. pytest's own 300 s
+# per-test timeout does not help here: a deadlocked collective hangs outside any single test.
+@app.function(image=image, gpu=GPUS, timeout=900)
 def run_cupy_tests(trees, selection):
     """Run the GPU test suite in the container, and hand back pytest's exit code and coverage.
 
