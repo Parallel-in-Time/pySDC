@@ -151,7 +151,13 @@
                 <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">buf</span>
             <span class="k">return</span> <span class="n">res</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">A</span> <span class="o">@</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span></div>
+            <span class="c1"># `asarray` stacks the vector into a single array, and CuPy builds that through</span>
+            <span class="c1"># `copy`, which asserts -- with no message -- when it is handed back an `ndarray`</span>
+            <span class="c1"># subclass instead of the base type. `cupy_mesh.copy` returns `type(self)` on</span>
+            <span class="c1"># purpose, so that a copied mesh stays a mesh, which makes every datatype here such a</span>
+            <span class="c1"># subclass. NumPy has no such restriction, but dropping the wrapper is right either</span>
+            <span class="c1"># way: what this wants is the numbers, not the datatype.</span>
+            <span class="k">return</span> <span class="n">A</span> <span class="o">@</span> <span class="n">xp</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">entry</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">xp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">b</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="EstimatePolynomialError.get_interpolated_solution">
