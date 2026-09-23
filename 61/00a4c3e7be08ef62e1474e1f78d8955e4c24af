@@ -1,0 +1,23 @@
+pySDC/tests/test_datatypes/test_multicomponent_mesh.py
+  s_9c604d5a2877a5::t_219fe0647b1e18 93-94,106-108
+pySDC/implementations/datatype_classes/cupy_mesh.py
+  s_9c604d5a2877a5::t_475953ee9bc2a6 88-106
+pySDC/tests/fake_cupy.py
+  s_9c604d5a2877a5::t_00944ff634dd65 61-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6100a4c3e7be08ef62e1474e1f78d8955e4c24af",
+  "prompts": {},
+  "sessions": {
+    "s_9c604d5a2877a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "15cd8f36-9134-439b-832b-77eb6325bef5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
