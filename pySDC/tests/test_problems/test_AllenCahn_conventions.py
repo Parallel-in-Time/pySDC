@@ -42,12 +42,22 @@ FD_VARIANTS = [
 FFT_VARIANTS = ['allencahn2d_imex', 'allencahn2d_imex_stab']
 
 
+def as_numpy(a):
+    """A pySDC datatype as a plain NumPy array, whichever array library it lives in.
+
+    Two things make this less trivial than `np.asarray`: a CuPy array refuses to be converted
+    implicitly and hands over a NumPy copy through `.get()` instead, and the wrapper has to come
+    off either way, because `mesh.__abs__` is a norm rather than an elementwise absolute value.
+    """
+    return np.asarray(a.get() if hasattr(a, 'get') else a)
+
+
 def total_rhs(f):
     """Sum an rhs over whatever splitting the variant uses, so all variants become comparable."""
     for parts in (('impl', 'expl'), ('comp1', 'comp2')):
         if hasattr(f, parts[0]):
-            return sum(np.asarray(getattr(f, part)) for part in parts)
-    return np.asarray(f)
+            return sum(as_numpy(getattr(f, part)) for part in parts)
+    return as_numpy(f)
 
 
 def problem_class(cls_name):
@@ -343,8 +353,6 @@ def test_the_work_counters_count(cls_name):
 @pytest.mark.parametrize('cls_name', FD_VARIANTS + FFT_VARIANTS)
 def test_the_GPU_path_matches_the_CPU_one(cls_name):
     """These used to be separate files that drifted apart; now useGPU is the only difference."""
-    import cupy as cp
-
     cls, extra = problem_class(cls_name)
     params = dict(nvars=NVARS, eps=EPS, radius=RADIUS, **extra)
 
@@ -357,11 +365,11 @@ def test_the_GPU_path_matches_the_CPU_one(cls_name):
     # a multilevel run builds one problem per level, so setup_GPU has to survive a second call
     on_gpu(useGPU=True, **params)
 
-    u_cpu, u_gpu = np.asarray(cpu.u_exact(0.0)), cp.asnumpy(gpu.u_exact(0.0))
+    u_cpu, u_gpu = as_numpy(cpu.u_exact(0.0)), as_numpy(gpu.u_exact(0.0))
     assert abs(u_cpu - u_gpu).max() < 1e-12, 'the two modes start from different fields'
 
     f_cpu = total_rhs(cpu.eval_f(cpu.u_exact(0.0), 0.0))
-    f_gpu = cp.asnumpy(total_rhs(gpu.eval_f(gpu.u_exact(0.0), 0.0)))
+    f_gpu = total_rhs(gpu.eval_f(gpu.u_exact(0.0), 0.0))
     assert abs(f_cpu - f_gpu).max() < 1e-10 * max(abs(f_cpu).max(), 1.0), 'the two modes disagree on the rhs'
 
 
