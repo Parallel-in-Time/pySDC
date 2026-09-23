@@ -1,0 +1,21 @@
+pySDC/implementations/problem_classes/HeatEquation_ND_FD_CuPy.py
+  s_9af5c84054669f::t_35786e0dd1a1bf 240
+etc/environment-cupy.yml
+  s_9af5c84054669f::t_b67c5b23e820b5 19-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d2005ba5ab649b1fb4ecfe5d70a5d2424821efa9",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
