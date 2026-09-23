@@ -17,6 +17,7 @@ The paths below are resolved relative to the working directory, so the repositor
 only place this works from.
 """
 
+import os
 import pathlib
 
 import modal
@@ -26,6 +27,10 @@ REMOTE = '/root/pySDC'
 
 #: Where the coverage data lands on the machine that runs this, for the pipeline to pick up.
 COVERAGE_OUT = 'coverage_GPU_hardware.dat'
+
+#: Two of them, because `test_sweeper_NCCL` asks for two ranks and NCCL wants a GPU per rank.
+#: Everything else needs one, and pays for two while it runs -- which is still a couple of cents.
+GPUS = 'T4:2'
 
 app = modal.App('pySDC-gpu-tests')
 
@@ -67,7 +72,28 @@ image = (
         'a7aeec6ace99dd49561625c866c605ed0b337c18.tar.gz',
         'python -c "import mpi4py_fft.distarrayCuPy"',
     )
-    .env({'PYTHONUNBUFFERED': '1', 'PYTHONPATH': REMOTE})
+    # `mpi-pytest` supplies the `parallel` marker, which is how a test says how many ranks it
+    # wants; without it `etc/run_mpi_tests.sh` finds no rank counts and runs one serial pass, and
+    # the NCCL tests would quietly execute on a single rank. It is a pip package, as in the
+    # `- pip:` block of every other environment file here.
+    .run_commands('python -m pip install "mpi-pytest>=2026.0"')
+    .env(
+        {
+            'PYTHONUNBUFFERED': '1',
+            'PYTHONPATH': REMOTE,
+            # Modal containers are root, and OpenMPI refuses to launch as root unless told twice.
+            'OMPI_ALLOW_RUN_AS_ROOT': '1',
+            'OMPI_ALLOW_RUN_AS_ROOT_CONFIRM': '1',
+            # PMIx's shared-memory store segfaults in this container -- `PMIX ERROR: PMIX_ERROR in
+            # file gds_shmem2.c` and then a dead launcher, before pytest prints anything. The hash
+            # store keeps the data in process memory instead and needs nothing from the host.
+            'PMIX_MCA_gds': 'hash',
+            # A slot is a physical core, and this container has fewer of those than it has GPUs to
+            # drive; same reasoning as the main CI pipeline's copy of these.
+            'PRTE_MCA_rmaps_default_mapping_policy': ':oversubscribe',
+            'OMPI_MCA_rmaps_base_oversubscribe': 'true',
+        }
+    )
     # `copy=False` attaches the checkout at container start instead of baking it into the image,
     # so a commit that touches only Python code reuses the cached image. The image is rebuilt
     # only when one of the two environment files changes -- which takes several minutes, because
@@ -76,7 +102,7 @@ image = (
 )
 
 
-@app.function(image=image, gpu='T4', timeout=1800)
+@app.function(image=image, gpu=GPUS, timeout=3600)
 def run_cupy_tests():
     """Run the GPU test suite in the container, and hand back pytest's exit code and coverage.
 
@@ -86,25 +112,22 @@ def run_cupy_tests():
     """
     import subprocess
 
+    # `etc/run_mpi_tests.sh` is how every other leg runs its tests: it asks the tests themselves
+    # what rank counts they declare and launches one pass per count, so `test_sweeper_NCCL` gets
+    # the two ranks its `parallel(2)` marker asks for, and everything else runs serially. Each
+    # rank is wrapped so it sees a GPU of its own -- see etc/bind_gpu_to_rank.sh.
+    #
     # `PYSDC_FAKE_GPU` is deliberately *not* set: this is the run that uses the real thing.
-    returncode = subprocess.run(
-        [
-            'python',
-            '-m',
-            'coverage',
-            'run',
-            '-m',
-            'pytest',
-            '-v',
-            '--durations=0',
-            '--continue-on-collection-errors',
-            '-m',
-            'cupy',
-            'pySDC/tests',
-            'pySDC/projects/GPU/tests',
-        ],
-        cwd=REMOTE,
-    ).returncode
+    env = {
+        **os.environ,
+        'PYTEST': f'bash {REMOTE}/etc/bind_gpu_to_rank.sh coverage run -m pytest'
+        ' --continue-on-collection-errors -v --durations=0',
+    }
+    returncode = 0
+    for tree in ('pySDC/tests', 'pySDC/projects/GPU/tests'):
+        returncode = (
+            subprocess.run(['bash', 'etc/run_mpi_tests.sh', tree, 'cupy'], cwd=REMOTE, env=env).returncode or returncode
+        )
 
     # `concurrency = ['multiprocessing']` in pyproject.toml makes coverage write one suffixed file
     # per process, so there is no `.coverage` to read until they are combined. Not fatal if it

@@ -1,5 +1,7 @@
 import pytest
 
+from pySDC.tests import fake_cupy
+
 
 def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL, ML):
     """
@@ -135,7 +137,10 @@ def test_sweeper(quad_type, residual_type, imex, init_guess, ML):
 
 
 @pytest.mark.cupy
-@pytest.mark.skip(reason="We haven\'t figured out how to run tests on the cluster with multiple processes yet.")
+@pytest.mark.skipif(
+    fake_cupy.ACTIVE,
+    reason='builds an NCCLComm, whose calls take raw device pointers and cannot be faked on the CPU',
+)
 @pytest.mark.parallel(2)
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
@@ -160,5 +165,7 @@ def test_sweeper_NCCL(quad_type, residual_type, imex, init_guess):
         imex=imex,
         init_guess=init_guess,
         useNCCL=True,
-        ML=1,
+        # not `ML=1`: a truthy `ML` selects `heatNd_unforced`, which has no `useGPU` argument and
+        # would raise before NCCL was reached. `0` selects `testequation0d`, which has one.
+        ML=0,
     )
