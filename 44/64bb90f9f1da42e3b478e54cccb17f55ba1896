@@ -1,0 +1,33 @@
+etc/modal_gpu_tests.py
+  s_9af5c84054669f::t_5b9620fb592eb1 31-33,116,134,137,160-165,169-178
+  s_9af5c84054669f::t_460c33d2348c06 111-115
+  s_9af5c84054669f::t_9f81964628412d 150-157,159,166-168
+  s_9af5c84054669f::t_86e53127873e94 104-107
+docs/contrib/02_continuous_integration.md
+  s_9af5c84054669f::t_a8f05f653507b7 213-217
+  s_9af5c84054669f::t_3b28c1187b0237 229-234
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_9af5c84054669f::t_f7ff139fa91feb 149-150,169
+  s_9af5c84054669f::t_3bed44426ba4d3 149-150,169
+pySDC/implementations/transfer_classes/TransferMesh.py
+  s_9af5c84054669f::t_b95b5d82dde40d 166-175,205,241
+pySDC/tests/test_transfer_classes/test_mesh_to_mesh_GPU.py
+  s_9af5c84054669f::t_6e6bc70b92e96e 1-15,17-52
+  s_9af5c84054669f::t_564dcb1323faee 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4464bb90f9f1da42e3b478e54cccb17f55ba1896",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
