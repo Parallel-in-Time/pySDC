@@ -1,0 +1,25 @@
+etc/modal_gpu_tests.py
+  s_9af5c84054669f::t_a467025236e4ad 87-90
+  s_9af5c84054669f::t_3e0bf16bfe88a3 129
+  s_9af5c84054669f::t_54c9d2b22ddcd0 20,31-34,75-86,91-96,105,115-119,121-128,130
+etc/bind_gpu_to_rank.sh
+  s_9af5c84054669f::t_751d63eaec41d2 1-21
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_9af5c84054669f::t_24b3a0a68d536a 3-4,140-143,168-170
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "af3dec1283afda6ab6c13672eab089d935cff4f4",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
