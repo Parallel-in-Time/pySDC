@@ -5,6 +5,8 @@ try:
 except ImportError:
     MPI = None
 
+from pySDC.implementations.datatype_classes.mesh import MultiComponentMeshMixin
+
 try:
     from pySDC.helpers.NCCL_communicator import NCCLComm
 except ImportError:
@@ -126,61 +128,8 @@ class cupy_mesh(cp.ndarray):
         return self
 
 
-class CuPyMultiComponentMesh(cupy_mesh):
-    r"""
-    Generic mesh with multiple components.
-
-    To make a specific multi-component mesh, derive from this class and list the components as strings in the class
-    attribute ``components``. An example:
-
-    ```
-    class imex_cupy_mesh(CuPyMultiComponentMesh):
-        components = ['impl', 'expl']
-    ```
-
-    Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access
-    to the components with ``.``. Continuing the above example:
-
-    ```
-    init = ((100,), None, numpy.dtype('d'))
-    f = imex_cupy_mesh(init)
-    f.shape  # (2, 100)
-    f.expl.shape  # (100,)
-    ```
-
-    Note that the components are not attributes of the mesh: ``"expl" in dir(f)`` will return False! Rather, the
-    components are handled in ``__getattr__``. This function is called if an attribute is not found and returns a view
-    on to the component if appropriate. Importantly, this means that you cannot name a component like something that
-    is already an attribute of ``cupy_mesh`` or ``cupy.ndarray`` because this will not result in calls to ``__getattr__``.
-
-    There are a couple more things to keep in mind:
-     - Because a ``CuPyMultiComponentMesh`` is just a ``cupy.ndarray`` with one more dimension, all components must have
-       the same shape.
-     - You can use the entire ``CuPyMultiComponentMesh`` like a ``cupy.ndarray`` in operations that accept arrays, but make
-       sure that you really want to apply the same operation on all components if you do.
-     - If you omit the assignment operator ``[:]`` during assignment, you will not change the mesh at all. Omitting this
-       leads to all kinds of trouble throughout the code. But here you really cannot get away without.
-    """
-
-    components = []
-
-    def __new__(cls, init, *args, **kwargs):
-        if isinstance(init, tuple):
-            shape = (init[0],) if type(init[0]) is int else init[0]
-            obj = super().__new__(cls, ((len(cls.components), *shape), *init[1:]), *args, **kwargs)
-        else:
-            obj = super().__new__(cls, init, *args, **kwargs)
-
-        return obj
-
-    def __getattr__(self, name):
-        if name in self.components:
-            if self.shape[0] == len(self.components):
-                return self[self.components.index(name)].view(cupy_mesh)
-            else:
-                raise AttributeError(f'Cannot access {name!r} in {type(self)!r} because the shape is unexpected.')
-        else:
-            raise AttributeError(f"{type(self)!r} does not have attribute {name!r}!")
+class CuPyMultiComponentMesh(MultiComponentMeshMixin, cupy_mesh):
+    """CuPy-based mesh with multiple components, see ``MultiComponentMeshMixin``."""
 
 
 class imex_cupy_mesh(CuPyMultiComponentMesh):

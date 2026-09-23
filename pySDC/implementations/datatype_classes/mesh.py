@@ -125,13 +125,14 @@ class mesh(np.ndarray):
         return self
 
 
-def _component_property(index, name):
+def _component_property(index, name, base):
     """
-    Make a property that reads and writes the ``index``-th component of a ``MultiComponentMesh``.
+    Make a property that reads and writes the ``index``-th component of a multi-component mesh.
 
     Args:
         index (int): position of the component along the first axis
         name (str): name of the component, used in error messages
+        base: the single-component datatype a component is a view of
 
     Returns:
         property: gives a view on the component, and writes into it on assignment
@@ -140,7 +141,7 @@ def _component_property(index, name):
     def getter(self):
         if self.shape[0] != len(self.components):
             raise AttributeError(f'Cannot access {name!r} in {type(self)!r} because the shape is unexpected.')
-        return self[index].view(mesh)
+        return self[index].view(base)
 
     def setter(self, value):
         getter(self)[:] = value
@@ -148,12 +149,13 @@ def _component_property(index, name):
     return property(getter, setter, doc=f'View on the {name!r} component of the mesh')
 
 
-class MultiComponentMesh(mesh):
+class MultiComponentMeshMixin:
     r"""
     Generic mesh with multiple components.
 
-    To make a specific multi-component mesh, derive from this class and list the components as strings in the class
-    attribute ``components``. An example:
+    Mix this into a mesh datatype to obtain the multi-component version of it, as ``MultiComponentMesh`` does for
+    ``mesh`` and ``CuPyMultiComponentMesh`` does for ``cupy_mesh``. To make a specific multi-component mesh, derive
+    from one of those and list the components as strings in the class attribute ``components``. An example:
 
     ```
     class imex_mesh(MultiComponentMesh):
@@ -172,15 +174,15 @@ class MultiComponentMesh(mesh):
 
     The components are properties, generated when the subclass is created. Both ``f.expl[:] = ...`` and
     ``f.expl = ...`` write into the mesh; the component is never replaced by an unrelated object. Because the
-    properties live on the class, you cannot name a component like something that is already an attribute of ``mesh``
-    or ``numpy.ndarray`` -- doing so raises an ``AttributeError`` when the class is created rather than silently
+    properties live on the class, you cannot name a component like something that is already an attribute of the
+    underlying mesh datatype -- doing so raises an ``AttributeError`` when the class is created rather than silently
     shadowing the component.
 
     There are a couple more things to keep in mind:
-     - Because a ``MultiComponentMesh`` is just a ``numpy.ndarray`` with one more dimension, all components must have
-       the same shape.
-     - You can use the entire ``MultiComponentMesh`` like a ``numpy.ndarray`` in operations that accept arrays, but make
-       sure that you really want to apply the same operation on all components if you do.
+     - Because a multi-component mesh is just an array with one more dimension, all components must have the same
+       shape.
+     - You can use the entire mesh like an array in operations that accept arrays, but make sure that you really want
+       to apply the same operation on all components if you do.
     """
 
     components = []
@@ -190,13 +192,17 @@ class MultiComponentMesh(mesh):
         Turn the names listed in ``components`` into properties giving a view on the corresponding slice of the mesh.
         """
         super().__init_subclass__(**kwargs)
+
+        # a single component is an instance of the datatype this multi-component mesh is built on
+        base = next(c for c in cls.__mro__ if not issubclass(c, MultiComponentMeshMixin))
+
         for index, name in enumerate(cls.components):
-            if hasattr(mesh, name):
+            if hasattr(base, name):
                 raise AttributeError(
                     f'Cannot use {name!r} as a component of {cls.__name__} because it is already an attribute of '
-                    f'{mesh.__name__}!'
+                    f'{base.__name__}!'
                 )
-            setattr(cls, name, _component_property(index, name))
+            setattr(cls, name, _component_property(index, name, base))
 
     def __new__(cls, init, *args, **kwargs):
         if isinstance(init, tuple):
@@ -206,6 +212,10 @@ class MultiComponentMesh(mesh):
             obj = super().__new__(cls, init, *args, **kwargs)
 
         return obj
+
+
+class MultiComponentMesh(MultiComponentMeshMixin, mesh):
+    """Numpy-based mesh with multiple components, see ``MultiComponentMeshMixin``."""
 
 
 class imex_mesh(MultiComponentMesh):
