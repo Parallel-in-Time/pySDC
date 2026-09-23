@@ -101,7 +101,10 @@ image = (
     # so a commit that touches only Python code reuses the cached image. The image is rebuilt
     # only when one of the two environment files changes -- which takes several minutes, because
     # conda-forge's `cupy` brings the CUDA runtime with it.
-    .add_local_dir('.', REMOTE, ignore=['.git', '.claude', '**/__pycache__'])
+    # `.coverage*` because this does not consult `.gitignore`: a local `modal run` or pytest leaves
+    # data files in the working directory, and they would be uploaded and then found by `coverage
+    # combine` in the container -- a hundred of them, from other machines, on every run.
+    .add_local_dir('.', REMOTE, ignore=['.git', '.claude', '**/__pycache__', '.coverage*'])
 )
 
 
