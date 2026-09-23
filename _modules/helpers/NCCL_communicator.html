@@ -50,6 +50,17 @@
 <span class="sd">    Wraps an MPI communicator and performs some calls to NCCL functions instead.</span>
 <span class="sd">    """</span>
 
+    <span class="c1">#: One NCCL communicator per MPI communicator, keyed by the MPI handle.</span>
+    <span class="c1">#:</span>
+    <span class="c1">#: Creating one costs about 17 MB of device memory that is never released: NCCL has no</span>
+    <span class="c1">#: reference counting, and destroying a communicator is itself collective, so a `__del__`</span>
+    <span class="c1">#: would have ranks tearing them down whenever their garbage collectors happened to run --</span>
+    <span class="c1">#: in different orders, which deadlocks. Making them once and sharing them avoids both.</span>
+    <span class="c1">#:</span>
+    <span class="c1">#: The MPI communicator is kept alongside so it cannot be freed and have its handle reused</span>
+    <span class="c1">#: for a different one, which would hand out the wrong NCCL communicator.</span>
+    <span class="n">_communicators</span> <span class="o">=</span> <span class="p">{}</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Args:</span>
@@ -57,8 +68,15 @@
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span> <span class="o">=</span> <span class="n">comm</span>
 
-        <span class="n">uid</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">nccl</span><span class="o">.</span><span class="n">get_unique_id</span><span class="p">(),</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">commNCCL</span> <span class="o">=</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NcclCommunicator</span><span class="p">(</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="p">)</span>
+        <span class="c1"># `py2f` rather than the communicator itself: mpi4py defines `__eq__` without `__hash__`,</span>
+        <span class="c1"># so a communicator cannot be a dictionary key, and the handle is the same for any two</span>
+        <span class="c1"># Python wrappers around one communicator.</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">py2f</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">NCCLComm</span><span class="o">.</span><span class="n">_communicators</span><span class="p">:</span>
+            <span class="n">uid</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">nccl</span><span class="o">.</span><span class="n">get_unique_id</span><span class="p">(),</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">NCCLComm</span><span class="o">.</span><span class="n">_communicators</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NcclCommunicator</span><span class="p">(</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">commNCCL</span> <span class="o">=</span> <span class="n">NCCLComm</span><span class="o">.</span><span class="n">_communicators</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
