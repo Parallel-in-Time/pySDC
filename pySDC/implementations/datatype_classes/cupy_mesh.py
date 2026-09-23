@@ -85,6 +85,25 @@ class cupy_mesh(cp.ndarray):
 
         return float(global_absval)
 
+    def copy(self, *args, **kwargs):
+        """
+        Copy the mesh, keeping its type.
+
+        CuPy's ``ndarray`` is a Cython extension type whose ``copy`` returns the base class rather than
+        ``type(self)``, unlike NumPy's. Without this, a copy of a mesh silently stops being one and loses the
+        components along with the ``__abs__`` that does the MPI reduction.
+
+        Returns:
+            mesh: copy of the mesh, of the same type
+        """
+        return super().copy(*args, **kwargs).view(type(self))
+
+    def __deepcopy__(self, memo=None):
+        """
+        CuPy routes ``copy.deepcopy`` through ``copy``, so the type has to be kept here as well.
+        """
+        return self.copy()
+
     def isend(self, dest=None, tag=None, comm=None):
         """
         Routine for sending data forward in time (non-blocking)
