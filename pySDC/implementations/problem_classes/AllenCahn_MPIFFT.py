@@ -101,8 +101,6 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         f.impl[:] = self._eval_Laplacian(u, f.impl)
 
         if self.spectral:
-            f.impl = -self.K2 * u
-
             if self.eps > 0:
                 tmp = self.fft.backward(u)
                 tmp[:] = self._eval_explicit_part(tmp, t, tmp)

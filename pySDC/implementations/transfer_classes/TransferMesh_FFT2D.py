@@ -49,7 +49,7 @@ class mesh_to_mesh_fft2d(SpaceTransfer):
         # rather than for the type
         if hasattr(type(F), 'components'):
             for comp in F.components:
-                _restrict(F.__getattr__(comp), G.__getattr__(comp))
+                _restrict(getattr(F, comp), getattr(G, comp))
         elif type(F).__name__ == 'mesh':
             _restrict(F, G)
         else:
@@ -73,7 +73,7 @@ class mesh_to_mesh_fft2d(SpaceTransfer):
 
         if hasattr(type(G), 'components'):
             for comp in G.components:
-                _prolong(G.__getattr__(comp), F.__getattr__(comp))
+                _prolong(getattr(G, comp), getattr(F, comp))
         elif type(G).__name__ == 'mesh':
             _prolong(G, F)
         else:

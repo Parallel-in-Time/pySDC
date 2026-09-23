@@ -1,6 +1,6 @@
 from petsc4py import PETSc
 
-from pySDC.core.errors import DataError
+from pySDC.implementations.datatype_classes.container import MultiComponentContainer
 
 
 class petsc_vec(PETSc.Vec):
@@ -72,69 +72,27 @@ class petsc_vec(PETSc.Vec):
         return self
 
 
-class petsc_vec_imex(object):
+class petsc_vec_imex(MultiComponentContainer):
     """
     RHS data type for Vec with implicit and explicit components
-
-    This data type can be used to have RHS with 2 components (here implicit and explicit)
 
     Attributes:
         impl (petsc_vec): implicit part
         expl (petsc_vec): explicit part
     """
 
-    def __init__(self, init, val=0.0):
-        """
-        Initialization routine
-
-        Args:
-            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another imex_mesh object
-            val (float): an initial number (default: 0.0)
-        Raises:
-            DataError: if init is none of the types above
-        """
-
-        if isinstance(init, type(self)):
-            self.impl = petsc_vec(init.impl)
-            self.expl = petsc_vec(init.expl)
-        elif isinstance(init, PETSc.DMDA):
-            self.impl = petsc_vec(init, val=val)
-            self.expl = petsc_vec(init, val=val)
-        # something is wrong, if none of the ones above hit
-        else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+    components = ['impl', 'expl']
+    component_type = petsc_vec
 
 
-class petsc_vec_comp2(object):
+class petsc_vec_comp2(MultiComponentContainer):
     """
-    RHS data type for Vec with implicit and explicit components
-
-    This data type can be used to have RHS with 2 components (here implicit and explicit)
+    RHS data type for Vec with two components
 
     Attributes:
-        impl (petsc_vec): implicit part
-        expl (petsc_vec): explicit part
+        comp1 (petsc_vec): first component
+        comp2 (petsc_vec): second component
     """
 
-    def __init__(self, init, val=0.0):
-        """
-        Initialization routine
-
-        Args:
-            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another imex_mesh object
-            val (float): an initial number (default: 0.0)
-        Raises:
-            DataError: if init is none of the types above
-        """
-
-        if isinstance(init, type(self)):
-            self.comp1 = petsc_vec(init.comp1)
-            self.comp2 = petsc_vec(init.comp2)
-        elif isinstance(init, PETSc.DMDA):
-            self.comp1 = petsc_vec(init, val=val)
-            self.comp2 = petsc_vec(init, val=val)
-        # something is wrong, if none of the ones above hit
-        else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+    components = ['comp1', 'comp2']
+    component_type = petsc_vec
