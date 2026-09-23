@@ -1,0 +1,22 @@
+etc/modal_gpu_tests.py
+  s_9af5c84054669f::t_6f85924bc0b272 109-115
+  s_9af5c84054669f::t_184d207ef5a6e5 94-96
+  s_9af5c84054669f::t_d93ef07ba146c5 83-93,97
+  s_9af5c84054669f::t_86e53127873e94 126-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e1fc5215d878dd25ebb896be447f78da5733dcb7",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
