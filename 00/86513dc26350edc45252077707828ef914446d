@@ -1,0 +1,28 @@
+pySDC/helpers/NCCL_communicator.py
+  s_9af5c84054669f::t_208ba7b9c64b6b 155-181
+pySDC/projects/GPU/run_experiment.py
+  s_9af5c84054669f::t_dc55f97ab75b66 45
+  s_9af5c84054669f::t_65e0215aafe294 62-70
+pySDC/tests/test_controllers/test_controller_MPI_GPU.py
+  s_9af5c84054669f::t_210b1730dd2376 1-63
+pySDC/projects/RayleighBenard/run_experiment.py
+  s_9af5c84054669f::t_be5b3618cc8c82 45,68-76
+etc/modal_gpu_tests.py
+  s_9af5c84054669f::t_8040f750f60f20 94-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0086513dc26350edc45252077707828ef914446d",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
