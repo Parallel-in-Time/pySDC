@@ -8,20 +8,21 @@ from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import u
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
-def main(cwd=''):
+def main(cwd='', nvars=(4, 300, 30), Tend=3000, Nsteps=100):
     """
     Example running/comparing SDC and different standard integrators for the 2D Boussinesq equation
 
     Args:
         cwd (string): current working directory
+        nvars (tuple): number of degrees of freedom, reduced by the test to keep it cheap
+        Tend (float): end time
+        Nsteps (int): number of time steps
     """
 
     num_procs = 1
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 3000
-    Nsteps = 100
     dt = Tend / float(Nsteps)
 
     # initialize level parameters
@@ -44,7 +45,7 @@ def main(cwd=''):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nvars'] = [(4, 300, 30)]
+    problem_params['nvars'] = [nvars]
     problem_params['u_adv'] = 0.02
     problem_params['c_s'] = 0.3
     problem_params['Nfreq'] = 0.01
