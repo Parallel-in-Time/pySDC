@@ -40,14 +40,24 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.acoustic_helpers.buildFDMatrix</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">getMatrix</span><span class="p">,</span>
-    <span class="n">getHorizontalDx</span><span class="p">,</span>
-    <span class="n">getBCLeft</span><span class="p">,</span>
-    <span class="n">getBCRight</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.problem_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_finite_difference_matrix</span>
 
 <span class="n">wave_order</span> <span class="o">=</span> <span class="mi">6</span>
+
+
+<div class="viewcode-block" id="getFDMatrix">
+<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getFDMatrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">getFDMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">stencil_type</span><span class="p">,</span> <span class="n">bc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    First derivative matrix. Only homogeneous boundary conditions are supported, so the</span>
+<span class="sd">    right hand side contribution returned by the helper has to vanish.</span>
+<span class="sd">    """</span>
+    <span class="n">A</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">get_finite_difference_matrix</span><span class="p">(</span>
+        <span class="n">derivative</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">stencil_type</span><span class="o">=</span><span class="n">stencil_type</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="n">bc</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">'Inhomogeneous boundary conditions are not supported here'</span>
+    <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="getWave1DMatrix">
@@ -55,8 +65,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">getWave1DMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_left</span><span class="p">,</span> <span class="n">bc_right</span><span class="p">):</span>
     <span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span>
 
-    <span class="n">D_u</span> <span class="o">=</span> <span class="n">getMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_left</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bc_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">wave_order</span><span class="p">)</span>
-    <span class="n">D_p</span> <span class="o">=</span> <span class="n">getMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_left</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bc_right</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">wave_order</span><span class="p">)</span>
+    <span class="n">D_u</span> <span class="o">=</span> <span class="n">getFDMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">wave_order</span><span class="p">,</span> <span class="s1">'center'</span><span class="p">,</span> <span class="p">(</span><span class="n">bc_left</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bc_right</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">D_p</span> <span class="o">=</span> <span class="n">getFDMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">wave_order</span><span class="p">,</span> <span class="s1">'center'</span><span class="p">,</span> <span class="p">(</span><span class="n">bc_left</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bc_right</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
     <span class="n">Zero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
     <span class="n">M1</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Zero</span><span class="p">,</span> <span class="n">D_p</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csc"</span><span class="p">)</span>
     <span class="n">M2</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">D_u</span><span class="p">,</span> <span class="n">Zero</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csc"</span><span class="p">)</span>
@@ -68,30 +78,12 @@
 <div class="viewcode-block" id="getWave1DAdvectionMatrix">
 <a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">getWave1DAdvectionMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
-    <span class="n">Dx</span> <span class="o">=</span> <span class="n">getHorizontalDx</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+    <span class="n">Dx</span> <span class="o">=</span> <span class="n">getFDMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="s1">'upwind'</span><span class="p">,</span> <span class="s1">'periodic'</span><span class="p">)</span>
     <span class="n">Zero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
     <span class="n">M1</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Dx</span><span class="p">,</span> <span class="n">Zero</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csc"</span><span class="p">)</span>
     <span class="n">M2</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Zero</span><span class="p">,</span> <span class="n">Dx</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csc"</span><span class="p">)</span>
     <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">M1</span><span class="p">,</span> <span class="n">M2</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"csc"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="getWaveBCLeft">
-<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCLeft">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">getWaveBCLeft</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_left</span><span class="p">):</span>
-    <span class="n">bu</span> <span class="o">=</span> <span class="n">getBCLeft</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_left</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">wave_order</span><span class="p">)</span>
-    <span class="n">bp</span> <span class="o">=</span> <span class="n">getBCLeft</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_left</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">wave_order</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">bp</span><span class="p">,</span> <span class="n">bu</span><span class="p">))</span></div>
-
-
-
-<div class="viewcode-block" id="getWaveBCRight">
-<a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">getWaveBCRight</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_right</span><span class="p">):</span>
-    <span class="n">bu</span> <span class="o">=</span> <span class="n">getBCRight</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">wave_order</span><span class="p">)</span>
-    <span class="n">bp</span> <span class="o">=</span> <span class="n">getBCRight</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">bc_right</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">wave_order</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">bp</span><span class="p">,</span> <span class="n">bu</span><span class="p">))</span></div>
 
 </pre></div>
 

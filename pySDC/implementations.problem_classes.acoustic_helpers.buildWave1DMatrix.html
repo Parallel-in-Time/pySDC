@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="implementations.problem_classes.acoustic_helpers.standard_integrators module" href="implementations.problem_classes.acoustic_helpers.standard_integrators.html" />
-    <link rel="prev" title="implementations.problem_classes.acoustic_helpers.buildFDMatrix module" href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html" /> 
+    <link rel="prev" title="implementations.problem_classes.acoustic_helpers package" href="implementations.problem_classes.acoustic_helpers.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -32,7 +32,7 @@
           <a href="implementations.problem_classes.acoustic_helpers.standard_integrators.html" title="implementations.problem_classes.acoustic_helpers.standard_integrators module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html" title="implementations.problem_classes.acoustic_helpers.buildFDMatrix module"
+          <a href="implementations.problem_classes.acoustic_helpers.html" title="implementations.problem_classes.acoustic_helpers package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
@@ -50,6 +50,13 @@
   <section id="module-implementations.problem_classes.acoustic_helpers.buildWave1DMatrix">
 <span id="implementations-problem-classes-acoustic-helpers-buildwave1dmatrix-module"></span><h1>implementations.problem_classes.acoustic_helpers.buildWave1DMatrix module<a class="headerlink" href="#module-implementations.problem_classes.acoustic_helpers.buildWave1DMatrix" title="Link to this heading">¶</a></h1>
 <dl class="py function">
+<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getFDMatrix">
+<span class="sig-name descname"><span class="pre">getFDMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getFDMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getFDMatrix" title="Link to this definition">¶</a></dt>
+<dd><p>First derivative matrix. Only homogeneous boundary conditions are supported, so the
+right hand side contribution returned by the helper has to vanish.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix">
 <span class="sig-name descname"><span class="pre">getWave1DAdvectionMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getWave1DAdvectionMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -57,16 +64,6 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DMatrix">
 <span class="sig-name descname"><span class="pre">getWave1DMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getWave1DMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DMatrix" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCLeft">
-<span class="sig-name descname"><span class="pre">getWaveBCLeft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_left</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getWaveBCLeft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCLeft" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight">
-<span class="sig-name descname"><span class="pre">getWaveBCRight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc_right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/acoustic_helpers/buildWave1DMatrix.html#getWaveBCRight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -82,10 +79,9 @@
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.acoustic_helpers.buildWave1DMatrix module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getFDMatrix"><code class="docutils literal notranslate"><span class="pre">getFDMatrix()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix"><code class="docutils literal notranslate"><span class="pre">getWave1DAdvectionMatrix()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DMatrix"><code class="docutils literal notranslate"><span class="pre">getWave1DMatrix()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCLeft"><code class="docutils literal notranslate"><span class="pre">getWaveBCLeft()</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWaveBCRight"><code class="docutils literal notranslate"><span class="pre">getWaveBCRight()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -93,8 +89,8 @@
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html"
-                          title="previous chapter">implementations.problem_classes.acoustic_helpers.buildFDMatrix module</a></p>
+    <p class="topless"><a href="implementations.problem_classes.acoustic_helpers.html"
+                          title="previous chapter">implementations.problem_classes.acoustic_helpers package</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -135,7 +131,7 @@
           <a href="implementations.problem_classes.acoustic_helpers.standard_integrators.html" title="implementations.problem_classes.acoustic_helpers.standard_integrators module"
              >next</a> |</li>
         <li class="right" >
-          <a href="implementations.problem_classes.acoustic_helpers.buildFDMatrix.html" title="implementations.problem_classes.acoustic_helpers.buildFDMatrix module"
+          <a href="implementations.problem_classes.acoustic_helpers.html" title="implementations.problem_classes.acoustic_helpers package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
