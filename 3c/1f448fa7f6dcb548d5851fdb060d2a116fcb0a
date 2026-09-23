@@ -1,0 +1,30 @@
+pySDC/implementations/datatype_classes/mesh.py
+  s_9c604d5a2877a5::t_e4cb18107fe0ad 128-150,173-177
+  s_9c604d5a2877a5::t_041681fd3e9a21 188-200
+pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py
+  s_9c604d5a2877a5::t_40215e622b31a3 93,143
+pySDC/tests/test_transfer_classes/test_space_transfer_properties.py
+  s_9c604d5a2877a5::t_40215e622b31a3 91,93
+pySDC/tests/test_datatypes/test_multicomponent_mesh.py
+  s_9c604d5a2877a5::t_e5bc0ef583278a 76-129
+pySDC/implementations/transfer_classes/TransferMesh.py
+  s_9c604d5a2877a5::t_40215e622b31a3 194,230
+pySDC/implementations/transfer_classes/TransferMesh_FFT2D.py
+  s_9c604d5a2877a5::t_40215e622b31a3 52,76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3c1f448fa7f6dcb548d5851fdb060d2a116fcb0a",
+  "prompts": {},
+  "sessions": {
+    "s_9c604d5a2877a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "15cd8f36-9134-439b-832b-77eb6325bef5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
