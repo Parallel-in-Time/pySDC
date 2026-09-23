@@ -166,7 +166,10 @@ def run_variants(variant=None, ml=None, num_procs=None):
     # settings the errors are 1.14e-08, or 2.8-3.2e-07 for mass_timebc, whose time-dependent
     # boundary data makes it a harder problem; the iteration counts are 6.00 serial, 3.00-3.20 with
     # a coarse level and 3.80 on five parallel steps.
-    max_err = 5e-07 if variant == 'mass_timebc' else 2e-08
+    max_err = 2e-08
+    if variant == 'mass_timebc':
+        # the loosened tolerance stops the parallel run a little earlier still, at a larger error
+        max_err = 5e-07 if num_procs == 1 else 2e-06
     max_niter = (5.0 if ml else 8.0) if num_procs == 1 else 6.0
 
     assert np.mean(niters) <= max_niter, 'Mean number of iterations is too high, got %s' % np.mean(niters)
@@ -186,10 +189,7 @@ def main():
     run_variants(variant='mass_timebc', ml=True, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=5)
     run_variants(variant='mass', ml=True, num_procs=5)
-
-    # 'mass_timebc' converges with PFASST too (2.80 iterations), but at an error of 1.27e-06 rather than
-    # the 1.15e-08 the parallel branch of the assertions above allows, so it would need its own bound.
-    # run_variants(variant='mass_timebc', ml=True, num_procs=5)
+    run_variants(variant='mass_timebc', ml=True, num_procs=5)
 
 
 if __name__ == "__main__":
