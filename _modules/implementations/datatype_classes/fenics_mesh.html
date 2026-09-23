@@ -40,6 +40,7 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dolfin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">df</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.container</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiComponentContainer</span>
 
 
 <div class="viewcode-block" id="fenics_mesh">
@@ -153,102 +154,17 @@
 
 <div class="viewcode-block" id="rhs_fenics_mesh">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.fenics_mesh.html#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">rhs_fenics_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">rhs_fenics_mesh</span><span class="p">(</span><span class="n">MultiComponentContainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    RHS data type for fenics_meshes with implicit and explicit components</span>
-
-<span class="sd">    This data type can be used to have RHS with 2 components (here implicit and explicit)</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        impl (fenics_mesh): implicit part</span>
 <span class="sd">        expl (fenics_mesh): explicit part</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)</span>
-<span class="sd">                  or another rhs_imex_mesh object</span>
-<span class="sd">            val (float): an initial number (default: 0.0)</span>
-<span class="sd">        Raises:</span>
-<span class="sd">            DataError: if init is none of the types above</span>
-<span class="sd">        """</span>
-        <span class="c1"># if init is another rhs_imex_mesh, do a deepcopy (init by copy)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
-        <span class="c1"># if init is a number or a tuple of numbers, create mesh object with None as initial value</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-        <span class="c1"># something is wrong, if none of the ones above hit</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'something went wrong during </span><span class="si">%s</span><span class="s1"> initialization'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Overloading the subtraction operator for rhs types</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            other (rhs_fenics_mesh): rhs object to be subtracted</span>
-<span class="sd">        Raises:</span>
-<span class="sd">            DataError: if other is not a rhs object</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            rhs_fenics_mesh: differences between caller and other values (self-other)</span>
-<span class="sd">        """</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">rhs_fenics_mesh</span><span class="p">):</span>
-            <span class="c1"># always create new rhs_imex_mesh, since otherwise c = a - b changes a as well!</span>
-            <span class="n">me</span> <span class="o">=</span> <span class="n">rhs_fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">impl</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">expl</span>
-            <span class="k">return</span> <span class="n">me</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">         Overloading the addition operator for rhs types</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            other (rhs_fenics_mesh): rhs object to be added</span>
-<span class="sd">        Raises:</span>
-<span class="sd">            DataError: if other is not a rhs object</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            rhs_fenics_mesh: sum of caller and other values (self-other)</span>
-<span class="sd">        """</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">rhs_fenics_mesh</span><span class="p">):</span>
-            <span class="c1"># always create new rhs_imex_mesh, since otherwise c = a + b changes a as well!</span>
-            <span class="n">me</span> <span class="o">=</span> <span class="n">rhs_fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">impl</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">expl</span>
-            <span class="k">return</span> <span class="n">me</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Overloading the right multiply by factor operator for mesh types</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            other (float): factor</span>
-<span class="sd">        Raises:</span>
-<span class="sd">            DataError: is other is not a float</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            rhs_fenics_mesh: copy of original values scaled by factor</span>
-<span class="sd">        """</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-            <span class="c1"># always create new mesh, since otherwise c = f*a changes a as well!</span>
-            <span class="n">me</span> <span class="o">=</span> <span class="n">rhs_fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">impl</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">expl</span>
-            <span class="k">return</span> <span class="n">me</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot multiply </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span></div>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'impl'</span><span class="p">,</span> <span class="s1">'expl'</span><span class="p">]</span>
+    <span class="n">component_type</span> <span class="o">=</span> <span class="n">fenics_mesh</span></div>
 
 </pre></div>
 

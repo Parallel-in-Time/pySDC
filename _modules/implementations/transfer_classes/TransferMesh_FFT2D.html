@@ -92,7 +92,7 @@
         <span class="c1"># rather than for the type</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="s1">'components'</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">F</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
-                <span class="n">_restrict</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">comp</span><span class="p">),</span> <span class="n">G</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">comp</span><span class="p">))</span>
+                <span class="n">_restrict</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">comp</span><span class="p">),</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">comp</span><span class="p">))</span>
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'mesh'</span><span class="p">:</span>
             <span class="n">_restrict</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -119,7 +119,7 @@
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="s1">'components'</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
-                <span class="n">_prolong</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">comp</span><span class="p">),</span> <span class="n">F</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">comp</span><span class="p">))</span>
+                <span class="n">_prolong</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">comp</span><span class="p">),</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">comp</span><span class="p">))</span>
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'mesh'</span><span class="p">:</span>
             <span class="n">_prolong</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>

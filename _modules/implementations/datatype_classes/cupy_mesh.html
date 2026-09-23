@@ -44,6 +44,8 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">MPI</span> <span class="o">=</span> <span class="kc">None</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiComponentMeshMixin</span>
+
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.NCCL_communicator</span><span class="w"> </span><span class="kn">import</span> <span class="n">NCCLComm</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -124,6 +126,28 @@
 
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">global_absval</span><span class="p">)</span>
 
+<div class="viewcode-block" id="cupy_mesh.copy">
+<a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.copy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Copy the mesh, keeping its type.</span>
+
+<span class="sd">        CuPy's ``ndarray`` is a Cython extension type whose ``copy`` returns the base class rather than</span>
+<span class="sd">        ``type(self)``, unlike NumPy's. Without this, a copy of a mesh silently stops being one and loses the</span>
+<span class="sd">        components along with the ``__abs__`` that does the MPI reduction.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mesh: copy of the mesh, of the same type</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        CuPy routes ``copy.deepcopy`` through ``copy``, so the type has to be kept here as well.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
 <div class="viewcode-block" id="cupy_mesh.isend">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.cupy_mesh.isend">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">isend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -179,61 +203,8 @@
 
 <div class="viewcode-block" id="CuPyMultiComponentMesh">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.cupy_mesh.html#implementations.datatype_classes.cupy_mesh.CuPyMultiComponentMesh">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">CuPyMultiComponentMesh</span><span class="p">(</span><span class="n">cupy_mesh</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Generic mesh with multiple components.</span>
-
-<span class="sd">    To make a specific multi-component mesh, derive from this class and list the components as strings in the class</span>
-<span class="sd">    attribute ``components``. An example:</span>
-
-<span class="sd">    ```</span>
-<span class="sd">    class imex_cupy_mesh(CuPyMultiComponentMesh):</span>
-<span class="sd">        components = ['impl', 'expl']</span>
-<span class="sd">    ```</span>
-
-<span class="sd">    Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access</span>
-<span class="sd">    to the components with ``.``. Continuing the above example:</span>
-
-<span class="sd">    ```</span>
-<span class="sd">    init = ((100,), None, numpy.dtype('d'))</span>
-<span class="sd">    f = imex_cupy_mesh(init)</span>
-<span class="sd">    f.shape  # (2, 100)</span>
-<span class="sd">    f.expl.shape  # (100,)</span>
-<span class="sd">    ```</span>
-
-<span class="sd">    Note that the components are not attributes of the mesh: ``"expl" in dir(f)`` will return False! Rather, the</span>
-<span class="sd">    components are handled in ``__getattr__``. This function is called if an attribute is not found and returns a view</span>
-<span class="sd">    on to the component if appropriate. Importantly, this means that you cannot name a component like something that</span>
-<span class="sd">    is already an attribute of ``cupy_mesh`` or ``cupy.ndarray`` because this will not result in calls to ``__getattr__``.</span>
-
-<span class="sd">    There are a couple more things to keep in mind:</span>
-<span class="sd">     - Because a ``CuPyMultiComponentMesh`` is just a ``cupy.ndarray`` with one more dimension, all components must have</span>
-<span class="sd">       the same shape.</span>
-<span class="sd">     - You can use the entire ``CuPyMultiComponentMesh`` like a ``cupy.ndarray`` in operations that accept arrays, but make</span>
-<span class="sd">       sure that you really want to apply the same operation on all components if you do.</span>
-<span class="sd">     - If you omit the assignment operator ``[:]`` during assignment, you will not change the mesh at all. Omitting this</span>
-<span class="sd">       leads to all kinds of trouble throughout the code. But here you really cannot get away without.</span>
-<span class="sd">    """</span>
-
-    <span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">int</span> <span class="k">else</span> <span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">components</span><span class="p">),</span> <span class="o">*</span><span class="n">shape</span><span class="p">),</span> <span class="o">*</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">obj</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">cupy_mesh</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Cannot access </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s1"> in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">!r}</span><span class="s1"> because the shape is unexpected.'</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">!r}</span><span class="s2"> does not have attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">!"</span><span class="p">)</span></div>
+<span class="k">class</span><span class="w"> </span><span class="nc">CuPyMultiComponentMesh</span><span class="p">(</span><span class="n">MultiComponentMeshMixin</span><span class="p">,</span> <span class="n">cupy_mesh</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""CuPy-based mesh with multiple components, see ``MultiComponentMeshMixin``."""</span></div>
 
 
 

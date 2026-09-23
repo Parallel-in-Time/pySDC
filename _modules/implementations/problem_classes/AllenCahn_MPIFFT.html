@@ -144,8 +144,6 @@
         <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_Laplacian</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">K2</span> <span class="o">*</span> <span class="n">u</span>
-
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
                 <span class="n">tmp</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_explicit_part</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>

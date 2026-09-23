@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 2
 
+   implementations.datatype_classes.container
    implementations.datatype_classes.cupy_mesh
    implementations.datatype_classes.fenics_mesh
    implementations.datatype_classes.firedrake_mesh

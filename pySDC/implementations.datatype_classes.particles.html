@@ -56,8 +56,8 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code></p>
 <p>Field data type for 3 dimensions</p>
 <p>This data type can be used for electric and magnetic fields in 3 dimensions</p>
 <dl class="py attribute">
@@ -72,16 +72,21 @@
 <dd><p>contains the magnetic field</p>
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields.electric">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">electric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields.electric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields.electric" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields.components">
+<span class="sig-name descname"><span class="pre">components</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['elec',</span> <span class="pre">'magn']</span></span><a class="headerlink" href="#implementations.datatype_classes.particles.fields.components" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id0">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">elec</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd><p>View on the ‘elec’ component of the mesh</p>
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="implementations.datatype_classes.particles.fields.magnetic">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magnetic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields.magnetic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields.magnetic" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">mesh</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="id1">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">magn</span></span><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<dd><p>View on the ‘magn’ component of the mesh</p>
 </dd></dl>
 
 </dd></dl>
@@ -189,8 +194,9 @@
 <li><a class="reference internal" href="#implementations.datatype_classes.particles.fields"><code class="docutils literal notranslate"><span class="pre">fields</span></code></a><ul>
 <li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.elec"><code class="docutils literal notranslate"><span class="pre">elec</span></code></a></li>
 <li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.magn"><code class="docutils literal notranslate"><span class="pre">magn</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.electric"><code class="docutils literal notranslate"><span class="pre">electric</span></code></a></li>
-<li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.magnetic"><code class="docutils literal notranslate"><span class="pre">magnetic</span></code></a></li>
+<li><a class="reference internal" href="#implementations.datatype_classes.particles.fields.components"><code class="docutils literal notranslate"><span class="pre">components</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">elec</span></code></a></li>
+<li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">magn</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#implementations.datatype_classes.particles.particles"><code class="docutils literal notranslate"><span class="pre">particles</span></code></a><ul>

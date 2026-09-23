@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_716c1644203275a5_TransferMesh_MPIFFT_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-23 08:40 +0000
+            created at 2026-09-23 14:58 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -131,7 +131,7 @@
     <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">        <span class="com"># rather than for the type</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">        <span class="key">if</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">type</span><span class="op">(</span><span class="nam">F</span><span class="op">)</span><span class="op">,</span> <span class="str">&#x27;components&#x27;</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">            <span class="key">for</span> <span class="nam">comp</span> <span class="key">in</span> <span class="nam">F</span><span class="op">.</span><span class="nam">components</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">                <span class="nam">_restrict</span><span class="op">(</span><span class="nam">F</span><span class="op">.</span><span class="nam">__getattr__</span><span class="op">(</span><span class="nam">comp</span><span class="op">)</span><span class="op">,</span> <span class="nam">G</span><span class="op">.</span><span class="nam">__getattr__</span><span class="op">(</span><span class="nam">comp</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">                <span class="nam">_restrict</span><span class="op">(</span><span class="nam">getattr</span><span class="op">(</span><span class="nam">F</span><span class="op">,</span> <span class="nam">comp</span><span class="op">)</span><span class="op">,</span> <span class="nam">getattr</span><span class="op">(</span><span class="nam">G</span><span class="op">,</span> <span class="nam">comp</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">        <span class="key">elif</span> <span class="nam">type</span><span class="op">(</span><span class="nam">F</span><span class="op">)</span><span class="op">.</span><span class="nam">__name__</span> <span class="op">==</span> <span class="str">&#x27;mesh&#x27;</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">            <span class="nam">_restrict</span><span class="op">(</span><span class="nam">F</span><span class="op">,</span> <span class="nam">G</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -155,7 +155,7 @@
     <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">        <span class="key">if</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">type</span><span class="op">(</span><span class="nam">G</span><span class="op">)</span><span class="op">,</span> <span class="str">&#x27;components&#x27;</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">            <span class="key">for</span> <span class="nam">comp</span> <span class="key">in</span> <span class="nam">G</span><span class="op">.</span><span class="nam">components</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">                <span class="nam">_prolong</span><span class="op">(</span><span class="nam">G</span><span class="op">.</span><span class="nam">__getattr__</span><span class="op">(</span><span class="nam">comp</span><span class="op">)</span><span class="op">,</span> <span class="nam">F</span><span class="op">.</span><span class="nam">__getattr__</span><span class="op">(</span><span class="nam">comp</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">                <span class="nam">_prolong</span><span class="op">(</span><span class="nam">getattr</span><span class="op">(</span><span class="nam">G</span><span class="op">,</span> <span class="nam">comp</span><span class="op">)</span><span class="op">,</span> <span class="nam">getattr</span><span class="op">(</span><span class="nam">F</span><span class="op">,</span> <span class="nam">comp</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">        <span class="key">elif</span> <span class="nam">type</span><span class="op">(</span><span class="nam">G</span><span class="op">)</span><span class="op">.</span><span class="nam">__name__</span> <span class="op">==</span> <span class="str">&#x27;mesh&#x27;</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">            <span class="nam">_prolong</span><span class="op">(</span><span class="nam">G</span><span class="op">,</span> <span class="nam">F</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -170,7 +170,7 @@
             <a class="nav" href="z_716c1644203275a5_TransferMesh_MPIFFT_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-23 08:40 +0000
+            created at 2026-09-23 14:58 +0000
         </p>
     </div>
 </footer>

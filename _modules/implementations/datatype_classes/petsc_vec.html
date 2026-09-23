@@ -39,7 +39,7 @@
   <h1>Source code for implementations.datatype_classes.petsc_vec</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">petsc4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">PETSc</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.container</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiComponentContainer</span>
 
 
 <div class="viewcode-block" id="petsc_vec">
@@ -125,75 +125,33 @@
 
 <div class="viewcode-block" id="petsc_vec_imex">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_imex">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">petsc_vec_imex</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">petsc_vec_imex</span><span class="p">(</span><span class="n">MultiComponentContainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    RHS data type for Vec with implicit and explicit components</span>
-
-<span class="sd">    This data type can be used to have RHS with 2 components (here implicit and explicit)</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        impl (petsc_vec): implicit part</span>
 <span class="sd">        expl (petsc_vec): explicit part</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)</span>
-<span class="sd">                  or another imex_mesh object</span>
-<span class="sd">            val (float): an initial number (default: 0.0)</span>
-<span class="sd">        Raises:</span>
-<span class="sd">            DataError: if init is none of the types above</span>
-<span class="sd">        """</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">DMDA</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-        <span class="c1"># something is wrong, if none of the ones above hit</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'something went wrong during </span><span class="si">%s</span><span class="s1"> initialization'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'impl'</span><span class="p">,</span> <span class="s1">'expl'</span><span class="p">]</span>
+    <span class="n">component_type</span> <span class="o">=</span> <span class="n">petsc_vec</span></div>
 
 
 
 <div class="viewcode-block" id="petsc_vec_comp2">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec_comp2">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">petsc_vec_comp2</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">petsc_vec_comp2</span><span class="p">(</span><span class="n">MultiComponentContainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    RHS data type for Vec with implicit and explicit components</span>
-
-<span class="sd">    This data type can be used to have RHS with 2 components (here implicit and explicit)</span>
+<span class="sd">    RHS data type for Vec with two components</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        impl (petsc_vec): implicit part</span>
-<span class="sd">        expl (petsc_vec): explicit part</span>
+<span class="sd">        comp1 (petsc_vec): first component</span>
+<span class="sd">        comp2 (petsc_vec): second component</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)</span>
-<span class="sd">                  or another imex_mesh object</span>
-<span class="sd">            val (float): an initial number (default: 0.0)</span>
-<span class="sd">        Raises:</span>
-<span class="sd">            DataError: if init is none of the types above</span>
-<span class="sd">        """</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comp1</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">comp1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comp2</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">init</span><span class="o">.</span><span class="n">comp2</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">DMDA</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comp1</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comp2</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
-        <span class="c1"># something is wrong, if none of the ones above hit</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'something went wrong during </span><span class="si">%s</span><span class="s1"> initialization'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'comp1'</span><span class="p">,</span> <span class="s1">'comp2'</span><span class="p">]</span>
+    <span class="n">component_type</span> <span class="o">=</span> <span class="n">petsc_vec</span></div>
 
 </pre></div>
 

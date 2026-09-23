@@ -1,0 +1,7 @@
+implementations.datatype\_classes.container module
+==================================================
+
+.. automodule:: implementations.datatype_classes.container
+   :members:
+   :show-inheritance:
+   :undoc-members:
