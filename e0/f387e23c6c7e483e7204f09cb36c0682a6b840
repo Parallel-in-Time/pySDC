@@ -1,0 +1,19 @@
+pySDC/implementations/datatype_classes/particles.py
+  s_9c604d5a2877a5::t_2c1d3c6e6826ed 3,214,225
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e0f387e23c6c7e483e7204f09cb36c0682a6b840",
+  "prompts": {},
+  "sessions": {
+    "s_9c604d5a2877a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "15cd8f36-9134-439b-832b-77eb6325bef5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
