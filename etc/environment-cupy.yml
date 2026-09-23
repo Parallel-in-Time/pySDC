@@ -17,6 +17,11 @@ dependencies:
   - matplotlib>=3.0
   - dill>=0.2.6
   - cupy
+  # conda-forge's `cupy` does not depend on NCCL, but `pySDC/helpers/NCCL_communicator.py`
+  # imports `cupy.cuda.nccl`, which is an empty shim unless libnccl is there. Without this,
+  # building an `NCCLComm` fails with a bare `module 'cupy.cuda.nccl' has no attribute
+  # 'get_unique_id'`, which says nothing about the missing library.
+  - nccl
   # the GPU project's configs go through `spectral_helper`, and its runs are MPI-decomposed
   - openmpi
   - mpi4py-fft>=2.0.2
