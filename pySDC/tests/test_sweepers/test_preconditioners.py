@@ -131,11 +131,11 @@ def test_FLEX_preconditioner_in_MPI_sweepers(imex):
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 @pytest.mark.parametrize("M", num_nodes)
-def test_LU(node_type, quad_type, M):
+def test_LU(node_type, quad_type, M, request):
     if M > 3 and node_type == 'EQUID' and quad_type in ['GAUSS', 'RADAU-RIGHT']:
-        # Edge case for some specific equidistant nodes
-        # TODO : still need to be understood ...
-        return
+        # scipy's LU pivots Q^T for these nodes, Q^T = P L U with P != I, so U^T is not a factor of Q
+        # and I - QDelta^{-1} Q is not strictly triangular
+        request.applymarker(pytest.mark.xfail(reason='LU factorization of Q^T pivots for these nodes', strict=True))
 
     params = {'num_nodes': M, 'quad_type': quad_type, 'node_type': node_type}
     sweeper = Sweeper(params, None)
@@ -179,7 +179,7 @@ def test_IE(node_type, quad_type, M):
     QDelta = sweeper.get_Qdelta_implicit('IE')[1:, 1:]
     for i in range(M):
         assert np.all(QDelta[i, : i + 1] == QDelta[-1, : i + 1]), "not the same coefficients in columns"
-    assert np.all(np.cumsum(QDelta[-1] == sweeper.coll.nodes)), "last line cumsum not equal to nodes"
+    assert np.allclose(np.cumsum(QDelta[-1]), sweeper.coll.nodes), "last line cumsum not equal to nodes"
 
 
 @pytest.mark.base
@@ -192,7 +192,7 @@ def test_IEpar(node_type, quad_type, M):
 
     QDelta = sweeper.get_Qdelta_implicit('IEpar')[1:, 1:]
     assert np.all(np.diag(np.diag(QDelta)) == QDelta), "no diagonal QDelta"
-    assert np.all(np.cumsum(np.diag(QDelta) == sweeper.coll.nodes)), "diagonal cumsum not equal to nodes"
+    assert np.allclose(np.diag(QDelta), sweeper.coll.nodes), "diagonal not equal to nodes"
 
 
 @pytest.mark.base

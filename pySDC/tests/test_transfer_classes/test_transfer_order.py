@@ -25,8 +25,6 @@ def get_problem(nvars, xp, L, mpifft=False, spectral=False, x0=0, useGPU=False, 
         def __init__(self, nvars):
             super().__init__(init=(nvars, None, xp.dtype('float64')))
             self._makeAttributeAndRegister('nvars', localVars=locals())
-            self.dx = L / (nvars + 1)
-            self.x = xp.array([x0 + me * self.dx for me in range(nvars)])
             self.dx, self.x = get_1d_grid(nvars, 'periodic', right_boundary=L)
 
         def eval_f(self, *args, **kwargs):
@@ -84,17 +82,15 @@ def get_transfer_class(name):
 
 @pytest.mark.base
 @pytest.mark.parametrize('L', [1.0, 6.283185307179586])
-@pytest.mark.parametrize('x0', [0.0, -3.141592653589793])
-def test_mesh_to_mesh_fft(L, x0):
-    single_test('mesh_to_mesh_fft', -1.0, L, mpifft=False, x0=x0)
+def test_mesh_to_mesh_fft(L):
+    single_test('mesh_to_mesh_fft', -1.0, L, mpifft=False)
 
 
 @pytest.mark.base
 @pytest.mark.parametrize('order', [2, 4, 6, 8])
 @pytest.mark.parametrize('L', [1.0, 6.283185307179586])
-@pytest.mark.parametrize('x0', [0.0, -3.141592653589793])
-def test_mesh_to_mesh(order, L, x0):
-    single_test('mesh_to_mesh', order, L, mpifft=False, x0=x0)
+def test_mesh_to_mesh(order, L):
+    single_test('mesh_to_mesh', order, L, mpifft=False)
 
 
 @pytest.mark.mpi4py
@@ -202,6 +198,11 @@ def single_test(name, order, L, mpifft, spectral=False, x0=0, useGPU=False):
     resolutions = xp.array(resolutions)
     for key, value in errors.items():
         value = xp.array(value)
+
+        if order == -1:
+            # spectral transfers are exact for the single Fourier mode the problems use
+            assert value.max() < 1e-14, f'Spectral transfer is not exact in {key}. Errors: {value}'
+            continue
 
         mask = value > 1e-14
 

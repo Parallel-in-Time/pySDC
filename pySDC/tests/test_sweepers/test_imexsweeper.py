@@ -15,6 +15,8 @@ class TestImexSweeper(unittest.TestCase):
     def setupLevelStepProblem(self):
         from pySDC.core import step as stepclass
 
+        # a fresh node count per combination, reproducible through the seeded generator
+        self.swparams['num_nodes'] = 2 + self.rng.integers(5)
         self.description['sweeper_params'] = self.swparams
         step = stepclass.Step(description=self.description)
         level = step.levels[0]
@@ -32,13 +34,15 @@ class TestImexSweeper(unittest.TestCase):
         from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
         from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 
+        self.rng = np.random.default_rng(seed=1984)
+
         self.pparams = {}
         self.pparams['lambda_s'] = np.array([-0.1 * 1j], dtype='complex')
         self.pparams['lambda_f'] = np.array([-1.0 * 1j], dtype='complex')
-        self.pparams['u0'] = np.random.rand()
+        self.pparams['u0'] = self.rng.random()
 
         self.swparams = {}
-        self.swparams['num_nodes'] = 2 + np.random.randint(5)
+        self.swparams['num_nodes'] = 2 + self.rng.integers(5)
 
         lparams = {}
         lparams['dt'] = 1.0
@@ -206,7 +210,7 @@ class TestImexSweeper(unittest.TestCase):
             u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
 
             # Perform K node-to-node SDC sweep
-            K = 1 + np.random.randint(6)
+            K = 1 + self.rng.integers(6)
             for _ in range(0, K):
                 level.sweep.update_nodes()
             usweep = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
@@ -239,7 +243,7 @@ class TestImexSweeper(unittest.TestCase):
             step.levels[0].sweep.predict()
 
             # Perform K node-to-node SDC sweep
-            K = 1 + np.random.randint(6)
+            K = 1 + self.rng.integers(6)
             for _ in range(0, K):
                 level.sweep.update_nodes()
             # Fetch final value
@@ -269,6 +273,7 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure the update with do_coll_update=False reproduces last stage
     #
     def test_update_nocollupdate_laststage(self):
+        tested = 0
         for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
@@ -276,20 +281,23 @@ class TestImexSweeper(unittest.TestCase):
             step, level, problem, nnodes = self.setupLevelStepProblem()
             # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test
             if not level.sweep.coll.right_is_node:
-                break
+                continue
+            tested += 1
             level.sweep.predict()
-            ulaststage = np.random.rand()
+            ulaststage = self.rng.random()
             level.u[nnodes][:] = ulaststage
             level.sweep.compute_end_point()
             uend = level.uend
             assert (
                 abs(uend - ulaststage) < 1e-14
             ), "compute_end_point with do_coll_update=False did not reproduce last stage value"
+        assert tested > 0, "no combination of nodes had the right endpoint as a node"
 
     #
     # Make sure that update with do_coll_update=False is identical to update formula with q=(0,...,0,1)
     #
     def test_updateformula_no_coll_update(self):
+        tested = 0
         for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
@@ -297,7 +305,8 @@ class TestImexSweeper(unittest.TestCase):
             step, level, problem, nnodes = self.setupLevelStepProblem()
             # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test
             if not level.sweep.coll.right_is_node:
-                break
+                continue
+            tested += 1
             level.sweep.predict()
 
             # Perform update step in sweeper
@@ -314,3 +323,4 @@ class TestImexSweeper(unittest.TestCase):
             assert (
                 np.linalg.norm(uend_sweep - uend_mat, np.inf) < 1e-14
             ), "For do_coll_update=False, update formula in sweeper gives different result than matrix update formula with q=(0,..,0,1)"
+        assert tested > 0, "no combination of nodes had the right endpoint as a node"
