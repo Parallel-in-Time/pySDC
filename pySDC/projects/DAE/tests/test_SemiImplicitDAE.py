@@ -190,9 +190,7 @@ def testComputeEndpoint(quad_type):
 
     if quad_type == 'RADAU-LEFT':
         with pytest.raises(ParameterError):
-            S = Step(description=description)
-            with pytest.raises(NotImplementedError):
-                S.levels[0].sweep.compute_end_point()
+            Step(description=description)
     else:
         S = Step(description=description)
 

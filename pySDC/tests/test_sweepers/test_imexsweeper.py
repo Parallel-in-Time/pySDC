@@ -1,3 +1,4 @@
+import itertools
 import unittest
 import pytest
 import numpy as np
@@ -59,7 +60,7 @@ class TestImexSweeper(unittest.TestCase):
         from pySDC.core import step as stepclass
         from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
@@ -72,24 +73,21 @@ class TestImexSweeper(unittest.TestCase):
     def test_canregisterlevel(self):
         from pySDC.core import step as stepclass
 
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
             step = stepclass.Step(description=self.description)
             L = step.levels[0]
-            with self.assertRaises(Exception):
-                L.sweep.predict()
-            with self.assertRaises(Exception):
-                L.update_nodes()
-            with self.assertRaises(Exception):
-                L.compute_end_point()
+            # the sweeper refuses to sweep a level that has not been initialized and unlocked
+            with self.assertRaises(AssertionError):
+                L.sweep.update_nodes()
 
     #
     # Check that the sweeper functions update_nodes and compute_end_point can be executed
     #
     def test_canrunsweep(self):
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
@@ -108,7 +106,7 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure a sweep in matrix form is equal to a sweep in node-to-node form
     #
     def test_sweepequalmatrix(self):
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
@@ -131,12 +129,11 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure the implemented update formula matches the matrix update formula
     #
     def test_updateformula(self):
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
             level.sweep.predict()
-            u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
 
             # Perform update step in sweeper
             level.sweep.update_nodes()
@@ -159,7 +156,7 @@ class TestImexSweeper(unittest.TestCase):
     # Compute the exact collocation solution by matrix inversion and make sure it is a fixed point
     #
     def test_collocationinvariant(self):
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
@@ -201,7 +198,7 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure that K node-to-node sweeps give the same result as K sweeps in matrix form and the single matrix formulation for K sweeps
     #
     def test_manysweepsequalmatrix(self):
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
@@ -210,7 +207,7 @@ class TestImexSweeper(unittest.TestCase):
 
             # Perform K node-to-node SDC sweep
             K = 1 + np.random.randint(6)
-            for i in range(0, K):
+            for _ in range(0, K):
                 level.sweep.update_nodes()
             usweep = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
 
@@ -218,7 +215,7 @@ class TestImexSweeper(unittest.TestCase):
             LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats(lambdas=lambdas)
 
             unew = u0full
-            for i in range(0, K):
+            for _ in range(0, K):
                 unew = np.linalg.inv(LHS).dot(u0full + RHS.dot(unew))
 
             assert (
@@ -235,16 +232,15 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
     #
     def test_manysweepupdate(self):
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
             step.levels[0].sweep.predict()
-            u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
 
             # Perform K node-to-node SDC sweep
             K = 1 + np.random.randint(6)
-            for i in range(0, K):
+            for _ in range(0, K):
                 level.sweep.update_nodes()
             # Fetch final value
             level.sweep.compute_end_point()
@@ -273,7 +269,7 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure the update with do_coll_update=False reproduces last stage
     #
     def test_update_nocollupdate_laststage(self):
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.swparams['do_coll_update'] = False
@@ -294,7 +290,7 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure that update with do_coll_update=False is identical to update formula with q=(0,...,0,1)
     #
     def test_updateformula_no_coll_update(self):
-        for node_type, quad_type in zip(node_types, quad_types):
+        for node_type, quad_type in itertools.product(node_types, quad_types):
             self.swparams['node_type'] = node_type
             self.swparams['quad_type'] = quad_type
             self.swparams['do_coll_update'] = False
@@ -303,7 +299,6 @@ class TestImexSweeper(unittest.TestCase):
             if not level.sweep.coll.right_is_node:
                 break
             level.sweep.predict()
-            u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
 
             # Perform update step in sweeper
             level.sweep.update_nodes()

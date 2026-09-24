@@ -122,23 +122,24 @@ def test_Nusselt_numbers(v, nx=1, nz=10):
     u = prob.u_init
     u[iT, ...] = prob.Z
     Nu = prob.compute_Nusselt_numbers(u)
-    for key, expect in zip(['t', 'b', 'V'], [-1, -1, -1]):
+    for key, expect in zip(['t', 'b', 'V'], [-1, -1, -1], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     u = prob.u_init
     u[iT, ...] = 3 * prob.Z**2 + 1
     Nu = prob.compute_Nusselt_numbers(u)
-    for key, expect in zip(['t', 'b', 'V'], [-6, 0, -3]):
+    for key, expect in zip(['t', 'b', 'V'], [-6, 0, -3], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     u = prob.u_init
     u[iT, ...] = 3 * prob.Z**2 + 1
     u[iv] = v * (1 + xp.sin(prob.X / prob.axes[0].L * 2 * xp.pi))
     Nu = prob.compute_Nusselt_numbers(u)
-    for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * v - 6, v, v * (1 + 1) - 3]):
+    for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * v - 6, v, v * (1 + 1) - 3], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
 
+@pytest.mark.mpi4py
 def test_viscous_dissipation(nx=2**5 + 1, nz=2**3 + 1):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
@@ -159,6 +160,7 @@ def test_viscous_dissipation(nx=2**5 + 1, nz=2**3 + 1):
     assert np.isclose(viscous_dissipation, abs(expect))
 
 
+@pytest.mark.mpi4py
 def test_buoyancy_computation(nx=9, nz=6):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard

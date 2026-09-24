@@ -512,7 +512,9 @@ def test_a_handed_down_residual_is_used_and_advanced():
                 self.eps_in = self._residual_nodes()
             super().update_nodes()
             rebuilt = delta_implicit._residual_nodes(self)
-            drift.append(max(float(np.max(np.abs(np.asarray(a - b)))) for a, b in zip(rebuilt, self.eps_in)))
+            drift.append(
+                max(float(np.max(np.abs(np.asarray(a - b)))) for a, b in zip(rebuilt, self.eps_in, strict=True))
+            )
             banked.append(self.delta_acc is not None)
 
     args = (heatNd_unforced, HEAT_PARAMS, sweeper_params(linear_implicit=True), 1e-2, 1, 6)

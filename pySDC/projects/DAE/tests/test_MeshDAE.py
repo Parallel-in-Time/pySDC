@@ -14,8 +14,8 @@ def testInitialization(shape):
     init = (shape, None, np.dtype('float64'))
     mesh = MeshDAE(init)
 
-    assert np.shape(mesh.diff) == shape, f'ERROR: Component diff does not have the desired length!'
-    assert np.shape(mesh.alg) == shape, f'ERROR: Component alg does not have the desired length!'
+    assert np.shape(mesh.diff) == shape, 'ERROR: Component diff does not have the desired length!'
+    assert np.shape(mesh.alg) == shape, 'ERROR: Component alg does not have the desired length!'
 
     assert len(mesh.components) == len(mesh), 'ERROR: Mesh does not contain two component arrays!'
 

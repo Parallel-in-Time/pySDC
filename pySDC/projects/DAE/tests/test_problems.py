@@ -690,10 +690,10 @@ def test_WSCC9_get_switching_info():
 
     switch_detected, _, state_function = P.get_switching_info(L.u, L.time)
 
-    assert switch_detected, f"Event should found here, but no event is found!"
+    assert switch_detected, "Event should found here, but no event is found!"
 
     sign_change = True if state_function[0] * state_function[-1] < 0 else False
-    assert sign_change, f"State function does not have sign change"
+    assert sign_change, "State function does not have sign change"
 
 
 # @pytest.mark.base

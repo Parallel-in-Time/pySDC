@@ -1,3 +1,7 @@
+import pytest
+
+
+@pytest.mark.base
 def test_Dahlquist_IMEX():
     from pySDC.implementations.problem_classes.TestEquation_0D import test_equation_IMEX
     import numpy as np

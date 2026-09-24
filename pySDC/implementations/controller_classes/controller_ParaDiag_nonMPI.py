@@ -45,9 +45,6 @@ class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
 
         self.n_steps = num_procs
 
-        if len(self.MS[0].levels) > 1:
-            raise NotImplementedError('This controller does not support multiple levels')
-
         # every step but the first still has the first one's G^-1
         self.set_G_inv(self._G_inv_alpha)
 
