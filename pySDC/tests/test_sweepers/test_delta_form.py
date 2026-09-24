@@ -111,8 +111,9 @@ def test_correction_precision_storage(precision):
         2,
         6,
     )
-    tolerance = 1e-10 if precision == 'float32' else 1e-3
-    assert abs(u64 - u_red) < tolerance
+    # measured 5.9e-14 (float32) and 5.4e-10 (float16); without the correction scaling float16 gives 4.1e-8
+    tolerance = 1e-12 if precision == 'float32' else 1e-8
+    assert abs(u64 - u_red) < tolerance, f'{precision} storage moved the answer by {abs(u64 - u_red):.2e}'
 
 
 @pytest.mark.base

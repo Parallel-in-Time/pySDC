@@ -122,7 +122,10 @@ def run_simulation():
     print(out)
     f.close()
 
-    # assert np.mean(niters) <= 3.46, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+    # measured 5.828 (2914 iterations in 500 steps, 3 to 10 per step); the tolerance allows about 50 iterations to
+    # change with round-off, since restol=1e-12 is close to it, but not one more (or less) iteration per step
+    mean_niters = np.mean(niters)
+    assert np.isclose(mean_niters, 5.828, atol=0.1), 'Mean number of iterations has changed, got %s' % mean_niters
 
     fname = 'data/fput.dat'
     f = open(fname, 'wb')
@@ -167,7 +170,8 @@ def show_results(cwd=''):
         err_ham = ham[-1]
         plt_helper.plt.semilogy(time, ham, '-', lw=1, label='Iter ' + str(k))
     print(err_ham)
-    # assert err_ham < 6E-10, 'Error in the Hamiltonian is too large, got %s' % err_ham
+    # the last error in the highest iteration, measured 1.98e-7, which is also the largest error of any converged step
+    assert err_ham < 3e-7, 'Error in the Hamiltonian is too large, got %s' % err_ham
 
     plt_helper.plt.xlabel('Time')
     plt_helper.plt.ylabel('Error in Hamiltonian')

@@ -272,8 +272,10 @@ def test_Dirichtlet_BCs_sin(order, reduce):
         assert np.min(orders) > 1.9
         assert np.max(orders) < order + 1
     else:
+        # measured mean deviations: 0.017 (2nd order), 0.04 (4th), 0.89 (6th) and 1.09 (8th order); the grids are too
+        # coarse for the last two to be asymptotic, so only the 2nd and 4th order stencils are checked tightly
         diff = np.mean(np.abs(orders - order))
-        assert diff < (0.999 if order != 8 else 1.2), (orders, order)
+        assert diff < {2: 0.2, 4: 0.2, 6: 0.999, 8: 1.2}[order], (orders, order)
 
 
 @pytest.mark.base

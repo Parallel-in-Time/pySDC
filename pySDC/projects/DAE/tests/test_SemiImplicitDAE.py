@@ -344,8 +344,8 @@ def testOrderAccuracy(case, M, QI):
     )
 
     assert np.isclose(
-        orderDiff, refOrderDiff[problem[case].__name__], atol=1e0
+        orderDiff, refOrderDiff[problem[case].__name__], atol=0.3
     ), f"Expected order {refOrderDiff[problem[case].__name__]} in differential variable, got {orderDiff}"
     assert np.isclose(
-        orderAlg, refOrderAlg[problem[case].__name__], atol=1e0
+        orderAlg, refOrderAlg[problem[case].__name__], atol=0.3
     ), f"Expected order {refOrderAlg[problem[case].__name__]} in algebraic variable, got {orderAlg}"

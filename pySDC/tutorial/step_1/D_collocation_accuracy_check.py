@@ -35,7 +35,7 @@ def main():
     coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')
 
     # assemble list of dt
-    dt_list = [0.1 / 2**p for p in range(0, 4)]
+    dt_list = [0.1 / 2**p for p in range(0, 5)]
 
     # run accuracy test for all dt
     results = run_accuracy_check(prob=prob, coll=coll, dt_list=dt_list)
@@ -43,20 +43,26 @@ def main():
     # get order of accuracy
     order = get_accuracy_order(results)
 
+    # We solve a single step, so this is the local error, which for a collocation method of order 2M-1 is of order 2M.
+    expected_order = 2 * coll.num_nodes
+
     Path("data").mkdir(parents=True, exist_ok=True)
     f = open('data/step_1_D_out.txt', 'w')
     for l in range(len(order)):
-        out = 'Expected order: %2i -- Computed order %4.3f' % (5, order[l])
+        out = 'Expected order: %2i -- Computed order %4.3f' % (expected_order, order[l])
         f.write(out + '\n')
         print(out)
     f.close()
 
     # visualize results
-    plot_accuracy(results)
+    plot_accuracy(results, order=expected_order)
 
     assert os.path.isfile('data/step_1_accuracy_test_coll.png')
 
-    assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), (
+    # The large dt are not asymptotic yet (|lambda dt| = 1.6 for the largest): the measured orders are 4.79, 5.36,
+    # 5.68 and 5.88, approaching 6 from below. Only the last one is checked. Lobatto nodes, whose local order is 5,
+    # get 4.86 there and would have passed the check this replaces, which accepted anything between 3 and 7.
+    assert np.isclose(order[-1], expected_order, atol=0.3), (
         "ERROR: did not get order of accuracy as expected, got %s" % order
     )
 
@@ -133,12 +139,13 @@ def get_accuracy_order(results):
     return order
 
 
-def plot_accuracy(results):
+def plot_accuracy(results, order):
     """
     Routine to visualize the errors as well as the expected errors
 
     Args:
         results: the dictionary containing the errors
+        order (int): the expected order of accuracy, drawn as a guide
     """
 
     # retrieve the list of nvars from results
@@ -169,9 +176,9 @@ def plot_accuracy(results):
     # get error for first entry in nvars_list
     id = ID(dt=dt_list[0])
     base_error = results[id]
-    # assemble optimal errors for 5th order method and plot
-    order_guide_space = [base_error * (2 ** (5 * i)) for i in range(0, len(dt_list))]
-    plt.loglog(dt_list, order_guide_space, color='k', ls='--', label='5th order')
+    # assemble optimal errors for a method of the expected order and plot
+    order_guide_space = [base_error * (2 ** (order * i)) for i in range(0, len(dt_list))]
+    plt.loglog(dt_list, order_guide_space, color='k', ls='--', label=f'{order}th order')
 
     min_err = 1e99
     max_err = 0e00
