@@ -1,7 +1,7 @@
 import pytest
 
 
-def run_problem(maxiter=1, num_procs=1, n_steps=1, error_estimator=None, params=None, restol=-1):
+def run_problem(maxiter=1, num_procs=1, n_steps=1, error_estimator=None, params=None, restol=-1, dt=6e-3):
     import numpy as np
     from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -14,7 +14,7 @@ def run_problem(maxiter=1, num_procs=1, n_steps=1, error_estimator=None, params=
 
     # initialize level parameters
     level_params = {}
-    level_params['dt'] = 6e-3
+    level_params['dt'] = dt
     level_params['restol'] = restol
 
     # initialize sweeper parameters
@@ -110,13 +110,16 @@ def test_EstimateExtrapolationErrorNonMPI_serial(order_time_marching=2, n_steps=
 @pytest.mark.base
 @pytest.mark.parametrize('no_storage', [True, False])
 def test_EstimateExtrapolationErrorNonMPI_parallel(
-    no_storage, order_time_marching=4, n_steps=3, num_procs=3, thresh=0.50
+    no_storage, order_time_marching=4, n_steps=3, num_procs=3, thresh=0.2, dt=3.75e-4
 ):
     from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
         EstimateExtrapolationErrorNonMPI,
     )
     from pySDC.helpers.stats_helper import get_sorted, filter_stats, sort_stats
 
+    # The estimate is only asymptotically exact: with |lambda * dt| up to 0.35 at the serial tests' dt = 6e-3,
+    # it was off by up to 48% (47% with no_storage) here, and by up to 20% even in serial. The relative
+    # difference shrinks with dt; at dt = 3.75e-4 it is at most 8% (6.7% with no_storage).
     params = {
         'no_storage': no_storage,
     }
@@ -131,6 +134,7 @@ def test_EstimateExtrapolationErrorNonMPI_parallel(
         error_estimator=EstimateExtrapolationErrorNonMPI,
         params=params,
         num_procs=num_procs,
+        dt=dt,
     )
 
     e_local = sort_stats(filter_stats(stats, type='e_local_post_iteration', iter=order_time_marching), sortby='time')

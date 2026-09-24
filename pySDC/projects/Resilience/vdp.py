@@ -343,7 +343,9 @@ def check_adaptivity_with_avoid_restarts(comm=None, size=1):
     fig.tight_layout()
     fig.savefig(f'data/vdp-{size}procs{"-use_MPI" if comm is not None else ""}-avoid_restarts.png')
 
-    assert np.isclose(results['e'][True], results['e'][False], rtol=5.0), (
+    # measured: 1.07e-8 with and 8.36e-9 without avoiding restarts; the step sequences are deterministic (the
+    # iteration counts below are compared exactly), so a factor 1.5 leaves room without accepting worse steps
+    assert np.isclose(results['e'][True], results['e'][False], rtol=0.5), (
         'Errors don\'t match with avoid_restarts and without, got '
         f'{results["e"][True]:.2e} and {results["e"][False]:.2e}'
     )

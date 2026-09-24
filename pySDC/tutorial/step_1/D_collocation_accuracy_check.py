@@ -35,7 +35,7 @@ def main():
     coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')
 
     # assemble list of dt
-    dt_list = [0.1 / 2**p for p in range(0, 4)]
+    dt_list = [0.1 / 2**p for p in range(0, 5)]
 
     # run accuracy test for all dt
     results = run_accuracy_check(prob=prob, coll=coll, dt_list=dt_list)
@@ -43,10 +43,13 @@ def main():
     # get order of accuracy
     order = get_accuracy_order(results)
 
+    # We solve a single step, so this is the local error, which for a collocation method of order 2M-1 is of order 2M.
+    expected_order = 2 * coll.num_nodes
+
     Path("data").mkdir(parents=True, exist_ok=True)
     f = open('data/step_1_D_out.txt', 'w')
     for l in range(len(order)):
-        out = 'Expected order: %2i -- Computed order %4.3f' % (5, order[l])
+        out = 'Expected order: %2i -- Computed order %4.3f' % (expected_order, order[l])
         f.write(out + '\n')
         print(out)
     f.close()
@@ -56,7 +59,10 @@ def main():
 
     assert os.path.isfile('data/step_1_accuracy_test_coll.png')
 
-    assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), (
+    # The large dt are not asymptotic yet (|lambda dt| = 1.6 for the largest): the measured orders are 4.79, 5.36,
+    # 5.68 and 5.88, approaching 6 from below. Only the last one is checked. Lobatto nodes, whose local order is 5,
+    # get 4.86 there and would have passed the check this replaces, which accepted anything between 3 and 7.
+    assert np.isclose(order[-1], expected_order, atol=0.3), (
         "ERROR: did not get order of accuracy as expected, got %s" % order
     )
 
