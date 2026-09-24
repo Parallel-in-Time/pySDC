@@ -127,8 +127,11 @@ def test_differentiation_matrix2D_GPU_MPI(axes):
     """A distributed transform on GPUs, which nothing else in the suite covers.
 
     Every other GPU test runs on one rank, where mpi4py-fft never redistributes, and every
-    distributed transform test runs on CPUs. This is the crossing of the two: the `DistArrayCuPy`
-    the fork exists for, and the alltoall over device pointers that needs MPI to be CUDA-aware.
+    distributed transform test runs on CPUs. This is the crossing of the two: `DistArrayCuPy`,
+    which the fork exists for, and `NCCLTransfer`, which moves the pencils between ranks with
+    NCCL send/recv on device pointers. MPI carries only the NCCL unique id at setup, so this
+    path does not depend on MPI being CUDA-aware -- the time-parallel controller does, and
+    `test_controller_MPI_GPU.py` covers that.
     """
     test_differentiation_matrix2D(32, 16, bx='fft', bz='cheby', axes=axes, useGPU=True, useMPI=True)
 
