@@ -1,0 +1,30 @@
+pySDC/tests/test_helpers/test_spectral_helper.py
+  s_9af5c84054669f::t_128ce46d2b5071 108-113,123-133
+  s_9af5c84054669f::t_f3f7d90a893e51 134-135
+pySDC/tests/test_helpers/_dataRef.json
+  s_9c604d5a2877a5::t_3f7daadb5a739c 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3b1936e0e48a247189189599146586fd9654f80d",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_9c604d5a2877a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "15cd8f36-9134-439b-832b-77eb6325bef5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
