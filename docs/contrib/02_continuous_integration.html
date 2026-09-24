@@ -39,8 +39,8 @@
   <section id="continuous-integration-in-pysdc">
 <span id="docs-contrib-02-continuous-integration-continuous-integration-in-pysdc"></span><h1>Continuous Integration in pySDC<a class="headerlink" href="#continuous-integration-in-pysdc" title="Link to this heading">¶</a></h1>
 <p>Any commit in <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> are tested by GitHub continuous integration (CI). You can see in in the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">action panel</a> the tests for each branches.
-Those tests are currently divided in three main categories : <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-linting"><span class="std std-ref">code linting</span></a>, <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">code testing</span></a> and <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-coverage"><span class="std std-ref">code coverage</span></a>.
-Finally, the CI also build artifacts that are used to generate the documentation website (see <a class="reference external" href="http://parallel-in-time.org/pySDC/">http://parallel-in-time.org/pySDC/</a>), more details given in the <a class="reference internal" href="#docs-contrib-02-continuous-integration-documentation-generation"><span class="std std-ref">documentation generation</span></a> section.</p>
+Those tests are currently divided in three main categories : <a class="reference external" href="#code-linting">code linting</a>, <a class="reference external" href="#code-testing">code testing</a> and <a class="reference external" href="#code-coverage">code coverage</a>.
+Finally, the CI also build artifacts that are used to generate the documentation website (see <a class="reference external" href="http://parallel-in-time.org/pySDC/">http://parallel-in-time.org/pySDC/</a>), more details given in the <a class="reference external" href="#documentation-generation">documentation generation</a> section.</p>
 <section id="ci-workflow-triggers">
 <span id="docs-contrib-02-continuous-integration-ci-workflow-triggers"></span><h2>CI Workflow Triggers<a class="headerlink" href="#ci-workflow-triggers" title="Link to this heading">¶</a></h2>
 <p>The CI pipeline is configured to avoid redundant runs. The workflow is triggered:</p>
@@ -53,12 +53,12 @@ Finally, the CI also build artifacts that are used to generate the documentation
 <blockquote>
 <div><p>🔔 <strong>A branch with no open pull request gets no CI.</strong> This is deliberate: a bare <code class="docutils literal notranslate"><span class="pre">push</span></code> trigger fires
 alongside <code class="docutils literal notranslate"><span class="pre">pull_request</span></code> for the same commit and doubles the ~42-job matrix. Run the tests
-<a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">locally</span></a> while you work, and open a pull request (a draft one is enough) as soon as you want
+<a class="reference external" href="#code-testing">locally</a> while you work, and open a pull request (a draft one is enough) as soon as you want
 the full matrix to run.</p>
 </div></blockquote>
 </section>
-<section id="code-linting">
-<span id="docs-contrib-02-continuous-integration-code-linting"></span><h2>Code linting<a class="headerlink" href="#code-linting" title="Link to this heading">¶</a></h2>
+<section id="docs-contrib-02-continuous-integration-code-linting">
+<span id="id1"></span><h2>Code linting<a class="headerlink" href="#docs-contrib-02-continuous-integration-code-linting" title="Link to this heading">¶</a></h2>
 <p>Code style linting is performed using <a class="reference external" href="https://black.readthedocs.io/en/stable/">black</a> and <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a> for code syntax checking. In particular, <code class="docutils literal notranslate"><span class="pre">black</span></code> is used to check compliance with (most of) <a class="reference external" href="https://peps.python.org/pep-0008/">PEP-8 guidelines</a>.</p>
 <p>Those tests are conducted for each commit (even for forks), but you can also run it locally in the root folder of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> before pushing any commit :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install required packages (works also with conda/mamba)</span>
@@ -148,8 +148,8 @@ pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
 This might cause the linting to fail in the GitHub action, which uses the most up to date versions available on the conda-forge channel, even though it passed locally.</p>
 </section>
 </section>
-<section id="code-testing">
-<span id="docs-contrib-02-continuous-integration-code-testing"></span><h2>Code testing<a class="headerlink" href="#code-testing" title="Link to this heading">¶</a></h2>
+<section id="docs-contrib-02-continuous-integration-code-testing">
+<span id="id2"></span><h2>Code testing<a class="headerlink" href="#docs-contrib-02-continuous-integration-code-testing" title="Link to this heading">¶</a></h2>
 <p>This is done using <a class="reference external" href="https://docs.pytest.org/en/7.2.x/">pytest</a>, and runs all the tests written in the <code class="docutils literal notranslate"><span class="pre">pySDC/tests</span></code> folder. You can run those locally in the root folder of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> using :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install required packages (works also with conda/mamba)</span>
 pip<span class="w"> </span>install<span class="w"> </span>pytest<span class="w"> </span>pytest-benchmark<span class="w"> </span>pytest-timeout<span class="w"> </span>coverage<span class="o">[</span>toml<span class="o">]</span>
@@ -251,8 +251,8 @@ As a starting point it is recommended to copy and adapt an existing file (e.g. <
 </section>
 </section>
 </section>
-<section id="code-coverage">
-<span id="docs-contrib-02-continuous-integration-code-coverage"></span><h2>Code coverage<a class="headerlink" href="#code-coverage" title="Link to this heading">¶</a></h2>
+<section id="docs-contrib-02-continuous-integration-code-coverage">
+<span id="id3"></span><h2>Code coverage<a class="headerlink" href="#docs-contrib-02-continuous-integration-code-coverage" title="Link to this heading">¶</a></h2>
 <p>This stage allows to checks how much of the <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> code is tested by the previous stage. It is based on the <a class="reference external" href="https://pypi.org/project/coverage/">coverage</a> library and currently applied to the following directories :</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">pySDC/core</span></code></p></li>
@@ -290,7 +290,7 @@ As a starting point it is recommended to copy and adapt an existing file (e.g. <
 <li><p>Shows coverage changes introduced by the PR, compared to the latest master run</p></li>
 <li><p>Highlights uncovered lines in modified files</p></li>
 <li><p>The master baseline, with a badge and a browsable report, lives on the
-<cite>``python-coverage-comment-action-data`</cite> &lt;<a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/tree/python-coverage-comment-action-data">https://github.com/Parallel-in-Time/pySDC/tree/python-coverage-comment-action-data</a>&gt;`_ branch</p></li>
+<a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/tree/python-coverage-comment-action-data"><code class="docutils literal notranslate"><span class="pre">python-coverage-comment-action-data</span></code></a> branch</p></li>
 </ul>
 </li>
 </ol>
@@ -300,7 +300,7 @@ coverage<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </
 </pre></div>
 </div>
 <blockquote>
-<div><p>🔔 Note that this will run all <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> tests while analyzing coverage, hence requires all packages installed for the <a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing"><span class="std std-ref">code testing stage</span></a>.</p>
+<div><p>🔔 Note that this will run all <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> tests while analyzing coverage, hence requires all packages installed for the <a class="reference external" href="#code-testing">code testing stage</a>.</p>
 </div></blockquote>
 <p>Once the test are finished, you can collect and post-process coverage result :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>coverage<span class="w"> </span>combine
@@ -341,8 +341,8 @@ Part of code (functions, conditionaly, for loops, etc …) can be ignored by cov
 <p>If you think the pragma should be used in other parts of your pull request, please indicate (and justify) this in your description.</p>
 </section>
 </section>
-<section id="documentation-generation">
-<span id="docs-contrib-02-continuous-integration-documentation-generation"></span><h2>Documentation generation<a class="headerlink" href="#documentation-generation" title="Link to this heading">¶</a></h2>
+<section id="docs-contrib-02-continuous-integration-documentation-generation">
+<span id="id4"></span><h2>Documentation generation<a class="headerlink" href="#docs-contrib-02-continuous-integration-documentation-generation" title="Link to this heading">¶</a></h2>
 <p>Documentation is built using <a class="reference external" href="https://www.sphinx-doc.org/en/master/">sphinx</a>.
 To check its generation, you can wait for all the CI tasks to download the <code class="docutils literal notranslate"><span class="pre">docs</span></code> artifacts, unzip it and open the <code class="docutils literal notranslate"><span class="pre">index.html</span></code> file there with you favorite browser.</p>
 <p>However, when you are working on documentation (of the project, of the code, etc …), you can already build and check the website locally :</p>
@@ -378,11 +378,11 @@ This approach can be considered for local testing of your contribution when it d
     <ul>
 <li><a class="reference internal" href="#">Continuous Integration in pySDC</a><ul>
 <li><a class="reference internal" href="#ci-workflow-triggers">CI Workflow Triggers</a></li>
-<li><a class="reference internal" href="#code-linting">Code linting</a><ul>
+<li><a class="reference internal" href="#docs-contrib-02-continuous-integration-code-linting">Code linting</a><ul>
 <li><a class="reference internal" href="#using-pre-commit-hooks-recommended">Using pre-commit hooks (Recommended)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#code-testing">Code testing</a></li>
+<li><a class="reference internal" href="#docs-contrib-02-continuous-integration-code-testing">Code testing</a></li>
 <li><a class="reference internal" href="#running-ci-on-hpc-from-pull-requests">Running CI on HPC from pull requests</a><ul>
 <li><a class="reference internal" href="#hpc-test-environments">HPC test environments</a><ul>
 <li><a class="reference internal" href="#running-the-gpu-tests">Running the GPU tests</a></li>
@@ -390,12 +390,12 @@ This approach can be considered for local testing of your contribution when it d
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#code-coverage">Code coverage</a><ul>
+<li><a class="reference internal" href="#docs-contrib-02-continuous-integration-code-coverage">Code coverage</a><ul>
 <li><a class="reference internal" href="#viewing-coverage-reports">Viewing Coverage Reports</a></li>
 <li><a class="reference internal" href="#coverage-exceptions">Coverage exceptions</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#documentation-generation">Documentation generation</a></li>
+<li><a class="reference internal" href="#docs-contrib-02-continuous-integration-documentation-generation">Documentation generation</a></li>
 </ul>
 </li>
 </ul>

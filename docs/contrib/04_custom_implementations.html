@@ -40,7 +40,7 @@
 <span id="docs-contrib-04-custom-implementations-custom-implementation-guidelines"></span><h1>Custom implementation guidelines<a class="headerlink" href="#custom-implementation-guidelines" title="Link to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">pySDC</span></code> solves (non-)linear ODE of the form</p>
 <p>$$
-frac{du}{dt} = f(u, t), quad u(0)=u_0, quad t in [0, T].
+\frac{du}{dt} = f(u, t), \quad u(0)=u_0, \quad t \in [0, T].
 $$</p>
 <p>where $u$ a vector or scalar, representing one or more variables.</p>
 <p>The type of variable, the definition of the right-hand side $f(u,t)$ and initial solution value $u_0$ are defined in a given <code class="docutils literal notranslate"><span class="pre">Problem</span></code> class.</p>
@@ -50,9 +50,9 @@ $$</p>
 <p>Any problem class inherit from the same base class, that is (currently) the <code class="docutils literal notranslate"><span class="pre">ptype</span></code> class from the module <code class="docutils literal notranslate"><span class="pre">pySDC.code.Problem</span></code>.
 Each custom problem should inherit from this base class, like for the following example template :</p>
 <ul class="simple">
-<li><p>right-hand side $f(u,t)=lambda u +  ct$ with</p>
+<li><p>right-hand side $f(u,t)=\lambda u +  ct$ with</p>
 <ul>
-<li><p>$lambda$ one or more complex values (in vector form)</p></li>
+<li><p>$\lambda$ one or more complex values (in vector form)</p></li>
 <li><p>$c$ one scalar value</p></li>
 </ul>
 </li>

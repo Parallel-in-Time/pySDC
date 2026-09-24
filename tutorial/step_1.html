@@ -479,8 +479,10 @@ time, we loop over a set of <code class="docutils literal notranslate"><span cla
 collocation problem and look at the error.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li><p>We take a large number of DOFs in space, since we need to beat 5th
-order in time with a 2nd order stencil in space.</p></li>
+<li><p>We take a large number of DOFs in space, since we need to beat 6th
+order in time with a 2nd order stencil in space. We solve a single
+step, so we see the local error, which for the collocation method of
+order 5 is of order 6.</p></li>
 <li><p>Orders of convergence are not as stable as for the space-only test.
 One of the problems of this example is that we are actually trying to
 compute 0 very, very thoroughly…</p></li>
@@ -523,7 +525,7 @@ compute 0 very, very thoroughly…</p></li>
     <span class="n">coll</span> <span class="o">=</span> <span class="n">CollBase</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="s1">'LEGENDRE'</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">'RADAU-RIGHT'</span><span class="p">)</span>
 
     <span class="c1"># assemble list of dt</span>
-    <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
 
     <span class="c1"># run accuracy test for all dt</span>
     <span class="n">results</span> <span class="o">=</span> <span class="n">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="o">=</span><span class="n">coll</span><span class="p">,</span> <span class="n">dt_list</span><span class="o">=</span><span class="n">dt_list</span><span class="p">)</span>
@@ -531,20 +533,26 @@ compute 0 very, very thoroughly…</p></li>
     <span class="c1"># get order of accuracy</span>
     <span class="n">order</span> <span class="o">=</span> <span class="n">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
+    <span class="c1"># We solve a single step, so this is the local error, which for a collocation method of order 2M-1 is of order 2M.</span>
+    <span class="n">expected_order</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+
     <span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_1_D_out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">order</span><span class="p">)):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">'Expected order: </span><span class="si">%2i</span><span class="s1"> -- Computed order </span><span class="si">%4.3f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">'Expected order: </span><span class="si">%2i</span><span class="s1"> -- Computed order </span><span class="si">%4.3f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">expected_order</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="c1"># visualize results</span>
-    <span class="n">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="n">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">expected_order</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">'data/step_1_accuracy_test_coll.png'</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)),</span> <span class="p">(</span>
+    <span class="c1"># The large dt are not asymptotic yet (|lambda dt| = 1.6 for the largest): the measured orders are 4.79, 5.36,</span>
+    <span class="c1"># 5.68 and 5.88, approaching 6 from below. Only the last one is checked. Lobatto nodes, whose local order is 5,</span>
+    <span class="c1"># get 4.86 there and would have passed the check this replaces, which accepted anything between 3 and 7.</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">expected_order</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.3</span><span class="p">),</span> <span class="p">(</span>
         <span class="s2">"ERROR: did not get order of accuracy as expected, got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">order</span>
     <span class="p">)</span>
 
@@ -621,12 +629,13 @@ compute 0 very, very thoroughly…</p></li>
     <span class="k">return</span> <span class="n">order</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Routine to visualize the errors as well as the expected errors</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        results: the dictionary containing the errors</span>
+<span class="sd">        order (int): the expected order of accuracy, drawn as a guide</span>
 <span class="sd">    """</span>
 
     <span class="c1"># retrieve the list of nvars from results</span>
@@ -657,9 +666,9 @@ compute 0 very, very thoroughly…</p></li>
     <span class="c1"># get error for first entry in nvars_list</span>
     <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">base_error</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
-    <span class="c1"># assemble optimal errors for 5th order method and plot</span>
-    <span class="n">order_guide_space</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_error</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">order_guide_space</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'k'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'5th order'</span><span class="p">)</span>
+    <span class="c1"># assemble optimal errors for a method of the expected order and plot</span>
+    <span class="n">order_guide_space</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_error</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">order</span> <span class="o">*</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">order_guide_space</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'k'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s1">th order'</span><span class="p">)</span>
 
     <span class="n">min_err</span> <span class="o">=</span> <span class="mf">1e99</span>
     <span class="n">max_err</span> <span class="o">=</span> <span class="mf">0e00</span>
@@ -689,9 +698,10 @@ compute 0 very, very thoroughly…</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">5</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">4.791</span>
-<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">5</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">5.364</span>
-<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">5</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">5.675</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">4.791</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">5.364</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">5.675</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">5.865</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/step_1_accuracy_test_coll.png"><img alt="../_images/step_1_accuracy_test_coll.png" height="406" src="../_images/step_1_accuracy_test_coll.png" width="606" />
