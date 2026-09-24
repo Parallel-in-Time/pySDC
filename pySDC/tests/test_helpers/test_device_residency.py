@@ -58,9 +58,13 @@ def build(levels, comm=None):
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
     from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
+    # `setup_GPU` switches the class rather than the instance, so a throwaway subclass takes the
+    # switch and the shared class is left on the CPU for whatever runs next
+    on_GPU = type('heatNd_on_GPU', (heatNd_unforced,), {})
+
     nvars = [128, 64] if levels > 1 else 128
     description = {
-        'problem_class': heatNd_unforced,
+        'problem_class': on_GPU,
         'problem_params': {'nvars': nvars, 'freq': 2, 'bc': 'periodic', 'useGPU': True},
         'sweeper_class': generic_implicit,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'},
