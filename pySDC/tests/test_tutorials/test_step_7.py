@@ -1,7 +1,5 @@
 import pytest
 
-from pySDC.tests import fake_cupy
-
 
 @pytest.mark.fenics
 def test_A():
@@ -128,7 +126,6 @@ def test_F_ML():
 
 
 @pytest.mark.cupy
-@pytest.mark.skipif(fake_cupy.ACTIVE, reason='sends device pointers between ranks, which the CPU stub cannot fake')
 @pytest.mark.parallel(2)
 def test_G():
     from pySDC.tutorial.step_7.G_pySDC_on_GPU import main as main_G

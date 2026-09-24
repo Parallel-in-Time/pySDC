@@ -1,7 +1,5 @@
 import pytest
 
-from pySDC.tests import fake_cupy
-
 
 def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL, ML):
     """
@@ -137,10 +135,6 @@ def test_sweeper(quad_type, residual_type, imex, init_guess, ML):
 
 
 @pytest.mark.cupy
-@pytest.mark.skipif(
-    fake_cupy.ACTIVE,
-    reason='builds an NCCLComm, whose calls take raw device pointers and cannot be faked on the CPU',
-)
 @pytest.mark.parallel(2)
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])

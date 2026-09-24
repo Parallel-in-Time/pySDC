@@ -10,17 +10,8 @@ where it happens says what actually broke.
 import numpy as np
 import pytest
 
-from pySDC.tests import fake_cupy
-
-# NCCL takes raw device pointers, and its datatype and operation constants come from the real
-# library, so none of this has a meaning on the CPU stub.
-needs_a_GPU = pytest.mark.skipif(
-    fake_cupy.ACTIVE, reason='NCCL cannot be faked on the CPU: its calls take raw device pointers'
-)
-
 
 @pytest.mark.cupy
-@needs_a_GPU
 def test_dtypes_translate_to_their_NCCL_equivalents():
     """NCCL has no complex numbers, so a complex array travels as twice as many reals."""
     import cupy as cp
@@ -44,7 +35,6 @@ def test_dtypes_translate_to_their_NCCL_equivalents():
 
 
 @pytest.mark.cupy
-@needs_a_GPU
 def test_complex_arrays_are_counted_as_twice_as_many_reals():
     """The other half of sending complex data as real: the count has to be doubled to match."""
     import cupy as cp
@@ -56,7 +46,6 @@ def test_complex_arrays_are_counted_as_twice_as_many_reals():
 
 
 @pytest.mark.cupy
-@needs_a_GPU
 def test_operations_translate_to_their_NCCL_equivalents():
     from cupy.cuda import nccl
     from mpi4py import MPI
@@ -80,7 +69,6 @@ def test_operations_translate_to_their_NCCL_equivalents():
 
 
 @pytest.mark.cupy
-@needs_a_GPU
 @pytest.mark.parallel(2)
 def test_host_buffers_are_handed_back_to_MPI():
     """Only device buffers can go through NCCL; anything else has to reach MPI unchanged."""
@@ -108,7 +96,6 @@ def test_host_buffers_are_handed_back_to_MPI():
 
 
 @pytest.mark.cupy
-@needs_a_GPU
 @pytest.mark.parallel(2)
 def test_device_arrays_are_synchronised_before_MPI_reads_them():
     """`reduce` and `allreduce` pickle through MPI, which reads the data from the host.

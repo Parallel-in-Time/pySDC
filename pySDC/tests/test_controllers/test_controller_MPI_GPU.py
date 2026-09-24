@@ -4,17 +4,10 @@ Time-parallel runs on GPUs.
 `controller_MPI` sends the solution from one time rank to the next with `cupy_mesh.isend`, which
 hands MPI a device pointer. That works only when MPI was built CUDA-aware *and* told to use it:
 conda-forge's OpenMPI is built with it and ships it off, so the suite sets
-`OMPI_MCA_opal_cuda_support=true`. Until this was tried, both GPU run scripts asserted that the
-time communicator had size one.
+`OMPI_MCA_opal_cuda_support=true`.
 """
 
 import pytest
-
-from pySDC.tests import fake_cupy
-
-needs_a_GPU = pytest.mark.skipif(
-    fake_cupy.ACTIVE, reason='sends device pointers between ranks, which the CPU stub cannot fake'
-)
 
 
 def run_time_parallel(levels, useGPU, dt=1e-2, nsteps=2):
@@ -54,7 +47,6 @@ def run_time_parallel(levels, useGPU, dt=1e-2, nsteps=2):
 
 
 @pytest.mark.cupy
-@needs_a_GPU
 @pytest.mark.parallel(2)
 @pytest.mark.parametrize('levels', [1, 2])
 def test_time_parallel_on_GPU(levels):

@@ -10,8 +10,6 @@ in `restrict` and `prolong` accepted only `'mesh'`.
 import numpy as np
 import pytest
 
-from pySDC.tests import fake_cupy
-
 
 def transfer_both_ways(useGPU, nvars_fine=32, nvars_coarse=16, freq=2):
     """Restrict an exact solution and prolong it back, on one side of the PCI bus or the other."""
@@ -35,10 +33,6 @@ def transfer_both_ways(useGPU, nvars_fine=32, nvars_coarse=16, freq=2):
 
 
 @pytest.mark.cupy
-@pytest.mark.skipif(
-    fake_cupy.ACTIVE,
-    reason='the stub is NumPy underneath, so it cannot show that a real CuPy array survives the transfer',
-)
 def test_mesh_to_mesh_on_GPU_matches_the_CPU():
     restricted_CPU, prolonged_CPU = transfer_both_ways(useGPU=False)
     restricted_GPU, prolonged_GPU = transfer_both_ways(useGPU=True)

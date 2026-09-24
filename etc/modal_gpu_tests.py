@@ -1,12 +1,8 @@
 """
 Run pySDC's ``cupy``-marked tests on a real GPU, using Modal's serverless containers.
 
-The rest of CI has no GPU: ``PYSDC_FAKE_GPU=1`` swaps CuPy for a NumPy stub (see
-``pySDC/tests/fake_cupy.py``), which shows that the ``useGPU`` code paths are wired up and
-import, but never that they compute the right thing -- and skips outright what cannot be faked.
-This is the other half of that story: real CuPy on a real T4, so cuSPARSE and cuFFT results are
-checked against the CPU ones, and ``test_heterogeneous_implementation`` (the only test that
-skips on ``fake_cupy.ACTIVE``) runs at all.
+These are the only tests in the project that touch a GPU, so this is the only place the
+``useGPU`` code paths, the CUDA kernels behind them and NCCL are executed at all.
 
 Run it from the repository root, either way:
 
@@ -120,7 +116,6 @@ def run_cupy_tests(trees, selection):
     # the two ranks its `parallel(2)` marker asks for, and everything else runs serially. Each
     # rank is wrapped so it sees a GPU of its own -- see etc/bind_gpu_to_rank.sh.
     #
-    # `PYSDC_FAKE_GPU` is deliberately *not* set: this is the run that uses the real thing.
     env = {
         **os.environ,
         'PYTEST': f'bash {REMOTE}/etc/bind_gpu_to_rank.sh coverage run -m pytest'
