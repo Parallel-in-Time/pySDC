@@ -40,30 +40,19 @@ image = (
     # spectral helper's `cupy`-marked tests go through them even on a single rank.
     .micromamba_install(spec_file='etc/environment-cupy.yml', channels=['conda-forge'])
     .micromamba_install(spec_file='etc/environment-tests.yml', channels=['conda-forge'])
-    # Released mpi4py-fft has no `cupy`/`cupyx-scipy` FFT backend, no `DistArrayCuPy` and no
-    # NCCL `comm_backend` -- upstream declined the approach in mpi4py/mpi4py-fft#14, because
-    # `cupy.ndarray` cannot be subclassed the way `DistArray` needs. pySDC's GPU spectral code
-    # asks for all three, so it can only run against this fork, which replaces the conda-forge
-    # build installed above. Pinned to a commit rather than to the branch, so that the image is
-    # reproducible and does not silently move under us.
+    # The GPU spectral code needs a `cupy`/`cupyx-scipy` FFT backend, `DistArrayCuPy` and the
+    # NCCL `comm_backend`, none of which are in any release -- see
+    # docs/contrib/02_continuous_integration.md. They come from this fork, pinned to a commit so
+    # the image is reproducible, and installed over the conda-forge build.
     #
-    # `c-compiler` and `cython` because the FFTW extension is built from source and its sources
-    # are `.pyx`: the GitHub archive carries no pre-generated C, unlike a PyPI sdist. Without
-    # Cython, setuptools quietly rewrites `utilities.pyx` to `utilities.c` and hands gcc a file
-    # nothing ever generated. They are installed here rather than left to the fork's
-    # `build-system.requires`, because `--no-build-isolation` is what keeps the build inside this
-    # environment -- where its setup.py finds FFTW by falling back to `sys.prefix`, and where the
-    # NumPy headers are the ones pySDC will run against. `--no-deps` so pip does not pull PyPI
-    # wheels over the conda-forge NumPy and mpi4py.
-    #
-    # The source archive rather than `git+https://...`: the image has no `git`, and GitHub serves
-    # the same commit as a tarball, so this pins exactly as tightly without installing one.
-    #
-    # `--force-reinstall` is what makes this take at all. The fork reports the same version as the
-    # conda-forge build it replaces, so without it pip calls the requirement satisfied and exits
-    # successfully having done nothing -- a green build and an unchanged environment. The import
-    # afterwards fails the build loudly if that ever happens again: `distarrayCuPy` exists only in
-    # the fork, so it is a direct check that these files, and not conda's, are installed.
+    # The flags all matter. A tarball rather than `git+https://`, since the image has no `git`.
+    # `c-compiler` and `cython` because the FFTW extension builds from `.pyx` sources that a
+    # GitHub archive does not ship pre-generated, and `--no-build-isolation` keeps the build in
+    # this environment, where setup.py finds FFTW through `sys.prefix`. `--no-deps` keeps pip off
+    # the conda-forge NumPy and mpi4py. `--force-reinstall` because the fork reports the same
+    # version as the build it replaces, and pip would otherwise call the requirement satisfied and
+    # install nothing. The import that follows fails the build if that happens: `distarrayCuPy`
+    # exists only in the fork.
     .micromamba_install('c-compiler', 'cython', channels=['conda-forge'])
     .run_commands(
         'python -m pip install --no-deps --no-build-isolation --force-reinstall '
@@ -87,6 +76,11 @@ image = (
             # file gds_shmem2.c` and then a dead launcher, before pytest prints anything. The hash
             # store keeps the data in process memory instead and needs nothing from the host.
             'PMIX_MCA_gds': 'hash',
+            # conda-forge's OpenMPI is built with CUDA awareness and ships it switched off. The
+            # time-parallel controller sends device buffers point to point, so without this MPI is
+            # handed a device pointer it will not read. NCCL covers the collectives but has no
+            # tags, and those sends are tagged -- see `NCCLComm.Send`.
+            'OMPI_MCA_opal_cuda_support': 'true',
             # A slot is a physical core, and this container has fewer of those than it has GPUs to
             # drive; same reasoning as the main CI pipeline's copy of these.
             'PRTE_MCA_rmaps_default_mapping_policy': ':oversubscribe',
@@ -104,11 +98,10 @@ image = (
 )
 
 
-# `timeout` is a wall clock limit on the container, and it is the only thing that stops a hung run
-# renting two GPUs until Modal's own maximum expires. A full run is about three minutes, so this is
-# generous even with a cold image, and still kills a stuck one quickly. pytest's own 300 s
-# per-test timeout does not help here: a deadlocked collective hangs outside any single test.
-@app.function(image=image, gpu=GPUS, timeout=900)
+# `timeout` is a wall clock limit on the container, and the only thing that stops a hung run
+# holding two GPUs until Modal's own maximum expires; pytest's 300 s per-test timeout does not
+# cover a collective that deadlocks between tests. Full runs take 180 to 185 seconds.
+@app.function(image=image, gpu=GPUS, timeout=420)
 def run_cupy_tests(trees, selection):
     """Run the GPU test suite in the container, and hand back pytest's exit code and coverage.
 

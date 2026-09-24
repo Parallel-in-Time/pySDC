@@ -196,24 +196,21 @@ modal run etc/modal_gpu_tests.py --tests pySDC/tests/test_sweepers/test_MPI_swee
 modal run etc/modal_gpu_tests.py --k NCCL
 ```
 
-In CI it runs:
+In CI it runs on **every push**, like the rest of the pipeline, with one exception: a pull request
+from a fork gets no secrets, so the job is skipped there.
 
-- on **every push to master**, which is where the coverage badge, Codecov and the website get
-  their numbers;
-- on a **pull request carrying the `gpu` label**, which only someone with write permission can
-  set, and only for branches in this repository -- a pull request from a fork gets no secrets and
-  the job says so rather than failing obscurely.
+It used to be opt-in through a `gpu` label. That was a mistake worth recording, because a label is
+a *gate* and not a *trigger*: adding one to an open pull request starts nothing, so the job
+skipped and the pull request went green having never touched a GPU. A skip that reads as a pass is
+the worst thing a check can do, and it happened four times before the label went away.
 
-> :bell: The pipeline does not listen for label changes, so adding the `gpu` label to an existing
-> pull request does not start anything by itself: **label it, then push**, and the job runs with
-> the push. Closing and reopening the pull request works too, since `reopened` is one of the
-> events the pipeline does listen for. Applying the label as the pull request is created is *not*
-> reliable -- `gh pr create --label gpu` has been observed both to work and to leave the pull
-> request with no labels at all, in which case the job silently skips. Listening for `labeled`
-> would re-run all ~40 jobs every time anyone touched any label on any pull request.
+Coverage is the other reason to run it unconditionally. `NCCL_communicator.py`, `cupy_mesh.py` and
+`log_GPU_timings.py` are executed nowhere else, so master's coverage includes them and a pull
+request that skipped the job reports a drop that is not real. Fork pull requests still show that
+drop, which cannot be helped without `pull_request_target`.
 
 It needs `MODAL_TOKEN_ID` and `MODAL_TOKEN_SECRET` as repository secrets. A run costs a few cents
-and takes about three minutes; the free tier covers several hundred of them a month.
+and takes about three minutes; the free tier covers several hundred a month.
 
 > :warning: The GPU spectral code needs an mpi4py-fft that no release provides -- the `cupy` and
 > `cupyx-scipy` FFT backends, `DistArrayCuPy` and the NCCL `comm_backend` only exist on the

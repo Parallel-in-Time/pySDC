@@ -123,3 +123,11 @@ def test_F_ML():
     assert all(
         res_SL > res_ML for res_SL, res_ML in zip(residual_SL, residual_fine)
     ), 'Single level SDC converged faster than multi-level!'
+
+
+@pytest.mark.cupy
+@pytest.mark.parallel(2)
+def test_G():
+    from pySDC.tutorial.step_7.G_pySDC_on_GPU import main as main_G
+
+    main_G()

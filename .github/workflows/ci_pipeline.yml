@@ -195,15 +195,11 @@ jobs:
     # etc/modal_gpu_tests.py. This is the only job that runs them, so it is the only source of
     # coverage for `NCCL_communicator.py`, `cupy_mesh.py` and `log_GPU_timings.py`.
     #
-    # It needs a secret, so it cannot work on a pull request from a fork, and renting hardware on
-    # every push is not worth it. On master it always runs, since that is the coverage the badge,
-    # Codecov and the website publish; on a pull request it takes the `gpu` label, which only
-    # someone with write access can set.
+    # Skipped for a pull request from a fork, which gets no secrets and so cannot reach Modal.
     runs-on: ubuntu-latest
     if: >-
       github.event_name != 'pull_request' ||
-      (contains(github.event.pull_request.labels.*.name, 'gpu')
-       && github.event.pull_request.head.repo.full_name == github.repository)
+      github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout
         uses: actions/checkout@v7
