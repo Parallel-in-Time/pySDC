@@ -1,0 +1,22 @@
+pySDC/tests/test_sweepers/test_Runge_Kutta_sweeper.py
+  s_15a3c3cad5de95::t_4a5cd97d110feb 324-352
+  s_15a3c3cad5de95::t_38143820c8feff 323
+pySDC/implementations/sweeper_classes/Runge_Kutta.py
+  s_15a3c3cad5de95::t_e1d32026b430d3 6,250-255
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "57f97e203ddd5d0b247f9d61a093315230f94a3b",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}

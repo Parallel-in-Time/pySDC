@@ -1,0 +1,31 @@
+pySDC/tests/test_sweepers/test_explicit_sweeper.py
+  s_15a3c3cad5de95::t_5f497a519b5bd7 1-35
+  s_15a3c3cad5de95::t_9913823a8699c7 36
+pySDC/projects/Resilience/tests/test_problems.py
+  s_15a3c3cad5de95::t_02548863b167e0 1-80
+  s_15a3c3cad5de95::t_be9290b6f61ab2 81-114
+pySDC/projects/Resilience/tests/test_dahlquist.py
+  s_15a3c3cad5de95::t_8adb6d858b0935 1-20
+pySDC/projects/Resilience/tests/test_work_precision.py
+  s_15a3c3cad5de95::t_00103dbf6e014b 1-60
+pySDC/projects/Resilience/dahlquist.py
+  s_15a3c3cad5de95::t_3c74f2950ee9ce 233
+pySDC/projects/Resilience/work_precision.py
+  s_15a3c3cad5de95::t_fdb4d05480d0f4 1278,1605,1611
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4794ef8ca06930a22a396c00ec2332f87e520b82",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
