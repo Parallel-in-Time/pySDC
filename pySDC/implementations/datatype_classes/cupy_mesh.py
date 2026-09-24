@@ -43,7 +43,7 @@ class cupy_mesh(cp.ndarray):
         ):
             obj = cp.ndarray.__new__(cls, init[0], dtype=init[2], **kwargs)
             obj.fill(val)
-            cls.comm = init[1]
+            obj.comm = init[1]
         else:
             raise NotImplementedError(type(init))
         return obj
@@ -59,7 +59,25 @@ class cupy_mesh(cp.ndarray):
             else:
                 args.append(input_)
         results = super(cupy_mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
+
+        # the inputs were viewed as plain arrays just above, so the result has no communicator to
+        # inherit through `__array_finalize__`; carry this one's over explicitly. A reduction or a
+        # comparison can return a scalar rather than an array, and a scalar takes no attributes.
+        if isinstance(results, cp.ndarray):
+            results.comm = self.comm
+
         return results
+
+    def __array_finalize__(self, obj):
+        """
+        Carry the communicator onto every array derived from this one.
+
+        CuPy honours this hook, so a slice keeps the communicator. What reaches here from a ufunc
+        or a copy is a plain `cupy.ndarray` with nothing to carry, which is why those propagate it
+        themselves.
+        """
+        if obj is not None:
+            self.comm = getattr(obj, 'comm', None)
 
     def __abs__(self):
         """
@@ -96,7 +114,9 @@ class cupy_mesh(cp.ndarray):
         Returns:
             mesh: copy of the mesh, of the same type
         """
-        return super().copy(*args, **kwargs).view(type(self))
+        copied = super().copy(*args, **kwargs).view(type(self))
+        copied.comm = self.comm
+        return copied
 
     def __deepcopy__(self, memo=None):
         """

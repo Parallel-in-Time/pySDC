@@ -43,7 +43,7 @@ class mesh(np.ndarray):
         ):
             obj = np.ndarray.__new__(cls, init[0], dtype=init[2], **kwargs)
             obj.fill(val)
-            cls.comm = init[1]
+            obj.comm = init[1]
         else:
             raise NotImplementedError(type(init))
         return obj
@@ -60,7 +60,25 @@ class mesh(np.ndarray):
                 args.append(input_)
 
         results = super().__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
+
+        # the inputs were viewed as plain arrays just above, so the result has no communicator to
+        # inherit through `__array_finalize__`; carry this one's over explicitly. A reduction or a
+        # comparison can return a scalar rather than an array, and a scalar takes no attributes.
+        if isinstance(results, np.ndarray):
+            results.comm = self.comm
+
         return results
+
+    def __array_finalize__(self, obj):
+        """
+        Carry the communicator onto every array derived from this one.
+
+        Without this the communicator would live only on the instance it was given to, and a slice,
+        a sum or a copy would silently lose it -- so `__abs__` would stop reducing across ranks and
+        quietly return a local norm on a space-parallel run.
+        """
+        if obj is not None:
+            self.comm = getattr(obj, 'comm', None)
 
     def __abs__(self):
         """

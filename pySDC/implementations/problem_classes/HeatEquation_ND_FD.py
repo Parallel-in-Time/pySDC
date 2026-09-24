@@ -165,15 +165,14 @@ class heatNd_forced(heatNd_unforced):
 
     dtype_f = imex_mesh
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """
         Switch to GPU modules, keeping the split right-hand side this class needs
         """
         from pySDC.implementations.datatype_classes.cupy_mesh import imex_cupy_mesh
 
         super().setup_GPU()
-        cls.dtype_f = imex_cupy_mesh
+        self.dtype_f = imex_cupy_mesh
 
     def eval_f_increment(self, base, delta, t):
         """

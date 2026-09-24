@@ -104,8 +104,7 @@ class SpectralHelper1D:
         if useGPU and useFFTW:
             raise ValueError('Please run either on GPUs or with FFTW, not both!')
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """switch to GPU modules"""
         import cupy as cp
         import cupyx.scipy.sparse as sparse_lib
@@ -113,10 +112,10 @@ class SpectralHelper1D:
         import cupyx.scipy.fft as fft_lib
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
-        cls.xp = cp
-        cls.sparse_lib = sparse_lib
-        cls.linalg = linalg
-        cls.fft_lib = fft_lib
+        self.xp = cp
+        self.sparse_lib = sparse_lib
+        self.linalg = linalg
+        self.fft_lib = fft_lib
 
     @classmethod
     def setup_CPU(cls, useFFTW=False):
@@ -962,8 +961,7 @@ class SpectralHelper:
     fft_backend = 'scipy'
     fft_comm_backend = 'MPI'
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """switch to GPU modules"""
         import cupy as cp
         import cupyx.scipy.sparse as sparse_lib
@@ -971,15 +969,15 @@ class SpectralHelper:
         import cupyx.scipy.fft as fft_lib
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
-        cls.xp = cp
-        cls.sparse_lib = sparse_lib
-        cls.linalg = linalg
+        self.xp = cp
+        self.sparse_lib = sparse_lib
+        self.linalg = linalg
 
-        cls.fft_lib = fft_lib
-        cls.fft_backend = 'cupyx-scipy'
-        cls.fft_comm_backend = 'NCCL'
+        self.fft_lib = fft_lib
+        self.fft_backend = 'cupyx-scipy'
+        self.fft_comm_backend = 'NCCL'
 
-        cls.dtype = cupy_mesh
+        self.dtype = cupy_mesh
 
     @classmethod
     def setup_CPU(cls, useFFTW=False):
