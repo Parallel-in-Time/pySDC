@@ -103,12 +103,13 @@ timeout = 300
 line-length = 120
 extend-exclude = [
     'playgrounds',
-    'tests',
     '*/data/*'
     ]
 
 [tool.ruff.lint]
-select = ["C", "E", "F", "W", "B"]
+# PT011 and PT012 are for the tests: a `pytest.raises` around several statements only ever runs
+# the first one that raises, and one around a broad exception passes on any unrelated error.
+select = ["C", "E", "F", "W", "B", "PT011", "PT012"]
 ignore = ["E203", # Whitespace before punctuation
           "E741", # Ambiguous variable name
           "E402", # Module level import not at top of cell

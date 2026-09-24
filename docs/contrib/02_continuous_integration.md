@@ -146,6 +146,11 @@ pytest -v pySDC/tests
 > pytest -v pySDC/tests/test_nodes.py::test_nodesGeneration[LEGENDRE]   # only test_nodesGeneration with LEGENDRE nodes
 > ```
 
+> :warning: CI runs `pySDC/tests` once per environment with `-m <marker>`, so every test there needs one of the
+> markers `base`, `fenics`, `mpi4py`, `petsc`, `pytorch`, `firedrake` or `cupy` (or `benchmark`, which CI
+> deliberately does not run). A test without one would never run anywhere, so collection stops with an error
+> that names it; see `pySDC/tests/conftest.py`.
+
 ## Running CI on HPC from pull requests
 
 > :warning: **Note:** The GitLab mirror integration is currently disabled due to technical issues. This section describes functionality that is temporarily unavailable.

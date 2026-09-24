@@ -35,7 +35,7 @@ def test_DataChecker():
     try:
         d2.storeAndCheck('r1', result)
     except UserWarning:
-        raise AssertionError("warning raised with reference data available")
+        raise AssertionError("warning raised with reference data available") from None
     d2.writeToJSON()
     warnings.resetwarnings()
 

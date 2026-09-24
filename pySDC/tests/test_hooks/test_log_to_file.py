@@ -48,25 +48,26 @@ def run(hook, Tend=0, ODE=True, t0=0):
 
 
 @pytest.mark.base
-def test_errors_pickle():
+def test_errors_pickle(tmp_path):
     from pySDC.implementations.hooks.log_solution import LogToPickleFile
     import os
 
     hook = type('LogToPickleFile', (LogToPickleFile,), {})
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='Please set a path'):
         run(hook)
 
-    hook.path = os.getcwd()
+    hook.path = str(tmp_path)
     run(hook)
 
-    path = f'{os.getcwd()}/tmp'
+    # a directory that does not exist yet is created
+    path = f'{tmp_path}/tmp'
     hook.path = path
     run(hook)
-    os.path.isdir(path)
+    assert os.path.isdir(path)
 
-    with pytest.raises(ValueError):
-        hook.path = __file__
+    hook.path = __file__
+    with pytest.raises(ValueError, match='a file of the same name exists'):
         run(hook)
 
 
@@ -126,7 +127,7 @@ def test_logging(tmpdir, use_pickle, ODE=True):
         data = logging_hook.load(i)
         u_file += [(data['t'], data['u'])]
 
-    for us, uf in zip(u, u_file):
+    for us, uf in zip(u, u_file, strict=True):
         assert us[0] == uf[0], 'time does not match'
         if ODE:
             assert np.allclose(us[1], uf[1]), 'solution does not match'
@@ -162,7 +163,7 @@ def test_restart(tmpdir, ODE=True):
         u_restart += [(data['t'], data['u'])]
 
     assert np.allclose([me[0] for me in u_restart], [me[0] for me in u_continuous]), 'Times don\'t match'
-    for u1, u2 in zip(u_restart, u_continuous):
+    for u1, u2 in zip(u_restart, u_continuous, strict=True):
         assert np.allclose(u1[1], u2[1]), 'solution does not match'
 
 

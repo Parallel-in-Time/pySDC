@@ -36,7 +36,7 @@ def single_test(shape, xp, MultiComponentMeshClass):
     B.a[:] = b
 
     # check that the meshes have been prepared appropriately
-    for M, m in zip([A, B], [a, b]):
+    for M, m in zip([A, B], [a, b], strict=True):
         assert M.shape == (len(TestMesh.components),) + ((shape,) if type(shape) is int else shape)
         assert xp.allclose(M.a, m)
         assert xp.allclose(M.b, zero)

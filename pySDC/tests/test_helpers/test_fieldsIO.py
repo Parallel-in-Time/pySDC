@@ -186,7 +186,7 @@ def testToVTR(tmpdir, nVar, nX, nY, nZ, nSteps):
         uVTR, coords, _ = readFromVTR(vFile)
         _, uFile = file.readField(i)
         assert np.allclose(uFile, uVTR), "mismatch between data"
-    for i, (xVTR, xFile) in enumerate(zip(coords, file.header["coords"])):
+    for i, (xVTR, xFile) in enumerate(zip(coords, file.header["coords"], strict=True)):
         assert np.allclose(xVTR, xFile), f"coordinate mismatch in dir. {i}"
 
 
@@ -211,7 +211,7 @@ def testRectilinear_MPI(tmpdir, dim, dtypeIdx, algo, nSteps, nVar):
     fileNames = [f"{tmpdir}/testRectilinear{dim}D_MPI_{i}.pysdc" for i in range(len(allGridSizes))]
 
     try:
-        for fileName, gridSizes in zip(fileNames, allGridSizes):
+        for fileName, gridSizes in zip(fileNames, allGridSizes, strict=True):
             u0 = writeFields_MPI(
                 fileName=fileName,
                 dtypeIdx=dtypeIdx,
@@ -231,7 +231,7 @@ def testRectilinear_MPI(tmpdir, dim, dtypeIdx, algo, nSteps, nVar):
 
     comm.Barrier()
 
-    for fileName, gridSizes in zip(fileNames, allGridSizes):
+    for fileName, gridSizes in zip(fileNames, allGridSizes, strict=True):
 
         f2: Rectilinear = FieldsIO.fromFile(fileName)
 
@@ -241,7 +241,7 @@ def testRectilinear_MPI(tmpdir, dim, dtypeIdx, algo, nSteps, nVar):
         assert f2.gridSizes == list(gridSizes), f"incorrect gridSizes in MPI written fields {f2}"
 
         coords, u0 = initGrid(nVar, gridSizes)
-        for i, (cFile, cRef) in enumerate(zip(f2.header['coords'], coords)):
+        for i, (cFile, cRef) in enumerate(zip(f2.header['coords'], coords, strict=True)):
             assert np.allclose(cFile, cRef), f"incorrect coords[{i}] in MPI written fields {f2}"
 
         times = np.arange(nSteps) / nSteps

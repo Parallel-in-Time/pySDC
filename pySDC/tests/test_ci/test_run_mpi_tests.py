@@ -173,9 +173,9 @@ def test_parallel_marker_without_mpi_pytest_is_an_error(monkeypatch):
         nodeid = 'tests/test_thing.py::test_on_two_ranks'
         own_markers = [_Marker()]
 
-    with pytest.raises(BaseException) as excinfo:
+    with pytest.raises(pytest.exit.Exception, match='mpi-pytest is not installed') as excinfo:
         mpi_ranks.pytest_collection_modifyitems(None, [_Item()])
-    assert 'mpi-pytest is not installed' in str(excinfo.value)
+    assert excinfo.value.returncode == 4
 
     # ...and it stays quiet when nothing declares ranks
     class _Plain:

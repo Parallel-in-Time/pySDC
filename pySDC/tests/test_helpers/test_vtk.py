@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("nZ", [1, 5, 16])
 @pytest.mark.parametrize("nY", [1, 5, 16])
 @pytest.mark.parametrize("nX", [1, 5, 16])
@@ -15,9 +16,9 @@ def testVTR(nVar, nX, nY, nZ):
 
     data2, coords2, varNames2 = readFromVTR(writeToVTR("testVTR", data1, coords1, varNames1))
 
-    for i, (x1, x2) in enumerate(zip(coords1, coords2)):
+    for i, (x1, x2) in enumerate(zip(coords1, coords2, strict=True)):
         print(x1, x2)
         assert np.allclose(x1, x2), f"coordinate mismatch in dir. {i}"
-    assert varNames1 == varNames2, f"varNames mismatch"
-    assert data1.shape == data2.shape, f"data shape mismatch"
-    assert np.allclose(data1, data2), f"data values mismatch"
+    assert varNames1 == varNames2, "varNames mismatch"
+    assert data1.shape == data2.shape, "data shape mismatch"
+    assert np.allclose(data1, data2), "data values mismatch"

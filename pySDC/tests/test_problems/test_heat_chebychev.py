@@ -97,6 +97,7 @@ def test_heat2d_chebychev(a, b, c, fx, fy, base_x, base_y, nx=2**5 + 1, ny=2**5 
     assert np.allclose(u0[0], u02[0], atol=1e-4), 'Error in eval_f'
 
 
+@pytest.mark.base
 def test_SDC():
     import numpy as np
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit

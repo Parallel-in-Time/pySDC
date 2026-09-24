@@ -106,5 +106,6 @@ def test_imex_vs_implicit(freq, nu):
         # check if ProblemError is raised correctly in case if nvars % 2 != 0
         problem_params.update({'nvars': 31})
         with pytest.raises(ProblemError):
-            imex_test = advectiondiffusion1d_imex(**problem_params)
-            fully_impl_test = advectiondiffusion1d_implicit(**problem_params)
+            advectiondiffusion1d_imex(**problem_params)
+        with pytest.raises(ProblemError):
+            advectiondiffusion1d_implicit(**problem_params)

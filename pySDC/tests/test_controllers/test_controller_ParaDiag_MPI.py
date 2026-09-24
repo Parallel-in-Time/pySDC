@@ -162,7 +162,7 @@ def test_multilevel_is_rejected():
         'level_params': {'dt': 1e-1, 'restol': 1e-8},
         'step_params': {'maxiter': 9},
     }
-    with pytest.raises(Exception):
+    with pytest.raises(NotImplementedError, match='multiple levels'):
         controller_ParaDiag_nonMPI(
             controller_params={'logger_level': 30, 'alpha': 1e-4}, description=description, num_procs=2
         )

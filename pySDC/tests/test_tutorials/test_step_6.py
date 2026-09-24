@@ -93,7 +93,7 @@ def test_C():
         'ERROR: got different number of results form MPI and nonMPI for even ' 'distribution of time-steps'
     )
 
-    for i, j in zip(diff_MPI, diff_nonMPI):
+    for i, j in zip(diff_MPI, diff_nonMPI, strict=True):
         assert abs(i - j) < 6e-11, (
             'ERROR: difference between MPI and nonMPI results is too large for even '
             'distributions of time-steps, got %s' % abs(i - j)
@@ -115,7 +115,7 @@ def test_C():
         'ERROR: got different number of results form MPI and nonMPI for odd ' 'distribution of time-steps'
     )
 
-    for i, j in zip(diff_MPI, diff_nonMPI):
+    for i, j in zip(diff_MPI, diff_nonMPI, strict=True):
         assert abs(i - j) < 6e-11, (
             'ERROR: difference between MPI and nonMPI results is too large for odd '
             'distributions of time-steps, got %s' % abs(i - j)

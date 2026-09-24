@@ -23,7 +23,7 @@ def test_script(sName):
     try:
         exec(f"from pySDC.projects.parallelSDC_reloaded import {sName}")
     except Exception as e:
-        raise ImportError(f"error when executing {sName}.py : {e}")
+        raise ImportError(f"error when executing {sName}.py : {e}") from e
 
 
 @pytest.mark.base
@@ -45,7 +45,7 @@ def test_playgrounds(pName, sType):
     try:
         exec(f"from pySDC.projects.parallelSDC_reloaded import {pName}_{sType}")
     except Exception as e:
-        raise ImportError(f"error when executing {pName}_{sType}.py : {e}")
+        raise ImportError(f"error when executing {pName}_{sType}.py : {e}") from e
 
 
 @pytest.mark.base

@@ -229,6 +229,7 @@ def test_Dirichtlet_BCs(order, size, reduce):
     assert np.allclose(u, u_expect), 'Dirichlet BCs failed!'
 
 
+@pytest.mark.base
 @pytest.mark.parametrize('reduce', [True, False])
 @pytest.mark.parametrize('order', [2, 4, 6, 8])
 def test_Dirichtlet_BCs_sin(order, reduce):
@@ -275,6 +276,7 @@ def test_Dirichtlet_BCs_sin(order, reduce):
         assert diff < (0.999 if order != 8 else 1.2), (orders, order)
 
 
+@pytest.mark.base
 @pytest.mark.parametrize('reduce', [True, False])
 @pytest.mark.parametrize('order', [2, 4, 6, 8])
 def test_Neumann_Dirichlet_BCs(order, reduce):
@@ -309,6 +311,7 @@ def test_Neumann_Dirichlet_BCs(order, reduce):
     assert np.allclose(u, u_expect), 'Dirichlet-Neumann BCs failed!'
 
 
+@pytest.mark.base
 @pytest.mark.parametrize('invert', [False, True])
 @pytest.mark.parametrize('reduce', [True, False])
 @pytest.mark.parametrize('order', [2, 4, 6, 8])

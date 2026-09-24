@@ -121,7 +121,7 @@ def test_F_ML():
     stats_SL = stepper_SL.scheme.stats
     residual_SL = get_sorted(stats_SL, type='residual_post_sweep', sortby='iter')
     assert all(
-        res_SL > res_ML for res_SL, res_ML in zip(residual_SL, residual_fine)
+        res_SL > res_ML for res_SL, res_ML in zip(residual_SL, residual_fine, strict=True)
     ), 'Single level SDC converged faster than multi-level!'
 
 

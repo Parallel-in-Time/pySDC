@@ -307,7 +307,9 @@ def test_Nusselt_number_computation(c, N=6):
     u[iw] = c * (1 + xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key, expect in zip(['t', 'b', 'V', 'thermal'], [prob.Lz * (3 + 1) * c - 6, c, c * (1 + 1) - 3, 12]):
+    for key, expect in zip(
+        ['t', 'b', 'V', 'thermal'], [prob.Lz * (3 + 1) * c - 6, c, c * (1 + 1) - 3, 12], strict=True
+    ):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     # zero
@@ -323,7 +325,7 @@ def test_Nusselt_number_computation(c, N=6):
     u[iu] = c * xp.sqrt(5) / 3 * prob.Z**3 + c
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key, expect in zip(['t', 'b', 'V', 'thermal', 'kinetic'], [-prob.Lz * 2, 0, -1, 4 / 3, 1 + c**2]):
+    for key, expect in zip(['t', 'b', 'V', 'thermal', 'kinetic'], [-prob.Lz * 2, 0, -1, 4 / 3, 1 + c**2], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]} with T=z**2!'
 
     # gradient plus fluctuations
