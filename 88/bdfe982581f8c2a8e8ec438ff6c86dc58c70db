@@ -1,0 +1,45 @@
+pySDC/projects/DAE/tests/test_RungeKuttaDAE.py
+  s_15a3c3cad5de95::t_5c357e5a25c72e 155,158,209-212,243,246,307
+pySDC/projects/DAE/tests/test_SemiImplicitDAE.py
+  s_15a3c3cad5de95::t_360ebb7138195d 347,350
+pySDC/projects/DAE/tests/test_convergence.py
+  s_15a3c3cad5de95::t_57064202b0b060 25-30,33-39
+pySDC/projects/DAE/tests/test_iteration.py
+  s_15a3c3cad5de95::t_9c1a622de6be4c 23-28,31-37
+pySDC/projects/FastWaveSlowWave/runmultiscale_acoustic.py
+  s_15a3c3cad5de95::t_b7a8d57a798b13 128-132
+pySDC/projects/Hamiltonian/fput.py
+  s_15a3c3cad5de95::t_64ae8552f0a02d 125-128,173-174
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_15a3c3cad5de95::t_87523b572197ec 474-480,482-490,494,496-497
+pySDC/projects/Resilience/vdp.py
+  s_15a3c3cad5de95::t_9a504a5cd7f9ea 346-348
+pySDC/projects/StroemungsRaum/tests/test_Navier_Stokes_monolithic_FEniCS.py
+  s_15a3c3cad5de95::t_1eaf665cfcc676 174-177
+pySDC/tests/test_convergence_controllers/test_error_convergence_controllers.py
+  s_15a3c3cad5de95::t_25a3d32f8636a8 4,17,113,120-122,137
+pySDC/tests/test_helpers/test_problem_helper.py
+  s_15a3c3cad5de95::t_47de216fe645c2 275-276,278
+pySDC/tests/test_sweepers/test_Runge_Kutta_sweeper.py
+  s_15a3c3cad5de95::t_c4cea33f062563 97-104,108,359-364,375-376,380,389-398,401-404
+pySDC/tests/test_sweepers/test_delta_form.py
+  s_15a3c3cad5de95::t_b9b7e52202f538 114-116
+pySDC/tutorial/step_1/D_collocation_accuracy_check.py
+  s_15a3c3cad5de95::t_485b8ae16a65e7 38,46-48,52,62-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "88bdfe982581f8c2a8e8ec438ff6c86dc58c70db",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
