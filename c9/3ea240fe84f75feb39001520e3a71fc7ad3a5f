@@ -1,0 +1,39 @@
+pySDC/projects/DAE/tests/test_FullyImplicitDAE.py
+  s_15a3c3cad5de95::t_d334272eec591d 190-193,197-199
+pySDC/projects/DAE/tests/test_problems.py
+  s_15a3c3cad5de95::t_4cebb8c973c2c5 110-111,316-317
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_15a3c3cad5de95::t_36dca99ae1b869 477-478
+pySDC/projects/Resilience/quench.py
+  s_15a3c3cad5de95::t_481feaf2614478 266
+pySDC/projects/Resilience/tests/test_ReachTendExactly.py
+  s_15a3c3cad5de95::t_ed4ab7f6f821f8 10
+pySDC/projects/Resilience/tests/test_quench.py
+  s_15a3c3cad5de95::t_a199f601147ac3 17,19,28-37
+pySDC/projects/TOMS/tests/test_AllenCahn_contracting_circle.py
+  s_15a3c3cad5de95::t_a292c4cab45852 26-28
+pySDC/tests/test_helpers/test_spectral_helper.py
+  s_15a3c3cad5de95::t_5652b5e6300df6 332,643
+pySDC/tests/test_helpers/test_spectral_helper_1d_chebychev.py
+  s_15a3c3cad5de95::t_5b95c9b74afb65 62,364-369,452-461
+pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py
+  s_15a3c3cad5de95::t_a10458464a2945 122
+pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py
+  s_15a3c3cad5de95::t_1952b598ce163e 174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c93ea240fe84f75feb39001520e3a71fc7ad3a5f",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
