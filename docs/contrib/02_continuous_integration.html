@@ -169,6 +169,12 @@ pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests/test_nodes.p
 </pre></div>
 </div>
 </div></blockquote>
+<blockquote>
+<div><p>⚠️ CI runs <code class="docutils literal notranslate"><span class="pre">pySDC/tests</span></code> once per environment with <code class="docutils literal notranslate"><span class="pre">-m</span> <span class="pre">&lt;marker&gt;</span></code>, so every test there needs one of the
+markers <code class="docutils literal notranslate"><span class="pre">base</span></code>, <code class="docutils literal notranslate"><span class="pre">fenics</span></code>, <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code>, <code class="docutils literal notranslate"><span class="pre">petsc</span></code>, <code class="docutils literal notranslate"><span class="pre">pytorch</span></code>, <code class="docutils literal notranslate"><span class="pre">firedrake</span></code> or <code class="docutils literal notranslate"><span class="pre">cupy</span></code> (or <code class="docutils literal notranslate"><span class="pre">benchmark</span></code>, which CI
+deliberately does not run). A test without one would never run anywhere, so collection stops with an error
+that names it; see <code class="docutils literal notranslate"><span class="pre">pySDC/tests/conftest.py</span></code>.</p>
+</div></blockquote>
 </section>
 <section id="running-ci-on-hpc-from-pull-requests">
 <span id="docs-contrib-02-continuous-integration-running-ci-on-hpc-from-pull-requests"></span><h2>Running CI on HPC from pull requests<a class="headerlink" href="#running-ci-on-hpc-from-pull-requests" title="Link to this heading">¶</a></h2>

@@ -40,7 +40,6 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ControllerError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ParaDiagHelper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_G_inv_matrix</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.ParaDiag</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParaDiag</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_MPI</span>
@@ -94,9 +93,6 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ControllerError</span><span class="p">(</span><span class="s1">'Multi-level SDC not implemented in ParaDiag!'</span><span class="p">)</span>
 
     <span class="c1"># ------------------------------------------------------------------ collectives</span>
 
