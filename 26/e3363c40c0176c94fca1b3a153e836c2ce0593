@@ -1,0 +1,35 @@
+pySDC/tests/test_2d_fd_accuracy.py
+  s_15a3c3cad5de95::t_600b0ceee54573 21-24,108
+pySDC/tests/test_Q_transfer.py
+  s_15a3c3cad5de95::t_e01d14ccbb5fd5 82
+pySDC/tests/test_collocation.py
+  s_15a3c3cad5de95::t_7f5639e30edb92 6-7,32-33,84,107
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_15a3c3cad5de95::t_c3abae17bedd9b 67
+pySDC/tests/test_problems/test_GrayScott_1D_FEniCS.py
+  s_15a3c3cad5de95::t_95a98ffcefec6f 49-53
+pySDC/tests/test_problems/test_RayleighBenard3D.py
+  s_15a3c3cad5de95::t_83c40d58c7d0cb 231-236
+pySDC/tests/test_problems/test_heat_chebychev.py
+  s_15a3c3cad5de95::t_0edbd81e5bd68d 52-65,67
+pySDC/tests/test_problems/test_nonlinear_ODE_1.py
+  s_15a3c3cad5de95::t_8bd041df8f6249 74-95
+pySDC/tests/tests_core.py
+  s_15a3c3cad5de95::t_9be8faa63f648b 6-8,10-12,54,117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "26e3363c40c0176c94fca1b3a153e836c2ce0593",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
