@@ -105,7 +105,7 @@ def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, useMPI=Fal
 
     assert np.allclose(D_u, expect, rtol=0, atol=1e-10)
 
-    if useMPI:
+    if useMPI and comm.size > 1:
         # a run that is distributed in name only proves nothing, so count the split axes in real
         # space, where the global shape is known
         split_axes = sum(local < size for local, size in zip(u.shape[1:], (nx, nz), strict=True))
