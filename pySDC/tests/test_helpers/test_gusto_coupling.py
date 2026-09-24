@@ -1,12 +1,17 @@
+import sys
+
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def _gusto_running_tests(monkeypatch):
+    # gusto reads this flag from the command line; set it for these tests only, and before the
+    # `setup` fixture creates its IO, instead of appending it to `sys.argv` for the whole session
+    monkeypatch.setattr(sys, 'argv', [*sys.argv, '--running-tests'])
 
 
 def get_gusto_stepper(eqns, method, spatial_methods, dirname='./tmp'):
     from gusto import IO, OutputParameters, PrescribedTransport
-    import sys
-
-    if '--running-tests' not in sys.argv:
-        sys.argv.append('--running-tests')
 
     output = OutputParameters(dirname=dirname, dumpfreq=15)
     io = IO(method.domain, output)

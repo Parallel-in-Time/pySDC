@@ -4,16 +4,19 @@ import sys
 import numpy as np
 
 
-def get_random_float():
+def get_random_float(rng):
     """
     Get a random float64 number in the full range.
+
+    Args:
+        rng (numpy.random.Generator): Where to draw from
 
     Returns:
         float: Random float
     """
     rand = 0.0
     while np.isclose(rand, 0.0, atol=1e-12):
-        rand = np.random.uniform(low=np.finfo(float).min / 1e1, high=np.finfo(float).max / 1e1, size=1)[0]
+        rand = rng.uniform(low=np.finfo(float).min / 1e1, high=np.finfo(float).max / 1e1, size=1)[0]
     return rand
 
 
@@ -27,13 +30,14 @@ def test_float_conversion():
 
     # Try the conversion between floats and bytes
     injector = FaultInjector()
+    rng = np.random.default_rng(seed=0)
     exp = [-1, 2, 256]
     bit = [0, 11, 8]
     nan_counter = 0
     num_tests = int(1e3)
     for i in range(num_tests):
         # generate a random number almost between the full range of python float
-        rand = get_random_float()
+        rand = get_random_float(rng)
         # convert to bytes and back
         res = injector.to_float(injector.to_binary(rand))
         assert np.isclose(res, rand), f"Conversion between bytes and float failed for {rand}: result: {res}"
@@ -60,9 +64,10 @@ def test_complex_conversion():
     from pySDC.projects.Resilience.fault_injection import FaultInjector
 
     injector = FaultInjector()
+    rng = np.random.default_rng(seed=0)
     num_tests = int(1e3)
     for _i in range(num_tests):
-        rand_complex = get_random_float() + get_random_float() * 1j
+        rand_complex = get_random_float(rng) + get_random_float(rng) * 1j
 
         # convert to bytes and back
         res = injector.to_float(injector.to_binary(rand_complex))
@@ -153,7 +158,7 @@ def test_fault_injection():
 @pytest.mark.mpi4py
 @pytest.mark.slow
 @pytest.mark.parametrize('strategy_name', ['adaptivity'])
-def test_fault_stats(strategy_name):
+def test_fault_stats(strategy_name, tmp_path):
     """
     Test generation of fault statistics and their recovery rates
     """
@@ -174,7 +179,8 @@ def test_fault_stats(strategy_name):
 
     strategy = strategies[strategy_name]()
 
-    stats = generate_stats(strategy, True)
+    # an empty `stats_path`, so that `load=True` only resumes this run's own steps, not old results
+    stats = generate_stats(strategy, True, stats_path=tmp_path)
 
     # test number of possible combinations for faults
     expected_max_combinations = 3840
@@ -210,12 +216,13 @@ def test_fault_stats(strategy_name):
     ), f'Expected {recovered_reference[strategy.name]} recovered faults, but got {recovered} recovered faults in {strategy.name} strategy!'
 
 
-def generate_stats(strategy, load=False):
+def generate_stats(strategy, load=False, stats_path='data'):
     """
     Generate stats to check the recovery rate
 
     Args:
         load: Load the stats or generate them from scratch
+        stats_path: Directory for the stats
 
     Returns:
         Object containing the stats
@@ -225,8 +232,6 @@ def generate_stats(strategy, load=False):
     )
     from pySDC.projects.Resilience.Lorenz import run_Lorenz
 
-    np.seterr(all='warn')  # get consistent behaviour across platforms
-
     stats = FaultStats(
         prob=run_Lorenz,
         faults=[False, True],
@@ -235,9 +240,10 @@ def generate_stats(strategy, load=False):
         num_procs=1,
         mode='random',
         strategies=[strategy],
-        stats_path='data',
+        stats_path=str(stats_path),
     )
-    stats.run_stats_generation(runs=2, step=1)
+    with np.errstate(all='warn'):  # get consistent behaviour across platforms
+        stats.run_stats_generation(runs=2, step=1)
     return stats
 
 
