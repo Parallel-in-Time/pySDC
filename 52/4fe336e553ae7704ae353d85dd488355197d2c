@@ -1,0 +1,23 @@
+pySDC/implementations/datatype_classes/mesh.py
+  s_9af5c84054669f::t_e770d209a646e7 39-41
+pySDC/tests/test_datatypes/test_backend_contract.py
+  s_9af5c84054669f::t_2225c908568a73 27,41
+pySDC/implementations/datatype_classes/cupy_mesh.py
+  s_9af5c84054669f::t_e770d209a646e7 39-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "524fe336e553ae7704ae353d85dd488355197d2c",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
