@@ -36,10 +36,10 @@
 | pySDC/helpers/transfer\_helper.py                                                                   |      142 |        0 |    100% |           |
 | pySDC/helpers/visualization\_tools.py                                                               |       40 |        0 |    100% |           |
 | pySDC/helpers/vtkIO.py                                                                              |       51 |        1 |     98% |        90 |
-| pySDC/implementations/controller\_classes/ParaDiag.py                                               |       53 |        3 |     94% |44, 51, 110 |
+| pySDC/implementations/controller\_classes/ParaDiag.py                                               |       55 |        3 |     95% |50, 57, 116 |
 | pySDC/implementations/controller\_classes/controller\_MPI.py                                        |      299 |       46 |     85% |70, 236, 260, 282, 434, 444, 452, 456, 461, 482, 515, 548, 552, 572, 577, 601-621, 634, 647, 667-683 |
-| pySDC/implementations/controller\_classes/controller\_ParaDiag\_MPI.py                              |       93 |        0 |    100% |           |
-| pySDC/implementations/controller\_classes/controller\_ParaDiag\_nonMPI.py                           |       87 |        0 |    100% |           |
+| pySDC/implementations/controller\_classes/controller\_ParaDiag\_MPI.py                              |       91 |        0 |    100% |           |
+| pySDC/implementations/controller\_classes/controller\_ParaDiag\_nonMPI.py                           |       86 |        0 |    100% |           |
 | pySDC/implementations/controller\_classes/controller\_nonMPI.py                                     |      297 |        3 |     99% |413-414, 456 |
 | pySDC/implementations/convergence\_controller\_classes/adaptive\_alpha.py                           |       36 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/adaptive\_collocation.py                     |       77 |        1 |     99% |       249 |
@@ -112,7 +112,7 @@
 | pySDC/implementations/problem\_classes/Piline.py                                                    |       44 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Quench.py                                                    |      152 |       34 |     78% |220-221, 282-284, 355, 422-472 |
 | pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |100, 321, 420, 468 |
-| pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      255 |       26 |     90% |97, 295, 315, 434, 474-486, 489-492, 620-635 |
+| pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      255 |       15 |     94% |97, 295, 315, 434, 479, 490, 620-635 |
 | pySDC/implementations/problem\_classes/TestEquation\_0D.py                                          |      101 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        1 |     98% |       180 |
 | pySDC/implementations/problem\_classes/VorticityVelocity\_2D\_FEniCS\_periodic.py                   |      108 |      108 |      0% |     1-483 |
@@ -396,7 +396,7 @@
 | pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       88 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       77 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       16 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32374** | **4306** | **87%** |           |
+| **TOTAL**                                                                                           | **32373** | **4295** | **87%** |           |
 
 41 empty files skipped.
 
