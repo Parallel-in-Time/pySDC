@@ -1,0 +1,21 @@
+pySDC/tutorial/step_1/D_collocation_accuracy_check.py
+  s_15a3c3cad5de95::t_2cef3f411b3822 58,142,148,179-181
+pySDC/tutorial/step_1/README.rst
+  s_15a3c3cad5de95::t_402ebf95cf0c6a 90-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0e579fe0fe84622cf20500beaf2edb9d78806a6e",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
