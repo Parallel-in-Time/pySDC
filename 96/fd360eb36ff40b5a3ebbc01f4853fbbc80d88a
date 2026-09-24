@@ -1,0 +1,39 @@
+pySDC/projects/DAE/tests/test_MeshDAE.py
+  s_15a3c3cad5de95::t_9b392e565a6337 55,60
+pySDC/projects/GPU/tests/test_configs.py
+  s_15a3c3cad5de95::t_01711e551001d6 24,44,53
+pySDC/projects/RayleighBenard/tests/test_RBC_3D_analysis.py
+  s_15a3c3cad5de95::t_2b2ce01149cd4f 96-97,118,127-128
+pySDC/projects/Resilience/tests/test_fault_injection.py
+  s_15a3c3cad5de95::t_7b01930fe11a4d 7,11-13,19,33,40,67,70,161,182-183,219,225,243,245-246
+pySDC/tests/conftest.py
+  s_15a3c3cad5de95::t_6343deb12e7fb7 2,8-11,16,42-46
+pySDC/tests/test_ci/test_run_mpi_tests.py
+  s_15a3c3cad5de95::t_5688fa1808836f 157
+pySDC/tests/test_datatypes/test_multicomponent_mesh.py
+  s_15a3c3cad5de95::t_326cd5751d0223 1,32-34
+pySDC/tests/test_helpers/test_fieldsIO.py
+  s_15a3c3cad5de95::t_8431f4b1d780c7 11-16,28,68-71
+pySDC/tests/test_helpers/test_gusto_coupling.py
+  s_15a3c3cad5de95::t_c3715353aea85d 1-2,6-12
+pySDC/tests/test_helpers/test_testing.py
+  s_15a3c3cad5de95::t_aed9bd0c4f48c1 15,20-23,35,43
+pySDC/tests/test_tutorials/test_step_7.py
+  s_15a3c3cad5de95::t_2b5b55d1fb4f47 72,81,99,107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "96fd360eb36ff40b5a3ebbc01f4853fbbc80d88a",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
