@@ -198,28 +198,8 @@ pytest<span class="w"> </span>-v<span class="w"> </span>pySDC/tests/test_nodes.p
 <section id="hpc-test-environments">
 <span id="docs-contrib-02-continuous-integration-hpc-test-environments"></span><h3>HPC test environments<a class="headerlink" href="#hpc-test-environments" title="Link to this heading">¶</a></h3>
 <p>In order to run tests on GPUs, please use the pytest marker <code class="docutils literal notranslate"><span class="pre">cupy</span></code>.</p>
-<section id="running-the-gpu-tests-without-a-gpu">
-<h4>Running the GPU tests without a GPU<a class="headerlink" href="#running-the-gpu-tests-without-a-gpu" title="Link to this heading">¶</a></h4>
-<p>The <code class="docutils literal notranslate"><span class="pre">cupy</span></code>-marked tests can also be run on any machine, against a NumPy-backed stand-in for CuPy:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">PYSDC_FAKE_GPU</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>pytest<span class="w"> </span>pySDC/tests<span class="w"> </span>-m<span class="w"> </span>cupy
-</pre></div>
-</div>
-<p>This installs fake <code class="docutils literal notranslate"><span class="pre">cupy</span></code>, <code class="docutils literal notranslate"><span class="pre">cupyx</span></code> and <code class="docutils literal notranslate"><span class="pre">cupy_backends</span></code> modules that forward to NumPy and SciPy (see
-<code class="docutils literal notranslate"><span class="pre">pySDC/tests/fake_cupy.py</span></code>), so the <code class="docutils literal notranslate"><span class="pre">useGPU=True</span></code> branches really do get executed. Because nearly
-every <code class="docutils literal notranslate"><span class="pre">*_GPU</span></code> test is its CPU counterpart called with <code class="docutils literal notranslate"><span class="pre">useGPU=True</span></code>, this catches the usual
-regressions: a <code class="docutils literal notranslate"><span class="pre">setup_GPU</span></code> that forgets an attribute, a GPU class whose signature has drifted, an
-<code class="docutils literal notranslate"><span class="pre">xp</span></code> that should have been <code class="docutils literal notranslate"><span class="pre">sparse_lib</span></code>, an import that no longer resolves.</p>
-<blockquote>
-<div><p>⚠️ It is a smoke test, not a substitute for real hardware. Nothing CUDA-specific is
-exercised: no kernels, no NCCL, no <code class="docutils literal notranslate"><span class="pre">DistArrayCuPy</span></code>, none of the <code class="docutils literal notranslate"><span class="pre">CuSparseError</span></code> fallbacks, and no
-place where CuPy’s behaviour genuinely differs from NumPy’s. <strong>A green stub run does not mean the
-GPU code works.</strong> It runs in the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> leg of <code class="docutils literal notranslate"><span class="pre">user_cpu_tests_linux</span></code>, and is deliberately kept
-out of the coverage report so that GPU-only lines are never reported as covered. The job below is
-what actually runs them.</p>
-</div></blockquote>
-</section>
-<section id="running-the-gpu-tests-on-a-real-gpu">
-<h4>Running the GPU tests on a real GPU<a class="headerlink" href="#running-the-gpu-tests-on-a-real-gpu" title="Link to this heading">¶</a></h4>
+<section id="running-the-gpu-tests">
+<h4>Running the GPU tests<a class="headerlink" href="#running-the-gpu-tests" title="Link to this heading">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">gpu_hardware_tests</span></code> job rents two NVIDIA T4s per run from <a class="reference external" href="https://modal.com">Modal</a> and runs
 the same <code class="docutils literal notranslate"><span class="pre">cupy</span></code>-marked selection on them, through <code class="docutils literal notranslate"><span class="pre">etc/run_mpi_tests.sh</span></code> as every other leg does.
 Unlike the stub, <strong>this one counts towards the coverage report</strong>, because it really executes the
@@ -398,8 +378,7 @@ This approach can be considered for local testing of your contribution when it d
 <li><a class="reference internal" href="#code-testing">Code testing</a></li>
 <li><a class="reference internal" href="#running-ci-on-hpc-from-pull-requests">Running CI on HPC from pull requests</a><ul>
 <li><a class="reference internal" href="#hpc-test-environments">HPC test environments</a><ul>
-<li><a class="reference internal" href="#running-the-gpu-tests-without-a-gpu">Running the GPU tests without a GPU</a></li>
-<li><a class="reference internal" href="#running-the-gpu-tests-on-a-real-gpu">Running the GPU tests on a real GPU</a></li>
+<li><a class="reference internal" href="#running-the-gpu-tests">Running the GPU tests</a></li>
 </ul>
 </li>
 </ul>
