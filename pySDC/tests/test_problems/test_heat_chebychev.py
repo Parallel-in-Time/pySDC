@@ -49,14 +49,22 @@ def test_heat1d_chebychev(a, b, f, noise, use_ultraspherical, spectral_space, so
     assert np.allclose(u0[0], u02[0], rtol=1e-5, atol=tol), 'Error in eval_f'
 
 
+def heat2d_params():
+    import itertools
+
+    bases = ['fft', 'chebychev', 'ultraspherical']
+    for a, b, c, fx, fy, base_x, base_y in itertools.product(
+        [0, 7], [0, -2.77], [0, 3.1415], [2, 1], [2, 1], bases, bases
+    ):
+        if {base_x, base_y} == {'chebychev', 'ultraspherical'}:
+            continue  # mixing Chebychev and ultraspherical bases is not supported
+        if (base_y == 'fft' and b != c) or (base_x == 'fft' and b != a):
+            continue  # boundary values that the periodic (fft) direction does not support
+        yield a, b, c, fx, fy, base_x, base_y
+
+
 @pytest.mark.base
-@pytest.mark.parametrize('a', [0, 7])
-@pytest.mark.parametrize('b', [0, -2.77])
-@pytest.mark.parametrize('c', [0, 3.1415])
-@pytest.mark.parametrize('fx', [2, 1])
-@pytest.mark.parametrize('fy', [2, 1])
-@pytest.mark.parametrize('base_x', ['fft', 'chebychev', 'ultraspherical'])
-@pytest.mark.parametrize('base_y', ['fft', 'chebychev', 'ultraspherical'])
+@pytest.mark.parametrize('a, b, c, fx, fy, base_x, base_y', heat2d_params())
 def test_heat2d_chebychev(a, b, c, fx, fy, base_x, base_y, nx=2**5 + 1, ny=2**5 + 1):
     import numpy as np
 
@@ -64,14 +72,6 @@ def test_heat2d_chebychev(a, b, c, fx, fy, base_x, base_y, nx=2**5 + 1, ny=2**5 
         from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat2DUltraspherical as problem_class
     else:
         from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat2DChebychev as problem_class
-
-    if base_x == 'chebychev' and base_y == 'ultraspherical' or base_y == 'chebychev' and base_x == 'ultraspherical':
-        return None
-
-    if base_y == 'fft' and (b != c):
-        return None
-    if base_x == 'fft' and (b != a):
-        return None
 
     P = problem_class(
         nx=nx,

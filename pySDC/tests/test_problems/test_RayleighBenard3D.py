@@ -228,9 +228,12 @@ def test_solver_convergence(solver_type, N, left_preconditioner, Dirichlet_recom
     assert error <= P.solver_args['atol'] * 1e3, error
 
     if 'ilu' in solver_type.lower():
-        size_LU = P_direct.cached_factorizations[dt].__sizeof__()
-        size_iLU = P.cached_factorizations[dt].__sizeof__()
-        assert size_iLU < size_LU, 'iLU does not require less memory than LU!'
+        # the cached solvers are Python wrappers of constant size, so compare the nonzeros of the factors
+        A = P.Pl @ P.spectral.put_BCs_in_matrix(P.M + dt * P.L) @ P.Pr
+        ilu_args = {**P.preconditioner_args, 'drop_tol': dt * P.preconditioner_args['drop_tol']}
+        nnz_LU = P.linalg.splu(A).nnz
+        nnz_iLU = P.linalg.spilu(A, **ilu_args).nnz
+        assert nnz_iLU < nnz_LU, f'iLU does not require less memory than LU! ({nnz_iLU=}, {nnz_LU=})'
 
 
 @pytest.mark.mpi4py

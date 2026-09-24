@@ -3,8 +3,8 @@ import numpy as np
 
 from pySDC.core.collocation import CollBase
 
-t_start = np.random.rand(1)[0] * 0.2
-t_end = 0.8 + np.random.rand(1)[0] * 0.2
+t_start = 0.13
+t_end = 0.91
 
 tolQuad = 1e-13
 
@@ -29,8 +29,8 @@ def test_canintegratepolynomials(nNodes, nodeType, quadType):
         + ", requesting M nodes did not produce M entries in nodes and weights"
     )
 
-    # generate random set of polynomial coefficients
-    poly_coeff = np.random.rand(coll.order - 1)
+    # generate random set of polynomial coefficients, degree coll.order - 1 must be integrated exactly
+    poly_coeff = np.random.default_rng(seed=1984).random(coll.order)
     # evaluate polynomial at collocation nodes
     poly_vals = np.polyval(poly_coeff, coll.nodes)
     # use python's polyint function to compute anti-derivative of polynomial
@@ -81,8 +81,7 @@ def test_partialquadraturewithQ(nNodes, nodeType, quadType):
     coll = CollBase(M, t_start, t_end, node_type=nodeType, quad_type=quadType)
     Q = coll.Qmat[1:, 1:]
     # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1
-    degree = min(coll.order, M - 1)
-    poly_coeff = np.random.rand(degree)
+    poly_coeff = np.random.default_rng(seed=1984).random(M)
     poly_vals = np.polyval(poly_coeff, coll.nodes)
     poly_int_coeff = np.polyint(poly_coeff)
     for i in range(0, M):
@@ -105,8 +104,7 @@ def test_partialquadraturewithS(nNodes, nodeType, quadType):
     coll = CollBase(M, t_start, t_end, node_type=nodeType, quad_type=quadType)
     S = coll.Smat[1:, 1:]
     # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1
-    degree = min(coll.order, M - 1)
-    poly_coeff = np.random.rand(degree)
+    poly_coeff = np.random.default_rng(seed=1984).random(M)
     poly_vals = np.polyval(poly_coeff, coll.nodes)
     poly_int_coeff = np.polyint(poly_coeff)
     for i in range(1, M):
