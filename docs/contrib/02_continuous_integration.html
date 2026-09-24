@@ -265,12 +265,11 @@ As a starting point it is recommended to copy and adapt an existing file (e.g. <
 <li><p>Updated automatically with each push to master</p></li>
 </ul>
 </li>
-<li><p><strong>Codecov Dashboard</strong> (for trends and PR analysis)</p>
+<li><p><strong>Codecov Dashboard</strong> (for trends)</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://app.codecov.io/gh/Parallel-in-Time/pySDC">Compare results with previous builds</a></p></li>
 <li><p>View coverage trends over time</p></li>
-<li><p>See coverage impact of specific commits</p></li>
-<li><p>Codecov automatically comments on pull requests with coverage changes</p></li>
+<li><p>See coverage impact of specific commits on master (only master’s coverage is uploaded)</p></li>
 </ul>
 </li>
 <li><p><strong>Coverage Badge</strong> (quick status check)</p>
@@ -281,9 +280,11 @@ As a starting point it is recommended to copy and adapt an existing file (e.g. <
 </li>
 <li><p><strong>PR Coverage Comments</strong> (for contributors)</p>
 <ul class="simple">
-<li><p>Codecov comments on each pull request</p></li>
-<li><p>Shows coverage changes introduced by the PR</p></li>
+<li><p><a class="reference external" href="https://github.com/py-cov-action/python-coverage-comment-action">python-coverage-comment-action</a> comments on each pull request</p></li>
+<li><p>Shows coverage changes introduced by the PR, compared to the latest master run</p></li>
 <li><p>Highlights uncovered lines in modified files</p></li>
+<li><p>The master baseline, with a badge and a browsable report, lives on the
+<cite>``python-coverage-comment-action-data`</cite> &lt;<a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/tree/python-coverage-comment-action-data">https://github.com/Parallel-in-Time/pySDC/tree/python-coverage-comment-action-data</a>&gt;`_ branch</p></li>
 </ul>
 </li>
 </ol>
