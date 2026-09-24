@@ -1,0 +1,19 @@
+pySDC/implementations/convergence_controller_classes/estimate_polynomial_error.py
+  s_9af5c84054669f::t_7e99f154541cda 96-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "34dc8582191edfbc408142c8c0615205dbe1d588",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
