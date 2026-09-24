@@ -1,0 +1,74 @@
+pySDC/tests/test_2d_fd_accuracy.py
+  s_15a3c3cad5de95::t_600b0ceee54573 21-24,108
+pySDC/tests/test_Q_transfer.py
+  s_15a3c3cad5de95::t_e01d14ccbb5fd5 82
+pySDC/tests/test_collocation.py
+  s_15a3c3cad5de95::t_7f5639e30edb92 6-7,32-33,84,107
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_15a3c3cad5de95::t_c3abae17bedd9b 67
+pySDC/tests/test_problems/test_GrayScott_1D_FEniCS.py
+  s_15a3c3cad5de95::t_95a98ffcefec6f 49-53
+pySDC/tests/test_problems/test_RayleighBenard3D.py
+  s_15a3c3cad5de95::t_83c40d58c7d0cb 231-236
+pySDC/tests/test_problems/test_heat_chebychev.py
+  s_15a3c3cad5de95::t_0edbd81e5bd68d 52-65,67
+pySDC/tests/test_problems/test_nonlinear_ODE_1.py
+  s_15a3c3cad5de95::t_8bd041df8f6249 74-95
+pySDC/tests/test_core.py
+  s_15a3c3cad5de95::t_9be8faa63f648b 6-8,10-12,54,117
+pySDC/tests/test_controllers/test_controller_ParaDiag_nonMPI.py
+  s_15a3c3cad5de95::t_0c06f19061aef1 194-195,215,217-219,270-271
+pySDC/tests/test_convergence_controllers/test_adaptive_alpha.py
+  s_15a3c3cad5de95::t_dab7dd9150b05e 101-102
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_15a3c3cad5de95::t_6c42586614a5c1 29
+pySDC/tests/test_sweepers/test_delta_form.py
+  s_15a3c3cad5de95::t_aebfde455aa462 125-138
+pySDC/tests/test_sweepers/test_imexsweeper.py
+  s_15a3c3cad5de95::t_ecda5c9b154a54 18-19,37-38,42,45,213,246,276,284-285,287,294,300,308-309,326
+pySDC/tests/test_sweepers/test_preconditioners.py
+  s_15a3c3cad5de95::t_0ace014d7279c5 134,136-138,182,195
+pySDC/tests/test_transfer_classes/test_base_transfer_MPI.py
+  s_15a3c3cad5de95::t_9b9bd19d4186e5 27-31
+pySDC/tests/test_transfer_classes/test_transfer_order.py
+  s_15a3c3cad5de95::t_614dc52e528ca4 85-86,92-93,202-206
+pySDC/projects/DAE/tests/test_FullyImplicitDAE.py
+  s_15a3c3cad5de95::t_d334272eec591d 190-193,197-199
+pySDC/projects/DAE/tests/test_problems.py
+  s_15a3c3cad5de95::t_4cebb8c973c2c5 110-111,316-317
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_15a3c3cad5de95::t_36dca99ae1b869 477-478
+pySDC/projects/Resilience/quench.py
+  s_15a3c3cad5de95::t_481feaf2614478 266
+pySDC/projects/Resilience/tests/test_ReachTendExactly.py
+  s_15a3c3cad5de95::t_ed4ab7f6f821f8 10
+pySDC/projects/Resilience/tests/test_quench.py
+  s_15a3c3cad5de95::t_a199f601147ac3 17,19,28-37
+pySDC/projects/TOMS/tests/test_AllenCahn_contracting_circle.py
+  s_15a3c3cad5de95::t_a292c4cab45852 26-28
+pySDC/tests/test_helpers/test_spectral_helper.py
+  s_15a3c3cad5de95::t_5652b5e6300df6 332,643
+  s_15a3c3cad5de95::t_3f3b3a372e2336 703-704,706,708,719
+pySDC/tests/test_helpers/test_spectral_helper_1d_chebychev.py
+  s_15a3c3cad5de95::t_5b95c9b74afb65 62,364-369,452-461
+pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py
+  s_15a3c3cad5de95::t_a10458464a2945 122
+pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py
+  s_15a3c3cad5de95::t_1952b598ce163e 174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7eb36c6ce48fac1289927ca9a814199b0631650c",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
