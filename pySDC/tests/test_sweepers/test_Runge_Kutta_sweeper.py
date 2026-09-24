@@ -321,6 +321,36 @@ def test_rhs_evals(sweeper_name, useGPU=False):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize("sweeper_name", ['BackwardEuler', 'ESDIRK53', 'RK4'])
+def test_implicit_scheme_on_split_problem(sweeper_name):
+    """
+    `solve_system` of an IMEX problem only inverts the implicit part, so implicit stages of a non-IMEX scheme would
+    silently drop the explicit part of the right hand side and converge to the wrong solution. Explicit schemes only
+    need the full right hand side and are fine.
+    """
+    from pySDC.core.errors import ProblemError
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex import acoustic_1d_imex
+
+    description = {
+        'problem_class': acoustic_1d_imex,
+        'problem_params': {},
+        'sweeper_class': get_sweeper(sweeper_name),
+        'sweeper_params': {},
+        'level_params': {'dt': 1e-2},
+        'step_params': {'maxiter': 1},
+    }
+    controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+    prob = controller.MS[0].levels[0].prob
+
+    if get_sweeper(sweeper_name).get_Butcher_tableau().implicit:
+        with pytest.raises(ProblemError, match='IMEX'):
+            controller.run(u0=prob.u_exact(0), t0=0, Tend=1e-2)
+    else:
+        controller.run(u0=prob.u_exact(0), t0=0, Tend=1e-2)
+
+
+@pytest.mark.base
 def test_embedded_method():
     """
     Here, we test if Cash Karp's method gives a hard-coded result and number of restarts when running with adaptivity.
