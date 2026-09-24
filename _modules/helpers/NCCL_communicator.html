@@ -217,6 +217,39 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">commNCCL</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">buff</span><span class="o">=</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ptr</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span> <span class="n">datatype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">ptr</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="NCCLComm.Send">
+<a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Send">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Send a buffer to another rank through NCCL.</span>
+
+<span class="sd">        NCCL has no tags: a send is matched to whichever receive the destination posts next for</span>
+<span class="sd">        this pair of ranks. That is fine when one message is in flight at a time, and wrong when</span>
+<span class="sd">        several are, which is why the non-blocking `Issend`/`Irecv` that pySDC's time-parallel</span>
+<span class="sd">        controller uses are left to fall through to MPI, where tags mean what they say.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_current_stream</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commNCCL</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_count</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dtype</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">dest</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">ptr</span><span class="p">)</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="NCCLComm.Recv">
+<a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Recv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Receive a buffer from another rank through NCCL. See `Send` on the absence of tags.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_current_stream</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commNCCL</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_count</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dtype</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">source</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">ptr</span><span class="p">)</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span></div>
+
+
 <div class="viewcode-block" id="NCCLComm.Barrier">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Barrier">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Barrier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

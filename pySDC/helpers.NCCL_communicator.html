@@ -68,9 +68,25 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Recv">
+<span class="sig-name descname"><span class="pre">Recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Recv" title="Link to this definition">¶</a></dt>
+<dd><p>Receive a buffer from another rank through NCCL. See <cite>Send</cite> on the absence of tags.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Reduce">
 <span class="sig-name descname"><span class="pre">Reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Reduce" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Send">
+<span class="sig-name descname"><span class="pre">Send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Send" title="Link to this definition">¶</a></dt>
+<dd><p>Send a buffer to another rank through NCCL.</p>
+<p>NCCL has no tags: a send is matched to whichever receive the destination posts next for
+this pair of ranks. That is fine when one message is in flight at a time, and wrong when
+several are, which is why the non-blocking <cite>Issend</cite>/<cite>Irecv</cite> that pySDC’s time-parallel
+controller uses are left to fall through to MPI, where tags mean what they say.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.allreduce">
@@ -118,7 +134,9 @@
 <li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Allreduce"><code class="docutils literal notranslate"><span class="pre">Allreduce()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Barrier"><code class="docutils literal notranslate"><span class="pre">Barrier()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Bcast"><code class="docutils literal notranslate"><span class="pre">Bcast()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Recv"><code class="docutils literal notranslate"><span class="pre">Recv()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Reduce"><code class="docutils literal notranslate"><span class="pre">Reduce()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.Send"><code class="docutils literal notranslate"><span class="pre">Send()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.allreduce"><code class="docutils literal notranslate"><span class="pre">allreduce()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.get_count"><code class="docutils literal notranslate"><span class="pre">get_count()</span></code></a></li>
 <li><a class="reference internal" href="#helpers.NCCL_communicator.NCCLComm.get_dtype"><code class="docutils literal notranslate"><span class="pre">get_dtype()</span></code></a></li>

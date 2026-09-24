@@ -237,25 +237,18 @@ modal<span class="w"> </span>run<span class="w"> </span>etc/modal_gpu_tests.py<s
 modal<span class="w"> </span>run<span class="w"> </span>etc/modal_gpu_tests.py<span class="w"> </span>--k<span class="w"> </span>NCCL
 </pre></div>
 </div>
-<p>In CI it runs:</p>
-<ul class="simple">
-<li><p>on <strong>every push to master</strong>, which is where the coverage badge, Codecov and the website get
-their numbers;</p></li>
-<li><p>on a <strong>pull request carrying the</strong> <code class="docutils literal notranslate"><span class="pre">gpu</span></code> <strong>label</strong>, which only someone with write permission can
-set, and only for branches in this repository – a pull request from a fork gets no secrets and
-the job says so rather than failing obscurely.</p></li>
-</ul>
-<blockquote>
-<div><p>🔔 The pipeline does not listen for label changes, so adding the <code class="docutils literal notranslate"><span class="pre">gpu</span></code> label to an existing
-pull request does not start anything by itself: <strong>label it, then push</strong>, and the job runs with
-the push. Closing and reopening the pull request works too, since <code class="docutils literal notranslate"><span class="pre">reopened</span></code> is one of the
-events the pipeline does listen for. Applying the label as the pull request is created is <em>not</em>
-reliable – <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">pr</span> <span class="pre">create</span> <span class="pre">--label</span> <span class="pre">gpu</span></code> has been observed both to work and to leave the pull
-request with no labels at all, in which case the job silently skips. Listening for <code class="docutils literal notranslate"><span class="pre">labeled</span></code>
-would re-run all ~40 jobs every time anyone touched any label on any pull request.</p>
-</div></blockquote>
+<p>In CI it runs on <strong>every push</strong>, like the rest of the pipeline, with one exception: a pull request
+from a fork gets no secrets, so the job is skipped there.</p>
+<p>It used to be opt-in through a <code class="docutils literal notranslate"><span class="pre">gpu</span></code> label. That was a mistake worth recording, because a label is
+a <em>gate</em> and not a <em>trigger</em>: adding one to an open pull request starts nothing, so the job
+skipped and the pull request went green having never touched a GPU. A skip that reads as a pass is
+the worst thing a check can do, and it happened four times before the label went away.</p>
+<p>Coverage is the other reason to run it unconditionally. <code class="docutils literal notranslate"><span class="pre">NCCL_communicator.py</span></code>, <code class="docutils literal notranslate"><span class="pre">cupy_mesh.py</span></code> and
+<code class="docutils literal notranslate"><span class="pre">log_GPU_timings.py</span></code> are executed nowhere else, so master’s coverage includes them and a pull
+request that skipped the job reports a drop that is not real. Fork pull requests still show that
+drop, which cannot be helped without <code class="docutils literal notranslate"><span class="pre">pull_request_target</span></code>.</p>
 <p>It needs <code class="docutils literal notranslate"><span class="pre">MODAL_TOKEN_ID</span></code> and <code class="docutils literal notranslate"><span class="pre">MODAL_TOKEN_SECRET</span></code> as repository secrets. A run costs a few cents
-and takes about three minutes; the free tier covers several hundred of them a month.</p>
+and takes about three minutes; the free tier covers several hundred a month.</p>
 <blockquote>
 <div><p>⚠️ The GPU spectral code needs an mpi4py-fft that no release provides – the <code class="docutils literal notranslate"><span class="pre">cupy</span></code> and
 <code class="docutils literal notranslate"><span class="pre">cupyx-scipy</span></code> FFT backends, <code class="docutils literal notranslate"><span class="pre">DistArrayCuPy</span></code> and the NCCL <code class="docutils literal notranslate"><span class="pre">comm_backend</span></code> only exist on the

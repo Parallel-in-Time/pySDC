@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>&lt;no title&gt; &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/G_pySDC_on_GPU.py">pySDC/tutorial/step_7/G_pySDC_on_GPU.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_MPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_MPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatNd_unforced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_description</span><span class="p">(</span><span class="n">useGPU</span><span class="p">,</span> <span class="n">ml</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up the heat equation, on a GPU or not, on one space level or two.</span>
+
+<span class="sd">    The only thing that differs between the CPU and the GPU version is `useGPU`. The problem class</span>
+<span class="sd">    is the same one either way: `setup_GPU` swaps the array library, the sparse library and the</span>
+<span class="sd">    datatypes, so the body of the class goes on calling `self.xp.sin` and does not care.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        useGPU (bool): Run on a GPU</span>
+<span class="sd">        ml (bool): Use two space levels rather than one</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: description of the problem to be solved</span>
+<span class="sd">    """</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'restol'</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="s1">'dt'</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">}</span>
+
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'quad_type'</span><span class="p">:</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">,</span> <span class="s1">'num_nodes'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">'QI'</span><span class="p">:</span> <span class="s1">'LU'</span><span class="p">}</span>
+
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'nu'</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s1">'freq'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">'bc'</span><span class="p">:</span> <span class="s1">'periodic'</span><span class="p">,</span>
+        <span class="s1">'nvars'</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span> <span class="k">if</span> <span class="n">ml</span> <span class="k">else</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s1">'useGPU'</span><span class="p">:</span> <span class="n">useGPU</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">step_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'maxiter'</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'problem_class'</span><span class="p">:</span> <span class="n">heatNd_unforced</span><span class="p">,</span>
+        <span class="s1">'problem_params'</span><span class="p">:</span> <span class="n">problem_params</span><span class="p">,</span>
+        <span class="s1">'sweeper_class'</span><span class="p">:</span> <span class="n">generic_implicit</span><span class="p">,</span>
+        <span class="s1">'sweeper_params'</span><span class="p">:</span> <span class="n">sweeper_params</span><span class="p">,</span>
+        <span class="s1">'level_params'</span><span class="p">:</span> <span class="n">level_params</span><span class="p">,</span>
+        <span class="s1">'step_params'</span><span class="p">:</span> <span class="n">step_params</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
+        <span class="c1"># the space transfer works on GPU arrays as well: the interpolation and restriction</span>
+        <span class="c1"># matrices are assembled with SciPy and then moved to the device once</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">'space_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'rorder'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">'iorder'</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">'periodic'</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">description</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="mf">8e-2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Run to `Tend` and report how it went.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        description (dict): description of the problem to be solved</span>
+<span class="sd">        comm (mpi4py.Intracomm): time communicator, for the parallel-in-time run</span>
+<span class="sd">        num_procs (int): number of time steps to treat in parallel, for the serial controller</span>
+<span class="sd">        Tend (float): time to run to</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: error against the exact solution</span>
+<span class="sd">        int: total number of iterations</span>
+<span class="sd">    """</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'logger_level'</span><span class="p">:</span> <span class="mi">30</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span>
+            <span class="n">num_procs</span><span class="o">=</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+        <span class="p">)</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># the parallel-in-time controller sends the solution from one time rank to the next as a</span>
+        <span class="c1"># GPU array, which needs MPI to have been told to expect device pointers -- see the README</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_MPI</span><span class="p">(</span><span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+    <span class="n">error</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span> <span class="o">-</span> <span class="n">uend</span><span class="p">)</span>
+    <span class="n">iterations</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">count</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">iterations</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Solve the same heat equation with SDC, MLSDC and PFASST, all of it on GPUs.</span>
+
+<span class="sd">    The three differ only in what they are given: one space level and one time step at a time is</span>
+<span class="sd">    SDC, two space levels is MLSDC, and two space levels spread over several time ranks is PFASST.</span>
+<span class="sd">    """</span>
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+
+    <span class="c1"># every rank runs the two serial variants -- they are the reference the parallel one is judged</span>
+    <span class="c1"># against, and running them everywhere keeps the ranks in step</span>
+    <span class="n">runs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">'SDC   '</span><span class="p">,</span> <span class="o">*</span><span class="n">run</span><span class="p">(</span><span class="n">get_description</span><span class="p">(</span><span class="n">useGPU</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">))),</span>
+        <span class="p">(</span><span class="s1">'MLSDC '</span><span class="p">,</span> <span class="o">*</span><span class="n">run</span><span class="p">(</span><span class="n">get_description</span><span class="p">(</span><span class="n">useGPU</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">True</span><span class="p">))),</span>
+        <span class="p">(</span><span class="s1">'PFASST'</span><span class="p">,</span> <span class="o">*</span><span class="n">run</span><span class="p">(</span><span class="n">get_description</span><span class="p">(</span><span class="n">useGPU</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)),</span>
+    <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">Path</span><span class="p">(</span><span class="s1">'data'</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'data/step_7_G_out.txt'</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">iterations</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> on </span><span class="si">{</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s1"> GPU(s): error </span><span class="si">{</span><span class="n">error</span><span class="si">:</span><span class="s1">.4e</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s1"> iterations in total'</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="c1"># all three solve the same problem, so they had better agree on the answer</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">error</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">max</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'Some run was not accurate enough: </span><span class="si">{</span><span class="n">errors</span><span class="si">}</span><span class="s1">'</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">errors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">errors</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="s1">'PFASST and MLSDC disagree, which they should not'</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/doc_step_7_G.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
