@@ -1,0 +1,23 @@
+.github/workflows/ci_pipeline.yml
+  s_15a3c3cad5de95::t_a61922703efd24 440-445,448-449
+.github/workflows/postprocess.yml
+  s_15a3c3cad5de95::t_73489d90b19452 51-54
+docs/contrib/02_continuous_integration.md
+  s_15a3c3cad5de95::t_8f9e1d8d83fd46 246,249,256-257,259-260
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "efa6cb8340cea9746952c85ab7a34917f07ab1ab",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
