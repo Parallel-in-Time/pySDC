@@ -24,9 +24,7 @@ def profile(datatype, xp):
     """What each operation on a datatype gives back: still a datatype? still carrying the comm?"""
 
     def fresh():
-        # `datatype(other)` copies the values but not the communicator, so each operation gets its
-        # own instance with the communicator put on directly -- otherwise every entry below would
-        # report a lost communicator and the comparison would be vacuous
+        # every operation gets its own instance, so that an in-place one cannot colour the next
         me = datatype(init=((8,), None, xp.dtype('float64')))
         me[:] = 1.0
         me.comm = SENTINEL
@@ -40,6 +38,7 @@ def profile(datatype, xp):
         'subtract self': lambda a: a - a,
         'in-place add': lambda a: a.__iadd__(0.0),
         'copy': lambda a: a.copy(),
+        'copy-construct': lambda a: type(a)(a),
         'deepcopy': copy_module.deepcopy,
         'view as itself': lambda a: a.view(type(a)),
         'reshape': lambda a: a.reshape((2, 4)),
