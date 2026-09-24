@@ -127,7 +127,7 @@
 | pySDC/implementations/problem\_classes/generic\_MPIFFT\_Laplacian.py                                |       89 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/generic\_ND\_FD.py                                           |       96 |        2 |     98% |   153-154 |
 | pySDC/implementations/problem\_classes/generic\_spectral.py                                         |      244 |       42 |     83% |115, 261-263, 330-332, 347-348, 385, 401, 429, 442, 445, 480, 487-492, 512-549 |
-| pySDC/implementations/problem\_classes/nonlinear\_ODE\_1.py                                         |       41 |        2 |     95% |  128, 143 |
+| pySDC/implementations/problem\_classes/nonlinear\_ODE\_1.py                                         |       41 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/odeScalar.py                                                 |       53 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/odeSystem.py                                                 |      187 |        6 |     97% |462-475, 810-823 |
 | pySDC/implementations/problem\_classes/polynomial\_test\_problem.py                                 |       36 |        0 |    100% |           |
@@ -203,14 +203,14 @@
 | pySDC/projects/FastWaveSlowWave/runconvergence\_acoustic.py                                         |      115 |       57 |     50% |    25-116 |
 | pySDC/projects/FastWaveSlowWave/rungmrescounter\_boussinesq.py                                      |      107 |        0 |    100% |           |
 | pySDC/projects/FastWaveSlowWave/runitererror\_acoustic.py                                           |       83 |        0 |    100% |           |
-| pySDC/projects/FastWaveSlowWave/runmultiscale\_acoustic.py                                          |       97 |        1 |     99% |       141 |
+| pySDC/projects/FastWaveSlowWave/runmultiscale\_acoustic.py                                          |       97 |        1 |     99% |       143 |
 | pySDC/projects/GPU/ac\_fft.py                                                                       |       48 |        0 |    100% |           |
 | pySDC/projects/GPU/configs/RBC\_configs.py                                                          |      229 |      157 |     31% |8-23, 97-134, 139-150, 153-161, 166-186, 189-197, 202-213, 220-233, 236-238, 244-256, 259-267, 274-286, 293-311, 314-318, 326-353, 356-362, 365-371 |
 | pySDC/projects/GPU/configs/base\_config.py                                                          |      177 |       29 |     84% |9, 11, 34-46, 75, 85, 116-120, 143, 162, 165-168, 195, 211, 243-244, 257-259, 274, 276 |
 | pySDC/projects/GPU/heat.py                                                                          |        5 |        0 |    100% |           |
 | pySDC/projects/GPU/paper\_plots.py                                                                  |        2 |        2 |      0% |       3-4 |
 | pySDC/projects/GPU/run\_experiment.py                                                               |       48 |       23 |     52% |2-38, 58-60, 66-67 |
-| pySDC/projects/Hamiltonian/fput.py                                                                  |      134 |        0 |    100% |           |
+| pySDC/projects/Hamiltonian/fput.py                                                                  |      137 |        0 |    100% |           |
 | pySDC/projects/Hamiltonian/hamiltonian\_and\_energy\_output.py                                      |       31 |        0 |    100% |           |
 | pySDC/projects/Hamiltonian/hamiltonian\_output.py                                                   |       24 |        0 |    100% |           |
 | pySDC/projects/Hamiltonian/harmonic\_oscillator.py                                                  |       88 |       88 |      0% |     1-161 |
@@ -239,7 +239,7 @@
 | pySDC/projects/PinTSimE/buck\_model.py                                                              |       13 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/discontinuous\_test\_ODE.py                                                 |       26 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/estimation\_check.py                                                        |       31 |        0 |    100% |           |
-| pySDC/projects/PinTSimE/hardcoded\_solutions.py                                                     |      133 |        1 |     99% |       478 |
+| pySDC/projects/PinTSimE/hardcoded\_solutions.py                                                     |      139 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/paper\_PSCC2024/log\_event.py                                               |       14 |        5 |     64% |     35-42 |
 | pySDC/projects/PinTSimE/piline\_model.py                                                            |       13 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/switch\_estimator.py                                                        |      105 |        1 |     99% |       168 |
@@ -275,7 +275,7 @@
 | pySDC/projects/Resilience/reachTendExactly.py                                                       |       19 |        0 |    100% |           |
 | pySDC/projects/Resilience/strategies.py                                                             |     1011 |      292 |     71% |53-54, 124, 126, 128, 131-136, 158, 161, 164-167, 180, 192, 207-210, 212, 215-224, 342-353, 389, 419-421, 425, 462, 471-488, 509, 534, 579, 603, 645, 655-656, 658, 660, 662-674, 696-703, 707, 719-728, 741-768, 783-789, 812, 829, 831, 835, 870-873, 894, 923-943, 964, 1008-1009, 1012, 1014, 1019-1025, 1028, 1030, 1066-1083, 1104, 1152-1153, 1155-1156, 1161-1162, 1197, 1218, 1234, 1255, 1267, 1288, 1313, 1371, 1384-1388, 1413, 1475, 1487-1496, 1500, 1511-1532, 1557, 1560-1563, 1623, 1636-1640, 1659-1663, 1667, 1680-1683, 1692, 1714, 1741, 1760, 1793, 1803, 1848, 1858, 1871-1886, 1901-1907, 1950-1951, 1953-1954, 1959-1960, 2001, 2058-2063, 2065, 2069, 2080-2088, 2123-2157, 2171-2176, 2197, 2201 |
 | pySDC/projects/Resilience/sweepers.py                                                               |      107 |        8 |     93% |34-40, 112, 216 |
-| pySDC/projects/Resilience/vdp.py                                                                    |      195 |       35 |     82% |28-54, 181-183, 189-192, 265-267, 334, 361-369, 452 |
+| pySDC/projects/Resilience/vdp.py                                                                    |      195 |       35 |     82% |28-54, 181-183, 189-192, 265-267, 334, 363-371, 454 |
 | pySDC/projects/Resilience/work\_precision.py                                                        |      486 |      134 |     72% |75-76, 120-121, 133, 163-168, 176-177, 279, 295, 299, 301, 303-305, 309-316, 325-328, 330-331, 333-334, 336-337, 373, 377, 433-438, 734-769, 940-943, 947-954, 973, 992-1050, 1075-1076, 1138-1139, 1783-1815, 1943-1950 |
 | pySDC/projects/SDC\_showdown/SDC\_timing\_Fisher.py                                                 |      109 |        0 |    100% |           |
 | pySDC/projects/SDC\_showdown/SDC\_timing\_GrayScott.py                                              |      146 |       30 |     79% |   218-269 |
@@ -361,7 +361,7 @@
 | pySDC/tutorial/step\_1/A\_spatial\_problem\_setup.py                                                |       21 |        0 |    100% |           |
 | pySDC/tutorial/step\_1/B\_spatial\_accuracy\_check.py                                               |       81 |        0 |    100% |           |
 | pySDC/tutorial/step\_1/C\_collocation\_problem\_setup.py                                            |       26 |        0 |    100% |           |
-| pySDC/tutorial/step\_1/D\_collocation\_accuracy\_check.py                                           |       85 |        0 |    100% |           |
+| pySDC/tutorial/step\_1/D\_collocation\_accuracy\_check.py                                           |       86 |        0 |    100% |           |
 | pySDC/tutorial/step\_2/A\_step\_data\_structure.py                                                  |       38 |        0 |    100% |           |
 | pySDC/tutorial/step\_2/B\_my\_first\_sweeper.py                                                     |       54 |        0 |    100% |           |
 | pySDC/tutorial/step\_2/C\_using\_pySDCs\_frontend.py                                                |       43 |        0 |    100% |           |
@@ -396,7 +396,7 @@
 | pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       88 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       77 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       16 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32373** | **4295** | **87%** |           |
+| **TOTAL**                                                                                           | **32383** | **4292** | **87%** |           |
 
 41 empty files skipped.
 
