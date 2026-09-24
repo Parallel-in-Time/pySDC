@@ -55,7 +55,7 @@ def main():
     f.close()
 
     # visualize results
-    plot_accuracy(results)
+    plot_accuracy(results, order=expected_order)
 
     assert os.path.isfile('data/step_1_accuracy_test_coll.png')
 
@@ -139,12 +139,13 @@ def get_accuracy_order(results):
     return order
 
 
-def plot_accuracy(results):
+def plot_accuracy(results, order):
     """
     Routine to visualize the errors as well as the expected errors
 
     Args:
         results: the dictionary containing the errors
+        order (int): the expected order of accuracy, drawn as a guide
     """
 
     # retrieve the list of nvars from results
@@ -175,9 +176,9 @@ def plot_accuracy(results):
     # get error for first entry in nvars_list
     id = ID(dt=dt_list[0])
     base_error = results[id]
-    # assemble optimal errors for 5th order method and plot
-    order_guide_space = [base_error * (2 ** (5 * i)) for i in range(0, len(dt_list))]
-    plt.loglog(dt_list, order_guide_space, color='k', ls='--', label='5th order')
+    # assemble optimal errors for a method of the expected order and plot
+    order_guide_space = [base_error * (2 ** (order * i)) for i in range(0, len(dt_list))]
+    plt.loglog(dt_list, order_guide_space, color='k', ls='--', label=f'{order}th order')
 
     min_err = 1e99
     max_err = 0e00

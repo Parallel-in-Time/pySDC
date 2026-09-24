@@ -87,8 +87,10 @@ collocation problem and look at the error.
 
 Important things to note:
 
--  We take a large number of DOFs in space, since we need to beat 5th
-   order in time with a 2nd order stencil in space.
+-  We take a large number of DOFs in space, since we need to beat 6th
+   order in time with a 2nd order stencil in space. We solve a single
+   step, so we see the local error, which for the collocation method of
+   order 5 is of order 6.
 -  Orders of convergence are not as stable as for the space-only test.
    One of the problems of this example is that we are actually trying to
    compute 0 very, very thoroughly...
