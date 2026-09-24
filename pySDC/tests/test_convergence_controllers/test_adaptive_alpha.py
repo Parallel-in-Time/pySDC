@@ -98,7 +98,8 @@ def test_alpha_history_advances_once_per_iteration():
     controller, _, niter = run_ParaDiag('adaptive')
     alphas = get_convergence_controller(controller).alphas
 
-    assert len(alphas) <= niter + 1, f'got {len(alphas)} alpha updates for {niter} iterations: {alphas}'
+    # one update per convergence check: the one after the initial guess and one after each iteration
+    assert len(alphas) == niter + 1, f'got {len(alphas)} alpha updates for {niter} iterations: {alphas}'
     assert len(alphas) > 1, 'alpha never changed'
 
 

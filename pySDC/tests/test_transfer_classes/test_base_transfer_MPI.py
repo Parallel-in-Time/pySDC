@@ -24,6 +24,11 @@ def getLevel(nvars, num_nodes, index, useMPI):
     L.status.unlocked = True
     L.u[0] = L.prob.u_exact(t=0)
     L.sweep.predict()
+    # the spread guess is the same at every node, which would hide mixing up nodes or ranks
+    for m in range(1, num_nodes + 1):
+        t = L.time + L.dt * L.sweep.coll.nodes[m - 1]
+        L.u[m] = L.prob.u_exact(t=t)
+        L.f[m] = L.prob.eval_f(L.u[m], t)
     return L
 
 

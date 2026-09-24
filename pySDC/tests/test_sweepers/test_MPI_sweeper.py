@@ -26,7 +26,7 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_class
 
-        if ML:
+        if ML > 1:
             from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced as problem_class
         else:
             from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
