@@ -700,10 +700,12 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
     assert np.isclose(error, 0, atol=6e-8), f'Got {error=:.2e}'
 
     if useMPI:
+        # which axes are split depends on the bases, so count them, in real space where the global shape is known
+        split_axes = sum(local < size for local, size in zip(u.shape[1:], (nx, ny, nz), strict=True))
         if comm.size == 2:
-            assert u_hat.shape[1] < nx or u_hat.shape[2] < ny, 'Not distributed'
+            assert split_axes >= 1, 'Not distributed'
         elif comm.size > 2:
-            assert u_hat.shape[1] < nx and u_hat.shape[2] < ny, 'Not distributed in pencils'
+            assert split_axes >= 2, 'Not distributed in pencils'
 
 
 @pytest.mark.mpi4py
@@ -714,7 +716,7 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
 @pytest.mark.parametrize('bz', ['fft', 'cheby', 'ultraspherical'])
 @pytest.mark.parametrize('axes', [(-1,), (-2,), (-3,), (-1, -2), (-2, -3), (-1, -3), (-1, -2, -3)])
 def test_differentiation_matrix3DMPI(nx, ny, nz, bz, axes, useMPI=True, **kwargs):
-    test_differentiation_matrix3D(nx, ny, nz, bz, axes, p=1, **kwargs)
+    test_differentiation_matrix3D(nx, ny, nz, bz, axes, p=1, useMPI=useMPI, **kwargs)
 
 
 @pytest.mark.base
