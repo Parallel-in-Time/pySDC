@@ -437,10 +437,16 @@ jobs:
 
   coverage_comment_on_pr:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && !cancelled()
+    # On a pull request the action posts the comment. On master it commits the coverage to the
+    # `python-coverage-comment-action-data` branch instead, which is the baseline the comments
+    # compare against: without it, every comment reports no previous coverage and every file as new.
+    if: >-
+      (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
+      && !cancelled()
     needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux, gpu_hardware_tests]
     permissions:
-      contents: read
+      # write: push the data branch on master. GitHub downgrades it to read for pull requests from forks.
+      contents: write
       pull-requests: write
     defaults:
       run:

@@ -243,20 +243,21 @@ There are multiple ways to view test coverage for pySDC:
    - Shows line-by-line coverage with color coding
    - Updated automatically with each push to master
 
-2. **Codecov Dashboard** (for trends and PR analysis)
+2. **Codecov Dashboard** (for trends)
    - [Compare results with previous builds](https://app.codecov.io/gh/Parallel-in-Time/pySDC)
    - View coverage trends over time
-   - See coverage impact of specific commits
-   - Codecov automatically comments on pull requests with coverage changes
+   - See coverage impact of specific commits on master (only master's coverage is uploaded)
 
 3. **Coverage Badge** (quick status check)
    - Displayed in the [README](../../README.md)
    - Shows current coverage percentage for master branch
 
 4. **PR Coverage Comments** (for contributors)
-   - Codecov comments on each pull request
-   - Shows coverage changes introduced by the PR
+   - [python-coverage-comment-action](https://github.com/py-cov-action/python-coverage-comment-action) comments on each pull request
+   - Shows coverage changes introduced by the PR, compared to the latest master run
    - Highlights uncovered lines in modified files
+   - The master baseline, with a badge and a browsable report, lives on the
+     [`python-coverage-comment-action-data`](https://github.com/Parallel-in-Time/pySDC/tree/python-coverage-comment-action-data) branch
 
 During developments, you can also run the coverage tests locally, using :
 
