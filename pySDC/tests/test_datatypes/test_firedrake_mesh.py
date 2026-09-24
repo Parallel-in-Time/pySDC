@@ -64,10 +64,8 @@ def test_right_multiplication(n=3, v1=1, v2=2):
     assert np.allclose(b.dat._numpy_data, v1 * v2)
     assert np.allclose(a.dat._numpy_data, v1)
 
-    try:
+    with pytest.raises(DataError):
         'Dat kölsche Dom' * b
-    except DataError:
-        pass
 
 
 @pytest.mark.firedrake

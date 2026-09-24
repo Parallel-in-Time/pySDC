@@ -18,11 +18,10 @@ def test_spatial_accuracy():
     problem_params['nu'] = 1.0
     problem_params['bc'] = 'periodic'
 
-    # create list of nvars to do the accuracy test with
-    nvars_list = [(2**p, 2**p) for p in range(4, 12)]
-
-    # run accuracy test for all nvars
-    for order_stencil in [2, 4, 8]:
+    # run accuracy test for all nvars, which are chosen per order such that the errors stay well above
+    # round-off, but are small enough to be in the asymptotic regime
+    for order_stencil, nvars_1d in [(2, [16, 32, 64, 128, 256]), (4, [16, 32, 64, 128, 256]), (8, [24, 32, 40, 48])]:
+        nvars_list = [(n, n) for n in nvars_1d]
         results = run_accuracy_check(nvars_list=nvars_list, problem_params=problem_params, order_stencil=order_stencil)
 
         # compute order of accuracy
@@ -106,7 +105,6 @@ def get_accuracy_order(results):
         id_prev = ID(nvars=nvars_list[i - 1])
 
         # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
-        if results[id] > 1e-8 and results[id_prev] > 1e-8:
-            order.append(np.log(results[id_prev] / results[id]) / np.log(nvars_list[i][0] / nvars_list[i - 1][0]))
+        order.append(np.log(results[id_prev] / results[id]) / np.log(nvars_list[i][0] / nvars_list[i - 1][0]))
 
     return order

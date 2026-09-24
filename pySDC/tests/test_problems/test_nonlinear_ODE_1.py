@@ -50,11 +50,6 @@ def test_SDC_on_problem_class():
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-    level_params = {
-        'restol': 1e-13,
-        'dt': 1e-3,
-    }
-
     sweeper_params = {
         'quad_type': 'LOBATTO',
         'num_nodes': 3,
@@ -73,23 +68,28 @@ def test_SDC_on_problem_class():
         'logger_level': 30,
     }
 
-    description = dict()
-    description['problem_class'] = nonlinear_ODE_1
-    description['problem_params'] = problem_params
-    description['sweeper_class'] = generic_implicit
-    description['sweeper_params'] = sweeper_params
-    description['level_params'] = level_params
-    description['step_params'] = step_params
-
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
     t0 = 1.999
     Tend = 2.0
 
-    P = controller.MS[0].levels[0].prob
-    uex = P.u_exact(Tend)
+    errors = []
+    dts = [1e-3, 5e-4]
+    for dt in dts:
+        description = dict()
+        description['problem_class'] = nonlinear_ODE_1
+        description['problem_params'] = problem_params
+        description['sweeper_class'] = generic_implicit
+        description['sweeper_params'] = sweeper_params
+        description['level_params'] = {'restol': 1e-13, 'dt': dt}
+        description['step_params'] = step_params
 
-    uend, _ = controller.run(u0=uex, t0=t0, Tend=Tend)
+        controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
-    err = abs(uex - uend)
-    assert err < 1.968e-8, f"Error is too large! Got {err}"
+        P = controller.MS[0].levels[0].prob
+        uend, _ = controller.run(u0=P.u_exact(t0), t0=t0, Tend=Tend)
+        errors.append(abs(P.u_exact(Tend) - uend))
+
+    # the error is dominated by the last step, which ends at the singularity: there the scheme
+    # converges with order 2 (errors 1.97e-8 and 4.92e-9), not with the collocation order
+    assert errors[0] < 3e-8, f"Error is too large! Got {errors[0]}"
+    order = np.log(errors[0] / errors[1]) / np.log(dts[0] / dts[1])
+    assert abs(order - 2) < 0.1, f"Expected order 2 at the singularity, got {order}"
