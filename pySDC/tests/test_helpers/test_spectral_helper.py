@@ -105,6 +105,12 @@ def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, useMPI=Fal
 
     assert np.allclose(D_u, expect, rtol=0, atol=1e-10)
 
+    if useMPI and comm.size > 1:
+        # a run that is distributed in name only proves nothing, so count the split axes in real
+        # space, where the global shape is known
+        split_axes = sum(local < size for local, size in zip(u.shape[1:], (nx, nz), strict=True))
+        assert split_axes >= 1, 'Not distributed'
+
 
 @pytest.mark.cupy
 @pytest.mark.parametrize('axes', [(-2,), (-1,), (-2, -1)])
@@ -112,6 +118,19 @@ def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, useMPI=Fal
 @pytest.mark.parametrize('bz', ['cheby', 'fft'])
 def test_differentiation_matrix2D_GPU(bx, bz, axes):
     test_differentiation_matrix2D(32, 16, bx=bx, bz=bz, axes=axes, useGPU=True)
+
+
+@pytest.mark.cupy
+@pytest.mark.parallel(2)
+@pytest.mark.parametrize('axes', [(-1,), (-1, -2)])
+def test_differentiation_matrix2D_GPU_MPI(axes):
+    """A distributed transform on GPUs, which nothing else in the suite covers.
+
+    Every other GPU test runs on one rank, where mpi4py-fft never redistributes, and every
+    distributed transform test runs on CPUs. This is the crossing of the two: the `DistArrayCuPy`
+    the fork exists for, and the alltoall over device pointers that needs MPI to be CUDA-aware.
+    """
+    test_differentiation_matrix2D(32, 16, bx='fft', bz='cheby', axes=axes, useGPU=True, useMPI=True)
 
 
 @pytest.mark.base
