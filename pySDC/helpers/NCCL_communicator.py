@@ -152,6 +152,33 @@ class NCCLComm(object):
 
         self.commNCCL.bcast(buff=buf.data.ptr, count=count, datatype=dtype, root=root, stream=stream.ptr)
 
+    def Send(self, buf, dest, tag=0):
+        """
+        Send a buffer to another rank through NCCL.
+
+        NCCL has no tags: a send is matched to whichever receive the destination posts next for
+        this pair of ranks. That is fine when one message is in flight at a time, and wrong when
+        several are, which is why the non-blocking `Issend`/`Irecv` that pySDC's time-parallel
+        controller uses are left to fall through to MPI, where tags mean what they say.
+        """
+        if not hasattr(buf.data, 'ptr'):
+            return self.commMPI.Send(buf, dest=dest, tag=tag)
+
+        stream = cp.cuda.get_current_stream()
+        self.commNCCL.send(buf.data.ptr, self.get_count(buf), self.get_dtype(buf), dest, stream.ptr)
+        stream.synchronize()
+
+    def Recv(self, buf, source, tag=0):
+        """
+        Receive a buffer from another rank through NCCL. See `Send` on the absence of tags.
+        """
+        if not hasattr(buf.data, 'ptr'):
+            return self.commMPI.Recv(buf, source=source, tag=tag)
+
+        stream = cp.cuda.get_current_stream()
+        self.commNCCL.recv(buf.data.ptr, self.get_count(buf), self.get_dtype(buf), source, stream.ptr)
+        stream.synchronize()
+
     def Barrier(self):
         cp.cuda.get_current_stream().synchronize()
         self.commMPI.Barrier()
