@@ -16,7 +16,7 @@ class GenericSpectralLinear(Problem):
     `self.add_BC`.
 
     You can port problems derived from this more or less seamlessly to GPU by using the numerical libraries that are
-    class attributes of the spectral helper. This class will automatically switch the datatype using the `setup_GPU` class method.
+    class attributes of the spectral helper. This class will automatically switch the datatype using the `setup_GPU` method.
 
     Attributes:
         spectral (pySDC.helpers.spectral_helper.SpectralHelper): Spectral helper

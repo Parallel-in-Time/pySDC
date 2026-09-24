@@ -105,5 +105,45 @@ def test_cupy_mesh_norm_is_taken_across_ranks():
         mesh[:] = comm.rank + 1
 
         assert abs(mesh) == comm.size, f'rank {comm.rank} did not get the global maximum'
+
+        # and through arithmetic, which is how the sweeper actually reaches it
+        assert abs(mesh * 1.0 + 0.0) == comm.size, 'the communicator was lost doing arithmetic'
     finally:
         cupy_mesh.comm = previously
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(2)
+def test_the_norm_stays_global_through_arithmetic():
+    """`__abs__` reduces across ranks, so the communicator has to survive everything done to a mesh.
+
+    It lives on the instance, so a slice, a sum or a copy has to carry it along -- and the sweeper
+    takes the norm of `L.residual[m] += L.u[0] - L.u[m + 1]`, an array that arithmetic produced.
+    A mesh that lost its communicator would return a local norm and be silently wrong on every
+    rank but one.
+    """
+    import numpy as np
+    from mpi4py import MPI
+
+    from pySDC.implementations.datatype_classes.mesh import mesh
+
+    comm = MPI.COMM_WORLD
+    me = mesh(init=((4,), comm, np.dtype('float64')))
+    me[:] = comm.rank + 1  # a different local maximum on every rank
+
+    assert abs(me) == comm.size, f'the norm was not global to begin with: {abs(me)}'
+
+    for what, derived in [
+        ('a sum', me + 0.0),
+        ('a product', 1.0 * me),
+        ('a difference', me - 0.0),
+        ('a copy', me.copy()),
+        ('a slice', me[:]),
+    ]:
+        assert derived.comm is comm, f'{what} lost the communicator'
+        assert abs(derived) == comm.size, f'{what} gave a local norm: {abs(derived)}'
+
+    # and a mesh built without one must not pick it up from somewhere else
+    alone = mesh(init=((4,), None, np.dtype('float64')))
+    alone[:] = comm.rank + 1
+    assert alone.comm is None, 'a mesh built without a communicator acquired one'

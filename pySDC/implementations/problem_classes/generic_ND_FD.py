@@ -90,8 +90,7 @@ class GenericNDimFinDiff(Problem):
     xsp = sp
     linalg = spla
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """
         Switch to GPU modules
         """
@@ -101,11 +100,11 @@ class GenericNDimFinDiff(Problem):
 
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
-        cls.xp = cp
-        cls.xsp = csp
-        cls.linalg = cspla
-        cls.dtype_u = cupy_mesh
-        cls.dtype_f = cupy_mesh
+        self.xp = cp
+        self.xsp = csp
+        self.linalg = cspla
+        self.dtype_u = cupy_mesh
+        self.dtype_f = cupy_mesh
 
     def __init__(
         self,

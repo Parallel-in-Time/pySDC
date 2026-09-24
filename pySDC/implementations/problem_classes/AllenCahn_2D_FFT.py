@@ -71,8 +71,7 @@ class allencahn2d_imex(Problem):
 
     xp = np
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """
         Switch the array module and the datatypes over to CuPy.
 
@@ -82,9 +81,9 @@ class allencahn2d_imex(Problem):
         import cupy as cp
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
-        cls.xp = cp
-        cls.dtype_u = cupy_mesh
-        cls.dtype_f = imex_cupy_mesh
+        self.xp = cp
+        self.dtype_u = cupy_mesh
+        self.dtype_f = imex_cupy_mesh
 
     def __init__(
         self,

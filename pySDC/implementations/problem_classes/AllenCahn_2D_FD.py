@@ -77,8 +77,7 @@ class allencahn_fullyimplicit(Problem):
     xsp = sp
     linalg = spla
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """
         Switch the array, sparse and solver modules and the datatypes over to CuPy.
 
@@ -90,13 +89,13 @@ class allencahn_fullyimplicit(Problem):
         import cupyx.scipy.sparse.linalg as cspla
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
 
-        cls.xp = cp
-        cls.xsp = csp
-        cls.linalg = cspla
-        cls.dtype_u = cupy_mesh
+        self.xp = cp
+        self.xsp = csp
+        self.linalg = cspla
+        self.dtype_u = cupy_mesh
         # .get, not [], because this runs once per instance and the class keeps what it is given
         GPU_versions = {mesh: cupy_mesh, imex_mesh: imex_cupy_mesh, comp2_mesh: comp2_cupy_mesh}
-        cls.dtype_f = GPU_versions.get(cls.dtype_f, cls.dtype_f)
+        self.dtype_f = GPU_versions.get(self.dtype_f, self.dtype_f)
 
     def __init__(
         self,
