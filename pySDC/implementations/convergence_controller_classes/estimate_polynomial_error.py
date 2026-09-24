@@ -93,6 +93,11 @@ class EstimatePolynomialError(ConvergenceController):
             buf = b[0] * 0.0
             for i in range(0, A.shape[0]):
                 index = self.comm.rank + (1 if self.comm.rank < self.params.estimate_on_node - 1 else 0)
+                # `zeros_like` gives a bare array on CuPy, where NumPy would keep the datatype:
+                # CuPy has no `subok`. That is fine here, since this is only a send buffer and
+                # needs a device pointer rather than a datatype. Do not "tidy" it into
+                # `res[0] * 0.0`, which would keep the type but propagate `NaN` -- and `res` is a
+                # residual, so it is `NaN` exactly when a solve has already gone wrong.
                 send_buf = (
                     (A[i, index] * b[index])
                     if self.comm.rank != self.params.estimate_on_node - 1
