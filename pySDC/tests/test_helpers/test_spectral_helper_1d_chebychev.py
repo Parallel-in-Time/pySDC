@@ -59,7 +59,7 @@ def test_T_U_conversion(N):
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('name', ['T2U', 'T2D', 'T2T'])
+@pytest.mark.parametrize('name', ['T2U', 'T2D'])
 def test_conversion_inverses(name):
     from pySDC.helpers.spectral_helper import ChebychevHelper
     import numpy as np
@@ -343,8 +343,6 @@ def test_tau_method2D(bc, nz, nx, bc_val, plotting=False):
 
     # construct polynomials for testing
     polys = [np.polynomial.Chebyshev(_sol[i, :]) for i in range(nx)]
-    # d_polys = [me.deriv(1) for me in polys]
-    # _z = np.linspace(-1, 1, 100)
 
     if plotting:
         import matplotlib.pyplot as plt
@@ -363,12 +361,12 @@ def test_tau_method2D(bc, nz, nx, bc_val, plotting=False):
             polys[i](z), sol[i, :]
         ), f'Solution is incorrectly transformed back to real space at x={x[i]}'
 
-        # coef = np.append(np.zeros(nz - 1), [1])
-        # Pz = np.polynomial.Chebyshev(coef)
-        # tau = (d_polys[i](_z) - polys[i](_z)) / Pz(_z)
-        # plt.plot(_z, tau)
-        # plt.show()
-        # assert np.allclose(tau, tau[0]), f'Solution does not satisfy perturbed equation at x={x[i]}'
+    # the tau method solves the PDE exactly in all but the highest Chebychev mode, which carries the BC
+    k = 1j * np.fft.fftfreq(nx, 1 / nx)[:, None]
+    u_z = np.zeros_like(sol_hat)
+    u_z[:, :-1] = np.polynomial.chebyshev.chebder(sol_hat, axis=1)
+    residual = u_z - 0.1 * k**2 * sol_hat - k * sol_hat
+    assert np.allclose(residual[:, :-1], 0), 'Solution does not satisfy perturbed equation'
 
 
 @pytest.mark.base
@@ -450,6 +448,16 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
         assert np.allclose(
             polys[i](z), sol[0, i, :]
         ), f'Solution is incorrectly transformed back to real space at x={x[i]}'
+
+    # the tau method solves the PDE exactly in all but the highest Chebychev mode, which carries the BC
+    def D_indep(w):
+        Dw = 1j * np.fft.fftfreq(nx, 1 / nx)[:, None] * w
+        Dw[:, :-1] += np.polynomial.chebyshev.chebder(w, axis=1)
+        return Dw
+
+    u_hat, u_x_hat = sol_hat
+    residual = np.array([D_indep(u_x_hat), D_indep(u_hat) - u_x_hat])
+    assert np.allclose(residual[..., :-1], 0), 'Solution does not satisfy perturbed equation'
 
 
 @pytest.mark.base

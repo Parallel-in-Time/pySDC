@@ -119,7 +119,7 @@ def main():
     print(out)
 
     assert diff < 6e-10, "ERROR: difference between MLSDC and SDC is higher than expected, got %s" % diff
-    assert niter_sdc - niter_mlsdc <= 6, "ERROR: MLSDC required more iterations than expected, got %s" % niter_mlsdc
+    assert niter_sdc - niter_mlsdc >= 6, "ERROR: MLSDC required more iterations than expected, got %s" % niter_mlsdc
 
 
 if __name__ == "__main__":

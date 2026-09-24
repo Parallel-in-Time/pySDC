@@ -107,6 +107,8 @@ def test_Pendulum2D_main():
     # check error
     err = abs(uend.diff - uend_ref.diff)
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
+    err_alg = abs(uend.alg - uend_ref.alg)
+    assert np.isclose(err_alg, 0.0, atol=1e-4), f"Error in algebraic variables too large, got {uend.alg}"
 
 
 @pytest.mark.base
@@ -311,6 +313,8 @@ def test_SynchronousMachineInfiniteBus_main():
     # check error
     err = abs(uend.diff - uend_ref.diff)
     assert np.isclose(err, 0.0, atol=1e-4), "Error too large."
+    err_alg = abs(uend.alg - uend_ref.alg)
+    assert np.isclose(err_alg, 0.0, atol=1e-4), f"Error in algebraic variables too large, got {uend.alg}"
 
 
 @pytest.mark.base

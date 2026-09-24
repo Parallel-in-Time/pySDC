@@ -187,8 +187,13 @@ def test_compute_end_point_main():
     L.u[0] = P.u_exact(L.time)
     # call prediction function to initialise nodes
     L.sweep.predict()
+    # give every node a different value so that we can tell from which one the end point is taken
+    M = L.sweep.coll.num_nodes
+    for m in range(1, M + 1):
+        L.u[m] = P.dtype_u(init=P.init, val=float(m))
     # computer end point
     L.sweep.compute_end_point()
 
-    for m in range(1, L.sweep.coll.num_nodes):
-        assert np.allclose(abs(L.u[m] - L.uend), 0.0), "ERROR: end point not computed correctly"
+    assert np.allclose(abs(L.u[M] - L.uend), 0.0), "ERROR: end point not computed correctly"
+    for m in range(1, M):
+        assert abs(L.u[m] - L.uend) > 0.5, f"ERROR: end point equals node {m}"
