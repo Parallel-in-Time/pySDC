@@ -8,7 +8,12 @@ import numpy as np
 
 from pySDC.helpers.fieldsIO import DTYPES, FieldsIO
 
-FieldsIO.ALLOW_OVERWRITE = True
+
+@pytest.fixture(autouse=True)
+def _allow_overwrite(monkeypatch):
+    # testRectilinear rewrites one file per grid size; scoped to this module, so the overwrite
+    # protection stays on for every other test in the session
+    monkeypatch.setattr(FieldsIO, 'ALLOW_OVERWRITE', True)
 
 
 @pytest.mark.base
@@ -20,7 +25,7 @@ def testHeader(tmpdir, dim, dtypeIdx):
     fileName = f"{tmpdir}/testHeader.pysdc"
     dtype = DTYPES[dtypeIdx]
 
-    coords = [np.linspace(0, 1, num=256, endpoint=False) for n in [256, 64, 32]]
+    coords = [np.linspace(0, 1, num=n, endpoint=False) for n in [256, 64, 32]]
 
     if dim == 0:
         Class = Scalar
@@ -60,7 +65,10 @@ def testHeader(tmpdir, dim, dtypeIdx):
 
     for key, val in f1.header.items():
         assert key in f2.header, f"could not read {key} key in written {f2}"
-        assert np.allclose(val, f2.header[key]), f"header's discrepancy for {key} in written {f2}"
+        # `coords` holds one array per axis, of different lengths, so compare it axis by axis
+        vals, vals2 = (val, f2.header[key]) if key == "coords" else ([val], [f2.header[key]])
+        for v, v2 in zip(vals, vals2, strict=True):
+            assert np.allclose(v, v2), f"header's discrepancy for {key} in written {f2}"
 
 
 @pytest.mark.base

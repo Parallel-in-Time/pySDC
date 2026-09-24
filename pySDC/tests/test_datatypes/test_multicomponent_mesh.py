@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 
@@ -28,9 +29,9 @@ def single_test(shape, xp, MultiComponentMeshClass):
     A = TestMesh(init)
     B = TestMesh(A)
 
-    # fill part of the meshes with values
-    a = xp.random.random(shape)
-    b = xp.random.random(shape)
+    # fill part of the meshes with values, drawn with NumPy, whose generator the conftest seeds, also for CuPy
+    a = xp.asarray(np.random.random(shape))
+    b = xp.asarray(np.random.random(shape))
     zero = xp.zeros_like(a)
     A.a[:] = a
     B.a[:] = b

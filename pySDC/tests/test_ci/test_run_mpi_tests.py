@@ -154,7 +154,7 @@ def test_parallel_marker_without_mpi_pytest_is_an_error(monkeypatch):
     import builtins
     import importlib
 
-    sys.path.insert(0, str(REPO / 'etc'))
+    monkeypatch.syspath_prepend(str(REPO / 'etc'))
     mpi_ranks = importlib.import_module('mpi_ranks')
 
     real_import = builtins.__import__

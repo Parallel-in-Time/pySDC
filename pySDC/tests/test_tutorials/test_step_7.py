@@ -69,7 +69,7 @@ def test_E_MPI():
 
 
 @pytest.mark.firedrake
-def test_F():
+def test_F(monkeypatch):
     """
     Test that the same result is obtained using the pySDC and Gusto coupling compared to only using Gusto after a few time steps.
     The test problem is Williamson 5, which involves huge numbers. Due to roundoff errors, we therefore cannot expect the solutions to match exactly.
@@ -78,8 +78,7 @@ def test_F():
     from firedrake import norm
     import sys
 
-    if '--running-tests' not in sys.argv:
-        sys.argv += ['--running-tests']
+    monkeypatch.setattr(sys, 'argv', [*sys.argv, '--running-tests'])
 
     params = {'dt': 900, 'tmax': 2700, 'use_adaptivity': False, 'M': 2, 'kmax': 3, 'QI': 'LU'}
     stepper_pySDC, mesh = williamson_5(use_pySDC=True, **params)
@@ -97,7 +96,7 @@ def test_F():
 
 
 @pytest.mark.firedrake
-def test_F_ML():
+def test_F_ML(monkeypatch):
     """
     Test that the Gusto coupling with multiple levels in space converges
     """
@@ -105,8 +104,7 @@ def test_F_ML():
     from pySDC.helpers.stats_helper import get_sorted, filter_stats
     import sys
 
-    if '--running-tests' not in sys.argv:
-        sys.argv += ['--running-tests']
+    monkeypatch.setattr(sys, 'argv', [*sys.argv, '--running-tests'])
 
     params = {'use_pySDC': True, 'dt': 1000, 'tmax': 1000, 'use_adaptivity': False, 'M': 2, 'kmax': 4, 'QI': 'LU'}
     stepper_ML, _ = williamson_5(Nlevels=2, **params)

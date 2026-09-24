@@ -93,7 +93,8 @@ def test_Nu_interpolation():
     from pySDC.projects.RayleighBenard.analysis_scripts.plot_Nu import interpolate_NuV_to_reference_times
     import numpy as np
 
-    t = sorted(np.random.rand(128))
+    rng = np.random.default_rng(seed=0)
+    t = sorted(rng.random(128))
     t_ref = np.linspace(0, max(t), 128)
 
     def _get_Nu(_t):
@@ -114,7 +115,7 @@ def test_Nu_interpolation():
     assert np.allclose(tI, ref_data['t'])
 
 
-def test_error_computation(tmp_sim_data, tmp_path):
+def test_error_computation(tmp_sim_data, tmp_path, monkeypatch):
     from pySDC.projects.RayleighBenard.analysis_scripts.RBC3D_order import compute_errors, get_path
     from pySDC.projects.RayleighBenard.RBC3D_configs import RBC3DG4R4SDC34Ra1e5
     import numpy as np
@@ -123,8 +124,8 @@ def test_error_computation(tmp_sim_data, tmp_path):
     args = get_args(tmp_path)
 
     generate_simulation_file(tmp_path, args={'config': args['config'].replace('SDC23', 'SDC34')})
-    RBC3DG4R4SDC34Ra1e5.res = args['res']
-    RBC3DG4R4SDC34Ra1e5.dt = args['dt']
+    monkeypatch.setattr(RBC3DG4R4SDC34Ra1e5, 'res', args['res'])
+    monkeypatch.setattr(RBC3DG4R4SDC34Ra1e5, 'dt', args['dt'])
 
     dts = [1e-2, 5e-4]
     compute_errors(args, dts, np.max(dts))

@@ -52,11 +52,12 @@ def testArrayUFuncOperator(shape):
     import numpy as np
     from pySDC.projects.DAE.misc.meshDAE import MeshDAE
 
+    rng = np.random.default_rng(seed=0)
     init = (shape, None, np.dtype('float64'))
     mesh = MeshDAE(init)
     mesh2 = MeshDAE(mesh)
 
-    randomArr = np.random.random(shape)
+    randomArr = rng.random(shape)
     mesh.diff[:] = randomArr
     mesh2.diff[:] = 2 * randomArr
 
