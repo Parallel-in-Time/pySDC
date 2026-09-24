@@ -7,7 +7,7 @@ import pytest
 @pytest.mark.parametrize('num_procs', [1, 2])
 def test_ReachTendExactly(Tend, dt, num_procs):
     if dt * num_procs > Tend:
-        return None
+        pytest.skip('Tend is reached before the first block of steps is complete')
 
     from pySDC.projects.Resilience.reachTendExactly import ReachTendExactly
     from pySDC.implementations.hooks.log_solution import LogSolution

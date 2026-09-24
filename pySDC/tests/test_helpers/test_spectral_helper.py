@@ -329,7 +329,7 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
     if nz > 0:
         helper.add_axis(base=bz, N=nz)
     elif -3 in axes:
-        return None
+        pytest.skip('Cannot transform along axis -3 in 2D')
 
     helper.setup_fft()
     u = helper.u_init
@@ -370,13 +370,6 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
             *helper.local_slice(True),
         )
     ]
-    if expect_local.shape != trf.shape:
-        expect_local = expect_trf[
-            (
-                ...,
-                *helper.local_slice(True),
-            )
-        ]
 
     assert np.allclose(expect_local, trf), 'Forward transform is unexpected'
     assert np.allclose(
@@ -647,9 +640,7 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
 
     X, Y, Z = helper.get_grid()
 
-    if bz == 'cheby' and p > 1:
-        return None
-    elif bz == 'ultraspherical' and -1 in axes:
+    if bz == 'ultraspherical' and -1 in axes:
         conv = helper.get_basis_change_matrix(p_out=0, p_in=p)
     else:
         conv = helper.get_basis_change_matrix()
