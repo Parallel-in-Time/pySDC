@@ -1,0 +1,36 @@
+pySDC/tests/test_datatypes/test_backend_contract.py
+  s_9af5c84054669f::t_1a6a758618e9de 91-94
+  s_9af5c84054669f::t_0a3911696176c6 1-25,33-40,42-47,49-54,56-68,73-88,90,95-122,128-130
+  s_9af5c84054669f::t_cc567031df8c7f 48,89
+  s_15a3c3cad5de95::t_93fd61723f4107 123-127
+  s_9af5c84054669f::t_6f746b2f686405 26,28-32,55,69-72
+  s_9af5c84054669f::t_2225c908568a73 27,41
+pySDC/implementations/datatype_classes/mesh.py
+  s_9af5c84054669f::t_e770d209a646e7 39-41
+pySDC/implementations/datatype_classes/cupy_mesh.py
+  s_9af5c84054669f::t_e770d209a646e7 39-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c7e7b3e75d4ea61685046ecc7b3d1659f12b7f75",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
