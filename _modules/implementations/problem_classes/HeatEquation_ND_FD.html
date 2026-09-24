@@ -214,15 +214,14 @@
 
 <div class="viewcode-block" id="heatNd_forced.setup_GPU">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_ND_FD.html#implementations.problem_classes.HeatEquation_ND_FD.heatNd_forced.setup_GPU">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Switch to GPU modules, keeping the split right-hand side this class needs</span>
 <span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_cupy_mesh</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_GPU</span><span class="p">()</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_cupy_mesh</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_cupy_mesh</span></div>
 
 
 <div class="viewcode-block" id="heatNd_forced.eval_f_increment">

@@ -120,8 +120,7 @@
 
 <div class="viewcode-block" id="allencahn_fullyimplicit.setup_GPU">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit.setup_GPU">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Switch the array, sparse and solver modules and the datatypes over to CuPy.</span>
 
@@ -133,13 +132,13 @@
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cspla</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_cupy_mesh</span><span class="p">,</span> <span class="n">comp2_cupy_mesh</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">xsp</span> <span class="o">=</span> <span class="n">csp</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">cspla</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xsp</span> <span class="o">=</span> <span class="n">csp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">cspla</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
         <span class="c1"># .get, not [], because this runs once per instance and the class keeps what it is given</span>
         <span class="n">GPU_versions</span> <span class="o">=</span> <span class="p">{</span><span class="n">mesh</span><span class="p">:</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_mesh</span><span class="p">:</span> <span class="n">imex_cupy_mesh</span><span class="p">,</span> <span class="n">comp2_mesh</span><span class="p">:</span> <span class="n">comp2_cupy_mesh</span><span class="p">}</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">GPU_versions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">GPU_versions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

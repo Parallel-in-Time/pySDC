@@ -114,8 +114,7 @@
 
 <div class="viewcode-block" id="allencahn2d_imex.setup_GPU">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.setup_GPU">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Switch the array module and the datatypes over to CuPy.</span>
 
@@ -125,9 +124,9 @@
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span><span class="p">,</span> <span class="n">imex_cupy_mesh</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_cupy_mesh</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span> <span class="o">=</span> <span class="n">cupy_mesh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_cupy_mesh</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

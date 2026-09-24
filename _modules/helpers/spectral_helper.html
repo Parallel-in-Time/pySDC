@@ -150,8 +150,7 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.setup_GPU">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.setup_GPU">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""switch to GPU modules"""</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sparse_lib</span>
@@ -159,10 +158,10 @@
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.fft</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fft_lib</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">sparse_lib</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">linalg</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">fft_lib</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">sparse_lib</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">linalg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">fft_lib</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper1D.setup_CPU">
@@ -1152,8 +1151,7 @@
 
 <div class="viewcode-block" id="SpectralHelper.setup_GPU">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.setup_GPU">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_GPU</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""switch to GPU modules"""</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sparse_lib</span>
@@ -1161,15 +1159,15 @@
         <span class="kn">import</span><span class="w"> </span><span class="nn">cupyx.scipy.fft</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fft_lib</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.cupy_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">cupy_mesh</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">sparse_lib</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">linalg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">cp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">sparse_lib</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">linalg</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">fft_lib</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'cupyx-scipy'</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">fft_comm_backend</span> <span class="o">=</span> <span class="s1">'NCCL'</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">fft_lib</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'cupyx-scipy'</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fft_comm_backend</span> <span class="o">=</span> <span class="s1">'NCCL'</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">cupy_mesh</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">cupy_mesh</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.setup_CPU">

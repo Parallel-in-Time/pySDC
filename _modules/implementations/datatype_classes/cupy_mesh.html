@@ -77,6 +77,9 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">cupy_mesh</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">init</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">init</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">obj</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">init</span><span class="p">[:]</span>
+            <span class="c1"># a fresh array of its own, so `__array_finalize__` has nothing to inherit from and the</span>
+            <span class="c1"># communicator has to be carried over by hand</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">init</span><span class="o">.</span><span class="n">comm</span>
         <span class="k">elif</span> <span class="p">(</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
             <span class="ow">and</span> <span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Intracomm</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">NCCLComm</span><span class="p">))</span>
@@ -84,7 +87,7 @@
         <span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">obj</span>
@@ -100,7 +103,25 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">cupy_mesh</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__array_ufunc__</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+        <span class="c1"># the inputs were viewed as plain arrays just above, so the result has no communicator to</span>
+        <span class="c1"># inherit through `__array_finalize__`; carry this one's over explicitly. A reduction or a</span>
+        <span class="c1"># comparison can return a scalar rather than an array, and a scalar takes no attributes.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span>
+
         <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Carry the communicator onto every array derived from this one.</span>
+
+<span class="sd">        CuPy honours this hook, so a slice keeps the communicator. What reaches here from a ufunc</span>
+<span class="sd">        or a copy is a plain `cupy.ndarray` with nothing to carry, which is why those propagate it</span>
+<span class="sd">        themselves.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">'comm'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
@@ -139,7 +160,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            mesh: copy of the mesh, of the same type</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+        <span class="n">copied</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">copied</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span>
+        <span class="k">return</span> <span class="n">copied</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
