@@ -16,12 +16,11 @@ This can take a while. When it is done you are ready to run ``pySDC`` on the GPU
 
 .. note::
 
-   ``environment.yml`` in *this* directory is for testing only and deliberately has no CuPy. The
-   GitHub runners have no GPU, so the ``cupy``-marked tests run there against a NumPy stub (see
-   ``pySDC/tests/fake_cupy.py``) and everything else runs with ``-m "not cupy"``. It will not run
-   anything on a GPU -- use ``etc/environment-cupy.yml`` above. The real GPU tests run on JUWELS,
-   driven by ``.gitlab-ci.yml``; the machine setups live in ``etc/venv_booster`` and
-   ``etc/venv_jusuf`` next to this README.
+   ``environment.yml`` in *this* directory is for testing only and deliberately has no CuPy: the
+   GitHub runners have no GPU, so they run everything with ``-m "not cupy"``. It will not run
+   anything on a GPU -- use ``etc/environment-cupy.yml`` above. The ``cupy``-marked tests run on
+   hardware rented per job, driven by ``etc/modal_gpu_tests.py``; see
+   ``docs/contrib/02_continuous_integration.md``.
 
 Changes in the problem_classes
 ------------------------------

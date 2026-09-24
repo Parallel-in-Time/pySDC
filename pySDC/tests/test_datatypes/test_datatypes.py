@@ -1,7 +1,5 @@
 import pytest
 
-from pySDC.tests import fake_cupy
-
 
 def get_dtype(name):
     if name == 'Tensor':
@@ -81,10 +79,6 @@ def test_mesh_dtypes(name):
 
 
 @pytest.mark.cupy
-@pytest.mark.skipif(
-    fake_cupy.ACTIVE,
-    reason='needs an NCCLComm, whose calls take raw device pointers and cannot be faked on the CPU',
-)
 @pytest.mark.parallel(2)
 def test_cupy_mesh_norm_is_taken_across_ranks():
     """`abs()` on a space-parallel mesh is a global maximum, and on the GPU it goes through NCCL.

@@ -2,8 +2,6 @@ import math
 
 import pytest
 
-from pySDC.tests import fake_cupy
-
 
 def run_with_GPU_timings(num_steps=2, dt=0.1):
     """Run a small problem on the GPU with `GPUTimings` added to the controller's default hooks."""
@@ -31,11 +29,6 @@ def run_with_GPU_timings(num_steps=2, dt=0.1):
 
 
 @pytest.mark.cupy
-@pytest.mark.skipif(
-    fake_cupy.ACTIVE,
-    reason='CUDA events cannot be faked: the stub reports every interval as exactly zero, so this '
-    'would pass without measuring anything',
-)
 def test_GPU_timings_record_what_the_CPU_ones_do():
     """`GPUTimings` only swaps how an interval is measured, so it has to record the same events."""
     from pySDC.helpers.stats_helper import get_sorted
