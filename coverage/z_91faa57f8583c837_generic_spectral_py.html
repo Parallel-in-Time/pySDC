@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/problem_classes/generic_spectral.py: 81%</title>
+    <title>Coverage for pySDC/implementations/problem_classes/generic_spectral.py: 83%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_15cffcd0.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>implementations<span class="sep">/</span>problem_classes<span class="sep">/</span>generic_spectral.py</b>:
-            <span class="pc_cov">81%</span>
+            <span class="pc_cov">83%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -54,9 +54,9 @@
             </div>
         </aside>
         <h2>
-            <span class="text">250 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">203<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">47<span class="text"> missing</span></button>
+            <span class="text">244 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">202<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">42<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">4<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_nonlinear_ODE_1_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-24 08:52 +0000
+            created at 2026-09-24 10:56 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -629,28 +629,6 @@
     <p class="mis show_mis"><span class="n"><a id="t547" href="#t547">547</a></span><span class="t">    <span class="nam">L</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">updated</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t548" href="#t548">548</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t549" href="#t549">549</a></span><span class="t">    <span class="key">return</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t550" href="#t550">550</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t551" href="#t551">551</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t552" href="#t552">552</a></span><span class="t"><span class="key">def</span> <span class="nam">get_extrapolated_error_DAE</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">S</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t553" href="#t553">553</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t554" href="#t554">554</a></span><span class="t"><span class="str">    The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t555" href="#t555">555</a></span><span class="t"><span class="str">    solution obtained by the time marching scheme. This function can be used in `EstimateExtrapolationError`.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t556" href="#t556">556</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t557" href="#t557">557</a></span><span class="t"><span class="str">    Args:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t558" href="#t558">558</a></span><span class="t"><span class="str">        S (pySDC.Step): The current step</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t559" href="#t559">559</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t560" href="#t560">560</a></span><span class="t"><span class="str">    Returns:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t561" href="#t561">561</a></span><span class="t"><span class="str">        None</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t562" href="#t562">562</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t563" href="#t563">563</a></span><span class="t">    <span class="nam">u_ex</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">get_extrapolated_solution</span><span class="op">(</span><span class="nam">S</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t564" href="#t564">564</a></span><span class="t">    <span class="nam">diff_mask</span> <span class="op">=</span> <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">diff_mask</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t565" href="#t565">565</a></span><span class="t">    <span class="key">if</span> <span class="nam">u_ex</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t566" href="#t566">566</a></span><span class="t">        <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">error_extrapolation_estimate</span> <span class="op">=</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t567" href="#t567">567</a></span><span class="t">            <span class="nam">abs</span><span class="op">(</span><span class="op">(</span><span class="nam">u_ex</span> <span class="op">-</span> <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">)</span><span class="op">[</span><span class="nam">diff_mask</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="nam">self</span><span class="op">.</span><span class="nam">coeff</span><span class="op">.</span><span class="nam">prefactor</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t568" href="#t568">568</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t569" href="#t569">569</a></span><span class="t">        <span class="com"># print([abs(me) for me in (u_ex - S.levels[0].u[-1]) * self.coeff.prefactor])</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t570" href="#t570">570</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t571" href="#t571">571</a></span><span class="t">        <span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">status</span><span class="op">.</span><span class="nam">error_extrapolation_estimate</span> <span class="op">=</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -660,7 +638,7 @@
             <a class="nav" href="z_91faa57f8583c837_nonlinear_ODE_1_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-24 08:52 +0000
+            created at 2026-09-24 10:56 +0000
         </p>
     </div>
 </footer>
