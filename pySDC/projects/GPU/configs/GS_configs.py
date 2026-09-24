@@ -36,11 +36,7 @@ class GrayScott(Config):
 
     def get_LogToFile(self, ranks=None):
         import numpy as np
-        from pySDC.implementations.hooks.log_solution import LogToPickleFileAfterXS as LogToFile
-
-        LogToFile.path = f'{self.base_path}/data/'
-        LogToFile.file_name = f'{self.get_path(ranks=ranks)}-solution'
-        LogToFile.time_increment = self.Tend / self.num_frames
+        from pySDC.implementations.hooks.log_solution import LogToPickleFileAfterXS
 
         def process_solution(L):
             P = L.prob
@@ -82,9 +78,15 @@ class GrayScott(Config):
             else:
                 return True
 
-        LogToFile.process_solution = process_solution
-        LogToFile.logging_condition = logging_condition
-        return LogToFile
+        return self.get_hook(
+            LogToPickleFileAfterXS,
+            key=None if ranks is None else tuple(ranks),
+            path=f'{self.base_path}/data/',
+            file_name=f'{self.get_path(ranks=ranks)}-solution',
+            time_increment=self.Tend / self.num_frames,
+            process_solution=process_solution,
+            logging_condition=logging_condition,
+        )
 
     def plot(self, P, idx, n_procs_list, projection=0, projection_type='flat'):  # pragma: no cover
         import numpy as np

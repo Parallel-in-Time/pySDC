@@ -48,11 +48,7 @@ def test_run(tmpdir):
             return None
         from pySDC.implementations.hooks.log_solution import LogToFile
 
-        LogToFile.filename = self.get_file_name()
-        LogToFile.time_increment = 0
-        LogToFile.allow_overwriting = True
-
-        return LogToFile
+        return self.get_hook(LogToFile, filename=self.get_file_name(), time_increment=0, allow_overwriting=True)
 
     type(config).get_LogToFile = get_LogToFile
     stats_path = f'{config.base_path}/data/{config.get_path()}-stats-whole-run.pickle'

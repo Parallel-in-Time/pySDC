@@ -52,30 +52,34 @@ def test_errors_pickle():
     from pySDC.implementations.hooks.log_solution import LogToPickleFile
     import os
 
-    with pytest.raises(ValueError):
-        run(LogToPickleFile)
+    hook = type('LogToPickleFile', (LogToPickleFile,), {})
 
-    LogToPickleFile.path = os.getcwd()
-    run(LogToPickleFile)
+    with pytest.raises(ValueError):
+        run(hook)
+
+    hook.path = os.getcwd()
+    run(hook)
 
     path = f'{os.getcwd()}/tmp'
-    LogToPickleFile.path = path
-    run(LogToPickleFile)
+    hook.path = path
+    run(hook)
     os.path.isdir(path)
 
     with pytest.raises(ValueError):
-        LogToPickleFile.path = __file__
-        run(LogToPickleFile)
+        hook.path = __file__
+        run(hook)
 
 
 @pytest.mark.base
 def test_errors_FieldsIO(tmpdir):
-    from pySDC.implementations.hooks.log_solution import LogToFile as hook
+    from pySDC.implementations.hooks.log_solution import LogToFile
     from pySDC.core.errors import DataError
     import os
 
     path = f'{tmpdir}/FieldsIO_test.pySDC'
-    hook.filename = path
+
+    class hook(LogToFile):
+        filename = path
 
     run_kwargs = {'hook': hook, 'Tend': 0.2, 'ODE': True}
 
@@ -110,11 +114,9 @@ def test_logging(tmpdir, use_pickle, ODE=True):
     Tend = 0.2
 
     if use_pickle:
-        logging_hook = LogToPickleFile
-        LogToPickleFile.path = path
+        logging_hook = type('LogToPickleFile', (LogToPickleFile,), {'path': path})
     else:
-        logging_hook = LogToFile
-        logging_hook.filename = f'{path}/FieldsIO_test.pySDC'
+        logging_hook = type('LogToFile', (LogToFile,), {'filename': f'{path}/FieldsIO_test.pySDC'})
 
     u0, stats = run([logging_hook, LogSolution], Tend=Tend, ODE=ODE)
     u = [(0.0, u0)] + get_sorted(stats, type='u')
@@ -140,8 +142,7 @@ def test_restart(tmpdir, ODE=True):
     Tend = 0.2
 
     # run the whole thing
-    logging_hook = LogToFile
-    logging_hook.filename = f'{tmpdir}/file.pySDC'
+    logging_hook = type('LogToFile', (LogToFile,), {'filename': f'{tmpdir}/file.pySDC'})
 
     _, _ = run([logging_hook], Tend=Tend, ODE=ODE)
 

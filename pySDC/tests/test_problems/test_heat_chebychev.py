@@ -106,7 +106,8 @@ def test_SDC():
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.implementations.hooks.log_work import LogSDCIterations
 
-    generic_implicit.compute_residual = compute_residual_DAE
+    class generic_implicit_DAE(generic_implicit):
+        compute_residual = compute_residual_DAE
 
     dt = 1e-1
     Tend = 2 * dt
@@ -132,7 +133,7 @@ def test_SDC():
     description = {}
     description['problem_class'] = Heat1DChebychev
     description['problem_params'] = problem_params
-    description['sweeper_class'] = generic_implicit
+    description['sweeper_class'] = generic_implicit_DAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
