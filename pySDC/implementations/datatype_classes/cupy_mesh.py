@@ -36,6 +36,9 @@ class cupy_mesh(cp.ndarray):
         if isinstance(init, cupy_mesh):
             obj = cp.ndarray.__new__(cls, shape=init.shape, dtype=init.dtype, **kwargs)
             obj[:] = init[:]
+            # a fresh array of its own, so `__array_finalize__` has nothing to inherit from and the
+            # communicator has to be carried over by hand
+            obj.comm = init.comm
         elif (
             isinstance(init, tuple)
             and (init[1] is None or isinstance(init[1], MPI.Intracomm) or isinstance(init[1], NCCLComm))
