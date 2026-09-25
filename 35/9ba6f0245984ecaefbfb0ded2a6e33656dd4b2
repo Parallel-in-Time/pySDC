@@ -1,0 +1,27 @@
+etc/run_mpi_tests.sh
+  s_3cfbaa2fb0772b::t_a1305462904796 64-66,68,70
+pySDC/helpers/problem_helper.py
+  s_3cfbaa2fb0772b::t_3f68a05bb57950 2,144-146,228
+pySDC/implementations/problem_classes/AllenCahn_2D_FD.py
+  s_3cfbaa2fb0772b::t_940a7930093e50 220-223,232,509-512,521,662-665,674,777-780,789
+pySDC/tests/test_problems/test_AllenCahn_conventions.py
+  s_3cfbaa2fb0772b::t_52934e933cb740 375-381
+pySDC/tests/test_problems/test_GPU_switch.py
+  s_3cfbaa2fb0772b::t_9062cd1bb5888e 26-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "359ba6f0245984ecaefbfb0ded2a6e33656dd4b2",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
