@@ -26,6 +26,7 @@ costs no extra right-hand side evaluation.
 """
 
 import numpy as np
+import scipy.fft
 
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
@@ -383,11 +384,22 @@ class heat_solve_dtype(heatNd_unforced):
     the state instead, as by :class:`generic_implicit`, the result would be capped at
     ``solve_dtype``'s precision -- which is the stall the delta form exists to remove.
 
+    ``solver_type='FFT'`` (periodic grids only) solves by diagonalising instead: the operator is
+    circulant, so the solve is a forward FFT, a division and an inverse FFT, all at ``solve_dtype``.
+    That is the one route to a genuinely **half-precision** solve, because neither SciPy's nor
+    CuPy's sparse matrices hold ``float16``: on a GPU the transforms are cuFFT's complex32 ones
+    (power-of-two grids), with every value stored and every product rounded in half precision. A
+    CPU has no half-precision FFT, so there the same flag rounds through ``float16`` around a
+    ``complex64`` transform -- an emulation, and an optimistic one, since the transform's own
+    arithmetic is then single. The right-hand side is normalised by its maximum and the transforms
+    are unitary, which keeps every intermediate inside ``float16``'s range: an unnormalised
+    transform of a 1024 x 1024 grid reaches 1e6, and ``float16`` stops at 65504.
+
     Parameters
     ----------
     solve_dtype : dtype-like or None, optional
         Precision of the solve. ``None`` defers to the stock solve at the level's own precision.
-        CuPy's sparse matrices, like SciPy's, stop at ``float32``.
+        CuPy's sparse matrices, like SciPy's, stop at ``float32``; ``float16`` needs ``'FFT'``.
     **kwargs
         Forwarded to :class:`heatNd_unforced`.
     """
@@ -396,9 +408,25 @@ class heat_solve_dtype(heatNd_unforced):
         """Initialization routine"""
         super().__init__(**kwargs)
         self.solve_dtype = None if solve_dtype is None else np.dtype(solve_dtype)
-        if self.solve_dtype is not None:
+        if self.solver_type == 'FFT':
+            if self.bc != 'periodic':
+                raise ValueError('the FFT solve diagonalises a circulant operator and needs a periodic grid')
+            if self.solve_dtype == np.float16 and self.xp is not np and any(n & (n - 1) for n in self._shape):
+                raise ValueError(f'cuFFT computes half precision on power-of-two grids only, got {self.nvars}')
+            self._fft = scipy.fft if self.xp is np else self.xp.fft
+            # the first column of a circulant transforms to its eigenvalues; real for a symmetric stencil
+            first_column = self.xp.zeros(self.A.shape[0])
+            first_column[0] = 1.0
+            self._eigenvalues = self._fft.fftn((self.A @ first_column).reshape(self._shape)).real
+            self._half_plan = None
+        elif self.solve_dtype is not None:
             self.A_solve = self.A.astype(self.solve_dtype)
             self.Id_solve = self.Id.astype(self.solve_dtype)
+
+    @property
+    def _shape(self):
+        """The grid as a tuple, also in 1D."""
+        return tuple(int(n) for n in np.atleast_1d(self.nvars))
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
@@ -420,6 +448,8 @@ class heat_solve_dtype(heatNd_unforced):
         dtype_u
             The solution, at the level's own precision.
         """
+        if self.solver_type == 'FFT':
+            return self._solve_fft(rhs, factor)
         if self.solve_dtype is None:
             return super().solve_system(rhs, factor, u0, t)
         # float(): an np.float64 factor would drag the operator back to double under NEP 50
@@ -435,3 +465,68 @@ class heat_solve_dtype(heatNd_unforced):
         me = self.dtype_u(self.init)
         me[:] = solution.reshape(self.nvars)
         return me
+
+    def _solve_fft(self, rhs, factor):
+        r"""
+        Solve :math:`(I - factor\,A)\,x = rhs` by diagonalisation, at ``solve_dtype``.
+
+        Returns
+        -------
+        dtype_u
+            The solution, at the level's own precision.
+        """
+        me = self.dtype_u(self.init, val=0.0)
+        b = rhs.view(self.xp.ndarray).reshape(self._shape)
+        scale = float(abs(b).max())
+        if scale == 0.0:
+            return me
+        inverse = 1.0 / (1.0 - float(factor) * self._eigenvalues)
+        dtype = np.dtype(np.float64) if self.solve_dtype is None else self.solve_dtype
+        if dtype == np.float16:
+            x = self._solve_fft_half(b / scale, inverse)
+        else:
+            spectrum = self._fft.fftn((b / scale).astype(np.result_type(dtype, np.complex64)))
+            x = self._fft.ifftn(spectrum * inverse.astype(dtype)).real
+        self.work_counters['FFT']()
+        # widen first, scale second, as for the stored corrections
+        me[:] = x.reshape(me.shape)
+        me *= scale
+        return me
+
+    def _solve_fft_half(self, y, inverse):
+        """
+        ``ifft(fft(y) * inverse)`` in half precision, for ``|y| <= 1``; returned in double.
+
+        Both transforms are scaled by ``1 / sqrt(N)``, so the forward one is bounded by ``sqrt(N)``
+        and the inverse one by ``sqrt(N)`` times the solution -- 1024 on a 1024 x 1024 grid.
+        """
+        unit = 1.0 / np.sqrt(y.size)
+        if self.xp is np:
+            f16 = np.float16
+
+            def rounded(z):
+                return z.real.astype(f16).astype(np.float32) + 1j * z.imag.astype(f16).astype(np.float32)
+
+            spectrum = rounded(self._fft.fftn((y * unit).astype(f16).astype(np.complex64)))
+            spectrum = rounded(spectrum * inverse.astype(f16).astype(np.float32))
+            solution = rounded(self._fft.ifftn(spectrum, norm='forward')).real
+            return solution.astype(np.float64) * unit
+
+        import cupy as cp
+        from cupy.cuda import cufft
+
+        shape, n = self._shape, y.size
+        if self._half_plan is None:
+            # complex32 in and out, stored as float16 (re, im) pairs along the last axis
+            self._half_plan = cufft.XtPlanNd(
+                shape, shape, 1, n, 'E', shape, 1, n, 'E', 1, 'E', order='C', last_axis=-1, last_size=None
+            )
+        data = cp.zeros(shape[:-1] + (2 * shape[-1],), dtype=cp.float16)
+        data[..., 0::2] = y * unit
+        spectrum = cp.empty_like(data)
+        self._half_plan.fft(data, spectrum, cufft.CUFFT_FORWARD)
+        inverse = inverse.astype(cp.float16)
+        spectrum[..., 0::2] *= inverse
+        spectrum[..., 1::2] *= inverse
+        self._half_plan.fft(spectrum, data, cufft.CUFFT_INVERSE)
+        return data[..., 0::2].astype(cp.float64) * unit

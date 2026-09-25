@@ -72,6 +72,28 @@ def configurations():
     ]
 
 
+def fft_configurations():
+    """
+    The delivered-accuracy specification, with the solve done by FFT at up to half precision.
+
+    The README's specification says what the iteration needs from a node-local solve: about four
+    digits for SDC's, six for MLSDC's fine one, two for MLSDC's coarse one. A half-precision FFT
+    delivers about three, genuinely on a GPU -- so SDC should lose an iteration or so, MLSDC's
+    coarse solve nothing, and MLSDC's fine solve clearly more. Same row format as
+    :func:`configurations`.
+    """
+    delta = {'linear_implicit': True}
+    fft = {'solver_type': 'FFT'}
+    return [
+        ('SDC, FFT', generic_implicit, fft, {}, False),
+        ('deltaSDC, fp32 FFT', delta_implicit, {**fft, 'solve_dtype': 'float32'}, delta, False),
+        ('deltaSDC, fp16 FFT', delta_implicit, {**fft, 'solve_dtype': 'float16'}, delta, False),
+        ('MLSDC, FFT', generic_implicit, fft, {}, True),
+        ('deltaMLSDC, fp16 coarse FFT', delta_implicit, {**fft, 'solve_dtype': [None, 'float16']}, delta, True),
+        ('deltaMLSDC, fp16 fine FFT', delta_implicit, {**fft, 'solve_dtype': ['float16', None]}, delta, True),
+    ]
+
+
 def run(n, sweeper_class, problem_params, sweeper_params, multilevel, use_gpu, dt, nsteps):
     """
     Build and run one configuration.
@@ -79,7 +101,8 @@ def run(n, sweeper_class, problem_params, sweeper_params, multilevel, use_gpu, d
     Returns
     -------
     tuple
-        End value, wall time in seconds, iterations of the last step, CG iterations on all levels, and
+        End value, wall time in seconds, iterations of the last step, inner solver work on all levels
+        (CG iterations, or FFT solves), and
         the controller, for inspecting the levels afterwards.
     """
     problem_params = {
@@ -119,7 +142,7 @@ def run(n, sweeper_class, problem_params, sweeper_params, multilevel, use_gpu, d
     sync()
     wall = time.perf_counter() - start
     niter = get_sorted(stats, type='niter')[-1][1]
-    cg = sum(level.prob.work_counters['CG'].niter for level in controller.MS[0].levels)
+    cg = sum(level.prob.work_counters[level.prob.solver_type].niter for level in controller.MS[0].levels)
     return uend, wall, niter, cg, controller
 
 
@@ -232,6 +255,7 @@ def main():
     parser.add_argument('--nsteps', type=int, default=2)
     parser.add_argument('--only', nargs='+', default=None, help='run only rows whose label contains one of these')
     parser.add_argument('--paradiag', action='store_true', help='the ParaDiag table instead of SDC/MLSDC')
+    parser.add_argument('--fft', action='store_true', help='FFT solves down to half precision, instead of CG')
     parser.add_argument(
         '--alpha', nargs='+', default=['1e-4'], help="ParaDiag alpha(s): numbers, 'adaptive', 'adaptive-fp64'"
     )
@@ -256,10 +280,14 @@ def main():
 
     for n in args.n:
         print(f'\n{n}x{n}, dt={args.dt}, {args.nsteps} steps, restol={RESTOL}')
-        print(f"{'configuration':>40} | {'iter':>4} {'CG':>6} | {'wall [s]':>8} {'speedup':>7} | {'diff to SDC':>11}")
+        print(
+            f"{'configuration':>40} | {'iter':>4} {'inner':>6} | {'wall [s]':>8} {'speedup':>7} | {'diff to SDC':>11}"
+        )
         print('-' * 90)
         reference = None
-        for label, sweeper_class, problem_params, sweeper_params, multilevel in configurations():
+        for label, sweeper_class, problem_params, sweeper_params, multilevel in (
+            fft_configurations() if args.fft else configurations()
+        ):
             # the first row is the reference, so it always runs
             if reference is not None and args.only and not any(key in label for key in args.only):
                 continue

@@ -327,3 +327,38 @@ def test_nonlinear_half_precision_solve_needs_normalisation():
 
     assert normalised < 10 * exact, f'normalised float16 floored at {normalised:.2e} against {exact:.2e}'
     assert naive > 1e4 * exact, f'the unnormalised control reached {naive:.2e}, so it is not controlling'
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('nvars', [64, (32, 32)])
+@pytest.mark.parametrize('precision, low, high', [(None, 0, 1e-14), ('float32', 1e-9, 1e-6), ('float16', 1e-5, 3e-3)])
+def test_fft_solve_matches_the_direct_one(nvars, precision, low, high):
+    """
+    The diagonalised solve is exact in double, and at a reduced precision off by about its epsilon.
+
+    ``low`` is the control: a solve that silently stayed in double would pass the upper bound too.
+    The right-hand side is tiny on purpose, as the delta form's corrections are: without the
+    normalisation, half precision would flush it to zero.
+    """
+    import numpy as np
+    from scipy.sparse.linalg import spsolve
+
+    from pySDC.projects.DeltaSDC.problems import heat_solve_dtype
+
+    prob = heat_solve_dtype(nvars=nvars, nu=0.1, bc='periodic', solver_type='FFT', solve_dtype=precision)
+    rhs = prob.dtype_u(prob.init)
+    rhs[:] = np.random.default_rng(0).standard_normal(rhs.shape) * 1e-9
+    solution = prob.solve_system(rhs, 1e-3, None, 0.0)
+    exact = spsolve((prob.Id - 1e-3 * prob.A).tocsc(), np.asarray(rhs).flatten()).reshape(rhs.shape)
+
+    error = np.abs(solution - exact).max() / np.abs(exact).max()
+    assert solution.dtype == np.float64, 'the solve hands back the level precision, whatever it computed in'
+    assert low <= error < high, f'{precision} solve is off by {error:.1e}'
+
+
+@pytest.mark.base
+def test_fft_solve_needs_a_periodic_grid():
+    from pySDC.projects.DeltaSDC.problems import heat_solve_dtype
+
+    with pytest.raises(ValueError, match='periodic'):
+        heat_solve_dtype(nvars=63, bc='dirichlet-zero', solver_type='FFT')

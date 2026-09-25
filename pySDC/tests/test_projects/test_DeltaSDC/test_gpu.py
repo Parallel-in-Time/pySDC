@@ -183,3 +183,46 @@ def test_readme_tables_are_complete():
 
     assert [config[0] for config in heat_configurations()] == list(HEAT_TABLE)
     assert [config[0] for config in configurations()] == list(ALLEN_CAHN_SWEEPS)
+
+
+@pytest.mark.cupy
+def test_half_precision_fft_solve_is_genuine():
+    """cuFFT's complex32 transform: off by half precision's epsilon, not by single's, and not broken."""
+    import cupy as cp
+
+    from pySDC.projects.DeltaSDC.problems import heat_solve_dtype
+
+    solves = {}
+    for precision in [None, 'float16']:
+        prob = heat_solve_dtype(
+            nvars=(256, 256), nu=0.1, bc='periodic', solver_type='FFT', solve_dtype=precision, useGPU=True
+        )
+        rhs = prob.dtype_u(prob.init)
+        rhs[:] = cp.random.default_rng(0).standard_normal(prob.nvars) * 1e-9
+        solves[precision] = prob.solve_system(rhs, 1e-3, None, 0.0)
+    error = float(abs(solves['float16'] - solves[None]) / abs(solves[None]))
+    # single precision would be ~1e-7; a broken transform or a flushed rhs would be ~1
+    assert 1e-5 < error < 1e-2, f'half-precision solve off by {error:.1e}'
+    assert solves['float16'].dtype == cp.float64
+
+
+@pytest.mark.cupy
+def test_half_precision_fft_follows_the_delivered_accuracy_spec():
+    """
+    The README's specification, with genuine half-precision arithmetic: MLSDC's fine solve is the
+    demanding one, its coarse solve the forgiving one, and every row still reaches the answer.
+    """
+    from pySDC.projects.DeltaSDC.run_gpu import fft_configurations, run
+
+    rows = {label: run(256, *config, use_gpu=True, dt=1e-2, nsteps=1) for label, *config in fft_configurations()}
+    iters = {label: row[2] for label, row in rows.items()}
+    for label, row in rows.items():
+        peer = rows['MLSDC, FFT' if 'ML' in label else 'SDC, FFT'][0]
+        assert float(abs(row[0] - peer)) < 1e-10, f'{label} did not reach its fp64 peer'
+
+    assert iters['deltaSDC, fp32 FFT'] == iters['SDC, FFT'], 'single precision should be free'
+    assert iters['deltaSDC, fp16 FFT'] <= iters['SDC, FFT'] + 2
+    assert iters['MLSDC, FFT'] <= iters['deltaMLSDC, fp16 coarse FFT'] <= iters['MLSDC, FFT'] + 1
+    assert (
+        iters['deltaMLSDC, fp16 fine FFT'] > iters['deltaMLSDC, fp16 coarse FFT']
+    ), f'the fine solve should need more accuracy than the coarse one: {iters}'

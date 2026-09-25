@@ -491,9 +491,12 @@ product, since the answer, the iteration count and nearly the CG count are uncha
 **Where precision buys nothing:**
 
 * **Half precision.** Neither CuPy's nor SciPy's sparse matrices take ``float16`` (cuSPARSE through
-  CuPy stops at ``float32``), and CuPy upcasts a ``float16`` FFT to ``complex64``. A genuinely fp16
-  coarse level therefore stores fp16 and computes fp32, and at this size its three extra iterations
-  cost more than the halved storage saves. Free at 64 x 64, not at 1024 x 1024.
+  CuPy stops at ``float32``), and ``cupy.fft`` upcasts a ``float16`` transform to ``complex64``. A
+  genuinely fp16 coarse level therefore stores fp16 and computes fp32, and at this size its three
+  extra iterations cost more than the halved storage saves. Free at 64 x 64, not at 1024 x 1024.
+  Genuine half-precision *arithmetic* is reachable through cuFFT's complex32 transforms -- see the
+  next section -- but is no faster than ``complex64`` on a T4 either (1024 x 1024: 0.35 ms against
+  0.25 ms; 4096 x 4096: 3.7 against 3.6).
 * **Big GPUs at moderate size.** On an H100, fp32 gains 1.13x for SDC and nothing for MLSDC at a
   million unknowns: one CG iteration takes 0.2 ms, which is kernel launches and Python, not memory
   traffic. At 512 x 512 no row is faster than another. Precision is a bandwidth play, and only pays
@@ -504,6 +507,31 @@ dense matmul on a T4 is 546 / 31 / 2.9 ms, a 2D real FFT 27 / 4.9 / 5.3 ms -- **
 precision where the double-precision units are scarce (T4, L4, A10), 1.9x on an A100 or H100. A sparse
 matrix-vector product is 2x at best on all five cards tried, and a CuPy ``spsolve`` is unusable at
 any precision (3 s for 65k unknowns), which is why this runs on CG.
+
+Half-precision arithmetic: the specification, checked
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The delivered-accuracy table above was measured by spoiling exact solves. With
+``solver_type='FFT'``, ``heat_solve_dtype`` solves by diagonalising the periodic operator, and at
+``float16`` on a GPU every value in that solve is stored, and every product rounded, in half
+precision -- cuFFT's complex32 transforms through ``cupy.cuda.cufft.XtPlanNd``. It delivers
+:math:`\eta \approx 2\cdot 10^{-3}` to :math:`4\cdot 10^{-3}`, growing with the grid as the
+transform gains stages. ``run_gpu.py --fft``, T4, iterations against the fp64 FFT solve:
+
+=====================================  ========  ==========  ============
+                                       64 x 64   256 x 256   1024 x 1024
+=====================================  ========  ==========  ============
+SDC, fp16 solve                        11 / 11   11 / 11     **13** / 11
+MLSDC, fp16 coarse solve               9 / 9     7 / 6       **7** / 6
+MLSDC, fp16 fine solve                 9 / 9     8 / 6       **10** / 6
+=====================================  ========  ==========  ============
+
+At 1024 x 1024 that is +2, +1 and +4, where the table above, read between its 1e-3 and 1e-2
+columns, predicts +2 to +4, +1 and +4 to +9 -- a different problem, spoiled solves against real
+arithmetic, and the same answer. Every row reaches its fp64 peer. On a CPU the same flag is an
+emulation (``float16`` rounding around a ``complex64`` transform), and an optimistic one: it finds
+the coarse and SDC solves free at 256 x 256, where the genuine arithmetic already costs the coarse
+solve an iteration.
 
 ParaDiag on a GPU
 ~~~~~~~~~~~~~~~~~
