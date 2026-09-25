@@ -1,0 +1,46 @@
+pySDC/implementations/problem_classes/generic_MPIFFT_Laplacian.py
+  s_9af5c84054669f::t_d0abd8fae7e56c 3
+pySDC/helpers/fft/__init__.py
+  s_9af5c84054669f::t_4c257bc7f3e75f 1-5,18,41,46
+  s_9af5c84054669f::t_a8f24ec74ad8a6 6-17,19-20,31-40,42-45,47-48
+  s_9af5c84054669f::t_d0abd8fae7e56c 21-30
+pySDC/helpers/fft/_distarray.py
+  s_9af5c84054669f::t_a8f24ec74ad8a6 5,13,182
+  s_9af5c84054669f::t_6db7a7c4fb5305 1-4,6-12,14-181,183-198
+etc/modal_gpu_tests.py
+  s_9af5c84054669f::t_183e3e9a8639c6 48-52
+pySDC/tests/test_helpers/test_fft_GPU.py
+  s_9af5c84054669f::t_ea9bf41c40855e 1-65
+pySDC/implementations/transfer_classes/TransferMesh_MPIFFT.py
+  s_9af5c84054669f::t_d0abd8fae7e56c 3
+pySDC/helpers/fft/_serial.py
+  s_9af5c84054669f::t_10f61e66f6c413 1-75,77-80,87-98,100-115,117-119,123-154,156,161
+  s_9af5c84054669f::t_8598415cc9cdf8 76,81-86,99,116,120-122,155,157-160
+pySDC/helpers/fft/_pfft.py
+  s_9af5c84054669f::t_29252778d174bd 1-158
+pySDC/helpers/fft_helper.py
+  s_9af5c84054669f::t_d0abd8fae7e56c 20-21,30-52
+pySDC/helpers/fft/_transfer.py
+  s_9af5c84054669f::t_0a84c5e2ec15ef 77-80,89-93,102,105
+  s_9af5c84054669f::t_4f91daa9b36206 123,125-128,131-132,135-148
+  s_9af5c84054669f::t_77d617353e133c 55-67,117-118
+  s_9af5c84054669f::t_4c257bc7f3e75f 1-54,68-76,81-88,94-101,103-104,106-116,119-122,124,129-130,133-134
+pySDC/helpers/spectral_helper.py
+  s_9af5c84054669f::t_d0abd8fae7e56c 1520,1705-1706,1708
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fa45322c7703ff19224e097be929d407b8da2bc5",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
