@@ -55,22 +55,42 @@ def test_time_parallel_on_GPU(levels):
     assert error < 1e-8, f'time-parallel GPU run with {levels} level(s) was inaccurate: {error:.3e}'
 
 
-def run_space_time(space_comm, time_comm, nvars=(32, 32), dt=1e-2, nsteps=2):
-    """A run distributed over both communicators, returning the end value and the problem."""
+def run_space_time(space_comm, time_comm, nvars=(32, 32), dt=1e-2, nsteps=2, levels=2):
+    """A run distributed over both communicators, returning the end value and the problem.
+
+    Two levels and a space transfer make this PFASST rather than parallel-in-time SDC; one level
+    is the same run without the coarse correction, which is what the serial reference uses.
+    """
     from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
     from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
     from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+    from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
+
+    # a list of resolutions is how pySDC gives each level its own problem
+    resolutions = [tuple(n // 2**i for n in nvars) for i in range(levels)]
 
     description = {
         'problem_class': IMEX_Laplacian_MPIFFT,
-        'problem_params': {'nvars': nvars, 'comm': space_comm, 'useGPU': True, 'spectral': False},
+        'problem_params': {
+            'nvars': resolutions if levels > 1 else nvars,
+            'comm': space_comm,
+            'useGPU': True,
+            'spectral': False,
+        },
         'sweeper_class': imex_1st_order,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'},
         'level_params': {'dt': dt, 'restol': 1e-10},
         'step_params': {'maxiter': 8},
     }
+    if levels > 1:
+        description['space_transfer_class'] = fft_to_fft
 
     controller = controller_MPI(controller_params={'logger_level': 30}, description=description, comm=time_comm)
+
+    # a run that is multi-level in name only would still pass the comparison below, so check that
+    # the coarse level was actually built
+    assert len(controller.S.levels) == levels, f'asked for {levels} levels, got {len(controller.S.levels)}'
+
     prob = controller.S.levels[0].prob
 
     u0 = prob.u_init
@@ -82,13 +102,13 @@ def run_space_time(space_comm, time_comm, nvars=(32, 32), dt=1e-2, nsteps=2):
 
 @pytest.mark.cupy
 @pytest.mark.parallel(4)
-def test_space_and_time_parallel_on_GPU():
-    """Two ranks in space by two in time, which nothing else in the suite covers.
+def test_PFASST_with_distributed_space_on_GPU():
+    """PFASST over two parallel steps, each of them distributed over two GPUs in space.
 
     The GPU tests are parallel in time, or over collocation nodes, or -- since the distributed
-    transform test -- in space, but never in two of those at once. This runs the same problem both
-    ways and requires the answers to agree: the space-time run against a run on one rank, compared
-    on the slice of the global array this rank owns.
+    transform test -- in space, but never in two of those at once, and none of them ran PFASST:
+    the coarse level and the `fft_to_fft` transfer between two distributed grids were untouched on
+    a GPU. Checked against a single-rank run on the slice of the global array this rank owns.
     """
     from mpi4py import MPI
 
@@ -103,12 +123,12 @@ def test_space_and_time_parallel_on_GPU():
     try:
         assert space_comm.size == 2 and time_comm.size == 2, 'the 2x2 split did not come out square'
 
-        parallel, prob = run_space_time(space_comm, time_comm)
-        serial, _ = run_space_time(MPI.COMM_SELF, MPI.COMM_SELF)
+        parallel, prob = run_space_time(space_comm, time_comm, levels=2)
+        serial, _ = run_space_time(MPI.COMM_SELF, MPI.COMM_SELF, levels=2)
 
         mine = serial[prob.fft.local_slice(False)]
         difference = float(abs(parallel - mine))
-        assert difference < 1e-10, f'space-time run differs from the serial one by {difference:.3e}'
+        assert difference < 1e-10, f'PFASST run differs from the serial one by {difference:.3e}'
 
         # and the space decomposition has to have actually split something, or the comparison above
         # is between two identical serial runs
