@@ -75,8 +75,8 @@ def round_value(value, dtype):
         local = vector.get_local()
         vector.set_local(local.astype(dtype).astype(local.dtype))
         vector.apply('insert')
-    elif isinstance(value, np.ndarray):
-        value[:] = np.asarray(value).astype(dtype)
+    elif hasattr(value, 'astype'):  # mesh or cupy_mesh
+        value[:] = value.astype(dtype)
     else:
         raise NotImplementedError(
             f'level_precision is not supported for {type(value).__name__}: it cannot be rounded '

@@ -26,8 +26,6 @@ costs no extra right-hand side evaluation.
 """
 
 import numpy as np
-import scipy.sparse as sp
-from scipy.sparse.linalg import cg
 
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
@@ -91,12 +89,18 @@ class allencahn_delta(allencahn_fullyimplicit):
         self._work_dtype = dtype
         self._compute_dtype = compute
         self._A_work = self.A.astype(compute).tocsr()
-        self._Id_work = sp.eye(size, dtype=compute, format='csr')
+        self._Id_work = self.xsp.eye(size, dtype=compute, format='csr')
         self._inv_eps2 = compute.type(1.0 / self.eps**2)
 
         # Bound on ||J||_inf, used to make the tolerance floor conditioning-aware. The reaction
         # term contributes |1 - (nu+1) v^nu| / eps^2 <= nu / eps^2 for v = 2u - 1 in [-1, 1].
-        self._operator_norm = float(abs(self.A).sum(axis=1).max()) + self.nu / self.eps**2
+        host_A = self.A.get() if hasattr(self.A, 'get') else self.A
+        self._operator_norm = float(abs(host_A).sum(axis=1).max()) + self.nu / self.eps**2
+
+    def _flat(self, value, dtype):
+        """A datatype instance as a flat plain array of ``dtype``, on whichever device it lives."""
+        # `view` strips the datatype wrapper, which CuPy's sparse products do not accept
+        return value.view(self.xp.ndarray).astype(dtype).reshape(-1)
 
     def _increment(self, base, delta, matrix=None, inv_eps2=None, scale=1.0):
         r"""
@@ -155,8 +159,8 @@ class allencahn_delta(allencahn_fullyimplicit):
         dtype_f
             The increment.
         """
-        w = np.asarray(base, dtype=float).reshape(-1)
-        d = np.asarray(delta, dtype=float).reshape(-1)
+        w = self._flat(base, np.float64)
+        d = self._flat(delta, np.float64)
         me = self.dtype_f(self.init)
         me[:] = self._increment(w, d, matrix=self.A, inv_eps2=1.0 / self.eps**2).reshape(self.nvars)
         return me
@@ -181,7 +185,7 @@ class allencahn_delta(allencahn_fullyimplicit):
         # the derivative of the reaction, as `reaction_prime` has it
         v = dtype.type(2.0) * state - dtype.type(1.0)
         diagonal = (dtype.type(1.0) - dtype.type(self.nu + 1) * v**self.nu).astype(dtype)
-        jacobian = self._A_work + self._inv_eps2 * sp.diags(diagonal, offsets=0, format='csr')
+        jacobian = self._A_work + self._inv_eps2 * self.xsp.diags([diagonal], [0], format='csr')
         return (self._Id_work - alpha * jacobian).astype(dtype).tocsr()
 
     def solve_system_delta(self, r, factor, base, f_base, t):
@@ -212,17 +216,17 @@ class allencahn_delta(allencahn_fullyimplicit):
         """
         store, dtype = self._work_dtype, self._compute_dtype
         alpha = dtype.type(factor)
-        base_work = np.asarray(base, dtype=dtype).reshape(-1)
-        rhs64 = np.asarray(r, dtype=np.float64).reshape(-1)
-        rhs_scale = max(float(np.linalg.norm(rhs64, np.inf)), 1e-300)
+        base_work = self._flat(base, dtype)
+        rhs64 = self._flat(r, np.float64)
+        rhs_scale = max(float(abs(rhs64).max()), 1e-300)
 
         # Normalise the unknown to O(1). The delta form hands the solver a correction that shrinks
         # with the sweeps, and float16's smallest normal is 6.1e-5 -- so without this the unknown
         # itself underflows to zero after a handful of iterations and the solve returns noise.
         # Exact here as well as in the linear case, because the increment carries the scale.
         scale = rhs_scale if self.normalize else 1.0
-        rhs_work = np.asarray((rhs64 / scale).astype(store), dtype=dtype)
-        delta = np.zeros_like(rhs_work)
+        rhs_work = (rhs64 / scale).astype(store).astype(dtype)
+        delta = self.xp.zeros_like(rhs_work)
 
         # Raise the inherited tolerances to what this working precision can actually deliver.
         # Asking for less than that does not fail loudly, it just runs to newton_maxiter against an
@@ -239,19 +243,19 @@ class allencahn_delta(allencahn_fullyimplicit):
         converged = False
         for _ in range(self.newton_maxiter):
             residual = delta - alpha * self._increment(base_work, delta, scale=scale) - rhs_work
-            if float(np.linalg.norm(residual, np.inf)) * scale < bar:
+            if float(abs(residual).max()) * scale < bar:
                 converged = True
                 break
-            step = cg(
+            step = self.linalg.cg(
                 self._jacobian(base_work + scale * delta, alpha),
                 residual,
-                x0=np.zeros_like(residual),
+                x0=self.xp.zeros_like(residual),
                 rtol=krylov_tol,
                 maxiter=self.lin_maxiter,
                 atol=0,
                 callback=self.work_counters['linear'],
             )[0]
-            delta = np.asarray((delta - step).astype(store), dtype=dtype)
+            delta = (delta - step).astype(store).astype(dtype)
             self.work_counters['newton']()
 
         if not converged:
@@ -332,13 +336,13 @@ class heat_delta(heatNd_unforced):
             return super().solve_system(rhs, factor, u0, t)
 
         dtype = self.solve_precision
-        b = np.asarray(rhs, dtype=np.float64).flatten()
-        scale = max(float(np.max(np.abs(b))), 1e-300) if self.normalize else 1.0
-        b = np.asarray((b / scale).astype(dtype), dtype=np.float64)
-        matrix = np.asarray((self.Id - factor * self.A).todense().astype(dtype), dtype=np.float64)
-        solution = np.linalg.solve(matrix, b)
+        b = rhs.view(self.xp.ndarray).astype(np.float64).flatten()
+        scale = max(float(abs(b).max()), 1e-300) if self.normalize else 1.0
+        b = (b / scale).astype(dtype).astype(np.float64)
+        matrix = (self.Id - factor * self.A).toarray().astype(dtype).astype(np.float64)
+        solution = self.xp.linalg.solve(matrix, b)
         me = self.dtype_u(self.init)
-        me[:] = (scale * np.asarray(solution.astype(dtype), dtype=np.float64)).reshape(self.nvars)
+        me[:] = (scale * solution.astype(dtype).astype(np.float64)).reshape(self.nvars)
         return me
 
 
@@ -363,3 +367,71 @@ class heat_no_increment(heat_delta):
             Always. That is the point of the class.
         """
         raise AttributeError('control: the analytic increment is deliberately unavailable here')
+
+
+class heat_solve_dtype(heatNd_unforced):
+    r"""
+    Heat equation whose node-local solve genuinely runs at ``solve_dtype``, on CPU or GPU.
+
+    Not emulated: the level's state stays at ``dtype``, but the operator is held a second time at
+    ``solve_dtype`` and the Krylov solve reads and writes arrays of that type, so on a GPU the
+    bandwidth the solve moves really halves. This is the configuration whose *speed* can be
+    measured, which the emulated :class:`heat_delta` cannot be.
+
+    Only meaningful under the delta form with ``linear_implicit=True``: the solve then returns a
+    correction, starts from zero and its relative tolerance is relative to the correction. Handed
+    the state instead, as by :class:`generic_implicit`, the result would be capped at
+    ``solve_dtype``'s precision -- which is the stall the delta form exists to remove.
+
+    Parameters
+    ----------
+    solve_dtype : dtype-like or None, optional
+        Precision of the solve. ``None`` defers to the stock solve at the level's own precision.
+        CuPy's sparse matrices, like SciPy's, stop at ``float32``.
+    **kwargs
+        Forwarded to :class:`heatNd_unforced`.
+    """
+
+    def __init__(self, solve_dtype=None, **kwargs):
+        """Initialization routine"""
+        super().__init__(**kwargs)
+        self.solve_dtype = None if solve_dtype is None else np.dtype(solve_dtype)
+        if self.solve_dtype is not None:
+            self.A_solve = self.A.astype(self.solve_dtype)
+            self.Id_solve = self.Id.astype(self.solve_dtype)
+
+    def solve_system(self, rhs, factor, u0, t):
+        r"""
+        Solve :math:`(I - factor\,A)\,x = rhs` by CG at ``solve_dtype``, from a zero initial guess.
+
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side.
+        factor : float
+            Implicit prefactor.
+        u0 : dtype_u
+            Initial guess, ignored at reduced precision: the unknown is a correction, so zero is it.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        dtype_u
+            The solution, at the level's own precision.
+        """
+        if self.solve_dtype is None:
+            return super().solve_system(rhs, factor, u0, t)
+        # float(): an np.float64 factor would drag the operator back to double under NEP 50
+        matrix = self.Id_solve - float(factor) * self.A_solve
+        solution, _ = self.linalg.cg(
+            matrix,
+            rhs.flatten().astype(self.solve_dtype),
+            rtol=self.lintol,
+            atol=0,
+            maxiter=self.liniter,
+            callback=self.work_counters['CG'],
+        )
+        me = self.dtype_u(self.init)
+        me[:] = solution.reshape(self.nvars)
+        return me

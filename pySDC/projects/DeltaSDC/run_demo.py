@@ -190,24 +190,42 @@ def configurations():
     ]
 
 
-def main():
+def run_configuration(label, useGPU=False):
+    """
+    Run one row of the Allen-Cahn table, so a test can run the rows separately.
+
+    Returns
+    -------
+    dict
+        As :func:`run`.
+    """
+    _, problem_class, problem_extra, sweeper_class, sweeper_extra, run_kwargs = next(
+        config for config in configurations() if config[0] == label
+    )
+    return run(
+        problem_class,
+        dict(BASE_PARAMS, useGPU=useGPU, **problem_extra),
+        sweeper_class,
+        dict(SWEEPER_PARAMS, **sweeper_extra),
+        **run_kwargs,
+    )
+
+
+def main(useGPU=False):
     """
     Run the comparison matrix and print it.
+
+    Parameters
+    ----------
+    useGPU : bool, optional
+        Run every configuration on the GPU. The table must come out the same.
 
     Returns
     -------
     dict
         One result dictionary per configuration, keyed by label.
     """
-    results = {}
-    for label, problem_class, problem_extra, sweeper_class, sweeper_extra, run_kwargs in configurations():
-        results[label] = run(
-            problem_class,
-            dict(BASE_PARAMS, **problem_extra),
-            sweeper_class,
-            dict(SWEEPER_PARAMS, **sweeper_extra),
-            **run_kwargs,
-        )
+    results = {config[0]: run_configuration(config[0], useGPU) for config in configurations()}
 
     peers = {label: 'MLSDC' if kwargs.get('multilevel') else 'SDC' for label, _, _, _, _, kwargs in configurations()}
     print(f"{'configuration':>30} | {'sweeps':>6} {'Newton':>7} {'CG':>7} | {'diff to SDC':>12} {'to fp64 peer':>13}")
@@ -375,24 +393,42 @@ def heat_configurations():
     ]
 
 
-def main_heat():
+def run_heat_configuration(label, useGPU=False):
+    """
+    Run one row of the linear table, so a test can run the rows separately.
+
+    Returns
+    -------
+    tuple
+        As :func:`run_heat`.
+    """
+    _, problem_extra, sweeper_class, sweeper_extra, multilevel, transfer = next(
+        config for config in heat_configurations() if config[0] == label
+    )
+    return run_heat(
+        dict(HEAT_PARAMS, useGPU=useGPU, **problem_extra),
+        sweeper_class,
+        dict(SWEEPER_PARAMS, **sweeper_extra),
+        multilevel,
+        transfer,
+    )
+
+
+def main_heat(useGPU=False):
     """
     Run the linear precision ladder and print it.
+
+    Parameters
+    ----------
+    useGPU : bool, optional
+        Run every configuration on the GPU. The table must come out the same.
 
     Returns
     -------
     dict
         ``(uend, iterations, floor)`` per configuration, keyed by label.
     """
-    results = {}
-    for label, problem_extra, sweeper_class, sweeper_extra, multilevel, transfer in heat_configurations():
-        results[label] = run_heat(
-            dict(HEAT_PARAMS, **problem_extra),
-            sweeper_class,
-            dict(SWEEPER_PARAMS, **sweeper_extra),
-            multilevel,
-            transfer,
-        )
+    results = {config[0]: run_heat_configuration(config[0], useGPU) for config in heat_configurations()}
 
     print(f"\n{'configuration':>36} | {'it to 1e-11':>11} {'floor':>10} | {'diff to SDC':>12}")
     print('-' * 76)
@@ -403,5 +439,7 @@ def main_heat():
 
 
 if __name__ == '__main__':
-    main()
-    main_heat()
+    import sys
+
+    main(useGPU='--gpu' in sys.argv)
+    main_heat(useGPU='--gpu' in sys.argv)

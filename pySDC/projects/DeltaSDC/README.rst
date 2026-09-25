@@ -461,6 +461,87 @@ Two practical notes. ParaDiag diagonalises in time, so its working type is compl
 precision means ``complex64``, not ``float32``. And unlike the PETSc and FEniCS routes, nothing here
 is emulated: SciPy's sparse solver and NumPy's matmul both carry ``complex64`` through.
 
+On real hardware
+----------------
+
+``run_gpu.py`` times the ladder where nothing is emulated: 2D heat, periodic, CG solves, a Gaussian
+bump as initial value, :math:`\Delta t = 10^{-2}`, two steps, every row run to the same residual
+tolerance of 1e-10. The reduced-precision solve reads and writes genuine ``float32`` arrays
+(``problems.heat_solve_dtype``); a reduced coarse level genuinely holds them (``dtype``). Measured on
+Modal, 1024 x 1024 -- speedup against fp64 SDC, answer distance to it in the last column:
+
+==========================================  ====  ======  ==========  ===========  ===========
+configuration                               iter  CG      T4          H100         diff to SDC
+==========================================  ====  ======  ==========  ===========  ===========
+SDC, CG 1e-12                               11    16603   23.8 s      3.35 s       --
+*CONTROL* SDC, CG 1e-5                      50    3468    *stalls*    *stalls*     1.9e-06
+deltaSDC, CG 1e-5                           11    13489   1.23x       1.24x        8e-14
+deltaSDC, fp32 CG 1e-5                      11    14361   **2.13x**   1.40x        8e-14
+MLSDC, CG 1e-12                             6     12225   1.75x       1.48x        7e-12
+deltaMLSDC, CG 1e-5                         6     10627   1.94x       1.63x        7e-12
+deltaMLSDC, fp32 fine CG + fp32 coarse      6     12051   **2.82x**   1.66x        8e-12
+deltaMLSDC, fp32 fine CG + fp16 coarse      9     16027   2.00x       --           9e-12
+==========================================  ====  ======  ==========  ===========  ===========
+
+Three separate gains, and they multiply. The delta form licenses a loose solver tolerance, which
+stock SDC cannot take (the control). MLSDC cuts the sweeps. And ``float32`` makes the same algorithm
+**1.7x faster on a T4** for SDC and 1.45x for MLSDC -- the bandwidth ratio of a sparse matrix-vector
+product, since the answer, the iteration count and nearly the CG count are unchanged.
+
+**Where precision buys nothing:**
+
+* **Half precision.** Neither CuPy's nor SciPy's sparse matrices take ``float16`` (cuSPARSE through
+  CuPy stops at ``float32``), and CuPy upcasts a ``float16`` FFT to ``complex64``. A genuinely fp16
+  coarse level therefore stores fp16 and computes fp32, and at this size its three extra iterations
+  cost more than the halved storage saves. Free at 64 x 64, not at 1024 x 1024.
+* **Big GPUs at moderate size.** On an H100, fp32 gains 1.13x for SDC and nothing for MLSDC at a
+  million unknowns: one CG iteration takes 0.2 ms, which is kernel launches and Python, not memory
+  traffic. At 512 x 512 no row is faster than another. Precision is a bandwidth play, and only pays
+  once bandwidth is what the run waits for.
+
+What the hardware sets, measured with 4096-wide operands (``float64`` / ``float32`` / ``float16``):
+dense matmul on a T4 is 546 / 31 / 2.9 ms, a 2D real FFT 27 / 4.9 / 5.3 ms -- **5.6x** from single
+precision where the double-precision units are scarce (T4, L4, A10), 1.9x on an A100 or H100. A sparse
+matrix-vector product is 2x at best on all five cards tried, and a CuPy ``spsolve`` is unusable at
+any precision (3 s for 65k unknowns), which is why this runs on CG.
+
+ParaDiag on a GPU
+~~~~~~~~~~~~~~~~~
+
+``paradiag.py`` runs on the device as well: the reduced transform is a single matmul on whatever
+``xp`` the problem uses, and with periodic boundaries the node-local solve is an FFT diagonalisation
+of the circulant finite-difference operator -- two FFTs and a division, exact, and the one kernel
+where single precision is several times faster on consumer cards. The table in the ParaDiag section
+above reproduces on a T4 to the digit it is printed with, control included.
+
+At scale (``run_gpu.py --paradiag``, 2D periodic heat, 8 steps, 3 nodes, restol 1e-10) the claim holds
+unchanged -- answers within 1e-14 of ``complex128``, floor unmoved, one extra iteration at small
+:math:`\alpha` and none at :math:`\alpha = 10^{-2}` -- and the whole preconditioner at ``complex64``
+is **1.4-1.9x cheaper per iteration on a T4** at 1024 x 1024. What reaches the wall clock depends on
+that one iteration:
+
+======================================  ==========  ==========  ==========  ===============
+T4, 1024 x 1024                         1e-4        1e-2        adaptive    adaptive (fp64)
+======================================  ==========  ==========  ==========  ===============
+``complex128``                          3 it        5 it        3 it        3 it
+whole preconditioner ``complex64``      4 it        5 it        4 it        4 it
+speedup of ``complex64``                **1.41x**   1.36x       1.26x       1.02x
+======================================  ==========  ==========  ==========  ===============
+
+``adaptive`` is :class:`AdaptiveAlpha` with its accuracy floor :math:`\gamma = L(3\varepsilon + \tau)`
+told the precision the preconditioner runs at, through ``inner_tol``; ``adaptive (fp64)`` is the stock
+floor, which assumes double throughout. **The floor has to know the precision.** The stock one drives
+:math:`\alpha` to 2e-9, where ``complex64``'s :math:`\varepsilon/\alpha` is of order ten, and the
+residual climbs for an iteration before it recovers. Told the precision, it settles at
+:math:`\alpha \approx 4\cdot 10^{-4}` to :math:`4\cdot 10^{-3}`, around :math:`\sqrt{\varepsilon_{32}}`, and
+contracts by three digits per iteration -- which is also all any fixed :math:`\alpha` achieves at
+``complex64`` here (4 iterations from :math:`10^{-6}` to :math:`10^{-3}`). In double, adaptive
+:math:`\alpha` converges in two iterations on a small grid, and a ``complex64`` preconditioner cannot
+match that: its contraction per iteration is capped near :math:`\sqrt{\varepsilon_{32}}`, double's
+near :math:`\sqrt{\varepsilon_{64}}`. On an H100 the preconditioner is not what the iteration waits
+for, and ``complex64`` gains 1.05x at 1024 x 1024 and loses at 2048 x 2048, where it costs two
+iterations. 2048 x 2048 does not fit a T4's 16 GB at all.
+
 Tolerances and inexactness
 --------------------------
 
@@ -514,7 +595,11 @@ PETSc and DOLFIN fix their scalar type at build time, so genuine single precisio
 ``--with-precision=single`` build. Both backends therefore emulate it, which caps the information but
 is optimistic about iteration counts; results obtained this way should be labelled as emulated.
 
-Backend tests live under ``pySDC/tests/test_projects/test_DeltaSDC`` rather than in this project's own
+Both demo tables are checked row by row on a GPU in
+``pySDC/tests/test_projects/test_DeltaSDC/test_gpu.py`` (``cupy`` marker, so the GPU job runs them):
+every iteration count must match the tables here, every answer its fp64 peer, and every control must
+still fail. The problem classes take ``useGPU`` like the rest of pySDC, so nothing about the
+algorithm is GPU-specific. Backend tests live under ``pySDC/tests/test_projects/test_DeltaSDC`` rather than in this project's own
 ``tests`` folder, because the CI job that installs FEniCS, PETSc and mpi4py selects tests by marker
 while the project job installs only this project's environment. Same split as
 ``pySDC/tests/test_tutorials/test_step_7.py``: the logic lives in the ``run_*.py`` scripts here and
@@ -526,7 +611,10 @@ Running
 .. code-block:: bash
 
     python pySDC/projects/DeltaSDC/run_demo.py
+    python pySDC/projects/DeltaSDC/run_demo.py --gpu    # the same two tables, on a GPU
     pytest pySDC/projects/DeltaSDC/tests
+    # on a GPU, from the repository root (about a minute on a T4 at 1024 x 1024)
+    modal run etc/modal_gpu_tests.py --script pySDC/projects/DeltaSDC/run_gpu.py
 
 Lessons learned and dead ends
 -----------------------------
@@ -599,6 +687,7 @@ its arrays at the new dtype. ``dtype_u(init)`` hands back the dtype the problem 
 genuine cascade needs the construction dtype to become a per-sweep choice rather than a per-problem
 one. It is the only part of this project a real dtype has made harder rather than easier.
 
-**None of this is a statement about speed.** Everything is either emulated or genuinely stored at a
-reduced dtype with backend-precision arithmetic. What a half-precision coarse level would actually
-cost in time needs hardware that carries the format.
+**A kernel speedup is not a solver speedup.** The emulated tables say nothing about time, and the one
+measurement that does -- "On real hardware" above -- shows why: ``float32`` doubles the bandwidth of
+every kernel on every card tried, and still buys nothing on an H100 at a million unknowns, because the
+run is waiting on launches, not on memory. Time the solver, not the kernel.
