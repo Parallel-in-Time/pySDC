@@ -1,0 +1,20 @@
+pySDC/projects/DeltaSDC/problems.py
+  s_3cfbaa2fb0772b::t_b4c0e3e6079caa 130-131,183
+  s_3cfbaa2fb0772b::t_080660dd2f4e0a 46-47,51,98,132-134,181-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7db7cc957de2b32db156ff48907c38d84cfc0a16",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
