@@ -43,11 +43,12 @@ class allencahn_delta(allencahn_fullyimplicit):
     r"""
         Fully implicit Allen-Cahn with a node-local correction solve.
 
-        The right-hand side is :math:`f(u) = Au + \varepsilon^{-2} u (1 - u^\nu)`, so for :math:`\nu=2`
+        The right-hand side is :math:`f(u) = Au + \frac{1}{2}\varepsilon^{-2} v (1 - v^\nu)` with
+        :math:`v = 2u - 1`, wells at 0 and 1, so for :math:`\nu=2`, writing :math:`d = 2\delta`,
 
         .. math::
             f(w+\delta) - f(w) = A\delta
-                + \varepsilon^{-2}\left[\delta - \left(3w^2\delta + 3w\delta^2 + \delta^3\right)\right],
+                + \tfrac{1}{2}\varepsilon^{-2}\left[d - \left(3v^2 d + 3v d^2 + d^3\right)\right],
 
         in which every term carries a factor :math:`\delta`.
 
@@ -94,7 +95,7 @@ class allencahn_delta(allencahn_fullyimplicit):
         self._inv_eps2 = compute.type(1.0 / self.eps**2)
 
         # Bound on ||J||_inf, used to make the tolerance floor conditioning-aware. The reaction
-        # term contributes |1 - (nu+1) u^nu| <= nu for u in [-1, 1].
+        # term contributes |1 - (nu+1) v^nu| / eps^2 <= nu / eps^2 for v = 2u - 1 in [-1, 1].
         self._operator_norm = float(abs(self.A).sum(axis=1).max()) + self.nu / self.eps**2
 
     def _increment(self, base, delta, matrix=None, inv_eps2=None, scale=1.0):
@@ -126,8 +127,11 @@ class allencahn_delta(allencahn_fullyimplicit):
         """
         matrix = self._A_work if matrix is None else matrix
         inv_eps2 = self._inv_eps2 if inv_eps2 is None else inv_eps2
-        cubic = 3.0 * base * base * delta + 3.0 * scale * base * delta * delta + scale**2 * delta**3
-        return matrix.dot(delta) + inv_eps2 * (delta - cubic)
+        # The reaction is (1 / 2 eps^2) v (1 - v^2) in v = 2u - 1 (wells at 0 and 1), so expand in
+        # v, where an increment delta in u is 2 delta.
+        v, d = 2.0 * base - 1.0, 2.0 * delta
+        cubic = 3.0 * v * v * d + 3.0 * scale * v * d * d + scale**2 * d**3
+        return matrix.dot(delta) + 0.5 * inv_eps2 * (d - cubic)
 
     def eval_f_increment(self, base, delta, t):
         r"""
@@ -174,7 +178,9 @@ class allencahn_delta(allencahn_fullyimplicit):
             The system matrix, at working precision.
         """
         dtype = self._compute_dtype
-        diagonal = (dtype.type(1.0) - dtype.type(self.nu + 1) * state**self.nu).astype(dtype)
+        # the derivative of the reaction, as `reaction_prime` has it
+        v = dtype.type(2.0) * state - dtype.type(1.0)
+        diagonal = (dtype.type(1.0) - dtype.type(self.nu + 1) * v**self.nu).astype(dtype)
         jacobian = self._A_work + self._inv_eps2 * sp.diags(diagonal, offsets=0, format='csr')
         return (self._Id_work - alpha * jacobian).astype(dtype).tocsr()
 
