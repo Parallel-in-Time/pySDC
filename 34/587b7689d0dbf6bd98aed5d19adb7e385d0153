@@ -1,0 +1,19 @@
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_9af5c84054669f::t_38fe0b677b4a1e 167,171-172,180,185-187,216,218,221-223,225,228-230,255-256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "34587b7689d0dbf6bd98aed5d19adb7e385d0153",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
