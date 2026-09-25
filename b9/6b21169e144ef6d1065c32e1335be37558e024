@@ -1,0 +1,30 @@
+etc/run_mpi_tests.sh
+  s_9af5c84054669f::t_b220857c9b35f2 26-30,82-83
+etc/modal_gpu_tests.py
+  s_9af5c84054669f::t_45f9a9da013282 82-83,141-147
+  s_9af5c84054669f::t_6abda4a2b1cf03 30-37,72-81,84
+  s_9af5c84054669f::t_a31a34477ceab4 120-121,134-135,139
+pySDC/tests/test_controllers/test_controller_MPI_GPU.py
+  s_9af5c84054669f::t_779547b5028b01 56-118
+etc/gpu_bind.py
+  s_9af5c84054669f::t_676bd39a1ce11e 1-26
+  s_9af5c84054669f::t_5bc4db11b065d4 27-40
+docs/contrib/02_continuous_integration.md
+  s_9af5c84054669f::t_4a7eda06ee8a77 188-200
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b96b21169e144ef6d1065c32e1335be37558e024",
+  "prompts": {},
+  "sessions": {
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
