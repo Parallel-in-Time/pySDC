@@ -101,7 +101,7 @@
 | pySDC/implementations/problem\_classes/HeatEquation\_1D\_FEniCS\_matrix\_forced.py                  |      123 |        9 |     93% |189-191, 226-231 |
 | pySDC/implementations/problem\_classes/HeatEquation\_2D\_PETSc\_forced.py                           |       90 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/HeatEquation\_Chebychev.py                                   |      220 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/HeatEquation\_ND\_FD.py                                      |       66 |       12 |     82% |82, 101, 112-113, 124-131, 231-232, 267-268 |
+| pySDC/implementations/problem\_classes/HeatEquation\_ND\_FD.py                                      |       66 |        8 |     88% |82, 101, 112-113, 231-232, 267-268 |
 | pySDC/implementations/problem\_classes/HeatFiredrake.py                                             |       63 |        1 |     98% |       169 |
 | pySDC/implementations/problem\_classes/HenonHeiles.py                                               |       31 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/LogisticEquation.py                                          |       40 |       20 |     50% |   118-154 |
@@ -396,7 +396,7 @@
 | pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       88 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       77 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       16 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32383** | **4291** | **87%** |           |
+| **TOTAL**                                                                                           | **32383** | **4287** | **87%** |           |
 
 41 empty files skipped.
 
