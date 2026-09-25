@@ -17,8 +17,8 @@ and it would equally hit any long-running driver that builds many problems.
 from mpi4py_fft import PFFT as _PFFT
 
 
-class PFFT(_PFFT):
-    """A :class:`mpi4py_fft.PFFT` that frees its MPI communicators when it is collected."""
+class _FreesItsCommunicators:
+    """Frees the MPI communicators of a transform when it is collected."""
 
     def __del__(self):
         try:
@@ -27,3 +27,26 @@ class PFFT(_PFFT):
             # Nothing useful can be done here: this runs during garbage collection, possibly at
             # interpreter shutdown with MPI already finalized, and raising would only print noise.
             pass
+
+
+class _PFFT_CPU(_FreesItsCommunicators, _PFFT):
+    """Released ``mpi4py-fft``, which holds its data in NumPy arrays and transposes with MPI."""
+
+
+def PFFT(*args, backend='fftw', **kwargs):
+    """A distributed transform, on the host or on a GPU depending on ``backend``.
+
+    ``mpi4py-fft`` cannot drive a GPU: its arrays are NumPy subclasses and its transposes go
+    through ``MPI_Alltoallw``. pySDC therefore carries its own GPU implementation, which reuses
+    everything in ``mpi4py-fft`` that does not touch the data -- see :mod:`pySDC.helpers.fft`.
+    Which one a caller gets is decided here, so nothing else has to know there are two.
+    """
+    if backend in ('cupy', 'cupyx-scipy'):
+        from pySDC.helpers.fft import PFFT_GPU
+
+        class _PFFT_GPU(_FreesItsCommunicators, PFFT_GPU):
+            pass
+
+        return _PFFT_GPU(*args, **kwargs)
+
+    return _PFFT_CPU(*args, backend=backend, **kwargs)

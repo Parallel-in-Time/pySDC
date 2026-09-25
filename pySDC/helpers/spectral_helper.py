@@ -1517,8 +1517,7 @@ class SpectralHelper:
     def get_pfft(self, axes=None, padding=None, grid=None):
         if self.ndim == 1 or self.comm is None:
             return None
-        from mpi4py_fft import newDistArray
-
+        from pySDC.helpers.fft import newDistArray
         from pySDC.helpers.fft_helper import PFFT
 
         axes = tuple(i for i in range(self.ndim)) if axes is None else axes
@@ -1687,7 +1686,6 @@ class SpectralHelper:
         """
         if self.comm is None:
             return self.xp.zeros(self.init[0], dtype=self.init[2])
-        from mpi4py_fft.distarray import DistArray
 
         pfft = pfft if pfft else self.get_pfft()
         if pfft is None:
@@ -1704,10 +1702,10 @@ class SpectralHelper:
             dtype = pfft.forward.input_array.dtype
         global_shape = (self.ncomponents,) * rank + global_shape
 
-        if pfft.xfftn[0].backend in ["cupy", "cupyx-scipy"]:
-            from mpi4py_fft.distarrayCuPy import DistArrayCuPy as darraycls
+        if getattr(pfft, 'on_GPU', False):
+            from pySDC.helpers.fft import DistArrayCuPy as darraycls
         else:
-            darraycls = DistArray
+            from mpi4py_fft.distarray import DistArray as darraycls
 
         z = darraycls(global_shape, subcomm=p0.subcomm, val=val, dtype=dtype, alignment=p0.axis, rank=rank)
         return z.v if view else z

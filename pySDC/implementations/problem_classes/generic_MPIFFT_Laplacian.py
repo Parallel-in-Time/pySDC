@@ -1,6 +1,6 @@
 import numpy as np
 from mpi4py import MPI
-from mpi4py_fft import newDistArray
+from pySDC.helpers.fft import newDistArray
 
 from pySDC.helpers.fft_helper import PFFT
 

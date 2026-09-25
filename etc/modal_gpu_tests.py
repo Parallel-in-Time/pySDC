@@ -45,30 +45,11 @@ image = (
     # spectral helper's `cupy`-marked tests go through them even on a single rank.
     .micromamba_install(spec_file='etc/environment-cupy.yml', channels=['conda-forge'])
     .micromamba_install(spec_file='etc/environment-tests.yml', channels=['conda-forge'])
-    # The GPU spectral code needs a `cupy`/`cupyx-scipy` FFT backend, `DistArrayCuPy` and the
-    # NCCL `comm_backend`, none of which are in any release -- see
-    # docs/contrib/02_continuous_integration.md. They come from this fork, pinned to a commit so
-    # the image is reproducible, and installed over the conda-forge build.
-    #
-    # The flags all matter. A tarball rather than `git+https://`, since the image has no `git`.
-    # `c-compiler` and `cython` because the FFTW extension builds from `.pyx` sources that a
-    # GitHub archive does not ship pre-generated, and `--no-build-isolation` keeps the build in
-    # this environment, where setup.py finds FFTW through `sys.prefix`. `--no-deps` keeps pip off
-    # the conda-forge NumPy and mpi4py. `--force-reinstall` because the fork reports the same
-    # version as the build it replaces, and pip would otherwise call the requirement satisfied and
-    # install nothing. The import that follows fails the build if that happens: `distarrayCuPy`
-    # exists only in the fork.
-    .micromamba_install('c-compiler', 'cython', channels=['conda-forge'])
-    .run_commands(
-        'python -m pip install --no-deps --no-build-isolation --force-reinstall '
-        'https://github.com/brownbaerchen/mpi4py-fft/archive/'
-        'a7aeec6ace99dd49561625c866c605ed0b337c18.tar.gz',
-        'python -c "import mpi4py_fft.distarrayCuPy"',
-    )
-    # `mpi-pytest` supplies the `parallel` marker, which is how a test says how many ranks it
-    # wants; without it `etc/run_mpi_tests.sh` finds no rank counts and runs one serial pass, and
-    # the NCCL tests would quietly execute on a single rank. It is a pip package, as in the
-    # `- pip:` block of every other environment file here.
+    # `mpi4py-fft` comes from conda-forge like any other dependency. It used to be overwritten
+    # here with a personal fork carrying CuPy support, because the released package holds its data
+    # in NumPy arrays and transposes with `MPI_Alltoallw`. pySDC owns that part now -- see
+    # `pySDC/helpers/fft` -- and uses the released package for everything that does not touch the
+    # data.
     # `pytest-xdist` splits the serial pass over the GPUs the MPI passes need anyway; see
     # `etc/gpu_bind.py` for how each worker is given one of its own.
     .run_commands('python -m pip install "mpi-pytest>=2026.0" "pytest-xdist>=3.6"')
