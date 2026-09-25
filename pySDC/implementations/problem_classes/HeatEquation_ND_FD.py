@@ -124,7 +124,7 @@ class heatNd_unforced(GenericNDimFinDiff):
         elif ndim == 3:
             rho = (
                 (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[0] * dx)) / dx**2
-                + (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[1] * dx))
+                + (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[1] * dx)) / dx**2
                 + (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[2] * dx)) / dx**2
             )
             x, y, z = self.grids
