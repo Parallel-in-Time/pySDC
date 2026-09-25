@@ -183,9 +183,10 @@ def run_with_distributed_space(space_comm, node_comm, nvars=(32, 32), dt=1e-2):
 
         sweeper_params = {'num_nodes': node_comm.size, 'comm': NCCLComm(node_comm)}
 
-    # `IEpar` because the MPI sweeper needs a diagonal preconditioner to have anything to
-    # parallelise, and the serial reference has to use the same one to be comparable
-    sweeper_params.update({'quad_type': 'RADAU-RIGHT', 'QI': 'IEpar', 'QE': 'PIC'})
+    # The MPI sweeper needs a diagonal preconditioner to have anything to parallelise, which rules
+    # out `LU`; `MIN-SR-S` is the diagonal one worth running. The serial reference uses the same,
+    # so the comparison is of the parallelisation and not of the preconditioner.
+    sweeper_params.update({'quad_type': 'RADAU-RIGHT', 'QI': 'MIN-SR-S', 'QE': 'PIC'})
 
     description = {
         'problem_class': IMEX_Laplacian_MPIFFT,
