@@ -210,10 +210,17 @@ that names it; see <code class="docutils literal notranslate"><span class="pre">
 the same <code class="docutils literal notranslate"><span class="pre">cupy</span></code>-marked selection on them, through <code class="docutils literal notranslate"><span class="pre">etc/run_mpi_tests.sh</span></code> as every other leg does.
 Unlike the stub, <strong>this one counts towards the coverage report</strong>, because it really executes the
 lines it reports.</p>
-<p>Two GPUs rather than one because <code class="docutils literal notranslate"><span class="pre">test_sweeper_NCCL</span></code> asks for two ranks and NCCL wants a GPU per
-rank. Nothing in pySDC selects a device – on a batch system the scheduler gives each task its own,
-so every rank taking device 0 is correct – and <code class="docutils literal notranslate"><span class="pre">etc/bind_gpu_to_rank.sh</span></code> reproduces that inside
-one container.</p>
+<p>Four GPUs, because the space-time tests ask for four ranks and NCCL wants a GPU per rank. The
+serial pass – most of the job – is spread over the same four with <code class="docutils literal notranslate"><span class="pre">pytest-xdist</span></code> rather than
+leaving three idle, which brings it from 101 seconds to 39 and costs about what two devices did.</p>
+<p>Nothing in pySDC selects a device: on a batch system the scheduler gives each task its own, so
+every process taking device 0 is correct. Inside one container it is not, so <code class="docutils literal notranslate"><span class="pre">etc/gpu_bind.py</span></code>
+assigns one, reading whichever of <code class="docutils literal notranslate"><span class="pre">OMPI_COMM_WORLD_LOCAL_RANK</span></code> or <code class="docutils literal notranslate"><span class="pre">PYTEST_XDIST_WORKER</span></code> the
+launcher set.</p>
+<p><code class="docutils literal notranslate"><span class="pre">coverage</span></code> does not follow xdist workers, which are <code class="docutils literal notranslate"><span class="pre">execnet</span></code> subprocesses rather than the
+<code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> children <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> declares. Left alone the split reported 3836 covered
+lines against 5332 unsplit, with every test passing either way, so the image installs coverage’s
+<code class="docutils literal notranslate"><span class="pre">.pth</span></code> hook and the job sets <code class="docutils literal notranslate"><span class="pre">COVERAGE_PROCESS_START</span></code>.</p>
 <p>You can run it yourself against your own Modal account, which is the fastest way to iterate:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>modal<span class="w"> </span>token<span class="w"> </span>new<span class="w">                      </span><span class="c1"># once</span>
 modal<span class="w"> </span>run<span class="w"> </span>etc/modal_gpu_tests.py<span class="w">     </span><span class="c1"># from the repository root, the whole selection</span>
