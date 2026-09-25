@@ -1,0 +1,21 @@
+.github/workflows/ci_pipeline.yml
+  s_3cfbaa2fb0772b::t_61771bf988d2ad 213-215
+etc/modal_gpu_tests.py
+  s_3cfbaa2fb0772b::t_e5b1451a056521 131-143,161-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "84817a5f87dd2878218cd38de8623e7aedf213f9",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
