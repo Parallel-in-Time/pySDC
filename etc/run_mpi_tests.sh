@@ -23,6 +23,11 @@ marker=${2:-}
 
 : "${PYTEST:=coverage run -m pytest --continue-on-collection-errors -v --durations=0}"
 
+# Options for the serial pass only. The GPU job spreads it over several devices with `pytest-xdist`,
+# which cannot go in $PYTEST: that is also how the MPI passes are launched, and xdist under mpiexec
+# would have every rank start workers of its own.
+: "${PYTEST_SERIAL_EXTRA:=}"
+
 # No arrays: bash 3.2 (still the system bash on macOS) treats "${empty[@]}" as an unbound variable
 # under `set -u`, which silently emptied the discovery below and skipped every MPI pass.
 discover() {
@@ -74,4 +79,5 @@ done
 # `parallel[1]` claims everything unmarked or explicitly serial
 sel="parallel[1]"
 [ -n "$marker" ] && sel="$marker and $sel"
-run_pass $PYTEST -m "$sel" "$tests" || exit $?
+# shellcheck disable=SC2086  # both are deliberately word-split into arguments
+run_pass $PYTEST $PYTEST_SERIAL_EXTRA -m "$sel" "$tests" || exit $?

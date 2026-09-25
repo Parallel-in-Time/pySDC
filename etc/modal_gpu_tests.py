@@ -27,9 +27,14 @@ COVERAGE_OUT = 'coverage_GPU_hardware.dat'
 #: The whole `cupy`-marked selection, which is what CI runs.
 DEFAULT_TREES = ['pySDC/tests', 'pySDC/projects/GPU/tests']
 
-#: Two of them, because `test_sweeper_NCCL` asks for two ranks and NCCL wants a GPU per rank.
-#: Everything else needs one, and pays for two while it runs -- which is still a couple of cents.
-GPUS = 'T4:2'
+#: Four of them. The space-time tests ask for four ranks and NCCL wants a GPU per rank, and the
+#: serial pass -- most of the job -- is spread over the same four rather than leaving three idle.
+#: That costs about what two did, because the split more than pays for the extra devices: 101
+#: seconds of serial tests become 39.
+GPUS = 'T4:4'
+
+#: Kept in step with `GPUS`, so that there is one `pytest-xdist` worker per device.
+WORKERS = int(GPUS.split(':')[1])
 
 app = modal.App('pySDC-gpu-tests')
 
@@ -64,7 +69,19 @@ image = (
     # wants; without it `etc/run_mpi_tests.sh` finds no rank counts and runs one serial pass, and
     # the NCCL tests would quietly execute on a single rank. It is a pip package, as in the
     # `- pip:` block of every other environment file here.
-    .run_commands('python -m pip install "mpi-pytest>=2026.0"')
+    # `pytest-xdist` splits the serial pass over the GPUs the MPI passes need anyway; see
+    # `etc/gpu_bind.py` for how each worker is given one of its own.
+    .run_commands('python -m pip install "mpi-pytest>=2026.0" "pytest-xdist>=3.6"')
+    # `coverage` follows `multiprocessing` children, which is what pyproject.toml declares, but
+    # xdist workers are `execnet` subprocesses and it does not follow those. Measured: the split
+    # reported 3836 covered lines where an unsplit run reported 5332, with all 119 tests passing
+    # either way -- a 28% drop that nothing in the test result would have shown. This is
+    # coverage's remedy: a .pth that starts measurement in every interpreter, armed by
+    # COVERAGE_PROCESS_START below.
+    .run_commands(
+        "echo 'import coverage; coverage.process_startup()'"
+        " > \"$(python -c 'import sysconfig; print(sysconfig.get_paths()[\"purelib\"])')\"/coverage-subprocess.pth"
+    )
     .env(
         {
             'PYTHONUNBUFFERED': '1',
@@ -100,8 +117,8 @@ image = (
 
 # `timeout` is a wall clock limit on the container, and the only thing that stops a hung run
 # holding two GPUs until Modal's own maximum expires; pytest's 300 s per-test timeout does not
-# cover a collective that deadlocks between tests. Full runs take 180 to 185 seconds.
-@app.function(image=image, gpu=GPUS, timeout=420)
+# cover a collective that deadlocks between tests. Full runs take 110 to 120 seconds.
+@app.function(image=image, gpu=GPUS, timeout=300)
 def run_cupy_tests(trees, selection):
     """Run the GPU test suite in the container, and hand back pytest's exit code and coverage.
 
@@ -114,12 +131,20 @@ def run_cupy_tests(trees, selection):
     # `etc/run_mpi_tests.sh` is how every other leg runs its tests: it asks the tests themselves
     # what rank counts they declare and launches one pass per count, so `test_sweeper_NCCL` gets
     # the two ranks its `parallel(2)` marker asks for, and everything else runs serially. Each
-    # rank is wrapped so it sees a GPU of its own -- see etc/bind_gpu_to_rank.sh.
+    # rank gets a GPU of its own from the `gpu_bind` plugin in $PYTEST, which does the same for
+    # the xdist workers of the serial pass -- see etc/gpu_bind.py.
     #
     env = {
         **os.environ,
-        'PYTEST': f'bash {REMOTE}/etc/bind_gpu_to_rank.sh coverage run -m pytest'
+        'PYTEST': 'coverage run -m pytest -p gpu_bind'
         ' --continue-on-collection-errors -v --durations=0' + (f' -k {selection}' if selection else ''),
+        # Only the serial pass is split: the MPI passes already use every device, one per rank.
+        'PYTEST_SERIAL_EXTRA': f'-n {WORKERS}',
+        # `etc` so that `-p gpu_bind` resolves. `run_mpi_tests.sh` puts it there too, but only in
+        # the subshell it collects rank counts in, so that does not reach the passes.
+        'PYTHONPATH': f'{REMOTE}/etc:{REMOTE}',
+        # arms the .pth installed in the image; without it that file does nothing
+        'COVERAGE_PROCESS_START': f'{REMOTE}/pyproject.toml',
     }
     returncode = 0
     for tree in trees:

@@ -53,3 +53,66 @@ def test_time_parallel_on_GPU(levels):
     """One level is parallel-in-time SDC, two is PFASST. Neither had ever run on a GPU."""
     error = run_time_parallel(levels=levels, useGPU=True)
     assert error < 1e-8, f'time-parallel GPU run with {levels} level(s) was inaccurate: {error:.3e}'
+
+
+def run_space_time(space_comm, time_comm, nvars=(32, 32), dt=1e-2, nsteps=2):
+    """A run distributed over both communicators, returning the end value and the problem."""
+    from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+    from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
+    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+
+    description = {
+        'problem_class': IMEX_Laplacian_MPIFFT,
+        'problem_params': {'nvars': nvars, 'comm': space_comm, 'useGPU': True, 'spectral': False},
+        'sweeper_class': imex_1st_order,
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'},
+        'level_params': {'dt': dt, 'restol': 1e-10},
+        'step_params': {'maxiter': 8},
+    }
+
+    controller = controller_MPI(controller_params={'logger_level': 30}, description=description, comm=time_comm)
+    prob = controller.S.levels[0].prob
+
+    u0 = prob.u_init
+    u0[...] = prob.xp.sin(prob.X[0]) * prob.xp.sin(prob.X[1])
+
+    uend, _ = controller.run(u0=u0, t0=0.0, Tend=nsteps * dt)
+    return uend, prob
+
+
+@pytest.mark.cupy
+@pytest.mark.parallel(4)
+def test_space_and_time_parallel_on_GPU():
+    """Two ranks in space by two in time, which nothing else in the suite covers.
+
+    The GPU tests are parallel in time, or over collocation nodes, or -- since the distributed
+    transform test -- in space, but never in two of those at once. This runs the same problem both
+    ways and requires the answers to agree: the space-time run against a run on one rank, compared
+    on the slice of the global array this rank owns.
+    """
+    from mpi4py import MPI
+
+    world = MPI.COMM_WORLD
+    assert world.size == 4, f'this test decomposes four ranks as 2x2, not {world.size}'
+
+    # ranks sharing a time step are together in space, ranks holding the same slice are together
+    # in time, so rank r sits at time r // 2 and space r % 2
+    space_comm = world.Split(color=world.rank // 2)
+    time_comm = world.Split(color=world.rank % 2)
+
+    try:
+        assert space_comm.size == 2 and time_comm.size == 2, 'the 2x2 split did not come out square'
+
+        parallel, prob = run_space_time(space_comm, time_comm)
+        serial, _ = run_space_time(MPI.COMM_SELF, MPI.COMM_SELF)
+
+        mine = serial[prob.fft.local_slice(False)]
+        difference = float(abs(parallel - mine))
+        assert difference < 1e-10, f'space-time run differs from the serial one by {difference:.3e}'
+
+        # and the space decomposition has to have actually split something, or the comparison above
+        # is between two identical serial runs
+        assert prob.fft.shape(False) != prob.fft.global_shape(), 'the problem was not distributed in space'
+    finally:
+        space_comm.Free()
+        time_comm.Free()
