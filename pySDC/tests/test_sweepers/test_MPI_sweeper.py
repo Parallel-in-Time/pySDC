@@ -164,11 +164,12 @@ def test_sweeper_NCCL(quad_type, residual_type, imex, init_guess, ML):
     )
 
 
-def run_with_distributed_space(space_comm, node_comm, nvars=(32, 32), dt=1e-2):
+def run_with_distributed_space(space_comm, node_comm, num_nodes, nvars=(32, 32), dt=1e-2):
     """One step of a GPU run, with the nodes over `node_comm` and the space over `space_comm`.
 
     `node_comm` of None runs every node on this rank with the ordinary sweeper, which is the
-    reference the parallel versions have to reproduce.
+    reference the parallel versions have to reproduce. `num_nodes` is passed rather than taken
+    from the communicator so that the reference is forced to use the same collocation rule.
     """
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
@@ -176,12 +177,14 @@ def run_with_distributed_space(space_comm, node_comm, nvars=(32, 32), dt=1e-2):
     if node_comm is None:
         from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as sweeper_class
 
-        sweeper_params = {'num_nodes': 2}
+        sweeper_params = {'num_nodes': num_nodes}
     else:
         from pySDC.helpers.NCCL_communicator import NCCLComm
         from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as sweeper_class
 
-        sweeper_params = {'num_nodes': node_comm.size, 'comm': NCCLComm(node_comm)}
+        # the MPI sweeper raises unless there is exactly one rank per node
+        assert node_comm.size == num_nodes, f'{num_nodes} nodes need {num_nodes} ranks, not {node_comm.size}'
+        sweeper_params = {'num_nodes': num_nodes, 'comm': NCCLComm(node_comm)}
 
     # The MPI sweeper needs a diagonal preconditioner to have anything to parallelise, which rules
     # out `LU`; `MIN-SR-S` is the diagonal one worth running. The serial reference uses the same,
@@ -210,20 +213,21 @@ def run_with_distributed_space(space_comm, node_comm, nvars=(32, 32), dt=1e-2):
 
 
 @pytest.mark.cupy
-@pytest.mark.parallel(2)
+@pytest.mark.parallel(4)
 def test_node_parallel_on_GPU_serial_space():
-    """Two collocation nodes on two GPUs, each holding the whole spatial domain.
+    """Four collocation nodes on four GPUs, each holding the whole spatial domain.
 
     `test_sweeper_NCCL` above already spreads nodes over GPUs, but on a finite-difference problem
-    that has no space communicator at all. This is the same split on a problem that does, which is
-    what makes it comparable with the space-distributed version below.
+    with no space communicator, so it cannot be compared with the space-distributed version below.
+    This uses the same problem as that one and spends the same four GPUs on nodes alone, which is
+    as many collocation nodes as can run in parallel here: the MPI sweeper wants a rank each.
     """
+    import cupy as cp
     from mpi4py import MPI
 
-    parallel = run_with_distributed_space(MPI.COMM_SELF, MPI.COMM_WORLD)
-    serial = run_with_distributed_space(MPI.COMM_SELF, None)
-
-    import cupy as cp
+    world = MPI.COMM_WORLD
+    parallel = run_with_distributed_space(MPI.COMM_SELF, world, num_nodes=world.size)
+    serial = run_with_distributed_space(MPI.COMM_SELF, None, num_nodes=world.size)
 
     assert cp.allclose(parallel.uend, serial.uend, rtol=0, atol=1e-13), 'node-parallel run differs from the serial one'
 
@@ -248,8 +252,8 @@ def test_node_parallel_on_GPU_distributed_space():
     node_comm = world.Split(color=world.rank % 2)
 
     try:
-        parallel = run_with_distributed_space(space_comm, node_comm)
-        serial = run_with_distributed_space(MPI.COMM_SELF, None)
+        parallel = run_with_distributed_space(space_comm, node_comm, num_nodes=node_comm.size)
+        serial = run_with_distributed_space(MPI.COMM_SELF, None, num_nodes=node_comm.size)
 
         mine = serial.uend[parallel.prob.fft.local_slice(False)]
         assert cp.allclose(parallel.uend, mine, rtol=0, atol=1e-13), 'the 2x2 run differs from the serial one'
