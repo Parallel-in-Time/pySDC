@@ -372,6 +372,13 @@ def test_the_GPU_path_matches_the_CPU_one(cls_name):
     f_gpu = total_rhs(gpu.eval_f(gpu.u_exact(0.0), 0.0))
     assert abs(f_cpu - f_gpu).max() < 1e-10 * max(abs(f_cpu).max(), 1.0), 'the two modes disagree on the rhs'
 
+    # and the solvers: comparing only the rhs let four Newton solves through that could not run on CuPy
+    for solver in ('solve_system', 'solve_system_1', 'solve_system_2'):
+        if hasattr(cpu, solver):
+            x_cpu = as_numpy(getattr(cpu, solver)(cpu.u_exact(0.0), 1e-4, cpu.u_exact(0.0), 0.0))
+            x_gpu = as_numpy(getattr(gpu, solver)(gpu.u_exact(0.0), 1e-4, gpu.u_exact(0.0), 0.0))
+            assert abs(x_cpu - x_gpu).max() < 1e-8, f'the two modes disagree on {solver}'
+
 
 # --------------------------------------------------------------------------------------------
 # the monitoring hook

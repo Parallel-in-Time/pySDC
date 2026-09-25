@@ -217,8 +217,10 @@ class allencahn_fullyimplicit(Problem):
             The solution as mesh.
         """
 
-        u = self.dtype_u(u0).flatten()
-        z = self.dtype_u(self.init, val=0.0).flatten()
+        # plain arrays, not the datatype: its `__abs__` is a norm, which CuPy's `linalg.norm` trips over
+        u = u0.view(self.xp.ndarray).flatten()
+        b = rhs.view(self.xp.ndarray).flatten()
+        z = self.xp.zeros_like(u)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
@@ -227,7 +229,7 @@ class allencahn_fullyimplicit(Problem):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + self.reaction(u)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction(u)) - b
 
             # if g is close to 0, then we are done
             res = self.xp.linalg.norm(g, self.xp.inf)
@@ -504,8 +506,10 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        u = self.dtype_u(u0).flatten()
-        z = self.dtype_u(self.init, val=0.0).flatten()
+        # plain arrays, not the datatype: its `__abs__` is a norm, which CuPy's `linalg.norm` trips over
+        u = u0.view(self.xp.ndarray).flatten()
+        b = rhs.view(self.xp.ndarray).flatten()
+        z = self.xp.zeros_like(u)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
@@ -514,7 +518,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - b
 
             # if g is close to 0, then we are done
             res = self.xp.linalg.norm(g, self.xp.inf)
@@ -655,8 +659,10 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        u = self.dtype_u(u0).flatten()
-        z = self.dtype_u(self.init, val=0.0).flatten()
+        # plain arrays, not the datatype: its `__abs__` is a norm, which CuPy's `linalg.norm` trips over
+        u = u0.view(self.xp.ndarray).flatten()
+        b = rhs.view(self.xp.ndarray).flatten()
+        z = self.xp.zeros_like(u)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
@@ -665,7 +671,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * self.reaction(u) - rhs.flatten()
+            g = u - factor * self.reaction(u) - b
 
             # if g is close to 0, then we are done
             res = self.xp.linalg.norm(g, self.xp.inf)
@@ -768,8 +774,10 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        u = self.dtype_u(u0).flatten()
-        z = self.dtype_u(self.init, val=0.0).flatten()
+        # plain arrays, not the datatype: its `__abs__` is a norm, which CuPy's `linalg.norm` trips over
+        u = u0.view(self.xp.ndarray).flatten()
+        b = rhs.view(self.xp.ndarray).flatten()
+        z = self.xp.zeros_like(u)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
@@ -778,7 +786,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - b
 
             # if g is close to 0, then we are done
             res = self.xp.linalg.norm(g, self.xp.inf)
