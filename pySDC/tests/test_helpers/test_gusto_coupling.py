@@ -1,12 +1,17 @@
+import sys
+
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def _gusto_running_tests(monkeypatch):
+    # gusto reads this flag from the command line; set it for these tests only, and before the
+    # `setup` fixture creates its IO, instead of appending it to `sys.argv` for the whole session
+    monkeypatch.setattr(sys, 'argv', [*sys.argv, '--running-tests'])
 
 
 def get_gusto_stepper(eqns, method, spatial_methods, dirname='./tmp'):
     from gusto import IO, OutputParameters, PrescribedTransport
-    import sys
-
-    if '--running-tests' not in sys.argv:
-        sys.argv.append('--running-tests')
 
     output = OutputParameters(dirname=dirname, dumpfreq=15)
     io = IO(method.domain, output)
@@ -621,32 +626,27 @@ def test_pySDC_integrator_with_adaptivity(dt_initial, setup):
 
 
 @pytest.mark.firedrake
+@pytest.mark.parallel(4)
 @pytest.mark.parametrize('n_steps', [1, 4])
-@pytest.mark.parametrize('useMPIController', [True, False])
-def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n_tasks=4):
-    if submit and useMPIController:
-        import os
-        import subprocess
+def test_pySDC_integrator_MSSDC_MPI(n_steps):
+    """
+    The MPI controller splits the ranks between space and time, so this needs a real MPI job.
 
-        assert n_steps <= n_tasks
+    It builds its own ``setup`` on the space communicator rather than taking the fixture, which is
+    what the subprocess this used to launch did too: that child got ``setup=None`` whenever it ran
+    on more than one rank.
+    """
+    _run_MSSDC(n_steps=n_steps, useMPIController=True, setup=None)
 
-        my_env = os.environ.copy()
-        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-        cwd = '.'
-        cmd = f'mpiexec -np {n_tasks} --oversubscribe python {__file__} --test=MSSDC --n_steps={n_steps}'.split()
 
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-        p.wait()
-        for line in p.stdout:
-            print(line)
-        for line in p.stderr:
-            print(line)
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-            p.returncode,
-            n_steps,
-        )
-        return None
+@pytest.mark.firedrake
+@pytest.mark.parametrize('n_steps', [1, 4])
+def test_pySDC_integrator_MSSDC(n_steps, setup):
+    """The serial controller runs the whole block itself, so one rank is the right size."""
+    _run_MSSDC(n_steps=n_steps, useMPIController=False, setup=setup)
 
+
+def _run_MSSDC(n_steps, useMPIController, setup):
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.helpers.pySDC_as_gusto_time_discretization import pySDC_integrator
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_cls
@@ -764,37 +764,3 @@ def test_pySDC_integrator_MSSDC(n_steps, useMPIController, setup, submit=True, n
     assert (
         error < solver_parameters['snes_rtol'] * 1e4
     ), f'pySDC and Gusto differ in method {method}! Got relative difference of {error}'
-
-
-if __name__ == '__main__':
-    from mpi4py import MPI
-    from argparse import ArgumentParser
-
-    if MPI.COMM_WORLD.size == 1:
-        setup = tracer_setup()
-    else:
-        setup = None
-
-    parser = ArgumentParser()
-    parser.add_argument(
-        '--test',
-        help="which kind of test you want to run",
-        type=str,
-        default=None,
-    )
-    parser.add_argument(
-        '--n_steps',
-        help="number of steps",
-        type=int,
-        default=None,
-    )
-    args = parser.parse_args()
-
-    if args.test == 'MSSDC':
-        test_pySDC_integrator_MSSDC(n_steps=args.n_steps, useMPIController=True, setup=setup, submit=False)
-    else:
-        # test_generic_gusto_problem(setup)
-        # test_pySDC_integrator_RK(False, RK4, setup)
-        # test_pySDC_integrator(False, False, setup)
-        # test_pySDC_integrator_with_adaptivity(1e-3, setup)
-        test_pySDC_integrator_MSSDC(4, True, setup)

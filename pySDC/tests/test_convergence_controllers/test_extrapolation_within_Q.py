@@ -198,37 +198,16 @@ def test_extrapolation_within_Q(num_nodes, quad_type):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_nodes', [2, 4])
+@pytest.mark.parallel([2, 4])
 @pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
-def test_extrapolation_within_Q_MPI(num_nodes, quad_type):
-    import subprocess
-    import os
+def test_extrapolation_within_Q_MPI(quad_type):
+    from mpi4py import MPI
 
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {num_nodes} python {__file__} {num_nodes} {quad_type}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_nodes,
+    check_order(
+        [5e-1, 1e-1, 8e-2, 5e-2],
+        num_nodes=MPI.COMM_WORLD.size,
+        quad_type=quad_type,
+        useMPI=True,
+        QI='MIN',
+        imex=True,
     )
-
-
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) > 1:
-        kwargs = {
-            'num_nodes': int(sys.argv[1]),
-            'quad_type': sys.argv[2],
-            'useMPI': True,
-            'QI': 'MIN',
-            'imex': True,
-        }
-        check_order([5e-1, 1e-1, 8e-2, 5e-2], **kwargs)

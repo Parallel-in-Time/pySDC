@@ -11,6 +11,10 @@ def next_neighbors_periodic(p, ps, k):
     This function gives for a value p the k points next to it which are found in
     in the vector ps and the points which are found periodically.
 
+    Note that the period is hardcoded to one, here and in the periodic branches of the two matrix
+    constructors below. Normalise the grid before you pass it in; the interpolation weights only
+    depend on ratios of distances, so nothing is lost by doing so.
+
     Args:
         p: the current point
         ps (np.ndarray): the grid with the potential neighbors
@@ -96,7 +100,7 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1):
         fine_grid (np.ndarray): a one dimensional 1d array containing the nodes of the fine grid
         coarse_grid (np.ndarray): a one dimensional 1d array containing the nodes of the coarse grid
         k (int): order of the restriction
-        periodic (bool): flag to indicate periodicity
+        periodic (bool): flag to indicate periodicity, which assumes a grid of period one
         pad (int): padding parameter for boundaries
 
     Returns:
@@ -144,7 +148,7 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
         fine_grid (np.ndarray): a one dimensional 1d array containing the nodes of the fine grid
         coarse_grid (np.ndarray): a one dimensional 1d array containing the nodes of the coarse grid
         k (int): order of the restriction
-        periodic (bool): flag to indicate periodicity
+        periodic (bool): flag to indicate periodicity, which assumes a grid of period one
         pad (int): padding parameter for boundaries
         equidist_nested (bool): shortcut possible, if nodes are equidistant and nested
 

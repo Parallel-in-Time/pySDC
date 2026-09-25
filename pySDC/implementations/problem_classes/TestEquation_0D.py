@@ -33,8 +33,7 @@ class testequation0d(Problem):
     dtype_u = mesh
     dtype_f = mesh
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """
         Switch to GPU modules
         """
@@ -42,10 +41,10 @@ class testequation0d(Problem):
         import cupy as cp
         import cupyx.scipy.sparse as csp
 
-        cls.xp = cp
-        cls.xsp = csp
-        cls.dtype_u = cupy_mesh
-        cls.dtype_f = cupy_mesh
+        self.xp = cp
+        self.xsp = csp
+        self.dtype_u = cupy_mesh
+        self.dtype_f = cupy_mesh
 
     def __init__(self, lambdas=None, u0=0.0, useGPU=False):
         """Initialization routine"""

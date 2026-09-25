@@ -64,10 +64,8 @@ def test_right_multiplication(n=3, v1=1, v2=2):
     assert np.allclose(b.dat._numpy_data, v1 * v2)
     assert np.allclose(a.dat._numpy_data, v1)
 
-    try:
+    with pytest.raises(DataError):
         'Dat kölsche Dom' * b
-    except DataError:
-        pass
 
 
 @pytest.mark.firedrake
@@ -177,60 +175,23 @@ def _test_bcast(comm, u):
 
 
 @pytest.mark.firedrake
+@pytest.mark.parallel(2)
 @pytest.mark.parametrize('pattern', ['p2p', 'bcast'])
-def test_communication(pattern, n=2, submit=True):
-    if submit:
-        import os
-        import subprocess
+def test_communication(pattern, n=2):
+    import firedrake as fd
+    from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
+    from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
 
-        my_env = os.environ.copy()
-        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-        cwd = '.'
-        num_procs = 2
-        cmd = f'mpiexec -np {num_procs} python {__file__} --pattern {pattern}'.split()
+    ensemble_comm = FiredrakeEnsembleCommunicator(fd.COMM_WORLD, 1)
 
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-        p.wait()
-        for line in p.stdout:
-            print(line)
-        for line in p.stderr:
-            print(line)
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-            p.returncode,
-            num_procs,
-        )
+    mesh = fd.UnitSquareMesh(n, n, comm=ensemble_comm.space_comm)
+    V = fd.VectorFunctionSpace(mesh, "CG", 2)
 
+    u = firedrake_mesh(V)
+
+    if pattern == 'p2p':
+        _test_p2p_communication(ensemble_comm, u)
+    elif pattern == 'bcast':
+        _test_bcast(ensemble_comm, u)
     else:
-        import firedrake as fd
-        from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
-        from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
-
-        ensemble_comm = FiredrakeEnsembleCommunicator(fd.COMM_WORLD, 1)
-
-        mesh = fd.UnitSquareMesh(n, n, comm=ensemble_comm.space_comm)
-        V = fd.VectorFunctionSpace(mesh, "CG", 2)
-
-        u = firedrake_mesh(V)
-
-        if pattern == 'p2p':
-            _test_p2p_communication(ensemble_comm, u)
-        elif pattern == 'bcast':
-            _test_bcast(ensemble_comm, u)
-        else:
-            raise NotImplementedError
-
-
-if __name__ == '__main__':
-    from argparse import ArgumentParser
-
-    parser = ArgumentParser()
-    parser.add_argument(
-        '--pattern',
-        help="pattern for parallel tests",
-        type=str,
-        default=None,
-    )
-    args = parser.parse_args()
-
-    if args.pattern:
-        test_communication(pattern=args.pattern, submit=False)
+        raise NotImplementedError

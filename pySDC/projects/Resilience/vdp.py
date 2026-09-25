@@ -343,7 +343,9 @@ def check_adaptivity_with_avoid_restarts(comm=None, size=1):
     fig.tight_layout()
     fig.savefig(f'data/vdp-{size}procs{"-use_MPI" if comm is not None else ""}-avoid_restarts.png')
 
-    assert np.isclose(results['e'][True], results['e'][False], rtol=5.0), (
+    # measured: 1.07e-8 with and 8.36e-9 without avoiding restarts; the step sequences are deterministic (the
+    # iteration counts below are compared exactly), so a factor 1.5 leaves room without accepting worse steps
+    assert np.isclose(results['e'][True], results['e'][False], rtol=0.5), (
         'Errors don\'t match with avoid_restarts and without, got '
         f'{results["e"][True]:.2e} and {results["e"][False]:.2e}'
     )
@@ -549,8 +551,11 @@ if __name__ == "__main__":
     elif 'mpi_vs_nonMPI' in sys.argv:
         mpi_vs_nonMPI(MPI_ready, comm)
     elif 'check_step_size_limiter' in sys.argv:
-        check_step_size_limiter(MPI_ready, comm)
-    elif 'check_adaptivity_with_avoid_restarts' and size == 1:
+        # `size` is the number of parallel steps; this passed `MPI_ready`, so it always ran on one
+        check_step_size_limiter(size, comm)
+    elif 'check_adaptivity_with_avoid_restarts' in sys.argv and size == 1:
+        # the `in sys.argv` was missing, and a non-empty string is truthy, so every unrecognised
+        # argument landed here instead of raising below
         check_adaptivity_with_avoid_restarts(comm=None, size=1)
     else:
-        raise NotImplementedError('Your test is not implemented!')
+        raise NotImplementedError(f'Cannot run {sys.argv[1:]} on {size} rank(s)!')

@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import cg
+import scipy.sparse.linalg as spla
 
 from pySDC.core.errors import ParameterError, ProblemError
 from pySDC.core.problem import Problem, WorkCounter
@@ -13,15 +13,21 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 # noinspection PyUnusedLocal
 class allencahn_fullyimplicit(Problem):
     r"""
-    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
 
-    for constant parameter :math:`\nu`. Initial condition are circles of the form
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+
+    Initial condition are circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right)
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
     treated *fully-implicitly*, i.e., the nonlinear system is solved by Newton.
@@ -30,8 +36,8 @@ class allencahn_fullyimplicit(Problem):
     ----------
     nvars : tuple of int, optional
         Number of unknowns in the problem, e.g. ``nvars=(128, 128)``.
-    nu : float, optional
-        Problem parameter :math:`\nu`.
+    nu : int, optional
+        Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`.
     newton_maxiter : int, optional
@@ -46,6 +52,8 @@ class allencahn_fullyimplicit(Problem):
         Radius of the circles.
     order : int, optional
         Order of the finite difference matrix.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
 
     Attributes
     ----------
@@ -55,18 +63,39 @@ class allencahn_fullyimplicit(Problem):
         Distance between two spatial nodes (same for both directions).
     xvalues : np.1darray
         Spatial grid points, here both dimensions have the same grid points.
-    newton_itercount : int
-        Number of iterations of Newton solver.
-    lin_itercount
-        Number of iterations of linear solver.
     newton_ncalls : int
-        Number of calls of Newton solver.
+        Number of calls of the Newton solver. The iterations themselves are counted in
+        ``work_counters['newton']``, and the linear ones in ``work_counters['linear']``.
     lin_ncalls : int
-        Number of calls of linear solver.
+        Number of calls of the linear solver.
     """
 
     dtype_u = mesh
     dtype_f = mesh
+
+    xp = np
+    xsp = sp
+    linalg = spla
+
+    def setup_GPU(self):
+        """
+        Switch the array, sparse and solver modules and the datatypes over to CuPy.
+
+        This changes the class, not the instance, as everything else in pySDC that does this
+        does: once one instance of a class runs on the GPU, they all do.
+        """
+        import cupy as cp
+        import cupyx.scipy.sparse as csp
+        import cupyx.scipy.sparse.linalg as cspla
+        from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
+
+        self.xp = cp
+        self.xsp = csp
+        self.linalg = cspla
+        self.dtype_u = cupy_mesh
+        # .get, not [], because this runs once per instance and the class keeps what it is given
+        GPU_versions = {mesh: cupy_mesh, imex_mesh: imex_cupy_mesh, comp2_mesh: comp2_cupy_mesh}
+        self.dtype_f = GPU_versions.get(self.dtype_f, self.dtype_f)
 
     def __init__(
         self,
@@ -80,8 +109,12 @@ class allencahn_fullyimplicit(Problem):
         inexact_linear_ratio=None,
         radius=0.25,
         order=2,
+        useGPU=False,
     ):
         """Initialization routine"""
+        if useGPU:
+            self.setup_GPU()
+
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(nvars) != 2:
             raise ProblemError('this is a 2d example, got %s' % nvars)
@@ -98,6 +131,7 @@ class allencahn_fullyimplicit(Problem):
             'eps',
             'radius',
             'order',
+            'useGPU',
             localVars=locals(),
             readOnly=True,
         )
@@ -121,17 +155,45 @@ class allencahn_fullyimplicit(Problem):
             size=self.nvars[0],
             dim=2,
             bc='periodic',
+            cupy=self.useGPU,
         )
-        self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.nvars[0])])
+        self.xvalues = self.xp.arange(self.nvars[0]) * self.dx - 0.5
 
-        self.newton_itercount = 0
-        self.lin_itercount = 0
         self.newton_ncalls = 0
         self.lin_ncalls = 0
 
         self.work_counters['newton'] = WorkCounter()
         self.work_counters['rhs'] = WorkCounter()
         self.work_counters['linear'] = WorkCounter()
+
+    def reaction(self, u):
+        r"""
+        The reaction term, :math:`\frac{1}{2\varepsilon^2}(2u - 1)\left(1 - (2u - 1)^\nu\right)`.
+
+        The wells sit at :math:`u = 0` and :math:`u = 1`, so the double well is symmetric about
+        :math:`2u - 1`; writing the term in that variable is what lets :math:`\nu` keep the meaning
+        it has always had here. For the default :math:`\nu = 2` this is
+        :math:`-\frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+        """
+        v = 2.0 * u - 1.0
+        return 0.5 / self.eps**2 * v * (1.0 - v**self.nu)
+
+    def reaction_prime(self, u):
+        """Derivative of :meth:`reaction`, ready to go on the diagonal of a Jacobian."""
+        v = 2.0 * u - 1.0
+        return 1.0 / self.eps**2 * (1.0 - (self.nu + 1.0) * v**self.nu)
+
+    def reaction_cubic(self, u):
+        r"""The stiff part of :meth:`reaction`, :math:`-\frac{1}{2\varepsilon^2}(2u - 1)^{\nu + 1}`."""
+        return -0.5 / self.eps**2 * (2.0 * u - 1.0) ** (self.nu + 1)
+
+    def reaction_cubic_prime(self, u):
+        """Derivative of :meth:`reaction_cubic`."""
+        return -(self.nu + 1.0) / self.eps**2 * (2.0 * u - 1.0) ** self.nu
+
+    def reaction_linear(self, u):
+        r"""The rest of :meth:`reaction`, :math:`\frac{1}{2\varepsilon^2}(2u - 1)`, so the two sum back to it."""
+        return 0.5 / self.eps**2 * (2.0 * u - 1.0)
 
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
@@ -157,20 +219,18 @@ class allencahn_fullyimplicit(Problem):
 
         u = self.dtype_u(u0).flatten()
         z = self.dtype_u(self.init, val=0.0).flatten()
-        nu = self.nu
-        eps2 = self.eps**2
 
-        Id = sp.eye(self.nvars[0] * self.nvars[1])
+        Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
         # start newton iteration
         n = 0
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + 1.0 / eps2 * u * (1.0 - u**nu)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction(u)) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            res = np.linalg.norm(g, np.inf)
+            res = self.xp.linalg.norm(g, self.xp.inf)
 
             # do inexactness in the linear solver
             if self.inexact_linear_ratio:
@@ -180,11 +240,11 @@ class allencahn_fullyimplicit(Problem):
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u**nu), offsets=0))
+            dg = Id - factor * (self.A + self.xsp.diags(self.reaction_prime(u), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(
+            u -= self.linalg.cg(
                 dg, g, x0=z, rtol=self.lin_tol, maxiter=self.lin_maxiter, atol=0, callback=self.work_counters['linear']
             )[0]
             # increase iteration count
@@ -200,7 +260,6 @@ class allencahn_fullyimplicit(Problem):
         me[:] = u.reshape(self.nvars)
 
         self.newton_ncalls += 1
-        self.newton_itercount += n
 
         return me
 
@@ -222,7 +281,7 @@ class allencahn_fullyimplicit(Problem):
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
-        f[:] = (self.A.dot(v) + 1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
+        f[:] = (self.A.dot(v) + self.reaction(v)).reshape(self.nvars)
 
         self.work_counters['rhs']()
         return f
@@ -250,9 +309,9 @@ class allencahn_fullyimplicit(Problem):
             me[:] = self.generate_scipy_reference_solution(eval_rhs, t, u_init, t_init)
 
         else:
-            X, Y = np.meshgrid(self.xvalues, self.xvalues)
+            X, Y = self.xp.meshgrid(self.xvalues, self.xvalues)
             r2 = X**2 + Y**2
-            me[:] = np.tanh((self.radius - np.sqrt(r2)) / (np.sqrt(2) * self.eps))
+            me[:] = 0.5 * (1.0 + self.xp.tanh((self.radius - self.xp.sqrt(r2)) / (np.sqrt(2) * self.eps)))
 
         return me
 
@@ -260,15 +319,21 @@ class allencahn_fullyimplicit(Problem):
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
     r"""
-    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
 
-    for constant parameter :math:`\nu`. Initial condition are circles of the form
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+
+    Initial condition are circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right)
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
     treated in a *semi-implicit* way, i.e., the linear system containing the Laplacian is solved by the conjugate gradients
@@ -296,7 +361,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         f = self.dtype_f(self.init)
         v = u.flatten()
         f.impl[:] = self.A.dot(v).reshape(self.nvars)
-        f.expl[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
+        f.expl[:] = self.reaction(v).reshape(self.nvars)
 
         self.work_counters['rhs']()
         return f
@@ -322,30 +387,21 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        class context:
-            num_iter = 0
-
-        def callback(xk):
-            context.num_iter += 1
-            self.work_counters['linear']()
-            return context.num_iter
-
         me = self.dtype_u(self.init)
 
-        Id = sp.eye(self.nvars[0] * self.nvars[1])
+        Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
-        me[:] = cg(
+        me[:] = self.linalg.cg(
             Id - factor * self.A,
             rhs.flatten(),
             x0=u0.flatten(),
             rtol=self.lin_tol,
             maxiter=self.lin_maxiter,
             atol=0,
-            callback=callback,
+            callback=self.work_counters['linear'],
         )[0].reshape(self.nvars)
 
         self.lin_ncalls += 1
-        self.lin_itercount += context.num_iter
 
         return me
 
@@ -379,19 +435,25 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     r"""
-    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
 
-    for constant parameter :math:`\nu`. Initial condition are circles of the form
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+
+    Initial condition are circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right)
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
-    is used to get a *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
-    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is used to get a *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{2\varepsilon^2}(2u - 1)^3`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{2\varepsilon^2}(2u - 1)`
     is only evaluated at each time.
     """
 
@@ -415,9 +477,10 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
-        f.impl[:] = (self.A.dot(v) - 1.0 / self.eps**2 * v ** (self.nu + 1)).reshape(self.nvars)
-        f.expl[:] = (1.0 / self.eps**2 * v).reshape(self.nvars)
+        f.impl[:] = (self.A.dot(v) + self.reaction_cubic(v)).reshape(self.nvars)
+        f.expl[:] = self.reaction_linear(v).reshape(self.nvars)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -443,34 +506,33 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
         u = self.dtype_u(u0).flatten()
         z = self.dtype_u(self.init, val=0.0).flatten()
-        nu = self.nu
-        eps2 = self.eps**2
 
-        Id = sp.eye(self.nvars[0] * self.nvars[1])
+        Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
         # start newton iteration
         n = 0
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            # res = np.linalg.norm(g, np.inf)
-            res = np.linalg.norm(g, np.inf)
+            res = self.xp.linalg.norm(g, self.xp.inf)
 
             if res < self.newton_tol:
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A - 1.0 / eps2 * sp.diags(((nu + 1) * u**nu), offsets=0))
+            dg = Id - factor * (self.A + self.xsp.diags(self.reaction_cubic_prime(u), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, rtol=self.lin_tol, atol=0)[0]
+            u -= self.linalg.cg(dg, g, x0=z, rtol=self.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
+
+            self.work_counters['newton']()
 
         # if n == self.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
@@ -479,7 +541,6 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         me[:] = u.reshape(self.nvars)
 
         self.newton_ncalls += 1
-        self.newton_itercount += n
 
         return me
 
@@ -487,15 +548,21 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
     r"""
-    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
 
-    for constant parameter :math:`\nu`. Initial condition are circles of the form
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+
+    Initial condition are circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right)
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is
     treated in *multi-implicit* fashion, i.e., the linear system containing the Laplacian is solved by the conjugate gradients
@@ -523,8 +590,9 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         f = self.dtype_f(self.init)
         v = u.flatten()
         f.comp1[:] = self.A.dot(v).reshape(self.nvars)
-        f.comp2[:] = (1.0 / self.eps**2 * v * (1.0 - v**self.nu)).reshape(self.nvars)
+        f.comp2[:] = self.reaction(v).reshape(self.nvars)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system_1(self, rhs, factor, u0, t):
@@ -548,29 +616,21 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        class context:
-            num_iter = 0
-
-        def callback(xk):
-            context.num_iter += 1
-            return context.num_iter
-
         me = self.dtype_u(self.init)
 
-        Id = sp.eye(self.nvars[0] * self.nvars[1])
+        Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
-        me[:] = cg(
+        me[:] = self.linalg.cg(
             Id - factor * self.A,
             rhs.flatten(),
             x0=u0.flatten(),
             rtol=self.lin_tol,
             maxiter=self.lin_maxiter,
             atol=0,
-            callback=callback,
+            callback=self.work_counters['linear'],
         )[0].reshape(self.nvars)
 
         self.lin_ncalls += 1
-        self.lin_itercount += context.num_iter
 
         return me
 
@@ -597,33 +657,33 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
         u = self.dtype_u(u0).flatten()
         z = self.dtype_u(self.init, val=0.0).flatten()
-        nu = self.nu
-        eps2 = self.eps**2
 
-        Id = sp.eye(self.nvars[0] * self.nvars[1])
+        Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
         # start newton iteration
         n = 0
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (1.0 / eps2 * u * (1.0 - u**nu)) - rhs.flatten()
+            g = u - factor * self.reaction(u) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            res = np.linalg.norm(g, np.inf)
+            res = self.xp.linalg.norm(g, self.xp.inf)
 
             if res < self.newton_tol:
                 break
 
             # assemble dg
-            dg = Id - factor * (1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u**nu), offsets=0))
+            dg = Id - factor * self.xsp.diags(self.reaction_prime(u), offsets=0)
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, rtol=self.lin_tol, atol=0)[0]
+            u -= self.linalg.cg(dg, g, x0=z, rtol=self.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
+
+            self.work_counters['newton']()
 
         # if n == self.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
@@ -632,7 +692,6 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         me[:] = u.reshape(self.nvars)
 
         self.newton_ncalls += 1
-        self.newton_itercount += n
 
         return me
 
@@ -640,19 +699,25 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     r"""
-    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions :math:`u \in [-1, 1]^2`
+    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = \Delta u + \frac{1}{\varepsilon^2} u (1 - u^\nu)
+        \frac{\partial u}{\partial t} = \Delta u
+            + \frac{1}{2\varepsilon^2} (2u - 1)\left(1 - (2u - 1)^\nu\right)
 
-    for constant parameter :math:`\nu`. The initial condition has the form of circles
+    for a constant :math:`\nu`, which at the default :math:`\nu = 2` is the usual
+    :math:`\Delta u - \frac{2}{\varepsilon^2} u (1 - u)(1 - 2u)`.
+
+    The initial condition has the form of circles
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}{\sqrt{2}\varepsilon}\right)
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right)
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
-    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{\varepsilon^2} u^{\nu + 1}`
-    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{\varepsilon^2} u`
+    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{2\varepsilon^2}(2u - 1)^3`
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{2\varepsilon^2}(2u - 1)`
     is solved by a linear solver provided by a ``SciPy`` routine.
     """
 
@@ -676,9 +741,10 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
-        f.comp1[:] = (self.A.dot(v) - 1.0 / self.eps**2 * v ** (self.nu + 1)).reshape(self.nvars)
-        f.comp2[:] = (1.0 / self.eps**2 * v).reshape(self.nvars)
+        f.comp1[:] = (self.A.dot(v) + self.reaction_cubic(v)).reshape(self.nvars)
+        f.comp2[:] = self.reaction_linear(v).reshape(self.nvars)
 
+        self.work_counters['rhs']()
         return f
 
     def solve_system_1(self, rhs, factor, u0, t):
@@ -704,30 +770,28 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
         u = self.dtype_u(u0).flatten()
         z = self.dtype_u(self.init, val=0.0).flatten()
-        nu = self.nu
-        eps2 = self.eps**2
 
-        Id = sp.eye(self.nvars[0] * self.nvars[1])
+        Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
         # start newton iteration
         n = 0
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            res = np.linalg.norm(g, np.inf)
+            res = self.xp.linalg.norm(g, self.xp.inf)
 
             if res < self.newton_tol:
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A - 1.0 / eps2 * sp.diags(((nu + 1) * u**nu), offsets=0))
+            dg = Id - factor * (self.A + self.xsp.diags(self.reaction_cubic_prime(u), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(
+            u -= self.linalg.cg(
                 dg,
                 g,
                 x0=z,
@@ -738,6 +802,8 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
             n += 1
             # print(n, res)
 
+            self.work_counters['newton']()
+
         # if n == self.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
@@ -745,7 +811,6 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         me[:] = u.reshape(self.nvars)
 
         self.newton_ncalls += 1
-        self.newton_itercount += n
 
         return me
 
@@ -772,5 +837,5 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
         me = self.dtype_u(self.init)
 
-        me[:] = (1.0 / (1.0 - factor * 1.0 / self.eps**2) * rhs).reshape(self.nvars)
+        me[:] = ((rhs - 0.5 * factor / self.eps**2) / (1.0 - factor / self.eps**2)).reshape(self.nvars)
         return me

@@ -74,11 +74,12 @@ class LogToPickleFile(Hooks):
     r"""
     Hook for logging the solution to file after the step using pickle.
 
-    Please configure the hook to your liking by manipulating class attributes.
-    You must set a custom path to a directory like so:
+    Please configure the hook to your liking by setting class attributes on a subclass, so that other runs in the same
+    process are not affected. You must set a custom path to a directory like so:
 
     ```
-    LogToFile.path = '/my/directory/'
+    class MyLogToPickleFile(LogToPickleFile):
+        path = '/my/directory/'
     ```
 
     Keep in mind that the hook will overwrite files without warning!

@@ -152,10 +152,10 @@ def testOrderAccuracySemiExplicitIndexOne(sweeper_name):
     )
 
     assert np.isclose(
-        orderDiff, expectedOrderDiff[sweeper_name], atol=1e0
+        orderDiff, expectedOrderDiff[sweeper_name], atol=0.3
     ), f"SE index-1 case: Expected order {expectedOrderDiff[sweeper_name]} in differential variable for {sweeper_name}, got {orderDiff}"
     assert np.isclose(
-        orderAlg, expectedOrderAlg[sweeper_name], atol=1e0
+        orderAlg, expectedOrderAlg[sweeper_name], atol=0.3
     ), f"SE index-1 case:  Expected order {expectedOrderAlg[sweeper_name]} in algebraic variable for {sweeper_name}, got {orderAlg}"
 
 
@@ -206,7 +206,10 @@ def testOrderAccuracySemiExplicitIndexTwo(sweeper_name):
     level_params = description['level_params']
 
     t0, Tend = 0.0, 0.5
-    dt_list = np.logspace(-1.7, -1.0, num=7)
+    # For dt > 10^-1.75 the orders are not yet asymptotic: over 10^-1.7..10^-1 the algebraic variable of the
+    # trapezoidal rule converged with order 1.4 and the differential variable of EDIRK4 with order 3.7. On this
+    # range the measured orders are within 0.1 of the expected ones.
+    dt_list = np.logspace(-2.5, -2.0, num=3)
 
     errorsDiff, errorsAlg = np.zeros(len(dt_list)), np.zeros(len(dt_list))
     for i, dt in enumerate(dt_list):
@@ -237,10 +240,10 @@ def testOrderAccuracySemiExplicitIndexTwo(sweeper_name):
     )
 
     assert np.isclose(
-        orderDiff, expectedOrderDiff[sweeper_name], atol=1e0
+        orderDiff, expectedOrderDiff[sweeper_name], atol=0.3
     ), f"SE index-2 case: Expected order {expectedOrderDiff[sweeper_name]} in differential variable for {sweeper_name}, got {orderDiff}"
     assert np.isclose(
-        orderAlg, expectedOrderAlg[sweeper_name], atol=1e0
+        orderAlg, expectedOrderAlg[sweeper_name], atol=0.3
     ), f"SE index-2 case: Expected order {expectedOrderAlg[sweeper_name]} in algebraic variable for {sweeper_name}, got {orderAlg}"
 
 
@@ -301,5 +304,5 @@ def testOrderAccuracyFullyImplicitIndexTwo(sweeper_name):
     )
 
     assert np.isclose(
-        order, expectedOrder[sweeper_name], atol=1e0
+        order, expectedOrder[sweeper_name], atol=0.3
     ), f"FI index-2 case: Expected order {expectedOrder[sweeper_name]} in differential variable for {sweeper_name}, got {order}"

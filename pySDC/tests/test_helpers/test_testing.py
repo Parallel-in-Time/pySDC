@@ -12,14 +12,15 @@ from pySDC.helpers.testing import DataChecker
 
 
 @pytest.mark.base
-def test_DataChecker():
+def test_DataChecker(tmp_path):
     result = [1, 2, 3, 4]
     correct = result
     wrong = [1, 2, 3, 3]
 
-    d1 = DataChecker(__file__)
-    if os.path.isfile(d1._dataRefFile):
-        os.remove(d1._dataRefFile)
+    # DataChecker keeps its json files next to the path it is given: a fresh directory, so that the
+    # test neither finds a stale reference nor leaves files in the source tree
+    script = str(tmp_path / 'script.py')
+    d1 = DataChecker(script)
 
     warnings.filterwarnings("error")
     try:
@@ -31,15 +32,15 @@ def test_DataChecker():
     d1.writeToJSON()
     os.rename(d1._dataFile, d1._dataRefFile)
 
-    d2 = DataChecker(__file__)
+    d2 = DataChecker(script)
     try:
         d2.storeAndCheck('r1', result)
     except UserWarning:
-        raise AssertionError("warning raised with reference data available")
+        raise AssertionError("warning raised with reference data available") from None
     d2.writeToJSON()
     warnings.resetwarnings()
 
-    d3 = DataChecker(__file__)
+    d3 = DataChecker(script)
 
     try:
         d3.storeAndCheck('r1', wrong)

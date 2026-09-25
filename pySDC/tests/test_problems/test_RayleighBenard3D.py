@@ -87,8 +87,8 @@ def test_eval_f(nx, nz, direction, spectral_space):
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('direction', ['x', 'y', 'z', 'mixed'])
-@pytest.mark.mpi(ranks=[2, 4])
-def test_eval_f_parallel(mpi_ranks, direction):
+@pytest.mark.parallel([2, 4])
+def test_eval_f_parallel(direction):
     test_eval_f(nx=4, nz=4, direction=direction, spectral_space=False)
 
 
@@ -228,9 +228,12 @@ def test_solver_convergence(solver_type, N, left_preconditioner, Dirichlet_recom
     assert error <= P.solver_args['atol'] * 1e3, error
 
     if 'ilu' in solver_type.lower():
-        size_LU = P_direct.cached_factorizations[dt].__sizeof__()
-        size_iLU = P.cached_factorizations[dt].__sizeof__()
-        assert size_iLU < size_LU, 'iLU does not require less memory than LU!'
+        # the cached solvers are Python wrappers of constant size, so compare the nonzeros of the factors
+        A = P.Pl @ P.spectral.put_BCs_in_matrix(P.M + dt * P.L) @ P.Pr
+        ilu_args = {**P.preconditioner_args, 'drop_tol': dt * P.preconditioner_args['drop_tol']}
+        nnz_LU = P.linalg.splu(A).nnz
+        nnz_iLU = P.linalg.spilu(A, **ilu_args).nnz
+        assert nnz_iLU < nnz_LU, f'iLU does not require less memory than LU! ({nnz_iLU=}, {nnz_LU=})'
 
 
 @pytest.mark.mpi4py
@@ -307,7 +310,9 @@ def test_Nusselt_number_computation(c, N=6):
     u[iw] = c * (1 + xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key, expect in zip(['t', 'b', 'V', 'thermal'], [prob.Lz * (3 + 1) * c - 6, c, c * (1 + 1) - 3, 12]):
+    for key, expect in zip(
+        ['t', 'b', 'V', 'thermal'], [prob.Lz * (3 + 1) * c - 6, c, c * (1 + 1) - 3, 12], strict=True
+    ):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     # zero
@@ -323,7 +328,7 @@ def test_Nusselt_number_computation(c, N=6):
     u[iu] = c * xp.sqrt(5) / 3 * prob.Z**3 + c
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key, expect in zip(['t', 'b', 'V', 'thermal', 'kinetic'], [-prob.Lz * 2, 0, -1, 4 / 3, 1 + c**2]):
+    for key, expect in zip(['t', 'b', 'V', 'thermal', 'kinetic'], [-prob.Lz * 2, 0, -1, 4 / 3, 1 + c**2], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]} with T=z**2!'
 
     # gradient plus fluctuations
@@ -353,8 +358,8 @@ def test_Nusselt_number_computation(c, N=6):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[1, 2, 5])
-def test_spectrum_computation(mpi_ranks):
+@pytest.mark.parallel([1, 2, 5])
+def test_spectrum_computation():
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 
     N = 5

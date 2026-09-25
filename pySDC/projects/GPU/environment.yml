@@ -1,0 +1,31 @@
+---
+
+# The environment the GitHub CI job for this project uses. It is NOT an environment for running the
+# project, because it deliberately has no CuPy: the runners have no GPU, so the `cupy`-marked tests
+# not run here; they run on rented hardware instead, and everything
+# else runs with `-m "not cupy"`. Installing CuPy here would pull in the CUDA toolkit to test nothing.
+#
+# To actually run this project on a GPU, see README.rst, which has the CuPy install. The machines it
+# is run on in anger are set up differently again: etc/venv_booster and etc/venv_jusuf here, and
+# etc/venv_juwels driven by .gitlab-ci.yml, which is where the real GPU tests live.
+#
+# The packages below mirror the RayleighBenard environment, because this project's configs import
+# that project's and both go through `spectral_helper`, which needs mpi4py-fft.
+name: pySDC
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10,<3.14
+  - numpy>=1.15.4
+  - scipy>=0.17.1
+  - matplotlib>=3.0
+  - dill>=0.2.6
+  - openmpi
+  - mpi4py-fft>=2.0.2
+  - mpi4py>=3.0.0
+  - tqdm
+  - pandas
+  - pip
+  - pip:
+    - qmat>=0.1.8
+    - mpi-pytest>=2026.0

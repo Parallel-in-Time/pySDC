@@ -48,34 +48,39 @@ def run(hook, Tend=0, ODE=True, t0=0):
 
 
 @pytest.mark.base
-def test_errors_pickle():
+def test_errors_pickle(tmp_path):
     from pySDC.implementations.hooks.log_solution import LogToPickleFile
     import os
 
-    with pytest.raises(ValueError):
-        run(LogToPickleFile)
+    hook = type('LogToPickleFile', (LogToPickleFile,), {})
 
-    LogToPickleFile.path = os.getcwd()
-    run(LogToPickleFile)
+    with pytest.raises(ValueError, match='Please set a path'):
+        run(hook)
 
-    path = f'{os.getcwd()}/tmp'
-    LogToPickleFile.path = path
-    run(LogToPickleFile)
-    os.path.isdir(path)
+    hook.path = str(tmp_path)
+    run(hook)
 
-    with pytest.raises(ValueError):
-        LogToPickleFile.path = __file__
-        run(LogToPickleFile)
+    # a directory that does not exist yet is created
+    path = f'{tmp_path}/tmp'
+    hook.path = path
+    run(hook)
+    assert os.path.isdir(path)
+
+    hook.path = __file__
+    with pytest.raises(ValueError, match='a file of the same name exists'):
+        run(hook)
 
 
 @pytest.mark.base
 def test_errors_FieldsIO(tmpdir):
-    from pySDC.implementations.hooks.log_solution import LogToFile as hook
+    from pySDC.implementations.hooks.log_solution import LogToFile
     from pySDC.core.errors import DataError
     import os
 
     path = f'{tmpdir}/FieldsIO_test.pySDC'
-    hook.filename = path
+
+    class hook(LogToFile):
+        filename = path
 
     run_kwargs = {'hook': hook, 'Tend': 0.2, 'ODE': True}
 
@@ -110,11 +115,9 @@ def test_logging(tmpdir, use_pickle, ODE=True):
     Tend = 0.2
 
     if use_pickle:
-        logging_hook = LogToPickleFile
-        LogToPickleFile.path = path
+        logging_hook = type('LogToPickleFile', (LogToPickleFile,), {'path': path})
     else:
-        logging_hook = LogToFile
-        logging_hook.filename = f'{path}/FieldsIO_test.pySDC'
+        logging_hook = type('LogToFile', (LogToFile,), {'filename': f'{path}/FieldsIO_test.pySDC'})
 
     u0, stats = run([logging_hook, LogSolution], Tend=Tend, ODE=ODE)
     u = [(0.0, u0)] + get_sorted(stats, type='u')
@@ -124,7 +127,7 @@ def test_logging(tmpdir, use_pickle, ODE=True):
         data = logging_hook.load(i)
         u_file += [(data['t'], data['u'])]
 
-    for us, uf in zip(u, u_file):
+    for us, uf in zip(u, u_file, strict=True):
         assert us[0] == uf[0], 'time does not match'
         if ODE:
             assert np.allclose(us[1], uf[1]), 'solution does not match'
@@ -140,8 +143,7 @@ def test_restart(tmpdir, ODE=True):
     Tend = 0.2
 
     # run the whole thing
-    logging_hook = LogToFile
-    logging_hook.filename = f'{tmpdir}/file.pySDC'
+    logging_hook = type('LogToFile', (LogToFile,), {'filename': f'{tmpdir}/file.pySDC'})
 
     _, _ = run([logging_hook], Tend=Tend, ODE=ODE)
 
@@ -161,16 +163,18 @@ def test_restart(tmpdir, ODE=True):
         u_restart += [(data['t'], data['u'])]
 
     assert np.allclose([me[0] for me in u_restart], [me[0] for me in u_continuous]), 'Times don\'t match'
-    for u1, u2 in zip(u_restart, u_continuous):
+    for u1, u2 in zip(u_restart, u_continuous, strict=True):
         assert np.allclose(u1[1], u2[1]), 'solution does not match'
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[1, 4])
-def test_loggingMPI(comm, mpi_ranks):
-    # `mpi_ranks` is a pytest fixture required by pytest-isolate-mpi. Do not remove.
+@pytest.mark.parallel([1, 4])
+def test_loggingMPI():
     import tempfile
     import shutil
+    from mpi4py import MPI
+
+    comm = MPI.COMM_WORLD
 
     tmpdir = tempfile.mkdtemp() if comm.rank == 0 else None
     tmpdir = comm.bcast(tmpdir, root=0)

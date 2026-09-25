@@ -588,9 +588,9 @@ def plot_RBC_solution(setup='resilience'):  # pragma: no cover
         divider = make_axes_locatable(ax)
         caxs += [divider.append_axes('right', size='3%', pad=0.03)]
 
-    from pySDC.projects.Resilience.RBC import RayleighBenard, PROBLEM_PARAMS
+    from pySDC.projects.Resilience.RBC import RayleighBenardReference, PROBLEM_PARAMS
 
-    prob = RayleighBenard(**PROBLEM_PARAMS)
+    prob = RayleighBenardReference(**PROBLEM_PARAMS)
 
     def _plot(t, ax, cax):
         u_hat = prob.u_exact(t)
@@ -705,7 +705,7 @@ def plot_Schroedinger_solution():  # pragma: no cover
 
 
 def plot_AC_solution():  # pragma: no cover
-    from pySDC.projects.Resilience.AC import monitor
+    from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 
     my_setup_mpl()
     if JOURNAL == 'JSC_beamer':
@@ -715,7 +715,7 @@ def plot_AC_solution():  # pragma: no cover
         fig, axs = plt.subplots(1, 2, figsize=figsize_by_journal(JOURNAL, 1.0, 0.45))
 
     description = {'problem_params': {'nvars': (256, 256)}}
-    stats, _, _ = run_AC(Tend=0.032, hook_class=monitor, custom_description=description)
+    stats, _, _ = run_AC(Tend=0.032, hook_class=AllenCahnMonitor, custom_description=description)
 
     u = get_sorted(stats, type='u')
 

@@ -1,6 +1,3 @@
-import subprocess
-import os
-
 import numpy as np
 from mpi4py import MPI
 
@@ -10,7 +7,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
-from pySDC.playgrounds.Allen_Cahn.AllenCahn_monitor import monitor
+from pySDC.implementations.hooks.AllenCahn_monitor import AllenCahnMonitor
 from pySDC.implementations.transfer_classes.BaseTransferMPI import base_transfer_MPI
 from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI
 
@@ -40,7 +37,6 @@ def run_variant(variant=None):
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 2
 
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 100
@@ -56,7 +52,7 @@ def run_variant(variant=None):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = monitor
+    controller_params['hook_class'] = AllenCahnMonitor
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -148,10 +144,12 @@ def run_variant(variant=None):
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         print(out)
 
-        print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
+        newton_iters = P.work_counters['newton'].niter
+        lin_iters = P.work_counters['linear'].niter
+        print('   Iteration count (nonlinear/linear): %i / %i' % (newton_iters, lin_iters))
         print(
             '   Mean Iteration count per call: %4.2f / %4.2f'
-            % (P.newton_itercount / max(P.newton_ncalls, 1), P.lin_itercount / max(P.lin_ncalls, 1))
+            % (newton_iters / max(P.newton_ncalls, 1), lin_iters / max(P.lin_ncalls, 1))
         )
 
         timing = get_sorted(stats, type='timing_run', sortby='time')
@@ -163,41 +161,19 @@ def run_variant(variant=None):
 
 def main():
     """
-    Main driver
+    Main driver: the serial variants.
 
+    The parallel variants need a 3-rank job, so they are not run from here. Use
+
+        mpirun -np 3 python -c "from pySDC.projects.parallelSDC.AllenCahn_parallel import run_variant as r; r('sl_parallel')"
+
+    or let the test do it -- `tests/test_AllenCahn_parallel.py` runs them through mpi-pytest.
     """
 
     run_variant(variant='sl_serial')
     print()
     run_variant(variant='ml_serial')
     print()
-
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-    cmd = (
-        "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "
-        "run_variant(\'sl_parallel\');\""
-    )
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
-    p.wait()
-    for line in p.stdout:
-        print(line)
-    for line in p.stderr:
-        print(line)
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % (p.returncode)
-
-    cmd = (
-        "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "
-        "run_variant(\'ml_parallel\');\""
-    )
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
-    p.wait()
-    for line in p.stdout:
-        print(line)
-    for line in p.stderr:
-        print(line)
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % (p.returncode)
 
 
 if __name__ == "__main__":

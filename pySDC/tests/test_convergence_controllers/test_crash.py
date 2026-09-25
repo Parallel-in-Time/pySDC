@@ -145,32 +145,11 @@ def test_stop_at_nan():
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('mode', ['0 1', '1 0'])
-def test_stop_at_nan_MPI(mode):
-    import subprocess
-    import os
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {3} python {__file__} {mode}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, 3)
-
-
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) > 1:
-        kwargs = {
-            'MPIsweeper': bool(int(sys.argv[1])),
-            'MPIcontroller': bool(int(sys.argv[2])),
-        }
-        single_test(**kwargs)
-    else:
-        single_test()
+@pytest.mark.parallel(3)
+@pytest.mark.parametrize('MPIsweeper, MPIcontroller', [(False, True), (True, False)])
+def test_stop_at_nan_MPI(MPIsweeper, MPIcontroller):
+    """
+    The NaN is written on one rank but detected collectively, and the resulting `ConvergenceError`
+    is caught here, so this needs no isolation despite the name.
+    """
+    single_test(MPIsweeper=MPIsweeper, MPIcontroller=MPIcontroller)

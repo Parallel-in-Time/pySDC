@@ -1,6 +1,8 @@
 import numpy as np
 from mpi4py import MPI
-from mpi4py_fft import PFFT, newDistArray
+from mpi4py_fft import newDistArray
+
+from pySDC.helpers.fft_helper import PFFT
 
 from pySDC.core.errors import ProblemError
 from pySDC.core.problem import Problem, WorkCounter
@@ -48,19 +50,18 @@ class IMEX_Laplacian_MPIFFT(Problem):
     fft_backend = 'fftw'
     fft_comm_backend = 'MPI'
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """switch to GPU modules"""
         import cupy as cp
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
-        cls.xp = cp
+        self.xp = cp
 
-        cls.dtype_u = cupy_mesh
-        cls.dtype_f = imex_cupy_mesh
+        self.dtype_u = cupy_mesh
+        self.dtype_f = imex_cupy_mesh
 
-        cls.fft_backend = 'cupy'
-        cls.fft_comm_backend = 'NCCL'
+        self.fft_backend = 'cupy'
+        self.fft_comm_backend = 'NCCL'
 
     def __init__(
         self, nvars=None, spectral=False, L=2 * np.pi, alpha=1.0, comm=MPI.COMM_WORLD, dtype='d', useGPU=False, x0=0.0

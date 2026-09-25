@@ -53,131 +53,6 @@ def cache(func):
     return wrapper
 
 
-class vkFFT(object):
-    """
-    pyVkFFT FFT backend.
-    The special feature of vkFFT is fast DCT on GPU with cached plans.
-    """
-
-    cached_plans = {}
-
-    @staticmethod
-    def is_complex(x):
-        return 'complex' in str(x.dtype)
-
-    @staticmethod
-    def get_plan(transform_type, shape, dtype, axes, norm):
-        from pyvkfft.cuda import VkFFTApp
-
-        assert norm == 'backward'
-
-        key = f'{transform_type=}, {shape=}, {dtype=}, {axes=}, {norm=}'
-
-        if key not in vkFFT.cached_plans.keys():
-
-            kwargs = {}
-
-            if transform_type == 'dct':
-                kwargs['dct'] = 2
-
-            vkFFT.cached_plans[key] = VkFFTApp(shape, dtype, len(axes), axes=axes, norm=norm, **kwargs)
-
-            logger = logging.getLogger(name='VkFFT')
-            logger.debug(f'Cached plan for VkFFT: {key}')
-        return vkFFT.cached_plans[key]
-
-    @staticmethod
-    def fftn(x, s=None, axes=None, norm='backward', overwrite_x=False):
-        assert not overwrite_x  # for consistent interface with scipy
-        assert norm == 'backward'  # for consistent interface with scipy
-        plan = vkFFT.get_plan(
-            transform_type='fft',
-            shape=x.shape,
-            dtype=x.dtype,
-            axes=axes,
-            norm=norm,
-        )
-        _x = x.copy() + 0j  # cast to complex
-        plan.fft(_x)
-        return _x
-
-    @staticmethod
-    def ifftn(x, s=None, axes=None, norm='forward', overwrite_x=False):
-        assert norm == 'forward'
-        assert not overwrite_x  # for consistent interface with scipy
-
-        norm = 'backward'
-        plan = vkFFT.get_plan(
-            transform_type='fft',
-            shape=x.shape,
-            dtype=x.dtype,
-            axes=axes,
-            norm=norm,
-        )
-        _x = x.copy() + 0j  # promote to complex
-        plan.ifft(_x)
-        return _x * sum(x.shape[i] for i in axes)
-
-    @staticmethod
-    def dctn(x, type=2, s=None, axes=None, norm=None, overwrite_x=False):
-        assert type == 2  # for consistent interface with scipy
-        assert not overwrite_x  # for consistent interface with scipy
-
-        is_complex = vkFFT.is_complex(x)
-
-        dtype = x.dtype if not is_complex else x.real.dtype
-
-        plan = vkFFT.get_plan(
-            transform_type='dct',
-            shape=x.shape,
-            dtype=dtype,
-            axes=axes,
-            norm=norm,
-        )
-
-        if is_complex:
-            x_real = x.real.copy()
-            x_imag = x.imag.copy()
-
-            plan.fft(x_real)
-            plan.fft(x_imag)
-
-            return x_real + 1j * x_imag
-        else:
-            _x = x.copy()
-            plan.fft(x)
-            return x
-
-    @staticmethod
-    def idctn(x, type=2, s=None, axes=None, norm=None, overwrite_x=False):
-        assert type == 2  # for consistent interface with scipy
-        assert not overwrite_x  # for consistent interface with scipy
-
-        is_complex = vkFFT.is_complex(x)
-        dtype = x.dtype if not is_complex else x.real.dtype
-
-        plan = vkFFT.get_plan(
-            transform_type='dct',
-            shape=x.shape,
-            dtype=dtype,
-            axes=axes,
-            norm=norm,
-        )
-
-        if is_complex:
-            x_real = x.real.copy()
-            x_imag = x.imag.copy()
-
-            plan.ifft(x_real)
-            plan.ifft(x_imag)
-
-            return x_real + 1j * x_imag
-        else:
-            _x = x.copy()
-            plan.ifft(x)
-            return x
-
-
 class SpectralHelper1D:
     """
     Abstract base class for 1D spectral discretizations. Defines a common interface with parameters and functions that
@@ -229,8 +104,7 @@ class SpectralHelper1D:
         if useGPU and useFFTW:
             raise ValueError('Please run either on GPUs or with FFTW, not both!')
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """switch to GPU modules"""
         import cupy as cp
         import cupyx.scipy.sparse as sparse_lib
@@ -238,10 +112,10 @@ class SpectralHelper1D:
         import cupyx.scipy.fft as fft_lib
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
-        cls.xp = cp
-        cls.sparse_lib = sparse_lib
-        cls.linalg = linalg
-        cls.fft_lib = fft_lib
+        self.xp = cp
+        self.sparse_lib = sparse_lib
+        self.linalg = linalg
+        self.fft_lib = fft_lib
 
     @classmethod
     def setup_CPU(cls, useFFTW=False):
@@ -1087,8 +961,7 @@ class SpectralHelper:
     fft_backend = 'scipy'
     fft_comm_backend = 'MPI'
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """switch to GPU modules"""
         import cupy as cp
         import cupyx.scipy.sparse as sparse_lib
@@ -1096,15 +969,15 @@ class SpectralHelper:
         import cupyx.scipy.fft as fft_lib
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 
-        cls.xp = cp
-        cls.sparse_lib = sparse_lib
-        cls.linalg = linalg
+        self.xp = cp
+        self.sparse_lib = sparse_lib
+        self.linalg = linalg
 
-        cls.fft_lib = fft_lib
-        cls.fft_backend = 'cupyx-scipy'
-        cls.fft_comm_backend = 'NCCL'
+        self.fft_lib = fft_lib
+        self.fft_backend = 'cupyx-scipy'
+        self.fft_comm_backend = 'NCCL'
 
-        cls.dtype = cupy_mesh
+        self.dtype = cupy_mesh
 
     @classmethod
     def setup_CPU(cls, useFFTW=False):
@@ -1644,7 +1517,9 @@ class SpectralHelper:
     def get_pfft(self, axes=None, padding=None, grid=None):
         if self.ndim == 1 or self.comm is None:
             return None
-        from mpi4py_fft import PFFT, newDistArray
+        from mpi4py_fft import newDistArray
+
+        from pySDC.helpers.fft_helper import PFFT
 
         axes = tuple(i for i in range(self.ndim)) if axes is None else axes
         padding = list(padding if padding else [1.0 for _ in range(self.ndim)])
@@ -1719,7 +1594,7 @@ class SpectralHelper:
                     self.fft_cache[key] = None
             else:
                 if direction == 'object':
-                    from mpi4py_fft import PFFT
+                    from pySDC.helpers.fft_helper import PFFT
 
                     _fft = PFFT(
                         comm=self.comm,

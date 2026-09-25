@@ -130,29 +130,6 @@ def test_entry_class():
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 def test_entry_class_MPI():
-    import os
-    import subprocess
-
-    num_procs = 4
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {num_procs} python {__file__}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_procs,
-    )
-
-
-if __name__ == "__main__":
-    import sys
-
     win_space_race(True)

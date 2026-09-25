@@ -3,7 +3,7 @@ import logging
 from qmat.qcoeff.butcher import RK_SCHEMES
 
 from pySDC.core.sweeper import Sweeper, _Pars
-from pySDC.core.errors import ParameterError
+from pySDC.core.errors import ParameterError, ProblemError
 from pySDC.core.level import Level
 
 
@@ -246,6 +246,12 @@ class RungeKutta(Sweeper):
 
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
+
+        # `solve_system` of a split problem only inverts the implicit part, so an implicit stage would drop the rest
+        if self.coll.implicit and prob.dtype_f.__name__.lower().startswith('imex'):
+            raise ProblemError(
+                f'{type(self).__name__} has implicit stages, but {type(prob).__name__} splits its right hand side. Use an IMEX Runge-Kutta scheme, such as ARK548L2SA, instead.'
+            )
 
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)

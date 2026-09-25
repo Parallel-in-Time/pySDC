@@ -9,6 +9,17 @@ class NCCLComm(object):
     Wraps an MPI communicator and performs some calls to NCCL functions instead.
     """
 
+    #: One NCCL communicator per MPI communicator, keyed by the MPI handle.
+    #:
+    #: Creating one costs about 17 MB of device memory that is never released: NCCL has no
+    #: reference counting, and destroying a communicator is itself collective, so a `__del__`
+    #: would have ranks tearing them down whenever their garbage collectors happened to run --
+    #: in different orders, which deadlocks. Making them once and sharing them avoids both.
+    #:
+    #: The MPI communicator is kept alongside so it cannot be freed and have its handle reused
+    #: for a different one, which would hand out the wrong NCCL communicator.
+    _communicators = {}
+
     def __init__(self, comm):
         """
         Args:
@@ -16,8 +27,15 @@ class NCCLComm(object):
         """
         self.commMPI = comm
 
-        uid = comm.bcast(nccl.get_unique_id(), root=0)
-        self.commNCCL = nccl.NcclCommunicator(comm.size, uid, comm.rank)
+        # `py2f` rather than the communicator itself: mpi4py defines `__eq__` without `__hash__`,
+        # so a communicator cannot be a dictionary key, and the handle is the same for any two
+        # Python wrappers around one communicator.
+        key = comm.py2f()
+        if key not in NCCLComm._communicators:
+            uid = comm.bcast(nccl.get_unique_id(), root=0)
+            NCCLComm._communicators[key] = (comm, nccl.NcclCommunicator(comm.size, uid, comm.rank))
+
+        self.commNCCL = NCCLComm._communicators[key][1]
 
     def __getattr__(self, name):
         """
@@ -133,6 +151,33 @@ class NCCLComm(object):
         stream = cp.cuda.get_current_stream()
 
         self.commNCCL.bcast(buff=buf.data.ptr, count=count, datatype=dtype, root=root, stream=stream.ptr)
+
+    def Send(self, buf, dest, tag=0):
+        """
+        Send a buffer to another rank through NCCL.
+
+        NCCL has no tags: a send is matched to whichever receive the destination posts next for
+        this pair of ranks. That is fine when one message is in flight at a time, and wrong when
+        several are, which is why the non-blocking `Issend`/`Irecv` that pySDC's time-parallel
+        controller uses are left to fall through to MPI, where tags mean what they say.
+        """
+        if not hasattr(buf.data, 'ptr'):
+            return self.commMPI.Send(buf, dest=dest, tag=tag)
+
+        stream = cp.cuda.get_current_stream()
+        self.commNCCL.send(buf.data.ptr, self.get_count(buf), self.get_dtype(buf), dest, stream.ptr)
+        stream.synchronize()
+
+    def Recv(self, buf, source, tag=0):
+        """
+        Receive a buffer from another rank through NCCL. See `Send` on the absence of tags.
+        """
+        if not hasattr(buf.data, 'ptr'):
+            return self.commMPI.Recv(buf, source=source, tag=tag)
+
+        stream = cp.cuda.get_current_stream()
+        self.commNCCL.recv(buf.data.ptr, self.get_count(buf), self.get_dtype(buf), source, stream.ptr)
+        stream.synchronize()
 
     def Barrier(self):
         cp.cuda.get_current_stream().synchronize()

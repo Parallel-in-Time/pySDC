@@ -1,4 +1,4 @@
-import numpy as np
+from scipy.signal import resample
 
 from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
@@ -57,12 +57,10 @@ class mesh_to_mesh_fft(SpaceTransfer):
         F = type(G)(self.fine_prob.init, val=0.0)
 
         def _prolong(coarse):
-            coarse_hat = np.fft.rfft(coarse)
-            fine_hat = np.zeros(self.fine_prob.init[0] // 2 + 1, dtype=np.complex128)
-            half_idx = self.coarse_prob.init[0] // 2
-            fine_hat[0:half_idx] = coarse_hat[0:half_idx]
-            fine_hat[-1] = coarse_hat[-1]
-            return np.fft.irfft(fine_hat) * self.ratio
+            # Fourier interpolation. `resample` also gets the normalisation and the splitting of the
+            # Nyquist mode right; zero-padding the spectrum by hand placed the coarse Nyquist mode at
+            # the *fine* Nyquist wavenumber, which is a different function entirely.
+            return resample(coarse, self.fine_prob.init[0])
 
         if type(G).__name__ == 'mesh':
             F[:] = _prolong(G)

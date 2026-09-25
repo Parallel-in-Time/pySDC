@@ -130,50 +130,23 @@ def test_adaptive_collocation():
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(3)
 def test_adaptive_collocation_MPI():
-    import subprocess
-    import os
-
-    num_nodes = 3
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {num_nodes} python {__file__} MPI".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_nodes,
-    )
+    single_test(useMPI=True)
 
 
-if __name__ == "__main__":
-    import sys
-
-    kwargs = {}
-    if len(sys.argv) > 1:
-        kwargs = {
-            'useMPI': True,
-        }
-    single_test(**kwargs)
-
-
-def run_block(num_procs, num_nodes=[2, 3]):
+def run_block(num_procs, num_nodes=None):
     """
     Run one block of `num_procs` steps and report the collocation method each step ended on.
 
     Args:
         num_procs (int): number of steps in the block
-        num_nodes (list): the collocation methods to walk through
+        num_nodes (list): the collocation methods to walk through, [2, 3] if not given
 
     Returns:
         list: number of nodes each step finished with
     """
+    num_nodes = [2, 3] if num_nodes is None else num_nodes
     from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation

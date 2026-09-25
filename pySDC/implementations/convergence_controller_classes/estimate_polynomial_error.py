@@ -93,6 +93,11 @@ class EstimatePolynomialError(ConvergenceController):
             buf = b[0] * 0.0
             for i in range(0, A.shape[0]):
                 index = self.comm.rank + (1 if self.comm.rank < self.params.estimate_on_node - 1 else 0)
+                # `zeros_like` gives a bare array on CuPy, where NumPy would keep the datatype:
+                # CuPy has no `subok`. That is fine here, since this is only a send buffer and
+                # needs a device pointer rather than a datatype. Do not "tidy" it into
+                # `res[0] * 0.0`, which would keep the type but propagate `NaN` -- and `res` is a
+                # residual, so it is `NaN` exactly when a solve has already gone wrong.
                 send_buf = (
                     (A[i, index] * b[index])
                     if self.comm.rank != self.params.estimate_on_node - 1
@@ -102,7 +107,13 @@ class EstimatePolynomialError(ConvergenceController):
                 res[i] += buf
             return res
         else:
-            return A @ xp.asarray(b)
+            # `asarray` stacks the vector into a single array, and CuPy builds that through
+            # `copy`, which asserts -- with no message -- when it is handed back an `ndarray`
+            # subclass instead of the base type. `cupy_mesh.copy` returns `type(self)` on
+            # purpose, so that a copied mesh stays a mesh, which makes every datatype here such a
+            # subclass. NumPy has no such restriction, but dropping the wrapper is right either
+            # way: what this wants is the numbers, not the datatype.
+            return A @ xp.asarray([entry.view(xp.ndarray) for entry in b])
 
     def get_interpolated_solution(self, L, xp):
         """

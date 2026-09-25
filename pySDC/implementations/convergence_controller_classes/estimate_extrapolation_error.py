@@ -387,7 +387,14 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
         """
         u_ex = self.get_extrapolated_solution(S)
         if u_ex is not None:
-            S.levels[0].status.error_extrapolation_estimate = abs(u_ex - S.levels[0].u[-1]) * self.coeff.prefactor
+            difference = u_ex - S.levels[0].u[-1]
+
+            # algebraic components of a DAE have no time derivative to extrapolate
+            diff_mask = getattr(S.levels[0].prob, 'diff_mask', None)
+            if diff_mask is not None and not all(diff_mask):
+                difference = difference[diff_mask]
+
+            S.levels[0].status.error_extrapolation_estimate = abs(difference) * self.coeff.prefactor
         else:
             S.levels[0].status.error_extrapolation_estimate = None
 

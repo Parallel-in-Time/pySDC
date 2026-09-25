@@ -38,6 +38,11 @@ env:
   # tests ask for 3 or 4 ranks and Monodomain's asks for 24. MPICH
   # oversubscribed silently, which is why this only appeared after the swap.
   PRTE_MCA_rmaps_default_mapping_policy: ':oversubscribe'
+  # ...and the OpenMPI 4 spelling of the same thing, which PRRTE superseded. The conda envs resolve
+  # OpenMPI 5 and need the variable above; the Firedrake container ships OpenMPI 4 and needs this
+  # one, which is why `mpiexec -n 3` there failed with "not enough slots available" while the same
+  # command worked everywhere else. Each version ignores the other's variable.
+  OMPI_MCA_rmaps_base_oversubscribe: 'true'
 
 jobs:
 
@@ -107,7 +112,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+          bash etc/run_mpi_tests.sh pySDC/tests "${{ matrix.env }}"
       - name: Make coverage report
         run: |
           coverage combine
@@ -133,6 +138,7 @@ jobs:
           - DAE
           - DeltaSDC
           - FastWaveSlowWave
+          - GPU
           - Hamiltonian
           - matrixPFASST
           - parallelSDC
@@ -170,7 +176,9 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/${{ matrix.env }}/tests
+          # `not cupy`: these runners have no GPU. The GPU project's cupy-marked tests are run
+          # against the NumPy stub in the step below instead; no other project has such a test.
+          bash etc/run_mpi_tests.sh pySDC/projects/${{ matrix.env }}/tests "not cupy"
       - name: Make coverage report
         run: |
           coverage combine
@@ -182,6 +190,50 @@ jobs:
           path: |
             data
             coverage_${{ matrix.env }}.dat
+
+  gpu_hardware_tests:
+    # The `cupy`-marked tests, on an actual GPU rented per job from Modal; see
+    # etc/modal_gpu_tests.py. This is the only job that runs them, so it is the only source of
+    # coverage for `NCCL_communicator.py`, `cupy_mesh.py` and `log_GPU_timings.py`.
+    #
+    # Skipped for a pull request from a fork, which gets no secrets and so cannot reach Modal.
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install the Modal client
+        run: |
+          pip install modal
+      # Secrets are withheld from pull requests opened from a fork, so labelling one of those
+      # would otherwise fail several minutes in with an unhelpful traceback from `modal run`.
+      - name: Check that the Modal credentials are present
+        run: |
+          if [ -z "${{ secrets.MODAL_TOKEN_ID }}" ]; then
+            echo "::error::No Modal credentials. Add MODAL_TOKEN_ID and MODAL_TOKEN_SECRET as" \
+                 "repository secrets, or run 'modal run etc/modal_gpu_tests.py' locally."
+            exit 1
+          fi
+      # This step only rents the GPU: the container runs pytest under coverage and its output is
+      # streamed back here, so the log below is an ordinary pytest log.
+      - name: Run the cupy-marked tests on a T4
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: |
+          modal run etc/modal_gpu_tests.py
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-artifacts-gpu-hardware
+          path: |
+            coverage_GPU_hardware.dat
 
   user_libpressio_tests:
     runs-on: ubuntu-latest
@@ -198,12 +250,14 @@ jobs:
       - name: Install pySDC and pytest
         run: |
           source /pySDC/pySDC/projects/compression/Docker/install_pySDC.sh
+          # the compression tests are collected through mpi-pytest's `parallel` marker
+          pip install "mpi-pytest>=2026.0"
       - name: Run pytest
         run: |
           source /opt/spack/share/spack/setup-env.sh
           spack load libpressio
            
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/compression/tests -m libpressio
+          bash etc/run_mpi_tests.sh pySDC/projects/compression/tests libpressio
       - name: Make coverage report
         run: |
           source /opt/spack/share/spack/setup-env.sh
@@ -255,6 +309,9 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           pip install -e /repositories/pySDC
+          # The Firedrake image ships mpi-pytest for its own suite, but don't depend on that:
+          # the MPI tests here are collected through its `parallel` marker.
+          pip install "mpi-pytest>=2026.0"
           # test installation
           python -c "import pySDC; print(f'pySDC module: {pySDC}')"
       - name: Install gusto
@@ -267,13 +324,20 @@ jobs:
         run: |
           . venv-pySDC/bin/activate
           firedrake-clean
-          cd ./pySDC
-          python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 /repositories/pySDC/pySDC/tests -m firedrake
+          # `cd /repositories/pySDC`, not `./pySDC`: the container mounts the workspace at
+          # /repositories, so those are the same directory reached by two different paths. pySDC is
+          # installed editable from /repositories/pySDC, so that is the prefix its modules report,
+          # and `source = ['pySDC']` only matches when the working directory agrees -- sitting in
+          # ./pySDC is why this job has always measured nothing. `..` is the workspace either way,
+          # so the moves in the next step are unaffected.
+          cd /repositories/pySDC
+          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0" \
+            bash etc/run_mpi_tests.sh /repositories/pySDC/pySDC/tests firedrake
         timeout-minutes: 45
       - name: Make coverage report
         run: |
 
-          cd ./pySDC
+          cd /repositories/pySDC
           mv data ../data_firedrake
           coverage combine
           mv .coverage ../coverage_firedrake.dat
@@ -312,7 +376,7 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          coverage run -m pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/Monodomain/tests -m monodomain
+          bash etc/run_mpi_tests.sh pySDC/projects/Monodomain/tests monodomain
       - name: Make coverage report
         run: |
           mv data data_monodomain
@@ -374,10 +438,16 @@ jobs:
 
   coverage_comment_on_pr:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && !cancelled()
-    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    # On a pull request the action posts the comment. On master it commits the coverage to the
+    # `python-coverage-comment-action-data` branch instead, which is the baseline the comments
+    # compare against: without it, every comment reports no previous coverage and every file as new.
+    if: >-
+      (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
+      && !cancelled()
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux, gpu_hardware_tests]
     permissions:
-      contents: read
+      # write: push the data branch on master. GitHub downgrades it to read for pull requests from forks.
+      contents: write
       pull-requests: write
     defaults:
       run:

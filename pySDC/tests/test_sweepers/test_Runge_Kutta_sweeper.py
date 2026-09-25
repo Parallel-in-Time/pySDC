@@ -94,10 +94,18 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
         'quad_type': 'RADAU-RIGHT',
     }
 
+    if use_RK_sweeper:
+        sweeper_class = get_sweeper(sweeper_name)
+    else:
+        # a subclass rather than patching `generic_implicit` itself, which would leak into every later test
+        sweeper_class = type(
+            'RKcoll', (generic_implicit,), {'compute_end_point': get_sweeper(sweeper_name).compute_end_point}
+        )
+
     description = {
         'level_params': level_params,
         'step_params': step_params,
-        'sweeper_class': get_sweeper(sweeper_name) if use_RK_sweeper else generic_implicit,
+        'sweeper_class': sweeper_class,
         'problem_class': problem_class,
         'sweeper_params': sweeper_params,
         'problem_params': problem_params,
@@ -122,16 +130,11 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
         sweeper = controller.MS[0].levels[0].sweep
         sweeper.QI = rk_sweeper.get_Q_matrix()
         sweeper.coll = rk_sweeper.get_Butcher_tableau()
-        _compute_end_point = type(sweeper).compute_end_point
-        type(sweeper).compute_end_point = rk_sweeper.compute_end_point
         sweeper.is_embedded = lambda: sweeper_name == 'Cash_Karp'
 
     prob = controller.MS[0].levels[0].prob
     ic = prob.u_exact(0)
     u_end, stats = controller.run(ic, 0.0, 5 * dt if Tend is None else Tend)
-
-    if not use_RK_sweeper:
-        type(sweeper).compute_end_point = _compute_end_point
 
     return stats, ic, controller
 
@@ -321,9 +324,44 @@ def test_rhs_evals(sweeper_name, useGPU=False):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize("sweeper_name", ['BackwardEuler', 'ESDIRK53', 'RK4'])
+def test_implicit_scheme_on_split_problem(sweeper_name):
+    """
+    `solve_system` of an IMEX problem only inverts the implicit part, so implicit stages of a non-IMEX scheme would
+    silently drop the explicit part of the right hand side and converge to the wrong solution. Explicit schemes only
+    need the full right hand side and are fine.
+    """
+    from pySDC.core.errors import ProblemError
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex import acoustic_1d_imex
+
+    description = {
+        'problem_class': acoustic_1d_imex,
+        'problem_params': {},
+        'sweeper_class': get_sweeper(sweeper_name),
+        'sweeper_params': {},
+        'level_params': {'dt': 1e-2},
+        'step_params': {'maxiter': 1},
+    }
+    controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+    prob = controller.MS[0].levels[0].prob
+
+    if get_sweeper(sweeper_name).get_Butcher_tableau().implicit:
+        with pytest.raises(ProblemError, match='IMEX'):
+            controller.run(u0=prob.u_exact(0), t0=0, Tend=1e-2)
+    else:
+        controller.run(u0=prob.u_exact(0), t0=0, Tend=1e-2)
+
+
+@pytest.mark.base
 def test_embedded_method():
     """
-    Here, we test if Cash Karp's method gives a hard-coded result and number of restarts when running with adaptivity.
+    Run Cash-Karp's method with adaptivity on van der Pol and check what adaptivity promises: it gets to the end,
+    every accepted step satisfies the tolerance, it has to restart to get there, and it does not waste steps by
+    being overly cautious.
+
+    Measured: 153 steps, 17 restarts, largest accepted estimate 0.92 e_tol, median 0.55 e_tol, and a global error
+    of 1.6e-7 at t=10.
 
     Returns:
         None
@@ -334,13 +372,12 @@ def test_embedded_method():
     from pySDC.helpers.stats_helper import get_sorted
 
     sweeper_name = 'Cash_Karp'
+    e_tol = 1e-7
+    Tend = 10.0
 
     # change only the things in the description that we need for adaptivity
-    adaptivity_params = {}
-    adaptivity_params['e_tol'] = 1e-7
-
     convergence_controllers = {}
-    convergence_controllers[AdaptivityRK] = adaptivity_params
+    convergence_controllers[AdaptivityRK] = {'e_tol': e_tol}
 
     description = {}
     description['convergence_controllers'] = convergence_controllers
@@ -349,12 +386,22 @@ def test_embedded_method():
 
     custom_controller_params = {'logger_level': 40}
 
-    stats, _, _ = run_vdp(description, 1, custom_controller_params=custom_controller_params)
+    stats, controller, crash = run_vdp(description, 1, Tend=Tend, custom_controller_params=custom_controller_params)
+    assert not crash, 'Cash-Karp with adaptivity crashed'
 
-    dt_last = get_sorted(stats, type='dt')[-2][1]
+    u = get_sorted(stats, type='u', recomputed=False)
+    assert u[-1][0] >= Tend - 1e-12, f'Cash-Karp with adaptivity stopped at t={u[-1][0]} instead of {Tend}'
+
+    e_em = np.array([me[1] for me in get_sorted(stats, type='error_embedded_estimate', recomputed=False)])
+    assert len(e_em) == len(u), 'there is not one error estimate for every accepted step'
+    assert max(e_em) < e_tol, f'Cash-Karp accepted a step with error estimate {max(e_em):.2e} > e_tol={e_tol:.2e}'
+    assert np.median(e_em) > 0.2 * e_tol, f'adaptivity is too cautious: median estimate {np.median(e_em):.2e}'
+
     restarts = sum([me[1] for me in get_sorted(stats, type='restart')])
-    assert np.isclose(dt_last, 0.14175080252629996), "Cash-Karp has computed a different last step size than before!"
-    assert restarts == 17, "Cash-Karp has restarted a different number of times than before"
+    assert restarts > 0, 'Cash-Karp with adaptivity never had to restart, so the rejection was not tested'
+
+    e_global = abs(u[-1][1] - controller.MS[0].levels[0].prob.u_exact(u[-1][0]))
+    assert e_global < 10 * e_tol, f'global error {e_global:.2e} is not controlled by e_tol={e_tol:.2e}'
 
 
 @pytest.mark.base

@@ -37,16 +37,19 @@ Part C: MPI parallelization
 Since PFASST is actually a parallel algorithm, executing it in parallel e.g. using MPI might be an interesting exercise.
 To do this, pySDC comes with the MPI-parallelized controller, namely ``controller_MPI``.
 It is supposed to yield the same results as the non-MPI counterpart and this is what we are demonstrating here (at least for one particular example).
-The actual code of this part is rather short, since the only task is to call another snippet (``playground_parallelization.py``) with different number of parallel processes.
-This is realized using Python's ``subprocess`` library and we check at the end if each call returned normally.
-Now, the snippet called by the example is basically the same code as used by Parts A and B.
+The code is the same as in Parts A and B -- it imports ``set_parameters`` from Part A so that all runs use the same parameters -- with ``controller_MPI`` in place of the non-MPI controller.
+
+Run it as you would run any MPI program, with one rank per parallel step::
+
+    mpirun -np 4 python C_MPI_parallelization.py
+
+The number of parallel steps is simply the size of ``MPI.COMM_WORLD``, so there is nothing to configure: run it on 4 ranks for 4 parallel steps, on 3 for 3, and so on.
 We can use the results of Parts A and B to compare with and we expect the same number of iterations, the same accuracy and the same difference between the two flavors as in Part A (up to machine precision).
 
 Important things to note:
 
-- The additional Python script ``playground_parallelization.py`` contains the code to run the MPI-parallel controller. To this end, we import the routine ``set_parameters`` from Part A to ensure that we use the same set of parameters for all runs.
-- This example also shows how the statistics of multiple MPI processes can be gathered and processed by rank 0, see ``playground_parallelization.py``.
+- This example also shows how the statistics of multiple MPI processes can be gathered and processed by rank 0.
 - The controller needs a working installation of ``mpi4py``. Since this is not always easy to achieve and since debugging a parallel program can cause a lot of headaches, the non-MPI controller performs the same operations in serial.
-- The somewhat weird notation with the current working directory ``cwd`` is due to the corresponding test, which, run by nosetests, has a different working directory than the tutorial.
+- The test that covers this part runs the same file on 1, 2, 3, 4, 5, 7, 8 and 9 ranks through `mpi-pytest <https://github.com/firedrakeproject/mpi-pytest>`_, which is also how the rest of pySDC's MPI tests are run.
 
 .. include:: doc_step_6_C.rst

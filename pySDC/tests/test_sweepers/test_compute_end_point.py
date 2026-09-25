@@ -60,34 +60,8 @@ def test_compute_end_point_generic_implicit(num_nodes):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize("num_nodes", [2, 3])
-def test_compute_end_point_generic_implicit_MPI(num_nodes):
-    import subprocess
-    import os
+@pytest.mark.parallel([2, 3])
+def test_compute_end_point_generic_implicit_MPI():
+    from mpi4py import MPI
 
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {num_nodes} python {__file__} MPI {num_nodes}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_nodes,
-    )
-
-
-if __name__ == "__main__":
-    import sys
-
-    kwargs = {}
-    if len(sys.argv) > 1:
-        kwargs = {
-            'useMPI': bool(sys.argv[1]),
-            'num_nodes': int(sys.argv[2]),
-        }
-    compute_end_point_generic_implicit(**kwargs)
+    compute_end_point_generic_implicit(MPI.COMM_WORLD.size, True)

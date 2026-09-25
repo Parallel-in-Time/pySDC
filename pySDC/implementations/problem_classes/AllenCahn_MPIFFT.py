@@ -7,7 +7,8 @@ from mpi4py_fft import newDistArray
 
 class allencahn_imex(IMEX_Laplacian_MPIFFT):
     r"""
-    Example implementing the :math:`2`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
+    Example implementing the :math:`2`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
         \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
@@ -17,7 +18,8 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
     conditions can be used, for example, circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right),
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
     *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) and the nonlinear part in the right-hand
@@ -69,6 +71,7 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         **kwargs,
     ):
         kwargs['L'] = kwargs.get('L', 1.0)
+        kwargs['x0'] = kwargs.get('x0', -kwargs['L'] / 2.0)
         super().__init__(alpha=1.0, dtype=np.dtype('float'), **kwargs)
         self._makeAttributeAndRegister('eps', 'radius', 'dw', 'init_type', localVars=locals(), readOnly=True)
 
@@ -98,8 +101,6 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         f.impl[:] = self._eval_Laplacian(u, f.impl)
 
         if self.spectral:
-            f.impl = -self.K2 * u
-
             if self.eps > 0:
                 tmp = self.fft.backward(u)
                 tmp[:] = self._eval_explicit_part(tmp, t, tmp)
@@ -131,7 +132,7 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.init_type == 'circle':
-            r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
+            r2 = self.X[0] ** 2 + self.X[1] ** 2
             if self.spectral:
                 tmp = 0.5 * (1.0 + self.xp.tanh((self.radius - self.xp.sqrt(r2)) / (np.sqrt(2) * self.eps)))
                 me[:] = self.fft.forward(tmp)
@@ -151,7 +152,7 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
                 for i in range(0, L):
                     for j in range(0, L):
                         # build radius
-                        r2 = (self.X[0] + i - L + 0.5) ** 2 + (self.X[1] + j - L + 0.5) ** 2
+                        r2 = (self.X[0] + i - L / 2 + 0.5) ** 2 + (self.X[1] + j - L / 2 + 0.5) ** 2
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
                         tmp += self.xp.tanh((rand_radii[i, j] - self.xp.sqrt(r2)) / (np.sqrt(2) * self.eps)) + 1
             else:
@@ -171,7 +172,8 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
 
 class allencahn_imex_timeforcing(allencahn_imex):
     r"""
-    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions :math:`u \in [0, 1]^2`
+    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
+    phases at :math:`u = 0` and :math:`u = 1`
     using time-dependent forcing
 
     .. math::
@@ -182,7 +184,8 @@ class allencahn_imex_timeforcing(allencahn_imex):
     conditions can be used, for example, circles of the form
 
     .. math::
-        u({\bf x}, 0) = \tanh\left(\frac{r - \sqrt{(x_i-0.5)^2 + (y_j-0.5)^2}}{\sqrt{2}\varepsilon}\right),
+        u({\bf x}, 0) = \frac{1}{2}\left(1 + \tanh\left(\frac{r - \sqrt{x_i^2 + y_j^2}}
+        {\sqrt{2}\varepsilon}\right)\right),
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
     *semi-implicitly*, i.e., the linear part is solved with Fast-Fourier Transform (FFT) using ``mpi4py-fft`` [1]_ and the nonlinear part in the right-hand

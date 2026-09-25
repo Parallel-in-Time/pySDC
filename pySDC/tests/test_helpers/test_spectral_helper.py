@@ -41,7 +41,7 @@ def test_integration_matrix2D(nx, nz, axes, useMPI=False, **kwargs):
     S_u_hat = (conv @ S @ u_hat.flatten()).reshape(u_hat.shape)
     S_u = helper.itransform(S_u_hat, axes=(-1, -2))
 
-    assert np.allclose(S_u, expect, atol=1e-12)
+    assert np.allclose(S_u, expect, rtol=0, atol=1e-12)
 
 
 @pytest.mark.mpi4py
@@ -50,10 +50,17 @@ def test_integration_matrix2D(nx, nz, axes, useMPI=False, **kwargs):
 @pytest.mark.parametrize('axes', [(-2,), (-1,), (-2, -1)])
 @pytest.mark.parametrize('bx', ['cheby', 'fft'])
 @pytest.mark.parametrize('bz', ['cheby', 'fft'])
-def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, **kwargs):
+def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, useMPI=False, **kwargs):
     from pySDC.helpers.spectral_helper import SpectralHelper
 
-    helper = SpectralHelper(debug=True, useGPU=useGPU)
+    if useMPI:
+        from mpi4py import MPI
+
+        comm = MPI.COMM_WORLD
+    else:
+        comm = None
+
+    helper = SpectralHelper(comm=comm, debug=True, useGPU=useGPU)
     helper.add_axis(base=bx, N=nx)
     helper.add_axis(base=bz, N=nz)
     helper.setup_fft()
@@ -96,7 +103,13 @@ def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, **kwargs):
     D_u_hat = (conv @ D @ u_hat.flatten()).reshape(u_hat.shape)
     D_u = helper.itransform(D_u_hat).real
 
-    assert np.allclose(D_u, expect, atol=1e-10)
+    assert np.allclose(D_u, expect, rtol=0, atol=1e-10)
+
+    if useMPI and comm.size > 1:
+        # a run that is distributed in name only proves nothing, so count the split axes in real
+        # space, where the global shape is known
+        split_axes = sum(local < size for local, size in zip(u.shape[1:], (nx, nz), strict=True))
+        assert split_axes >= 1, 'Not distributed'
 
 
 @pytest.mark.cupy
@@ -105,6 +118,22 @@ def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, **kwargs):
 @pytest.mark.parametrize('bz', ['cheby', 'fft'])
 def test_differentiation_matrix2D_GPU(bx, bz, axes):
     test_differentiation_matrix2D(32, 16, bx=bx, bz=bz, axes=axes, useGPU=True)
+
+
+@pytest.mark.cupy
+@pytest.mark.parallel(2)
+@pytest.mark.parametrize('axes', [(-1,), (-1, -2)])
+def test_differentiation_matrix2D_GPU_MPI(axes):
+    """A distributed transform on GPUs, which nothing else in the suite covers.
+
+    Every other GPU test runs on one rank, where mpi4py-fft never redistributes, and every
+    distributed transform test runs on CPUs. This is the crossing of the two: `DistArrayCuPy`,
+    which the fork exists for, and `NCCLTransfer`, which moves the pencils between ranks with
+    NCCL send/recv on device pointers. MPI carries only the NCCL unique id at setup, so this
+    path does not depend on MPI being CUDA-aware -- the time-parallel controller does, and
+    `test_controller_MPI_GPU.py` covers that.
+    """
+    test_differentiation_matrix2D(32, 16, bx='fft', bz='cheby', axes=axes, useGPU=True, useMPI=True)
 
 
 @pytest.mark.base
@@ -131,7 +160,7 @@ def test_identity_matrix2D(nx, nz, bx, **kwargs):
     I_u_hat = (conv @ I @ u_hat.flatten()).reshape(u_hat.shape)
     I_u = helper.itransform(I_u_hat, axes=(-1, -2))
 
-    assert np.allclose(I_u, u, atol=1e-12)
+    assert np.allclose(I_u, u, rtol=0, atol=1e-12)
 
 
 @pytest.mark.base
@@ -322,7 +351,7 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
     if nz > 0:
         helper.add_axis(base=bz, N=nz)
     elif -3 in axes:
-        return None
+        pytest.skip('Cannot transform along axis -3 in 2D')
 
     helper.setup_fft()
     u = helper.u_init
@@ -363,13 +392,6 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
             *helper.local_slice(True),
         )
     ]
-    if expect_local.shape != trf.shape:
-        expect_local = expect_trf[
-            (
-                ...,
-                *helper.local_slice(True),
-            )
-        ]
 
     assert np.allclose(expect_local, trf), 'Forward transform is unexpected'
     assert np.allclose(
@@ -391,7 +413,7 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[1, 2])
+@pytest.mark.parallel([1, 2])
 @pytest.mark.parametrize('nx', [4, 8])
 @pytest.mark.parametrize('ny', [4, 8])
 @pytest.mark.parametrize('nz', [0, 8])
@@ -410,49 +432,27 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
 @pytest.mark.parametrize('bz', ['fft', 'cheby'])
 @pytest.mark.parametrize('axes', [(-1,), (-1, -2), (-2, -1, -3)])
 @pytest.mark.parametrize('padding', [1, 1.5])
-def test_transform_MPI(mpi_ranks, nx, ny, nz, bx, by, bz, axes, padding, **kwargs):
+def test_transform_MPI(nx, ny, nz, bx, by, bz, axes, padding, **kwargs):
     test_transform(nx=nx, ny=ny, nz=nz, bx=bx, by=by, bz=bz, axes=axes, padding=padding, useMPI=True, **kwargs)
 
 
-def run_MPI_test(num_procs, **kwargs):
-    import os
-    import subprocess
-
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    cmd = f"mpirun -np {num_procs} python {__file__}"
-
-    for key, value in kwargs.items():
-        cmd += f' --{key}={value}'
-    p = subprocess.Popen(cmd.split(), env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_procs,
-    )
-
-
 @pytest.mark.mpi4py
+@pytest.mark.parallel([1, 2])
 @pytest.mark.parametrize('nx', [8])
 @pytest.mark.parametrize('nz', [16])
 @pytest.mark.parametrize('bx', ['fft'])
-@pytest.mark.parametrize('num_procs', [2, 1])
-@pytest.mark.parametrize('axes', ["-1", "-1,-2"])
-def test_differentiation_MPI(nx, nz, bx, num_procs, axes):
-    run_MPI_test(num_procs=num_procs, test='diff', nx=nx, nz=nz, bx=bx, bz='cheby', axes=axes)
+@pytest.mark.parametrize('axes', [(-1,), (-1, -2)])
+def test_differentiation_MPI(nx, nz, bx, axes):
+    test_differentiation_matrix2D(nx=nx, nz=nz, bx=bx, bz='cheby', axes=axes, useMPI=True)
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel([1, 2])
 @pytest.mark.parametrize('nx', [8])
 @pytest.mark.parametrize('nz', [16])
-@pytest.mark.parametrize('num_procs', [2, 1])
-@pytest.mark.parametrize('axes', ["-1", "-1,-2"])
-def test_integration_MPI(nx, nz, num_procs, axes):
-    run_MPI_test(num_procs=num_procs, test='int', nx=nx, nz=nz, axes=axes)
+@pytest.mark.parametrize('axes', [(-1,), (-1, -2)])
+def test_integration_MPI(nx, nz, axes):
+    test_integration_matrix2D(nx=nx, nz=nz, axes=axes, useMPI=True)
 
 
 @pytest.mark.base
@@ -619,22 +619,21 @@ def test_tau_method2D(nz, nx, bc_val, bc=-1, plotting=False, useMPI=False, **kwa
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[2])
+@pytest.mark.parallel([2])
 @pytest.mark.parametrize('nx', [4, 8])
 @pytest.mark.parametrize('nz', [4, 8])
 @pytest.mark.parametrize('bc_val', [-2])
-@pytest.mark.parametrize('num_procs', [2, 1])
-def test_tau_method2D_MPI(mpi_ranks, nz, nx, bc_val, num_procs, **kwargs):
-    test_tau_method2D(nz=nz, nx=nx, bc_val=bc_val, num_procs=num_procs, test='tau', useMPI=True)
+def test_tau_method2D_MPI(nz, nx, bc_val, **kwargs):
+    test_tau_method2D(nz=nz, nx=nx, bc_val=bc_val, test='tau', useMPI=True)
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_procs', [1])
+@pytest.mark.parallel(1)
 @pytest.mark.parametrize('axis', [-1, -2])
 @pytest.mark.parametrize('bx', ['fft'])
 @pytest.mark.parametrize('bz', ['cheby'])
-def test_dealias_MPI(num_procs, axis, bx, bz, nx=32, nz=64, **kwargs):
-    run_MPI_test(num_procs=num_procs, axis=axis, nx=nx, nz=nz, bx=bx, bz=bz, test='dealias')
+def test_dealias_MPI(axis, bx, bz, nx=32, nz=64, **kwargs):
+    _test_transform_dealias(axis=axis, nx=nx, nz=nz, bx=bx, bz=bz, useMPI=True)
 
 
 @pytest.mark.base
@@ -663,9 +662,7 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
 
     X, Y, Z = helper.get_grid()
 
-    if bz == 'cheby' and p > 1:
-        return None
-    elif bz == 'ultraspherical' and -1 in axes:
+    if bz == 'ultraspherical' and -1 in axes:
         conv = helper.get_basis_change_matrix(p_out=0, p_in=p)
     else:
         conv = helper.get_basis_change_matrix()
@@ -725,21 +722,23 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
     assert np.isclose(error, 0, atol=6e-8), f'Got {error=:.2e}'
 
     if useMPI:
+        # which axes are split depends on the bases, so count them, in real space where the global shape is known
+        split_axes = sum(local < size for local, size in zip(u.shape[1:], (nx, ny, nz), strict=True))
         if comm.size == 2:
-            assert u_hat.shape[1] < nx or u_hat.shape[2] < ny, 'Not distributed'
+            assert split_axes >= 1, 'Not distributed'
         elif comm.size > 2:
-            assert u_hat.shape[1] < nx and u_hat.shape[2] < ny, 'Not distributed in pencils'
+            assert split_axes >= 2, 'Not distributed in pencils'
 
 
 @pytest.mark.mpi4py
-@pytest.mark.mpi(ranks=[2, 4])
+@pytest.mark.parallel([2, 4])
 @pytest.mark.parametrize('nx', [8])
 @pytest.mark.parametrize('ny', [16])
 @pytest.mark.parametrize('nz', [32])
 @pytest.mark.parametrize('bz', ['fft', 'cheby', 'ultraspherical'])
 @pytest.mark.parametrize('axes', [(-1,), (-2,), (-3,), (-1, -2), (-2, -3), (-1, -3), (-1, -2, -3)])
-def test_differentiation_matrix3DMPI(mpi_ranks, nx, ny, nz, bz, axes, useMPI=True, **kwargs):
-    test_differentiation_matrix3D(nx, ny, nz, bz, axes, p=1, **kwargs)
+def test_differentiation_matrix3DMPI(nx, ny, nz, bz, axes, useMPI=True, **kwargs):
+    test_differentiation_matrix3D(nx, ny, nz, bz, axes, p=1, useMPI=useMPI, **kwargs)
 
 
 @pytest.mark.base
@@ -779,7 +778,7 @@ def test_identity_matrix_ND(nx, ny, nz, bx, useMPI=False, **kwargs):
     I_u_hat = (conv @ I @ u_hat.flatten()).reshape(u_hat.shape)
     I_u = helper.itransform(I_u_hat, axes=(-1, -2))
 
-    assert np.allclose(I_u, u, atol=1e-12)
+    assert np.allclose(I_u, u, rtol=0, atol=1e-12)
 
 
 @pytest.mark.base
@@ -837,50 +836,3 @@ def test_cache_memory_leaks():
         function()
 
     assert track[0] == 0, "possible memory leak with the @cache"
-
-
-if __name__ == '__main__':
-    str_to_bool = lambda me: False if me == 'False' else True
-    str_to_tuple = lambda arg: tuple(int(me) for me in arg.split(','))
-
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--nx', type=int, help='Dof in x direction')
-    parser.add_argument('--nz', type=int, help='Dof in z direction')
-    parser.add_argument('--axes', type=str_to_tuple, help='Axes over which to transform')
-    parser.add_argument('--axis', type=int, help='Direction of the action')
-    parser.add_argument('--bz', type=str, help='Base in z direction')
-    parser.add_argument('--bx', type=str, help='Base in x direction')
-    parser.add_argument('--bc_val', type=int, help='Value of boundary condition')
-    parser.add_argument('--test', type=str, help='type of test', choices=['transform', 'diff', 'int', 'tau', 'dealias'])
-    parser.add_argument('--useMPI', type=str_to_bool, help='use MPI or not', choices=[True, False], default=True)
-    args = parser.parse_args()
-
-    if args.test == 'transform':
-        test_transform(**vars(args))
-    elif args.test == 'diff':
-        test_differentiation_matrix2D(**vars(args))
-    elif args.test == 'int':
-        test_integration_matrix2D(**vars(args))
-    elif args.test == 'tau':
-        test_tau_method2D(**vars(args))
-    elif args.test == 'dealias':
-        _test_transform_dealias(**vars(args))
-    elif args.test is None:
-        # test_differentiation_matrix3D(2, 2, 4, 'cheby', p=1, axes=(-1, -2, -3), useMPI=True)
-        # test_differentiation_matrix3D(2, 2, 4, 'ultraspherical', p=1, axes=(-1, -2, -3), useMPI=True)
-        # test_differentiation_matrix3D(32, 32, 32, 'fft', p=2, axes=(-1, -2), useMPI=True)
-        # test_transform(4, 4, 8, 'fft', 'fft', 'cheby', axes=(-1,), padding=1.5, useMPI=True)
-        # test_dealias_GPU(axis=(-1, -2), bx='fft', bz='cheby', padding=1.5)
-        # test_differentiation_matrix2D(2**5, 2**5, 'T2U', bx='cheby', bz='fft', axes=(-2, -1))
-        # test_matrix1D(4, 'cheby', 'diff')
-        # test_tau_method(-1, 8, 99, kind='Dirichlet')
-        # test_tau_method2D('T2U', 2**8, 2**8, -2, plotting=True, useMPI=True)
-        # test_tau_method2D('T2U', 2**1, 2**2, -2, plotting=False, useMPI=True)
-        # test_filter(6, 6, (0,))
-        # _test_transform_dealias('fft', 'cheby', -1, nx=2**2, nz=5, padding=1.5)
-        test_tau_method_GPU()
-    else:
-        raise NotImplementedError
-    print('done')

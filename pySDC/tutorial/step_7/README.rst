@@ -89,3 +89,23 @@ During this instantiation the equation, and the residual that is used for solvin
 Afterwards, you have a Gusto timestepping scheme that you can run in Gusto and a pySDC controller that you can run by itself.
 
 .. include:: doc_step_7_F.rst
+
+
+Part G: pySDC on GPUs
+---------------------
+
+pySDC runs on GPUs through `CuPy <https://cupy.dev>`_, and a problem class does not need a GPU twin to do so.
+It takes a ``useGPU`` flag, and a ``setup_GPU`` classmethod swaps what the class computes with: the array library, the sparse library and the datatypes.
+The body of the class then calls ``self.xp.sin`` where it would have called ``numpy.sin``, and works either way.
+Everything above the problem class -- sweepers, transfer operators, convergence controllers -- is unchanged, so the same run that gives you SDC on a CPU gives you SDC on a GPU.
+
+This example solves one heat equation three ways, all of it on the device: with SDC on a single space level, with MLSDC on two, and with PFASST on two levels spread over several time ranks.
+The three differ only in what the controller is handed.
+
+Important things to note:
+
+- Space coarsening works on GPU arrays: ``mesh_to_mesh`` assembles its interpolation and restriction matrices with SciPy and moves them to the device once, so the transfers themselves never leave it.
+- PFASST sends the solution from one time rank to the next as a GPU array. That needs an MPI built with CUDA awareness, and told to use it. conda-forge's OpenMPI is built with it and ships it switched off, so export ``OMPI_MCA_opal_cuda_support=true`` before launching.
+- ``NCCLComm`` in ``pySDC/helpers/NCCL_communicator.py`` routes the collectives through NCCL instead, which is worth doing when a run is parallel in space as well.
+
+.. include:: doc_step_7_G.rst

@@ -1,7 +1,6 @@
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.core.errors import ControllerError
 from pySDC.helpers.ParaDiagHelper import get_G_inv_matrix
 from pySDC.implementations.controller_classes.ParaDiag import ParaDiag
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
@@ -53,9 +52,6 @@ class controller_ParaDiag_MPI(ParaDiag, controller_MPI):
         super().__init__(controller_params, description, comm)
 
         self.n_steps = comm.size
-
-        if len(self.S.levels) > 1:
-            raise ControllerError('Multi-level SDC not implemented in ParaDiag!')
 
     # ------------------------------------------------------------------ collectives
 

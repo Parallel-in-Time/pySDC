@@ -1,13 +1,10 @@
 # script to run a Rayleigh-Benard Convection problem
-from pySDC.implementations.problem_classes.generic_spectral import compute_residual_DAE, get_extrapolated_error_DAE
+from pySDC.implementations.problem_classes.generic_spectral import compute_residual_DAE
 from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.Resilience.hook import hook_collection, LogData
 from pySDC.projects.Resilience.strategies import merge_descriptions
 from pySDC.projects.Resilience.sweepers import imex_1st_order_efficient
-from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
-    EstimateExtrapolationErrorNonMPI,
-)
 from pySDC.projects.Resilience.reachTendExactly import ReachTendExactly
 
 from pySDC.core.errors import ConvergenceError
@@ -55,9 +52,15 @@ def u_exact(self, t, u_init=None, t_init=None, recompute=False, _t0=None):
     return data
 
 
-if not hasattr(RayleighBenard, '_u_exact'):
-    RayleighBenard._u_exact = RayleighBenard.u_exact
-    RayleighBenard.u_exact = u_exact
+class RayleighBenardReference(RayleighBenard):
+    """Rayleigh-Benard whose solution at t > 0 is a reference solution computed with `run_RBC` and cached on disk"""
+
+    _u_exact = RayleighBenard.u_exact
+    u_exact = u_exact
+
+
+class imex_1st_order_efficient_DAE(imex_1st_order_efficient):
+    compute_residual = compute_residual_DAE
 
 
 def run_RBC(
@@ -90,8 +93,6 @@ def run_RBC(
         controller: The controller
         bool: If the code crashed
     """
-    EstimateExtrapolationErrorNonMPI.get_extrapolated_error = get_extrapolated_error_DAE
-
     level_params = {}
     level_params['dt'] = 1e-3
     level_params['restol'] = -1
@@ -125,12 +126,10 @@ def run_RBC(
     if custom_controller_params is not None:
         controller_params = {**controller_params, **custom_controller_params}
 
-    imex_1st_order_efficient.compute_residual = compute_residual_DAE
-
     description = {}
-    description['problem_class'] = RayleighBenard
+    description['problem_class'] = RayleighBenardReference
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order_efficient
+    description['sweeper_class'] = imex_1st_order_efficient_DAE
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -173,7 +172,7 @@ def run_RBC(
 
 
 def generate_data_for_fault_stats(Tend):
-    prob = RayleighBenard(**PROBLEM_PARAMS)
+    prob = RayleighBenardReference(**PROBLEM_PARAMS)
     _ts = np.linspace(0, Tend, Tend * 10 + 1, dtype=float)
     for i in range(len(_ts) - 1):
         print(f'Generating reference solution from {_ts[i]:.4e} to {_ts[i+1]:.4e}')
@@ -249,7 +248,7 @@ def plot_order(t, dt, steps, num_nodes, e_tol=1e-9, restol=1e-9, ax=None, recomp
 
 
 def check_order(t=14, dt=1e-1, steps=6):
-    prob = RayleighBenard(**PROBLEM_PARAMS)
+    prob = RayleighBenardReference(**PROBLEM_PARAMS)
     _ts = [0, t, t + dt]
     for i in range(len(_ts) - 1):
         prob.u_exact(_ts[i + 1], _t0=_ts[i])

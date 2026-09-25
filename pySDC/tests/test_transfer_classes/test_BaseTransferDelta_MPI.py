@@ -6,8 +6,8 @@ identities it rests on become reductions here -- the restricted fine residual an
 coarse correction each couple all nodes -- which is the part that can be got wrong without changing
 any answer at backend precision on a single rank.
 
-Follows the launch pattern of ``test_MPI_sweeper.py``: pytest re-executes this module under
-``mpirun``, and the ``__main__`` block below runs the comparison inside it.
+Follows the pattern of ``test_MPI_sweeper.py``: pytest itself is launched under
+``mpiexec``, and ``mpi-pytest`` runs the comparison on the ranks of that job.
 """
 
 import pytest
@@ -71,22 +71,8 @@ def run(use_MPI, num_nodes, stock_hierarchy):
     return uend
 
 
-def individual_test(num_nodes, launch=False):
-    """Compare the node-parallel delta hierarchy against the serial one, or launch mpirun to do so."""
-    if launch:
-        import os
-        import subprocess
-
-        my_env = os.environ.copy()
-        my_env['PYTHONPATH'] = '../../..:.'
-        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-        cmd = f'mpirun -np {num_nodes} python {__file__} --num_nodes={num_nodes}'
-        p = subprocess.Popen(cmd.split(), env=my_env, cwd='.')
-        p.wait()
-        assert p.returncode == 0, f'got return code {p.returncode} with {num_nodes} processes'
-        return
-
+def individual_test(num_nodes):
+    """Compare the node-parallel delta hierarchy against the serial one."""
     parallel = run(True, num_nodes, stock_hierarchy=False)
     serial = run(False, num_nodes, stock_hierarchy=False)
     stock = run(True, num_nodes, stock_hierarchy=True)
@@ -100,19 +86,14 @@ def individual_test(num_nodes, launch=False):
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_nodes', [2, 3])
-def test_matches_the_serial_and_the_stock_hierarchy(num_nodes):
+@pytest.mark.parallel([2, 3])
+def test_matches_the_serial_and_the_stock_hierarchy():
     """
     The reduced identities have to give what the serial loops give, and what stock MLSDC gives.
 
     Comparing only against the serial delta hierarchy would pass if both were wrong the same way,
     which is why the stock node-parallel hierarchy is the third leg.
     """
-    individual_test(num_nodes, launch=True)
+    from mpi4py import MPI
 
-
-if __name__ == '__main__':
-    import sys
-
-    kwargs = dict(arg.removeprefix('--').split('=') for arg in sys.argv[1:])
-    individual_test(num_nodes=int(kwargs['num_nodes']))
+    individual_test(MPI.COMM_WORLD.size)

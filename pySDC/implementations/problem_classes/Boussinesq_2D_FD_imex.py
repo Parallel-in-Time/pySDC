@@ -103,13 +103,13 @@ class boussinesq_2d_imex(Problem):
         """Initialization routine"""
 
         if nvars is None:
-            nvars = [(4, 300, 30)]
+            nvars = (4, 300, 30)
 
         if x_bounds is None:
-            x_bounds = [(-150.0, 150.0)]
+            x_bounds = (-150.0, 150.0)
 
         if z_bounds is None:
-            z_bounds = [(0.0, 10.0)]
+            z_bounds = (0.0, 10.0)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -124,10 +124,11 @@ class boussinesq_2d_imex(Problem):
             'order',
             'gmres_maxiter',
             'gmres_restart',
-            'gmres_tol_limit',
             localVars=locals(),
             readOnly=True,
         )
+        # not read-only: rungmrescounter_boussinesq tightens it for its reference solution
+        self._makeAttributeAndRegister('gmres_tol_limit', localVars=locals())
 
         self.N = [self.nvars[1], self.nvars[2]]
 

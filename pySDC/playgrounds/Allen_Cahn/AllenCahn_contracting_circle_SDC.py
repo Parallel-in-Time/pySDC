@@ -162,10 +162,12 @@ def run_SDC_variant(variant=None, inexact=False):
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
-    print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
+    newton_iters = P.work_counters['newton'].niter
+    lin_iters = P.work_counters['linear'].niter
+    print('   Iteration count (nonlinear/linear): %i / %i' % (newton_iters, lin_iters))
     print(
         '   Mean Iteration count per call: %4.2f / %4.2f'
-        % (P.newton_itercount / max(P.newton_ncalls, 1), P.lin_itercount / max(P.lin_ncalls, 1))
+        % (newton_iters / max(P.newton_ncalls, 1), lin_iters / max(P.lin_ncalls, 1))
     )
 
     timing = get_sorted(stats, type='timing_run', sortby='time')

@@ -26,7 +26,7 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
         else:
             from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_class
 
-        if ML:
+        if ML > 1:
             from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced as problem_class
         else:
             from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
@@ -85,137 +85,182 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
     return controller.MS[0].levels[0]
 
 
-def individual_test(launch=False, **kwargs):
+def individual_test(**kwargs):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
-
-    Args:
-        launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
-    num_nodes = kwargs['num_nodes']
-    useNCCL = kwargs['useNCCL']
-
-    if launch:
-        import os
-        import subprocess
-
-        # Set python path once
-        my_env = os.environ.copy()
-        my_env['PYTHONPATH'] = '../../..:.'
-        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-        cmd = f"mpirun -np {num_nodes} python {__file__}"
-
-        for key, value in kwargs.items():
-            cmd += f' --{key}={value}'
-        p = subprocess.Popen(cmd.split(), env=my_env, cwd=".")
-
-        p.wait()
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-            p.returncode,
-            num_nodes,
-        )
+    if kwargs['useNCCL']:
+        import cupy as xp
     else:
-        if useNCCL:
-            import cupy as xp
-        else:
-            import numpy as xp
+        import numpy as xp
 
-        MPI = run(
-            **kwargs,
-            use_MPI=True,
-        )
-        nonMPI = run(
-            **kwargs,
-            use_MPI=False,
-        )
+    MPI = run(**kwargs, use_MPI=True)
+    nonMPI = run(**kwargs, use_MPI=False)
 
-        assert xp.allclose(
-            MPI.uend, nonMPI.uend, atol=1e-14
-        ), f'Got different solutions at end point! {MPI.uend=} {nonMPI.uend=}'
-        assert xp.allclose(MPI.status.residual, nonMPI.status.residual, atol=1e-14), 'Got different residuals!'
+    assert xp.allclose(
+        MPI.uend, nonMPI.uend, rtol=0, atol=1e-14
+    ), f'Got different solutions at end point! {MPI.uend=} {nonMPI.uend=}'
+    assert xp.allclose(MPI.status.residual, nonMPI.status.residual, rtol=0, atol=1e-14), 'Got different residuals!'
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize("num_nodes", [2])
+@pytest.mark.parallel(2)
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [True, False])
 @pytest.mark.parametrize("init_guess", ['spread', 'copy', 'zero'])
 @pytest.mark.parametrize("ML", [1, 2, 3])
-def test_sweeper(num_nodes, quad_type, residual_type, imex, init_guess, ML, launch=True):
+def test_sweeper(quad_type, residual_type, imex, init_guess, ML):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
 
     Args:
-        num_nodes (int): The number of nodes to use
         quad_type (str): Type of nodes
         residual_type (str): Type of residual computation
         imex (bool): Use IMEX sweeper or not
-        launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
+    from mpi4py import MPI
+
     individual_test(
-        num_nodes=num_nodes,
+        num_nodes=MPI.COMM_WORLD.size,
         quad_type=quad_type,
         residual_type=residual_type,
         imex=imex,
         init_guess=init_guess,
         useNCCL=False,
         ML=ML,
-        launch=launch,
     )
 
 
 @pytest.mark.cupy
-@pytest.mark.skip(reason="We haven\'t figured out how to run tests on the cluster with multiple processes yet.")
-@pytest.mark.parametrize("num_nodes", [2])
+@pytest.mark.parallel(2)
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])
 @pytest.mark.parametrize("residual_type", ['last_abs', 'full_rel'])
 @pytest.mark.parametrize("imex", [False])
 @pytest.mark.parametrize("init_guess", ['spread', 'copy', 'zero'])
-def test_sweeper_NCCL(num_nodes, quad_type, residual_type, imex, init_guess, launch=True):
+@pytest.mark.parametrize("ML", [1, 2, 3])
+def test_sweeper_NCCL(quad_type, residual_type, imex, init_guess, ML):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
     Tests solution at the right end point and the residual.
 
     Args:
-        num_nodes (int): The number of nodes to use
         quad_type (str): Type of nodes
         residual_type (str): Type of residual computation
         imex (bool): Use IMEX sweeper or not
-        launch (bool): If yes, it will launch `mpirun` with the required number of processes
     """
+    from mpi4py import MPI
+
     individual_test(
-        num_nodes=num_nodes,
+        num_nodes=MPI.COMM_WORLD.size,
         quad_type=quad_type,
         residual_type=residual_type,
         imex=imex,
         init_guess=init_guess,
         useNCCL=True,
-        ML=1,
-        launch=launch,
+        ML=ML,
     )
 
 
-if __name__ == '__main__':
-    str_to_bool = lambda me: False if me == 'False' else True
-    import argparse
+def run_with_distributed_space(space_comm, node_comm, num_nodes, nvars=(32, 32), dt=1e-2):
+    """One step of a GPU run, with the nodes over `node_comm` and the space over `space_comm`.
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--ML', type=int, help='Number of levels in space')
-    parser.add_argument('--num_nodes', type=int, help='Number of collocation nodes')
-    parser.add_argument('--quad_type', type=str, help='Quadrature rule', choices=['GAUSS', 'RADAU-RIGHT', 'RADAU-LEFT'])
-    parser.add_argument(
-        '--residual_type',
-        type=str,
-        help='Way of computing the residual',
-        choices=['full_rel', 'last_abs', 'full_abs', 'last_rel'],
-    )
-    parser.add_argument('--imex', type=str_to_bool, help='Toggle for IMEX', choices=[True, False])
-    parser.add_argument('--useNCCL', type=str_to_bool, help='Toggle for NCCL communicator', choices=[True, False])
-    parser.add_argument('--init_guess', type=str, help='Initial guess', choices=['spread', 'copy', 'zero'])
-    args = parser.parse_args()
+    `node_comm` of None runs every node on this rank with the ordinary sweeper, which is the
+    reference the parallel versions have to reproduce. `num_nodes` is passed rather than taken
+    from the communicator so that the reference is forced to use the same collocation rule.
+    """
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_Laplacian_MPIFFT
 
-    individual_test(**vars(args))
+    if node_comm is None:
+        from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as sweeper_class
+
+        sweeper_params = {'num_nodes': num_nodes}
+    else:
+        from pySDC.helpers.NCCL_communicator import NCCLComm
+        from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as sweeper_class
+
+        # the MPI sweeper raises unless there is exactly one rank per node
+        assert node_comm.size == num_nodes, f'{num_nodes} nodes need {num_nodes} ranks, not {node_comm.size}'
+        sweeper_params = {'num_nodes': num_nodes, 'comm': NCCLComm(node_comm)}
+
+    # The MPI sweeper needs a diagonal preconditioner to have anything to parallelise, which rules
+    # out `LU`; `MIN-SR-S` is the diagonal one worth running. The serial reference uses the same,
+    # so the comparison is of the parallelisation and not of the preconditioner.
+    sweeper_params.update({'quad_type': 'RADAU-RIGHT', 'QI': 'MIN-SR-S', 'QE': 'PIC'})
+
+    description = {
+        'problem_class': IMEX_Laplacian_MPIFFT,
+        'problem_params': {'nvars': nvars, 'comm': space_comm, 'useGPU': True, 'spectral': False},
+        'sweeper_class': sweeper_class,
+        'sweeper_params': sweeper_params,
+        'level_params': {'dt': dt},
+        'step_params': {'maxiter': 3},
+    }
+
+    controller = controller_nonMPI(1, {'logger_level': 30}, description)
+    level = controller.MS[0].levels[0]
+    prob = level.prob
+
+    u0 = prob.u_init
+    u0[...] = prob.xp.sin(prob.X[0]) * prob.xp.sin(prob.X[1])
+
+    controller.run(u0, 0, dt)
+    level.sweep.compute_end_point()
+    return level
+
+
+@pytest.mark.cupy
+@pytest.mark.parallel(4)
+def test_node_parallel_on_GPU_serial_space():
+    """Four collocation nodes on four GPUs, each holding the whole spatial domain.
+
+    `test_sweeper_NCCL` above already spreads nodes over GPUs, but on a finite-difference problem
+    with no space communicator, so it cannot be compared with the space-distributed version below.
+    This uses the same problem as that one and spends the same four GPUs on nodes alone, which is
+    as many collocation nodes as can run in parallel here: the MPI sweeper wants a rank each.
+    """
+    import cupy as cp
+    from mpi4py import MPI
+
+    world = MPI.COMM_WORLD
+    parallel = run_with_distributed_space(MPI.COMM_SELF, world, num_nodes=world.size)
+    serial = run_with_distributed_space(MPI.COMM_SELF, None, num_nodes=world.size)
+
+    assert cp.allclose(parallel.uend, serial.uend, rtol=0, atol=1e-13), 'node-parallel run differs from the serial one'
+
+
+@pytest.mark.cupy
+@pytest.mark.parallel(4)
+def test_node_parallel_on_GPU_distributed_space():
+    """Two collocation nodes by two ranks in space, which nothing else covers.
+
+    The nodes talk over NCCL while the spatial transforms redistribute over a communicator of their
+    own, so the two decompositions have to stay out of each other's way. Checked against a run with
+    neither, on the slice of the global array this rank holds.
+    """
+    import cupy as cp
+    from mpi4py import MPI
+
+    world = MPI.COMM_WORLD
+    assert world.size == 4, f'this test decomposes four ranks as 2x2, not {world.size}'
+
+    # rank r sits at node r // 2 and space r % 2, so ranks sharing a node are together in space
+    space_comm = world.Split(color=world.rank // 2)
+    node_comm = world.Split(color=world.rank % 2)
+
+    try:
+        parallel = run_with_distributed_space(space_comm, node_comm, num_nodes=node_comm.size)
+        serial = run_with_distributed_space(MPI.COMM_SELF, None, num_nodes=node_comm.size)
+
+        mine = serial.uend[parallel.prob.fft.local_slice(False)]
+        assert cp.allclose(parallel.uend, mine, rtol=0, atol=1e-13), 'the 2x2 run differs from the serial one'
+
+        # and both decompositions have to have done something, or the comparison is vacuous
+        assert parallel.prob.fft.shape(False) != parallel.prob.fft.global_shape(), 'space was not distributed'
+        assert parallel.sweep.comm.size == 2, 'the nodes were not distributed'
+    finally:
+        space_comm.Free()
+        node_comm.Free()

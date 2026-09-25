@@ -6,6 +6,25 @@ from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
 
 
+def _unit_grid(nvars, periodic):
+    """
+    Grid of one spatial dimension, scaled to a domain of length one.
+
+    The interpolation weights depend only on ratios of distances, so building the grids on the unit
+    domain instead of on the problem's own ``dx`` gives the same operator for any domain length.
+    For periodic grids it is also what makes the operator correct at all: the helpers in
+    ``transfer_helper`` hardcode a period of one.
+
+    Args:
+        nvars (int): number of degrees of freedom in this dimension
+        periodic (bool): whether this dimension is periodic
+
+    Returns:
+        np.ndarray: the grid, within [0, 1)
+    """
+    return np.arange(nvars) / nvars if periodic else (np.arange(nvars) + 1) / (nvars + 1)
+
+
 class mesh_to_mesh(SpaceTransfer):
     """
     Custom base_transfer class, implements Transfer.py
@@ -56,12 +75,8 @@ class mesh_to_mesh(SpaceTransfer):
                 self.Pspace = sp.eye(self.fine_prob.nvars)
             # assemble restriction as transpose of interpolation
             else:
-                if not self.params.periodic:
-                    fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(self.fine_prob.nvars)])
-                    coarse_grid = np.array([(i + 1) * self.coarse_prob.dx for i in range(self.coarse_prob.nvars)])
-                else:
-                    fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.nvars)])
-                    coarse_grid = np.array([i * self.coarse_prob.dx for i in range(self.coarse_prob.nvars)])
+                fine_grid = _unit_grid(self.fine_prob.nvars, self.params.periodic)
+                coarse_grid = _unit_grid(self.coarse_prob.nvars, self.params.periodic)
 
                 self.Pspace = th.interpolation_matrix_1d(
                     fine_grid,
@@ -101,14 +116,8 @@ class mesh_to_mesh(SpaceTransfer):
                     Pspace.append(sp.eye(self.fine_prob.nvars[i]))
                 # assemble restriction as transpose of interpolation
                 else:
-                    if not self.params.periodic:
-                        fine_grid = np.array([(j + 1) * self.fine_prob.dx for j in range(self.fine_prob.nvars[i])])
-                        coarse_grid = np.array(
-                            [(j + 1) * self.coarse_prob.dx for j in range(self.coarse_prob.nvars[i])]
-                        )
-                    else:
-                        fine_grid = np.array([j * self.fine_prob.dx for j in range(self.fine_prob.nvars[i])])
-                        coarse_grid = np.array([j * self.coarse_prob.dx for j in range(self.coarse_prob.nvars[i])])
+                    fine_grid = _unit_grid(self.fine_prob.nvars[i], self.params.periodic)
+                    coarse_grid = _unit_grid(self.coarse_prob.nvars[i], self.params.periodic)
 
                     Pspace.append(
                         th.interpolation_matrix_1d(
@@ -154,6 +163,16 @@ class mesh_to_mesh(SpaceTransfer):
         self.Rspace = self.Rspace.astype(np.promote_types(self.coarse_prob.init[-1], np.float32))
         self.Pspace = self.Pspace.astype(np.promote_types(self.fine_prob.init[-1], np.float32))
 
+        # Which side of the PCI bus this runs on is a property of the problem, not something the
+        # transfer is told -- the same way `TransferMesh_MPIFFT` decides it. The operators are
+        # assembled with SciPy either way, since that work is small, one-off and full of host-side
+        # index arithmetic; only the finished matrices move.
+        if 'cupy' in self.fine_prob.dtype_u.__name__.lower():
+            import cupyx.scipy.sparse as csp
+
+            self.Rspace = csp.csr_matrix(self.Rspace)
+            self.Pspace = csp.csr_matrix(self.Pspace)
+
     def restrict(self, F):
         """
         Restriction implementation
@@ -182,8 +201,8 @@ class mesh_to_mesh(SpaceTransfer):
 
         if hasattr(type(F), 'components'):
             for comp in F.components:
-                _restrict(F.__getattr__(comp), G.__getattr__(comp))
-        elif type(F).__name__ == 'mesh':
+                _restrict(getattr(F, comp), getattr(G, comp))
+        elif type(F).__name__ in ['mesh', 'cupy_mesh']:
             _restrict(F, G)
         else:
             raise TransferError('Wrong data type for restriction, got %s' % type(F))
@@ -218,8 +237,8 @@ class mesh_to_mesh(SpaceTransfer):
 
         if hasattr(type(F), 'components'):
             for comp in G.components:
-                _prolong(G.__getattr__(comp), F.__getattr__(comp))
-        elif type(G).__name__ == 'mesh':
+                _prolong(getattr(G, comp), getattr(F, comp))
+        elif type(G).__name__ in ['mesh', 'cupy_mesh']:
             F[:] = _prolong(G, F)
         else:
             raise TransferError('Wrong data type for prolongation, got %s' % type(G))

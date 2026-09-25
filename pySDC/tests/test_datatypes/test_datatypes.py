@@ -54,54 +54,96 @@ def single_test(name, useMPI=False):
             assert comm.size < comm_wd.size
 
 
-def launch_test(name, useMPI, num_procs=1):
-    if useMPI:
-        import os
-        import subprocess
-
-        # Set python path once
-        my_env = os.environ.copy()
-        my_env['PYTHONPATH'] = '../../..:.'
-        my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-        cmd = f"mpirun -np {num_procs} python {__file__} --name={name} --useMPI=True"
-
-        p = subprocess.Popen(cmd.split(), env=my_env, cwd=".")
-
-        p.wait()
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-            p.returncode,
-            num_procs,
-        )
-    else:
-        single_test(name, False)
+@pytest.mark.pytorch
+@pytest.mark.parallel(4)
+def test_PyTorch_dtype_MPI():
+    single_test('Tensor', True)
 
 
 @pytest.mark.pytorch
-@pytest.mark.parametrize('useMPI', [True, False])
-def test_PyTorch_dtype(useMPI):
-    launch_test('Tensor', useMPI=useMPI, num_procs=4)
+def test_PyTorch_dtype():
+    single_test('Tensor', False)
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel(4)
 @pytest.mark.parametrize('name', ['mesh', 'imex_mesh'])
 def test_mesh_dtypes_MPI(name):
-    launch_test(name, useMPI=True, num_procs=4)
+    single_test(name, True)
 
 
 @pytest.mark.base
 @pytest.mark.parametrize('name', ['mesh', 'imex_mesh'])
 def test_mesh_dtypes(name):
-    launch_test(name, useMPI=False)
+    single_test(name, False)
 
 
-if __name__ == '__main__':
-    str_to_bool = lambda me: False if me == 'False' else True
-    import argparse
+@pytest.mark.cupy
+@pytest.mark.parallel(2)
+def test_cupy_mesh_norm_is_taken_across_ranks():
+    """`abs()` on a space-parallel mesh is a global maximum, and on the GPU it goes through NCCL.
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--name', type=str, help='Name of the datatype')
-    parser.add_argument('--useMPI', type=str_to_bool, help='Toggle for MPI', choices=[True, False])
-    args = parser.parse_args()
+    The CPU twin reduces a Python float through MPI; this one hands NCCL two device buffers
+    instead, which is a different branch of `__abs__` and the only one a GPU ever takes.
+    """
+    import cupy as cp
+    from mpi4py import MPI
 
-    single_test(**vars(args))
+    from pySDC.helpers.NCCL_communicator import NCCLComm
+    from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+
+    comm = NCCLComm(MPI.COMM_WORLD)
+
+    # `__new__` keeps the communicator on the class rather than on the instance, so put back
+    # whatever was there and leave the rest of the session as it was found
+    previously = cupy_mesh.comm
+    try:
+        mesh = cupy_mesh(init=((4,), comm, cp.dtype('float64')))
+
+        # a different local maximum on every rank, so a norm that forgot to reduce would come
+        # back wrong on every rank but the last
+        mesh[:] = comm.rank + 1
+
+        assert abs(mesh) == comm.size, f'rank {comm.rank} did not get the global maximum'
+
+        # and through arithmetic, which is how the sweeper actually reaches it
+        assert abs(mesh * 1.0 + 0.0) == comm.size, 'the communicator was lost doing arithmetic'
+    finally:
+        cupy_mesh.comm = previously
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(2)
+def test_the_norm_stays_global_through_arithmetic():
+    """`__abs__` reduces across ranks, so the communicator has to survive everything done to a mesh.
+
+    It lives on the instance, so a slice, a sum or a copy has to carry it along -- and the sweeper
+    takes the norm of `L.residual[m] += L.u[0] - L.u[m + 1]`, an array that arithmetic produced.
+    A mesh that lost its communicator would return a local norm and be silently wrong on every
+    rank but one.
+    """
+    import numpy as np
+    from mpi4py import MPI
+
+    from pySDC.implementations.datatype_classes.mesh import mesh
+
+    comm = MPI.COMM_WORLD
+    me = mesh(init=((4,), comm, np.dtype('float64')))
+    me[:] = comm.rank + 1  # a different local maximum on every rank
+
+    assert abs(me) == comm.size, f'the norm was not global to begin with: {abs(me)}'
+
+    for what, derived in [
+        ('a sum', me + 0.0),
+        ('a product', 1.0 * me),
+        ('a difference', me - 0.0),
+        ('a copy', me.copy()),
+        ('a slice', me[:]),
+    ]:
+        assert derived.comm is comm, f'{what} lost the communicator'
+        assert abs(derived) == comm.size, f'{what} gave a local norm: {abs(derived)}'
+
+    # and a mesh built without one must not pick it up from somewhere else
+    alone = mesh(init=((4,), None, np.dtype('float64')))
+    alone[:] = comm.rank + 1
+    assert alone.comm is None, 'a mesh built without a communicator acquired one'

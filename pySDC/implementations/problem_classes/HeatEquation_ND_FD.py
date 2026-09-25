@@ -1,5 +1,3 @@
-import numpy as np
-
 from pySDC.implementations.problem_classes.generic_ND_FD import GenericNDimFinDiff
 from pySDC.implementations.datatype_classes.mesh import imex_mesh
 
@@ -74,9 +72,12 @@ class heatNd_unforced(GenericNDimFinDiff):
         bc='periodic',
         sigma=6e-2,
         dtype='float64',
+        useGPU=False,
     ):
         """Initialization routine"""
-        super().__init__(nvars, nu, 2, freq, stencil_type, order, lintol, liniter, solver_type, bc, dtype=dtype)
+        super().__init__(
+            nvars, nu, 2, freq, stencil_type, order, lintol, liniter, solver_type, bc, dtype=dtype, useGPU=useGPU
+        )
         if solver_type == 'GMRES':
             self.logger.warning('GMRES is not usually used for heat equation')
         self._makeAttributeAndRegister('nu', localVars=locals(), readOnly=True)
@@ -105,29 +106,33 @@ class heatNd_unforced(GenericNDimFinDiff):
 
         if ndim == 1:
             x = self.grids
-            rho = (2.0 - 2.0 * np.cos(np.pi * freq[0] * dx)) / dx**2
+            rho = (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[0] * dx)) / dx**2
             if freq[0] > 0:
-                sol[:] = np.sin(np.pi * freq[0] * x) * np.exp(-t * nu * rho)
+                sol[:] = self.xp.sin(self.xp.pi * freq[0] * x) * self.xp.exp(-t * nu * rho)
             elif freq[0] == -1:  # Gaussian
-                sol[:] = np.exp(-0.5 * ((x - 0.5) / sigma) ** 2) * np.exp(-t * nu * rho)
+                sol[:] = self.xp.exp(-0.5 * ((x - 0.5) / sigma) ** 2) * self.xp.exp(-t * nu * rho)
         elif ndim == 2:
-            rho = (2.0 - 2.0 * np.cos(np.pi * freq[0] * dx)) / dx**2 + (
-                2.0 - 2.0 * np.cos(np.pi * freq[1] * dx)
+            rho = (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[0] * dx)) / dx**2 + (
+                2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[1] * dx)
             ) / dx**2
             x, y = self.grids
-            sol[:] = np.sin(np.pi * freq[0] * x) * np.sin(np.pi * freq[1] * y) * np.exp(-t * nu * rho)
+            sol[:] = (
+                self.xp.sin(self.xp.pi * freq[0] * x)
+                * self.xp.sin(self.xp.pi * freq[1] * y)
+                * self.xp.exp(-t * nu * rho)
+            )
         elif ndim == 3:
             rho = (
-                (2.0 - 2.0 * np.cos(np.pi * freq[0] * dx)) / dx**2
-                + (2.0 - 2.0 * np.cos(np.pi * freq[1] * dx))
-                + (2.0 - 2.0 * np.cos(np.pi * freq[2] * dx)) / dx**2
+                (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[0] * dx)) / dx**2
+                + (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[1] * dx))
+                + (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[2] * dx)) / dx**2
             )
             x, y, z = self.grids
             sol[:] = (
-                np.sin(np.pi * freq[0] * x)
-                * np.sin(np.pi * freq[1] * y)
-                * np.sin(np.pi * freq[2] * z)
-                * np.exp(-t * nu * rho)
+                self.xp.sin(self.xp.pi * freq[0] * x)
+                * self.xp.sin(self.xp.pi * freq[1] * y)
+                * self.xp.sin(self.xp.pi * freq[2] * z)
+                * self.xp.exp(-t * nu * rho)
             )
 
         return sol
@@ -159,6 +164,15 @@ class heatNd_forced(heatNd_unforced):
     """
 
     dtype_f = imex_mesh
+
+    def setup_GPU(self):
+        """
+        Switch to GPU modules, keeping the split right-hand side this class needs
+        """
+        from pySDC.implementations.datatype_classes.cupy_mesh import imex_cupy_mesh
+
+        super().setup_GPU()
+        self.dtype_f = imex_cupy_mesh
 
     def eval_f_increment(self, base, delta, t):
         """
@@ -210,23 +224,23 @@ class heatNd_forced(heatNd_unforced):
         ndim, freq, nu = self.ndim, self.freq, self.nu
         if ndim == 1:
             x = self.grids
-            f.expl[:] = np.sin(np.pi * freq[0] * x) * (
-                nu * np.pi**2 * sum([freq**2 for freq in freq]) * np.cos(t) - np.sin(t)
+            f.expl[:] = self.xp.sin(self.xp.pi * freq[0] * x) * (
+                nu * self.xp.pi**2 * sum([freq**2 for freq in freq]) * self.xp.cos(t) - self.xp.sin(t)
             )
         elif ndim == 2:
             x, y = self.grids
             f.expl[:] = (
-                np.sin(np.pi * freq[0] * x)
-                * np.sin(np.pi * freq[1] * y)
-                * (nu * np.pi**2 * sum([freq**2 for freq in freq]) * np.cos(t) - np.sin(t))
+                self.xp.sin(self.xp.pi * freq[0] * x)
+                * self.xp.sin(self.xp.pi * freq[1] * y)
+                * (nu * self.xp.pi**2 * sum([freq**2 for freq in freq]) * self.xp.cos(t) - self.xp.sin(t))
             )
         elif ndim == 3:
             x, y, z = self.grids
             f.expl[:] = (
-                np.sin(np.pi * freq[0] * x)
-                * np.sin(np.pi * freq[1] * y)
-                * np.sin(np.pi * freq[2] * z)
-                * (nu * np.pi**2 * sum([freq**2 for freq in freq]) * np.cos(t) - np.sin(t))
+                self.xp.sin(self.xp.pi * freq[0] * x)
+                * self.xp.sin(self.xp.pi * freq[1] * y)
+                * self.xp.sin(self.xp.pi * freq[2] * z)
+                * (nu * self.xp.pi**2 * sum([freq**2 for freq in freq]) * self.xp.cos(t) - self.xp.sin(t))
             )
 
         return f
@@ -248,11 +262,16 @@ class heatNd_forced(heatNd_unforced):
         ndim, freq, sol = self.ndim, self.freq, self.u_init
         if ndim == 1:
             x = self.grids
-            sol[:] = np.sin(np.pi * freq[0] * x) * np.cos(t)
+            sol[:] = self.xp.sin(self.xp.pi * freq[0] * x) * self.xp.cos(t)
         elif ndim == 2:
             x, y = self.grids
-            sol[:] = np.sin(np.pi * freq[0] * x) * np.sin(np.pi * freq[1] * y) * np.cos(t)
+            sol[:] = self.xp.sin(self.xp.pi * freq[0] * x) * self.xp.sin(self.xp.pi * freq[1] * y) * self.xp.cos(t)
         elif ndim == 3:
             x, y, z = self.grids
-            sol[:] = np.sin(np.pi * freq[0] * x) * np.sin(np.pi * freq[1] * y) * np.sin(np.pi * freq[2] * z) * np.cos(t)
+            sol[:] = (
+                self.xp.sin(self.xp.pi * freq[0] * x)
+                * self.xp.sin(self.xp.pi * freq[1] * y)
+                * self.xp.sin(self.xp.pi * freq[2] * z)
+                * self.xp.cos(t)
+            )
         return sol

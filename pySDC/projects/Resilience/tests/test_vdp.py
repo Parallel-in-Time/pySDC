@@ -2,34 +2,26 @@ import pytest
 
 
 @pytest.mark.mpi4py
-@pytest.mark.parametrize('num_procs', [1, 2, 5, 8])
+@pytest.mark.parallel([1, 2, 5, 8])
 @pytest.mark.parametrize('test_name', ['mpi_vs_nonMPI', 'check_step_size_limiter'])
-def test_stuff(num_procs, test_name):
-    import pySDC.projects.Resilience.vdp as vdp
-    import os
-    import subprocess
+def test_stuff(test_name):
+    from mpi4py import MPI
+    from pySDC.projects.Resilience.vdp import mpi_vs_nonMPI, check_step_size_limiter
 
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    # run code with different number of MPI processes
-    cmd = f"mpirun -np {num_procs} python {vdp.__file__} {test_name}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_procs,
-    )
+    comm = MPI.COMM_WORLD
+    if test_name == 'mpi_vs_nonMPI':
+        mpi_vs_nonMPI(True, comm)
+    else:
+        # `size` only controls how many steps are trimmed from each end of the step-size window
+        # before the limits are checked -- `num_procs` is ignored once a communicator is passed.
+        # Deliberately 1 rather than `comm.size`: it checks every step except the first and last,
+        # which is stricter than the function's own default and passes at every rank count here.
+        # `vdp.py`'s `__main__` passed `MPI_ready`, which is how this came to be 1 by accident.
+        check_step_size_limiter(1, comm)
 
 
 @pytest.mark.mpi4py
 def test_adaptivity_with_avoid_restarts():
-    test_stuff(1, 'adaptivity_with_avoid_restarts')
+    from pySDC.projects.Resilience.vdp import check_adaptivity_with_avoid_restarts
 
-
-if __name__ == "__main__":
-    test_stuff(8, '')
+    check_adaptivity_with_avoid_restarts(comm=None, size=1)

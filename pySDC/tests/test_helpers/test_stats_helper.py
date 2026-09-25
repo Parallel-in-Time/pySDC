@@ -123,37 +123,10 @@ def test_filter_recomputed(test_type, num_procs, comm=None):
 
 
 @pytest.mark.mpi4py
+@pytest.mark.parallel([1, 4])
 @pytest.mark.parametrize("test_type", [1, 2])
-@pytest.mark.parametrize("num_procs", [1, 4])
-def test_filter_recomputedMPI(test_type, num_procs):
-    import os
-    import subprocess
+def test_filter_recomputedMPI(test_type):
+    from mpi4py import MPI
 
-    # Set python path once
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-    my_env['COVERAGE_PROCESS_START'] = 'pyproject.toml'
-
-    # run code with different number of MPI processes
-    cmd = f"mpirun -np {num_procs} python {__file__} test {test_type}".split()
-
-    p = subprocess.Popen(cmd, env=my_env, cwd=".")
-
-    p.wait()
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
-        p.returncode,
-        num_procs,
-    )
-
-
-if __name__ == '__main__':
-    import sys
-
-    if 'test' in sys.argv:
-        from mpi4py import MPI
-
-        comm = MPI.COMM_WORLD
-        test_type = int(sys.argv[2])
-        test_filter_recomputed(test_type=test_type, num_procs=comm.size, comm=comm)
-    else:
-        test_filter_recomputedMPI(1, 2)
+    comm = MPI.COMM_WORLD
+    test_filter_recomputed(test_type=test_type, num_procs=comm.size, comm=comm)
