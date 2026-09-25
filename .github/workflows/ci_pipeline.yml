@@ -210,8 +210,9 @@ jobs:
       - name: Install the Modal client
         run: |
           pip install modal
-      # Secrets are withheld from pull requests opened from a fork, so labelling one of those
-      # would otherwise fail several minutes in with an unhelpful traceback from `modal run`.
+      # Pull requests from forks are skipped above, since they get no secrets. This catches the
+      # remaining case -- a repository without the Modal secrets, such as a fork's own pushes --
+      # which would otherwise fail several minutes in with an unhelpful traceback from `modal run`.
       - name: Check that the Modal credentials are present
         run: |
           if [ -z "${{ secrets.MODAL_TOKEN_ID }}" ]; then

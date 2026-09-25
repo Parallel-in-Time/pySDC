@@ -128,6 +128,19 @@ def run_cupy_tests(trees, selection):
     """
     import subprocess
 
+    # Which host this landed on. The two-rank NCCL pass has failed on some hosts and passed on
+    # others with identical code -- NCCL_ERROR_UNHANDLED_CUDA_ERROR on the first allReduce, and
+    # CUDA_ERROR_ILLEGAL_ADDRESS in every test after it -- so a log has to say what it ran on.
+    subprocess.run(['nvidia-smi', '--query-gpu=index,name,driver_version', '--format=csv,noheader'])
+    subprocess.run(
+        [
+            'python',
+            '-c',
+            'import cupy; from cupy.cuda import nccl; r = cupy.cuda.runtime; '
+            'print(f"CUDA runtime {r.runtimeGetVersion()}, driver {r.driverGetVersion()}, NCCL {nccl.get_version()}")',
+        ]
+    )
+
     # `etc/run_mpi_tests.sh` is how every other leg runs its tests: it asks the tests themselves
     # what rank counts they declare and launches one pass per count, so `test_sweeper_NCCL` gets
     # the two ranks its `parallel(2)` marker asks for, and everything else runs serially. Each
@@ -145,6 +158,10 @@ def run_cupy_tests(trees, selection):
         'PYTHONPATH': f'{REMOTE}/etc:{REMOTE}',
         # arms the .pth installed in the image; without it that file does nothing
         'COVERAGE_PROCESS_START': f'{REMOTE}/pyproject.toml',
+        # NCCL only says why a call failed at WARN or above, and prints nothing there when all is
+        # well. Without it the failure above reads "unhandled cuda error (run with NCCL_DEBUG=INFO
+        # for details)", on a host that is gone by the time anyone reads the log.
+        'NCCL_DEBUG': 'WARN',
     }
     returncode = 0
     for tree in trees:
