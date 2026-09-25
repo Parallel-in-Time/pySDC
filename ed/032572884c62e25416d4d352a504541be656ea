@@ -1,0 +1,28 @@
+pySDC/tests/test_projects/test_DeltaSDC/test_gpu.py
+  s_3cfbaa2fb0772b::t_0b7b165a9fd580 186-228
+pySDC/projects/DeltaSDC/run_gpu.py
+  s_3cfbaa2fb0772b::t_bd5185c25de396 75-96,258,288-290
+  s_3cfbaa2fb0772b::t_709761bc51b235 104-105,145,283-285
+pySDC/projects/DeltaSDC/problems.py
+  s_3cfbaa2fb0772b::t_fcd04ccec0d22d 29,387-397,402,411-422,426-430,451-452,468-532
+pySDC/projects/DeltaSDC/tests/test_problems.py
+  s_3cfbaa2fb0772b::t_0b7b165a9fd580 330-364
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_74b9d7ccac402b 494-499,511-535
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ed032572884c62e25416d4d352a504541be656ea",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
