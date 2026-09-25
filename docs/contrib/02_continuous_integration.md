@@ -185,10 +185,19 @@ the same `cupy`-marked selection on them, through `etc/run_mpi_tests.sh` as ever
 Unlike the stub, **this one counts towards the coverage report**, because it really executes the
 lines it reports.
 
-Two GPUs rather than one because `test_sweeper_NCCL` asks for two ranks and NCCL wants a GPU per
-rank. Nothing in pySDC selects a device -- on a batch system the scheduler gives each task its own,
-so every rank taking device 0 is correct -- and `etc/bind_gpu_to_rank.sh` reproduces that inside
-one container.
+Four GPUs, because the space-time tests ask for four ranks and NCCL wants a GPU per rank. The
+serial pass -- most of the job -- is spread over the same four with `pytest-xdist` rather than
+leaving three idle, which brings it from 101 seconds to 39 and costs about what two devices did.
+
+Nothing in pySDC selects a device: on a batch system the scheduler gives each task its own, so
+every process taking device 0 is correct. Inside one container it is not, so `etc/gpu_bind.py`
+assigns one, reading whichever of `OMPI_COMM_WORLD_LOCAL_RANK` or `PYTEST_XDIST_WORKER` the
+launcher set.
+
+`coverage` does not follow xdist workers, which are `execnet` subprocesses rather than the
+`multiprocessing` children `pyproject.toml` declares. Left alone the split reported 3836 covered
+lines against 5332 unsplit, with every test passing either way, so the image installs coverage's
+`.pth` hook and the job sets `COVERAGE_PROCESS_START`.
 
 You can run it yourself against your own Modal account, which is the fastest way to iterate:
 
