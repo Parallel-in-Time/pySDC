@@ -61,10 +61,13 @@ run_pass() {
 # pass, exactly as before this runner existed. Selecting `parallel[1]` instead would deselect
 # everything wherever the marker is unknown, and the job would pass having run nothing.
 if [ -z "$ranks" ]; then
+    # this is the serial pass too, so it gets the serial options -- without them a tree declaring no
+    # ranks ran on one GPU of the four the job rents
+    # shellcheck disable=SC2086
     if [ -n "$marker" ]; then
-        $PYTEST -m "$marker" "$tests"
+        $PYTEST $PYTEST_SERIAL_EXTRA -m "$marker" "$tests"
     else
-        $PYTEST "$tests"
+        $PYTEST $PYTEST_SERIAL_EXTRA "$tests"
     fi
     exit $?
 fi
