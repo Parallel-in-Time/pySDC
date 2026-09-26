@@ -345,6 +345,16 @@ Then you can open `docs/build/html/index.html` using you favorite browser and ch
 > But you can still generate the website without it: just all images for the tutorials, projects and playgrounds will be missing.
 > This approach can be considered for local testing of your contribution when it does not concern parts containing images (_i.e_ project or code documentation).
 
+Tutorial pages listed in `BROWSER_PAGES` in `docs/source/conf.py` have a "Run in browser" button, which runs their code in [Pyodide](https://pyodide.org).
+CI presses it on every such page after building the site, and fails if a page does not finish or a cell raises.
+To do the same locally:
+
+```bash
+python -m pip install playwright
+python -m playwright install chromium
+python docs/check_run_in_browser.py docs/build/html
+```
+
 :arrow_left: [Back to Pull Request Recommendation](./01_pull_requests.md) ---
 :arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
 :arrow_right: [Next to Naming Conventions](./03_naming_conventions.md)

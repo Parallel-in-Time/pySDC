@@ -435,6 +435,13 @@ jobs:
             grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg"
             exit 1
           fi
+      - name: Run the tutorials in the browser
+        # Presses "Run in browser" on every page that has it, in headless Chromium, with Pyodide from
+        # jsDelivr and the wheels built above: what readers get once the site is online.
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps --only-shell chromium
+          python docs/check_run_in_browser.py docs/build/html
 
   coverage_comment_on_pr:
     runs-on: ubuntu-latest
