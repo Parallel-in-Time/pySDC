@@ -1,0 +1,28 @@
+.github/workflows/ci_pipeline.yml
+  s_619b2228c15391::t_7ad19bcca21b46 438-444
+pySDC/tutorial/step_9/B_paradiag_for_nonlinear_problems.py
+  s_619b2228c15391::t_4121a8db318275 169-170
+pySDC/tutorial/step_9/D_adaptive_alpha.py
+  s_619b2228c15391::t_4121a8db318275 33-34
+pySDC/tutorial/step_9/C_paradiag_in_pySDC.py
+  s_619b2228c15391::t_4121a8db318275 202-207,212-213
+pySDC/tutorial/step_9/E_paradiag_MPI.py
+  s_619b2228c15391::t_7a1b0ca33af00c 82-83
+  s_619b2228c15391::t_4121a8db318275 81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c76eb66dabc44a59c6e20acd9f5ee23767c59073",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
