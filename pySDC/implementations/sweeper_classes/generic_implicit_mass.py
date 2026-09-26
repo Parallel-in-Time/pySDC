@@ -1,22 +1,20 @@
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
-class imex_1st_order_mass(imex_1st_order):
-    """
-    Custom sweeper class, implements Sweeper.py
-
-    First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix
-    """
+class generic_implicit_mass(generic_implicit):
+    """Fully implicit SDC sweeper for the mass-matrix formulation (no M^-1 anywhere)."""
 
     def update_nodes(self):
         """
-        Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
+        Fully implicit sweep for problems posed in mass-matrix form, M u' = f(u), where eval_f
+        returns the load vector f and solve_system solves (M - factor J) u = rhs with rhs already
+        in the dual space. u0 carries the mass matrix on the finest level only; coarse levels
+        receive it already applied from the space-time transfer.
 
         Returns:
             None
         """
 
-        # get current level and problem description
         L = self.level
         P = L.prob
 
@@ -26,8 +24,12 @@ class imex_1st_order_mass(imex_1st_order):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
+        # update the MIN-SR-FLEX preconditioner
+        if self.params.QI == 'MIN-SR-FLEX':
+            self.QI = self.get_Qdelta_implicit(qd_type="MIN-SR-FLEX", k=L.status.sweep)
+
         # gather all terms which are known already (e.g. from the previous iteration)
-        # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
+        # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
 
         # get QF(u^k)
         integral = self.integrate()
@@ -39,9 +41,10 @@ class imex_1st_order_mass(imex_1st_order):
             u0 = L.u[0]
 
         for m in range(M):
-            # subtract QIFI(u^k)_m + QEFE(u^k)_m
-            for j in range(M + 1):
-                integral[m] -= L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
+            # get -QdF(u^k)_m
+            for j in range(1, M + 1):
+                integral[m] -= L.dt * self.QI[m + 1, j] * L.f[j]
+
             # add initial value
             integral[m] += u0
             # add tau if associated
@@ -52,13 +55,14 @@ class imex_1st_order_mass(imex_1st_order):
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = P.dtype_u(integral[m])
-            for j in range(m + 1):
-                rhs += L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
+            for j in range(1, m + 1):
+                rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
-            # implicit solve with prefactor stemming from QI
+            # implicit solve with prefactor stemming from the diagonal of Qd
             L.u[m + 1] = P.solve_system(
                 rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
             )
+
             # update function values
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
@@ -123,7 +127,9 @@ class imex_1st_order_mass(imex_1st_order):
         res_norm = []
         res = self.integrate()
         for m in range(self.coll.num_nodes):
+
             # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
+
             if L.level_index == 0:
                 res[m] += P.apply_mass_matrix(L.u[0] - L.u[m + 1])
             else:
@@ -131,8 +137,9 @@ class imex_1st_order_mass(imex_1st_order):
             # add tau if associated
             if L.tau[m] is not None:
                 res[m] += L.tau[m]
+
             # Due to different boundary conditions we might have to fix the residual
-            if L.prob.fix_bc_for_residual:
+            if getattr(L.prob, 'fix_bc_for_residual', False):
                 L.prob.fix_residual(res[m])
             # use abs function from data type here
             res_norm.append(abs(res[m]))

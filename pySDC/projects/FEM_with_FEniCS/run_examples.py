@@ -1,0 +1,143 @@
+"""
+Run every declared combination and write the tables the README quotes to
+``data/fem_with_fenics_out.txt``.
+"""
+
+from pathlib import Path
+
+import numpy as np
+
+from pySDC.helpers.stats_helper import get_sorted
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.projects.FEM_with_FEniCS.setups import (
+    EXAMPLES,
+    get_coarsenings,
+    get_description,
+    get_families,
+    get_order_study,
+    get_pfasst_procs,
+)
+
+#: Cost of one solution restriction as a fraction of one fine-level sweep. Measured across the
+#: examples as 0.006-0.014 for the L2 projection and 0.023-0.037 for point sampling, so it is a
+#: 1-10%% correction either way -- small, but not zero, and the metric used to assume it was zero.
+RESTRICTION_COST = 0.01
+
+
+def run(example, nlevels=1, num_procs=1, **kwargs):
+    """
+    Run one configuration.
+
+    Returns
+    -------
+    dict
+        ``niter`` (mean over the steps), ``uend``, ``dofs`` per level and ``work``, the number of
+        fine-level sweep equivalents: iterations times the summed dof ratio of the hierarchy, plus
+        the solution restrictions, which are not free -- see :data:`RESTRICTION_COST`.
+    """
+    description, controller_params, t0, Tend = get_description(example, nlevels=nlevels, **kwargs)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
+
+    step = controller.MS[0]
+    dofs = [level.prob.init.dim() for level in step.levels]
+    prob = step.levels[0].prob
+
+    uend, stats = controller.run(u0=prob.u_exact(t0), t0=t0, Tend=Tend)
+    niter = np.mean([item[1] for item in get_sorted(stats, type='niter', sortby='time')])
+
+    # one restriction per coarse level per iteration, projecting the M node values and u0
+    num_nodes = step.levels[0].sweep.coll.num_nodes
+    restrictions = (num_nodes + 1) * (len(dofs) - 1) * RESTRICTION_COST
+
+    return {
+        'niter': niter,
+        'uend': uend,
+        'dofs': dofs,
+        'work': niter * (sum(n / dofs[0] for n in dofs) + restrictions),
+    }
+
+
+def compare_mlsdc(example, family='CG', coarsening='h', out=print, **kwargs):
+    """SDC against MLSDC with 2 and 3 levels. Returns the per-level results keyed by nlevels."""
+    results = {
+        nlevels: run(example, nlevels=nlevels, family=family, coarsening=coarsening, **kwargs) for nlevels in (1, 2, 3)
+    }
+    ref = results[1]
+
+    ladder = 'mesh coarsening' if coarsening == 'h' else 'order coarsening'
+    out(f'\n{example} [{family}, {coarsening}]: SDC vs MLSDC ({ladder}, collocation nodes kept)')
+    out(f'  {"levels":>7s} {"dofs":>22s} {"niter":>7s} {"work":>7s} {"speed-up":>9s} {"|u - u_SDC|":>12s}')
+    for nlevels, res in results.items():
+        speedup = ref['work'] / res['work']
+        diff = abs(res['uend'] - ref['uend'])
+        out(
+            f'  {nlevels:7d} {str(res["dofs"]):>22s} {res["niter"]:7.2f} {res["work"]:7.2f} '
+            f'{speedup:8.2f}x {diff:12.2e}'
+        )
+    return results
+
+
+def check_pfasst(example, nlevels=2, family='CG', coarsening='h', procs=None, out=print, **kwargs):
+    """PFASST over a growing number of parallel steps. Returns the results keyed by num_procs."""
+    procs = get_pfasst_procs(example) if procs is None else procs
+    results = {
+        p: run(example, nlevels=nlevels, num_procs=p, family=family, coarsening=coarsening, **kwargs) for p in procs
+    }
+    ref = results[procs[0]]
+
+    out(f'\n{example} [{family}, {coarsening}]: PFASST with {nlevels} levels, iterations over parallel steps')
+    out(f'  {"procs":>6s} {"niter":>7s} {"|u - u_serial|":>15s}')
+    for p, res in results.items():
+        out(f'  {p:6d} {res["niter"]:7.2f} {abs(res["uend"] - ref["uend"]):15.2e}')
+    return results
+
+
+def compare_orders(example, orders, family='CG', out=print, **kwargs):
+    """
+    MLSDC speed-up against the element order, at identical dof counts on every level.
+
+    This is the table behind "use high-order elements": the refinement ladder is shifted so that
+    ``CG1``, ``CG2`` and ``CG4`` all give the same dofs per level, which leaves the *quality* of the
+    coarse space as the only thing that varies. Returns the speed-ups keyed by (order, nlevels).
+    """
+    speedups = {}
+    for order in orders:
+        results = {
+            nlevels: run(example, nlevels=nlevels, family=family, coarsening='h', order=order, **kwargs)
+            for nlevels in (1, 2, 3)
+        }
+        for nlevels in (2, 3):
+            speedups[(order, nlevels)] = results[1]['work'] / results[nlevels]['work']
+
+    out(f'\n{example} [{family}]: MLSDC speed-up against element order, at equal dofs per level')
+    out(f'  {"levels":>7s}' + ''.join(f'{"CG%d" % o:>12s}' for o in orders))
+    for nlevels in (2, 3):
+        out(f'  {nlevels:7d}' + ''.join(f'{speedups[(o, nlevels)]:11.2f}x' for o in orders))
+    return speedups
+
+
+def main():
+    Path('data').mkdir(parents=True, exist_ok=True)
+    with open('data/fem_with_fenics_out.txt', 'w') as f:
+
+        def out(line=''):
+            print(line)
+            f.write(str(line) + '\n')
+
+        out('FEniCS + pySDC, mass-matrix formulation throughout (no mass inverse anywhere).')
+        out(
+            f'work = iterations x [sum(dofs_l / dofs_0) + (M+1)(nlevels-1) x {RESTRICTION_COST}], '
+            'i.e. fine-level sweep equivalents including the solution restrictions.'
+        )
+        out('[family, coarsening]: CG/DG elements, h = coarser mesh, p = lower element order.')
+        for example in EXAMPLES:
+            for family in get_families(example):
+                for coarsening in get_coarsenings(example):
+                    compare_mlsdc(example, family=family, coarsening=coarsening, out=out)
+                    check_pfasst(example, family=family, coarsening=coarsening, out=out)
+            if get_order_study(example):
+                compare_orders(example, orders=get_order_study(example), out=out)
+
+
+if __name__ == '__main__':
+    main()
