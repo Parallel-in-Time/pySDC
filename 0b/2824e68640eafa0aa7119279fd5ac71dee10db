@@ -1,0 +1,39 @@
+docs/source/tutorial/step_7.rst
+  s_619b2228c15391::t_e7404ee85c990f 1-12
+pySDC/tutorial/step_7/G_pySDC_on_GPU.py
+  s_619b2228c15391::t_2fdda990e3c8d9 1-29,89-95,132-138,172-185
+pySDC/tutorial/step_7/README.rst
+  s_619b2228c15391::t_e7404ee85c990f 7-20
+pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py
+  s_619b2228c15391::t_8a19ca2c5b634b 1-29,87-93,147-154,206-218,243-246
+pySDC/tutorial/step_7/B_pySDC_with_mpi4pyfft.py
+  s_619b2228c15391::t_1d461ce89a31bc 1-27,166-174,191-205
+pySDC/tutorial/step_7/D_pySDC_with_PyTorch.py
+  s_619b2228c15391::t_f989779d57c002 1-27,35-53,135-144
+pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
+  s_619b2228c15391::t_528bbc80d7f69e 1-28,195-204,212-240
+docs/source/conf.py
+  s_619b2228c15391::t_e7404ee85c990f 45
+pySDC/tutorial/step_7/F_pySDC_with_Gusto.py
+  s_619b2228c15391::t_2309d995c25bd8 1-39,84-89,91,372-379,436-440
+pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py
+  s_619b2228c15391::t_12c113d2dc6cfc 1-26,109-122,211-218,231-246
+docs/source/tutorial/step_7
+  s_619b2228c15391::t_5791010591f077 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0b2824e68640eafa0aa7119279fd5ac71dee10db",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
