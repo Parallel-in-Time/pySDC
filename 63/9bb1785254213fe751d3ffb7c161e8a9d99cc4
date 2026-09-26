@@ -1,0 +1,28 @@
+docs/source/_static/custom.css
+  s_619b2228c15391::t_2bbeaa39071c74 28-29
+docs/source/conf.py
+  s_619b2228c15391::t_2bbeaa39071c74 69-83,136-140
+  s_619b2228c15391::t_599258cd5631dc 44
+docs/check_run_in_browser.py
+  s_619b2228c15391::t_599258cd5631dc 50-61,63-65,90-94
+  s_619b2228c15391::t_d0bd3042e78deb 95
+docs/source/_templates/notebook-links.html
+  s_619b2228c15391::t_2bbeaa39071c74 6-7,10,12
+  s_619b2228c15391::t_e9e49d14ae8365 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "639bb1785254213fe751d3ffb7c161e8a9d99cc4",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
