@@ -127,7 +127,7 @@ for QI in QI_list:
     print()
 
 # %% tags=["hide-input"]
-fig, axes = plt.subplots(1, len(QI_list), figsize=(10, 2.6), sharey=True)
+fig, axes = plt.subplots(1, len(QI_list), figsize=(10, 2.6), sharey=True, constrained_layout=True)
 vmax = max(max(niters) for _, niters in results.values())
 for ax, QI in zip(axes, QI_list, strict=True):
     image = ax.imshow([results[QI, n][1] for n in num_proc_list], cmap='viridis', aspect='auto', vmin=0, vmax=vmax)

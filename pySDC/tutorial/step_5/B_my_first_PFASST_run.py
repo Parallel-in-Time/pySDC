@@ -122,14 +122,13 @@ for num_proc in num_proc_list:
 # The iteration counts of all runs at a glance, one row per number of parallel steps:
 
 # %% tags=["hide-input"]
-fig, ax = plt.subplots(figsize=(8, 2.6))
+fig, ax = plt.subplots(figsize=(8, 2.6), constrained_layout=True)
 image = ax.imshow([results[n][1] for n in num_proc_list], cmap='viridis', aspect='auto', vmin=0)
 ax.set_yticks(range(len(num_proc_list)))
 ax.set_yticklabels(num_proc_list)
 ax.set_ylabel('parallel steps')
 ax.set_xlabel('time step')
 fig.colorbar(image, label='iterations')
-fig.tight_layout()
 
 # %% [markdown]
 # PFASST performs very well here: whether the 16 steps are computed one after another or all at once, they need

@@ -48,7 +48,7 @@ iterations_sl = run_pfasst(num_proc_list=[1], fname='step_6_A_sl_out.txt', multi
 iterations_ml = run_pfasst(num_proc_list=[1, 2, 4, 8], fname='step_6_A_ml_out.txt', multi_level=True)
 
 # %% tags=["hide-input"]
-fig, ax = plt.subplots(figsize=(8, 2.4))
+fig, ax = plt.subplots(figsize=(8, 2.4), constrained_layout=True)
 rows = {'SDC, 1': iterations_sl[1]}
 rows.update({f'{"MLSDC" if n == 1 else "PFASST"}, {n}': counts for n, counts in iterations_ml.items()})
 image = ax.imshow(list(rows.values()), cmap='viridis', aspect='auto', vmin=0)
@@ -57,7 +57,6 @@ ax.set_yticklabels(list(rows))
 ax.set_ylabel('method, processes')
 ax.set_xlabel('time step')
 fig.colorbar(image, label='iterations')
-fig.tight_layout()
 
 # %% [markdown]
 # :::{admonition} Important things to note

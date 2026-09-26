@@ -23,14 +23,13 @@ from pySDC.tutorial.step_6.pfasst_setup import run_pfasst
 iterations = run_pfasst(num_proc_list=[3, 5, 7, 9], fname='step_6_B_out.txt', multi_level=True)
 
 # %% tags=["hide-input"]
-fig, ax = plt.subplots(figsize=(8, 2.2))
+fig, ax = plt.subplots(figsize=(8, 2.2), constrained_layout=True)
 image = ax.imshow(list(iterations.values()), cmap='viridis', aspect='auto', vmin=0)
 ax.set_yticks(range(len(iterations)))
 ax.set_yticklabels(list(iterations))
 ax.set_ylabel('processes')
 ax.set_xlabel('time step')
 fig.colorbar(image, label='iterations')
-fig.tight_layout()
 
 # %% [markdown]
 # With 3 processes, the 8 steps come in blocks of 3, 3 and 2, and with 9 processes, one process has nothing to do.
