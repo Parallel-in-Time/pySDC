@@ -133,7 +133,8 @@ for ax, QI in zip(axes, QI_list, strict=True):
     image = ax.imshow([results[QI, n][1] for n in num_proc_list], cmap='viridis', aspect='auto', vmin=0, vmax=vmax)
     ax.set_title(f'QI = {QI}', fontsize=10)
     ax.set_xlabel('time step')
-axes[0].set_yticks(range(len(num_proc_list)), num_proc_list)
+axes[0].set_yticks(range(len(num_proc_list)))
+axes[0].set_yticklabels(num_proc_list)
 axes[0].set_ylabel('parallel steps')
 fig.colorbar(image, ax=axes, label='iterations')
 

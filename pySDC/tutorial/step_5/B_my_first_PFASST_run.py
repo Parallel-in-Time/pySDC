@@ -124,7 +124,8 @@ for num_proc in num_proc_list:
 # %% tags=["hide-input"]
 fig, ax = plt.subplots(figsize=(8, 2.6))
 image = ax.imshow([results[n][1] for n in num_proc_list], cmap='viridis', aspect='auto', vmin=0)
-ax.set_yticks(range(len(num_proc_list)), num_proc_list)
+ax.set_yticks(range(len(num_proc_list)))
+ax.set_yticklabels(num_proc_list)
 ax.set_ylabel('parallel steps')
 ax.set_xlabel('time step')
 fig.colorbar(image, label='iterations')

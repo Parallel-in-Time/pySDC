@@ -146,7 +146,7 @@ def set_parameters_ml():
 
 def set_parameters_sl():
     """
-    Helper routine to set parameters for the following multi-level runs
+    Helper routine to set parameters for the following single-level runs
 
     Returns:
         dict: dictionary containing the simulation parameters

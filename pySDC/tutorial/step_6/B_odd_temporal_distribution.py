@@ -25,7 +25,8 @@ iterations = run_pfasst(num_proc_list=[3, 5, 7, 9], fname='step_6_B_out.txt', mu
 # %% tags=["hide-input"]
 fig, ax = plt.subplots(figsize=(8, 2.2))
 image = ax.imshow(list(iterations.values()), cmap='viridis', aspect='auto', vmin=0)
-ax.set_yticks(range(len(iterations)), list(iterations))
+ax.set_yticks(range(len(iterations)))
+ax.set_yticklabels(list(iterations))
 ax.set_ylabel('processes')
 ax.set_xlabel('time step')
 fig.colorbar(image, label='iterations')

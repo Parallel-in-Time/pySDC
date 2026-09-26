@@ -79,10 +79,10 @@ for i, S in enumerate(controller.MS):
         ax.text(i + 0.5, L.level_index + 0.5, L.prob.nvars[0], ha='center', va='center', color='white', fontsize=9)
 ax.set_xlim(0, len(controller.MS))
 ax.set_ylim(len(controller.MS[0].levels), 0)
-ax.set_xticks(
-    [i + 0.5 for i in range(len(controller.MS))], [f'step {i}' for i in range(len(controller.MS))], fontsize=8
-)
-ax.set_yticks([0.5, 1.5, 2.5], ['level 0 (fine)', 'level 1', 'level 2 (coarse)'], fontsize=8)
+ax.set_xticks([i + 0.5 for i in range(len(controller.MS))])
+ax.set_xticklabels([f'step {i}' for i in range(len(controller.MS))], fontsize=8)
+ax.set_yticks([0.5, 1.5, 2.5])
+ax.set_yticklabels(['level 0 (fine)', 'level 1', 'level 2 (coarse)'], fontsize=8)
 ax.set_title('the steps in controller.MS, with the number of unknowns on each level', fontsize=10)
 ax.set_frame_on(False)
 fig.tight_layout()

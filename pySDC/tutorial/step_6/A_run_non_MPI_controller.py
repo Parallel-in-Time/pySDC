@@ -15,8 +15,8 @@
 # installations. By monitoring the convergence, it can already give a detailed idea of how PFASST will work for a
 # given problem.
 #
-# We run the heat equation of [Step 5](../step_5/B_my_first_PFASST_run) once on a single level, as SDC, and then with
-# two levels as PFASST on 1, 2, 4 and 8 processes. The setup is in `pfasst_setup.py` next to this tutorial, as
+# We run an unforced heat equation, on a smaller grid than in [Step 5](../step_5/B_my_first_PFASST_run), once on a
+# single level, as SDC, and then with two levels on 1, 2, 4 and 8 processes: MLSDC on one, PFASST on more. The setup is in `pfasst_setup.py` next to this tutorial, as
 # [Parts B](B_odd_temporal_distribution) and [C](C_MPI_parallelization) use it as well. The parameters of the
 # multi-level runs:
 #
@@ -49,9 +49,11 @@ iterations_ml = run_pfasst(num_proc_list=[1, 2, 4, 8], fname='step_6_A_ml_out.tx
 
 # %% tags=["hide-input"]
 fig, ax = plt.subplots(figsize=(8, 2.4))
-rows = {'SDC, 1': iterations_sl[1], **{f'PFASST, {n}': counts for n, counts in iterations_ml.items()}}
+rows = {'SDC, 1': iterations_sl[1]}
+rows.update({f'{"MLSDC" if n == 1 else "PFASST"}, {n}': counts for n, counts in iterations_ml.items()})
 image = ax.imshow(list(rows.values()), cmap='viridis', aspect='auto', vmin=0)
-ax.set_yticks(range(len(rows)), list(rows))
+ax.set_yticks(range(len(rows)))
+ax.set_yticklabels(list(rows))
 ax.set_ylabel('method, processes')
 ax.set_xlabel('time step')
 fig.colorbar(image, label='iterations')
