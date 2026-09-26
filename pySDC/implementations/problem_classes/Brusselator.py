@@ -150,8 +150,7 @@ class Brusselator(IMEX_Laplacian_MPIFFT):
         import matplotlib.pyplot as plt
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-        plt.rcParams['figure.constrained_layout.use'] = True
-        self.fig, axs = plt.subplots(1, 2, sharex=True, sharey=True, figsize=((8, 3)))
+        self.fig, axs = plt.subplots(1, 2, sharex=True, sharey=True, figsize=((8, 3)), constrained_layout=True)
         divider = make_axes_locatable(axs[1])
         self.cax = divider.append_axes('right', size='3%', pad=0.03)
         return self.fig

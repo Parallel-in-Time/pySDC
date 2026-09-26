@@ -115,8 +115,7 @@ class Burgers1D(GenericSpectralLinear):
         """
         import matplotlib.pyplot as plt
 
-        plt.rcParams['figure.constrained_layout.use'] = True
-        self.fig, axs = plt.subplots()
+        self.fig, axs = plt.subplots(constrained_layout=True)
         return self.fig
 
     def plot(self, u, t=None, fig=None, comp='u'):  # pragma: no cover
@@ -287,8 +286,7 @@ class Burgers2D(GenericSpectralLinear):
         import matplotlib.pyplot as plt
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-        plt.rcParams['figure.constrained_layout.use'] = True
-        self.fig, axs = plt.subplots(3, 1, sharex=True, sharey=True, figsize=((8, 7)))
+        self.fig, axs = plt.subplots(3, 1, sharex=True, sharey=True, figsize=((8, 7)), constrained_layout=True)
         self.cax = []
         divider = make_axes_locatable(axs[0])
         self.cax += [divider.append_axes('right', size='3%', pad=0.03)]
