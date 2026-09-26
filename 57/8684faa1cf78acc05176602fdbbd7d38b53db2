@@ -1,0 +1,39 @@
+pySDC/tutorial/step_8/C_iteration_estimator.py
+  s_619b2228c15391::t_b914331ce9ef28 1-37,42-54,59,62,64,72,75-79,82-89,96,99,102,105,108-116,126,129,132-140,147,150,153,156,159-167,177,180,183,186,189,192,195-203,210-217,220,250,272,279,287,290-299,301,304-317,322-323,326-331
+  s_619b2228c15391::t_0e1fa5053546e1 318-319
+  s_619b2228c15391::t_506f13c99671a2 38-41,300,302-303,320-321,324-325
+pySDC/tutorial/step_8/A_visualize_residuals.py
+  s_619b2228c15391::t_3401d24e8ef898 1-19,26-127
+docs/source/tutorial/step_8.rst
+  s_619b2228c15391::t_cbc2dfea1a7c1c 1-8
+pySDC/tutorial/step_8/README.rst
+  s_619b2228c15391::t_cbc2dfea1a7c1c 4-6,8-10,12-14
+pySDC/tutorial/step_8/HookClass_error_output.py
+  s_619b2228c15391::t_a3e79bb3583210 28-30,32-34
+pySDC/tutorial/step_8/B_multistep_SDC.py
+  s_619b2228c15391::t_9c63e846290427 174-175
+  s_619b2228c15391::t_f51ad4671aeaef 1-23,27,36-104,108-149,152-173,176-182,186-189
+  s_619b2228c15391::t_cbc2dfea1a7c1c 105-107,183-185
+docs/source/conf.py
+  s_619b2228c15391::t_c6230081fa7c97 74
+pySDC/tests/test_tutorials/test_step_8.py
+  s_619b2228c15391::t_cbc2dfea1a7c1c 1,3,6,8-15
+docs/source/tutorial/step_8
+  s_619b2228c15391::t_3b037b6e7fc688 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "578684faa1cf78acc05176602fdbbd7d38b53db2",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
