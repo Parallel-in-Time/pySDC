@@ -2,7 +2,7 @@
 import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.mjs';
 
 const RUNNER = `
-import ast, base64, contextlib, io, json, os, sys, traceback, warnings
+import ast, base64, io, json, os, sys, traceback, warnings
 
 os.environ['MPLBACKEND'] = 'Agg'
 import matplotlib.pyplot as plt
@@ -15,18 +15,30 @@ warnings.filterwarnings('ignore', category=MatplotlibDeprecationWarning)
 namespace = {'__name__': '__main__'}
 
 
+class CellOutput(io.TextIOBase):
+    """Stands in for stdout and stderr for good, and writes to the current cell, as in Jupyter. Loggers keep the
+    stream they found when they were created, e.g. a controller made in one cell and run in the next."""
+
+    current = io.StringIO()
+
+    def write(self, text):
+        return CellOutput.current.write(text)
+
+
+sys.stdout = sys.stderr = CellOutput()
+
+
 def run_cell(code):
     """Run one cell like Jupyter does: show stdout, the value of a trailing expression, and all new figures"""
-    out, error = io.StringIO(), None
+    CellOutput.current, error = io.StringIO(), None
     try:
         tree = ast.parse(code)
         last = tree.body.pop() if tree.body and isinstance(tree.body[-1], ast.Expr) else None
-        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
-            exec(compile(tree, '<cell>', 'exec'), namespace)
-            if last is not None:
-                value = eval(compile(ast.Expression(last.value), '<cell>', 'eval'), namespace)
-                if value is not None:
-                    print(repr(value))
+        exec(compile(tree, '<cell>', 'exec'), namespace)
+        if last is not None:
+            value = eval(compile(ast.Expression(last.value), '<cell>', 'eval'), namespace)
+            if value is not None:
+                print(repr(value))
     except Exception:
         kind, value, tb = sys.exc_info()
         error = ''.join(traceback.format_exception(kind, value, tb.tb_next))
@@ -36,7 +48,7 @@ def run_cell(code):
         plt.figure(number).savefig(buffer, format='png', bbox_inches='tight')
         images.append(base64.b64encode(buffer.getvalue()).decode())
     plt.close('all')
-    return json.dumps({'stdout': out.getvalue(), 'error': error, 'images': images})
+    return json.dumps({'stdout': CellOutput.current.getvalue(), 'error': error, 'images': images})
 `;
 
 let pyodide;
