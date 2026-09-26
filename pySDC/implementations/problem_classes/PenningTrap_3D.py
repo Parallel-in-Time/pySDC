@@ -1,5 +1,12 @@
 import numpy as np
-from numba import jit
+
+try:
+    from numba import jit
+except ImportError:  # numba does not exist everywhere, e.g. not in the browser (Pyodide): run uncompiled there
+
+    def jit(*args, **kwargs):
+        return lambda function: function
+
 
 from pySDC.core.errors import ProblemError
 from pySDC.core.problem import Problem, WorkCounter

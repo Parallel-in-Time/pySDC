@@ -31,7 +31,9 @@ dependencies = [
     'scipy>=0.17.1',
     'matplotlib>=3.0',
     'sympy>=1.0',
-    'numba>=0.35',
+    # Only PenningTrap_3D uses numba, and it falls back to plain Python without it. Pyodide has no numba,
+    # so this marker is what lets `pip install pySDC` work in the browser.
+    'numba>=0.35; sys_platform != "emscripten"',
     'dill>=0.2.6',
     'qmat>=0.1.19',
     ]
