@@ -1,0 +1,26 @@
+pySDC/tutorial/step_1/C_collocation_problem_setup.py
+  s_619b2228c15391::t_ab6339796f776e 42,49-52
+  s_619b2228c15391::t_9c389f5c6d2923 43
+pySDC/tutorial/step_1/D_collocation_accuracy_check.py
+  s_619b2228c15391::t_ab6339796f776e 137-142,163-164
+pySDC/tutorial/step_4/A_spatial_transfer_operators.py
+  s_619b2228c15391::t_471cc996854cf1 68-71
+pySDC/tutorial/step_1/B_spatial_accuracy_check.py
+  s_619b2228c15391::t_ab6339796f776e 165-167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d763abbbffce574883dc8b81c591891bf0e99ac0",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
