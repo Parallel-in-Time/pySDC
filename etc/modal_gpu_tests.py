@@ -162,6 +162,13 @@ def run_cupy_tests(trees, selection):
         # well. Without it the failure above reads "unhandled cuda error (run with NCCL_DEBUG=INFO
         # for details)", on a host that is gone by the time anyone reads the log.
         'NCCL_DEBUG': 'WARN',
+        # NCCL's shared-memory transport allocates its host buffers as cuMem handles and passes
+        # them between ranks, and on some Modal hosts importing one fails
+        # (`ncclShmImportShareableBuffer`: CUDA 801, operation not supported), which poisons the
+        # context for every test after it. Plain /dev/shm works everywhere. Only the host side:
+        # `NCCL_CUMEM_ENABLE=0` fixes it too, but then every communicator callocs 512 MB up front
+        # and `test_heterogeneous_implementation`, which builds several, runs out of memory.
+        'NCCL_CUMEM_HOST_ENABLE': '0',
     }
     returncode = 0
     for tree in trees:
