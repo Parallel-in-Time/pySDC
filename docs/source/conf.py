@@ -65,7 +65,13 @@ html_js_files = [('run-in-browser.js', {'type': 'module'})]
 # Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, FEniCS,
 # PETSc, ...), was measured by running every tutorial there. The wheels are built by docs/update_apidocs.sh;
 # without them, no page gets the button.
-BROWSER_PAGES = ['tutorial/step_1/*', 'tutorial/step_2/*', 'tutorial/step_3/*', 'tutorial/step_4/*']
+BROWSER_PAGES = [
+    'tutorial/step_1/*',
+    'tutorial/step_2/*',
+    'tutorial/step_3/*',
+    'tutorial/step_4/*',
+    'tutorial/step_5/*',
+]
 BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
     'logo': {'text': 'pySDC'},
