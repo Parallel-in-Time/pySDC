@@ -1,36 +1,38 @@
-"""
-This script shows how to setup ParaDiag in pySDC for two examples and compares performance to single-level PFASST in
-Jacobi mode and serial time stepping.
-In PFASST, we use a diagonal preconditioner, which allows for the same amount of parallelism as ParaDiag.
-We show iteration counts per step here, but both schemes have further concurrency across the nodes.
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+# ---
 
-We have a linear advection example, discretized with finite differences, where ParaDiag converges in very few iterations.
-PFASST, on the hand, needs a lot more iterations for this hyperbolic problem.
-Note that we did not optimize either setup. With different choice of alpha in ParaDiag, or inexactness and coarsening
-in PFASST, both schemes could be improved significantly.
+# %% [markdown]
+# # Part C: ParaDiag in pySDC
+#
+# Here we leave the hand-written linear algebra behind and set ParaDiag up through pySDC's controllers, comparing it
+# with single-level PFASST in Jacobi mode and with serial time stepping. In PFASST, we use a diagonal preconditioner,
+# which allows for the same amount of parallelism as ParaDiag. We show iteration counts per step, but both schemes
+# have further concurrency across the nodes.
+#
+# Two examples: a linear advection problem, discretized with finite differences, and the nonlinear van der Pol
+# oscillator, with `mu` chosen such that the problem is not overly stiff. Neither setup is optimized: with a
+# different choice of $\alpha$ in ParaDiag, or with inexactness and coarsening in PFASST, both schemes could be
+# improved significantly. This is not meant to show that one parallelization scheme is better than the other. It
+# does show that both, without optimization, need fewer iterations per task than serial time stepping. Kindly refrain
+# from computing parallel efficiency from these numbers, though. ;)
+#
+# ## The setups
+#
+# ParaDiag needs its own sweeper, `QDiagonalization`, and its own controller, `controller_ParaDiag_nonMPI`. Its
+# controller parameters set $\alpha$, and whether to average the Jacobian (for the nonlinear problem only, as it
+# costs communication).
 
-Second is the nonlinear van der Pol oscillator. We choose the mu parameter such that the problem is not overly stiff.
-Here, ParaDiag needs many iterations compared to PFASST, but remember that we only perform one Newton iteration per
-ParaDiag iteration. So per node, the number of Newton iterations is equal to the number of ParaDiag iterations.
-In PFASST, on the other hand, we solve the systems to some accuracy and allow more iterations. Here, ParaDiag needs
-fewer Newton iterations per step in total, leaving it with greater speedup. Again, inexactness could improve PFASST.
-
-This script is not meant to show that one parallelization scheme is better than the other. It does, however, demonstrate
-that both schemes, without optimization, need fewer iterations per task than serial time stepping. Kindly refrain from
-computing parallel efficiency for these examples, however. ;)
-"""
-
+# %%
+import matplotlib.pyplot as plt
 import numpy as np
-import sys
+
 from pySDC.helpers.stats_helper import get_sorted
-
-# prepare output
-out_file = open('data/step_9_C_out.txt', 'w')
-
-
-def my_print(*args, **kwargs):
-    for output in [sys.stdout, out_file]:
-        print(*args, **kwargs, file=output)
 
 
 def get_description(problem='advection', mode='ParaDiag'):
@@ -135,8 +137,19 @@ def run_problem(
     return uend, stats
 
 
+# %% [markdown]
+# The solution becomes complex, because the diagonalization is: `run_problem` switches the data type of the problems
+# to complex numbers before the run.
+#
+# ## The comparison
+#
+# ParaDiag, PFASST in Jacobi mode and serial time stepping, for 16 steps. Besides the iterations, we compare the work
+# of the inner solvers: GMRES iterations for advection, Jacobian solves for van der Pol.
+
+
+# %%
 def compare_ParaDiag_and_PFASST(n_steps, problem):
-    my_print(f'Running {problem} with {n_steps} steps')
+    print(f'Running {problem} with {n_steps} steps')
 
     uend_PD, stats_PD = run_problem(n_steps, problem, mode='ParaDiag')
     uend_PF, stats_PF = run_problem(n_steps, problem, mode='PFASST')
@@ -151,30 +164,53 @@ def compare_ParaDiag_and_PFASST(n_steps, problem):
     k_PD = get_sorted(stats_PD, type='k')
     k_PF = get_sorted(stats_PF, type='k')
 
-    my_print(
+    print(
         f'Needed {max(me[1] for me in k_PD)} ParaDiag iterations and {max(me[1] for me in k_PF)} single-level PFASST iterations'
     )
     if problem == 'advection':
         k_GMRES_PD = get_sorted(stats_PD, type='work_GMRES')
         k_GMRES_PF = get_sorted(stats_PF, type='work_GMRES')
         k_GMRES_S = get_sorted(stats_S, type='work_GMRES')
-        my_print(
+        print(
             f'Maximum GMRES iterations on each step: {max(me[1] for me in k_GMRES_PD)} in ParaDiag, {max(me[1] for me in k_GMRES_PF)} in single-level PFASST and {sum(me[1] for me in k_GMRES_S)} total GMRES iterations in serial'
         )
     elif problem == 'vdp':
         k_Jac_PD = get_sorted(stats_PD, type='work_jacobian_solves')
         k_Jac_PF = get_sorted(stats_PF, type='work_jacobian_solves')
         k_Jac_S = get_sorted(stats_S, type='work_jacobian_solves')
-        my_print(
-            f'Maximum Jacabian solves on each step: {max(me[1] for me in k_Jac_PD)} in ParaDiag, {max(me[1] for me in k_Jac_PF)} in single-level PFASST and {sum(me[1] for me in k_Jac_S)} total Jacobian solves in serial'
+        print(
+            f'Maximum Jacobian solves on each step: {max(me[1] for me in k_Jac_PD)} in ParaDiag, {max(me[1] for me in k_Jac_PF)} in single-level PFASST and {sum(me[1] for me in k_Jac_S)} total Jacobian solves in serial'
         )
-    my_print()
+    print()
+    return max(me[1] for me in k_PD), max(me[1] for me in k_PF)
 
 
-if __name__ == '__main__':
-    out_file = open('data/step_9_C_out.txt', 'w')
-    params = {
-        'n_steps': 16,
-    }
-    # compare_ParaDiag_and_PFASST(**params, problem='advection')
-    compare_ParaDiag_and_PFASST(**params, problem='vdp')
+# %%
+iterations = {problem: compare_ParaDiag_and_PFASST(n_steps=16, problem=problem) for problem in ['advection', 'vdp']}
+
+# %% tags=["hide-input"]
+fig, ax = plt.subplots(figsize=(6, 3))
+x = np.arange(len(iterations))
+ax.bar(x - 0.2, [k[0] for k in iterations.values()], width=0.4, label='ParaDiag')
+ax.bar(x + 0.2, [k[1] for k in iterations.values()], width=0.4, label='single-level PFASST')
+ax.set_xticks(x, ['advection', 'van der Pol'])
+ax.set_ylabel('iterations')
+ax.legend(frameon=False)
+fig.tight_layout()
+
+# %% [markdown]
+# ParaDiag converges in very few iterations for the hyperbolic advection problem, where PFASST struggles, and the
+# picture reverses for van der Pol. Remember, though, that ParaDiag does only one Newton iteration per ParaDiag
+# iteration, so per node, its number of Newton iterations equals the number of ParaDiag iterations. PFASST solves
+# the systems to some accuracy and allows more iterations. So ParaDiag needs fewer Jacobian solves per step in total,
+# which leaves it with the greater speedup. Again, inexactness could improve PFASST.
+#
+# :::{admonition} Important things to note
+# - ParaDiag needs its own sweeper (`QDiagonalization`) and its own controller.
+# - The solution becomes complex, because the diagonalization is.
+# - ParaDiag converges in very few iterations for the hyperbolic advection example, where PFASST struggles, and the
+#   picture reverses for the van der Pol oscillator.
+# :::
+#
+# The checks the tests run are inside `compare_ParaDiag_and_PFASST`: all three methods agree, and the two iterative
+# ones are not identical.
