@@ -15,15 +15,14 @@ SPHINX_APIDOC="`which sphinx-apidoc`"
     }
 
 echo "removing existing .rst files ..."
-rm ${PWD}/docs/source/pySDC/*.rst
-#rm -r ${PWD}/target/doc/build
-#rm -r ${PWD}/*_out.txt ${PWD}/*.png run_*.log
+rm -f ${PWD}/docs/source/pySDC/*.rst
 
 echo ""
 echo "generating new .rst files ..."
-${SPHINX_APIDOC} -o docs/source/pySDC pySDC/core --force -T -d 2 -e
-${SPHINX_APIDOC} -o docs/source/pySDC pySDC/implementations --force -T -d 2 -e
-${SPHINX_APIDOC} -o docs/source/pySDC pySDC/helpers --force -T -d 2 -e
-#rm docs/source/pySDC/pySDC.rst
+# One run over the whole package, so that modules are documented under their import names (pySDC.core...).
+${SPHINX_APIDOC} -o docs/source/pySDC pySDC pySDC/tutorial pySDC/projects pySDC/playgrounds pySDC/tests --force -T -d 2 -e
+# The package page would be a second, orphaned entry point next to api.rst.
+rm docs/source/pySDC/pySDC.rst
 
 ./docs/convert_markdown.py
+
