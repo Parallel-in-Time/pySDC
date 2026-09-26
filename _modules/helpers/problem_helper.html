@@ -38,6 +38,7 @@
             
   <h1>Source code for helpers.problem_helper</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">factorial</span>
 
 
@@ -187,7 +188,9 @@
             <span class="k">if</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">A_1d</span> <span class="o">+=</span> <span class="n">coeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">size</span> <span class="o">+</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">A_1d</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">'lil'</span><span class="p">)</span>
+        <span class="c1"># Built on the host whatever the target: the boundary rows are edited in place below, which</span>
+        <span class="c1"># needs `lil`, and CuPy has no `lil`. The matrix moves to the device once it is finished.</span>
+        <span class="n">A_1d</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">'lil'</span><span class="p">)</span>
 
         <span class="c1"># Default parameters for Dirichlet and Neumann BCs</span>
         <span class="n">bc_params_defaults</span> <span class="o">=</span> <span class="p">{</span>
@@ -269,7 +272,7 @@
                     <span class="n">b</span><span class="p">[</span><span class="n">iLine</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="o">*</span> <span class="n">b_coeff</span><span class="p">[</span><span class="n">iCoeff</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_coeff</span><span class="p">[</span><span class="n">iCoeff</span><span class="p">]</span> <span class="o">*</span> <span class="n">dx</span>
 
     <span class="c1"># TODO: extend the BCs to higher dimensions</span>
-    <span class="n">A_1d</span> <span class="o">=</span> <span class="n">A_1d</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+    <span class="n">A_1d</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">(</span><span class="n">A_1d</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">A</span> <span class="o">=</span> <span class="n">A_1d</span>
     <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
