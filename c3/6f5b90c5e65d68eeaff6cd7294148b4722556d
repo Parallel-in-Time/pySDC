@@ -1,0 +1,46 @@
+docs/source/conf.py
+  s_619b2228c15391::t_b6fde0a464d9e1 29-30
+  s_619b2228c15391::t_f35ba92b016a78 1,8-15,23-24,34,36-37,39-59
+docs/source/_static/custom.css
+  s_619b2228c15391::t_4e044cb753b70c 1-4
+docs/source/development.rst
+  s_619b2228c15391::t_9f2b9537e69991 1-21
+etc/environment-postprocess.yml
+  s_619b2228c15391::t_d27b82adc07f34 9-11
+docs/source/.gitignore
+  s_619b2228c15391::t_9f2b9537e69991 5-6
+docs/source/projects/index.rst
+  s_619b2228c15391::t_1e05b9c6a638cb 1-32
+docs/update_apidocs.sh
+  s_619b2228c15391::t_9f2b9537e69991 18,22-25
+  s_619b2228c15391::t_3f9c620390fbf6 28
+docs/source/projects/RayleighBenard.rst
+  s_619b2228c15391::t_1e05b9c6a638cb 1
+docs/source/projects/StroemungsRaum.rst
+  s_619b2228c15391::t_1e05b9c6a638cb 1
+pySDC/tutorial/README.rst
+  s_619b2228c15391::t_1e05b9c6a638cb 6
+docs/source/index.rst
+  s_619b2228c15391::t_87cb5ec66bb660 1,3-4,6,8,10,12-14,16,18-35,38-39,41,43,45,47-51,53-55,57,59-72,75-78
+  s_619b2228c15391::t_84675113f502ef 42,74
+docs/source/tutorial/index.rst
+  s_619b2228c15391::t_1e05b9c6a638cb 1-17
+docs/source/api.rst
+  s_619b2228c15391::t_0ddbd748d5a732 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c36f5b90c5e65d68eeaff6cd7294148b4722556d",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
