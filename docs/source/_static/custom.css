@@ -5,3 +5,23 @@
 .notebook-links { display: flex; gap: 0.4rem; }
 .notebook-links .btn { border: 1px solid var(--pst-color-border); border-radius: 999px; font-size: 0.8rem; }
 
+/* Run in browser, see run-in-browser.js */
+.notebook-links { flex-wrap: wrap; align-items: center; }
+.notebook-links .run-in-browser { background: var(--pst-color-primary); color: var(--pst-color-background); border-color: var(--pst-color-primary); }
+.notebook-links .run-in-browser:disabled { opacity: 0.6; cursor: wait; }
+.rib-status { flex-basis: 100%; margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--pst-color-text-muted); }
+.rib-status:empty { display: none; }
+.rib-live .cell_input { position: relative; }
+.rib-live .cell_input pre { outline: none; }
+.rib-live .cell_input:focus-within { box-shadow: 0 0 0 2px var(--pst-color-primary); border-radius: 4px; }
+.rib-cell-run {
+  position: absolute; right: 0.4rem; bottom: 0.4rem; z-index: 2; width: 1.7rem; height: 1.7rem; border-radius: 50%;
+  border: 1px solid var(--pst-color-border); background: var(--pst-color-background); color: var(--pst-color-primary);
+  font-size: 0.7rem; line-height: 1; cursor: pointer;
+}
+.rib-running .cell_input { box-shadow: 0 0 0 2px var(--pst-color-warning); border-radius: 4px; }
+.rib-running .rib-cell-run { animation: rib-pulse 1s infinite; }
+@keyframes rib-pulse { 50% { opacity: 0.3; } }
+.cell_output pre.rib-stdout { margin: 0.3rem 0; padding: 0.6rem; background: var(--pst-color-surface); border: none; }
+.cell_output pre.rib-error { margin: 0.3rem 0; padding: 0.6rem; color: var(--pst-color-danger); background: var(--pst-color-surface); border-left: 3px solid var(--pst-color-danger); }
+.cell_output img { max-width: 100%; }

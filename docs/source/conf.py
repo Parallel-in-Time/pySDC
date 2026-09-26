@@ -2,6 +2,7 @@
 
 import os
 import sys
+from fnmatch import fnmatch
 from pathlib import Path
 
 ROOT = os.path.abspath('../../')
@@ -51,6 +52,13 @@ html_theme = 'pydata_sphinx_theme'
 html_title = 'pySDC'
 html_static_path = ['_static']
 html_css_files = ['custom.css']
+html_js_files = [('run-in-browser.js', {'type': 'module'})]
+
+# Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, FEniCS,
+# PETSc, ...), was measured by running every tutorial there. The wheels are built by docs/update_apidocs.sh;
+# without them, no page gets the button.
+BROWSER_PAGES = ['tutorial/step_1/*']
+BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
     'logo': {'text': 'pySDC'},
     'icon_links': [
@@ -101,5 +109,11 @@ def write_notebooks(app, exception):
             nbformat.write(notebook, Path(app.outdir) / f'{docname}.ipynb')
 
 
+def add_run_in_browser(app, pagename, templatename, context, doctree):
+    context['run_in_browser'] = bool(BROWSER_WHEELS) and any(fnmatch(pagename, page) for page in BROWSER_PAGES)
+    context['browser_wheels'] = BROWSER_WHEELS
+
+
 def setup(app):
     app.connect('build-finished', write_notebooks)
+    app.connect('html-page-context', add_run_in_browser)

@@ -26,3 +26,8 @@ rm docs/source/pySDC/pySDC.rst
 
 ./docs/convert_markdown.py
 
+echo ""
+echo "building the wheels the tutorials install when they run in the browser ..."
+# From this checkout, so the browser runs the code the pages were built from. qmat has no wheel on PyPI.
+rm -rf docs/source/_static/wheels
+python -m pip wheel . qmat dill --no-deps --quiet -w docs/source/_static/wheels
