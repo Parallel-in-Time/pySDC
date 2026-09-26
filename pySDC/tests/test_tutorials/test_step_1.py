@@ -16,4 +16,9 @@ import pytest
     ],
 )
 def test_part(part):
-    runpy.run_module(f'pySDC.tutorial.step_1.{part}', run_name='__main__')
+    import matplotlib.pyplot as plt
+
+    try:
+        runpy.run_module(f'pySDC.tutorial.step_1.{part}', run_name='__main__')
+    finally:
+        plt.close('all')  # the parts leave their figures open, as a notebook does
