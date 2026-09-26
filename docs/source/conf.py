@@ -71,6 +71,7 @@ BROWSER_PAGES = [
     'tutorial/step_3/*',
     'tutorial/step_4/*',
     'tutorial/step_5/*',
+    'tutorial/step_8/*',
 ]
 BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
