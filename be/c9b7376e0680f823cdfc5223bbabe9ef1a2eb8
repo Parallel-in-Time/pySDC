@@ -1,0 +1,26 @@
+docs/check_run_in_browser.py
+  s_619b2228c15391::t_8b37494a0dff1a 17,25,27,31,34-36,46
+  s_619b2228c15391::t_26d8925f7aa5f5 32-33,41
+  s_619b2228c15391::t_e2c8bd0d6a643a 1-16,18-24,26,28-30,37-40,42-45,47-54,60-82
+  s_619b2228c15391::t_4d7f8d43683c57 55-59
+docs/contrib/02_continuous_integration.md
+  s_619b2228c15391::t_ac212539f9277c 348-357
+.github/workflows/ci_pipeline.yml
+  s_619b2228c15391::t_a4539d71686620 438-444
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bec9b7376e0680f823cdfc5223bbabe9ef1a2eb8",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
