@@ -53,12 +53,13 @@ class Controller(object):
         user_hooks = controller_params.get('hook_class', [])
         hook_classes += user_hooks if type(user_hooks) == list else [user_hooks]
         [self.add_hook(hook) for hook in hook_classes]
-        controller_params['hook_class'] = hook_classes
 
         for hook in self.hooks:
             hook.pre_setup(step=None, level_number=None)
 
-        self.params: _Pars = _Pars(controller_params)
+        # the hooks go into the parameters, not into the caller's dictionary, where dump_setup would mark the
+        # defaults as user-defined and a controller reusing the dictionary would get them again
+        self.params: _Pars = _Pars({**controller_params, 'hook_class': hook_classes})
 
         self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file, self.params.fname)
         self.logger: logging.Logger = logging.getLogger('controller')
@@ -204,7 +205,7 @@ class Controller(object):
         out += '\nStep: %s\n' % step.__class__
         for k, v in sorted(vars(step.params).items()):
             if not k.startswith('_'):
-                if k in description['step_params']:
+                if k in description.get('step_params', {}):
                     out += '--> %s = %s\n' % (k, v)
                 else:
                     out += '    %s = %s\n' % (k, v)
@@ -225,8 +226,8 @@ class Controller(object):
                     out += '-->             %s = %s\n' % (k, v)
                 else:
                     out += '                %s = %s\n' % (k, v)
-            out += '-->             Data type u: %s\n' % L.prob.dtype_u
-            out += '-->             Data type f: %s\n' % L.prob.dtype_f
+            out += ' ->             Data type u: %s\n' % L.prob.dtype_u
+            out += ' ->             Data type f: %s\n' % L.prob.dtype_f
             out += '-->             Sweeper: %s\n' % L.sweep.__class__
             for k, v in sorted(vars(L.sweep.params).items()):
                 if not k.startswith('_'):
@@ -234,7 +235,7 @@ class Controller(object):
                         out += '-->                 %s = %s\n' % (k, v)
                     else:
                         out += '                    %s = %s\n' % (k, v)
-            out += '-->                 Collocation: %s\n' % L.sweep.coll.__class__
+            out += ' ->                 Collocation: %s\n' % L.sweep.coll.__class__
 
         if len(step.levels) > 1:
             if 'base_transfer_class' in description and description['base_transfer_class'] is not BaseTransfer:

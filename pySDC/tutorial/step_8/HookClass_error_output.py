@@ -30,7 +30,8 @@ class error_output(Hooks):
         if type(L.prob) != auzinger:
             description['problem_params']['solver_type'] = 'direct'
 
-        controller_params = step.params.controller_params
+        # a copy: this hook runs in every step, and the outer run's parameters must keep it
+        controller_params = dict(step.params.controller_params)
         del controller_params['hook_class']  # get rid of the hook, otherwise this will be an endless recursion..
         controller_params['logger_level'] = 90
         controller_params['convergence_controllers'] = {}
