@@ -1,0 +1,43 @@
+docs/source/_static/playground.js
+  s_619b2228c15391::t_98ef1e9fca10fd 1-138
+docs/source/getting_started.md
+  s_619b2228c15391::t_e195994590be59 1-34
+docs/source/api/index.md
+  s_619b2228c15391::t_73d0eb6aaded1c 1-201
+docs/source/projects/index.md
+  s_619b2228c15391::t_ebd43a40ad4ada 1-128
+docs/source/projects/more.md
+  s_619b2228c15391::t_f9bb29107d6fe2 1-11
+docs/source/index.md
+  s_619b2228c15391::t_433399d6d608ee 1-109
+  s_619b2228c15391::t_c258e1f1f3558d 110-114
+docs/source/tutorials/index.md
+  s_619b2228c15391::t_9b21b6c58da136 1-128
+docs/source/_static/pysdc.css
+  s_619b2228c15391::t_47c6a4ef38b270 1-53
+  s_619b2228c15391::t_33ed97d4f53c64 54-55
+docs/source/tutorials/sdc_in_ten_minutes.py
+  s_619b2228c15391::t_e5ff16bd26242b 1-224
+  s_619b2228c15391::t_2daea6fd6cd400 225
+docs/source/conf.py
+  s_619b2228c15391::t_7a1a4238a599ff 1,7-10,13-15,17,21,25-36,38-41,44-85
+  s_619b2228c15391::t_33813834750964 86
+.gitignore
+  s_619b2228c15391::t_e2e6d708dcb359 172-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "22267a81742a71f0c3253e292b179856ac96e231",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
