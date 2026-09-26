@@ -45,6 +45,15 @@ def test_C_run():
     main(fname)
 
 
+def _results(fname):
+    """The errors and the iteration lines of one results file, in order"""
+    with open('data/' + fname) as f:
+        lines = [line.strip() for line in f if line.strip()]
+    errors = [float(line.split()[-1]) for line in lines if 'Error vs. exact solution' in line]
+    iterations = [line for line in lines if 'iterations' in line]
+    return errors, iterations
+
+
 @pytest.mark.mpi4py
 def test_C():
     """
@@ -59,66 +68,24 @@ def test_C():
                 with open(f'data/step_6_C_np{n}.txt') as part:
                     f.write(part.read())
 
-    with open('data/step_6_C1_out.txt', 'r') as file1:
-        with open('data/step_6_A_ml_out.txt', 'r') as file2:
-            diff = set(file1).difference(file2)
-    diff.discard('\n')
-    for line in diff:
-        assert 'iterations' not in line, (
-            'ERROR: iteration counts differ between MPI and nonMPI for even ' 'distribution of time-steps'
-        )
+    # Line by line and in order: the same iterations for every step, and the same errors to the precision they are
+    # printed with. This used to compare sets of lines, which let a count through that also occurred elsewhere, and
+    # lines with "Diff" in them, which no part prints any more, so that the errors were never compared at all.
+    for mpi, non_mpi, distribution in [
+        ('step_6_C1_out.txt', 'step_6_A_ml_out.txt', 'even'),
+        ('step_6_C2_out.txt', 'step_6_B_out.txt', 'odd'),
+    ]:
+        errors_mpi, iterations_mpi = _results(mpi)
+        errors_non_mpi, iterations_non_mpi = _results(non_mpi)
 
-    with open('data/step_6_C2_out.txt', 'r') as file1:
-        with open('data/step_6_B_out.txt', 'r') as file2:
-            diff = set(file1).difference(file2)
-    diff.discard('\n')
-    for line in diff:
-        assert 'iterations' not in line, (
-            'ERROR: iteration counts differ between MPI and nonMPI for odd distribution ' 'of time-steps'
-        )
-
-    # The errors of the MPI and the non-MPI runs have to agree. This compared lines with "Diff" in them, which
-    # neither part prints any more, so it compared two empty lists and checked nothing.
-    diff_MPI = []
-    with open("data/step_6_C1_out.txt") as f:
-        for line in f:
-            if "Error vs. exact solution" in line:
-                diff_MPI.append(float(line.split()[-1]))
-
-    diff_nonMPI = []
-    with open("data/step_6_A_ml_out.txt") as f:
-        for line in f:
-            if "Error vs. exact solution" in line:
-                diff_nonMPI.append(float(line.split()[-1]))
-
-    assert len(diff_MPI) == len(diff_nonMPI), (
-        'ERROR: got different number of results form MPI and nonMPI for even ' 'distribution of time-steps'
-    )
-
-    for i, j in zip(diff_MPI, diff_nonMPI, strict=True):
-        assert abs(i - j) < 6e-11, (
-            'ERROR: difference between MPI and nonMPI results is too large for even '
-            'distributions of time-steps, got %s' % abs(i - j)
-        )
-
-    diff_MPI = []
-    with open("data/step_6_C2_out.txt") as f:
-        for line in f:
-            if "Error vs. exact solution" in line:
-                diff_MPI.append(float(line.split()[-1]))
-
-    diff_nonMPI = []
-    with open("data/step_6_B_out.txt") as f:
-        for line in f:
-            if "Error vs. exact solution" in line:
-                diff_nonMPI.append(float(line.split()[-1]))
-
-    assert len(diff_MPI) == len(diff_nonMPI), (
-        'ERROR: got different number of results form MPI and nonMPI for odd ' 'distribution of time-steps'
-    )
-
-    for i, j in zip(diff_MPI, diff_nonMPI, strict=True):
-        assert abs(i - j) < 6e-11, (
-            'ERROR: difference between MPI and nonMPI results is too large for odd '
-            'distributions of time-steps, got %s' % abs(i - j)
-        )
+        assert (
+            iterations_mpi == iterations_non_mpi
+        ), f'ERROR: iteration counts differ between MPI and nonMPI for the {distribution} distribution of time-steps'
+        assert (
+            len(errors_mpi) == len(errors_non_mpi) == len(C_OUTPUTS[mpi])
+        ), f'ERROR: expected one error per run for the {distribution} distribution of time-steps'
+        for error_mpi, error_non_mpi in zip(errors_mpi, errors_non_mpi, strict=True):
+            assert abs(error_mpi - error_non_mpi) <= 1e-8 * abs(error_non_mpi), (
+                f'ERROR: MPI and nonMPI errors differ for the {distribution} distribution of time-steps: '
+                f'{error_mpi} vs. {error_non_mpi}'
+            )
