@@ -77,17 +77,19 @@ def test_C():
             'ERROR: iteration counts differ between MPI and nonMPI for odd distribution ' 'of time-steps'
         )
 
+    # The errors of the MPI and the non-MPI runs have to agree. This compared lines with "Diff" in them, which
+    # neither part prints any more, so it compared two empty lists and checked nothing.
     diff_MPI = []
     with open("data/step_6_C1_out.txt") as f:
         for line in f:
-            if "Diff" in line:
-                diff_MPI.append(float(line.split()[1]))
+            if "Error vs. exact solution" in line:
+                diff_MPI.append(float(line.split()[-1]))
 
     diff_nonMPI = []
     with open("data/step_6_A_ml_out.txt") as f:
         for line in f:
-            if "Diff" in line:
-                diff_nonMPI.append(float(line.split()[1]))
+            if "Error vs. exact solution" in line:
+                diff_nonMPI.append(float(line.split()[-1]))
 
     assert len(diff_MPI) == len(diff_nonMPI), (
         'ERROR: got different number of results form MPI and nonMPI for even ' 'distribution of time-steps'
@@ -102,14 +104,14 @@ def test_C():
     diff_MPI = []
     with open("data/step_6_C2_out.txt") as f:
         for line in f:
-            if "Diff" in line:
-                diff_MPI.append(float(line.split()[1]))
+            if "Error vs. exact solution" in line:
+                diff_MPI.append(float(line.split()[-1]))
 
     diff_nonMPI = []
     with open("data/step_6_B_out.txt") as f:
         for line in f:
-            if "Diff" in line:
-                diff_nonMPI.append(float(line.split()[1]))
+            if "Error vs. exact solution" in line:
+                diff_nonMPI.append(float(line.split()[-1]))
 
     assert len(diff_MPI) == len(diff_nonMPI), (
         'ERROR: got different number of results form MPI and nonMPI for odd ' 'distribution of time-steps'
