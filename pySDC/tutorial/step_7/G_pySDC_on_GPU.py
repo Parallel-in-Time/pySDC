@@ -1,3 +1,32 @@
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+#   language_info:
+#     name: python
+# ---
+
+# %% [markdown]
+# # Part G: pySDC on GPUs
+#
+# pySDC runs on GPUs through [CuPy](https://cupy.dev), and a problem class does not need a GPU twin to do so. It takes
+# a `useGPU` flag, and a `setup_GPU` classmethod swaps what the class computes with: the array library, the sparse
+# library and the data types. The body of the class then calls `self.xp.sin` where it would have called `numpy.sin`,
+# and works either way. Everything above the problem class (sweepers, transfer operators, convergence controllers) is
+# unchanged, so the same run that gives you SDC on a CPU gives you SDC on a GPU.
+#
+# This example solves one heat equation three ways, all of it on the device: with SDC on a single space level, with
+# MLSDC on two, and with PFASST on two levels spread over several time ranks. The three differ only in what the
+# controller is handed.
+#
+# ## The description
+#
+# The only difference to a CPU run is `useGPU`:
+
+# %%
 from pathlib import Path
 
 from mpi4py import MPI
@@ -57,6 +86,13 @@ def get_description(useGPU, ml):
     return description
 
 
+# %% [markdown]
+# ## One run
+#
+# The serial controller for SDC and MLSDC, `controller_MPI` with a time communicator for PFASST:
+
+
+# %%
 def run(description, comm=None, num_procs=1, Tend=8e-2):
     """
     Run to `Tend` and report how it went.
@@ -93,6 +129,13 @@ def run(description, comm=None, num_procs=1, Tend=8e-2):
     return error, iterations
 
 
+# %% [markdown]
+# ## All three
+#
+# Run it with one rank per parallel time step, e.g. `mpirun -np 2 python G_pySDC_on_GPU.py`:
+
+
+# %%
 def main():
     """
     Solve the same heat equation with SDC, MLSDC and PFASST, all of it on GPUs.
@@ -126,3 +169,17 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# %% [markdown]
+# CuPy and GPUs are not available in the browser, nor in the environment this website is built in. Our CI runs this
+# part on GPUs, and checks that all three runs are accurate and that PFASST and MLSDC agree.
+#
+# :::{admonition} Important things to note
+# - Space coarsening works on GPU arrays: `mesh_to_mesh` assembles its interpolation and restriction matrices with
+#   SciPy and moves them to the device once, so the transfers themselves never leave it.
+# - PFASST sends the solution from one time rank to the next as a GPU array. That needs an MPI built with CUDA
+#   awareness, and told to use it. conda-forge's OpenMPI is built with it and ships it switched off, so export
+#   `OMPI_MCA_opal_cuda_support=true` before launching.
+# - `NCCLComm` in `pySDC/helpers/NCCL_communicator.py` routes the collectives through NCCL instead, which is worth
+#   doing when a run is parallel in space as well.
+# :::

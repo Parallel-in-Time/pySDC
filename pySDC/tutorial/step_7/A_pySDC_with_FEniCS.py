@@ -1,3 +1,29 @@
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+#   language_info:
+#     name: python
+# ---
+
+# %% [markdown]
+# # Part A: pySDC and FEniCS
+#
+# In this example, pySDC is coupled with the [FEniCS framework](https://fenicsproject.org/) for finite elements in
+# space. This implies significant changes to the algorithm, depending on whether or not the mass matrix should be
+# inverted. SDC, MLSDC and PFASST can be used without changes when the right-hand side of the ODE is defined with the
+# inverse of the mass matrix. Otherwise, the mass matrix has to be used, e.g. in the tau-correction. This example tests
+# different variants of this methodology for SDC, MLSDC and PFASST.
+#
+# ## The setup
+#
+# The forced heat equation in 1D, with continuous Lagrange elements of order 4, and for MLSDC an aggressively
+# coarsened second level. The problem and sweeper classes are set per variant below.
+
+# %%
 from pathlib import Path
 import numpy as np
 
@@ -80,6 +106,20 @@ def setup(t0=None, ml=None):
     return description, controller_params
 
 
+# %% [markdown]
+# ## The variants
+#
+# - `'mass_inv'`: the right-hand side includes the inverse of the mass matrix, with the problem class `fenics_heat`,
+#   so that the standard IMEX sweeper works unchanged.
+# - `'mass'`: the mass matrix stays on the left, with `fenics_heat_mass` and the sweeper `imex_1st_order_mass`, which
+#   also uses it in the tau-correction.
+# - `'mass_timebc'`: as `'mass'`, but with time-dependent boundary conditions, `fenics_heat_mass_timebc`.
+#
+# Each run prints the error, statistics of the iterations and the time to solution, and appends them to
+# `data/step_7_A_out.txt`.
+
+
+# %%
 def run_variants(variant=None, ml=None, num_procs=None):
     """
     Main routine to run the different implementations of the heat equation with FEniCS
@@ -168,6 +208,14 @@ def run_variants(variant=None, ml=None, num_procs=None):
     f.close()
 
 
+# %% [markdown]
+# SDC and MLSDC with all three variants, and PFASST on 5 processes with the inverted mass matrix. All other PFASST
+# variants do not work, either because of FEniCS restrictions (weak forms with different meshes will not work
+# together) or because of inconsistent use of the mass matrix (the locality condition for the tau correction is not
+# satisfied, and the mass matrix does not commute with restriction).
+
+
+# %%
 def main():
     run_variants(variant='mass_inv', ml=False, num_procs=1)
     run_variants(variant='mass', ml=False, num_procs=1)
@@ -177,11 +225,22 @@ def main():
     run_variants(variant='mass_timebc', ml=True, num_procs=1)
     run_variants(variant='mass_inv', ml=True, num_procs=5)
 
-    # WARNING: all other variants do NOT work, either because of FEniCS restrictions (weak forms with different meshes
-    # will not work together) or because of inconsistent use of the mass matrix (locality condition for the tau
-    # correction is not satisfied, mass matrix does not permute with restriction).
-    # run_pfasst_variants(variant='mass', ml=True, num_procs=5)
-
 
 if __name__ == "__main__":
     main()
+
+# %% [markdown]
+# ## Results
+#
+# FEniCS does not run in the browser, nor in the environment this website is built in. These are the results of our
+# CI, which runs this part in an environment with FEniCS, in the run that built this page:
+#
+# :::{literalinclude} /../../data/step_7_A_out.txt
+# :language: text
+# :::
+#
+# :::{admonition} Important things to note
+# - This example shows that even core routines like the `BaseTransfer` can be overwritten if needed.
+# - It is also valuable to check out the data type and transfer classes required to work with FEniCS. Both can be
+#   found in the `implementations` folder.
+# :::

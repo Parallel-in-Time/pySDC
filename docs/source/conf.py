@@ -42,6 +42,7 @@ exclude_patterns = [
     'tutorial/step_*/HookClass_*.py',
     'tutorial/step_4/PenningTrap_3D_coarse.py',
     'tutorial/step_*/[a-z]*.py',  # helper modules, such as step_9/paradiag_setup.py
+    'tutorial/step_7/F_2_*.py',  # the plotting script of part F
 ]
 
 # Ported tutorials are jupytext "percent" scripts, linked into docs/source/tutorial. Sphinx runs them as notebooks.
