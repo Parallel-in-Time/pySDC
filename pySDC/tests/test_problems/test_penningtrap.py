@@ -31,4 +31,5 @@ def test_interactions_without_numba():
         check=True,
         cwd=Path(__file__).parents[3],
     )
-    assert np.allclose(json.loads(run.stdout), compiled, rtol=1e-12)
+    # The last line: in CI, a sitecustomize.py that sets up coverage announces itself on stdout first
+    assert np.allclose(json.loads(run.stdout.splitlines()[-1]), compiled, rtol=1e-12)
