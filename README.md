@@ -19,18 +19,18 @@
 | pySDC/core/step.py                                                                                  |      118 |        4 |     97% |113-114, 142-143 |
 | pySDC/core/sweeper.py                                                                               |      129 |        8 |     94% |11, 69-70, 253-256, 275-276 |
 | pySDC/core/timings.py                                                                               |       96 |        0 |    100% |           |
-| pySDC/helpers/NCCL\_communicator.py                                                                 |       97 |       97 |      0% |     1-184 |
+| pySDC/helpers/NCCL\_communicator.py                                                                 |       97 |       10 |     90% |164-169, 175-180 |
 | pySDC/helpers/ParaDiagHelper.py                                                                     |       36 |        0 |    100% |           |
 | pySDC/helpers/blocks.py                                                                             |       68 |        9 |     87% |45-47, 50-53, 68-69 |
 | pySDC/helpers/fft\_helper.py                                                                        |        6 |        1 |     83% |        26 |
 | pySDC/helpers/fieldsIO.py                                                                           |      308 |        7 |     98% |89-90, 98-99, 418, 606-607 |
 | pySDC/helpers/firedrake\_ensemble\_communicator.py                                                  |       43 |        8 |     81% |42, 48-52, 56, 62, 75 |
 | pySDC/helpers/plot\_helper.py                                                                       |       33 |        2 |     94% |  108, 133 |
-| pySDC/helpers/problem\_helper.py                                                                    |      103 |        1 |     99% |       116 |
+| pySDC/helpers/problem\_helper.py                                                                    |      103 |        0 |    100% |           |
 | pySDC/helpers/pySDC\_as\_gusto\_time\_discretization.py                                             |       91 |        2 |     98% |  104, 135 |
 | pySDC/helpers/pysdc\_helper.py                                                                      |       19 |        1 |     95% |        89 |
 | pySDC/helpers/setup\_helper.py                                                                      |       19 |        0 |    100% |           |
-| pySDC/helpers/spectral\_helper.py                                                                   |      797 |       91 |     89% |99-100, 109-118, 156, 185, 239, 342-343, 555, 701, 800-807, 895, 904, 966-980, 991-994, 1016, 1059, 1145, 1171, 1245, 1294, 1473, 1477, 1573-1619, 1694-1697, 1708, 1717, 1728-1750, 1827, 1894-1896 |
+| pySDC/helpers/spectral\_helper.py                                                                   |      797 |       57 |     93% |156, 185, 239, 342-343, 555, 895, 904, 991-994, 1059, 1145, 1245, 1294, 1573-1619, 1694-1697, 1717, 1728-1750, 1827, 1894-1896 |
 | pySDC/helpers/stats\_helper.py                                                                      |       36 |        0 |    100% |           |
 | pySDC/helpers/testing.py                                                                            |       30 |        0 |    100% |           |
 | pySDC/helpers/transfer\_helper.py                                                                   |      142 |        0 |    100% |           |
@@ -58,13 +58,14 @@
 | pySDC/implementations/convergence\_controller\_classes/step\_size\_limiter.py                       |       63 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/store\_uold.py                               |       14 |        0 |    100% |           |
 | pySDC/implementations/datatype\_classes/container.py                                                |       25 |        0 |    100% |           |
-| pySDC/implementations/datatype\_classes/cupy\_mesh.py                                               |       65 |       65 |      0% |     1-182 |
+| pySDC/implementations/datatype\_classes/cupy\_mesh.py                                               |       65 |        4 |     94% |5-6, 12-13 |
 | pySDC/implementations/datatype\_classes/fenics\_mesh.py                                             |       33 |        0 |    100% |           |
 | pySDC/implementations/datatype\_classes/firedrake\_mesh.py                                          |       49 |        1 |     98% |        35 |
 | pySDC/implementations/datatype\_classes/mesh.py                                                     |       72 |        0 |    100% |           |
 | pySDC/implementations/datatype\_classes/particles.py                                                |       82 |       20 |     76% |63-73, 173-174, 188, 202-207 |
 | pySDC/implementations/datatype\_classes/petsc\_vec.py                                               |       30 |        0 |    100% |           |
 | pySDC/implementations/hooks/AllenCahn\_monitor.py                                                   |       60 |        0 |    100% |           |
+| pySDC/implementations/hooks/log\_GPU\_timings.py                                                    |       11 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_embedded\_error\_estimate.py                                       |       20 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_errors.py                                                          |       50 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_extrapolated\_error\_estimate.py                                   |        6 |        0 |    100% |           |
@@ -76,8 +77,8 @@
 | pySDC/implementations/problem\_classes/AdvectionDiffusionEquation\_1D\_FFT.py                       |       63 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/AdvectionEquation\_ND\_FD.py                                 |       23 |        8 |     65% |   114-124 |
 | pySDC/implementations/problem\_classes/AllenCahn\_1D\_FD.py                                         |      225 |       10 |     96% |   464-475 |
-| pySDC/implementations/problem\_classes/AllenCahn\_2D\_FD.py                                         |      212 |       19 |     91% |87-98, 116, 239, 308-311, 427-431 |
-| pySDC/implementations/problem\_classes/AllenCahn\_2D\_FFT.py                                        |       85 |       21 |     75% |81-86, 101, 104, 230-243, 318, 370-375 |
+| pySDC/implementations/problem\_classes/AllenCahn\_2D\_FD.py                                         |      212 |        8 |     96% |239, 308-311, 427-431 |
+| pySDC/implementations/problem\_classes/AllenCahn\_2D\_FFT.py                                        |       85 |       11 |     87% |104, 230-243, 318 |
 | pySDC/implementations/problem\_classes/AllenCahn\_MPIFFT.py                                         |       92 |        8 |     91% |164, 224, 231, 238, 244, 259, 266, 272 |
 | pySDC/implementations/problem\_classes/AllenCahn\_Temp\_MPIFFT.py                                   |      125 |       23 |     82% |91, 269-293, 309-311 |
 | pySDC/implementations/problem\_classes/Auzinger\_implicit.py                                        |       38 |        0 |    100% |           |
@@ -100,7 +101,7 @@
 | pySDC/implementations/problem\_classes/HeatEquation\_1D\_FEniCS\_matrix\_forced.py                  |      123 |        9 |     93% |189-191, 226-231 |
 | pySDC/implementations/problem\_classes/HeatEquation\_2D\_PETSc\_forced.py                           |       90 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/HeatEquation\_Chebychev.py                                   |      220 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/HeatEquation\_ND\_FD.py                                      |       66 |       19 |     71% |82, 101, 112-113, 172-175, 230-239, 266-271 |
+| pySDC/implementations/problem\_classes/HeatEquation\_ND\_FD.py                                      |       66 |        8 |     88% |82, 101, 112-113, 231-232, 267-268 |
 | pySDC/implementations/problem\_classes/HeatFiredrake.py                                             |       63 |        1 |     98% |       169 |
 | pySDC/implementations/problem\_classes/HenonHeiles.py                                               |       31 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/LogisticEquation.py                                          |       40 |       20 |     50% |   118-154 |
@@ -112,7 +113,7 @@
 | pySDC/implementations/problem\_classes/Quench.py                                                    |      152 |       34 |     78% |220-221, 282-284, 355, 422-472 |
 | pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |100, 321, 420, 468 |
 | pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      255 |       15 |     94% |97, 295, 315, 434, 479, 490, 620-635 |
-| pySDC/implementations/problem\_classes/TestEquation\_0D.py                                          |      101 |        8 |     92% | 40-47, 52 |
+| pySDC/implementations/problem\_classes/TestEquation\_0D.py                                          |      101 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        1 |     98% |       180 |
 | pySDC/implementations/problem\_classes/VorticityVelocity\_2D\_FEniCS\_periodic.py                   |      108 |      108 |      0% |     1-483 |
 | pySDC/implementations/problem\_classes/acoustic\_helpers/buildWave1DMatrix.py                       |       24 |        0 |    100% |           |
@@ -123,13 +124,13 @@
 | pySDC/implementations/problem\_classes/boussinesq\_helpers/helper\_classes.py                       |       19 |        1 |     95% |        14 |
 | pySDC/implementations/problem\_classes/boussinesq\_helpers/standard\_integrators.py                 |      394 |      112 |     72% |21-25, 28-32, 36-50, 266-271, 274-276, 282, 288-301, 309-313, 316, 319-320, 326, 332-345, 372-378, 459-466, 472, 492-496, 499-511, 514-526, 551-580 |
 | pySDC/implementations/problem\_classes/boussinesq\_helpers/unflatten.py                             |        7 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/generic\_MPIFFT\_Laplacian.py                                |       89 |        8 |     91% | 55-64, 70 |
-| pySDC/implementations/problem\_classes/generic\_ND\_FD.py                                           |       96 |       12 |     88% |97-107, 126, 153-154 |
-| pySDC/implementations/problem\_classes/generic\_spectral.py                                         |      244 |       64 |     74% |34-51, 112-115, 146-152, 227, 261-263, 330-332, 347-348, 356-358, 385, 401, 429, 442, 445, 480, 487-492, 512-549 |
+| pySDC/implementations/problem\_classes/generic\_MPIFFT\_Laplacian.py                                |       89 |        0 |    100% |           |
+| pySDC/implementations/problem\_classes/generic\_ND\_FD.py                                           |       96 |        2 |     98% |   153-154 |
+| pySDC/implementations/problem\_classes/generic\_spectral.py                                         |      244 |       42 |     83% |115, 261-263, 330-332, 347-348, 385, 401, 429, 442, 445, 480, 487-492, 512-549 |
 | pySDC/implementations/problem\_classes/nonlinear\_ODE\_1.py                                         |       41 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/odeScalar.py                                                 |       53 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/odeSystem.py                                                 |      187 |        6 |     97% |462-475, 810-823 |
-| pySDC/implementations/problem\_classes/polynomial\_test\_problem.py                                 |       36 |        5 |     86% |     21-26 |
+| pySDC/implementations/problem\_classes/polynomial\_test\_problem.py                                 |       36 |        0 |    100% |           |
 | pySDC/implementations/sweeper\_classes/Multistep.py                                                 |       91 |        6 |     93% |48-52, 119-121 |
 | pySDC/implementations/sweeper\_classes/ParaDiagSweepers.py                                          |       71 |        8 |     89% |37, 129, 148-158 |
 | pySDC/implementations/sweeper\_classes/Runge\_Kutta.py                                              |      363 |       25 |     93% |202-204, 217-229, 404-418, 475-477, 481-483 |
@@ -151,10 +152,10 @@
 | pySDC/implementations/transfer\_classes/BaseTransfer\_mass.py                                       |       84 |       84 |      0% |     1-187 |
 | pySDC/implementations/transfer\_classes/TransferFenicsMesh.py                                       |       29 |        0 |    100% |           |
 | pySDC/implementations/transfer\_classes/TransferFiredrakeMesh.py                                    |       47 |        0 |    100% |           |
-| pySDC/implementations/transfer\_classes/TransferMesh.py                                             |      103 |       22 |     79% |134, 171-174, 186-194, 221-229 |
+| pySDC/implementations/transfer\_classes/TransferMesh.py                                             |      103 |       19 |     82% |134, 186-194, 221-229 |
 | pySDC/implementations/transfer\_classes/TransferMesh\_FFT2D.py                                      |       31 |        0 |    100% |           |
 | pySDC/implementations/transfer\_classes/TransferMesh\_FFT.py                                        |       25 |        0 |    100% |           |
-| pySDC/implementations/transfer\_classes/TransferMesh\_MPIFFT.py                                     |       78 |        2 |     97% |     42-43 |
+| pySDC/implementations/transfer\_classes/TransferMesh\_MPIFFT.py                                     |       78 |        0 |    100% |           |
 | pySDC/implementations/transfer\_classes/TransferMesh\_NoCoarse.py                                   |        6 |        0 |    100% |           |
 | pySDC/implementations/transfer\_classes/TransferPETScDMDA.py                                        |       34 |        0 |    100% |           |
 | pySDC/implementations/transfer\_classes/TransferParticles\_NoCoarse.py                              |       20 |        0 |    100% |           |
@@ -203,10 +204,10 @@
 | pySDC/projects/FastWaveSlowWave/rungmrescounter\_boussinesq.py                                      |      107 |        0 |    100% |           |
 | pySDC/projects/FastWaveSlowWave/runitererror\_acoustic.py                                           |       83 |        0 |    100% |           |
 | pySDC/projects/FastWaveSlowWave/runmultiscale\_acoustic.py                                          |       97 |        1 |     99% |       143 |
-| pySDC/projects/GPU/ac\_fft.py                                                                       |       48 |       48 |      0% |      1-88 |
+| pySDC/projects/GPU/ac\_fft.py                                                                       |       48 |        0 |    100% |           |
 | pySDC/projects/GPU/configs/RBC\_configs.py                                                          |      229 |      157 |     31% |8-23, 97-134, 139-150, 153-161, 166-186, 189-197, 202-213, 220-233, 236-238, 244-256, 259-267, 274-286, 293-311, 314-318, 326-353, 356-362, 365-371 |
 | pySDC/projects/GPU/configs/base\_config.py                                                          |      177 |       29 |     84% |9, 11, 34-46, 75, 85, 116-120, 143, 162, 165-168, 195, 211, 243-244, 257-259, 274, 276 |
-| pySDC/projects/GPU/heat.py                                                                          |        5 |        5 |      0% |       1-5 |
+| pySDC/projects/GPU/heat.py                                                                          |        5 |        0 |    100% |           |
 | pySDC/projects/GPU/paper\_plots.py                                                                  |        2 |        2 |      0% |       3-4 |
 | pySDC/projects/GPU/run\_experiment.py                                                               |       48 |       23 |     52% |2-38, 58-60, 66-67 |
 | pySDC/projects/Hamiltonian/fput.py                                                                  |      137 |        0 |    100% |           |
@@ -385,7 +386,7 @@
 | pySDC/tutorial/step\_7/D\_pySDC\_with\_PyTorch.py                                                   |       43 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/E\_pySDC\_with\_Firedrake.py                                                 |      105 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/F\_pySDC\_with\_Gusto.py                                                     |      112 |       10 |     91% |137-142, 206-213, 341 |
-| pySDC/tutorial/step\_7/G\_pySDC\_on\_GPU.py                                                         |       43 |       43 |      0% |     1-124 |
+| pySDC/tutorial/step\_7/G\_pySDC\_on\_GPU.py                                                         |       43 |        0 |    100% |           |
 | pySDC/tutorial/step\_8/A\_visualize\_residuals.py                                                   |       32 |        0 |    100% |           |
 | pySDC/tutorial/step\_8/B\_multistep\_SDC.py                                                         |       98 |        0 |    100% |           |
 | pySDC/tutorial/step\_8/C\_iteration\_estimator.py                                                   |      179 |        0 |    100% |           |
@@ -395,7 +396,7 @@
 | pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       88 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       77 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       16 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32377** | **4652** | **86%** |           |
+| **TOTAL**                                                                                           | **32388** | **4283** | **87%** |           |
 
 41 empty files skipped.
 
