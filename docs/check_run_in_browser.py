@@ -47,8 +47,22 @@ def check(page, url):
     return problems
 
 
+def check_unavailable(page, url):
+    """A page that cannot run in the browser has to say why, next to a disabled button"""
+    page.goto(url)
+    problems = []
+    if not page.locator('.run-in-browser-unavailable').is_disabled():
+        problems.append('the greyed-out button is not disabled')
+    if not page.locator('.rib-unavailable').inner_text().strip():
+        problems.append('no explanation why it does not run in the browser')
+    page.close()
+    return problems
+
+
 def main(site):
-    pages = sorted(p.relative_to(site).as_posix() for p in site.rglob('*.html') if 'run-in-browser"' in p.read_text())
+    html = {p.relative_to(site).as_posix(): p.read_text() for p in site.rglob('*.html')}
+    pages = sorted(name for name, text in html.items() if 'run-in-browser"' in text)
+    unavailable = sorted(name for name, text in html.items() if 'run-in-browser-unavailable"' in text)
     if not pages:
         sys.exit(f'No page in {site} has a "Run in browser" button: were the wheels built by docs/update_apidocs.sh?')
 
@@ -72,6 +86,12 @@ def main(site):
             print(f'{"FAIL" if problems else "ok  "} {name}')
             for problem in problems:
                 print('     ' + problem.replace('\n', '\n     '))
+            failed |= bool(problems)
+        for name in unavailable:
+            problems = check_unavailable(context.new_page(), f'http://127.0.0.1:{server.server_port}/{name}')
+            print(f'{"FAIL" if problems else "n/a "} {name} (does not run in the browser)')
+            for problem in problems:
+                print('     ' + problem)
             failed |= bool(problems)
         browser.close()
     server.shutdown()

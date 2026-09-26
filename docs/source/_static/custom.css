@@ -25,3 +25,5 @@
 .cell_output pre.rib-stdout { margin: 0.3rem 0; padding: 0.6rem; background: var(--pst-color-surface); border: none; }
 .cell_output pre.rib-error { margin: 0.3rem 0; padding: 0.6rem; color: var(--pst-color-danger); background: var(--pst-color-surface); border-left: 3px solid var(--pst-color-danger); }
 .cell_output img { max-width: 100%; }
+.notebook-links .run-in-browser-unavailable { opacity: 0.45; cursor: not-allowed; }
+.rib-status.rib-unavailable { display: block; }

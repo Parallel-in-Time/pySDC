@@ -41,6 +41,7 @@ exclude_patterns = [
     'tutorial/step_*/README.rst',
     'tutorial/step_*/HookClass_*.py',
     'tutorial/step_4/PenningTrap_3D_coarse.py',
+    'tutorial/step_*/[a-z]*.py',  # helper modules, such as step_9/paradiag_setup.py
 ]
 
 # Ported tutorials are jupytext "percent" scripts, linked into docs/source/tutorial. Sphinx runs them as notebooks.
@@ -65,14 +66,21 @@ html_js_files = [('run-in-browser.js', {'type': 'module'})]
 # Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, FEniCS,
 # PETSc, ...), was measured by running every tutorial there. The wheels are built by docs/update_apidocs.sh;
 # without them, no page gets the button.
-BROWSER_PAGES = [
-    'tutorial/step_1/*',
-    'tutorial/step_2/*',
-    'tutorial/step_3/*',
-    'tutorial/step_4/*',
-    'tutorial/step_5/*',
-    'tutorial/step_8/*',
-]
+BROWSER_PAGES = ['tutorial/step_*/*']
+# The parts that cannot, and why. They are not executed by the docs build either, as its environment lacks the same
+# things; their pages show the results of the CI jobs that have them.
+NOT_IN_BROWSER = {
+    'tutorial/step_6/C_*': 'it runs on several processes with MPI (mpi4py).',
+    'tutorial/step_7/A_*': 'it needs FEniCS.',
+    'tutorial/step_7/B_*': 'it needs mpi4py-fft and MPI.',
+    'tutorial/step_7/C_*': 'it needs PETSc (petsc4py) and MPI.',
+    'tutorial/step_7/D_*': 'it needs PyTorch.',
+    'tutorial/step_7/E_*': 'it needs Firedrake.',
+    'tutorial/step_7/F_*': 'it needs Firedrake and Gusto.',
+    'tutorial/step_7/G_*': 'it needs a GPU and CuPy.',
+    'tutorial/step_9/E_*': 'it runs on several processes with MPI (mpi4py).',
+}
+nb_execution_excludepatterns = [f'{page}.py' for page in NOT_IN_BROWSER]
 BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
     'logo': {'text': 'pySDC'},
@@ -125,7 +133,11 @@ def write_notebooks(app, exception):
 
 
 def add_run_in_browser(app, pagename, templatename, context, doctree):
-    context['run_in_browser'] = bool(BROWSER_WHEELS) and any(fnmatch(pagename, page) for page in BROWSER_PAGES)
+    reasons = [reason for page, reason in NOT_IN_BROWSER.items() if fnmatch(pagename, page)]
+    context['run_unavailable'] = reasons[0] if reasons else None
+    context['run_in_browser'] = (
+        bool(BROWSER_WHEELS) and not reasons and any(fnmatch(pagename, page) for page in BROWSER_PAGES)
+    )
     context['browser_wheels'] = BROWSER_WHEELS
 
 
