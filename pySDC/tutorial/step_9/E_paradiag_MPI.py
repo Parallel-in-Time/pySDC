@@ -78,9 +78,9 @@ if comm.rank == comm.size - 1:
 #   it rather than truncating, and says so.
 # - At a given block size the MPI and the virtually parallel controllers must agree exactly, which is the comparison
 #   against Part D.
-# - Windowing does not change what is being solved. Where the iteration count comes out the same the answers are
-#   identical; where it does not (a fixed $\alpha$ of $10^{-2}$ is loose enough that a larger block costs one extra
-#   iteration) the two runs stop at slightly different residuals, and their errors differ by about
+# - Windowing does not change what is being solved. Where the iteration count comes out the same the answers agree
+#   to about $10^{-11}$; where it does not (a fixed $\alpha$ of $10^{-2}$ is loose enough that a larger block costs
+#   one extra iteration) the two runs stop at slightly different residuals, and their errors differ by about
 #   $2 \cdot 10^{-8}$, three orders inside the discretisation error.
 # - Adaptive $\alpha$ does not notice the block size either, but for a more interesting reason: it picks a
 #   *different* $\alpha$ for each one, because $\gamma$ scales with the number of steps in the block, and still

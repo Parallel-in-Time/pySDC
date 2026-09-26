@@ -30,7 +30,8 @@
 # ## The setup
 #
 # We compare a few fixed values of $\alpha$ with the adaptive one on the advection problem of
-# [Part C](C_paradiag_in_pySDC). The setup lives in `paradiag_setup.py` next to this tutorial, because
+# [Part C](C_paradiag_in_pySDC), but with a direct solver for the complex shifted systems ParaDiag produces instead
+# of GMRES, which struggles with them. The setup lives in `paradiag_setup.py` next to this tutorial, because
 # [Part E](E_paradiag_MPI) uses exactly the same. Switching to the adaptive strategy is one entry in the description:
 #
 # :::{literalinclude} paradiag_setup.py

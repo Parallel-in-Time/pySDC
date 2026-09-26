@@ -435,6 +435,13 @@ jobs:
             grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg"
             exit 1
           fi
+          # The same for the results the tutorial parts that need MPI, FEniCS, ... include from the test jobs.
+          includes_not_found=$(grep "WARNING: Include file" < sphinx_build.log | wc -l)
+          if [ $includes_not_found != "0" ] ; then
+            echo "Some included files were not found:"
+            grep "WARNING: Include file" < sphinx_build.log
+            exit 1
+          fi
       - name: Run the tutorials in the browser
         # Presses "Run in browser" on every page that has it, in headless Chromium, with Pyodide from
         # jsDelivr and the wheels built above: what readers get once the site is online.

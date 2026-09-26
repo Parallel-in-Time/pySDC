@@ -166,8 +166,8 @@ def residual(_u, u0):
 # %% [markdown]
 # ## The iteration
 #
-# The six steps from above. Each ParaDiag iteration does a single Newton iteration on every node (`newton_maxiter=1`
-# above), so the number of Newton iterations per node equals the number of ParaDiag iterations.
+# The six steps from above. Each ParaDiag iteration does a single Newton iteration on every node, one call of
+# `solve_jacobian` per node, so the number of Newton iterations per node equals the number of ParaDiag iterations.
 
 # %%
 sol_paradiag = u.copy() * 0j

@@ -199,17 +199,18 @@ ax.legend(frameon=False)
 fig.tight_layout()
 
 # %% [markdown]
-# ParaDiag converges in very few iterations for the hyperbolic advection problem, where PFASST struggles, and the
-# picture reverses for van der Pol. Remember, though, that ParaDiag does only one Newton iteration per ParaDiag
-# iteration, so per node, its number of Newton iterations equals the number of ParaDiag iterations. PFASST solves
-# the systems to some accuracy and allows more iterations. So ParaDiag needs fewer Jacobian solves per step in total,
-# which leaves it with the greater speedup. Again, inexactness could improve PFASST.
+# ParaDiag converges in very few iterations for the hyperbolic advection problem (3), where PFASST struggles (36).
+# For van der Pol, ParaDiag needs fewer iterations as well (10 against 24), with a much smaller margin. Remember
+# that ParaDiag does only one Newton iteration per ParaDiag iteration, so per node, its number of Newton iterations
+# equals the number of ParaDiag iterations, while PFASST solves the systems to some accuracy in every iteration. That
+# makes the difference in Jacobian solves per step much larger than the one in iterations: 30 against 143. Again,
+# inexactness could improve PFASST.
 #
 # :::{admonition} Important things to note
 # - ParaDiag needs its own sweeper (`QDiagonalization`) and its own controller.
 # - The solution becomes complex, because the diagonalization is.
-# - ParaDiag converges in very few iterations for the hyperbolic advection example, where PFASST struggles, and the
-#   picture reverses for the van der Pol oscillator.
+# - ParaDiag converges in very few iterations for the hyperbolic advection example, where PFASST struggles. For the
+#   van der Pol oscillator, the gap in iterations is much smaller.
 # :::
 #
 # The checks the tests run are inside `compare_ParaDiag_and_PFASST`: all three methods agree, and the two iterative
