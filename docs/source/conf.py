@@ -41,6 +41,7 @@ nb_custom_formats = {'.py': ['jupytext.reads', {'fmt': 'py:percent'}]}
 nb_execution_mode = 'force'
 nb_execution_raise_on_error = True
 nb_execution_timeout = 600
+nb_execution_in_temp = True  # tutorials write data/ relative to where they run
 myst_enable_extensions = ['colon_fence', 'dollarmath', 'amsmath']
 templates_path = ['_templates']
 add_module_names = False
@@ -57,7 +58,7 @@ html_js_files = [('run-in-browser.js', {'type': 'module'})]
 # Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, FEniCS,
 # PETSc, ...), was measured by running every tutorial there. The wheels are built by docs/update_apidocs.sh;
 # without them, no page gets the button.
-BROWSER_PAGES = ['tutorial/step_1/*']
+BROWSER_PAGES = ['tutorial/step_1/*', 'tutorial/step_2/*']
 BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
     'logo': {'text': 'pySDC'},
