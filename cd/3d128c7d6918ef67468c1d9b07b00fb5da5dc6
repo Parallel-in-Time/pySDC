@@ -1,0 +1,23 @@
+pySDC/tests/test_controllers/test_setup_dump.py
+  s_619b2228c15391::t_c953a1e78b8ab4 1-67
+pySDC/core/controller.py
+  s_619b2228c15391::t_59cb72f1eef9f2 60-62,208,229-230,238
+pySDC/tutorial/step_8/HookClass_error_output.py
+  s_619b2228c15391::t_79fe61d4934de9 33-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cd3d128c7d6918ef67468c1d9b07b00fb5da5dc6",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
