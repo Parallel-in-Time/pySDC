@@ -6,6 +6,7 @@ Created on Tue Jan 17 19:47:56 2023
 @author: telu
 """
 import os
+import re
 import glob
 import json
 import m2r2
@@ -84,9 +85,20 @@ def linkReadmeToIndex(rst):
     return rst.replace('<./README>', '<./index>')
 
 
+def linkFilesToGitHub(text, md):
+    """m2r2 turns every relative link into a :doc: reference, which only works for other Markdown pages"""
+
+    def toGitHub(match):
+        path = os.path.normpath(os.path.join(os.path.dirname(md), match.group(2)))
+        return f'{match.group(1)}(https://github.com/Parallel-in-Time/pySDC/blob/master/{path})'
+
+    return re.sub(r'((?<!!)\[[^\]]*\])\((?!<|\w+://|#|mailto:)([^)\s#]+(?<!\.md))\)', toGitHub, text)
+
+
 def convert(md, orphan=False, sectionRefs=True):
     baseName = os.path.splitext(md)[0]
-    rst = m2r2.parse_from_file(md, parse_relative_links=True)
+    with open(md) as f:
+        rst = m2r2.convert(linkFilesToGitHub(f.read(), md), parse_relative_links=True)
     rst = wrappEmojis(rst)
     if sectionRefs:
         rst = addSectionRefs(rst, baseName)
