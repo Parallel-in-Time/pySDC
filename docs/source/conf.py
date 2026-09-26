@@ -33,8 +33,14 @@ extensions = [
 
 master_doc = 'index'
 # The doc_*.rst files and the READMEs of the ported tutorial steps are only ever pulled into other pages with
-# `.. include::`.
-exclude_patterns = ['conf.py', '**/__init__.py', '**/doc_*.rst', 'tutorial/step_*/README.rst']
+# `.. include::`, and the helper modules next to the tutorial parts are not notebooks.
+exclude_patterns = [
+    'conf.py',
+    '**/__init__.py',
+    '**/doc_*.rst',
+    'tutorial/step_*/README.rst',
+    'tutorial/step_*/HookClass_*.py',
+]
 
 # Ported tutorials are jupytext "percent" scripts, linked into docs/source/tutorial. Sphinx runs them as notebooks.
 nb_custom_formats = {'.py': ['jupytext.reads', {'fmt': 'py:percent'}]}
@@ -58,7 +64,7 @@ html_js_files = [('run-in-browser.js', {'type': 'module'})]
 # Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, FEniCS,
 # PETSc, ...), was measured by running every tutorial there. The wheels are built by docs/update_apidocs.sh;
 # without them, no page gets the button.
-BROWSER_PAGES = ['tutorial/step_1/*', 'tutorial/step_2/*']
+BROWSER_PAGES = ['tutorial/step_1/*', 'tutorial/step_2/*', 'tutorial/step_3/*']
 BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
     'logo': {'text': 'pySDC'},
