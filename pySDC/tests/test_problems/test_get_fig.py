@@ -1,21 +1,35 @@
 import pytest
 
 
-def get_problems():
-    from pySDC.implementations.problem_classes.Brusselator import Brusselator
-    from pySDC.implementations.problem_classes.Burgers import Burgers1D, Burgers2D
-    from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
+def get_problem(name):
+    """Import only the class needed: Brusselator and RayleighBenard import mpi4py, which the base environment lacks"""
+    if name == 'Brusselator':
+        from pySDC.implementations.problem_classes.Brusselator import Brusselator
 
-    return {
-        'Brusselator': lambda: Brusselator(nvars=(16, 16)),
-        'Burgers1D': lambda: Burgers1D(N=16),
-        'Burgers2D': lambda: Burgers2D(nx=16, nz=16),
-        'RayleighBenard': lambda: RayleighBenard(nx=16, nz=8),
-    }
+        return Brusselator(nvars=(16, 16))
+    elif name == 'Burgers1D':
+        from pySDC.implementations.problem_classes.Burgers import Burgers1D
+
+        return Burgers1D(N=16)
+    elif name == 'Burgers2D':
+        from pySDC.implementations.problem_classes.Burgers import Burgers2D
+
+        return Burgers2D(nx=16, nz=16)
+    elif name == 'RayleighBenard':
+        from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
+
+        return RayleighBenard(nx=16, nz=8)
 
 
-@pytest.mark.base
-@pytest.mark.parametrize('name', ['Brusselator', 'Burgers1D', 'Burgers2D', 'RayleighBenard'])
+@pytest.mark.parametrize(
+    'name',
+    [
+        pytest.param('Burgers1D', marks=pytest.mark.base),
+        pytest.param('Burgers2D', marks=pytest.mark.base),
+        pytest.param('Brusselator', marks=pytest.mark.mpi4py),
+        pytest.param('RayleighBenard', marks=pytest.mark.mpi4py),
+    ],
+)
 def test_get_fig_leaves_rcParams_alone(name):
     """
     get_fig used to switch on the constrained layout for every figure made afterwards, so that e.g. tight_layout()
@@ -24,7 +38,7 @@ def test_get_fig_leaves_rcParams_alone(name):
     import matplotlib
     import matplotlib.pyplot as plt
 
-    problem = get_problems()[name]()
+    problem = get_problem(name)
     # starting from the option switched off, and restoring all settings afterwards, whatever get_fig does to them
     with matplotlib.rc_context({'figure.constrained_layout.use': False}):
         before = dict(matplotlib.rcParams)
