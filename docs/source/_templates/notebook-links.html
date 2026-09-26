@@ -1,0 +1,7 @@
+{%- if page_source_suffix == '.py' %}
+{%- set notebook = pagename.split('/')[-1] ~ '.ipynb' %}
+<div class="notebook-links">
+  <a class="btn btn-sm" href="{{ notebook }}" download><i class="fa-solid fa-download"></i> Notebook</a>
+  <a class="btn btn-sm" href="https://colab.research.google.com/github/Parallel-in-Time/pySDC/blob/gh-pages/{{ pagename }}.ipynb" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Open in Colab</a>
+</div>
+{%- endif %}

@@ -2,3 +2,6 @@
 .hero .sd-badge { font-size: 0.8rem; margin: 0 0.15rem 0.3rem 0; }
 .sd-card { transition: transform .12s ease; }
 .sd-card:hover { transform: translateY(-2px); }
+.notebook-links { display: flex; gap: 0.4rem; }
+.notebook-links .btn { border: 1px solid var(--pst-color-border); border-radius: 999px; font-size: 0.8rem; }
+
