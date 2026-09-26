@@ -39,16 +39,17 @@ prob = heatNd_unforced(
 # ## Nodes and the collocation matrix
 #
 # `CollBase` provides the quadrature: here three Gauss-Radau nodes, whose last node is the right end of the
-# interval. The node type is chosen with `quad_type`.
+# interval. `node_type` picks the family of nodes (Legendre here), `quad_type` which ends of the interval are nodes
+# themselves: none (`'GAUSS'`), one (`'RADAU-LEFT'`, `'RADAU-RIGHT'`) or both (`'LOBATTO'`).
 
 # %%
 # instantiate collocation class, relative to the time interval [0,1]
 coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')
 
-np.set_printoptions(precision=4, suppress=True)
-print('nodes tau_m:', coll.nodes)
-print('Q =')
-print(coll.Qmat[1:, 1:])
+with np.printoptions(precision=4, suppress=True):
+    print('nodes tau_m:', coll.nodes)
+    print('Q =')
+    print(coll.Qmat[1:, 1:])
 
 # %% [markdown]
 # Row $m$ of the matrix $Q = (q_{mj})$ holds the quadrature weights for the integral from $0$ to $\tau_m$. Its

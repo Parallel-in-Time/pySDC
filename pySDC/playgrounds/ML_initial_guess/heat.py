@@ -8,7 +8,6 @@ from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.playgrounds.ML_initial_guess.tensor import Tensor
 from pySDC.playgrounds.ML_initial_guess.sweeper import GenericImplicitML_IG
-from pySDC.tutorial.step_1.A_spatial_problem_setup import run_accuracy_check
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.playgrounds.ML_initial_guess.ml_heat import HeatEquationModel
 

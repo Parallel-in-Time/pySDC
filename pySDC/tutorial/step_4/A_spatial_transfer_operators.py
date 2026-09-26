@@ -5,7 +5,6 @@ import numpy as np
 
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.tutorial.step_1.B_spatial_accuracy_check import get_accuracy_order
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars_fine')
@@ -66,7 +65,10 @@ def main():
 
     # print out and check
     print('Running order checks...')
-    orders = get_accuracy_order(results)
+    # observed order between consecutive meshes, as in step 1, part B
+    nvars = sorted(results['nvars_list'])
+    errors = [results[ID(nvars_fine=n)] for n in nvars]
+    orders = [np.log(errors[i - 1] / errors[i]) / np.log(nvars[i] / nvars[i - 1]) for i in range(1, len(nvars))]
     Path("data").mkdir(parents=True, exist_ok=True)
     f = open('data/step_4_A_out.txt', 'w')
     for p in range(len(orders)):

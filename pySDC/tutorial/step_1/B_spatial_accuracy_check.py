@@ -162,8 +162,9 @@ fig.tight_layout()
 # :::
 #
 # :::{dropdown} Answer
-# Fourth order, but only up to about $2^{10}$ unknowns: the error bottoms out near $10^{-9}$ and grows from
-# $2^{11}$ on, much earlier than with the second-order stencil, because the error is so much smaller.
+# Fourth order (4.1 to 4.9 on the coarse meshes, then 3.99), but only up to 2047 unknowns, where the error bottoms
+# out near $10^{-9}$; from 4095 on it grows again. That is much earlier than with the second-order stencil, because
+# the error is so much smaller. The check in the last cell then fails, of course: it expects second order.
 # :::
 #
 # ## Summary

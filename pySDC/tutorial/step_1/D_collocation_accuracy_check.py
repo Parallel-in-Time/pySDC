@@ -134,7 +134,12 @@ for dt, p in zip(dt_list[1:], order, strict=True):
 errors = [results[ID(dt=dt)] for dt in dt_list]
 fig, ax = plt.subplots(figsize=(6, 4))
 ax.loglog(dt_list, errors, 'o', label='experiment')
-ax.loglog(dt_list, [errors[-1] * (dt / dt_list[-1]) ** expected_order for dt in dt_list], 'k--', label='6th order')
+ax.loglog(
+    dt_list,
+    [errors[-1] * (dt / dt_list[-1]) ** expected_order for dt in dt_list],
+    'k--',
+    label=f'{expected_order}th order',
+)
 ax.set_xlabel(r'$\Delta t$')
 ax.set_ylabel('abs. error')
 ax.grid(alpha=0.3)
@@ -155,8 +160,8 @@ fig.tight_layout()
 #
 # :::{dropdown} Answer
 # About 4.9 for the smallest step, approaching 5: Gauss-Lobatto collocation with $M$ nodes has order $2M - 2$,
-# so the local error is of order $2M - 1 = 5$. That is why the check below only looks at the last, asymptotic
-# value, and demands it to be close to 6.
+# so the local error is of order $2M - 1 = 5$. The check in the last cell therefore fails: it only looks at the
+# last, asymptotic value and demands it to be close to 6, which is exactly what tells the two node types apart.
 # :::
 #
 # ## Summary
