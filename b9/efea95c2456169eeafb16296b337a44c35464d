@@ -1,0 +1,19 @@
+pySDC/tests/test_problems/test_get_fig.py
+  s_619b2228c15391::t_a2a0a2043342fc 4-7,9-11,13-15,17-32,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b9efea95c2456169eeafb16296b337a44c35464d",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
