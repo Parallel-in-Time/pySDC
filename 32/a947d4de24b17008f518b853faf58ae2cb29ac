@@ -1,0 +1,21 @@
+pySDC/tests/test_convergence_controllers/test_check_iteration_estimator.py
+  s_95bab24a882a3c::t_1c5ea595f9e2f8 1-25
+pySDC/implementations/convergence_controller_classes/check_iteration_estimator.py
+  s_95bab24a882a3c::t_6aeeb9cfe52440 118-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "32a947d4de24b17008f518b853faf58ae2cb29ac",
+  "prompts": {},
+  "sessions": {
+    "s_95bab24a882a3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b994f9e9-82e3-44b5-a10b-72438e342d4c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
