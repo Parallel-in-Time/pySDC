@@ -1,0 +1,36 @@
+pySDC/tutorial/step_5/A_multistep_multilevel_hierarchy.py
+  s_619b2228c15391::t_4a17cc7f33e2f4 82-85
+pySDC/tutorial/step_5/C_advection_and_PFASST.py
+  s_619b2228c15391::t_4a17cc7f33e2f4 136-137
+pySDC/tutorial/step_6/A_run_non_MPI_controller.py
+  s_619b2228c15391::t_ce8ed7f43793d4 18-19,52-53
+  s_619b2228c15391::t_4a17cc7f33e2f4 55-56
+pySDC/tutorial/step_6/B_odd_temporal_distribution.py
+  s_619b2228c15391::t_4a17cc7f33e2f4 28-29
+pySDC/tutorial/step_9/C_paradiag_in_pySDC.py
+  s_619b2228c15391::t_4a17cc7f33e2f4 196-197
+pySDC/tutorial/step_6/README.rst
+  s_619b2228c15391::t_ce8ed7f43793d4 6
+pySDC/tutorial/step_5/B_my_first_PFASST_run.py
+  s_619b2228c15391::t_4a17cc7f33e2f4 127-128
+pySDC/tutorial/step_6/pfasst_setup.py
+  s_619b2228c15391::t_ce8ed7f43793d4 149
+pySDC/tests/test_tutorials/test_step_6.py
+  s_619b2228c15391::t_858f3ecbd3e643 48-56,71-91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3b316f1118ab2ce6a1a329510516088cbd9af54c",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
