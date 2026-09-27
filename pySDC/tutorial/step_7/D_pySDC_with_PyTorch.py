@@ -21,16 +21,15 @@
 # infrastructure. This is work in progress in very early stages! The tensor data type is the simplest possible
 # implementation, rather than an efficient one. If you want to work on this, your input is appreciated!
 #
-# The problem class `Heat1DFDTensor` and the network `HeatEquationModel` come from the playground
-# `pySDC/playgrounds/ML_initial_guess`.
+# The tensor data type, the problem class `Heat1DFDTensor` using it and the network `HeatEquationModel` live in the
+# helper module `torch_heat.py` next to this tutorial.
 
 # %%
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from pySDC.playgrounds.ML_initial_guess.ml_heat import HeatEquationModel, Train_pySDC
-from pySDC.playgrounds.ML_initial_guess.heat import Heat1DFDTensor
+from pySDC.tutorial.step_7.torch_heat import Heat1DFDTensor, HeatEquationModel
 
 # %% [markdown]
 # ## Training at the collocation nodes

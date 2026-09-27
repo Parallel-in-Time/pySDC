@@ -7,7 +7,8 @@ In the following, we show a few examples of pySDC + X.
 - **Part A: pySDC and FEniCS.** Finite elements in space, with and without inverting the mass matrix.
 - **Part B: mpi4py-fft for parallel Fourier transforms.** The nonlinear Schrödinger equation with SDC, MLSDC and PFASST.
 - **Part C: Time-parallel pySDC with space-parallel PETSc.** Space and time communicators, split by coloring.
-- **Part D: pySDC and PyTorch.** A tensor data type, and a network trained at the collocation nodes.
+- **Part D: pySDC and PyTorch.** A tensor data type, and a network trained at the collocation nodes;
+  ``torch_heat.py`` holds the data type, the heat equation using it and the network.
 - **Part E: pySDC and Firedrake.** The heat equation of Part A, in Firedrake, serial, parallel across the nodes, or
   on three levels.
 - **Part F: pySDC and Gusto.** pySDC as a time discretization for Gusto, in the Williamson 5 test case;
