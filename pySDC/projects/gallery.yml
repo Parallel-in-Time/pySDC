@@ -7,6 +7,10 @@
 
 - section: Methods and analysis
   projects:
+    - title: The pySDC paper
+      page: TOMS
+      image: data/runtimes_matrix_heat.png
+      summary: SDC variants for the Allen-Cahn equation, and space-time parallel runs with PETSc, from ACM TOMS.
     - title: Parallel SDC
       page: parallelSDC
       image: data/parallelSDC_preconditioner_heat.png
@@ -74,6 +78,10 @@
       page: Resilience
       image: data/piline_hotrod_adaptive_1procs.png
       summary: Adaptivity and Hot Rod against bit flips, e.g. from radiation, and fault statistics.
+    - title: Soft faults
+      page: soft_failure
+      image: data/vanderpol_500_runs_min_max_residuals.png
+      summary: Bit flips injected into SDC sweeps, a detector for them, and its statistics over 500 runs.
     - title: Lossy compression
       page: compression
       image: data_libpressio/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png
