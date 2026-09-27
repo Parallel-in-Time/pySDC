@@ -1,0 +1,34 @@
+pySDC/tests/test_sweepers/test_Runge_Kutta_sweeper.py
+  s_6435d1fae13e27::t_3f3c886a1f0208 50-89
+pySDC/tests/test_sweepers/test_preconditioners.py
+  s_6435d1fae13e27::t_3f3c886a1f0208 220-241
+pySDC/implementations/sweeper_classes/ParaDiagSweepers.py
+  s_6435d1fae13e27::t_933dc5a308009c 25-26,129-130
+pySDC/core/sweeper.py
+  s_6435d1fae13e27::t_e4c3828d40311f 131,158,161,164-165,167
+  s_6435d1fae13e27::t_f09b2c9ddeea92 169
+  s_6435d1fae13e27::t_933dc5a308009c 93,115,141,162-163,166,168
+pySDC/implementations/problem_classes/odeSystem.py
+  s_6435d1fae13e27::t_933dc5a308009c 200,202,210-211
+pySDC/implementations/sweeper_classes/Runge_Kutta.py
+  s_6435d1fae13e27::t_933dc5a308009c 427,432-433
+pySDC/tests/test_sweepers/test_ParaDiag_sweepers.py
+  s_6435d1fae13e27::t_5a18dd87d57d41 116
+  s_6435d1fae13e27::t_4382670d67569c 106-115,117-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c44d9c3f0bd08377562370d987df9526307c52fd",
+  "prompts": {},
+  "sessions": {
+    "s_6435d1fae13e27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79d56209-5811-4846-8ee3-ed8d7bdb952b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
