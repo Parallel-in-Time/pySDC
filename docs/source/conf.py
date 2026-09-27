@@ -142,6 +142,40 @@ def add_run_in_browser(app, pagename, templatename, context, doctree):
     context['browser_wheels'] = BROWSER_WHEELS
 
 
+def add_project_gallery(app, docname, source):
+    """Replace the placeholder on the projects page with the cards and the toctree from pySDC/projects/gallery.yml"""
+    if docname != 'projects/index':
+        return
+    import yaml
+
+    gallery = Path(ROOT, 'pySDC/projects/gallery.yml')
+    app.env.note_dependency(gallery)
+    sections = yaml.safe_load(gallery.read_text(encoding='utf-8'))
+    pages = [project['page'] for section in sections for project in section['projects']]
+    missing = [page for page in pages if not Path(app.srcdir, 'projects', f'{page}.rst').exists()]
+    if missing:
+        raise ValueError(f'{gallery} names pages that docs/source/projects does not have: {missing}')
+    lines = []
+    for section in sections:
+        lines += [section['section'], '-' * len(section['section']), '']
+        lines += ['.. grid:: 1 2 2 3', '   :gutter: 3', '   :class-container: project-gallery', '']
+        for project in section['projects']:
+            lines += [
+                f"   .. grid-item-card:: {project['title']}",
+                f"      :link: {project['page']}",
+                '      :link-type: doc',
+            ]
+            if 'image' in project:
+                lines += [f"      :img-top: /../../{project['image']}", f"      :img-alt: {project['title']}"]
+            else:
+                lines += ['      :class-card: no-image']
+            lines += ['', f"      {project['summary']}", '']
+    lines += ['.. toctree::', '   :hidden:', '']
+    lines += [f'   {page}' for page in pages]
+    source[0] = source[0].replace('.. project-gallery', '\n'.join(lines))
+
+
 def setup(app):
     app.connect('build-finished', write_notebooks)
     app.connect('html-page-context', add_run_in_browser)
+    app.connect('source-read', add_project_gallery)

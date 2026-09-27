@@ -27,3 +27,12 @@
 .cell_output img { max-width: 100%; }
 .notebook-links .run-in-browser-unavailable { opacity: 0.45; cursor: not-allowed; }
 .rib-status.rib-unavailable { display: block; }
+
+/* Project gallery, see add_project_gallery in conf.py */
+.project-gallery .sd-card-img-top { height: 11rem; object-fit: contain; padding: 0.5rem; background: #fff; border-bottom: 1px solid var(--pst-color-border); }
+.project-gallery .sd-card-title { font-size: 1rem; }
+.project-gallery .sd-card-text { font-size: 0.9rem; color: var(--pst-color-text-muted); }
+.project-gallery .no-image::before {
+  content: ''; display: block; height: 11rem; border-bottom: 1px solid var(--pst-color-border);
+  background: linear-gradient(135deg, var(--pst-color-primary-bg), var(--pst-color-secondary-bg));
+}

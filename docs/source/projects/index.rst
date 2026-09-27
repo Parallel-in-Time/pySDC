@@ -1,30 +1,13 @@
+:html_theme.sidebar_secondary.remove: true
+
 Projects
 ========
 
 .. include:: ../../../pySDC/projects/README.rst
 
-.. toctree::
-   :maxdepth: 1
+.. conf.py replaces the placeholder below with the cards and the toctree from pySDC/projects/gallery.yml
 
-   parallelSDC
-   parallelSDC_reloaded
-   fwsw
-   RDC
-   asymp_conv
-   matrixPFASST
-   Hamiltonian
-   SDC_showdown
-   AllenCahn_Bayreuth
-   performance
-   PinTSimE
-   Resilience
-   DAE
-   compression
-   second_order
-   monodomain
-   GPU
-   RayleighBenard
-   StroemungsRaum
+.. project-gallery
 
 Playgrounds
 -----------

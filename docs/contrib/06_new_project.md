@@ -47,6 +47,19 @@ In order to run the tests of your project, please add the name of your project *
 in the [CI-File](<https://github.com/Parallel-in-Time/pySDC/blob/master/.github/workflows/ci_pipeline.yml>)
 in the job `project_cpu_tests_linux` in the list `strategy/matrix/env`.
 
+## Add the project to the website
+
+The [project gallery](https://parallel-in-time.org/pySDC/projects/index.html) shows one card per project.
+To add yours:
+
+1. Describe the project in a `README.rst` in its directory.
+2. Add a page `docs/source/projects/<your_project>.rst` that includes it, like the other pages there do:
+   `.. include:: /../../pySDC/projects/<your_project>/README.rst`.
+3. Add an entry to [`pySDC/projects/gallery.yml`](./../../pySDC/projects/gallery.yml), with a title,
+   a one-line summary and the name of that page. For the card's image, name a plot your tests write into `data/`.
+   The CI builds the website after the tests, so the card always shows what the current code produces,
+   and it fails if the plot is missing.
+
 ## Getting a DOI of pySDC for publication
 
 If your project is published and you need a dedicated pySDC version with a DOI, please get in touch with us and/or open a new issue.
