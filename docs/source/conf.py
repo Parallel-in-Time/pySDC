@@ -1,6 +1,7 @@
 # Sphinx configuration for the pySDC website, https://parallel-in-time.org/pySDC
 
 import os
+import re
 import sys
 from fnmatch import fnmatch
 from pathlib import Path
@@ -186,7 +187,115 @@ def add_project_gallery(app, docname, source):
     source[0] = source[0].replace('.. project-gallery', '\n'.join(lines))
 
 
+# The API overview on api.rst: one table per role in a run, with the first paragraph of each class's docstring. The
+# classes are read with ast, so that modules whose imports are missing here (FEniCS, PETSc, ...) are listed too.
+API_CATEGORIES = [
+    (
+        'Problems',
+        'implementations/problem_classes',
+        ['Problem'],
+        'The equations: right-hand sides, implicit solves and, where known, exact solutions.',
+    ),
+    (
+        'Sweepers',
+        'implementations/sweeper_classes',
+        ['Sweeper'],
+        'The integrators within a step: SDC with its preconditioners, IMEX and multi-implicit splittings, Runge-Kutta.',
+    ),
+    (
+        'Controllers',
+        'implementations/controller_classes',
+        ['Controller'],
+        'Run the steps, one after the other or in parallel, with SDC, MLSDC, PFASST or ParaDiag.',
+    ),
+    (
+        'Convergence controllers',
+        'implementations/convergence_controller_classes',
+        ['ConvergenceController'],
+        'Change a run while it goes: error estimates, adaptive step sizes, stopping criteria and restarts.',
+    ),
+    ('Hooks', 'implementations/hooks', ['Hooks'], 'Record what happens during a run into the statistics.'),
+    (
+        'Transfer',
+        'implementations/transfer_classes',
+        ['SpaceTransfer', 'BaseTransfer'],
+        'Move data between the levels of MLSDC and PFASST, in space and between them.',
+    ),
+    ('Data types', 'implementations/datatype_classes', None, 'What solutions and right-hand sides are stored in.'),
+    ('Core', 'core', None, 'The base classes everything above derives from, and the step and level they run on.'),
+]
+
+
+def _summary(docstring):
+    """The first paragraph of a docstring, on one line and without footnote references"""
+    paragraph = re.split(r'\n\s*\n', (docstring or '').strip())[0]
+    if paragraph.startswith('..'):
+        return ''
+    text = ' '.join(paragraph.split())
+    text = re.sub(r'\s*\[[#\w]+\]_', '', text)
+    text = re.sub(r'\[([^\]]+)\]\((https?://(?:[^()\s]|\([^()\s]*\))+)\)', r'`\1 <\2>`__', text)
+    # the first sentence: a period before a capital letter, not inside inline markup
+    ends = [m.start() + 1 for m in re.finditer(r'\.\s+(?=[A-Z])', text) if text[: m.start()].count('`') % 2 == 0]
+    text = text[: ends[0]] if ends else text
+    return text[:-1] + '.' if text.endswith(':') else text
+
+
+def _api_table(rows, header):
+    lines = ['.. list-table::', '   :header-rows: 1', '   :widths: 35 65', '   :width: 100%', '   :class: api-overview']
+    lines += ['', f'   * - {header}', '     - Summary']
+    for name, summary in rows:
+        lines += [f'   * - {name}', f'     - {summary or "—"}']
+    return lines + ['']
+
+
+def add_api_overview(app, docname, source):
+    """Replace the placeholder on api.rst with the tables of API_CATEGORIES and of the helpers"""
+    if docname != 'api':
+        return
+    import ast
+
+    files = sorted(Path(ROOT, 'pySDC').glob('*/**/*.py'))
+    files = [f for f in files if f.parts[-2] in ('core', 'helpers') or 'implementations' in f.parts]
+    classes, bases = [], {}
+    for file in files:
+        app.env.note_dependency(file)
+        tree = ast.parse(file.read_text(encoding='utf-8'))
+        module = '.'.join(file.relative_to(ROOT).with_suffix('').parts)
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef):
+                bases[node.name] = [getattr(base, 'id', getattr(base, 'attr', '')) for base in node.bases]
+                if not node.name.startswith('_'):
+                    classes.append((file, module, node.name, _summary(ast.get_docstring(node))))
+
+    def derives(name, roots, seen=()):
+        return name in roots or any(derives(b, roots, seen + (name,)) for b in bases.get(name, []) if b not in seen)
+
+    lines = []
+    for title, folder, roots, description in API_CATEGORIES:
+        rows = [
+            (f':py:class:`~{module}.{name}`', summary)
+            for file, module, name, summary in classes
+            if file.parent == Path(ROOT, 'pySDC', folder) and (roots is None or derives(name, roots))
+        ]
+        lines += [title, '-' * len(title), '', description, ''] + _api_table(rows, 'Class')
+    rows = []
+    for file in files:
+        if file.parent == Path(ROOT, 'pySDC', 'helpers') and file.name != '__init__.py':
+            tree = ast.parse(file.read_text(encoding='utf-8'))
+            names = [
+                node.name
+                for node in tree.body
+                if isinstance(node, (ast.ClassDef, ast.FunctionDef)) and not node.name.startswith('_')
+            ]
+            module = '.'.join(file.relative_to(ROOT).with_suffix('').parts)
+            rows.append((f':py:mod:`~{module}`', ', '.join(f'``{name}``' for name in names)))
+    lines += ['Helpers', '-------', '', 'Utilities for statistics, plots, setups, input and output.', '']
+    lines += _api_table(rows, 'Module')
+    source[0] = source[0].replace('.. api-overview', '\n'.join(lines))
+
+
 def setup(app):
     app.connect('build-finished', write_notebooks)
     app.connect('html-page-context', add_run_in_browser)
     app.connect('source-read', add_project_gallery)
+    app.connect('source-read', add_api_overview)

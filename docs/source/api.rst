@@ -1,7 +1,17 @@
 API reference
 =============
 
-.. include:: ../../pySDC/README_API.rst
+A run of pySDC is set up with a *description*, a dictionary that names a problem class, a sweeper class and their
+parameters, and possibly transfer classes, convergence controllers and hooks. A controller then runs it. The tables
+below list the classes pySDC ships for each of these roles, with the first paragraph of their docstrings; each name
+links to its full documentation. The complete list of modules is at the end of this page.
+
+.. conf.py replaces the placeholder below with the tables, from the docstrings in pySDC/
+
+.. api-overview
+
+All modules
+-----------
 
 .. toctree::
    :maxdepth: 1

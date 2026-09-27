@@ -36,3 +36,8 @@
   content: ''; display: block; height: 11rem; border-bottom: 1px solid var(--pst-color-border);
   background: linear-gradient(135deg, var(--pst-color-primary-bg), var(--pst-color-secondary-bg));
 }
+
+/* API overview, see add_api_overview in conf.py */
+table.api-overview { table-layout: fixed; }
+table.api-overview td:first-child code, table.api-overview td:first-child .pre { white-space: normal; word-break: break-all; }
+table.api-overview td { font-size: 0.9rem; overflow-wrap: anywhere; }
