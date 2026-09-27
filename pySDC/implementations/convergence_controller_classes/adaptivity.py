@@ -213,9 +213,10 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
             'restart_at_maxiter': True,
             'restol_min': 1e-12,
             'restol_max': 1e-5,
+            'e_tol_min': 1e-10,
+            'e_tol_max': 1e-5,
             'factor_if_not_converged': 4.0,
             'residual_max_tol': 1e9,
-            'maxiter': description['sweeper_params'].get('maxiter', 99),
             'interpolate_between_restarts': True,
             'abort_at_growing_residual': True,
             **super().setup(controller, params, description, **kwargs),
@@ -225,10 +226,9 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
                 [max([defaults['restol_rel'] * defaults['e_tol'], defaults['restol_min']]), defaults['restol_max']]
             )
         elif defaults['e_tol_rel']:
-            description['level_params']['e_tol'] = min([max([defaults['e_tol_rel'] * defaults['e_tol'], 1e-10]), 1e-5])
-
-        if defaults['restart_at_maxiter']:
-            defaults['maxiter'] = description['step_params'].get('maxiter', 99)
+            description['level_params']['e_tol'] = min(
+                [max([defaults['e_tol_rel'] * defaults['e_tol'], defaults['e_tol_min']]), defaults['e_tol_max']]
+            )
 
         self.res_last_iter = np.inf
 
@@ -664,9 +664,6 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         for key in defaults['adaptive_coll_params'].keys():
             if type(defaults['adaptive_coll_params'][key]) == list:
                 defaults['num_colls'] = max([defaults['num_colls'], len(defaults['adaptive_coll_params'][key])])
-
-        if defaults['restart_at_maxiter']:
-            defaults['maxiter'] = description['step_params'].get('maxiter', 99) * defaults['num_colls']
 
         return defaults
 

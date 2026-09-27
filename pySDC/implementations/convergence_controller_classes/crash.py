@@ -9,6 +9,8 @@ class CrashBase(ConvergenceController):
     Base class for convergence controllers that raise a `ConvergenceError` on all ranks as soon as one rank crashes.
     """
 
+    comm = None  #: communicator across the sweeper, which subclasses set up in `setup`
+
     def __init__(self, controller, params, description, **kwargs):
         """
         Initialization routine, which additionally prepares the logical or for communicating crashes with MPI
