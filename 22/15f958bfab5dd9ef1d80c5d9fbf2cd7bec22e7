@@ -1,0 +1,21 @@
+pySDC/tests/test_problems/test_DiscontinuousTestODE.py
+  s_4635c976c08496::t_93200285f82c39 83-95
+pySDC/implementations/problem_classes/DiscontinuousTestODE.py
+  s_4635c976c08496::t_ee43bb0b01ac6b 276
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2215f958bfab5dd9ef1d80c5d9fbf2cd7bec22e7",
+  "prompts": {},
+  "sessions": {
+    "s_4635c976c08496": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f09ffcac-1bb6-468a-8482-42d83e6ac4f0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
