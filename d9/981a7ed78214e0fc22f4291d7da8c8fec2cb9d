@@ -1,0 +1,22 @@
+pySDC/implementations/problem_classes/Battery.py
+  s_4635c976c08496::t_463ed8b67f88c4 95,519,525,563
+  s_4635c976c08496::t_76c932606b1665 94
+pySDC/tests/test_problems/test_battery.py
+  s_4635c976c08496::t_a4086c464ab9ce 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d9981a7ed78214e0fc22f4291d7da8c8fec2cb9d",
+  "prompts": {},
+  "sessions": {
+    "s_4635c976c08496": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f09ffcac-1bb6-468a-8482-42d83e6ac4f0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
