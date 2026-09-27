@@ -77,16 +77,23 @@ class NCCLComm(object):
         else:
             return data.size
 
-    def get_op(self, MPI_op):
+    def get_op(self, MPI_op, data=None):
         """
         Translate an MPI reduction operation to the NCCL one.
 
+        Complex data is reduced as twice as many reals, which is only right for sums: the product of two complex
+        numbers is not the pairwise product of their parts, and they have no order for `MAX` and `MIN`.
+
         Args:
             MPI_op (mpi4py.MPI.Op): One of `MPI.SUM`, `MPI.PROD`, `MPI.MAX` and `MPI.MIN`
+            data (cupy.ndarray, optional): The data to be reduced, to check that the operation works for its dtype
 
         Returns:
             NCCL reduction operation
         """
+        if data is not None and cp.iscomplexobj(data) and MPI_op != MPI.SUM:
+            raise NotImplementedError('NCCL can only sum complex data, since it reduces it as pairs of reals!')
+
         if MPI_op == MPI.SUM:
             return nccl.NCCL_SUM
         elif MPI_op == MPI.PROD:
@@ -133,7 +140,7 @@ class NCCLComm(object):
 
         dtype = self.get_dtype(sendbuf)
         count = self.get_count(sendbuf)
-        op = self.get_op(op)
+        op = self.get_op(op, sendbuf)
         recvbuf = cp.empty(1) if recvbuf is None else recvbuf
         stream = cp.cuda.get_current_stream()
 
@@ -160,7 +167,7 @@ class NCCLComm(object):
 
         dtype = self.get_dtype(sendbuf)
         count = self.get_count(sendbuf)
-        op = self.get_op(op)
+        op = self.get_op(op, sendbuf)
         stream = cp.cuda.get_current_stream()
 
         self.commNCCL.allReduce(
