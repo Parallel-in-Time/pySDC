@@ -1,0 +1,22 @@
+pySDC/implementations/problem_classes/RayleighBenard3D.py
+  s_6435d1fae13e27::t_f40fb976473d55 216,310-311,329,371
+  s_6435d1fae13e27::t_9619df1119586b 387-388,395-396
+pySDC/tests/test_problems/test_RayleighBenard3D.py
+  s_6435d1fae13e27::t_26acaf204f78d1 359-367,434-477
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b85b3bd2ef6839e89f941ad1070cbcc3e0e75be1",
+  "prompts": {},
+  "sessions": {
+    "s_6435d1fae13e27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79d56209-5811-4846-8ee3-ed8d7bdb952b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": null
+    }
+  }
+}
