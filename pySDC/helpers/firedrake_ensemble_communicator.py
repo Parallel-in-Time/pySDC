@@ -3,6 +3,21 @@ import firedrake as fd
 import numpy as np
 
 
+class _Requests:
+    """
+    The requests Firedrake returns for sending or receiving a function, one per subfunction, to be waited on together
+    like a single request.
+    """
+
+    def __init__(self, requests):
+        self.requests = requests
+
+    def Wait(self):
+        MPI.Request.Waitall(self.requests)
+
+    wait = Wait
+
+
 class FiredrakeEnsembleCommunicator:
     """
     Ensemble communicator for performing multiple similar distributed simulations with Firedrake, see https://www.firedrakeproject.org/firedrake/parallelism.html
@@ -23,12 +38,16 @@ class FiredrakeEnsembleCommunicator:
         self.ensemble = fd.Ensemble(comm, space_size)
         self.comm_wold = comm
 
+    _owns_comm_wold = False  # only communicators made by `Split` are freed by `Free`
+
     def Split(self, *args, **kwargs):
         """
         Split the world communicator with mpi4py's `Split` and return a new `FiredrakeEnsembleCommunicator` on the
         result, with the same spatial size.
         """
-        return FiredrakeEnsembleCommunicator(self.comm_wold.Split(*args, **kwargs), space_size=self.space_comm.size)
+        split = FiredrakeEnsembleCommunicator(self.comm_wold.Split(*args, **kwargs), space_size=self.space_comm.size)
+        split._owns_comm_wold = True
+        return split
 
     @property
     def space_comm(self):
@@ -75,24 +94,28 @@ class FiredrakeEnsembleCommunicator:
     def Irecv(self, buf, source, tag=MPI.ANY_TAG):
         """
         Wrap `Irecv` on the time communicator for numpy arrays and lists, and `Ensemble.irecv` for Firedrake functions,
-        of which only the first request is returned.
+        whose requests, one per subfunction, are returned to be waited on together.
         """
         if type(buf) in [np.ndarray, list]:
             return self.ensemble.ensemble_comm.Irecv(buf=buf, source=source, tag=tag)
-        return self.ensemble.irecv(buf, source, tag=tag)[0]
+        return _Requests(self.ensemble.irecv(buf, source, tag=tag))
 
-    def Isend(self, buf, dest, tag=MPI.ANY_TAG):
+    def Isend(self, buf, dest, tag=0):
         """
         Wrap `Isend` on the time communicator for numpy arrays and lists, and `Ensemble.isend` for Firedrake functions,
-        of which only the first request is returned.
+        whose requests, one per subfunction, are returned to be waited on together.
         """
         if type(buf) in [np.ndarray, list]:
             return self.ensemble.ensemble_comm.Isend(buf=buf, dest=dest, tag=tag)
-        return self.ensemble.isend(buf, dest, tag=tag)[0]
+        return _Requests(self.ensemble.isend(buf, dest, tag=tag))
 
     def Free(self):
-        """Does nothing: `del self` only removes the local name, so no communicator is freed."""
-        del self
+        """
+        Free the world communicator if `Split` made it. The ensemble frees its own spatial and time communicators when
+        it is garbage collected.
+        """
+        if self._owns_comm_wold:
+            self.comm_wold.Free()
 
 
 def get_ensemble(comm, space_size):
