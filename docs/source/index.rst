@@ -79,6 +79,12 @@ Where to go
 
       Problems, sweepers, controllers, hooks and helpers.
 
+   .. grid-item-card:: :octicon:`book;1.5em` Publications
+      :link: publications
+      :link-type: doc
+
+      How to cite pySDC, and the research that uses it.
+
    .. grid-item-card:: :octicon:`git-pull-request;1.5em` Development
       :link: development
       :link-type: doc
