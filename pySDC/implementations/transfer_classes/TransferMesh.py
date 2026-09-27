@@ -111,7 +111,7 @@ class mesh_to_mesh(SpaceTransfer):
             Pspace = []
             for i in range(len(self.fine_prob.nvars)):
                 # if number of variables is the same on both levels, Rspace and Pspace are identity
-                if self.coarse_prob.nvars == self.fine_prob.nvars:
+                if self.coarse_prob.nvars[i] == self.fine_prob.nvars[i]:
                     Rspace.append(sp.eye(self.coarse_prob.nvars[i]))
                     Pspace.append(sp.eye(self.fine_prob.nvars[i]))
                 # assemble restriction as transpose of interpolation
