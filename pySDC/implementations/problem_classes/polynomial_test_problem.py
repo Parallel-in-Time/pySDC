@@ -28,11 +28,12 @@ class polynomial_testequation(Problem):
 
         if useGPU:
             import cupy as cp
-            from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+            from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
-            type(self).xp = cp
-            type(self).dtype_u = cupy_mesh
-            type(self).dtype_f = cupy_mesh
+            # on the instance, since setting them on the class would switch every later instance to the GPU
+            self.xp = cp
+            self.dtype_u = cupy_mesh
+            self.dtype_f = imex_cupy_mesh if self.dtype_f is imex_mesh else cupy_mesh
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(1, None, np.dtype('float64')))
