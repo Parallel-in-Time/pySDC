@@ -11,8 +11,8 @@ from mpi4py_fft import newDistArray
 class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
     r"""
     The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
-    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
-    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces
+    :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for
     :math:`u,\, v`. Here, the process is described by the :math:`N`-dimensional model
 
     .. math::
@@ -37,9 +37,9 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
     Dv : float, optional
         Diffusion rate for :math:`v`.
     A : float, optional
-        Feed rate for :math:`v`.
+        Feed rate for :math:`u`.
     B : float, optional
-        Overall decay rate for :math:`u`.
+        Removal rate for :math:`v`.
     spectral : bool, optional
         If True, the solution is computed in spectral space.
     L : float, optional
@@ -358,22 +358,23 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 class grayscott_imex_linear(grayscott_imex_diffusion):
     r"""
     The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
-    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
-    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
-    :math:`u,\, v`. The model with linear (reaction) part is described by the :math:`N`-dimensional model
+    where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces
+    :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. This is the same model as in ``grayscott_imex_diffusion``, with the linear reaction terms grouped with the
+    diffusion:
 
     .. math::
-        \frac{d u}{d t} = D_u \Delta u - u v^2 + A,
+        \frac{d u}{d t} = (D_u \Delta - A) u - u v^2 + A,
 
     .. math::
-        \frac{d v}{d t} = D_v \Delta v + u v^2
+        \frac{d v}{d t} = (D_v \Delta - B) v + u v^2
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
     Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also
     https://mpi4py-fft.readthedocs.io/en/latest/.
 
-    This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and linear
-    part is computed in an explicit way).
+    This class implements the problem for *semi-explicit* time-stepping (diffusion and the linear reaction terms are
+    treated implicitly, the rest of the reaction explicitly).
 
     References
     ----------
@@ -436,15 +437,15 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
     r"""
     The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
-    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
-    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces
+    :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for
     :math:`u,\, v`. Here, the process is described by the :math:`N`-dimensional model
 
     .. math::
         \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
 
     .. math::
-        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B v
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
     Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also
@@ -462,9 +463,9 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
     Dv : float, optional
         Diffusion rate for :math:`v`.
     A : float, optional
-        Feed rate for :math:`v`.
+        Feed rate for :math:`u`.
     B : float, optional
-        Overall decay rate for :math:`u`.
+        Removal rate for :math:`v`.
     spectral : bool, optional
         If True, the solution is computed in spectral space.
     L : float, optional
@@ -690,22 +691,24 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 class grayscott_mi_linear(grayscott_imex_linear):
     r"""
     The original Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
-    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
-    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
-    :math:`u,\, v`. The model with linear (reaction) part is described by the :math:`N`-dimensional model
+    where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces
+    :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for
+    :math:`u,\, v`. This is the same model as in ``grayscott_imex_diffusion``, with the linear reaction terms grouped with the
+    diffusion:
 
     .. math::
-        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A,
+        \frac{\partial u}{\partial t} = (D_u \Delta - A) u - u v^2 + A,
 
     .. math::
-        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2
+        \frac{\partial v}{\partial t} = (D_v \Delta - B) v + u v^2
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
     Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also
     https://mpi4py-fft.readthedocs.io/en/latest/.
 
-    The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., for the system containing
-    the diffusion part will be solved by FFT, and for the linear part a Newton solver is used.
+    The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., the system for the
+    diffusion and the linear reaction terms is solved by FFT, and the one for the rest of the reaction by a Newton
+    solver.
 
     Parameters
     ----------
