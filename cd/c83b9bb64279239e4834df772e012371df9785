@@ -1,0 +1,21 @@
+pySDC/tests/test_problems/test_polynomial_test_problem.py
+  s_4635c976c08496::t_492077b74b8da5 1-27
+pySDC/implementations/problem_classes/polynomial_test_problem.py
+  s_4635c976c08496::t_492077b74b8da5 31,33-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cdc83b9bb64279239e4834df772e012371df9785",
+  "prompts": {},
+  "sessions": {
+    "s_4635c976c08496": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f09ffcac-1bb6-468a-8482-42d83e6ac4f0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
