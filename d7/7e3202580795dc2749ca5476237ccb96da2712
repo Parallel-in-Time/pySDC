@@ -1,0 +1,49 @@
+pySDC/core/convergence_controller.py
+  s_619b2228c15391::t_1cda48979151dd 128-132
+pySDC/helpers/blocks.py
+  s_619b2228c15391::t_a68d8826fb2da1 20
+pySDC/helpers/spectral_helper.py
+  s_619b2228c15391::t_d14adc39234b77 1431
+pySDC/implementations/datatype_classes/container.py
+  s_619b2228c15391::t_b73973fd955db5 15-19
+pySDC/implementations/datatype_classes/mesh.py
+  s_619b2228c15391::t_2afd4366f46240 181-184,189-194
+pySDC/implementations/hooks/log_solution.py
+  s_619b2228c15391::t_2287b76750035b 80-83
+pySDC/implementations/problem_classes/Battery.py
+  s_619b2228c15391::t_2e358958983edd 139-143
+pySDC/implementations/problem_classes/GrayScott_MPIFFT.py
+  s_619b2228c15391::t_a600437f7784f3 13,25,67,69,189-190,358,370,375-381,436,448,488,490,681,693,698-704
+pySDC/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.py
+  s_619b2228c15391::t_a35d6df14b31cc 33,51,76,78,388,406,433,435,540,558,585,587
+pySDC/implementations/problem_classes/NonlinearSchroedinger_MPIFFT.py
+  s_619b2228c15391::t_ac26442fc87797 19,46,109-110,114-116,165-166
+pySDC/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.py
+  s_619b2228c15391::t_f060ff6aca6cfc 20,35,58,60,251,258,337,352,375,377
+pySDC/implementations/problem_classes/generic_spectral.py
+  s_619b2228c15391::t_a2c1afc2d4592d 193-198
+pySDC/implementations/problem_classes/odeScalar.py
+  s_619b2228c15391::t_28f015c4f5c106 63-64
+pySDC/implementations/problem_classes/odeSystem.py
+  s_619b2228c15391::t_c4f84fd19d01de 69-70,264-265,418-419,765-766
+pySDC/implementations/sweeper_classes/generic_implicit_MPI.py
+  s_619b2228c15391::t_130175119cf3f7 13-15
+pySDC/implementations/transfer_classes/TransferFiredrakeMesh.py
+  s_619b2228c15391::t_ec77ee630eb002 62,64-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d77e3202580795dc2749ca5476237ccb96da2712",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
