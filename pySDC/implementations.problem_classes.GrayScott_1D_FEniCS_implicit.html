@@ -57,7 +57,7 @@
 <p>The Gray-Scott system <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> describes a reaction-diffusion process of two substances <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(v\)</span>,
 where they diffuse over time. During the reaction <span class="math notranslate nohighlight">\(u\)</span> is used up with overall decay rate <span class="math notranslate nohighlight">\(B\)</span>,
 whereas <span class="math notranslate nohighlight">\(v\)</span> is produced with feed rate <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(D_u,\, D_v\)</span> are the diffusion rates for
-<span class="math notranslate nohighlight">\(u,\, v\)</span>. This process is described by the one-dimensional model using Dirichlet boundary conditions</p>
+<span class="math notranslate nohighlight">\(u,\, v\)</span>. This process is described by the one-dimensional model with homogeneous Neumann boundary conditions</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),\]</div>
 <div class="math notranslate nohighlight">
@@ -68,7 +68,8 @@ system with a test function <span class="math notranslate nohighlight">\(q\)</sp
 \[\int_\Omega u_t q\,dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,\]</div>
 <div class="math notranslate nohighlight">
 \[\int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,\]</div>
-<p>The spatial solve of the weak formulation is realized by <code class="docutils literal notranslate"><span class="pre">FEniCS</span></code> <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<p>The Laplacians are integrated by parts, and no Dirichlet conditions are imposed, so the boundary terms drop out and
+the boundaries are zero-flux. The spatial solve of the weak formulation is realized by <code class="docutils literal notranslate"><span class="pre">FEniCS</span></code> <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

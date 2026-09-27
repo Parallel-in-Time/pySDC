@@ -92,12 +92,40 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.add_status_variable_to_level">
 <span class="sig-name descname"><span class="pre">add_status_variable_to_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.add_status_variable_to_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.add_status_variable_to_level" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Add a status variable to the levels of the controller and optionally set its value on all of them.</p>
+<p>The variable is registered on the class of the level status, see <cite>FrozenClass.add_attr</cite>, so it exists on every
+level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Name of the status variable</p></li>
+<li><p><strong>value</strong> – Value to set on all levels of all steps, which is skipped if None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.add_status_variable_to_step">
 <span class="sig-name descname"><span class="pre">add_status_variable_to_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.add_status_variable_to_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.add_status_variable_to_step" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Add a status variable to the steps of the controller and optionally set its value on all of them.</p>
+<p>The variable is registered on the class of the step status, see <cite>FrozenClass.add_attr</cite>, so it exists on every
+step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Name of the status variable</p></li>
+<li><p><strong>value</strong> – Value to set on all steps, which is skipped if None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.check_iteration_status">
@@ -481,12 +509,36 @@ This is called in the <cite>restart_block</cite> function.
 <dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.set_level_status_variable">
 <span class="sig-name descname"><span class="pre">set_level_status_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.set_level_status_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.set_level_status_variable" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set a status variable on all levels of all steps of the controller.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Name of the status variable, which must have been added already</p></li>
+<li><p><strong>value</strong> – Value to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.set_step_status_variable">
 <span class="sig-name descname"><span class="pre">set_step_status_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/convergence_controller.html#ConvergenceController.set_step_status_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.convergence_controller.ConvergenceController.set_step_status_variable" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set a status variable on all steps of the controller.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Name of the status variable, which must have been added already</p></li>
+<li><p><strong>value</strong> – Value to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.convergence_controller.ConvergenceController.setup">

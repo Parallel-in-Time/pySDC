@@ -58,7 +58,7 @@
 <span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
 <span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
 <span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
-<span class="sd">    :math:`u,\, v`. This process is described by the one-dimensional model using Dirichlet boundary conditions</span>
+<span class="sd">    :math:`u,\, v`. This process is described by the one-dimensional model with homogeneous Neumann boundary conditions</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
@@ -75,7 +75,8 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,</span>
 
-<span class="sd">    The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.</span>
+<span class="sd">    The Laplacians are integrated by parts, and no Dirichlet conditions are imposed, so the boundary terms drop out and</span>
+<span class="sd">    the boundaries are zero-flux. The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

@@ -242,6 +242,26 @@
 <div class="viewcode-block" id="vanderpol.solve_jacobian">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_jacobian">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Solve the linear system with the Jacobian of the Newton function :math:`g(u) = u - dt f(u) - rhs` of</span>
+<span class="sd">        ``solve_system``, by applying the analytically computed inverse of the :math:`2 \times 2` Jacobian at ``u``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : np.1darray</span>
+<span class="sd">            Right-hand side of the linear system, i.e., the Newton residual.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current Newton iterate, at which the Jacobian is evaluated.</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Not used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        du : np.1darray</span>
+<span class="sd">            The Newton update.</span>
+<span class="sd">        """</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
         <span class="n">u1</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">u2</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

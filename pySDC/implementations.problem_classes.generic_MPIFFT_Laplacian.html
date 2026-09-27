@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=cd132f8b"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -155,12 +156,26 @@ Journal of Parallel and Distributed Computing (2019).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLaplacian">
 <span class="sig-name descname"><span class="pre">getLaplacian</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_MPIFFT_Laplacian.html#IMEX_Laplacian_MPIFFT.getLaplacian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLaplacian" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the squared wave numbers <span class="math notranslate nohighlight">\(|k|^2\)</span> of the local part of the spectral grid, with the wave numbers
+scaled by <span class="math notranslate nohighlight">\(2\pi / L\)</span>, and store them in <code class="docutils literal notranslate"><span class="pre">self.K2</span></code>. The Laplacian in spectral space is <span class="math notranslate nohighlight">\(-|k|^2\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLocalGrid">
 <span class="sig-name descname"><span class="pre">getLocalGrid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_MPIFFT_Laplacian.html#IMEX_Laplacian_MPIFFT.getLocalGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLocalGrid" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the coordinates of the local part of the grid in real space and store them in <code class="docutils literal notranslate"><span class="pre">self.X</span></code>, one array per
+dimension broadcast to the local shape, with the points <span class="math notranslate nohighlight">\(x_0 + i L / N\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.setup_GPU">

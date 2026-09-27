@@ -98,7 +98,19 @@ pp. 145–162.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.dg">
 <span class="sig-name descname"><span class="pre">dg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeScalar.html#ProtheroRobinson.dg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dg" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>First derivative <span class="math notranslate nohighlight">\(g'(t) = -\sin(t)\)</span> of <span class="math notranslate nohighlight">\(g\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of <span class="math notranslate nohighlight">\(g'(t)\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_f">
@@ -135,37 +147,133 @@ pp. 145–162.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.f">
 <span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeScalar.html#ProtheroRobinson.f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.f" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Right-hand side, replaced in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> by <code class="docutils literal notranslate"><span class="pre">f_LIN</span></code> or <code class="docutils literal notranslate"><span class="pre">f_NONLIN</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – Always.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.f_LIN">
 <span class="sig-name descname"><span class="pre">f_LIN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeScalar.html#ProtheroRobinson.f_LIN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.f_LIN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Right-hand side <span class="math notranslate nohighlight">\(-(u - g(t)) / \epsilon + g'(t)\)</span> of the linear form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The right-hand side.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.f_NONLIN">
 <span class="sig-name descname"><span class="pre">f_NONLIN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeScalar.html#ProtheroRobinson.f_NONLIN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.f_NONLIN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Right-hand side <span class="math notranslate nohighlight">\(-(u^3 - g(t)^3) / \epsilon + g'(t)\)</span> of the nonlinear form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The right-hand side.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.g">
 <span class="sig-name descname"><span class="pre">g</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeScalar.html#ProtheroRobinson.g"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.g" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function <span class="math notranslate nohighlight">\(g(t) = \cos(t)\)</span>, which is the exact solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of <span class="math notranslate nohighlight">\(g(t)\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.jac">
 <span class="sig-name descname"><span class="pre">jac</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeScalar.html#ProtheroRobinson.jac"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.jac" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Jacobian of the right-hand side, replaced in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> by <code class="docutils literal notranslate"><span class="pre">jac_LIN</span></code> or <code class="docutils literal notranslate"><span class="pre">jac_NONLIN</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – Always.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.jac_LIN">
 <span class="sig-name descname"><span class="pre">jac_LIN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeScalar.html#ProtheroRobinson.jac_LIN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.jac_LIN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Jacobian <span class="math notranslate nohighlight">\(-1/\epsilon\)</span> of the right-hand side of the linear form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Jacobian.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.jac_NONLIN">
 <span class="sig-name descname"><span class="pre">jac_NONLIN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeScalar.html#ProtheroRobinson.jac_NONLIN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.jac_NONLIN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Jacobian <span class="math notranslate nohighlight">\(-3 u^2 / \epsilon\)</span> of the right-hand side of the nonlinear form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Jacobian.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u" title="implementations.problem_classes.odeScalar.ProtheroRobinson.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeScalar.ProtheroRobinson.solve_system">

@@ -93,17 +93,60 @@ of the parameters supplied.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.plot_helper.newfig">
 <span class="sig-name descname"><span class="pre">newfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">textwidth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6180339887</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#newfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.newfig" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Clear the current figure and create a new figure with one axis, sized with <cite>figsize</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>textwidth</strong> (<em>float</em>) – Textwidth in your LaTeX file in points</p></li>
+<li><p><strong>scale</strong> (<em>float</em>) – The width of the figure relative to the textwidth</p></li>
+<li><p><strong>ratio</strong> (<em>float</em>) – The height of the figure relative to its width</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The figure
+matplotlib.axes.Axes: The axis</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.plot_helper.savefig">
 <span class="sig-name descname"><span class="pre">savefig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_pdf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_pgf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_png</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#savefig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.savefig" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save the current figure with a tight bounding box in the chosen formats, then close it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Path without extension, which is added for each format</p></li>
+<li><p><strong>save_pdf</strong> (<em>bool</em>) – Save as pdf</p></li>
+<li><p><strong>save_pgf</strong> (<em>bool</em>) – Save as pgf, only done if <cite>latex</cite> is found</p></li>
+<li><p><strong>save_png</strong> (<em>bool</em>) – Save as png</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.plot_helper.setup_mpl">
 <span class="sig-name descname"><span class="pre">setup_mpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#setup_mpl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.setup_mpl" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set the matplotlib rcParams for publication plots, with LaTeX for text if <cite>latex</cite> is found, and close all figures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_size</strong> (<em>int</em>) – Font size in points</p></li>
+<li><p><strong>reset</strong> (<em>bool</em>) – Restore the rcParams from import time before applying the style</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

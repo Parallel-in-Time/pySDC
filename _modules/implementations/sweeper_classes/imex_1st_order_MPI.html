@@ -50,6 +50,13 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialization routine for the sweeper, which additionally checks that the explicit preconditioner is Picard</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: passed on to the parent classes, i.e. the parameters for the sweeper and the level</span>
+<span class="sd">            **kwargs: passed on to the parent classes</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">assert</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span> <span class="o">==</span> <span class="s1">'PIC'</span>

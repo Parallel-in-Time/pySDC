@@ -55,17 +55,36 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">compute_max_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit.compute_max_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the largest step size allowed by the CFL condition with CFL number 1: the minimum over the grid of the
+grid spacing divided by the absolute velocity, in x and in z, reduced over the space communicator of the
+problem. The vertical grid spacing is the distance between the midpoints of neighbouring Chebychev nodes, with
+the domain [0, Lz].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard" title="implementations.problem_classes.RayleighBenard.RayleighBenard"><em>RayleighBenard</em></a>) – The problem</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>P.spectral_space</cite> is set, else in physical space</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Maximal step size</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit.dependencies">
 <span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit.dependencies" title="Link to this definition">¶</a></dt>
-<dd><p>Load dependencies on other convergence controllers here.</p>
+<dd><p>Add the hooks <cite>LogCFL</cite> and <cite>LogStepSize</cite> to the controller to record the CFL limit and the step size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+<li><p><strong>*args</strong> – Not used, e.g. the description</p></li>
+<li><p><strong>**kwargs</strong> – Not used, e.g. the description</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -77,15 +96,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.CFLLimit.get_new_step_size">
 <span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#CFLLimit.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.CFLLimit.get_new_step_size" title="Link to this definition">¶</a></dt>
-<dd><p>This function allows to set a step size with arbitrary criteria.
-Make sure to give an order to the convergence controller by setting the <cite>control_order</cite> variable in the params.
-This variable is an integer and you can see what the current order is by using
-<cite>controller.print_convergence_controllers()</cite>.</p>
+<dd><p>Once the step has converged, compute the CFL limit at the end point of the finest level, store <cite>cfl</cite> times it in
+the level status for <cite>LogCFL</cite> and limit the new step size to it. If no other convergence controller has set a
+new step size, max(<cite>dt_max</cite>, current step size) is limited instead. The result is at least <cite>dt_min</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+<li><p><strong>step</strong> (<em>pySDC.Step</em>) – The current step</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -261,17 +279,55 @@ Computing the Nusselt number at various places can be used to check the code.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation">
 <span class="sig-name descname"><span class="pre">compute_buoyancy_generation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.compute_buoyancy_generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the pointwise buoyancy production <code class="docutils literal notranslate"><span class="pre">abs(Rayleigh</span> <span class="pre">v</span> <span class="pre">T)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u" title="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Buoyancy production in physical space</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation">
 <span class="sig-name descname"><span class="pre">compute_viscous_dissipation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.compute_viscous_dissipation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the pointwise viscous dissipation <code class="docutils literal notranslate"><span class="pre">abs(u</span> <span class="pre">Lap(u)</span> <span class="pre">+</span> <span class="pre">v</span> <span class="pre">Lap(v))</span></code>, the velocity times its Laplacian, where
+the
+Laplacian is computed by spectral differentiation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u" title="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u"><em>dtype_u</em></a>) – Solution in physical space</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Viscous dissipation in physical space</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity">
 <span class="sig-name descname"><span class="pre">compute_vorticity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.compute_vorticity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the vorticity by spectral differentiation, as Dx v + Dz u.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u" title="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vorticity in physical space</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_f">
@@ -288,16 +344,20 @@ Computing the Nusselt number at various places can be used to check the code.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dd><p>Evaluate the right hand side, split into an implicit and an explicit part.</p>
+<p>The implicit part is -L u, i.e. diffusion, pressure gradient, buoyancy and, in the pressure line, the negative
+divergence, converted back to the Chebychev-T basis. The explicit part is the advection -(u d/dx + v d/dz) of u,
+v and T, computed in physical space on a grid padded by the dealiasing factor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u" title="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u" title="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p></li>
+<li><p><strong>*args</strong> – Not used, the right hand side does not depend on time</p></li>
+<li><p><strong>**kwargs</strong> – Not used, the right hand side does not depend on time</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+<dd class="field-even"><p>The right hand side, in the same space as <cite>u</cite></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_f" title="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_f">dtype_f</a></p>
@@ -308,7 +368,20 @@ Computing the Nusselt number at various places can be used to check the code.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.getOutputFile">
 <span class="sig-name descname"><span class="pre">getOutputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.getOutputFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.getOutputFile" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set up a <cite>Rectilinear</cite> output file on the grid of this problem, with one variable per component plus the
+vorticity, see <cite>processSolutionForOutput</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileName</strong> (<em>str</em>) – Name of the file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The initialized output file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pySDC.helpers.fieldsIO.Rectilinear</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.get_fig">
@@ -346,12 +419,43 @@ Computing the Nusselt number at various places can be used to check the code.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.processSolutionForOutput">
 <span class="sig-name descname"><span class="pre">processSolutionForOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.processSolutionForOutput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.processSolutionForOutput" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Prepare a solution for output: the real parts of all components in physical space, with the vorticity appended
+as the last variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u" title="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Components u, v, T, p and the vorticity</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Initial conditions, which are only available at t=0. Velocities and temperature are linear in z between their
+boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly distributed noise,
+multiplied by <cite>noise_level</cite> and (z - z0) (z - z0 + Lz).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Time, has to be 0</p></li>
+<li><p><strong>noise_level</strong> (<em>float</em>) – Amplitude of the noise</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Seed for the random number generator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initial conditions, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u" title="implementations.problem_classes.RayleighBenard.RayleighBenard.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

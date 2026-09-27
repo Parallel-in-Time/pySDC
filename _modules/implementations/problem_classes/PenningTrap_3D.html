@@ -132,6 +132,7 @@
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">fields</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">omega_B</span><span class="p">,</span> <span class="n">omega_E</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">nparts</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="c1"># invoke super init, passing nparts, dtype_u and dtype_f</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="n">nparts</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'nparts'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

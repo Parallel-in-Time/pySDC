@@ -56,7 +56,22 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimate.log_error">
 <span class="sig-name descname"><span class="pre">log_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">appendix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_embedded_error_estimate.html#LogEmbeddedErrorEstimate.log_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimate.log_error" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Add the embedded error estimate as <code class="docutils literal notranslate"><span class="pre">error_embedded_estimate&lt;appendix&gt;</span></code> and, if the level carries one, the
+estimate of the collocation error as <code class="docutils literal notranslate"><span class="pre">error_embedded_estimate_collocation&lt;appendix&gt;</span></code> to the stats. The latter
+is recorded with the iteration number stored alongside it in the level status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+<li><p><strong>appendix</strong> (<em>str</em>) – suffix appended to the type of the recorded statistics</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimate.post_step">
@@ -105,13 +120,12 @@ iteration, which is also why we need to record something after the step, which b
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimatePostIter.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_embedded_error_estimate.html#LogEmbeddedErrorEstimatePostIter.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimatePostIter.post_step" title="Link to this definition">¶</a></dt>
-<dd><p>Record embedded error estimate</p>
+<dd><p>Record the embedded error estimate of the final iteration as <code class="docutils literal notranslate"><span class="pre">error_embedded_estimate_post_iteration</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
-<li><p><strong>appendix</strong> (<em>str</em>) – suffix appended to the type of the recorded statistics</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

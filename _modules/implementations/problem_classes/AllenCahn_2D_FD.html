@@ -456,7 +456,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit.solve_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.</span>
+<span class="sd">        Pointwise solver for :math:`\vec{u} - factor \cdot \frac{1}{2\varepsilon^2}(2\vec{u} - 1) = \vec{rhs}`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -847,8 +847,9 @@
 
 <span class="sd">    for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting</span>
 <span class="sd">    is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{2\varepsilon^2}(2u - 1)^3`</span>
-<span class="sd">    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{2\varepsilon^2}(2u - 1)`</span>
-<span class="sd">    is solved by a linear solver provided by a ``SciPy`` routine.</span>
+<span class="sd">    is handled implicitly and the nonlinear system including this part will be solved by Newton. The linear reaction</span>
+<span class="sd">    term :math:`\frac{1}{2\varepsilon^2}(2u - 1)` acts pointwise, so its implicit system is solved by a pointwise</span>
+<span class="sd">    division.</span>
 <span class="sd">    """</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>

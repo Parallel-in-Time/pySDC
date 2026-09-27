@@ -52,9 +52,9 @@
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Abstract base class for error estimates by Taylor extrapolation of solutions and right-hand sides from other times.</span>
 
-<span class="sd">    This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.</span>
-<span class="sd">    In particular, child classes need to implement how to make these solutions available, which works differently for</span>
-<span class="sd">    MPI and non-MPI versions.</span>
+<span class="sd">    This error estimate extrapolates a solution based on Taylor expansions using solutions at other times. Child</span>
+<span class="sd">    classes decide where these come from: EstimateExtrapolationErrorNonMPI uses previous time steps, and</span>
+<span class="sd">    EstimateExtrapolationErrorWithinQ the collocation nodes of the current step. There is no MPI version.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

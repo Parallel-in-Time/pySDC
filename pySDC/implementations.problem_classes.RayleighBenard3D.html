@@ -62,7 +62,8 @@ u_t - nu (u_xx + u_yy + u_zz) + p_x = -uu_x - vu_y - wu_z
 v_t - nu (v_xx + v_yy + v_zz) + p_y = -uv_x - vv_y - wv_z
 w_t - nu (w_xx + w_yy + w_zz) + p_z - T = -uw_x - vw_y - ww_z</p>
 </div></blockquote>
-<p>with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices
+<p>with u and v the horizontal velocities (in x and y), w the vertical velocity (in z), T the temperature, p the
+pressure, indices
 denoting derivatives, kappa=(Rayleigh * Prandtl)**(-1/2) and nu = (Rayleigh / Prandtl)**(-1/2). Everything on the left
 hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated
 implicitly, while the non-linear convection part on the right hand side is integrated explicitly.</p>
@@ -71,7 +72,7 @@ implicitly, while the non-linear convection part on the right hand side is integ
 <div><p>Omega = [0, Lx) x [0, Ly] x (0, Lz)
 T(z=+1) = 0
 T(z=-1) = Lz
-u(z=+-1) = v(z=+-1) = 0
+u(z=+-1) = v(z=+-1) = w(z=+-1) = 0
 integral over p = 0</p>
 </div></blockquote>
 <p>The spectral discretization uses FFT horizontally, implying periodic BCs, and an ultraspherical method vertically to
@@ -128,16 +129,20 @@ Computing the Nusselt number at various places can be used to check the code.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard3D.html#RayleighBenard3D.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dd><p>Evaluate the right hand side, split into an implicit and an explicit part.</p>
+<p>The implicit part is -L u, i.e. diffusion, pressure gradient, buoyancy and, in the pressure line, the negative
+divergence, converted back to the Chebychev-T basis. The explicit part is the advection -(u d/dx + v d/dy + w
+d/dz) of u, v, w and T, computed in physical space on a grid padded by the dealiasing factor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u" title="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u" title="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p></li>
+<li><p><strong>*args</strong> – Not used, the right hand side does not depend on time</p></li>
+<li><p><strong>**kwargs</strong> – Not used, the right hand side does not depend on time</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+<dd class="field-even"><p>The right hand side, in the same space as <cite>u</cite></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_f" title="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_f">dtype_f</a></p>
@@ -170,12 +175,46 @@ RayleighBenard3D.xp.ndarray: spectrum</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_vertical_profiles">
 <span class="sig-name descname"><span class="pre">get_vertical_profiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard3D.html#RayleighBenard3D.get_vertical_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_vertical_profiles" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute horizontally averaged vertical profiles from the horizontal mean mode of each component, transformed to
+physical space in z and broadcast from rank 0, which holds the mean mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u" title="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p></li>
+<li><p><strong>components</strong> (<em>list</em><em> of </em><em>str</em>) – Names of the components you want the profiles of</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Profile along z for each component, as xp.ndarray</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard3D.html#RayleighBenard3D.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.u_exact" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Initial conditions, which are only available at t=0 and for Lz=1. Velocities and temperature are linear in z
+between their boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly
+distributed noise, multiplied by <cite>noise_level</cite> and (z - 1) (z + 1).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em>) – Time, has to be 0</p></li>
+<li><p><strong>noise_level</strong> (<em>float</em>) – Amplitude of the noise</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Seed for the random number generator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initial conditions, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u" title="implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

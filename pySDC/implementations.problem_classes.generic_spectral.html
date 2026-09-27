@@ -151,22 +151,59 @@ class attributes of the spectral helper. This class will automatically switch th
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.getOutputFile">
 <span class="sig-name descname"><span class="pre">getOutputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.getOutputFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.getOutputFile" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set up a <cite>Rectilinear</cite> output file on the grid of this problem, with one variable per component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileName</strong> (<em>str</em>) – Name of the file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The initialized output file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pySDC.helpers.fieldsIO.Rectilinear</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.heterogeneous_setup">
 <span class="sig-name descname"><span class="pre">heterogeneous_setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.heterogeneous_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.heterogeneous_setup" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Prepare the operators for heterogeneous runs, once and only if <cite>heterogeneous</cite> is set. On GPU, the BC matrices
+<cite>BC_line_zero_matrix</cite> and <cite>BCs</cite> of the spectral helper are moved to the CPU, and CPU copies of <cite>Pl</cite>, <cite>Pr</cite>, <cite>L</cite>
+and <cite>M</cite> are stored with the suffix <cite>_CPU</cite>. On CPU, the <cite>_CPU</cite> attributes refer to the operators themselves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.processSolutionForOutput">
 <span class="sig-name descname"><span class="pre">processSolutionForOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.processSolutionForOutput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.processSolutionForOutput" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Prepare a solution for output: its real part in physical space, moved to the CPU if running on GPU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The solution as contiguous array</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.generic_spectral.GenericSpectralLinear.setUpFieldsIO">
 <span class="sig-name descname"><span class="pre">setUpFieldsIO</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.setUpFieldsIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setUpFieldsIO" title="Link to this definition">¶</a></dt>
-<dd><p>Set up FieldsIO for MPI with the space decomposition of this problem</p>
+<dd><p>Set up the MPI mode of <cite>Rectilinear</cite> output files with the local slice of this problem in physical space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

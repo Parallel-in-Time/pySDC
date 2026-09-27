@@ -100,7 +100,19 @@ check it out to see all available coefficient types.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.buildGenerator">
 <span class="sig-name descname"><span class="pre">buildGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qdType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QDeltaGenerator</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.buildGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.buildGenerator" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the qmat generator of QDelta coefficients for the collocation nodes of this sweeper.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>qdType</strong> (<em>str</em>) – Name or alias of the QDelta type, a key of <cite>qmat.qdelta.QDELTA_GENERATORS</cite></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generator for these nodes and left interval boundary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>qmat.qdelta.QDeltaGenerator</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.compute_end_point">
@@ -122,12 +134,48 @@ check it out to see all available coefficient types.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.get_Qdelta_explicit">
 <span class="sig-name descname"><span class="pre">get_Qdelta_explicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qd_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.get_Qdelta_explicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.get_Qdelta_explicit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get a QDelta matrix of explicit type, i.e. strictly lower triangular, with the distances of the nodes to the
+left
+interval boundary in the first column and zeros in the first row.</p>
+<p>The generator is cached as <cite>self.genQE</cite> and only rebuilt if <cite>qd_type</cite> is not an alias of the cached one. Sets
+<cite>self.parallelizable</cite> to True if the matrix is diagonal, but never back to False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qd_type</strong> (<em>str</em>) – Name or alias of the QDelta type</p></li>
+<li><p><strong>k</strong> (<em>int</em><em>, </em><em>optional</em>) – Sweep index, for QDelta types whose coefficients change with the sweep</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>QDelta matrix of shape (num_nodes + 1, num_nodes + 1)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.get_Qdelta_implicit">
 <span class="sig-name descname"><span class="pre">get_Qdelta_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qd_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.get_Qdelta_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.get_Qdelta_implicit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get a QDelta matrix of implicit type, i.e. lower triangular with zeros in the first row and column.</p>
+<p>The generator is cached as <cite>self.genQI</cite> and only rebuilt if <cite>qd_type</cite> is not an alias of the cached one. Sets
+<cite>self.parallelizable</cite> to True if the matrix is diagonal, but never back to False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qd_type</strong> (<em>str</em>) – Name or alias of the QDelta type</p></li>
+<li><p><strong>k</strong> (<em>int</em><em>, </em><em>optional</em>) – Sweep index, for QDelta types whose coefficients change with the sweep</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>QDelta matrix of shape (num_nodes + 1, num_nodes + 1)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.integrate">
@@ -160,7 +208,13 @@ and evaluates the RHS of the ODE there</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.rank">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rank</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#core.sweeper.Sweeper.rank" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>always 0 here, overridden by the MPI sweepers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Rank of this sweeper in the communicator across nodes</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.sweeper.Sweeper.updateVariableCoeffs">

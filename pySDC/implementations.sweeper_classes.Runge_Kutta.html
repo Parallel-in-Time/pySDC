@@ -154,7 +154,15 @@ Can be used to integrate simple DAEs because explicit and implicit part are both
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK32.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK32.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK32.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the second order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -198,7 +206,15 @@ Can be used to integrate simple DAEs because explicit and implicit part are both
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK324L2SAERK.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the second order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>3</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -257,7 +273,15 @@ Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK54.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK54.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK54.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>5</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -306,7 +330,15 @@ as of now. And we are not aware of higher order ones. This one is newer then the
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SA.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SA.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SA.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>5</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -350,7 +382,15 @@ as of now. And we are not aware of higher order ones. This one is newer then the
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SAERK.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>5</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -393,7 +433,9 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ARK548L2SAESDIRK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SAESDIRK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK" title="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARK548L2SAERK</span></code></a></p>
-<p>Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.</p>
+<p>Implicit part of the ARK54 scheme. As Kennedy and Carpenter state, the embedded method has order 4 and the main
+method order 5. The fifth-order conditions of the embedded method are violated only by about 1e-4, however, so it
+can look like order 5 in convergence tests at moderate step sizes.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK.generator_IMP">
 <span class="sig-name descname"><span class="pre">generator_IMP</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.ARK548L2SAESDIRK</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK.generator_IMP" title="Link to this definition">¶</a></dt>
@@ -428,7 +470,15 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SAESDIRK2.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>5</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -495,7 +545,17 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ButcherTableau.globally_stiffly_accurate">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">globally_stiffly_accurate</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau.globally_stiffly_accurate" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Whether the last row of the Butcher matrix equals the weights, such that the last stage is the solution of the
+step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the method is stiffly accurate</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -512,7 +572,17 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded.globally_stiffly_accurate">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">globally_stiffly_accurate</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded.globally_stiffly_accurate" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Whether the last row of the Butcher matrix equals the weights of the primary (higher order) method, such that
+the last stage is the solution of the step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the method is stiffly accurate</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -535,7 +605,15 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Cash_Karp.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>5</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -602,7 +680,15 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#DIRK43.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.DIRK43.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>4</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -698,7 +784,15 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK43.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ESDIRK43.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK43.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>4</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -738,7 +832,15 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ESDIRK53.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ESDIRK53.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>4</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -832,7 +934,15 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_update_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#Heun_Euler.get_update_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler.get_update_order" title="Link to this definition">¶</a></dt>
-<dd><p>Get the order of the lower order method for doing adaptivity. Only applies to embedded methods.</p>
+<dd><p>Order in dt of the embedded error estimate, i.e. of the local error of forward Euler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -857,6 +967,10 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IMEXEuler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#IMEXEuler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.IMEXEuler" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX" title="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaIMEX</span></code></a></p>
 <p>First-order IMEX Euler with one backward Euler stage, at which both parts of the right hand side are evaluated.</p>
+<p>This is a Lie splitting of a backward Euler step for fI and a forward Euler step for fE from its result:
+u1 = u0 + dt fI(u1), u = u1 + dt fE(u1, t + dt). The explicit tableau has node 1 and matrix entry 0, so fE is
+evaluated at the new time and the implicit stage, not at the start of the step. For the variant with fE at the
+start of the step, see IMEXEulerStifflyAccurate.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.IMEXEuler.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[1.]])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.IMEXEuler.matrix" title="Link to this definition">¶</a></dt>
@@ -884,7 +998,7 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IMEXEulerStifflyAccurate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#IMEXEulerStifflyAccurate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.IMEXEulerStifflyAccurate" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX" title="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaIMEX</span></code></a></p>
 <p>IMEX Euler with the explicit part evaluated at the start of the step, as a stiffly accurate two-stage method.
-This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.
+This implements u = fI^-1(u0 + fE(u0)) rather than IMEXEuler’s u = fI^-1(u0) + fE(fI^-1(u0)).
 This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly
 accurate and suitable for some DAEs.</p>
 <dl class="py attribute">
@@ -1008,12 +1122,31 @@ method, which does not require us to solve a system of equations to compute the 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Butcher_tableau">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_Butcher_tableau</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.get_Butcher_tableau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Butcher_tableau" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the Butcher tableau from the class attributes <code class="docutils literal notranslate"><span class="pre">weights</span></code>, <code class="docutils literal notranslate"><span class="pre">nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">matrix</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>an instance of <code class="docutils literal notranslate"><span class="pre">ButcherTableauClass</span></code></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau">ButcherTableau</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_Q_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.get_Q_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_Q_matrix" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the quadrature matrix of the scheme, i.e. the Butcher matrix padded with a leading row and column of zeros
+for the initial conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the quadrature matrix</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.get_full_f">
@@ -1055,7 +1188,17 @@ method, which does not require us to solve a system of equations to compute the 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.is_embedded">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_embedded</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta.is_embedded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.is_embedded" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Whether the scheme is an embedded pair, i.e. uses <code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code> and has a secondary solution for
+error estimation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the scheme is embedded</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.level">
@@ -1125,7 +1268,16 @@ method, which does not require us to solve a system of equations to compute the 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.get_Butcher_tableau_explicit">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_Butcher_tableau_explicit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKuttaIMEX.get_Butcher_tableau_explicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.get_Butcher_tableau_explicit" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build the Butcher tableau of the explicit part from <code class="docutils literal notranslate"><span class="pre">weights_explicit</span></code>, <code class="docutils literal notranslate"><span class="pre">nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">matrix_explicit</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>an instance of <code class="docutils literal notranslate"><span class="pre">ButcherTableauClass_explicit</span></code></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau">ButcherTableau</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.integrate">

@@ -206,6 +206,19 @@
 <div class="viewcode-block" id="testequation0d.getOutputFile">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.getOutputFile">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getOutputFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Set up a ``Scalar`` output file for complex values, with one variable per :math:`\lambda`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fileName : str</span>
+<span class="sd">            Name of the output file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fOut : pySDC.helpers.fieldsIO.Scalar</span>
+<span class="sd">            The initialized output file.</span>
+<span class="sd">        """</span>
         <span class="n">fOut</span> <span class="o">=</span> <span class="n">Scalar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="n">fileName</span><span class="o">=</span><span class="n">fileName</span><span class="p">)</span>
         <span class="n">fOut</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lambdas</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="n">fOut</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
@@ -215,6 +228,19 @@
 <div class="viewcode-block" id="testequation0d.processSolutionForOutput">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.testequation0d.processSolutionForOutput">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">processSolutionForOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Flatten the solution for output.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Solution to be written.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.1darray</span>
+<span class="sd">            The flattened solution.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
 </div>
 

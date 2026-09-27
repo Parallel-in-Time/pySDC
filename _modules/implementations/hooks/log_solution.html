@@ -160,22 +160,50 @@
 <div class="viewcode-block" id="LogToPickleFile.logging_condition">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.logging_condition">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">logging_condition</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Decide whether to log after a step. Called on the class, not an instance; the default logs every step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            L (pySDC.Level.level): the level to log</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: whether to write a file</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="LogToPickleFile.process_solution">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.process_solution">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_solution</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Data to store in a file. Called on the class, not an instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            L (pySDC.Level.level): the level to log</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: the time ``t`` at the end of the step and a numpy view ``u`` of ``L.uend``</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">'t'</span><span class="p">:</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="s1">'u'</span><span class="p">:</span> <span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)}</span></div>
 
 
 <div class="viewcode-block" id="LogToPickleFile.format_index">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.format_index">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">format_index</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Render the file index for the file name. Called on the class, not an instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): the index of the file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the index padded with zeros to six digits</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">index</span><span class="si">:</span><span class="s1">06d</span><span class="si">}</span><span class="s1">'</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Check that ``path`` is set and is not a file, and create the directory if it does not exist."""</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -192,6 +220,19 @@
 <div class="viewcode-block" id="LogToPickleFile.log_to_file">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.log_to_file">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">log_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">process_solution</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Pickle the processed solution of the finest level to the file of the current ``counter`` and increment the</span>
+<span class="sd">        counter. Nothing is written on coarser levels or if ``condition`` is false.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">            condition (bool): whether to write the file</span>
+<span class="sd">            process_solution (callable): replaces the class's ``process_solution`` if given</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">level_number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -215,6 +256,16 @@
 <div class="viewcode-block" id="LogToPickleFile.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.post_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Write the solution at the end of the step to file if ``logging_condition`` allows it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_to_file</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">logging_condition</span><span class="p">(</span><span class="n">L</span><span class="p">))</span></div>
 
@@ -222,6 +273,17 @@
 <div class="viewcode-block" id="LogToPickleFile.pre_run">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.pre_run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Write the initial conditions to file, stored with the time ``L.time`` at the start of the run. Sets ``L.uend``</span>
+<span class="sd">        to the initial conditions for this.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
         <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -238,6 +300,15 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.get_path">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the path to the file with a given index.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): the index of the file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the path</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">file_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">format_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="si">}</span><span class="s1">.pickle'</span></div>
 
 
@@ -245,6 +316,15 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.load">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Load the data stored in the file with a given index.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): the index of the file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: the data as returned by ``process_solution`` when it was written</span>
+<span class="sd">        """</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span></div>
@@ -265,6 +345,17 @@
 <div class="viewcode-block" id="LogToPickleFileAfterXS.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFileAfterXS.post_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Write the solution to file once the end of the step has reached the next logging time and the step is not</span>
+<span class="sd">        restarted, then move the next logging time on by ``time_increment``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_next_log</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -278,6 +369,16 @@
 <div class="viewcode-block" id="LogToPickleFileAfterXS.pre_run">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFileAfterXS.pre_run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Write the initial conditions to file like the parent class, but only if ``logging_condition`` allows it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
         <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -305,6 +406,7 @@
     <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># number of stored time points in the file</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Set up without an output file and allow overwriting in ``FieldsIO`` according to ``allow_overwriting``."""</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outfile</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">t_next_log</span> <span class="o">=</span> <span class="mi">0</span>
@@ -313,6 +415,17 @@
 <div class="viewcode-block" id="LogToFile.pre_run">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.pre_run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Set up the output file on the finest level. If the file exists and the run does not start at :math:`t=0`, it is</span>
+<span class="sd">        opened to append to it. Otherwise, the problem creates a new file and the initial conditions are written to it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">level_number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
@@ -341,6 +454,20 @@
 <div class="viewcode-block" id="LogToFile.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.post_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Write the solution of the finest level to file once the end of the step has reached the next logging time and</span>
+<span class="sd">        the step is not restarted, then move the next logging time on by ``time_increment``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            DataError: if the file already has a solution at this time and ``allow_overwriting`` is not set</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">level_number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -362,6 +489,16 @@
 <div class="viewcode-block" id="LogToFile.post_run">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.post_run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Write the final solution of the finest level to file unless the file has it already.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">level_number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -379,6 +516,15 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.load">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Load a solution from ``filename``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): the index of the time point in the file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: the time ``t`` and the solution ``u``</span>
+<span class="sd">        """</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">file</span> <span class="o">=</span> <span class="n">FieldsIO</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">file_entry</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readField</span><span class="p">(</span><span class="n">idx</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>

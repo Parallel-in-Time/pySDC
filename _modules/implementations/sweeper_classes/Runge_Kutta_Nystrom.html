@@ -164,6 +164,13 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom.get_Butcher_tableau_bar">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_Butcher_tableau_bar</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Build the Butcher tableau for the positions from the class attributes ``weights_bar``, ``nodes`` and</span>
+<span class="sd">        ``matrix_bar``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ButcherTableauNoCollUpdate: an instance of ``ButcherTableauClass``</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ButcherTableauClass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">weights_bar</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">matrix_bar</span><span class="p">)</span></div>
 
 

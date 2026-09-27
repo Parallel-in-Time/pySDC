@@ -62,13 +62,17 @@ You can control the name in the stats via the class attribute <code class="docut
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_work.LogSDCIterations.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_work.html#LogSDCIterations.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_work.LogSDCIterations.post_step" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called after each step or block</p>
+<dd><p>Add the number of iterations of the step to the stats under the type <code class="docutils literal notranslate"><span class="pre">name</span></code>, via <code class="docutils literal notranslate"><span class="pre">increment_stats</span></code>, so the
+value is added to an entry with the same metadata if one exists.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

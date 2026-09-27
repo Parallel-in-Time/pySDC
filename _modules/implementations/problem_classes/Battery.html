@@ -570,6 +570,7 @@
         <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-11</span><span class="p">,</span>
         <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ncapacitors</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">V_ref</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'newton_maxiter'</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">,</span> <span class="s1">'stop_at_nan'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 

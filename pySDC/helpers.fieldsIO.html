@@ -565,17 +565,65 @@ The default is “{:06d}”.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.fieldsIO.compareFields_MPI">
 <span class="sig-name descname"><span class="pre">compareFields_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nSteps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#compareFields_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.compareFields_MPI" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check that the fields in a file are <cite>u0 * t</cite> for <cite>t = i / nSteps</cite>, raising an AssertionError otherwise.</p>
+<p>Reads the local fields only, so the MPI mode must be set up as in <a class="reference internal" href="#helpers.fieldsIO.writeFields_MPI" title="helpers.fieldsIO.writeFields_MPI"><code class="xref py py-func docutils literal notranslate"><span class="pre">writeFields_MPI()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fileName</strong> (<em>str</em>) – Name of the file.</p></li>
+<li><p><strong>u0</strong> (<em>np.ndarray</em>) – Local initial fields, as returned by <a class="reference internal" href="#helpers.fieldsIO.writeFields_MPI" title="helpers.fieldsIO.writeFields_MPI"><code class="xref py py-func docutils literal notranslate"><span class="pre">writeFields_MPI()</span></code></a>.</p></li>
+<li><p><strong>nSteps</strong> (<em>int</em>) – Number of fields in the file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.fieldsIO.initGrid">
 <span class="sig-name descname"><span class="pre">initGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridSizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#initGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.initGrid" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build a test grid on [0, 1)^dim and fields that are products of the coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nVar</strong> (<em>int</em>) – Number of variables.</p></li>
+<li><p><strong>gridSizes</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Number of grid points in each dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>coords</strong> (<em>list[np.ndarray]</em>) – 1D coordinates in each dimension, without the right boundary.</p></li>
+<li><p><strong>u0</strong> (<em>np.ndarray</em>) – Fields of shape <code class="docutils literal notranslate"><span class="pre">(nVar,</span> <span class="pre">*gridSizes)</span></code>, variable <cite>i</cite> being <cite>i + 1</cite> times the product of the coordinates.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.fieldsIO.writeFields_MPI">
 <span class="sig-name descname"><span class="pre">writeFields_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtypeIdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nSteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridSizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/fieldsIO.html#writeFields_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.fieldsIO.writeFields_MPI" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Write test fields with MPI, decomposing the grid from <a class="reference internal" href="#helpers.fieldsIO.initGrid" title="helpers.fieldsIO.initGrid"><code class="xref py py-func docutils literal notranslate"><span class="pre">initGrid()</span></code></a> in blocks over <cite>MPI.COMM_WORLD</cite>.</p>
+<p>Sets up the MPI mode of <a class="reference internal" href="#helpers.fieldsIO.Rectilinear" title="helpers.fieldsIO.Rectilinear"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear</span></code></a> for the local block and writes <cite>nSteps</cite> fields <cite>u0 * t</cite> for
+<cite>t = i / nSteps</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fileName</strong> (<em>str</em>) – Name of the file.</p></li>
+<li><p><strong>dtypeIdx</strong> (<em>int</em>) – Index of the data type in <cite>DTYPES</cite>.</p></li>
+<li><p><strong>algo</strong> (<em>str</em>) – Algorithm for <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.helpers.blocks.BlockDecomposition</span></code>.</p></li>
+<li><p><strong>nSteps</strong> (<em>int</em>) – Number of fields to write.</p></li>
+<li><p><strong>nVar</strong> (<em>int</em>) – Number of variables.</p></li>
+<li><p><strong>gridSizes</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Number of grid points in each dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>u0</strong> – Local block of the initial fields, in the data type of the file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

@@ -72,7 +72,7 @@ The exact solution is given by</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[
         \frac{1 - a}{1 - a (2u - 1)^2} - 1
-    \right] (2u - 1).\]</div>
+    \right] (2u - 1) - 6 d_w u (1 - u).\]</div>
 <p>For time-stepping, this problem will be treated in a <em>fully-implicit</em> way. The nonlinear system is solved using Newton.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel.eval_f">

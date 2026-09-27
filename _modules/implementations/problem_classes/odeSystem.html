@@ -118,6 +118,7 @@
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">nonLinear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
 
@@ -135,18 +136,57 @@
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.g">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.g">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Function :math:`g(t) = \cos(t)`, which is the exact solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The value of :math:`g(t)`.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dg">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dg">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        First derivative :math:`g'(t) = -\sin(t)` of :math:`g`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The value of :math:`g'(t)`.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dg2">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dg2">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dg2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Second derivative :math:`g''(t) = -\cos(t)` of :math:`g`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The value of :math:`g''(t)`.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
@@ -156,30 +196,109 @@
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Right-hand side of the first component, replaced in ``__init__`` by ``f_LIN`` or ``f_NONLIN``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : float</span>
+<span class="sd">            First solution component :math:`u`.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Second solution component :math:`v`, which equals the time.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            Always.</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.f_LIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f_LIN">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">f_LIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Right-hand side :math:`-(u - g(v)) / \epsilon + g'(v)` of the first component in the linear form.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : float</span>
+<span class="sd">            First solution component :math:`u`.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Second solution component :math:`v`, which equals the time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The right-hand side of the first component.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.f_NONLIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f_NONLIN">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">f_NONLIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Right-hand side :math:`-(u^3 - g(v)^3) / \epsilon + g'(v)` of the first component in the nonlinear form.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : float</span>
+<span class="sd">            First solution component :math:`u`.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Second solution component :math:`v`, which equals the time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The right-hand side of the first component.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dgInv">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dgInv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Inverse Jacobian of the Newton function, replaced in ``__init__`` by ``dgInv_LIN`` or ``dgInv_NONLIN``, which</span>
+<span class="sd">        also take the step size ``dt``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : float</span>
+<span class="sd">            First solution component :math:`u`.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Second solution component :math:`v`, which equals the time.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            Always.</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dgInv_LIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv_LIN">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dgInv_LIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Inverse of the Jacobian of the Newton function :math:`G(u, v) = (u, v) - dt f(u, v) - rhs` of ``solve_system``</span>
+<span class="sd">        for the linear form, which does not depend on :math:`u`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : float</span>
+<span class="sd">            First solution component :math:`u`.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Second solution component :math:`v`, which equals the time.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.2darray</span>
+<span class="sd">            The inverse of the :math:`2 \times 2` Jacobian.</span>
+<span class="sd">        """</span>
         <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span>
         <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">dt</span> <span class="o">/</span> <span class="n">e</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">dt</span> <span class="o">*</span> <span class="n">g2</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">g1</span> <span class="o">/</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">dt</span> <span class="o">/</span> <span class="n">e</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span></div>
@@ -188,6 +307,24 @@
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dgInv_NONLIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv_NONLIN">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dgInv_NONLIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Inverse of the Jacobian of the Newton function :math:`G(u, v) = (u, v) - dt f(u, v) - rhs` of ``solve_system``</span>
+<span class="sd">        for the nonlinear form.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : float</span>
+<span class="sd">            First solution component :math:`u`.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Second solution component :math:`v`, which equals the time.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.2darray</span>
+<span class="sd">            The inverse of the :math:`2 \times 2` Jacobian.</span>
+<span class="sd">        """</span>
         <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span>
         <span class="n">g</span><span class="p">,</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -352,6 +489,7 @@
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
 
@@ -518,6 +656,7 @@
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.990731920827</span><span class="p">,</span> <span class="mf">1.009264413846</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.366532612659e-5</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
@@ -878,6 +1017,7 @@
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">u0</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>

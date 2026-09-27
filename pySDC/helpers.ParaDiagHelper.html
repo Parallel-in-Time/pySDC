@@ -85,7 +85,25 @@ Compute inverse FFT by multiplying by the complex conjugate (numpy.conjugate) of
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.ParaDiagHelper.get_G_inv_matrix">
 <span class="sig-name descname"><span class="pre">get_G_inv_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweeper_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/ParaDiagHelper.html#get_G_inv_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.ParaDiagHelper.get_G_inv_matrix" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the inverse of the preconditioner of the collocation problem of step <cite>l</cite> after diagonalization in time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l</strong> (<em>int</em>) – Index of the step in the block</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Number of steps in the block</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – alpha parameter in ParaDiag</p></li>
+<li><p><strong>sweeper_params</strong> (<em>dict</em>) – Parameters for the sweeper, needs <cite>num_nodes</cite> and <cite>quad_type=’RADAU-RIGHT’</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dense matrix (I + d_l H)^-1 of shape (num_nodes, num_nodes), with d_l the <cite>l</cite>-th eigenvalue of
+the alpha-circulant <cite>E</cite> from <cite>get_E_matrix</cite> and H from <cite>get_H_matrix</cite></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helpers.ParaDiagHelper.get_H_matrix">

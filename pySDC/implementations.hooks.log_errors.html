@@ -175,13 +175,16 @@ where the error is stored, the step size can change.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_errors.LogGlobalErrorPostStep.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_errors.html#LogGlobalErrorPostStep.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_errors.LogGlobalErrorPostStep.post_step" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called after each step or block</p>
+<dd><p>Record the global error after the step as <code class="docutils literal notranslate"><span class="pre">e_global_post_step</span></code> and <code class="docutils literal notranslate"><span class="pre">e_global_rel_post_step</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -221,13 +224,16 @@ be made available from the initial conditions of the step, not of the run. Other
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_errors.LogLocalErrorPostStep.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_errors.html#LogLocalErrorPostStep.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_errors.LogLocalErrorPostStep.post_step" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called after each step or block</p>
+<dd><p>Record the local error after the step as <code class="docutils literal notranslate"><span class="pre">e_local_post_step</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

@@ -99,6 +99,18 @@
 <div class="viewcode-block" id="Heat1DChebychev.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right hand side nu u_xx, computed as nu times the Chebychev derivative of the auxiliary component</span>
+<span class="sd">        `ux`. The algebraic `ux` equation gets zero.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+<span class="sd">            *args: Not used, the right hand side does not depend on time</span>
+<span class="sd">            **kwargs: Not used, the right hand side does not depend on time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Heat1DChebychev.dtype_f: The right hand side, in the same space as `u`</span>
+<span class="sd">        """</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
         <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 
@@ -222,6 +234,18 @@
 <div class="viewcode-block" id="Heat1DUltraspherical.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right hand side nu u_xx with the ultraspherical second derivative matrix, converted back to the</span>
+<span class="sd">        Chebychev basis.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+<span class="sd">            *args: Not used, the right hand side does not depend on time</span>
+<span class="sd">            **kwargs: Not used, the right hand side does not depend on time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Heat1DUltraspherical.dtype_f: The right hand side, in the same space as `u`</span>
+<span class="sd">        """</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
         <span class="n">iu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">'u'</span><span class="p">)</span>
 
@@ -366,6 +390,18 @@
 <div class="viewcode-block" id="Heat2DChebychev.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right hand side nu (u_xx + u_yy), computed by spectral differentiation of the auxiliary components</span>
+<span class="sd">        `ux` and `uy`. The algebraic `ux` and `uy` equations get zero.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution in physical space</span>
+<span class="sd">            *args: Not used, the right hand side does not depend on time</span>
+<span class="sd">            **kwargs: Not used, the right hand side does not depend on time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Heat2DChebychev.dtype_f: The right hand side in physical space</span>
+<span class="sd">        """</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
         <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span><span class="p">,</span> <span class="n">iuy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 
@@ -383,6 +419,17 @@
 <div class="viewcode-block" id="Heat2DChebychev.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the exact solution at time `t`: sin(fx x) sin(fy y) exp(-nu (fx^2 + fy^2) t) plus the linear function in x</span>
+<span class="sd">        and y that satisfies the boundary conditions, where the frequencies are multiplied by pi in Chebychev</span>
+<span class="sd">        directions. The components `ux` and `uy` are set to the derivatives.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): When you want the exact solution</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Heat2DChebychev.dtype_u: Exact solution in physical space</span>
+<span class="sd">        """</span>
         <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
         <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span><span class="p">,</span> <span class="n">iuy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
@@ -488,6 +535,18 @@
 <div class="viewcode-block" id="Heat2DUltraspherical.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right hand side nu (u_xx + u_yy) with the ultraspherical second derivative matrices, converted back</span>
+<span class="sd">        to the Chebychev basis.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution in physical space</span>
+<span class="sd">            *args: Not used, the right hand side does not depend on time</span>
+<span class="sd">            **kwargs: Not used, the right hand side does not depend on time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Heat2DUltraspherical.dtype_f: The right hand side in physical space</span>
+<span class="sd">        """</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
         <span class="n">iu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">'u'</span><span class="p">)</span>
 
@@ -503,6 +562,17 @@
 <div class="viewcode-block" id="Heat2DUltraspherical.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the exact solution at time `t`: sin(fx x) sin(fy y) exp(-nu (fx^2 + fy^2) t) plus the linear function in x</span>
+<span class="sd">        and y that satisfies the boundary conditions, where the frequencies are multiplied by pi in ultraspherical</span>
+<span class="sd">        directions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): When you want the exact solution</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Heat2DUltraspherical.dtype_u: Exact solution in physical space</span>
+<span class="sd">        """</span>
         <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span>
         <span class="n">iu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">'u'</span><span class="p">)</span>
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>

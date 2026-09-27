@@ -70,6 +70,7 @@
     <span class="n">default_phase_thresh</span> <span class="o">=</span> <span class="mf">0.5</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Start with no initial radius or dimension; both are filled in by :meth:`pre_run`."""</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">init_radius</span> <span class="o">=</span> <span class="kc">None</span>
@@ -120,12 +121,14 @@
 <div class="viewcode-block" id="AllenCahnMonitor.exact_radius">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_radius">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">exact_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Exact radius at time ``t`` under mean curvature flow, clipped at zero once the blob has vanished."""</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exact_radius_squared</span><span class="p">(</span><span class="n">t</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="AllenCahnMonitor.exact_volume">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_volume">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">exact_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Exact area (2D) or volume (3D) of the blob at time ``t``."""</span>
         <span class="n">r2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exact_radius_squared</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">r2</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">r2</span><span class="o">**</span><span class="mf">1.5</span></div>
 
@@ -171,6 +174,15 @@
 <div class="viewcode-block" id="AllenCahnMonitor.record">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.record">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add each diagnostic to the stats, with its key as ``type``, on level ``-1``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            L (pySDC.Level.level): the finest level</span>
+<span class="sd">            t (float): the time the diagnostics refer to</span>
+<span class="sd">            diagnostics (dict): stats entries as returned by :meth:`get_diagnostics`</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">diagnostics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
                 <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
@@ -186,6 +198,14 @@
 <div class="viewcode-block" id="AllenCahnMonitor.pre_run">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.pre_run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Read the initial radius, phase threshold and dimension off the problem, and record the diagnostics of the</span>
+<span class="sd">        initial condition if the run starts at :math:`t = 0`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_run</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -200,6 +220,13 @@
 <div class="viewcode-block" id="AllenCahnMonitor.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.post_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Record the diagnostics of the solution at the end of the step, at time ``L.time + L.dt``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 

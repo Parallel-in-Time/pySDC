@@ -50,6 +50,19 @@
 <div class="viewcode-block" id="LogEmbeddedErrorEstimate.log_error">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_embedded_error_estimate.html#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimate.log_error">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">log_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="n">appendix</span><span class="o">=</span><span class="s1">''</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add the embedded error estimate as ``error_embedded_estimate&lt;appendix&gt;`` and, if the level carries one, the</span>
+<span class="sd">        estimate of the collocation error as ``error_embedded_estimate_collocation&lt;appendix&gt;`` to the stats. The latter</span>
+<span class="sd">        is recorded with the iteration number stored alongside it in the level status.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+<span class="sd">            appendix (str): suffix appended to the type of the recorded statistics</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">flavour</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">''</span><span class="p">,</span> <span class="s1">'_collocation'</span><span class="p">]:</span>
@@ -121,6 +134,16 @@
 <div class="viewcode-block" id="LogEmbeddedErrorEstimatePostIter.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_embedded_error_estimate.html#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimatePostIter.post_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Record the embedded error estimate of the final iteration as ``error_embedded_estimate_post_iteration``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="n">appendix</span><span class="o">=</span><span class="s1">'_post_iteration'</span><span class="p">)</span></div>
 </div>
 

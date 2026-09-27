@@ -127,6 +127,15 @@
 <div class="viewcode-block" id="NCCLComm.get_op">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_op">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MPI_op</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Translate an MPI reduction operation to the NCCL one.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            MPI_op (mpi4py.MPI.Op): One of `MPI.SUM`, `MPI.PROD`, `MPI.MAX` and `MPI.MIN`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            NCCL reduction operation</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">MPI_op</span> <span class="o">==</span> <span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">nccl</span><span class="o">.</span><span class="n">NCCL_SUM</span>
         <span class="k">elif</span> <span class="n">MPI_op</span> <span class="o">==</span> <span class="n">MPI</span><span class="o">.</span><span class="n">PROD</span><span class="p">:</span>
@@ -142,6 +151,7 @@
 <div class="viewcode-block" id="NCCLComm.reduce">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.reduce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendobj</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Wrap mpi4py's pickle-based `reduce`, synchronizing the device first if `sendobj` holds CuPy data."""</span>
         <span class="n">sync</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="s1">'data'</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
@@ -155,6 +165,7 @@
 <div class="viewcode-block" id="NCCLComm.allreduce">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.allreduce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">allreduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendobj</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Wrap mpi4py's pickle-based `allreduce`, synchronizing the device first if `sendobj` holds CuPy data."""</span>
         <span class="n">sync</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="p">,</span> <span class="s1">'data'</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendobj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
@@ -168,6 +179,13 @@
 <div class="viewcode-block" id="NCCLComm.Reduce">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Reduce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Wrap mpi4py's `Reduce`, going through NCCL if `sendbuf` is a CuPy array and through MPI otherwise.</span>
+
+<span class="sd">        The NCCL reduction is enqueued on the current CuPy stream without synchronizing. It reduces complex data as</span>
+<span class="sd">        pairs of</span>
+<span class="sd">        reals, so `MPI.PROD` is not the complex product. `recvbuf` may be None on ranks other than `root`.</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Reduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">=</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="o">=</span><span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
 
@@ -191,6 +209,13 @@
 <div class="viewcode-block" id="NCCLComm.Allreduce">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Allreduce">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Allreduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Wrap mpi4py's `Allreduce`, going through NCCL if `sendbuf` is a CuPy array and through MPI otherwise.</span>
+
+<span class="sd">        The NCCL reduction is enqueued on the current CuPy stream without synchronizing. It reduces complex data as</span>
+<span class="sd">        pairs of</span>
+<span class="sd">        reals, so `MPI.PROD` is not the complex product.</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Allreduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="o">=</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="o">=</span><span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">)</span>
 
@@ -207,6 +232,10 @@
 <div class="viewcode-block" id="NCCLComm.Bcast">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Bcast">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Bcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Wrap mpi4py's `Bcast`, going through NCCL on the current CuPy stream, without synchronizing, if `buf` is a CuPy</span>
+<span class="sd">        array and through MPI otherwise.</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">'ptr'</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Bcast</span><span class="p">(</span><span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
 
@@ -253,6 +282,7 @@
 <div class="viewcode-block" id="NCCLComm.Barrier">
 <a class="viewcode-back" href="../../pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Barrier">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Barrier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Synchronize the current CuPy stream, then wrap mpi4py's `Barrier`."""</span>
         <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_current_stream</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commMPI</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span></div>
 </div>

@@ -55,17 +55,24 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Allreduce">
 <span class="sig-name descname"><span class="pre">Allreduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Allreduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Allreduce" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Wrap mpi4py’s <cite>Allreduce</cite>, going through NCCL if <cite>sendbuf</cite> is a CuPy array and through MPI otherwise.</p>
+<p>The NCCL reduction is enqueued on the current CuPy stream without synchronizing. It reduces complex data as
+pairs of
+reals, so <cite>MPI.PROD</cite> is not the complex product.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Barrier">
 <span class="sig-name descname"><span class="pre">Barrier</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Barrier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Barrier" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Synchronize the current CuPy stream, then wrap mpi4py’s <cite>Barrier</cite>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Bcast">
 <span class="sig-name descname"><span class="pre">Bcast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Bcast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Bcast" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Wrap mpi4py’s <cite>Bcast</cite>, going through NCCL on the current CuPy stream, without synchronizing, if <cite>buf</cite> is a CuPy
+array and through MPI otherwise.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Recv">
@@ -76,7 +83,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Reduce">
 <span class="sig-name descname"><span class="pre">Reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recvbuf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.Reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.Reduce" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Wrap mpi4py’s <cite>Reduce</cite>, going through NCCL if <cite>sendbuf</cite> is a CuPy array and through MPI otherwise.</p>
+<p>The NCCL reduction is enqueued on the current CuPy stream without synchronizing. It reduces complex data as
+pairs of
+reals, so <cite>MPI.PROD</cite> is not the complex product. <cite>recvbuf</cite> may be None on ranks other than <cite>root</cite>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.Send">
@@ -91,7 +102,8 @@ controller uses are left to fall through to MPI, where tags mean what they say.<
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.allreduce">
 <span class="sig-name descname"><span class="pre">allreduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.allreduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.allreduce" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Wrap mpi4py’s pickle-based <cite>allreduce</cite>, synchronizing the device first if <cite>sendobj</cite> holds CuPy data.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_count">
@@ -108,12 +120,22 @@ controller uses are left to fall through to MPI, where tags mean what they say.<
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_op">
 <span class="sig-name descname"><span class="pre">get_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MPI_op</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_op" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Translate an MPI reduction operation to the NCCL one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>MPI_op</strong> (<em>mpi4py.MPI.Op</em>) – One of <cite>MPI.SUM</cite>, <cite>MPI.PROD</cite>, <cite>MPI.MAX</cite> and <cite>MPI.MIN</cite></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>NCCL reduction operation</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.reduce">
 <span class="sig-name descname"><span class="pre">reduce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sendobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">mpi4py.MPI.SUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.reduce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.reduce" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Wrap mpi4py’s pickle-based <cite>reduce</cite>, synchronizing the device first if <cite>sendobj</cite> holds CuPy data.</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -47,6 +47,9 @@
 <span class="sd">    IMEX-SDC sweeper for problems M u' = f(u) with a mass matrix M, as they arise from finite elements.</span>
 
 <span class="sd">    First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix</span>
+
+<span class="sd">    The end point is only available as a copy of the last node: ``compute_end_point`` raises unless the right end of</span>
+<span class="sd">    the interval is a node and ``do_coll_update`` is off.</span>
 <span class="sd">    """</span>
 
 <div class="viewcode-block" id="imex_1st_order_mass.update_nodes">
@@ -117,7 +120,8 @@
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Compute u at the right point of the interval</span>
 
-<span class="sd">        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</span>
+<span class="sd">        This is a copy of the last node. The mass matrix sweeper does not support the collocation update, so this</span>
+<span class="sd">        raises unless the right end of the interval is a node and do_coll_update is False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>

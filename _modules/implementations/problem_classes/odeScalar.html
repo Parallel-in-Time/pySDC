@@ -112,6 +112,7 @@
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">mesh</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">nonLinear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">5e-11</span><span class="p">,</span> <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="n">nvars</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
 
@@ -129,12 +130,38 @@
 <div class="viewcode-block" id="ProtheroRobinson.g">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.g">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Function :math:`g(t) = \cos(t)`, which is the exact solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The value of :math:`g(t)`.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinson.dg">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.dg">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        First derivative :math:`g'(t) = -\sin(t)` of :math:`g`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The value of :math:`g'(t)`.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
@@ -144,36 +171,126 @@
 <div class="viewcode-block" id="ProtheroRobinson.f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Right-hand side, replaced in ``__init__`` by ``f_LIN`` or ``f_NONLIN``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            Always.</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinson.f_LIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.f_LIN">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">f_LIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Right-hand side :math:`-(u - g(t)) / \epsilon + g'(t)` of the linear form.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dtype_u</span>
+<span class="sd">            The right-hand side.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinson.f_NONLIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.f_NONLIN">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">f_NONLIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Right-hand side :math:`-(u^3 - g(t)^3) / \epsilon + g'(t)` of the nonlinear form.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dtype_u</span>
+<span class="sd">            The right-hand side.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dg</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinson.jac">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.jac">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">jac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Jacobian of the right-hand side, replaced in ``__init__`` by ``jac_LIN`` or ``jac_NONLIN``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            Always.</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinson.jac_LIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.jac_LIN">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">jac_LIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Jacobian :math:`-1/\epsilon` of the right-hand side of the linear form.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The Jacobian.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ProtheroRobinson.jac_NONLIN">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeScalar.html#implementations.problem_classes.odeScalar.ProtheroRobinson.jac_NONLIN">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">jac_NONLIN</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Jacobian :math:`-3 u^2 / \epsilon` of the right-hand side of the nonlinear form.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dtype_u</span>
+<span class="sd">            The Jacobian.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">u</span><span class="o">**</span><span class="mi">2</span></div>
 
 

@@ -66,12 +66,27 @@ class, but the <cite>SweeperMPI</cite> class adds parameters to the <cite>params
 <dl class="py property">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.comm" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The communicator across the collocation nodes, taken from the parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the communicator</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>mpi4py.MPI.Intracomm</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.communicate_tau_correction_for_full_interval">
 <span class="sig-name descname"><span class="pre">communicate_tau_correction_for_full_interval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit_MPI.html#SweeperMPI.communicate_tau_correction_for_full_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.communicate_tau_correction_for_full_interval" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Broadcast the tau correction of the full interval, stored in <code class="docutils literal notranslate"><span class="pre">L.tau[-1]</span></code> on the last rank, to all ranks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.compute_end_point">
@@ -107,7 +122,16 @@ and evaluates the RHS of the ODE there</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rank</span></span><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.rank" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The rank in the node communicator, which is also the index of the collocation node this rank administers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the rank</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

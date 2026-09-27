@@ -183,6 +183,14 @@
 <div class="viewcode-block" id="GenericSpectralLinear.heterogeneous_setup">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.heterogeneous_setup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">heterogeneous_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Prepare the operators for heterogeneous runs, once and only if `heterogeneous` is set. On GPU, the BC matrices</span>
+<span class="sd">        `BC_line_zero_matrix` and `BCs` of the spectral helper are moved to the CPU, and CPU copies of `Pl`, `Pr`, `L`</span>
+<span class="sd">        and `M` are stored with the suffix `_CPU`. On CPU, the `_CPU` attributes refer to the operators themselves.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heterogeneous</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__heterogeneous_setup</span><span class="p">:</span>
 
             <span class="n">CPU_only</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'BC_line_zero_matrix'</span><span class="p">,</span> <span class="s1">'BCs'</span><span class="p">]</span>
@@ -478,6 +486,12 @@
 <div class="viewcode-block" id="GenericSpectralLinear.setUpFieldsIO">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setUpFieldsIO">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setUpFieldsIO</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Set up the MPI mode of `Rectilinear` output files with the local slice of this problem in physical space.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">Rectilinear</span><span class="o">.</span><span class="n">setupMPI</span><span class="p">(</span>
             <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">commMPI</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">useGPU</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span>
             <span class="n">iLoc</span><span class="o">=</span><span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">start</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">(</span><span class="kc">False</span><span class="p">)],</span>
@@ -488,6 +502,15 @@
 <div class="viewcode-block" id="GenericSpectralLinear.getOutputFile">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.getOutputFile">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getOutputFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Set up a `Rectilinear` output file on the grid of this problem, with one variable per component.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fileName (str): Name of the file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pySDC.helpers.fieldsIO.Rectilinear: The initialized output file</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUpFieldsIO</span><span class="p">()</span>
 
         <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span><span class="o">.</span><span class="n">get_1dgrid</span><span class="p">()</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">axes</span><span class="p">]</span>
@@ -505,6 +528,15 @@
 <div class="viewcode-block" id="GenericSpectralLinear.processSolutionForOutput">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.processSolutionForOutput">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">processSolutionForOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Prepare a solution for output: its real part in physical space, moved to the CPU if running on GPU.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: The solution as contiguous array</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
             <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
         <span class="k">else</span><span class="p">:</span>

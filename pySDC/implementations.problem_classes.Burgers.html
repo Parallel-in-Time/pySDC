@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=cd132f8b"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -84,16 +85,20 @@ Feel free to do a more efficient implementation using an ultraspherical method t
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Burgers.Burgers1D.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers1D.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers1D.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dd><p>Routine to evaluate the right-hand side, split into diffusion and advection.</p>
+<p>The implicit part of the <code class="docutils literal notranslate"><span class="pre">u</span></code> equation is the diffusion <span class="math notranslate nohighlight">\(\varepsilon \partial_x u_x\)</span>, computed by
+applying the Chebychev differentiation matrix to the auxiliary component <code class="docutils literal notranslate"><span class="pre">ux</span></code>. The explicit part is the
+advection <span class="math notranslate nohighlight">\(-u u_x\)</span>, computed pointwise. The algebraic <code class="docutils literal notranslate"><span class="pre">ux</span></code> equation gets zero in both parts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers1D.dtype_u" title="implementations.problem_classes.Burgers.Burgers1D.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers1D.dtype_u" title="implementations.problem_classes.Burgers.Burgers1D.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution, in physical space.</p></li>
+<li><p><strong>*args</strong> – Not used, the right-hand side does not depend on time.</p></li>
+<li><p><strong>**kwargs</strong> – Not used, the right-hand side does not depend on time.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side, with <code class="docutils literal notranslate"><span class="pre">impl</span></code> and <code class="docutils literal notranslate"><span class="pre">expl</span></code> parts.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers1D.dtype_f" title="implementations.problem_classes.Burgers.Burgers1D.dtype_f">dtype_f</a></p>
@@ -137,7 +142,26 @@ Feel free to do a more efficient implementation using an ultraspherical method t
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Burgers.Burgers1D.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers1D.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers1D.u_exact" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Routine to return the initial conditions at <span class="math notranslate nohighlight">\(t=0\)</span> or the stationary solution for <span class="math notranslate nohighlight">\(t=\infty\)</span>.</p>
+<p>At <span class="math notranslate nohighlight">\(t=0\)</span>, <code class="docutils literal notranslate"><span class="pre">u</span></code> is the linear function through the boundary values multiplied by <span class="math notranslate nohighlight">\(\cos(\pi f x)\)</span>,
+and <code class="docutils literal notranslate"><span class="pre">ux</span></code> is its derivative. For <code class="docutils literal notranslate"><span class="pre">t=np.inf</span></code>, which requires <code class="docutils literal notranslate"><span class="pre">f=0</span></code> and <code class="docutils literal notranslate"><span class="pre">BCl=-BCr</span></code>, <code class="docutils literal notranslate"><span class="pre">u</span></code> is the stationary
+viscous shock connecting the boundary values and <code class="docutils literal notranslate"><span class="pre">ux</span></code> is left zero. Other times are not implemented.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em><em>, </em><em>optional</em>) – Time, either <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">np.inf</span></code>.</p></li>
+<li><p><strong>*args</strong> – Not used.</p></li>
+<li><p><strong>**kwargs</strong> – Not used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The solution in physical space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers1D.dtype_u" title="implementations.problem_classes.Burgers.Burgers1D.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -155,18 +179,30 @@ This implementation is discretized with FFTs in x and Chebychev in z.</p>
 <li><p><strong>nx</strong> (<em>int</em>) – Spatial resolution in x direction</p></li>
 <li><p><strong>nz</strong> (<em>int</em>) – Spatial resolution in z direction</p></li>
 <li><p><strong>epsilon</strong> (<em>float</em>) – viscosity</p></li>
-<li><p><strong>BCl</strong> (<em>float</em>) – Value at left boundary</p></li>
-<li><p><strong>BCr</strong> (<em>float</em>) – Value at right boundary</p></li>
 <li><p><strong>fux</strong> (<em>int</em>) – Frequency of the initial conditions in x-direction</p></li>
 <li><p><strong>fuz</strong> (<em>int</em>) – Frequency of the initial conditions in z-direction</p></li>
 <li><p><strong>mode</strong> (<em>str</em>) – ‘T2U’ or ‘T2T’. Use ‘T2U’ to get sparse differentiation matrices</p></li>
 </ul>
 </dd>
 </dl>
+<p>The boundary conditions are fixed: u = 0 at z = -1 and z = 1, v = -1 at z = -1 and v = 1 at z = 1.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Burgers.Burgers2D.compute_vorticity">
 <span class="sig-name descname"><span class="pre">compute_vorticity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers2D.compute_vorticity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers2D.compute_vorticity" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the vorticity from the velocity components by spectral differentiation, as <span class="math notranslate nohighlight">\(\partial_x v +
+\partial_z u\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers2D.dtype_u" title="implementations.problem_classes.Burgers.Burgers2D.dtype_u"><em>dtype_u</em></a>) – Solution in physical space.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>vorticity</strong> – The vorticity in physical space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.2darray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.Burgers.Burgers2D.dtype_f">
@@ -183,16 +219,21 @@ This implementation is discretized with FFTs in x and Chebychev in z.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Burgers.Burgers2D.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers2D.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers2D.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dd><p>Routine to evaluate the right-hand side, split into diffusion and advection.</p>
+<p>The implicit part is the diffusion <span class="math notranslate nohighlight">\(\varepsilon (\partial_x w_x + \partial_z w_z)\)</span> of both velocity
+components <span class="math notranslate nohighlight">\(w=u,v\)</span>, computed by spectral differentiation of the auxiliary derivative components. The
+explicit part is the advection <span class="math notranslate nohighlight">\(-(u \partial_x w + v \partial_z w)\)</span>, computed pointwise. The algebraic
+derivative equations get zero in both parts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers2D.dtype_u" title="implementations.problem_classes.Burgers.Burgers2D.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers2D.dtype_u" title="implementations.problem_classes.Burgers.Burgers2D.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution, in physical space.</p></li>
+<li><p><strong>*args</strong> – Not used, the right-hand side does not depend on time.</p></li>
+<li><p><strong>**kwargs</strong> – Not used, the right-hand side does not depend on time.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+<dd class="field-even"><p><strong>f</strong> – The right-hand side, with <code class="docutils literal notranslate"><span class="pre">impl</span></code> and <code class="docutils literal notranslate"><span class="pre">expl</span></code> parts.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers2D.dtype_f" title="implementations.problem_classes.Burgers.Burgers2D.dtype_f">dtype_f</a></p>
@@ -237,7 +278,27 @@ This implementation is discretized with FFTs in x and Chebychev in z.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.Burgers.Burgers2D.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Burgers.html#Burgers2D.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Burgers.Burgers2D.u_exact" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Routine to return the initial conditions, which are only implemented for <span class="math notranslate nohighlight">\(t=0\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">u</span></code> is <span class="math notranslate nohighlight">\(\cos(f_{ux} x) \sin(\pi f_{uz} z)\)</span> plus <code class="docutils literal notranslate"><span class="pre">BCtopu</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code> is linear in <span class="math notranslate nohighlight">\(z\)</span> between
+<code class="docutils literal notranslate"><span class="pre">BCbottom</span></code> and <code class="docutils literal notranslate"><span class="pre">BCtop</span></code>, and the derivative components are set accordingly. Seeded normally distributed
+noise, multiplied by <span class="math notranslate nohighlight">\((z-1)(z+1)\)</span>, can be added to <code class="docutils literal notranslate"><span class="pre">v</span></code>; its derivatives are not updated for the noise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em><em>, </em><em>optional</em>) – Time, has to be <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><strong>*args</strong> – Not used.</p></li>
+<li><p><strong>**kwargs</strong> – Not used.</p></li>
+<li><p><strong>noise_level</strong> (<em>float</em><em>, </em><em>optional</em>) – Amplitude of the noise added to <code class="docutils literal notranslate"><span class="pre">v</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>me</strong> – The initial conditions in physical space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.Burgers.Burgers2D.dtype_u" title="implementations.problem_classes.Burgers.Burgers2D.dtype_u">dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

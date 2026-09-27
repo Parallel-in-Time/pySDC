@@ -116,6 +116,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spectral</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'d'</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="mf">0.0</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="k">if</span> <span class="n">useGPU</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setup_GPU</span><span class="p">()</span>
 
@@ -163,6 +164,14 @@
 <div class="viewcode-block" id="IMEX_Laplacian_MPIFFT.getLocalGrid">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_MPIFFT_Laplacian.html#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLocalGrid">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getLocalGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute the coordinates of the local part of the grid in real space and store them in ``self.X``, one array per</span>
+<span class="sd">        dimension broadcast to the local shape, with the points :math:`x_0 + i L / N`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
         <span class="n">X</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">ogrid</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">local_slice</span><span class="p">(</span><span class="kc">False</span><span class="p">)])</span>
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">global_shape</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">N</span><span class="p">)):</span>
@@ -173,6 +182,14 @@
 <div class="viewcode-block" id="IMEX_Laplacian_MPIFFT.getLaplacian">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.generic_MPIFFT_Laplacian.html#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.getLaplacian">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getLaplacian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Compute the squared wave numbers :math:`|k|^2` of the local part of the spectral grid, with the wave numbers</span>
+<span class="sd">        scaled by :math:`2\pi / L`, and store them in ``self.K2``. The Laplacian in spectral space is :math:`-|k|^2`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
         <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">local_slice</span><span class="p">()</span>
         <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">global_shape</span><span class="p">()</span>
         <span class="n">k</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">N</span><span class="p">]</span>

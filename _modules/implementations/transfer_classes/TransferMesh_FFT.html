@@ -52,8 +52,7 @@
 <span class="sd">    This implementation can restrict and prolong between 1d meshes with FFT for periodic boundaries</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        irfft_object_fine: planned FFT for backward transformation, real-valued output</span>
-<span class="sd">        rfft_object_coarse: planned real-valued FFT for forward transformation</span>
+<span class="sd">        ratio (int): ratio of the fine to the coarse resolution</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>

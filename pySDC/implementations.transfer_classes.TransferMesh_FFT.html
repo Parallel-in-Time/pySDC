@@ -55,15 +55,14 @@
 <p>Space transfer between periodic 1d meshes: injection to restrict, Fourier interpolation to prolong.</p>
 <p>This implementation can restrict and prolong between 1d meshes with FFT for periodic boundaries</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.irfft_object_fine">
-<span class="sig-name descname"><span class="pre">irfft_object_fine</span></span><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.irfft_object_fine" title="Link to this definition">¶</a></dt>
-<dd><p>planned FFT for backward transformation, real-valued output</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.rfft_object_coarse">
-<span class="sig-name descname"><span class="pre">rfft_object_coarse</span></span><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.rfft_object_coarse" title="Link to this definition">¶</a></dt>
-<dd><p>planned real-valued FFT for forward transformation</p>
+<dt class="sig sig-object py" id="implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.ratio">
+<span class="sig-name descname"><span class="pre">ratio</span></span><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.ratio" title="Link to this definition">¶</a></dt>
+<dd><p>ratio of the fine to the coarse resolution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -104,8 +103,7 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.transfer_classes.TransferMesh_FFT module</a><ul>
 <li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft"><code class="docutils literal notranslate"><span class="pre">mesh_to_mesh_fft</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.irfft_object_fine"><code class="docutils literal notranslate"><span class="pre">irfft_object_fine</span></code></a></li>
-<li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.rfft_object_coarse"><code class="docutils literal notranslate"><span class="pre">rfft_object_coarse</span></code></a></li>
+<li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.ratio"><code class="docutils literal notranslate"><span class="pre">ratio</span></code></a></li>
 <li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
 <li><a class="reference internal" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
 </ul>

@@ -823,6 +823,23 @@
 <div class="viewcode-block" id="initGrid">
 <a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.initGrid">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">initGrid</span><span class="p">(</span><span class="n">nVar</span><span class="p">,</span> <span class="n">gridSizes</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Build a test grid on [0, 1)^dim and fields that are products of the coordinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nVar : int</span>
+<span class="sd">        Number of variables.</span>
+<span class="sd">    gridSizes : list[int]</span>
+<span class="sd">        Number of grid points in each dimension.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    coords : list[np.ndarray]</span>
+<span class="sd">        1D coordinates in each dimension, without the right boundary.</span>
+<span class="sd">    u0 : np.ndarray</span>
+<span class="sd">        Fields of shape ``(nVar, *gridSizes)``, variable `i` being `i + 1` times the product of the coordinates.</span>
+<span class="sd">    """</span>
     <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gridSizes</span><span class="p">)</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">gridSizes</span><span class="p">]</span>
     <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">dim</span>
@@ -836,6 +853,32 @@
 <div class="viewcode-block" id="writeFields_MPI">
 <a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.writeFields_MPI">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">writeFields_MPI</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">dtypeIdx</span><span class="p">,</span> <span class="n">algo</span><span class="p">,</span> <span class="n">nSteps</span><span class="p">,</span> <span class="n">nVar</span><span class="p">,</span> <span class="n">gridSizes</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Write test fields with MPI, decomposing the grid from :func:`initGrid` in blocks over `MPI.COMM_WORLD`.</span>
+
+<span class="sd">    Sets up the MPI mode of :class:`Rectilinear` for the local block and writes `nSteps` fields `u0 * t` for</span>
+<span class="sd">    `t = i / nSteps`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileName : str</span>
+<span class="sd">        Name of the file.</span>
+<span class="sd">    dtypeIdx : int</span>
+<span class="sd">        Index of the data type in `DTYPES`.</span>
+<span class="sd">    algo : str</span>
+<span class="sd">        Algorithm for :class:`pySDC.helpers.blocks.BlockDecomposition`.</span>
+<span class="sd">    nSteps : int</span>
+<span class="sd">        Number of fields to write.</span>
+<span class="sd">    nVar : int</span>
+<span class="sd">        Number of variables.</span>
+<span class="sd">    gridSizes : list[int]</span>
+<span class="sd">        Number of grid points in each dimension.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    u0 : np.ndarray</span>
+<span class="sd">        Local block of the initial fields, in the data type of the file.</span>
+<span class="sd">    """</span>
     <span class="n">coords</span><span class="p">,</span> <span class="n">u0</span> <span class="o">=</span> <span class="n">initGrid</span><span class="p">(</span><span class="n">nVar</span><span class="p">,</span> <span class="n">gridSizes</span><span class="p">)</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
@@ -871,6 +914,20 @@
 <div class="viewcode-block" id="compareFields_MPI">
 <a class="viewcode-back" href="../../pySDC/helpers.fieldsIO.html#helpers.fieldsIO.compareFields_MPI">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compareFields_MPI</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">nSteps</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Check that the fields in a file are `u0 * t` for `t = i / nSteps`, raising an AssertionError otherwise.</span>
+
+<span class="sd">    Reads the local fields only, so the MPI mode must be set up as in :func:`writeFields_MPI`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileName : str</span>
+<span class="sd">        Name of the file.</span>
+<span class="sd">    u0 : np.ndarray</span>
+<span class="sd">        Local initial fields, as returned by :func:`writeFields_MPI`.</span>
+<span class="sd">    nSteps : int</span>
+<span class="sd">        Number of fields in the file.</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldsIO</span>
 
     <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>

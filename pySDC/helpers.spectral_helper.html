@@ -389,7 +389,22 @@ after.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_plan">
 <span class="sig-name descname"><span class="pre">get_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#FFTHelper.get_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.FFTHelper.get_plan" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get a callable that computes the FFT of data like <cite>u</cite>.</p>
+<p>With FFTW, the planned transform is cached in <cite>self.plans</cite> by direction, shape of <cite>u</cite> and the other arguments.
+Otherwise, this is <cite>fftn</cite> or <cite>ifftn</cite> of the FFT library with the <cite>norm</cite> from <cite>kwargs</cite>, “backward” and “forward”
+by default, so that neither direction normalizes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data to transform</p></li>
+<li><p><strong>forward</strong> (<em>bool</em>) – Forward transform if True, inverse transform otherwise</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>callable transform</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.FFTHelper.get_wavenumbers">
@@ -772,7 +787,20 @@ Therefore, this function copies the matrix to host, eliminates the zeros there a
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.expand_matrix_ND">
 <span class="sig-name descname"><span class="pre">expand_matrix_ND</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligned</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.expand_matrix_ND"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.expand_matrix_ND" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Expand a global 1D matrix acting along axis <cite>aligned</cite> to the local part of the ND matrix, by Kronecker products
+with identities in the other axes. Uses the local slices in spectral space in every axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix</strong> (<em>sparse matrix</em>) – Global 1D matrix</p></li>
+<li><p><strong>aligned</strong> (<em>int</em>) – Axis the matrix acts along</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sparse local ND matrix in CSC format</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.fft_backend">
@@ -919,7 +947,19 @@ admissible.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_indices">
 <span class="sig-name descname"><span class="pre">get_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_indices" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the global indices of the modes or grid points held by this rank in each axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>forward_output</strong> (<em>bool</em>) – Indices in spectral space if True, in physical space otherwise</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Indices in each axis</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of self.xp.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_integration_matrix">
@@ -957,7 +997,24 @@ use this method to get the part corresponding to the modes carried by this rank.
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_pfft">
 <span class="sig-name descname"><span class="pre">get_pfft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.get_pfft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.get_pfft" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get a cached distributed transform object from mpi4py-fft, planned by one forward and backward transform.
+Axes that are not in <cite>axes</cite> are not transformed. The arguments must be hashable, e.g. tuples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes to transform, all by default</p></li>
+<li><p><strong>padding</strong> (<em>tuple</em>) – Padding factor in each axis for dealiasing, none by default</p></li>
+<li><p><strong>grid</strong> (<em>tuple</em>) – Processor grid, passed on to <cite>PFFT</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transform object, or None in 1D or without a communicator</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pySDC.helpers.fft_helper.PFFT</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.get_wavenumbers">
@@ -968,7 +1025,19 @@ use this method to get the part corresponding to the modes carried by this rank.
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.global_slice">
 <span class="sig-name descname"><span class="pre">global_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.global_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.global_slice" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get slices spanning the global data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>forward_output</strong> (<em>bool</em>) – Slices in spectral space if True, in physical space otherwise</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Global slice in each axis</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of slice</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.index">
@@ -990,12 +1059,48 @@ use this method to get the part corresponding to the modes carried by this rank.
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.infer_alignment">
 <span class="sig-name descname"><span class="pre">infer_alignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.infer_alignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.infer_alignment" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Find the axes in which <cite>u</cite> is not distributed, by comparing its local shape to the global shape of arrays of the
+transform object from <cite>get_pfft</cite>. With <cite>padding</cite>, transforms padded in subsets of the axes are tried until one
+fits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data with the solution components in the first axis</p></li>
+<li><p><strong>forward_output</strong> (<em>bool</em>) – Compare to arrays in spectral space if True, in physical space otherwise</p></li>
+<li><p><strong>padding</strong> (<em>tuple</em>) – Padding factor in each axis</p></li>
+<li><p><strong>**kwargs</strong> – Passed on to <cite>get_pfft</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Aligned axes, not counting the component axis, or [0] without a communicator</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.itransform">
 <span class="sig-name descname"><span class="pre">itransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.itransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.itransform" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Transform all solution components from spectral to physical space along <cite>axes</cite>, the inverse of <cite>transform</cite>.
+With a distributed transform, <cite>u</cite> is first redistributed if its local shape does not fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data with the solution components in the first axis</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes to transform, all by default</p></li>
+<li><p><strong>padding</strong> (<em>tuple</em>) – Padding factor in each axis for dealiasing, only used with a distributed transform. The
+padded
+resolution must be an integer.</p></li>
+<li><p><strong>**kwargs</strong> – Passed on to <cite>get_pfft</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed data in a new array, which is distributed if the transform is</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.linalg">
@@ -1005,17 +1110,31 @@ use this method to get the part corresponding to the modes carried by this rank.
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.local_slice">
 <span class="sig-name descname"><span class="pre">local_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.local_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.local_slice" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the slices of the global data held by this rank.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>forward_output</strong> (<em>bool</em>) – Slices in spectral space if True, in physical space otherwise</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Local slice in each axis</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of slice</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.ncomponents">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ncomponents</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ncomponents" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Number of solution components</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.ndim">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.ndim" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Number of dimensions, i.e. of 1D bases</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.newDistArray">
@@ -1064,7 +1183,24 @@ This function needs no transforms and caches a mask for faster subsequent use.</
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.redistribute">
 <span class="sig-name descname"><span class="pre">redistribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_output</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.redistribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.redistribute" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Copy <cite>u</cite> into a new distributed array aligned in <cite>axis</cite>, i.e. not distributed in that axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data with the solution components in the first axis</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis to align in</p></li>
+<li><p><strong>forward_output</strong> (<em>bool</em>) – Layout of the new array: spectral space if True, physical space otherwise</p></li>
+<li><p><strong>**kwargs</strong> – Passed on to <cite>get_pfft</cite>, e.g. <cite>padding</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redistributed copy of <cite>u</cite>, or <cite>u</cite> itself without a communicator</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mpi4py_fft.DistArray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.remove_BC">
@@ -1132,7 +1268,22 @@ This must also be called before setting up any BCs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.transform">
 <span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper.transform" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Transform all solution components from physical to spectral space along <cite>axes</cite>.
+With a distributed transform, <cite>u</cite> is first redistributed if its local shape does not fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Data with the solution components in the first axis</p></li>
+<li><p><strong>axes</strong> (<em>tuple</em>) – Axes to transform, all by default</p></li>
+<li><p><strong>padding</strong> (<em>tuple</em>) – Padding factor in each axis for dealiasing, only used with a distributed transform</p></li>
+<li><p><strong>**kwargs</strong> – Passed on to <cite>get_pfft</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed data in a new array, which is distributed if the transform is</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper.u_init">
@@ -1299,7 +1450,13 @@ you want. This is what the <cite>SpectralHelper</cite> does when you call the me
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_differentiation_matrix">
 <span class="sig-name descname"><span class="pre">get_differentiation_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_differentiation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_differentiation_matrix" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the differentiation matrix of this basis. Implemented by the derived bases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse differentiation matrix</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_empty_operator_matrix">
@@ -1338,7 +1495,13 @@ you want. This is what the <cite>SpectralHelper</cite> does when you call the me
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_integration_matrix">
 <span class="sig-name descname"><span class="pre">get_integration_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/spectral_helper.html#SpectralHelper1D.get_integration_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.spectral_helper.SpectralHelper1D.get_integration_matrix" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the integration matrix of this basis. Implemented by the derived bases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sparse integration matrix</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.spectral_helper.SpectralHelper1D.get_integration_weights">

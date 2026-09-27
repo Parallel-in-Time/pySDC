@@ -57,16 +57,20 @@
 <p>The <span class="math notranslate nohighlight">\(N\)</span>-body problem describes the mutual influence of the motion of <span class="math notranslate nohighlight">\(N\)</span> bodies. Formulation of the problem is
 based on Newton’s second law. Therefore, the <span class="math notranslate nohighlight">\(N\)</span>-body problem is formulated as</p>
 <div class="math notranslate nohighlight">
-\[m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_i - {\bf r}_j),\]</div>
+\[m_i \frac{d^2 {\bf r}_i}{d t^2} = \sum_{j=1, i\neq j}^N G \frac{m_i m_j}{|{\bf r}_i - {\bf r}_j|^3}({\bf r}_j - {\bf r}_i),\]</div>
 <p>where <span class="math notranslate nohighlight">\(m_i\)</span> is the <span class="math notranslate nohighlight">\(i\)</span>-th mass point with position described by the vector <span class="math notranslate nohighlight">\({\bf r}_i\)</span>, and <span class="math notranslate nohighlight">\(G\)</span>
-is the gravitational constant. If only the sun influences the motion of the bodies gravitationally, the equations become</p>
+is the gravitational constant. If only the sun (body 1) influences the motion of the bodies gravitationally, the
+equations become</p>
 <div class="math notranslate nohighlight">
-\[m_i \frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_i - {\bf r}_1).\]</div>
-<p>This class implements the full solar system containing all planets including Earth’s moon, i.e., <span class="math notranslate nohighlight">\(N=10\)</span>. Initial conditions
-are taken from <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, and masses relative to the sun taken from <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+\[\frac{d^2 {\bf r}_i}{d t^2} = G \frac{m_1}{|{\bf r}_i - {\bf r}_1|^3}({\bf r}_1 - {\bf r}_i), \quad i \geq 2,\]</div>
+<p>and the sun is not accelerated.</p>
+<p>This class implements the full solar system: the sun, the eight planets, with Earth and its moon combined into one
+body, and Pluto, i.e., <span class="math notranslate nohighlight">\(N=10\)</span>. Initial conditions are taken from <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, and masses relative to the sun taken
+from <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sun_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If False, only the sun is taken into account for the influence of the motion.</p>
+<dd class="field-odd"><p><strong>sun_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, only the gravity of the sun acts on the other bodies, see above. If False (default), all bodies
+attract each other.</p>
 </dd>
 </dl>
 <dl class="py attribute">

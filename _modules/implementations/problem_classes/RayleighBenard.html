@@ -238,6 +238,21 @@
 <div class="viewcode-block" id="RayleighBenard.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right hand side, split into an implicit and an explicit part.</span>
+
+<span class="sd">        The implicit part is -L u, i.e. diffusion, pressure gradient, buoyancy and, in the pressure line, the negative</span>
+<span class="sd">        divergence, converted back to the Chebychev-T basis. The explicit part is the advection -(u d/dx + v d/dz) of u,</span>
+<span class="sd">        v and T, computed in physical space on a grid padded by the dealiasing factor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+<span class="sd">            *args: Not used, the right hand side does not depend on time</span>
+<span class="sd">            **kwargs: Not used, the right hand side does not depend on time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: The right hand side, in the same space as `u`</span>
+<span class="sd">        """</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
@@ -294,6 +309,19 @@
 <div class="viewcode-block" id="RayleighBenard.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">99</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initial conditions, which are only available at t=0. Velocities and temperature are linear in z between their</span>
+<span class="sd">        boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly distributed noise,</span>
+<span class="sd">        multiplied by `noise_level` and (z - z0) (z - z0 + Lz).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): Time, has to be 0</span>
+<span class="sd">            noise_level (float): Amplitude of the noise</span>
+<span class="sd">            seed (int): Seed for the random number generator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: Initial conditions, in spectral space if `spectral_space` is set, else in physical space</span>
+<span class="sd">        """</span>
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">'v_top'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">'v_bottom'</span><span class="p">]</span>
@@ -434,6 +462,15 @@
 <div class="viewcode-block" id="RayleighBenard.compute_vorticity">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_vorticity">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_vorticity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute the vorticity by spectral differentiation, as Dx v + Dz u.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            xp.ndarray: Vorticity in physical space</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
             <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -451,6 +488,16 @@
 <div class="viewcode-block" id="RayleighBenard.getOutputFile">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.getOutputFile">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getOutputFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Set up a `Rectilinear` output file on the grid of this problem, with one variable per component plus the</span>
+<span class="sd">        vorticity, see `processSolutionForOutput`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fileName (str): Name of the file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pySDC.helpers.fieldsIO.Rectilinear: The initialized output file</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rectilinear</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">setUpFieldsIO</span><span class="p">()</span>
@@ -467,6 +514,16 @@
 <div class="viewcode-block" id="RayleighBenard.processSolutionForOutput">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.processSolutionForOutput">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">processSolutionForOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Prepare a solution for output: the real parts of all components in physical space, with the vorticity appended</span>
+<span class="sd">        as the last variable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: Components u, v, T, p and the vorticity</span>
+<span class="sd">        """</span>
         <span class="n">vorticity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_vorticity</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
@@ -542,6 +599,17 @@
 <div class="viewcode-block" id="RayleighBenard.compute_viscous_dissipation">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_viscous_dissipation">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_viscous_dissipation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute the pointwise viscous dissipation ``abs(u Lap(u) + v Lap(v))``, the velocity times its Laplacian, where</span>
+<span class="sd">        the</span>
+<span class="sd">        Laplacian is computed by spectral differentiation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution in physical space</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            xp.ndarray: Viscous dissipation in physical space</span>
+<span class="sd">        """</span>
         <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">'u'</span><span class="p">,</span> <span class="s1">'v'</span><span class="p">])</span>
 
         <span class="n">Lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">u_init_forward</span>
@@ -560,6 +628,15 @@
 <div class="viewcode-block" id="RayleighBenard.compute_buoyancy_generation">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.compute_buoyancy_generation">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_buoyancy_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute the pointwise buoyancy production ``abs(Rayleigh v T)``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            xp.ndarray: Buoyancy production in physical space</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
             <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itransform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
         <span class="n">iv</span><span class="p">,</span> <span class="n">iT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">([</span><span class="s1">'v'</span><span class="p">,</span> <span class="s1">'T'</span><span class="p">])</span>
@@ -575,6 +652,17 @@
 <div class="viewcode-block" id="CFLLimit.dependencies">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.dependencies">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add the hooks `LogCFL` and `LogStepSize` to the controller to record the CFL limit and the step size.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            *args: Not used, e.g. the description</span>
+<span class="sd">            **kwargs: Not used, e.g. the description</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_step_size</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogStepSize</span>
 
         <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogCFL</span><span class="p">)</span>
@@ -625,6 +713,19 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.compute_max_step_size">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_max_step_size</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute the largest step size allowed by the CFL condition with CFL number 1: the minimum over the grid of the</span>
+<span class="sd">        grid spacing divided by the absolute velocity, in x and in z, reduced over the space communicator of the</span>
+<span class="sd">        problem. The vertical grid spacing is the distance between the midpoints of neighbouring Chebychev nodes, with</span>
+<span class="sd">        the domain [0, Lz].</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            P (RayleighBenard): The problem</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `P.spectral_space` is set, else in physical space</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Maximal step size</span>
+<span class="sd">        """</span>
         <span class="n">grid_spacing_x</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="n">cell_wallz</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">nz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -650,6 +751,18 @@
 <div class="viewcode-block" id="CFLLimit.get_new_step_size">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.CFLLimit.get_new_step_size">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Once the step has converged, compute the CFL limit at the end point of the finest level, store `cfl` times it in</span>
+<span class="sd">        the level status for `LogCFL` and limit the new step size to it. If no other convergence controller has set a</span>
+<span class="sd">        new step size, max(`dt_max`, current step size) is limited instead. The result is at least `dt_min`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            step (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">step</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 

@@ -371,7 +371,22 @@ between collocation problems between iterations.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_convergence">
 <span class="sig-name descname"><span class="pre">get_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityCollocation.get_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_convergence" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The step is converged once all collocation problems have been solved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether all <code class="docutils literal notranslate"><span class="pre">num_colls</span></code> collocation problems have been solved</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_local_error_estimate">
@@ -396,7 +411,8 @@ between collocation problems between iterations.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_new_step_size">
 <span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityCollocation.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.get_new_step_size" title="Link to this definition">¶</a></dt>
-<dd><p>Determine a step size for the next step from an estimate of the local error of the current step.</p>
+<dd><p>Once all collocation problems have been solved, compute the new step size from the error estimate, using as
+order one more than the lower order of the last two collocation methods.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -427,13 +443,13 @@ between collocation problems between iterations.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.reset_status_variables">
 <span class="sig-name descname"><span class="pre">reset_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityCollocation.reset_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.reset_status_variables" title="Link to this definition">¶</a></dt>
-<dd><p>Reset status variables.
-This is called in the <cite>restart_block</cite> function.
-:param controller: The controller
-:type controller: pySDC.Controller</p>
+<dd><p>Empty the lists of error estimates and orders, e.g. when restarting.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -462,10 +478,7 @@ This is called in the <cite>restart_block</cite> function.
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.setup_status_variables">
 <span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityCollocation.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.setup_status_variables" title="Link to this definition">¶</a></dt>
-<dd><p>Setup status variables.
-This is not done at the time of instantiation, since the controller is not fully instantiated at that time and
-hence not all information are available. Instead, this function is called after the controller has been fully
-instantiated.</p>
+<dd><p>Set up empty lists for the error estimates and orders of the collocation problems solved in the current step.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p>
@@ -504,7 +517,23 @@ instantiated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_convergence">
 <span class="sig-name descname"><span class="pre">get_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityExtrapolationWithinQ.get_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_convergence" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check if the step is converged with the regular convergence criteria, i.e. residual, increment or maximum number
+of iterations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the step is converged</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.get_local_error_estimate">
@@ -546,20 +575,21 @@ instantiated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityExtrapolationWithinQ.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ.setup" title="Link to this definition">¶</a></dt>
-<dd><p>Add a default value for control order to the parameters.</p>
+<dd><p>Add the default <code class="docutils literal notranslate"><span class="pre">high_Taylor_order=False</span></code> to the parameters and use the regular convergence check to determine
+if the collocation problem is converged.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>params</strong> (<em>dict</em>) – Parameters for the convergence controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
 <li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Updated parameters</p>
+<dd class="field-even"><p>The updated params dictionary</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>(dict)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -591,7 +621,11 @@ instantiated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart">
 <span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.determine_restart" title="Link to this definition">¶</a></dt>
-<dd><p>Check if the step wants to be restarted by comparing the estimate of the local error to a preset tolerance</p>
+<dd><p>Once the collocation problem is converged, restart with a smaller step size if the residual is still above
+<code class="docutils literal notranslate"><span class="pre">restol</span></code> (with <code class="docutils literal notranslate"><span class="pre">restart_at_maxiter</span></code>, unless the increment is below <code class="docutils literal notranslate"><span class="pre">e_tol</span></code>), or restart if the local error
+estimate exceeds <code class="docutils literal notranslate"><span class="pre">e_tol</span></code>. Before convergence, restart with a smaller step size if the residual
+grows between iterations (only without parallelism across steps and with <code class="docutils literal notranslate"><span class="pre">abort_at_growing_residual</span></code>) or
+exceeds <code class="docutils literal notranslate"><span class="pre">residual_max_tol</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -608,7 +642,22 @@ instantiated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.get_convergence">
 <span class="sig-name descname"><span class="pre">get_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.get_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.get_convergence" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check if the collocation problem is converged. Needs to be implemented by the child class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the collocation problem is converged</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.setup">
@@ -634,7 +683,17 @@ instantiated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence">
 <span class="sig-name descname"><span class="pre">trigger_restart_upon_nonconvergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.trigger_restart_upon_nonconvergence" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Restart the step and stop iterating, dividing the step size on all levels by <code class="docutils literal notranslate"><span class="pre">factor_if_not_converged</span></code>. No
+interpolation is done for the restarted step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -664,7 +723,23 @@ instantiated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.get_convergence">
 <span class="sig-name descname"><span class="pre">get_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityPolynomialError.get_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.get_convergence" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check if the step is converged with the regular convergence criteria, i.e. residual, increment or maximum number
+of iterations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
+<li><p><strong>S</strong> (<em>pySDC.Step</em>) – The current step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the step is converged</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.get_local_error_estimate">
@@ -706,20 +781,21 @@ instantiated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityPolynomialError.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError.setup" title="Link to this definition">¶</a></dt>
-<dd><p>Add a default value for control order to the parameters.</p>
+<dd><p>Add defaults for the mesh type of the problem, which selects the error estimator, and <code class="docutils literal notranslate"><span class="pre">rel_error</span></code>, and use the
+regular convergence check to determine if the collocation problem is converged.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>controller</strong> (<em>pySDC.Controller</em>) – The controller</p></li>
-<li><p><strong>params</strong> (<em>dict</em>) – Parameters for the convergence controller</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – The params passed for this specific convergence controller</p></li>
 <li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Updated parameters</p>
+<dd class="field-even"><p>The updated params dictionary</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>(dict)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -751,14 +827,8 @@ instantiated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.adaptivity.AdaptivityRK.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/adaptivity.html#AdaptivityRK.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.adaptivity.AdaptivityRK.setup" title="Link to this definition">¶</a></dt>
-<dd><p>Define default parameters here.</p>
-<dl class="simple">
-<dt>Default parameters are:</dt><dd><ul class="simple">
-<li><p>control_order (int): The order relative to other convergence controllers</p></li>
-<li><p>beta (float): The safety factor</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Add the order of the embedded error estimate of the Runge-Kutta method, from the sweeper’s <code class="docutils literal notranslate"><span class="pre">get_update_order</span></code>,
+as default for the parameter <code class="docutils literal notranslate"><span class="pre">update_order</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

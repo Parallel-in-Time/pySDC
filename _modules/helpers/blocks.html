@@ -67,6 +67,7 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nProcs</span><span class="p">,</span> <span class="n">gridSizes</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="s2">"Hybrid"</span><span class="p">,</span> <span class="n">gRank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">"C"</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Compute the number of blocks in each dimension, see the class docstring."""</span>
         <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gridSizes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">dim</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s2">"block decomposition only works for 1D, 2D or 3D domains"</span>
 
@@ -137,12 +138,30 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ranks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Coordinates of the block of `gRank` in the cartesian grid of blocks, which uses `order`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[int]</span>
+<span class="sd">            Block index of `gRank` in each dimension.</span>
+<span class="sd">        """</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">gRank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"gRank attribute needs to be set"</span>
         <span class="n">cart</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nBlocks</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nBlocks</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">cart</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">gRank</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">localBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Bounds of the block of `gRank`. The points left over by an even split go one each to the first blocks.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        iLocList : list[int]</span>
+<span class="sd">            Global index of the first local point in each dimension.</span>
+<span class="sd">        nLocList : list[int]</span>
+<span class="sd">            Number of local points in each dimension.</span>
+<span class="sd">        """</span>
         <span class="n">iLocList</span><span class="p">,</span> <span class="n">nLocList</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">nPoints</span><span class="p">,</span> <span class="n">nBlocks</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nBlocks</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="n">n0</span> <span class="o">=</span> <span class="n">nPoints</span> <span class="o">//</span> <span class="n">nBlocks</span>

@@ -73,12 +73,31 @@ the <a class="reference external" href="https://web.stanford.edu/group/ctr/ResBr
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.blocks.BlockDecomposition.localBounds">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">localBounds</span></span><a class="headerlink" href="#helpers.blocks.BlockDecomposition.localBounds" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Bounds of the block of <cite>gRank</cite>. The points left over by an even split go one each to the first blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>iLocList</strong> (<em>list[int]</em>) – Global index of the first local point in each dimension.</p></li>
+<li><p><strong>nLocList</strong> (<em>list[int]</em>) – Number of local points in each dimension.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="helpers.blocks.BlockDecomposition.ranks">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ranks</span></span><a class="headerlink" href="#helpers.blocks.BlockDecomposition.ranks" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Coordinates of the block of <cite>gRank</cite> in the cartesian grid of blocks, which uses <cite>order</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Block index of <cite>gRank</cite> in each dimension.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

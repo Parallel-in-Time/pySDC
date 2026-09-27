@@ -187,6 +187,12 @@
 <div class="viewcode-block" id="QDiagonalization.eval_f_at_all_nodes">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.eval_f_at_all_nodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f_at_all_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right hand side at all collocation nodes, since the solve does not do this by default.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">prob</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
@@ -219,6 +225,16 @@
 <div class="viewcode-block" id="QDiagonalization.compute_residual">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.compute_residual">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right hand side at all nodes and then compute the residual as in the base class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: passed on to the base class method, typically the stage (str)</span>
+<span class="sd">            **kwargs: passed on to the base class method</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_f_at_all_nodes</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 </div>

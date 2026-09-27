@@ -54,11 +54,14 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_1st_order</span></code></p>
 <p>IMEX-SDC sweeper for problems M u’ = f(u) with a mass matrix M, as they arise from finite elements.</p>
 <p>First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix</p>
+<p>The end point is only available as a copy of the last node: <code class="docutils literal notranslate"><span class="pre">compute_end_point</span></code> raises unless the right end of
+the interval is a node and <code class="docutils literal notranslate"><span class="pre">do_coll_update</span></code> is off.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point">
 <span class="sig-name descname"><span class="pre">compute_end_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order_mass.html#imex_1st_order_mass.compute_end_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point" title="Link to this definition">¶</a></dt>
 <dd><p>Compute u at the right point of the interval</p>
-<p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
+<p>This is a copy of the last node. The mass matrix sweeper does not support the collocation update, so this
+raises unless the right end of the interval is a node and do_coll_update is False.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>

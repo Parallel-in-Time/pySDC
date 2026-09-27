@@ -85,10 +85,22 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The communicator across the collocation nodes, taken from the parameters.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mpi4py.MPI.Intracomm: the communicator</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">comm</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rank</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The rank in the node communicator, which is also the index of the collocation node this rank administers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: the rank</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span>
 
 <div class="viewcode-block" id="SweeperMPI.compute_end_point">
@@ -209,6 +221,12 @@
 <div class="viewcode-block" id="SweeperMPI.communicate_tau_correction_for_full_interval">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.communicate_tau_correction_for_full_interval">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">communicate_tau_correction_for_full_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Broadcast the tau correction of the full interval, stored in ``L.tau[-1]`` on the last rank, to all ranks.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>

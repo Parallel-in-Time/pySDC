@@ -78,13 +78,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.plotting.PlotPostStep.pre_run">
 <span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/plotting.html#PlotPostStep.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.plotting.PlotPostStep.pre_run" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called before time-loop starts</p>
+<dd><p>Set up the figure and plot the initial conditions, on the finest level only.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
-<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – Number of current level</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -104,18 +107,36 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.plotting.PlottingHook.plot">
 <span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_ic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/plotting.html#PlottingHook.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.plotting.PlottingHook.plot" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Plot the initial conditions or the solution at the end of the step with the problem’s <code class="docutils literal notranslate"><span class="pre">plot</span></code> method. The
+figure is saved to <code class="docutils literal notranslate"><span class="pre">&lt;save_plot&gt;_&lt;counter&gt;.png</span></code> if <code class="docutils literal notranslate"><span class="pre">save_plot</span></code> is set, and shown for <code class="docutils literal notranslate"><span class="pre">live_plot</span></code> seconds if
+that is not <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – Number of current level</p></li>
+<li><p><strong>plot_ic</strong> (<em>bool</em>) – plot the initial conditions <code class="docutils literal notranslate"><span class="pre">u[0]</span></code> instead of the end point</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.plotting.PlottingHook.pre_run">
 <span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/plotting.html#PlottingHook.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.plotting.PlottingHook.pre_run" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called before time-loop starts</p>
+<dd><p>Get the figure to plot into from the problem’s <code class="docutils literal notranslate"><span class="pre">get_fig</span></code> method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
-<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – The current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – Number of current level</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

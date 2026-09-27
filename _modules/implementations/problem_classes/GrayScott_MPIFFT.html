@@ -123,6 +123,7 @@
         <span class="n">num_blobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine. ``kwargs`` are passed on to ``IMEX_Laplacian_MPIFFT``."""</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">'d'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">x0</span><span class="o">=-</span><span class="n">L</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># prepare the array with two components</span>
@@ -448,6 +449,15 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialization routine</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Passed on to ``grayscott_imex_diffusion``, see there. The linear reaction terms :math:`-A u` and</span>
+<span class="sd">            :math:`-B v` are then added to the implicit operators ``Ku`` and ``Kv``.</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span>

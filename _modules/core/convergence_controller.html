@@ -55,6 +55,10 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Args:</span>
+<span class="sd">            params (dict): Parameters to store as attributes, overriding the defaults</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># integer that determines the order in which the convergence controllers are called</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># depends on the controller</span>
 
@@ -76,6 +80,10 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_variabes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Args:</span>
+<span class="sd">            status_variabes (list of str): Names of the status variables, all initialized to None</span>
+<span class="sd">        """</span>
         <span class="p">[</span><span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">status_variabes</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span></div>
@@ -633,6 +641,19 @@
 <div class="viewcode-block" id="ConvergenceController.add_status_variable_to_step">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.add_status_variable_to_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_status_variable_to_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add a status variable to the steps of the controller and optionally set its value on all of them.</span>
+
+<span class="sd">        The variable is registered on the class of the step status, see `FrozenClass.add_attr`, so it exists on every</span>
+<span class="sd">        step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): Name of the status variable</span>
+<span class="sd">            value: Value to set on all steps, which is skipped if None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">steps</span>
 
         <span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">add_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -644,6 +665,16 @@
 <div class="viewcode-block" id="ConvergenceController.set_step_status_variable">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.set_step_status_variable">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_step_status_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Set a status variable on all steps of the controller.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): Name of the status variable, which must have been added already</span>
+<span class="sd">            value: Value to set</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">steps</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
@@ -653,6 +684,19 @@
 <div class="viewcode-block" id="ConvergenceController.add_status_variable_to_level">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.add_status_variable_to_level">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_status_variable_to_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add a status variable to the levels of the controller and optionally set its value on all of them.</span>
+
+<span class="sd">        The variable is registered on the class of the level status, see `FrozenClass.add_attr`, so it exists on every</span>
+<span class="sd">        level.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): Name of the status variable</span>
+<span class="sd">            value: Value to set on all levels of all steps, which is skipped if None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">steps</span>
 
         <span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">add_attr</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -664,6 +708,16 @@
 <div class="viewcode-block" id="ConvergenceController.set_level_status_variable">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.set_level_status_variable">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_level_status_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Set a status variable on all levels of all steps of the controller.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): Name of the status variable, which must have been added already</span>
+<span class="sd">            value: Value to set</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">steps</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>

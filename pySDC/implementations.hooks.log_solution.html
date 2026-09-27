@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=cd132f8b"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -119,18 +120,33 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.load">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.load" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Load a solution from <code class="docutils literal notranslate"><span class="pre">filename</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – the index of the time point in the file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the time <code class="docutils literal notranslate"><span class="pre">t</span></code> and the solution <code class="docutils literal notranslate"><span class="pre">u</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.post_run">
 <span class="sig-name descname"><span class="pre">post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile.post_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.post_run" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called after each run</p>
+<dd><p>Write the final solution of the finest level to file unless the file has it already.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -138,7 +154,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.post_step" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called after each step or block</p>
+<dd><p>Write the solution of the finest level to file once the end of the step has reached the next logging time and
+the step is not restarted, then move the next logging time on by <code class="docutils literal notranslate"><span class="pre">time_increment</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -146,19 +163,29 @@
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.errors.html#core.errors.DataError" title="core.errors.DataError"><strong>DataError</strong></a> – if the file already has a solution at this time and <code class="docutils literal notranslate"><span class="pre">allow_overwriting</span></code> is not set</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.pre_run">
 <span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.pre_run" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called before time-loop starts</p>
+<dd><p>Set up the output file on the finest level. If the file exists and the run does not start at <span class="math notranslate nohighlight">\(t=0\)</span>, it is
+opened to append to it. Otherwise, the problem creates a new file and the initial conditions are written to it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -206,27 +233,90 @@ sure to give a different <cite>file_name</cite> for each task that writes files.
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.format_index">
 <span class="sig-name descname"><span class="pre">format_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.format_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.format_index" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Render the file index for the file name. Called on the class, not an instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – the index of the file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the index padded with zeros to six digits</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.get_path">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.get_path" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the path to the file with a given index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – the index of the file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the path</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.load">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.load" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Load the data stored in the file with a given index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – the index of the file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the data as returned by <code class="docutils literal notranslate"><span class="pre">process_solution</span></code> when it was written</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.log_to_file">
 <span class="sig-name descname"><span class="pre">log_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_solution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.log_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.log_to_file" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Pickle the processed solution of the finest level to the file of the current <code class="docutils literal notranslate"><span class="pre">counter</span></code> and increment the
+counter. Nothing is written on coarser levels or if <code class="docutils literal notranslate"><span class="pre">condition</span></code> is false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+<li><p><strong>condition</strong> (<em>bool</em>) – whether to write the file</p></li>
+<li><p><strong>process_solution</strong> (<em>callable</em>) – replaces the class’s <code class="docutils literal notranslate"><span class="pre">process_solution</span></code> if given</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.logging_condition">
 <span class="sig-name descname"><span class="pre">logging_condition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.logging_condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.logging_condition" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Decide whether to log after a step. Called on the class, not an instance; the default logs every step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>L</strong> (<em>pySDC.Level.level</em>) – the level to log</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>whether to write a file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.path">
@@ -236,13 +326,16 @@ sure to give a different <cite>file_name</cite> for each task that writes files.
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.post_step" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called after each step or block</p>
+<dd><p>Write the solution at the end of the step to file if <code class="docutils literal notranslate"><span class="pre">logging_condition</span></code> allows it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -250,7 +343,8 @@ sure to give a different <cite>file_name</cite> for each task that writes files.
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.pre_run">
 <span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.pre_run" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called before time-loop starts</p>
+<dd><p>Write the initial conditions to file, stored with the time <code class="docutils literal notranslate"><span class="pre">L.time</span></code> at the start of the run. Sets <code class="docutils literal notranslate"><span class="pre">L.uend</span></code>
+to the initial conditions for this.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -258,13 +352,28 @@ sure to give a different <cite>file_name</cite> for each task that writes files.
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.process_solution">
 <span class="sig-name descname"><span class="pre">process_solution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.process_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.process_solution" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Data to store in a file. Called on the class, not an instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>L</strong> (<em>pySDC.Level.level</em>) – the level to log</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the time <code class="docutils literal notranslate"><span class="pre">t</span></code> at the end of the step and a numpy view <code class="docutils literal notranslate"><span class="pre">u</span></code> of <code class="docutils literal notranslate"><span class="pre">L.uend</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -276,7 +385,8 @@ sure to give a different <cite>file_name</cite> for each task that writes files.
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFileAfterXS.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFileAfterXS.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.post_step" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called after each step or block</p>
+<dd><p>Write the solution to file once the end of the step has reached the next logging time and the step is not
+restarted, then move the next logging time on by <code class="docutils literal notranslate"><span class="pre">time_increment</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -284,19 +394,25 @@ sure to give a different <cite>file_name</cite> for each task that writes files.
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFileAfterXS.pre_run">
 <span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFileAfterXS.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.pre_run" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called before time-loop starts</p>
+<dd><p>Write the initial conditions to file like the parent class, but only if <code class="docutils literal notranslate"><span class="pre">logging_condition</span></code> allows it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

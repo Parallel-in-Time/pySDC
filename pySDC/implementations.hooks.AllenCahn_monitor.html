@@ -84,7 +84,8 @@ counting is consistent and its <span class="math notranslate nohighlight">\(O(\D
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_radius">
 <span class="sig-name descname"><span class="pre">exact_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/AllenCahn_monitor.html#AllenCahnMonitor.exact_radius"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_radius" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Exact radius at time <code class="docutils literal notranslate"><span class="pre">t</span></code> under mean curvature flow, clipped at zero once the blob has vanished.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_radius_squared">
@@ -95,7 +96,8 @@ counting is consistent and its <span class="math notranslate nohighlight">\(O(\D
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_volume">
 <span class="sig-name descname"><span class="pre">exact_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/AllenCahn_monitor.html#AllenCahnMonitor.exact_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_volume" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Exact area (2D) or volume (3D) of the blob at time <code class="docutils literal notranslate"><span class="pre">t</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_diagnostics">
@@ -130,7 +132,7 @@ counting is consistent and its <span class="math notranslate nohighlight">\(O(\D
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/AllenCahn_monitor.html#AllenCahnMonitor.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.post_step" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called after each step or block</p>
+<dd><p>Record the diagnostics of the solution at the end of the step, at time <code class="docutils literal notranslate"><span class="pre">L.time</span> <span class="pre">+</span> <span class="pre">L.dt</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -144,7 +146,8 @@ counting is consistent and its <span class="math notranslate nohighlight">\(O(\D
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.pre_run">
 <span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/AllenCahn_monitor.html#AllenCahnMonitor.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.pre_run" title="Link to this definition">¶</a></dt>
-<dd><p>Default routine called before time-loop starts</p>
+<dd><p>Read the initial radius, phase threshold and dimension off the problem, and record the diagnostics of the
+initial condition if the run starts at <span class="math notranslate nohighlight">\(t = 0\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -164,7 +167,18 @@ counting is consistent and its <span class="math notranslate nohighlight">\(O(\D
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.record">
 <span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagnostics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/AllenCahn_monitor.html#AllenCahnMonitor.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.record" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Add each diagnostic to the stats, with its key as <code class="docutils literal notranslate"><span class="pre">type</span></code>, on level <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>L</strong> (<em>pySDC.Level.level</em>) – the finest level</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – the time the diagnostics refer to</p></li>
+<li><p><strong>diagnostics</strong> (<em>dict</em>) – stats entries as returned by <a class="reference internal" href="#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_diagnostics" title="implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_diagnostics"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_diagnostics()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

@@ -150,6 +150,16 @@
 <div class="viewcode-block" id="LogGlobalErrorPostStep.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostStep.post_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Record the global error after the step as ``e_global_post_step`` and ``e_global_rel_post_step``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_global_error</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="s1">'_post_step'</span><span class="p">)</span></div>
 </div>
@@ -283,6 +293,16 @@
 <div class="viewcode-block" id="LogLocalErrorPostStep.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogLocalErrorPostStep.post_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Record the local error after the step as ``e_local_post_step``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_local_error</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">'_post_step'</span><span class="p">)</span></div>
 </div>

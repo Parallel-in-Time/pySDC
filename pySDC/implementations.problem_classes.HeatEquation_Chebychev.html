@@ -68,19 +68,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat1DChebychev.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dd><p>Evaluate the right hand side nu u_xx, computed as nu times the Chebychev derivative of the auxiliary component
+<cite>ux</cite>. The algebraic <cite>ux</cite> equation gets zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p></li>
+<li><p><strong>*args</strong> – Not used, the right hand side does not depend on time</p></li>
+<li><p><strong>**kwargs</strong> – Not used, the right hand side does not depend on time</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+<dd class="field-even"><p>The right hand side, in the same space as <cite>u</cite></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_f" title="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_f">dtype_f</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_f" title="implementations.problem_classes.HeatEquation_Chebychev.Heat1DChebychev.dtype_f">Heat1DChebychev.dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -128,19 +130,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat1DUltraspherical.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dd><p>Evaluate the right hand side nu u_xx with the ultraspherical second derivative matrix, converted back to the
+Chebychev basis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_u"><em>dtype_u</em></a>) – Solution, in spectral space if <cite>spectral_space</cite> is set, else in physical space</p></li>
+<li><p><strong>*args</strong> – Not used, the right hand side does not depend on time</p></li>
+<li><p><strong>**kwargs</strong> – Not used, the right hand side does not depend on time</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+<dd class="field-even"><p>The right hand side, in the same space as <cite>u</cite></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_f" title="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_f">dtype_f</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_f" title="implementations.problem_classes.HeatEquation_Chebychev.Heat1DUltraspherical.dtype_f">Heat1DUltraspherical.dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -189,19 +193,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DChebychev.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dd><p>Evaluate the right hand side nu (u_xx + u_yy), computed by spectral differentiation of the auxiliary components
+<cite>ux</cite> and <cite>uy</cite>. The algebraic <cite>ux</cite> and <cite>uy</cite> equations get zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u"><em>dtype_u</em></a>) – Solution in physical space</p></li>
+<li><p><strong>*args</strong> – Not used, the right hand side does not depend on time</p></li>
+<li><p><strong>**kwargs</strong> – Not used, the right hand side does not depend on time</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+<dd class="field-even"><p>The right hand side in physical space</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_f" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_f">dtype_f</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_f" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_f">Heat2DChebychev.dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -209,7 +215,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DChebychev.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.u_exact" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the exact solution at time <cite>t</cite>: sin(fx x) sin(fy y) exp(-nu (fx^2 + fy^2) t) plus the linear function in x
+and y that satisfies the boundary conditions, where the frequencies are multiplied by pi in Chebychev
+directions. The components <cite>ux</cite> and <cite>uy</cite> are set to the derivatives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – When you want the exact solution</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exact solution in physical space</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev.dtype_u">Heat2DChebychev.dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -234,19 +254,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DUltraspherical.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.eval_f" title="Link to this definition">¶</a></dt>
-<dd><p>Abstract interface to RHS computation of the ODE</p>
+<dd><p>Evaluate the right hand side nu (u_xx + u_yy) with the ultraspherical second derivative matrices, converted back
+to the Chebychev basis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u"><em>dtype_u</em></a>) – Current values.</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – Current time.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u"><em>dtype_u</em></a>) – Solution in physical space</p></li>
+<li><p><strong>*args</strong> – Not used, the right hand side does not depend on time</p></li>
+<li><p><strong>**kwargs</strong> – Not used, the right hand side does not depend on time</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> – The RHS values.</p>
+<dd class="field-even"><p>The right hand side in physical space</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_f" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_f">dtype_f</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_f" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_f">Heat2DUltraspherical.dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -254,7 +276,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_Chebychev.html#Heat2DUltraspherical.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.u_exact" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the exact solution at time <cite>t</cite>: sin(fx x) sin(fy y) exp(-nu (fx^2 + fy^2) t) plus the linear function in x
+and y that satisfies the boundary conditions, where the frequencies are multiplied by pi in ultraspherical
+directions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – When you want the exact solution</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exact solution in physical space</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u" title="implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical.dtype_u">Heat2DUltraspherical.dtype_u</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

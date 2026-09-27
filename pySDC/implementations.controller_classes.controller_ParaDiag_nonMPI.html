@@ -129,7 +129,16 @@ iteration will be done.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians">
 <span class="sig-name descname"><span class="pre">prepare_Jacobians</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_ParaDiag_nonMPI.html#controller_ParaDiag_nonMPI.prepare_Jacobians"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Average the solution over the steps of the block, node by node, for constructing average Jacobians.</p>
+<p>Does nothing unless <cite>average_jacobian</cite> is set. Stores the list of averages as <cite>u_avg</cite> on the finest level of
+every
+running step, which all share the same list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.set_G_inv">

@@ -209,6 +209,16 @@
 <div class="viewcode-block" id="controller_ParaDiag_nonMPI.prepare_Jacobians">
 <a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.controller_ParaDiag_nonMPI.html#implementations.controller_classes.controller_ParaDiag_nonMPI.controller_ParaDiag_nonMPI.prepare_Jacobians">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_Jacobians</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Average the solution over the steps of the block, node by node, for constructing average Jacobians.</span>
+
+<span class="sd">        Does nothing unless `average_jacobian` is set. Stores the list of averages as `u_avg` on the finest level of</span>
+<span class="sd">        every</span>
+<span class="sd">        running step, which all share the same list.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            local_MS_running (list): list of currently running steps</span>
+<span class="sd">        """</span>
         <span class="c1"># get solutions for constructing average Jacobians</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">average_jacobian</span><span class="p">:</span>
             <span class="n">level</span> <span class="o">=</span> <span class="n">local_MS_running</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

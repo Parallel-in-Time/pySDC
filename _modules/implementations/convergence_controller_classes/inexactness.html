@@ -133,12 +133,32 @@
 <div class="viewcode-block" id="NewtonInexactness.set_tolerance">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_tolerance">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lvl</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Set the tolerance of the Newton solver of the problem.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lvl (pySDC.Level): The level whose problem to change</span>
+<span class="sd">            tol (float): The new tolerance</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">newton_tol</span> <span class="o">=</span> <span class="n">tol</span></div>
 
 
 <div class="viewcode-block" id="NewtonInexactness.set_maxiter">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.inexactness.html#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_maxiter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">maxiter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Set the maximum number of Newton iterations in the problem parameters of the description.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+<span class="sd">            maxiter (int): The maximum number of Newton iterations</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'newton_maxiter'</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxiter</span></div>
 </div>
 

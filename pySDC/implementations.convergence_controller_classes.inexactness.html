@@ -91,12 +91,36 @@ Be aware that the problem needs a parameter called “newton_tol” which contro
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter">
 <span class="sig-name descname"><span class="pre">set_maxiter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/inexactness.html#NewtonInexactness.set_maxiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_maxiter" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set the maximum number of Newton iterations in the problem parameters of the description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>description</strong> (<em>dict</em>) – The description object used to instantiate the controller</p></li>
+<li><p><strong>maxiter</strong> (<em>int</em>) – The maximum number of Newton iterations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_tolerance">
 <span class="sig-name descname"><span class="pre">set_tolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lvl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/inexactness.html#NewtonInexactness.set_tolerance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.inexactness.NewtonInexactness.set_tolerance" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set the tolerance of the Newton solver of the problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lvl</strong> (<em>pySDC.Level</em>) – The level whose problem to change</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – The new tolerance</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.inexactness.NewtonInexactness.setup">

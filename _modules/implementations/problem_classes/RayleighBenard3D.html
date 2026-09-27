@@ -64,7 +64,8 @@
 <span class="sd">        v_t - nu (v_xx + v_yy + v_zz) + p_y = -uv_x - vv_y - wv_z</span>
 <span class="sd">        w_t - nu (w_xx + w_yy + w_zz) + p_z - T = -uw_x - vw_y - ww_z</span>
 
-<span class="sd">    with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices</span>
+<span class="sd">    with u and v the horizontal velocities (in x and y), w the vertical velocity (in z), T the temperature, p the</span>
+<span class="sd">    pressure, indices</span>
 <span class="sd">    denoting derivatives, kappa=(Rayleigh * Prandtl)**(-1/2) and nu = (Rayleigh / Prandtl)**(-1/2). Everything on the left</span>
 <span class="sd">    hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated</span>
 <span class="sd">    implicitly, while the non-linear convection part on the right hand side is integrated explicitly.</span>
@@ -74,7 +75,7 @@
 <span class="sd">        Omega = [0, Lx) x [0, Ly] x (0, Lz)</span>
 <span class="sd">        T(z=+1) = 0</span>
 <span class="sd">        T(z=-1) = Lz</span>
-<span class="sd">        u(z=+-1) = v(z=+-1) = 0</span>
+<span class="sd">        u(z=+-1) = v(z=+-1) = w(z=+-1) = 0</span>
 <span class="sd">        integral over p = 0</span>
 
 <span class="sd">    The spectral discretization uses FFT horizontally, implying periodic BCs, and an ultraspherical method vertically to</span>
@@ -265,6 +266,21 @@
 <div class="viewcode-block" id="RayleighBenard3D.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right hand side, split into an implicit and an explicit part.</span>
+
+<span class="sd">        The implicit part is -L u, i.e. diffusion, pressure gradient, buoyancy and, in the pressure line, the negative</span>
+<span class="sd">        divergence, converted back to the Chebychev-T basis. The explicit part is the advection -(u d/dx + v d/dy + w</span>
+<span class="sd">        d/dz) of u, v, w and T, computed in physical space on a grid padded by the dealiasing factor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+<span class="sd">            *args: Not used, the right hand side does not depend on time</span>
+<span class="sd">            **kwargs: Not used, the right hand side does not depend on time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: The right hand side, in the same space as `u`</span>
+<span class="sd">        """</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
@@ -322,6 +338,19 @@
 <div class="viewcode-block" id="RayleighBenard3D.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">99</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initial conditions, which are only available at t=0 and for Lz=1. Velocities and temperature are linear in z</span>
+<span class="sd">        between their boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly</span>
+<span class="sd">        distributed noise, multiplied by `noise_level` and (z - 1) (z + 1).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): Time, has to be 0</span>
+<span class="sd">            noise_level (float): Amplitude of the noise</span>
+<span class="sd">            seed (int): Seed for the random number generator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: Initial conditions, in spectral space if `spectral_space` is set, else in physical space</span>
+<span class="sd">        """</span>
         <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">'v_top'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">BCs</span><span class="p">[</span><span class="s1">'v_bottom'</span><span class="p">]</span>
@@ -525,6 +554,17 @@
 <div class="viewcode-block" id="RayleighBenard3D.get_vertical_profiles">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_vertical_profiles">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_vertical_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">components</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute horizontally averaged vertical profiles from the horizontal mean mode of each component, transformed to</span>
+<span class="sd">        physical space in z and broadcast from rank 0, which holds the mean mode.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space</span>
+<span class="sd">            components (list of str): Names of the components you want the profiles of</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Profile along z for each component, as xp.ndarray</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
             <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>

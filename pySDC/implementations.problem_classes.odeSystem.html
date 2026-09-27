@@ -414,27 +414,98 @@ pp. 145–162.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dg">
 <span class="sig-name descname"><span class="pre">dg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.dg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dg" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>First derivative <span class="math notranslate nohighlight">\(g'(t) = -\sin(t)\)</span> of <span class="math notranslate nohighlight">\(g\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of <span class="math notranslate nohighlight">\(g'(t)\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dg2">
 <span class="sig-name descname"><span class="pre">dg2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.dg2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dg2" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Second derivative <span class="math notranslate nohighlight">\(g''(t) = -\cos(t)\)</span> of <span class="math notranslate nohighlight">\(g\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of <span class="math notranslate nohighlight">\(g''(t)\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv">
 <span class="sig-name descname"><span class="pre">dgInv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.dgInv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Inverse Jacobian of the Newton function, replaced in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> by <code class="docutils literal notranslate"><span class="pre">dgInv_LIN</span></code> or <code class="docutils literal notranslate"><span class="pre">dgInv_NONLIN</span></code>, which
+also take the step size <code class="docutils literal notranslate"><span class="pre">dt</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>float</em>) – First solution component <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Second solution component <span class="math notranslate nohighlight">\(v\)</span>, which equals the time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – Always.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv_LIN">
 <span class="sig-name descname"><span class="pre">dgInv_LIN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.dgInv_LIN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv_LIN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Inverse of the Jacobian of the Newton function <span class="math notranslate nohighlight">\(G(u, v) = (u, v) - dt f(u, v) - rhs\)</span> of <code class="docutils literal notranslate"><span class="pre">solve_system</span></code>
+for the linear form, which does not depend on <span class="math notranslate nohighlight">\(u\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>float</em>) – First solution component <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Second solution component <span class="math notranslate nohighlight">\(v\)</span>, which equals the time.</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The inverse of the <span class="math notranslate nohighlight">\(2 \times 2\)</span> Jacobian.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.2darray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv_NONLIN">
 <span class="sig-name descname"><span class="pre">dgInv_NONLIN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.dgInv_NONLIN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv_NONLIN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Inverse of the Jacobian of the Newton function <span class="math notranslate nohighlight">\(G(u, v) = (u, v) - dt f(u, v) - rhs\)</span> of <code class="docutils literal notranslate"><span class="pre">solve_system</span></code>
+for the nonlinear form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>float</em>) – First solution component <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Second solution component <span class="math notranslate nohighlight">\(v\)</span>, which equals the time.</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The inverse of the <span class="math notranslate nohighlight">\(2 \times 2\)</span> Jacobian.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.2darray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dtype_f">
@@ -471,22 +542,76 @@ pp. 145–162.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f">
 <span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Right-hand side of the first component, replaced in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> by <code class="docutils literal notranslate"><span class="pre">f_LIN</span></code> or <code class="docutils literal notranslate"><span class="pre">f_NONLIN</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>float</em>) – First solution component <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Second solution component <span class="math notranslate nohighlight">\(v\)</span>, which equals the time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – Always.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f_LIN">
 <span class="sig-name descname"><span class="pre">f_LIN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.f_LIN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f_LIN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Right-hand side <span class="math notranslate nohighlight">\(-(u - g(v)) / \epsilon + g'(v)\)</span> of the first component in the linear form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>float</em>) – First solution component <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Second solution component <span class="math notranslate nohighlight">\(v\)</span>, which equals the time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The right-hand side of the first component.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f_NONLIN">
 <span class="sig-name descname"><span class="pre">f_NONLIN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.f_NONLIN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.f_NONLIN" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Right-hand side <span class="math notranslate nohighlight">\(-(u^3 - g(v)^3) / \epsilon + g'(v)\)</span> of the first component in the nonlinear form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>float</em>) – First solution component <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Second solution component <span class="math notranslate nohighlight">\(v\)</span>, which equals the time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The right-hand side of the first component.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.g">
 <span class="sig-name descname"><span class="pre">g</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.g"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.g" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function <span class="math notranslate nohighlight">\(g(t) = \cos(t)\)</span>, which is the exact solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of <span class="math notranslate nohighlight">\(g(t)\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.solve_system">

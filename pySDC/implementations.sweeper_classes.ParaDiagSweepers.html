@@ -86,10 +86,16 @@ numpy.ndarray: Inverse of S</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.compute_residual">
 <span class="sig-name descname"><span class="pre">compute_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.compute_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.compute_residual" title="Link to this definition">¶</a></dt>
-<dd><p>Computation of the residual using the collocation matrix Q</p>
+<dd><p>Evaluate the right hand side at all nodes and then compute the residual as in the base class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>stage</strong> (<em>str</em>) – The current stage of the step the level belongs to</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> – passed on to the base class method, typically the stage (str)</p></li>
+<li><p><strong>**kwargs</strong> – passed on to the base class method</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -97,7 +103,13 @@ numpy.ndarray: Inverse of S</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.eval_f_at_all_nodes">
 <span class="sig-name descname"><span class="pre">eval_f_at_all_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.eval_f_at_all_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.eval_f_at_all_nodes" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Evaluate the right hand side at all collocation nodes, since the solve does not do this by default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.get_residual">

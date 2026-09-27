@@ -68,6 +68,7 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Start counting at zero."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">niter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -77,6 +78,7 @@
 <div class="viewcode-block" id="WorkCounter.decrement">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.WorkCounter.decrement">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">decrement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Decrease `niter` by one, e.g. to take back a count."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">-=</span> <span class="mi">1</span></div>
 
 
@@ -141,6 +143,7 @@
     <span class="n">dtype_f</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Store `init`, see the class docstring, and start without work counters."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">WorkCounter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Dictionary to store WorkCounter objects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">init</span>  <span class="c1"># Initialization parameter to instantiate data types</span>
 
@@ -158,6 +161,19 @@
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.get_default_sweeper_class">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_default_sweeper_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the sweeper class to use with this problem if none is given, e.g. in `pySDC.helpers.setup_helper`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        type</span>
+<span class="sd">            Sweeper class.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the problem class does not define a default.</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'No default sweeper class implemented for </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s1"> problem!'</span><span class="p">)</span></div>
 
 
@@ -173,12 +189,38 @@
 <div class="viewcode-block" id="Problem.getOutputFile">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.getOutputFile">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getOutputFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Create the file the `LogToFile` hook writes the solution to. Implemented by problems that support file output.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fileName : str</span>
+<span class="sd">            Name of the file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pySDC.helpers.fieldsIO.FieldsIO</span>
+<span class="sd">            File object with the header set and initialized.</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'No output implemented file for </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Problem.processSolutionForOutput">
 <a class="viewcode-back" href="../../pySDC/core.problem.html#core.problem.Problem.processSolutionForOutput">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">processSolutionForOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Convert a solution to the data written to the file from `getOutputFile`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            Data to write, `u` itself by default.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">u</span></div>
 
 

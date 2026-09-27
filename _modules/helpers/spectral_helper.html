@@ -214,12 +214,24 @@
 <div class="viewcode-block" id="SpectralHelper1D.get_differentiation_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_differentiation_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_differentiation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the differentiation matrix of this basis. Implemented by the derived bases.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            sparse differentiation matrix</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper1D.get_integration_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.get_integration_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_integration_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the integration matrix of this basis. Implemented by the derived bases.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            sparse integration matrix</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 
@@ -1000,6 +1012,20 @@
 <div class="viewcode-block" id="FFTHelper.get_plan">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_plan">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get a callable that computes the FFT of data like `u`.</span>
+
+<span class="sd">        With FFTW, the planned transform is cached in `self.plans` by direction, shape of `u` and the other arguments.</span>
+<span class="sd">        Otherwise, this is `fftn` or `ifftn` of the FFT library with the `norm` from `kwargs`, "backward" and "forward"</span>
+<span class="sd">        by default, so that neither direction normalizes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u: Data to transform</span>
+<span class="sd">            forward (bool): Forward transform if True, inverse transform otherwise</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            callable transform</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_lib</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'mpi4py_fft.fftw'</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">'axes'</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">'axes'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'axes'</span><span class="p">])</span>
@@ -1258,10 +1284,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Number of dimensions, i.e. of 1D bases"""</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ncomponents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Number of solution components"""</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -1762,6 +1790,15 @@
 <div class="viewcode-block" id="SpectralHelper.get_indices">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_indices">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward_output</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the global indices of the modes or grid points held by this rank in each axis.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            forward_output (bool): Indices in spectral space if True, in physical space otherwise</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of self.xp.ndarray: Indices in each axis</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">N</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">local_slice</span><span class="p">(</span><span class="n">forward_output</span><span class="p">)[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">))]</span></div>
 
 
@@ -1769,6 +1806,18 @@
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_pfft">[docs]</a>
     <span class="nd">@cache</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_pfft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get a cached distributed transform object from mpi4py-fft, planned by one forward and backward transform.</span>
+<span class="sd">        Axes that are not in `axes` are not transformed. The arguments must be hashable, e.g. tuples.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            axes (tuple): Axes to transform, all by default</span>
+<span class="sd">            padding (tuple): Padding factor in each axis for dealiasing, none by default</span>
+<span class="sd">            grid (tuple): Processor grid, passed on to `PFFT`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pySDC.helpers.fft_helper.PFFT: Transform object, or None in 1D or without a communicator</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py_fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">newDistArray</span>
@@ -1879,6 +1928,15 @@
 <div class="viewcode-block" id="SpectralHelper.local_slice">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.local_slice">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">local_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward_output</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the slices of the global data held by this rank.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            forward_output (bool): Slices in spectral space if True, in physical space otherwise</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of slice: Local slice in each axis</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_obj</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pfft</span><span class="p">()</span><span class="o">.</span><span class="n">local_slice</span><span class="p">(</span><span class="n">forward_output</span><span class="o">=</span><span class="n">forward_output</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1888,6 +1946,15 @@
 <div class="viewcode-block" id="SpectralHelper.global_slice">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.global_slice">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">global_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forward_output</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get slices spanning the global data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            forward_output (bool): Slices in spectral space if True, in physical space otherwise</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of slice: Global slice in each axis</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_obj</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_obj</span><span class="o">.</span><span class="n">global_shape</span><span class="p">(</span><span class="n">forward_output</span><span class="o">=</span><span class="n">forward_output</span><span class="p">)]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1985,6 +2052,20 @@
 <div class="viewcode-block" id="SpectralHelper.infer_alignment">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.infer_alignment">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">infer_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">forward_output</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Find the axes in which `u` is not distributed, by comparing its local shape to the global shape of arrays of the</span>
+<span class="sd">        transform object from `get_pfft`. With `padding`, transforms padded in subsets of the axes are tried until one</span>
+<span class="sd">        fits.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u: Data with the solution components in the first axis</span>
+<span class="sd">            forward_output (bool): Compare to arrays in spectral space if True, in physical space otherwise</span>
+<span class="sd">            padding (tuple): Padding factor in each axis</span>
+<span class="sd">            **kwargs: Passed on to `get_pfft`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of int: Aligned axes, not counting the component axis, or [0] without a communicator</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -2028,6 +2109,18 @@
 <div class="viewcode-block" id="SpectralHelper.redistribute">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.redistribute">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">redistribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">forward_output</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Copy `u` into a new distributed array aligned in `axis`, i.e. not distributed in that axis.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u: Data with the solution components in the first axis</span>
+<span class="sd">            axis (int): Axis to align in</span>
+<span class="sd">            forward_output (bool): Layout of the new array: spectral space if True, physical space otherwise</span>
+<span class="sd">            **kwargs: Passed on to `get_pfft`, e.g. `padding`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mpi4py_fft.DistArray: Redistributed copy of `u`, or `u` itself without a communicator</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">u</span>
 
@@ -2056,6 +2149,19 @@
 <div class="viewcode-block" id="SpectralHelper.transform">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.transform">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Transform all solution components from physical to spectral space along `axes`.</span>
+<span class="sd">        With a distributed transform, `u` is first redistributed if its local shape does not fit.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u: Data with the solution components in the first axis</span>
+<span class="sd">            axes (tuple): Axes to transform, all by default</span>
+<span class="sd">            padding (tuple): Padding factor in each axis for dealiasing, only used with a distributed transform</span>
+<span class="sd">            **kwargs: Passed on to `get_pfft`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Transformed data in a new array, which is distributed if the transform is</span>
+<span class="sd">        """</span>
         <span class="n">pfft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pfft</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">pfft</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2085,6 +2191,21 @@
 <div class="viewcode-block" id="SpectralHelper.itransform">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.itransform">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">itransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Transform all solution components from spectral to physical space along `axes`, the inverse of `transform`.</span>
+<span class="sd">        With a distributed transform, `u` is first redistributed if its local shape does not fit.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u: Data with the solution components in the first axis</span>
+<span class="sd">            axes (tuple): Axes to transform, all by default</span>
+<span class="sd">            padding (tuple): Padding factor in each axis for dealiasing, only used with a distributed transform. The</span>
+<span class="sd">                padded</span>
+<span class="sd">                resolution must be an integer.</span>
+<span class="sd">            **kwargs: Passed on to `get_pfft`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Transformed data in a new array, which is distributed if the transform is</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">padding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">N</span> <span class="o">*</span> <span class="n">padding</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
@@ -2136,6 +2257,17 @@
 <div class="viewcode-block" id="SpectralHelper.expand_matrix_ND">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.expand_matrix_ND">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">expand_matrix_ND</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">aligned</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Expand a global 1D matrix acting along axis `aligned` to the local part of the ND matrix, by Kronecker products</span>
+<span class="sd">        with identities in the other axes. Uses the local slices in spectral space in every axis.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            matrix (sparse matrix): Global 1D matrix</span>
+<span class="sd">            aligned (int): Axis the matrix acts along</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            sparse local ND matrix in CSC format</span>
+<span class="sd">        """</span>
         <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span>
         <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">),</span> <span class="n">aligned</span><span class="p">)</span>
         <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>

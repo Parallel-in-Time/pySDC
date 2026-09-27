@@ -179,6 +179,19 @@
 <div class="viewcode-block" id="get_G_inv_matrix">
 <a class="viewcode-back" href="../../pySDC/helpers.ParaDiagHelper.html#helpers.ParaDiagHelper.get_G_inv_matrix">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_G_inv_matrix</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">sweeper_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Get the inverse of the preconditioner of the collocation problem of step `l` after diagonalization in time.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        l (int): Index of the step in the block</span>
+<span class="sd">        L (int): Number of steps in the block</span>
+<span class="sd">        alpha (float): alpha parameter in ParaDiag</span>
+<span class="sd">        sweeper_params (dict): Parameters for the sweeper, needs `num_nodes` and `quad_type='RADAU-RIGHT'`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Dense matrix (I + d_l H)^-1 of shape (num_nodes, num_nodes), with d_l the `l`-th eigenvalue of</span>
+<span class="sd">        the alpha-circulant `E` from `get_E_matrix` and H from `get_H_matrix`</span>
+<span class="sd">    """</span>
     <span class="n">M</span> <span class="o">=</span> <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span>
     <span class="n">I_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
     <span class="n">E_alpha</span> <span class="o">=</span> <span class="n">get_E_matrix</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>

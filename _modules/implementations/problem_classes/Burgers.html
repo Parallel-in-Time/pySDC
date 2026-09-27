@@ -111,6 +111,25 @@
 <div class="viewcode-block" id="Burgers1D.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers1D.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Routine to return the initial conditions at :math:`t=0` or the stationary solution for :math:`t=\infty`.</span>
+
+<span class="sd">        At :math:`t=0`, ``u`` is the linear function through the boundary values multiplied by :math:`\cos(\pi f x)`,</span>
+<span class="sd">        and ``ux`` is its derivative. For ``t=np.inf``, which requires ``f=0`` and ``BCl=-BCr``, ``u`` is the stationary</span>
+<span class="sd">        viscous shock connecting the boundary values and ``ux`` is left zero. Other times are not implemented.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float, optional</span>
+<span class="sd">            Time, either ``0`` or ``np.inf``.</span>
+<span class="sd">        *args, **kwargs</span>
+<span class="sd">            Not used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The solution in physical space.</span>
+<span class="sd">        """</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
 
         <span class="c1"># x = (self.x + 1) / 2</span>
@@ -142,6 +161,25 @@
 <div class="viewcode-block" id="Burgers1D.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers1D.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Routine to evaluate the right-hand side, split into diffusion and advection.</span>
+
+<span class="sd">        The implicit part of the ``u`` equation is the diffusion :math:`\varepsilon \partial_x u_x`, computed by</span>
+<span class="sd">        applying the Chebychev differentiation matrix to the auxiliary component ``ux``. The explicit part is the</span>
+<span class="sd">        advection :math:`-u u_x`, computed pointwise. The algebraic ``ux`` equation gets zero in both parts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution, in physical space.</span>
+<span class="sd">        *args, **kwargs</span>
+<span class="sd">            Not used, the right-hand side does not depend on time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side, with ``impl`` and ``expl`` parts.</span>
+<span class="sd">        """</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
         <span class="n">iu</span><span class="p">,</span> <span class="n">iux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">'u'</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">'ux'</span><span class="p">)</span>
 
@@ -220,11 +258,11 @@
 <span class="sd">       nx (int): Spatial resolution in x direction</span>
 <span class="sd">       nz (int): Spatial resolution in z direction</span>
 <span class="sd">       epsilon (float): viscosity</span>
-<span class="sd">       BCl (float): Value at left boundary</span>
-<span class="sd">       BCr (float): Value at right boundary</span>
 <span class="sd">       fux (int): Frequency of the initial conditions in x-direction</span>
 <span class="sd">       fuz (int): Frequency of the initial conditions in z-direction</span>
 <span class="sd">       mode (str): 'T2U' or 'T2T'. Use 'T2U' to get sparse differentiation matrices</span>
+
+<span class="sd">    The boundary conditions are fixed: u = 0 at z = -1 and z = 1, v = -1 at z = -1 and v = 1 at z = 1.</span>
 <span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -294,6 +332,27 @@
 <div class="viewcode-block" id="Burgers2D.u_exact">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">noise_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Routine to return the initial conditions, which are only implemented for :math:`t=0`.</span>
+
+<span class="sd">        ``u`` is :math:`\cos(f_{ux} x) \sin(\pi f_{uz} z)` plus ``BCtopu``, ``v`` is linear in :math:`z` between</span>
+<span class="sd">        ``BCbottom`` and ``BCtop``, and the derivative components are set accordingly. Seeded normally distributed</span>
+<span class="sd">        noise, multiplied by :math:`(z-1)(z+1)`, can be added to ``v``; its derivatives are not updated for the noise.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float, optional</span>
+<span class="sd">            Time, has to be ``0``.</span>
+<span class="sd">        *args, **kwargs</span>
+<span class="sd">            Not used.</span>
+<span class="sd">        noise_level : float, optional</span>
+<span class="sd">            Amplitude of the noise added to ``v``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The initial conditions in physical space.</span>
+<span class="sd">        """</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
 
         <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">iux</span><span class="p">,</span> <span class="n">iuz</span><span class="p">,</span> <span class="n">ivx</span><span class="p">,</span> <span class="n">ivz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
@@ -318,6 +377,26 @@
 <div class="viewcode-block" id="Burgers2D.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D.eval_f">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Routine to evaluate the right-hand side, split into diffusion and advection.</span>
+
+<span class="sd">        The implicit part is the diffusion :math:`\varepsilon (\partial_x w_x + \partial_z w_z)` of both velocity</span>
+<span class="sd">        components :math:`w=u,v`, computed by spectral differentiation of the auxiliary derivative components. The</span>
+<span class="sd">        explicit part is the advection :math:`-(u \partial_x w + v \partial_z w)`, computed pointwise. The algebraic</span>
+<span class="sd">        derivative equations get zero in both parts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution, in physical space.</span>
+<span class="sd">        *args, **kwargs</span>
+<span class="sd">            Not used, the right-hand side does not depend on time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The right-hand side, with ``impl`` and ``expl`` parts.</span>
+<span class="sd">        """</span>
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_init</span>
         <span class="n">iu</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">iux</span><span class="p">,</span> <span class="n">iuz</span><span class="p">,</span> <span class="n">ivx</span><span class="p">,</span> <span class="n">ivz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
 
@@ -339,6 +418,20 @@
 <div class="viewcode-block" id="Burgers2D.compute_vorticity">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D.compute_vorticity">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_vorticity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Compute the vorticity from the velocity components by spectral differentiation, as :math:`\partial_x v +</span>
+<span class="sd">        \partial_z u`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Solution in physical space.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        vorticity : np.2darray</span>
+<span class="sd">            The vorticity in physical space.</span>
+<span class="sd">        """</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init_forward</span>
 
         <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>

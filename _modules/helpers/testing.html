@@ -97,6 +97,12 @@
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filePath</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filePath : str</span>
+<span class="sd">            Absolute path of the calling script, usually `__file__`. The data files are in its directory.</span>
+<span class="sd">        """</span>
         <span class="n">path</span> <span class="o">=</span> <span class="s1">'/'</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">filePath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># cache for data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataRef</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># cache for reference data</span>
