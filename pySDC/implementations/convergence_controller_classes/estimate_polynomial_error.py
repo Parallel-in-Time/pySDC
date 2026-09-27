@@ -14,7 +14,7 @@ class EstimatePolynomialError(ConvergenceController):
     instance.
     If the last node is not the end point, we can interpolate to that node, which is an order M approximation and compare
     to the order 2M approximation we get from the extrapolation step.
-    By default, we interpolate to the second to last node.
+    By default, we interpolate to the second to last node, or to the end point for Gauss nodes, where it is not a node.
     """
 
     def setup(self, controller, params, description, **kwargs):

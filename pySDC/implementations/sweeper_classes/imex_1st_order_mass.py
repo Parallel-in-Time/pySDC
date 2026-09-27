@@ -6,6 +6,9 @@ class imex_1st_order_mass(imex_1st_order):
     Custom sweeper class, implements Sweeper.py
 
     First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix
+
+    The end point is only available as a copy of the last node: ``compute_end_point`` raises unless the right end of
+    the interval is a node and ``do_coll_update`` is off.
     """
 
     def update_nodes(self):
@@ -71,7 +74,8 @@ class imex_1st_order_mass(imex_1st_order):
         """
         Compute u at the right point of the interval
 
-        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
+        This is a copy of the last node. The mass matrix sweeper does not support the collocation update, so this
+        raises unless the right end of the interval is a node and do_coll_update is False.
 
         Returns:
             None

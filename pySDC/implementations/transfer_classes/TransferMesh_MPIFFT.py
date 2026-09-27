@@ -9,7 +9,8 @@ class fft_to_fft(SpaceTransfer):
     """
     Custom base_transfer class, implements Transfer.py
 
-    This implementation can restrict and prolong between PMESH datatypes meshes with FFT for periodic boundaries
+    This implementation can restrict and prolong between ``mesh`` or ``cupy_mesh`` datatypes, or datatypes made of
+    several such components, with FFT for periodic boundaries
 
     """
 

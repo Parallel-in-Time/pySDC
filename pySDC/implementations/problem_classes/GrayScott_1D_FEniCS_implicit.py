@@ -15,7 +15,7 @@ class fenics_grayscott(Problem):
     The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
-    :math:`u,\, v`. This process is described by the one-dimensional model using Dirichlet boundary conditions
+    :math:`u,\, v`. This process is described by the one-dimensional model with homogeneous Neumann boundary conditions
 
     .. math::
         \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
@@ -32,7 +32,8 @@ class fenics_grayscott(Problem):
     .. math::
         \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,
 
-    The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.
+    The Laplacians are integrated by parts, and no Dirichlet conditions are imposed, so the boundary terms drop out and
+    the boundaries are zero-flux. The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.
 
     Parameters
     ----------

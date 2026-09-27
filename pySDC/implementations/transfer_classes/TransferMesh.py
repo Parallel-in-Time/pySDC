@@ -33,8 +33,8 @@ class mesh_to_mesh(SpaceTransfer):
     via matrix-vector products.
 
     Attributes:
-        Rspace: spatial restriction matrix, dim. Nf x Nc
-        Pspace: spatial prolongation matrix, dim. Nc x Nf
+        Rspace: spatial restriction matrix, dim. Nc x Nf
+        Pspace: spatial prolongation matrix, dim. Nf x Nc
     """
 
     def __init__(self, fine_prob, coarse_prob, params):

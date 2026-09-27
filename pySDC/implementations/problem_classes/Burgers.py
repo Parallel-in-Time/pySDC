@@ -158,11 +158,11 @@ class Burgers2D(GenericSpectralLinear):
        nx (int): Spatial resolution in x direction
        nz (int): Spatial resolution in z direction
        epsilon (float): viscosity
-       BCl (float): Value at left boundary
-       BCr (float): Value at right boundary
        fux (int): Frequency of the initial conditions in x-direction
        fuz (int): Frequency of the initial conditions in z-direction
        mode (str): 'T2U' or 'T2T'. Use 'T2U' to get sparse differentiation matrices
+
+    The boundary conditions are fixed: u = 0 at z = -1 and z = 1, v = -1 at z = -1 and v = 1 at z = 1.
     """
 
     dtype_u = mesh

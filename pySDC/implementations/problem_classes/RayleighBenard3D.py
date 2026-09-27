@@ -21,7 +21,8 @@ class RayleighBenard3D(GenericSpectralLinear):
         v_t - nu (v_xx + v_yy + v_zz) + p_y = -uv_x - vv_y - wv_z
         w_t - nu (w_xx + w_yy + w_zz) + p_z - T = -uw_x - vw_y - ww_z
 
-    with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices
+    with u and v the horizontal velocities (in x and y), w the vertical velocity (in z), T the temperature, p the
+    pressure, indices
     denoting derivatives, kappa=(Rayleigh * Prandtl)**(-1/2) and nu = (Rayleigh / Prandtl)**(-1/2). Everything on the left
     hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated
     implicitly, while the non-linear convection part on the right hand side is integrated explicitly.
@@ -31,7 +32,7 @@ class RayleighBenard3D(GenericSpectralLinear):
         Omega = [0, Lx) x [0, Ly] x (0, Lz)
         T(z=+1) = 0
         T(z=-1) = Lz
-        u(z=+-1) = v(z=+-1) = 0
+        u(z=+-1) = v(z=+-1) = w(z=+-1) = 0
         integral over p = 0
 
     The spectral discretization uses FFT horizontally, implying periodic BCs, and an ultraspherical method vertically to
