@@ -213,7 +213,7 @@ class RayleighBenard3D(GenericSpectralLinear):
                     component=component, equation=component, axis=0, kind='Nyquist', line=int(Nyquist_mode_index), v=0
                 )
         if ny % 2 == 0:
-            Nyquist_mode_index = self.axes[0].get_Nyquist_mode_index()
+            Nyquist_mode_index = self.axes[1].get_Nyquist_mode_index()
             for component in self.components:
                 self.add_BC(
                     component=component, equation=component, axis=1, kind='Nyquist', line=int(Nyquist_mode_index), v=0
@@ -295,7 +295,8 @@ class RayleighBenard3D(GenericSpectralLinear):
         """
         Initial conditions, which are only available at t=0 and for Lz=1. Velocities and temperature are linear in z
         between their boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly
-        distributed noise, multiplied by `noise_level` and (z - 1) (z + 1).
+        distributed noise, multiplied by `noise_level` and z (z - Lz), which vanishes at both plates. The vertical
+        velocity w has to have equal boundary values, since a linear w is not divergence free.
 
         Args:
             t (float): Time, has to be 0
@@ -307,8 +308,8 @@ class RayleighBenard3D(GenericSpectralLinear):
         """
         assert t == 0
         assert (
-            self.BCs['v_top'] == self.BCs['v_bottom']
-        ), 'Initial conditions are only implemented for zero velocity gradient'
+            self.BCs['w_top'] == self.BCs['w_bottom']
+        ), 'Initial conditions are only implemented for zero vertical velocity gradient'
 
         me = self.spectral.u_init
         iu, iw, iT, ip = self.index(['u', 'w', 'T', 'p'])
@@ -326,7 +327,7 @@ class RayleighBenard3D(GenericSpectralLinear):
         noise = self.spectral.u_init
         noise[iT] = rng.random(size=me[iT].shape)
 
-        me[iT] += noise[iT].real * noise_level * (self.Z - 1) * (self.Z + 1)
+        me[iT] += noise[iT].real * noise_level * self.Z * (self.Z - self.Lz)
 
         if self.spectral_space:
             me_hat = self.spectral.u_init_forward
@@ -368,7 +369,7 @@ class RayleighBenard3D(GenericSpectralLinear):
                 self.xp.copyto(_D_u_hat[i], (D @ u_hat_flat[i]).reshape(_D_u_hat[i].shape))
             derivatives.append(
                 self.itransform(_D_u_hat).real
-            )  # derivatives[0] contains x derivatives, [2] is y and [3] is z
+            )  # derivatives[0] contains x derivatives, [1] is y and [2] is z
 
         DzT_hat = (self.Dz @ u_hat[iT].flatten()).reshape(u_hat[iT].shape)
 
@@ -384,16 +385,16 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         # compute thermal dissipation
         thermal_dissipation = self.u_init_physical
-        thermal_dissipation[0, ...] = (
-            self.kappa * (derivatives[0][iT].real + derivatives[1][iT].real + derivatives[2][iT].real) ** 2
+        thermal_dissipation[0, ...] = self.kappa * (
+            derivatives[0][iT] ** 2 + derivatives[1][iT] ** 2 + derivatives[2][iT] ** 2
         )
         thermal_dissipation_hat = self.transform(thermal_dissipation)[0]
 
         # compute kinetic energy dissipation
         kinetic_energy_dissipation = self.u_init_physical
         for i in [iu, iv, iw]:
-            kinetic_energy_dissipation[0, ...] += (
-                self.nu * (derivatives[0][i].real + derivatives[1][i].real + derivatives[2][i].real) ** 2
+            kinetic_energy_dissipation[0, ...] += self.nu * (
+                derivatives[0][i] ** 2 + derivatives[1][i] ** 2 + derivatives[2][i] ** 2
             )
         kinetic_energy_dissipation_hat = self.transform(kinetic_energy_dissipation)[0]
 
