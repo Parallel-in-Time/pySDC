@@ -1,0 +1,21 @@
+pySDC/tests/test_problems/test_AdvectionDiffusionEquation_1D_FFT.py
+  s_dd65e9d467ee66::t_0c0e355b620ac2 112-123
+pySDC/implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.py
+  s_dd65e9d467ee66::t_0c0e355b620ac2 214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8af1e6ec57d9bdd09be93c31e3b2d192cc4e702b",
+  "prompts": {},
+  "sessions": {
+    "s_dd65e9d467ee66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dd5efbb1-bf67-4877-926b-42698f1be818",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
