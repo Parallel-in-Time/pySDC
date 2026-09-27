@@ -195,3 +195,44 @@ def test_communication(pattern, n=2):
         _test_bcast(ensemble_comm, u)
     else:
         raise NotImplementedError
+
+
+@pytest.mark.firedrake
+@pytest.mark.parallel(2)
+def test_communication_of_mixed_functions(n=2):
+    """Every subfunction of a function on a mixed space arrives, and sending needs no tag, like in mpi4py."""
+    import firedrake as fd
+    import numpy as np
+    from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
+
+    comm = FiredrakeEnsembleCommunicator(fd.COMM_WORLD, 1)
+    mesh = fd.UnitSquareMesh(n, n, comm=comm.space_comm)
+    W = fd.FunctionSpace(mesh, 'CG', 1) * fd.FunctionSpace(mesh, 'DG', 0)
+    u = fd.Function(W)
+
+    if comm.rank == 0:
+        for i, sub in enumerate(u.subfunctions):
+            sub.assign(i + 1)
+        req = comm.Isend(u, dest=1)
+    else:
+        req = comm.Irecv(u, source=0, tag=0)
+    req.Wait()
+
+    for i, sub in enumerate(u.subfunctions):
+        assert np.allclose(sub.dat.data_ro, i + 1), f'Subfunction {i} did not arrive'
+
+
+@pytest.mark.firedrake
+@pytest.mark.parallel(2)
+def test_free_releases_only_split_communicators():
+    import firedrake as fd
+    from mpi4py import MPI
+    from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
+
+    comm = FiredrakeEnsembleCommunicator(fd.COMM_WORLD, 1)
+    split = comm.Split(0)
+    split.Free()
+    assert split.comm_wold == MPI.COMM_NULL
+
+    comm.Free()
+    assert fd.COMM_WORLD != MPI.COMM_NULL

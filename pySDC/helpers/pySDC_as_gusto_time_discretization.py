@@ -26,6 +26,7 @@ class LogTime(Hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
+        super().post_step(step, level_number)
         L = step.levels[level_number]
         self.add_to_stats(
             process=step.status.slot,
@@ -105,15 +106,15 @@ class pySDC_integrator(TimeDiscretisation):
 
         if useMPIController:
             assert (
+                controller_communicator is not None
+            ), 'You need to supply a communicator when using the MPI controller!'
+            assert (
                 type(self.controller_communicator).__name__ == 'FiredrakeEnsembleCommunicator'
             ), f'Need to give a FiredrakeEnsembleCommunicator here, not {type(self.controller_communicator)}'
             if n_steps > 1:
                 logging.getLogger(type(self).__name__).warning(
                     f'Warning: You selected {n_steps=}, which will be ignored when using the MPI controller!'
                 )
-            assert (
-                controller_communicator is not None
-            ), 'You need to supply a communicator when using the MPI controller!'
             self.n_steps = controller_communicator.size
         else:
             self.n_steps = n_steps

@@ -92,45 +92,6 @@ class GenericGusto(Problem):
         else:
             return self.equation.bcs[self.equation.field_name]
 
-    def invert_mass_matrix(self, rhs):
-        """
-        Solve the variational problem M x = M rhs with the boundary conditions, where M is the mass form made of the
-        time derivative terms of the residual. The solver is set up once and cached.
-
-        Since the mass form is applied to `rhs` on the right hand side as well, this returns `rhs` with the boundary
-        conditions imposed, not the inverse mass matrix applied to `rhs`.
-
-        Args:
-            rhs (dtype_u): Right hand side
-
-        Returns:
-            dtype_u: The solution x
-        """
-        self._u.assign(rhs.functionspace)
-
-        if 'mass_matrix' not in self.solvers.keys():
-            mass_form = self.residual.label_map(
-                lambda t: t.has_label(time_derivative),
-                map_if_true=replace_subject(self.x_out, old_idx=self.idx),
-                map_if_false=drop,
-            )
-            rhs_form = self.residual.label_map(
-                lambda t: t.has_label(time_derivative),
-                map_if_true=replace_subject(self._u, old_idx=self.idx),
-                map_if_false=drop,
-            )
-
-            problem = fd.NonlinearVariationalProblem((mass_form - rhs_form).form, self.x_out, bcs=self.bcs)
-            solver_name = self.field_name + self.__class__.__name__
-            self.solvers['mass_matrix'] = fd.NonlinearVariationalSolver(
-                problem, solver_parameters=self.solver_parameters, options_prefix=solver_name
-            )
-            self.work_counters['solver_setup']()
-
-        self.solvers['mass_matrix'].solve()
-
-        return self.dtype_u(self.x_out)
-
     def eval_f(self, u, *args):
         """
         Evaluate the right hand side f(u) by solving M f = -R(u), where M is the mass form (the time derivative terms of
