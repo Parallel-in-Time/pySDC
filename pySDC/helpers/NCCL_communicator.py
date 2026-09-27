@@ -43,7 +43,7 @@ class NCCLComm(object):
         When performing any operations that depend on data, we have to synchronize host and device beforehand.
 
         Args:
-            Name (str): Name of the requested attribute
+            name (str): Name of the requested attribute
         """
         if name not in ['size', 'rank', 'Get_rank', 'Get_size', 'Split', 'Create_cart', 'Is_inter', 'Get_topology']:
             cp.cuda.get_current_stream().synchronize()

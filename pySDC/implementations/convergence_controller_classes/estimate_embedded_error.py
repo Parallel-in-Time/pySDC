@@ -21,6 +21,7 @@ class EstimateEmbeddedError(ConvergenceController):
 
         Args:
             flavor (str): The implementation that you want
+            useMPI (bool): Whether to return the MPI version, only relevant for the `'linearized'` flavor
 
         Returns:
             cls: The child class that implements the desired flavor

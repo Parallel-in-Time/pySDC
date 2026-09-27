@@ -41,7 +41,7 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         Denotes the period of the function to be approximated for the Fourier transform.
     init_type : str, optional
         Initialises type of initial state.
-    comm : bool, optional
+    comm : MPI.Intracomm, optional
         Communicator for parallelization.
 
     Attributes

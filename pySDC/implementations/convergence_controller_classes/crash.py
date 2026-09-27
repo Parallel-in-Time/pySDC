@@ -22,6 +22,7 @@ class CrashBase(ConvergenceController):
 
         Args:
             crash (bool): If this rank wants to crash
+            msg (str): Message of the `ConvergenceError` raised on a crash
             comm (mpi4py.MPI.Intracomm or None): Communicator of the controller, if applicable:
         """
 

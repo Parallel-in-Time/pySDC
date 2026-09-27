@@ -55,8 +55,8 @@ class fenics_heat(Problem):
         Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
-    c: float, optional
-        Constant for the Dirichlet boundary condition :math: `c`
+    c : float, optional
+        Constant for the Dirichlet boundary condition :math:`c`.
 
     Attributes
     ----------
@@ -410,6 +410,8 @@ class fenics_heat_mass(fenics_heat):
         Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
+    c : float, optional
+        Constant for the Dirichlet boundary condition :math:`c`.
 
     Attributes
     ----------
@@ -562,6 +564,8 @@ class fenics_heat_mass_timebc(fenics_heat_mass):
         Denotes the refinement of the mesh. ``refinements=2`` refines the mesh by factor :math:`2`.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
+    c : float, optional
+        Constant :math:`c` added to the exact solution and hence to the time-dependent Dirichlet boundary condition.
 
     Attributes
     ----------

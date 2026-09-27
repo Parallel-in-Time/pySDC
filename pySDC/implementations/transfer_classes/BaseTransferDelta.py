@@ -1,9 +1,9 @@
 r"""
 Space-time transfer for the delta-form hierarchy.
 
-:class:`BaseTransfer` makes a coarse level rebuild its own residual from :math:`\mathcal{O}(1)`
-coarse data and recovers the coarse-grid correction as :math:`u_G - u_G^{\mathrm{old}}`. Both have
-exact algebraic replacements -- :math:`\varepsilon_G = R\varepsilon_F`, which is what the FAS
+:class:`~pySDC.core.base_transfer.BaseTransfer` makes a coarse level rebuild its own residual from
+:math:`\mathcal{O}(1)` coarse data and recovers the coarse-grid correction as :math:`u_G - u_G^{\mathrm{old}}`.
+Both have exact algebraic replacements -- :math:`\varepsilon_G = R\varepsilon_F`, which is what the FAS
 :math:`\tau` is *for*, and the correction is the sum of the sweep's own increments -- and this
 transfer uses those instead. It is what decides whether a level rebuilds its residual or is handed
 one: the delta-form sweepers do both, and this is what hands one down.
@@ -16,8 +16,8 @@ precisely the FAS-corrected problem -- and must *not* also add :math:`\tau`, whi
 twice. What is skipped is materialising :math:`\tau` as an array, since the quantity it exists to
 produce arrives directly.
 
-Identical to :class:`BaseTransfer` up to round-off at backend precision, verified for two, three and
-four levels and for PFASST -- and against a control with :math:`\tau` genuinely zeroed, which does
+Identical to :class:`~pySDC.core.base_transfer.BaseTransfer` up to round-off at backend precision, verified
+for two, three and four levels and for PFASST -- and against a control with :math:`\tau` genuinely zeroed, which does
 not converge at all. It is also slightly cheaper, because nothing then reads :math:`\tau` except
 :meth:`compute_end_point` in the quadrature-update case: see :meth:`delta_transfer.restrict`.
 
@@ -36,8 +36,8 @@ class delta_transfer(BaseTransfer):
     """
     Space-time transfer that passes a residual down and an accumulated correction up.
 
-    Drop-in for :class:`BaseTransfer`, and identical to it up to round-off when every level is at
-    backend precision. Falls back to the stock prolongation when the coarse level has banked no
+    Drop-in for :class:`~pySDC.core.base_transfer.BaseTransfer`, and identical to it up to round-off when every
+    level is at backend precision. Falls back to the stock prolongation when the coarse level has banked no
     corrections, so a hierarchy mixing delta-form and stock sweepers still runs.
     """
 

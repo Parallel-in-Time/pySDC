@@ -78,6 +78,8 @@ class GenericSpectralLinear(Problem):
             left_preconditioner (bool): Reverse the Kronecker product if yes
             solver_type (str): Solver for linear systems
             solver_args (dict): Arguments for linear solver
+            preconditioner_args (dict): Arguments for the incomplete LU preconditioner of the `ilu` solver types,
+                passed to `spilu`. `drop_tol` (default 1e-3) is scaled by the step size, `fill_factor` defaults to 100
             useGPU (bool): Run on GPU or CPU
             max_cached_factorizations (int): Number of matrix decompositions to cache before starting eviction
             spectral_space (bool): If yes, the solution will not be transformed back after solving and evaluating the RHS, and is expected as input in spectral space to these functions

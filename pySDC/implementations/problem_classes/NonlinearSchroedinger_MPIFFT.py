@@ -25,8 +25,6 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
         Spatial resolution
     spectral : bool, optional
         If True, the solution is computed in spectral space.
-    L : float, optional
-        Denotes the period of the function to be approximated for the Fourier transform.
     c : float, optional
         Nonlinearity parameter.
     comm : MPI.COMM_World

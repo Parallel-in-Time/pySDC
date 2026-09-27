@@ -44,7 +44,8 @@ class piline(Problem):
     Rl : float, optional
         Resistance of the resistive load :math:`R_\ell`.
 
-    Attributes:
+    Attributes
+    ----------
     A : np.2darray
         Coefficient matrix of the linear ODE system.
     """

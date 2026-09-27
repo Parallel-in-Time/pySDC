@@ -61,6 +61,8 @@ class CollBase(object):
             num_nodes (int): number of collocation nodes
             tleft (float): left interval point
             tright (float): right interval point
+            node_type (str): type of the node distribution, see above
+            quad_type (str): type of quadrature, see above; there is no default, it has to be given
         """
 
         if not num_nodes > 0:

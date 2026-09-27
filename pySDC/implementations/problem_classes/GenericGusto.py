@@ -42,7 +42,8 @@ class GenericGusto(Problem):
             equation (:class:`PrognosticEquation`): the model's equation.
             apply_bcs (bool, optional): whether to apply the equation's boundary
                 conditions. Defaults to True.
-            solver_params (dict, optional): Solver parameters for the nonlinear variational problems
+            solver_parameters (dict, optional): Solver parameters for the nonlinear variational problems.
+                Defaults to GMRES with a block Jacobi preconditioner with ILU on the blocks.
             stop_at_divergence (bool, optional): Whether to raise an error when the variational problems do not converge. Defaults to False
             LHS_cache_size (int, optional): Size of the cache for solvers. Defaults to 12.
             residual (Firedrake.form, optional): Overwrite the residual of the equation, e.g. after adding spatial methods. Defaults to None.

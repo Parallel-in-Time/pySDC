@@ -48,6 +48,8 @@ class allencahn_fullyimplicit(Problem):
         Tolerance for linear solver to terminate.
     lin_maxiter : int, optional
         Maximum number of iterations for the linear solver.
+    inexact_linear_ratio : float, optional
+        Ratio of tolerance of linear solver to the Newton residual, overrides ``lin_tol`` if set.
     radius : float, optional
         Radius of the circles.
     order : int, optional
@@ -296,6 +298,10 @@ class allencahn_fullyimplicit(Problem):
         ----------
         t : float
             Time of the exact solution.
+        u_init : dtype_u, optional
+            Initial conditions for getting the exact solution.
+        t_init : float, optional
+            The starting time.
 
         Returns
         -------
@@ -415,6 +421,10 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         ----------
         t : float
             Time of the exact solution.
+        u_init : dtype_u, optional
+            Initial conditions for getting the exact solution.
+        t_init : float, optional
+            The starting time.
 
         Returns
         -------

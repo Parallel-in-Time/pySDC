@@ -43,6 +43,8 @@ class Controller(object):
 
         Args:
             controller_params (dict): parameter set for the controller and the steps
+            description (dict): description of the problem, sweeper, levels, ... passed to the steps
+            useMPI (bool): whether the controller communicates via MPI
         """
         self.useMPI: Optional[bool] = useMPI
         self.description: Dict[str, Any] = description

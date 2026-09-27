@@ -53,7 +53,8 @@ class outer_solar_system(Problem):
         ----------
         u : dtype_u
             The particles.
-        t (float): Current time at which the particles are computed (not used here).
+        t : float
+            Current time at which the particles are computed (not used here).
 
         Returns
         -------
