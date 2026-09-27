@@ -39,7 +39,7 @@
 
 /* API overview, see add_api_overview in conf.py */
 table.api-overview { table-layout: fixed; }
-table.api-overview td:first-child code, table.api-overview td:first-child .pre { white-space: normal; word-break: break-all; }
+table.api-overview td:first-child code, table.api-overview td:first-child .pre { white-space: normal; overflow-wrap: anywhere; }
 table.api-overview td { font-size: 0.9rem; overflow-wrap: anywhere; }
 
 /* Gallery cards that show an excerpt of the code or its output instead of a plot: the excerpt takes the plot's place */
@@ -59,3 +59,16 @@ table.api-overview td { font-size: 0.9rem; overflow-wrap: anywhere; }
 .landing-demo .btn:disabled { opacity: 0.6; }
 .landing-demo .demo-status { font-size: 0.85rem; color: var(--pst-color-text-muted); min-height: 1.3em; }
 .landing-demo .demo-plot { max-width: 100%; background: #fff; border-radius: 4px; }
+
+/* Found by a visual review: buttons without their own colour turned dark on dark in dark mode, module pages' long
+   dotted titles and table-of-contents entries ran out of their column, and the per-cell ▶ covered code */
+.notebook-links .btn, .landing-demo .btn { color: var(--pst-color-text-base); }
+.notebook-links .run-in-browser, .landing-demo .demo-run { color: var(--pst-color-background); }
+.bd-article h1, .bd-toc-nav a, .bd-sidenav a { overflow-wrap: anywhere; }
+.rib-live .cell_input pre { padding-bottom: 2.2rem; }
+/* results the tests wrote, included on the pages that do not run on the website: wrap instead of scrolling */
+div.highlight-text pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* pages without a primary sidebar (the overview, publications) are centred like the others */
+.bd-container__inner:has(> .bd-sidebar-primary.hide-on-wide) > .bd-main { max-width: 72rem; margin: 0 auto; }
+/* a row of images from a README, e.g. of a project, keeps some distance from the text after it */
+.bd-article img[style*="width"] { margin-bottom: 0.75rem; }

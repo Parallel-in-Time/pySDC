@@ -1,6 +1,6 @@
 # Continuous Integration in pySDC
 
-Any commit in `pySDC` are tested by GitHub continuous integration (CI). You can see in in the [action panel](https://github.com/Parallel-in-Time/pySDC/actions) the tests for each branches.
+Every commit in `pySDC` is tested by GitHub continuous integration (CI). You can see the tests for each branch in the [action panel](https://github.com/Parallel-in-Time/pySDC/actions).
 Those tests are currently divided in three main categories : [code linting](#code-linting), [code testing](#code-testing) and [code coverage](#code-coverage).
 Finally, the CI also build artifacts that are used to generate the documentation website (see http://parallel-in-time.org/pySDC/), more details given in the [documentation generation](#documentation-generation) section.
 

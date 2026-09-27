@@ -6,7 +6,7 @@
 [![SQAaaS badge shields.io](https://img.shields.io/badge/sqaaas%20software-silver-lightgrey)](https://api.eu.badgr.io/public/assertions/aS8J0NDTTjCyYP6iVufviQ "SQAaaS silver badge achieved")
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/pySDC?logo=pypi)](https://pypistats.org/packages/pysdc)
 [![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)](https://go.fzj.de/CodePromo)
-[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC)
+[![SWH](https://img.shields.io/badge/Software_Heritage-archived-orange)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC)
 [![validated with aidecl](https://img.shields.io/badge/ai%20declaration%20format-aidecl-blue)](https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml)
 
 # Welcome to pySDC!

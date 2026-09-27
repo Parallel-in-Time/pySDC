@@ -11,16 +11,12 @@ import re
 import glob
 import json
 import m2r2
-import shutil
 import numpy as np
 
 mdFiles = ['README.md', 'CONTRIBUTING.md', 'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'docs/contrib']
 
 docSources = 'docs/source'
 
-# Move already images in the future build directory
-os.makedirs('docs/build/html/_images/', exist_ok=True)
-shutil.copytree('docs/img', 'docs/build/html/_images/docs/img', dirs_exist_ok=True)
 
 counter = np.array(0)
 
@@ -83,14 +79,9 @@ def addOrphanTag(rst):
     return '\n:orphan:\n\n' + rst
 
 
-def setImgPath(rst):
-    i = 0
-    while i != -1:
-        i = rst.find('<img src=".', i)
-        if i != -1:
-            rst = rst[: i + 11] + '/_images' + rst[i + 11 :]
-            i += 16
-    return rst
+def setImgPath(rst, md):
+    """Raw <img> tags of docs/img, which conf.py's html_static_path copies into _static"""
+    return rst.replace('<img src="./docs/img/', f'<img src="{"../" * md.count("/")}_static/')
 
 
 def linkReadmeToIndex(rst):
@@ -118,7 +109,7 @@ def convert(md, orphan=False, sectionRefs=True):
     rst = completeRefLinks(rst, baseName)
     if orphan:
         rst = addOrphanTag(rst)
-    rst = setImgPath(rst)
+    rst = setImgPath(rst, md)
     rst = linkReadmeToIndex(rst)
     with open(f'{docSources}/{baseName}.rst', 'w') as f:
         f.write(rst)

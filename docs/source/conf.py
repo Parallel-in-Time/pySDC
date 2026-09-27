@@ -1,6 +1,7 @@
 # Sphinx configuration for the pySDC website, https://parallel-in-time.org/pySDC
 
 import hashlib
+import inspect
 import os
 import re
 import sys
@@ -75,7 +76,8 @@ viewcode_follow_imported_members = False
 
 html_theme = 'pydata_sphinx_theme'
 html_title = 'pySDC'
-html_static_path = ['_static']
+html_static_path = ['_static', '../img']  # ../img: the logos in README.md
+pygments_dark_style = 'github-dark'  # the theme's default dark style is loud
 html_css_files = ['custom.css']
 html_js_files = [('run-in-browser.js', {'type': 'module'})]
 
@@ -115,8 +117,9 @@ html_theme_options = {
     'footer_end': ['theme-version'],
 }
 # pages without subpages have nothing to show in the primary sidebar
-html_sidebars = {'publications': []}
+html_sidebars = {'publications': [], 'README': []}
 html_context = {
+    'default_mode': 'auto',  # the theme's default is empty, which it reports as an error in every page's console
     'github_user': 'Parallel-in-Time',
     'github_repo': 'pySDC',
     'github_version': 'master',
@@ -472,6 +475,11 @@ def add_landing_demo(app, docname, source):
     source[0] = source[0].replace('.. landing-demo', demo)
 
 
+def skip_modules(app, what, name, obj, skip, options):
+    """Class attributes such as `xp = numpy` would be documented as the module, with the path it was imported from"""
+    return True if inspect.ismodule(obj) else None
+
+
 def setup(app):
     app.connect('build-finished', write_notebooks)
     app.connect('html-page-context', add_run_in_browser)
@@ -479,3 +487,4 @@ def setup(app):
     app.connect('source-read', add_api_overview)
     app.connect('source-read', add_publications)
     app.connect('source-read', add_landing_demo)
+    app.connect('autodoc-skip-member', skip_modules)
