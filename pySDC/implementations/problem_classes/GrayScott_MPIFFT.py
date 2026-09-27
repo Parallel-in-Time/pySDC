@@ -688,6 +688,18 @@ class grayscott_mi_linear(grayscott_imex_linear):
 
     The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., for the system containing
     the diffusion part will be solved by FFT, and for the linear part a Newton solver is used.
+
+    Parameters
+    ----------
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method in ``solve_system_2``.
+    newton_tol : float, optional
+        Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residuals of both
+        components in real space.
+    **kwargs
+        Passed on to ``grayscott_imex_diffusion``, see there: ``Du``, ``Dv``, ``A``, ``B``, ``L``, ``num_blobs``,
+        ``nvars``, ``spectral``, ``comm`` and ``useGPU``. The Newton solver runs on a single process only, so
+        ``comm`` has to have size one.
     """
 
     dtype_f = comp2_mesh

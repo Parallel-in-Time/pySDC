@@ -17,6 +17,15 @@ class Brusselator(IMEX_Laplacian_MPIFFT):
     We discretize in a periodic domain of length 1 and solve with an IMEX scheme based on a spectral method for the
     Laplacian which we invert implicitly. We treat the reaction and source terms explicitly.
 
+    Parameters
+    ----------
+    alpha : float, optional
+        Diffusion coefficient in front of the Laplacian, the same for both components.
+    **kwargs
+        Passed on to ``IMEX_Laplacian_MPIFFT``: ``nvars`` (tuple of two int, spatial resolution), ``comm``
+        (communicator for ``mpi4py-fft``), ``useGPU`` and ``x0`` (left end of the domain :math:`[x_0, x_0 + 1]^2`).
+        ``spectral=False``, ``L=1.0`` and ``dtype='d'`` are fixed and cannot be passed.
+
     References
     ----------
     .. [1] https://link.springer.com/book/10.1007/978-3-642-05221-7
