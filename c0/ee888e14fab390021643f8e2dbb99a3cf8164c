@@ -1,0 +1,24 @@
+pySDC/projects/soft_failure/data/dump_injections_vanderpol.txt
+  s_d2597225a276c7::t_991fe83680345c 1-500
+pySDC/projects/soft_failure/generate_statistics.py
+  s_d2597225a276c7::t_7dfaae75f5cc55 338,366,368,373-375,377-378,381,383-384
+  s_d2597225a276c7::t_087c75460bb030 339,348,367,382
+pySDC/projects/soft_failure/data/vanderpol_500_runs_Statistics.txt
+  s_d2597225a276c7::t_991fe83680345c 2-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c0ee888e14fab390021643f8e2dbb99a3cf8164c",
+  "prompts": {},
+  "sessions": {
+    "s_d2597225a276c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "56f39cf2-e93b-497d-ba52-941478cd00ad",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
