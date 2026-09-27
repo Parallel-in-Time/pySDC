@@ -45,7 +45,7 @@
 | pySDC/implementations/convergence\_controller\_classes/adaptive\_collocation.py                     |       77 |        1 |     99% |       249 |
 | pySDC/implementations/convergence\_controller\_classes/adaptivity.py                                |      261 |       20 |     92% |131-132, 215, 238, 247, 249, 262-271, 363, 370, 535, 655, 671, 872-873 |
 | pySDC/implementations/convergence\_controller\_classes/basic\_restarting.py                         |       99 |        5 |     95% |172-174, 260-262 |
-| pySDC/implementations/convergence\_controller\_classes/check\_iteration\_estimator.py               |       43 |        1 |     98% |        35 |
+| pySDC/implementations/convergence\_controller\_classes/check\_iteration\_estimator.py               |       46 |        1 |     98% |        35 |
 | pySDC/implementations/convergence\_controller\_classes/crash.py                                     |       44 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/estimate\_contraction\_factor.py             |       23 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/estimate\_embedded\_error.py                 |      113 |       25 |     78% |32, 35-36, 56, 99, 108-115, 215, 241-242, 256-277 |
@@ -86,7 +86,7 @@
 | pySDC/implementations/problem\_classes/Boussinesq\_2D\_FD\_imex.py                                  |       67 |        1 |     99% |       106 |
 | pySDC/implementations/problem\_classes/Brusselator.py                                               |       44 |        6 |     86% |46-47, 134-138 |
 | pySDC/implementations/problem\_classes/BuckConverter.py                                             |       47 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/Burgers.py                                                   |       96 |        5 |     95% |   271-277 |
+| pySDC/implementations/problem\_classes/Burgers.py                                                   |       96 |        5 |     95% |   270-276 |
 | pySDC/implementations/problem\_classes/DiscontinuousTestODE.py                                      |       87 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/FastWaveSlowWave\_0D.py                                      |       40 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/FermiPastaUlamTsingou.py                                     |       40 |        1 |     98% |        61 |
@@ -96,7 +96,7 @@
 | pySDC/implementations/problem\_classes/GenericGusto.py                                              |      122 |       19 |     84% |60, 82, 87-110, 145, 171-175, 256-260 |
 | pySDC/implementations/problem\_classes/GrayScott\_1D\_FEniCS\_implicit.py                           |       87 |        2 |     98% |  119, 123 |
 | pySDC/implementations/problem\_classes/GrayScott\_2D\_PETSc\_periodic.py                            |      305 |        2 |     99% |  175, 281 |
-| pySDC/implementations/problem\_classes/GrayScott\_MPIFFT.py                                         |      297 |       10 |     97% |261-272, 285-286, 659, 662, 865, 868 |
+| pySDC/implementations/problem\_classes/GrayScott\_MPIFFT.py                                         |      297 |       10 |     97% |261-272, 285-286, 657, 660, 863, 866 |
 | pySDC/implementations/problem\_classes/HarmonicOscillator.py                                        |       54 |       17 |     69% |68-75, 99-108, 111-118 |
 | pySDC/implementations/problem\_classes/HeatEquation\_1D\_FEniCS\_matrix\_forced.py                  |      123 |        9 |     93% |189-191, 226-231 |
 | pySDC/implementations/problem\_classes/HeatEquation\_2D\_PETSc\_forced.py                           |       90 |        0 |    100% |           |
@@ -112,7 +112,7 @@
 | pySDC/implementations/problem\_classes/Piline.py                                                    |       44 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Quench.py                                                    |      152 |       34 |     78% |220-221, 282-284, 355, 422-472 |
 | pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |100, 321, 420, 468 |
-| pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      255 |       15 |     94% |97, 295, 315, 434, 479, 490, 620-635 |
+| pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      255 |       15 |     94% |97, 295, 315, 433, 478, 489, 619-634 |
 | pySDC/implementations/problem\_classes/TestEquation\_0D.py                                          |      101 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        1 |     98% |       180 |
 | pySDC/implementations/problem\_classes/VorticityVelocity\_2D\_FEniCS\_periodic.py                   |      108 |      108 |      0% |     1-483 |
@@ -396,7 +396,7 @@
 | pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       88 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       77 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       16 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32391** | **4286** | **87%** |           |
+| **TOTAL**                                                                                           | **32394** | **4286** | **87%** |           |
 
 41 empty files skipped.
 
