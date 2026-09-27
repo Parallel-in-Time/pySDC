@@ -26,6 +26,7 @@ class PlottingHook(Hooks):  # pragma: no cover
         Returns:
             None
         """
+        super().pre_run(step, level_number)
         prob = step.levels[level_number].prob
         self.fig = prob.get_fig()
 
@@ -48,11 +49,13 @@ class PlottingHook(Hooks):  # pragma: no cover
 
         if plot_ic:
             u = level.u[0]
+            t = level.time
         else:
             level.sweep.compute_end_point()
             u = level.uend
+            t = level.time + level.dt
 
-        prob.plot(u=u, t=step.time, fig=self.fig)
+        prob.plot(u=u, t=t, fig=self.fig)
 
         if self.save_plot is not None:
             path = f'{self.save_plot}_{self.plot_counter:04d}.png'
@@ -89,7 +92,8 @@ class PlotPostStep(PlottingHook):  # pragma: no cover
             None
         """
         if level_number > 0:
-            return
+            # no figure on coarse levels, but the rest of the chain
+            return super(PlottingHook, self).pre_run(step, level_number)
         super().pre_run(step, level_number)
         self.plot(step, level_number, plot_ic=True)
 
@@ -104,6 +108,7 @@ class PlotPostStep(PlottingHook):  # pragma: no cover
         Returns:
             None
         """
+        super().post_step(step, level_number)
         if level_number > 0:
             return
 
