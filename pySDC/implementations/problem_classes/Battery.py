@@ -136,9 +136,11 @@ class battery_n_capacitors(Problem):
             v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.
 
         :math:`max_{index}` is initialized to :math:`-1`. List "switch" contains a True if :math:`v_k \leq V_{ref,k-1}` is satisfied.
-            - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.
-            - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.
-              So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.
+
+        - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.
+        - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.
+          So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.
+
         In case of using the switch estimator, we count the number of switches which illustrates in which case of voltage source we are.
 
         Parameters

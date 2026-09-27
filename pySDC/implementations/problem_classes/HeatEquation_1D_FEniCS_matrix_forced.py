@@ -30,7 +30,7 @@ class fenics_heat(Problem):
     .. math::
         u(x, t) = \sin(\pi x)\cos(t) + c.
 
-    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [#]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
@@ -48,7 +48,7 @@ class fenics_heat(Problem):
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
-        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [#]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
@@ -73,9 +73,9 @@ class fenics_heat(Problem):
 
     References
     ----------
-    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+    .. [#] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
         C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
-    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+    .. [#] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
         Wells and others. Springer (2012).
     """
 
@@ -385,7 +385,7 @@ class fenics_heat_mass(fenics_heat):
     .. math::
         u(x, t) = \sin(\pi x)\cos(t) + c.
 
-    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [#]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
@@ -403,7 +403,7 @@ class fenics_heat_mass(fenics_heat):
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
-        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [#]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
@@ -430,9 +430,9 @@ class fenics_heat_mass(fenics_heat):
 
     References
     ----------
-    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+    .. [#] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
         C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
-    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+    .. [#] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
         Wells and others. Springer (2012).
     """
 
@@ -537,7 +537,7 @@ class fenics_heat_mass_timebc(fenics_heat_mass):
     .. math::
         u(x, t) = \cos(\pi x)\cos(t) + c.
 
-    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [1]_. Hence, the problem
+    In this class the problem is implemented in the way that the spatial part is solved using ``FEniCS`` [#]_. Hence, the problem
     is reformulated to the *weak formulation*
 
     .. math:
@@ -555,7 +555,7 @@ class fenics_heat_mass_timebc(fenics_heat_mass):
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
-        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [#]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
@@ -582,9 +582,9 @@ class fenics_heat_mass_timebc(fenics_heat_mass):
 
     References
     ----------
-    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+    .. [#] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
         C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
-    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+    .. [#] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
         Wells and others. Springer (2012).
     """
 
