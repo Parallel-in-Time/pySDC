@@ -50,6 +50,10 @@
 <div class="viewcode-block" id="Pars">
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.Pars">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Frozen parameters of a convergence controller as attributes, with defaults for `control_order` and `useMPI`.</span>
+<span class="sd">    """</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># integer that determines the order in which the convergence controllers are called</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># depends on the controller</span>
@@ -66,6 +70,7 @@
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.Status">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Status</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Frozen container for named variables of a convergence controller.</span>
 <span class="sd">    Initialize status variables with None, since at the time of instantiation of the convergence controllers, not all</span>
 <span class="sd">    relevant information about the controller are known.</span>
 <span class="sd">    """</span>
@@ -81,8 +86,7 @@
 <a class="viewcode-back" href="../../pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConvergenceController</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Base abstract class for convergence controller, which is plugged into the controller to determine the iteration</span>
-<span class="sd">    count and time step size.</span>
+<span class="sd">    Abstract base class for convergence controllers, which plug into the controller to steer iterations and step sizes.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>

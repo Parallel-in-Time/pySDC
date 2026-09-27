@@ -53,6 +53,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.Quench">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Quench</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    1D heat equation with a nonlinear heat source, modelling a magnet quench, fully implicit with Newton.</span>
+
 <span class="sd">    This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.</span>
 <span class="sd">    However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment</span>
 <span class="sd">    sufficiently, there will be a runaway effect heating up the entire magnet.</span>
@@ -182,16 +184,6 @@
             <span class="s1">'liniter'</span><span class="p">,</span>
             <span class="s1">'inexact_linear_ratio'</span><span class="p">,</span>
             <span class="s1">'min_lintol'</span><span class="p">,</span>
-            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
-            <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">'newton_tol'</span><span class="p">,</span>
-            <span class="s1">'newton_maxiter'</span><span class="p">,</span>
-            <span class="s1">'lintol'</span><span class="p">,</span>
-            <span class="s1">'liniter'</span><span class="p">,</span>
-            <span class="s1">'direct_solver'</span><span class="p">,</span>
             <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
             <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
@@ -532,6 +524,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Quench.html#implementations.problem_classes.Quench.QuenchIMEX">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">QuenchIMEX</span><span class="p">(</span><span class="n">Quench</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    1D heat equation with a nonlinear heat source, modelling a magnet quench, IMEX with diffusion implicit.</span>
+
 <span class="sd">    This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.</span>
 <span class="sd">    However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment</span>
 <span class="sd">    sufficiently, there will be a runaway effect heating up the entire magnet.</span>

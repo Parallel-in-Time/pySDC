@@ -295,6 +295,10 @@
 <div class="viewcode-block" id="LogToFile">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LogToFile</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Write the solution every `time_increment` to one `FieldsIO` file set up by the problem, resuming an existing file.</span>
+<span class="sd">    """</span>
+
     <span class="n">filename</span> <span class="o">=</span> <span class="s1">'myRun.pySDC'</span>
     <span class="n">time_increment</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">allow_overwriting</span> <span class="o">=</span> <span class="kc">False</span>

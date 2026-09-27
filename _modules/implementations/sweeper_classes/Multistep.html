@@ -100,6 +100,10 @@
 <div class="viewcode-block" id="MultiStep">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.MultiStep">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MultiStep</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Base class for linear multistep methods, given by alpha and beta coefficients and a cache of previous steps.</span>
+<span class="sd">    """</span>
+
     <span class="n">alpha</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -261,7 +265,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdamsBashforthExplicit1Step</span><span class="p">(</span><span class="n">MultiStep</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    This is just forward Euler.</span>
+<span class="sd">    One-step Adams-Bashforth method, which is just forward Euler.</span>
 <span class="sd">    """</span>
 
     <span class="n">alpha</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
@@ -273,6 +277,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.BackwardEuler">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BackwardEuler</span><span class="p">(</span><span class="n">MultiStep</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Backward Euler written as a one-step implicit multistep method.</span>
 <span class="sd">    Almost as old, impressive and beloved as Koelner Dom.</span>
 <span class="sd">    """</span>
 
@@ -297,7 +302,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Multistep.html#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdamsMoultonImplicit2Step</span><span class="p">(</span><span class="n">MultiStep</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Third order implicit scheme</span>
+<span class="sd">    Third-order implicit two-step Adams-Moulton method, started with a trapezoidal rule step.</span>
 <span class="sd">    """</span>
 
     <span class="n">alpha</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>

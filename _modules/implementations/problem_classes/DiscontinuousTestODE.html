@@ -294,7 +294,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.ExactDiscontinuousTestODE">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExactDiscontinuousTestODE</span><span class="p">(</span><span class="n">DiscontinuousTestODE</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Dummy ODE problem for testing the ``SwitchEstimator`` class. The problem contains the exact dynamics</span>
+<span class="sd">    Variant of ``DiscontinuousTestODE`` whose ``solve_system`` returns the exact solution, to test the</span>
+<span class="sd">    ``SwitchEstimator``.</span>
+<span class="sd">    The problem contains the exact dynamics</span>
 <span class="sd">    of the problem class ``DiscontinuousTestODE``.</span>
 
 <span class="sd">    Parameters</span>
@@ -334,7 +336,7 @@
         <span class="n">t_switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch</span>
         <span class="n">h</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span>
         <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
-            <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_switch_exact</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span></div>

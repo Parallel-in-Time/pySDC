@@ -54,7 +54,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">boussinesq_2d_imex</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    This class implements the two-dimensional Boussinesq equations for different boundary conditions with</span>
+<span class="sd">    Linearized 2D Boussinesq equations with finite differences, IMEX with waves implicit (GMRES), advection explicit.</span>
+
+<span class="sd">    The equations, for different boundary conditions, are</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} + U \frac{\partial u}{\partial x} + \frac{\partial p}{\partial x} = 0,</span>

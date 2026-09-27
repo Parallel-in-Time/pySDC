@@ -47,12 +47,14 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Brusselator.html#implementations.problem_classes.Brusselator.Brusselator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Brusselator</span><span class="p">(</span><span class="n">IMEX_Laplacian_MPIFFT</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Two-dimensional Brusselator from [1]_.</span>
-<span class="sd">    This is a reaction-diffusion equation with non-autonomous source term:</span>
+<span class="sd">    2D periodic Brusselator reaction-diffusion system with mpi4py-fft, IMEX with diffusion implicit, reactions explicit.</span>
+
+<span class="sd">    This Brusselator from [1]_ is a reaction-diffusion equation with non-autonomous source term:</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{\partial u}{\partial t} = \varalpha \Delta u + 1 + u^2 v - 4.4u _ f(x,y,t),</span>
-<span class="sd">        \frac{\partial v}{\partial t} = \varalpha \Delta v + 3.4u - u^2 v</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \alpha \Delta u + 1 + u^2 v - 4.4u + f(x,y,t),</span>
+
+<span class="sd">        \frac{\partial v}{\partial t} = \alpha \Delta v + 3.4u - u^2 v</span>
 
 <span class="sd">    with the source term :math:`f(x,y,t) = 5` if :math:`(x-0.3)^2 + (y-0.6)^2 &lt;= 0.1^2` and :math:`t &gt;= 1.1` and 0 else.</span>
 <span class="sd">    We discretize in a periodic domain of length 1 and solve with an IMEX scheme based on a spectral method for the</span>

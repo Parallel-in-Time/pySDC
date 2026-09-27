@@ -51,6 +51,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">fenics_vortex_2d</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic vorticity-velocity problem with FEniCS, IMEX (diffusion implicit), with the mass matrix inverted.</span>
+
 <span class="sd">    This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions</span>
 <span class="sd">    in :math:`[0, 1]^2`</span>
 
@@ -113,7 +115,7 @@
 <span class="w">        </span><span class="sd">"""Initialization routine"""</span>
 
         <span class="k">if</span> <span class="n">c_nvars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">c_nvars</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)]</span>
+            <span class="n">c_nvars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">refinements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">refinements</span> <span class="o">=</span> <span class="mi">1</span>
@@ -380,6 +382,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">fenics_vortex_2d_mass</span><span class="p">(</span><span class="n">fenics_vortex_2d</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic vorticity-velocity problem with FEniCS, IMEX (diffusion implicit), with the mass matrix applied.</span>
+
 <span class="sd">    This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions</span>
 <span class="sd">    in :math:`[0, 1]^2`</span>
 

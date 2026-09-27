@@ -45,8 +45,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwise">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpreadStepSizesBlockwise</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Take the step size from the last step in the block and spread it to all steps in the next block such that every step</span>
-<span class="sd">    in a block always has the same step size.</span>
+<span class="sd">    Give all steps of the next block the same step size, taken from the last step or from the first restarted one.</span>
 <span class="sd">    By block we refer to a composite collocation problem, which is solved in pipelined SDC parallel-in-time.</span>
 
 <span class="sd">    Also, we overrule the step size control here, if we get close to the final time and we would take too large of a</span>
@@ -135,7 +134,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseNonMPI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpreadStepSizesBlockwiseNonMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwise</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Non-MPI version</span>
+<span class="sd">    Spread one step size to all steps of the next block for the non-MPI controller, reading the steps directly.</span>
 <span class="sd">    """</span>
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseNonMPI.get_step_from_which_to_spread">
@@ -219,7 +218,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.spread_step_sizes.html#implementations.convergence_controller_classes.spread_step_sizes.SpreadStepSizesBlockwiseMPI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpreadStepSizesBlockwiseMPI</span><span class="p">(</span><span class="n">SpreadStepSizesBlockwise</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    MPI version</span>
+<span class="sd">    Spread one step size to all steps of the next block for the MPI controller, with collectives across the time ranks.</span>
 <span class="sd">    """</span>
 
 <div class="viewcode-block" id="SpreadStepSizesBlockwiseMPI.get_step_from_which_to_spread">

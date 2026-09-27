@@ -229,7 +229,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalizationIMEX">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">QDiagonalizationIMEX</span><span class="p">(</span><span class="n">QDiagonalization</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Use as sweeper class for ParaDiag with IMEX splitting. Note that it will not work with SDC.</span>
+<span class="sd">    Variant of QDiagonalization for ParaDiag on problems whose right hand side has implicit and explicit parts.</span>
+<span class="sd">    Note that it will not work with SDC.</span>
 <span class="sd">    """</span>
 
     <span class="n">integrate</span> <span class="o">=</span> <span class="n">imex_1st_order</span><span class="o">.</span><span class="n">integrate</span></div>

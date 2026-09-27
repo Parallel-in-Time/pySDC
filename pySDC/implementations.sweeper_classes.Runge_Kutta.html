@@ -138,6 +138,7 @@ Can be used to integrate simple DAEs because explicit and implicit part are both
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK32">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ARK32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK32" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX" title="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaIMEX</span></code></a></p>
+<p>Embedded IMEX Runge-Kutta method ARK3(2)4L[2]SA of Kennedy and Carpenter, of orders 3 and 2.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK32.ButcherTableauClass">
 <span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK32.ButcherTableauClass" title="Link to this definition">¶</a></dt>
@@ -182,6 +183,7 @@ Can be used to integrate simple DAEs because explicit and implicit part are both
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ARK324L2SAERK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK324L2SAERK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
+<p>Explicit part of ARK32: an explicit embedded Runge-Kutta pair of orders 3 and 2.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK.ButcherTableauClass">
 <span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK.ButcherTableauClass" title="Link to this definition">¶</a></dt>
@@ -220,6 +222,7 @@ Can be used to integrate simple DAEs because explicit and implicit part are both
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK324L2SAESDIRK">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ARK324L2SAESDIRK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK324L2SAESDIRK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAESDIRK" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK" title="implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARK324L2SAERK</span></code></a></p>
+<p>Implicit part of ARK32: an L-stable, stiffly accurate ESDIRK pair of orders 3 and 2.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK324L2SAESDIRK.generator">
 <span class="sig-name descname"><span class="pre">generator</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;qmat.qcoeff.butcher.ARK324L2SAESDIRK</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAESDIRK.generator" title="Link to this definition">¶</a></dt>
@@ -236,7 +239,9 @@ Can be used to integrate simple DAEs because explicit and implicit part are both
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK54">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ARK54</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK54"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK54" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX" title="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaIMEX</span></code></a></p>
-<p>Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from [here](<a class="reference external" href="https://doi.org/10.1016/S0168-9274(02)00138-1">https://doi.org/10.1016/S0168-9274(02)00138-1</a>).</p>
+<p>IMEX Runge-Kutta method ARK5(4)8L[2]SA of Kennedy and Carpenter, combining ARK548L2SAERK and ARK548L2SAESDIRK.
+Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from
+[here](<a class="reference external" href="https://doi.org/10.1016/S0168-9274(02)00138-1">https://doi.org/10.1016/S0168-9274(02)00138-1</a>).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK54.ButcherTableauClass">
 <span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK54.ButcherTableauClass" title="Link to this definition">¶</a></dt>
@@ -281,7 +286,8 @@ Can be used to integrate simple DAEs because explicit and implicit part are both
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SA">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ARK548L2SA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SA" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX" title="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaIMEX</span></code></a></p>
-<p>IMEX Runge-Kutta method of order 5 based on the explicit method ARK548L2SAERK2 and the implicit method
+<p>Newer order-5 IMEX Runge-Kutta method ARK5(4)8L[2]SA of Kennedy and Carpenter, an alternative to ARK54.
+It is based on the explicit method ARK548L2SAERK2 and the implicit method
 ARK548L2SAESDIRK2 from [here](<a class="reference external" href="https://doi.org/10.1016/j.apnum.2018.10.007">https://doi.org/10.1016/j.apnum.2018.10.007</a>).</p>
 <p>According to Kennedy and Carpenter (see reference), the two IMEX RK methods of order 5 are the only ones available
 as of now. And we are not aware of higher order ones. This one is newer then the other one and apparently better.</p>
@@ -368,7 +374,8 @@ as of now. And we are not aware of higher order ones. This one is newer then the
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ARK548L2SAERK2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SAERK2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2" title="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARK548L2SAESDIRK2</span></code></a></p>
-<p>Explicit embedded pair of Runge-Kutta methods of orders 5 and 4 from [here](<a class="reference external" href="https://doi.org/10.1016/j.apnum.2018.10.007">https://doi.org/10.1016/j.apnum.2018.10.007</a>).
+<p>Explicit part of ARK548L2SA: an explicit embedded Runge-Kutta pair of orders 5 and 4.
+Taken from [here](<a class="reference external" href="https://doi.org/10.1016/j.apnum.2018.10.007">https://doi.org/10.1016/j.apnum.2018.10.007</a>).
 This method is part of the IMEX method ARK548L2SA.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2.generator_EXP">
@@ -403,7 +410,9 @@ This method is part of the IMEX method ARK548L2SA.</p>
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ARK548L2SAESDIRK2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#ARK548L2SAESDIRK2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKutta</span></code></a></p>
-<p>Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit first stage from [here](<a class="reference external" href="https://doi.org/10.1016/j.apnum.2018.10.007">https://doi.org/10.1016/j.apnum.2018.10.007</a>).
+<p>Implicit part of ARK548L2SA: an L-stable, stiffly accurate ESDIRK pair of orders 5 and 4.
+Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit
+first stage from [here](<a class="reference external" href="https://doi.org/10.1016/j.apnum.2018.10.007">https://doi.org/10.1016/j.apnum.2018.10.007</a>).
 This method is part of the IMEX method ARK548L2SA.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2.ButcherTableauClass">
@@ -847,6 +856,7 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.IMEXEuler">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IMEXEuler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#IMEXEuler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.IMEXEuler" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX" title="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaIMEX</span></code></a></p>
+<p>First-order IMEX Euler with one backward Euler stage, at which both parts of the right hand side are evaluated.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.IMEXEuler.matrix">
 <span class="sig-name descname"><span class="pre">matrix</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([[1.]])</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.IMEXEuler.matrix" title="Link to this definition">¶</a></dt>
@@ -873,7 +883,8 @@ Taken from [here](<a class="reference external" href="https://ntrs.nasa.gov/cita
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.IMEXEulerStifflyAccurate">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IMEXEulerStifflyAccurate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#IMEXEulerStifflyAccurate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.IMEXEulerStifflyAccurate" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX" title="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">RungeKuttaIMEX</span></code></a></p>
-<p>This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.
+<p>IMEX Euler with the explicit part evaluated at the start of the step, as a stiffly accurate two-stage method.
+This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.
 This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly
 accurate and suitable for some DAEs.</p>
 <dl class="py attribute">
@@ -961,10 +972,7 @@ accurate and suitable for some DAEs.</p>
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">RungeKutta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKutta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sweeper</span></code></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.ButcherTableauClass">
-<span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.ButcherTableauClass" title="Link to this definition">¶</a></dt>
-<dd><p>Runge-Kutta scheme that fits the interface of a sweeper.
+<p>Base class for Runge-Kutta methods with lower triangular Butcher tableaux, wrapped in the sweeper interface.
 Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
 at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</p>
 <p>We have two choices to realise a Runge-Kutta sweeper: We can choose Q = Q_Delta = &lt;Butcher tableau&gt;, but in this
@@ -985,7 +993,10 @@ method, which does not require us to solve a system of equations to compute the 
 </div></blockquote>
 <p>All of these variables are either determined by the RK rule, or are not part of an RK scheme.</p>
 <p>The entries of the Butcher tableau are stored as class attributes.</p>
-<p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKutta.ButcherTableauClass">
+<span class="sig-name descname"><span class="pre">ButcherTableauClass</span></span><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.ButcherTableauClass" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau" title="implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="xref py py-class docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">

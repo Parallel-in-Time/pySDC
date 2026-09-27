@@ -52,8 +52,7 @@
 <dt class="sig sig-object py" id="implementations.hooks.log_errors.LogError">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LogError</span></span><a class="reference internal" href="../_modules/implementations/hooks/log_errors.html#LogError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_errors.LogError" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></p>
-<p>Base class with functions to add the local and global error to the stats, which can be inherited by hooks logging
-these at specific places.</p>
+<p>Base class for hooks that log the local or global error with respect to the <cite>u_exact</cite> of the problem.</p>
 <p>Errors are computed with respect to <cite>u_exact</cite> defined in the problem class.
 Be aware that this requires the problems to be compatible with this. We need some kind of “exact” solution for this
 to work, be it a reference solution or something analytical.</p>
@@ -172,6 +171,7 @@ where the error is stored, the step size can change.</p>
 <dt class="sig sig-object py" id="implementations.hooks.log_errors.LogGlobalErrorPostStep">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LogGlobalErrorPostStep</span></span><a class="reference internal" href="../_modules/implementations/hooks/log_errors.html#LogGlobalErrorPostStep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_errors.LogGlobalErrorPostStep" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.hooks.log_errors.LogError" title="implementations.hooks.log_errors.LogError"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogError</span></code></a></p>
+<p>Log the global error with respect to <cite>u_exact</cite> at the end of each step as “e_global_post_step”.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.hooks.log_errors.LogGlobalErrorPostStep.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_errors.html#LogGlobalErrorPostStep.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_errors.LogGlobalErrorPostStep.post_step" title="Link to this definition">¶</a></dt>

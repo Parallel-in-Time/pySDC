@@ -50,8 +50,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EstimateExtrapolationErrorBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Abstract base class for extrapolated error estimates</span>
-<span class="sd">    ----------------------------------------------------</span>
+<span class="sd">    Abstract base class for error estimates by Taylor extrapolation of solutions and right-hand sides from other times.</span>
+
 <span class="sd">    This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.</span>
 <span class="sd">    In particular, child classes need to implement how to make these solutions available, which works differently for</span>
 <span class="sd">    MPI and non-MPI versions.</span>
@@ -481,8 +481,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_extrapolation_error.html#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EstimateExtrapolationErrorWithinQ</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    This convergence controller estimates the local error based on comparing the SDC solution to an extrapolated</span>
-<span class="sd">    solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination</span>
+<span class="sd">    Estimate the local error by comparing the converged SDC solution to an extrapolation from other quadrature nodes.</span>
+<span class="sd">    Collocation methods compute a high order solution from a linear combination</span>
 <span class="sd">    of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don't share the order of</span>
 <span class="sd">    accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of</span>
 <span class="sd">    nodes + 1 (locally). This is because the solution to the collocation problem is a polynomial approximation of order</span>

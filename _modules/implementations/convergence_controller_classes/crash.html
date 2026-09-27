@@ -47,7 +47,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.CrashBase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CrashBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Crash the code across all ranks</span>
+<span class="sd">    Base class for convergence controllers that raise a `ConvergenceError` on all ranks as soon as one rank crashes.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -87,7 +87,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.crash.html#implementations.convergence_controller_classes.crash.StopAtNan">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StopAtNan</span><span class="p">(</span><span class="n">CrashBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Crash the code when the norm of the solution exceeds some limit or contains nan.</span>
+<span class="sd">    Crash all ranks when the solution contains nan or inf, or when its norm reaches the optional threshold `thresh`.</span>
 <span class="sd">    This class is useful when running with MPI in the sweeper or controller.</span>
 <span class="sd">    """</span>
 

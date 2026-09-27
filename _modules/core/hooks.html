@@ -63,7 +63,7 @@
 <a class="viewcode-back" href="../../pySDC/core.hooks.html#core.hooks.Hooks">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Hooks</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)</span>
+<span class="sd">    Base class for hooks, with methods the controller calls around each run, step, iteration and sweep to record stats.</span>
 
 <span class="sd">    When deriving a custom hook from this class make sure to always call the parent method using e.g.</span>
 <span class="sd">    `super().post_step(step, level_number)`. Otherwise bugs may arise when using `filer_recomputed` from the stats</span>

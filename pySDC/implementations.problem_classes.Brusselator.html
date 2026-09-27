@@ -53,11 +53,10 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.Brusselator.Brusselator">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Brusselator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Brusselator.html#Brusselator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.Brusselator.Brusselator" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IMEX_Laplacian_MPIFFT</span></code></p>
-<p>Two-dimensional Brusselator from <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
-This is a reaction-diffusion equation with non-autonomous source term:</p>
+<p>2D periodic Brusselator reaction-diffusion system with mpi4py-fft, IMEX with diffusion implicit, reactions explicit.</p>
+<p>This Brusselator from <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> is a reaction-diffusion equation with non-autonomous source term:</p>
 <div class="math notranslate nohighlight">
-\[\frac{\partial u}{\partial t} = \varalpha \Delta u + 1 + u^2 v - 4.4u _ f(x,y,t),
-\frac{\partial v}{\partial t} = \varalpha \Delta v + 3.4u - u^2 v\]</div>
+\[ \begin{align}\begin{aligned}\frac{\partial u}{\partial t} = \alpha \Delta u + 1 + u^2 v - 4.4u + f(x,y,t),\\\frac{\partial v}{\partial t} = \alpha \Delta v + 3.4u - u^2 v\end{aligned}\end{align} \]</div>
 <p>with the source term <span class="math notranslate nohighlight">\(f(x,y,t) = 5\)</span> if <span class="math notranslate nohighlight">\((x-0.3)^2 + (y-0.6)^2 &lt;= 0.1^2\)</span> and <span class="math notranslate nohighlight">\(t &gt;= 1.1\)</span> and 0 else.
 We discretize in a periodic domain of length 1 and solve with an IMEX scheme based on a spectral method for the
 Laplacian which we invert implicitly. We treat the reaction and source terms explicitly.</p>

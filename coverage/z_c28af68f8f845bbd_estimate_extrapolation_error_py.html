@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_c28af68f8f845bbd_estimate_polynomial_error_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-27 08:21 +0000
+            created at 2026-09-27 13:42 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -91,8 +91,8 @@
     <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">class</span> <span class="nam">EstimateExtrapolationErrorBase</span><span class="op">(</span><span class="nam">ConvergenceController</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">    Abstract base class for extrapolated error estimates</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="str">    ----------------------------------------------------</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">    Abstract base class for error estimates by Taylor extrapolation of solutions and right-hand sides from other times.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">    This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="str">    In particular, child classes need to implement how to make these solutions available, which works differently for</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">    MPI and non-MPI versions.</span>&nbsp;</span><span class="r"></span></p>
@@ -483,8 +483,8 @@
     <p class="pln"><span class="n"><a id="t401" href="#t401">401</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t402" href="#t402">402</a></span><span class="t"><span class="key">class</span> <span class="nam">EstimateExtrapolationErrorWithinQ</span><span class="op">(</span><span class="nam">EstimateExtrapolationErrorBase</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t403" href="#t403">403</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t404" href="#t404">404</a></span><span class="t"><span class="str">    This convergence controller estimates the local error based on comparing the SDC solution to an extrapolated</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t405" href="#t405">405</a></span><span class="t"><span class="str">    solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t404" href="#t404">404</a></span><span class="t"><span class="str">    Estimate the local error by comparing the converged SDC solution to an extrapolation from other quadrature nodes.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t405" href="#t405">405</a></span><span class="t"><span class="str">    Collocation methods compute a high order solution from a linear combination</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t406" href="#t406">406</a></span><span class="t"><span class="str">    of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don&#x27;t share the order of</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t407" href="#t407">407</a></span><span class="t"><span class="str">    accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t408" href="#t408">408</a></span><span class="t"><span class="str">    nodes + 1 (locally). This is because the solution to the collocation problem is a polynomial approximation of order</span>&nbsp;</span><span class="r"></span></p>
@@ -602,7 +602,7 @@
             <a class="nav" href="z_c28af68f8f845bbd_estimate_polynomial_error_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-27 08:21 +0000
+            created at 2026-09-27 13:42 +0000
         </p>
     </div>
 </footer>

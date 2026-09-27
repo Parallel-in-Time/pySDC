@@ -150,13 +150,8 @@
 <div class="viewcode-block" id="RungeKutta">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKutta">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RungeKutta</span><span class="p">(</span><span class="n">Sweeper</span><span class="p">):</span>
-    <span class="n">nodes</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">matrix</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableau</span>
-
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Runge-Kutta scheme that fits the interface of a sweeper.</span>
+<span class="sd">    Base class for Runge-Kutta methods with lower triangular Butcher tableaux, wrapped in the sweeper interface.</span>
 <span class="sd">    Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions</span>
 <span class="sd">    at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</span>
 
@@ -180,6 +175,11 @@
 
 <span class="sd">    The entries of the Butcher tableau are stored as class attributes.</span>
 <span class="sd">    """</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableau</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
@@ -633,6 +633,10 @@
 <div class="viewcode-block" id="IMEXEuler">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.IMEXEuler">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IMEXEuler</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    First-order IMEX Euler with one backward Euler stage, at which both parts of the right hand side are evaluated.</span>
+<span class="sd">    """</span>
+
     <span class="n">nodes</span> <span class="o">=</span> <span class="n">BackwardEuler</span><span class="o">.</span><span class="n">nodes</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="n">BackwardEuler</span><span class="o">.</span><span class="n">weights</span>
 
@@ -645,6 +649,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.IMEXEulerStifflyAccurate">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IMEXEulerStifflyAccurate</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    IMEX Euler with the explicit part evaluated at the start of the step, as a stiffly accurate two-stage method.</span>
 <span class="sd">    This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.</span>
 <span class="sd">    This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly</span>
 <span class="sd">    accurate and suitable for some DAEs.</span>
@@ -877,7 +882,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK54">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ARK54</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from [here](https://doi.org/10.1016/S0168-9274(02)00138-1).</span>
+<span class="sd">    IMEX Runge-Kutta method ARK5(4)8L[2]SA of Kennedy and Carpenter, combining ARK548L2SAERK and ARK548L2SAESDIRK.</span>
+<span class="sd">    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from</span>
+<span class="sd">    [here](https://doi.org/10.1016/S0168-9274(02)00138-1).</span>
 <span class="sd">    """</span>
 
     <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
@@ -902,7 +909,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAESDIRK2">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ARK548L2SAESDIRK2</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
+<span class="sd">    Implicit part of ARK548L2SA: an L-stable, stiffly accurate ESDIRK pair of orders 5 and 4.</span>
+<span class="sd">    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit</span>
+<span class="sd">    first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
 <span class="sd">    This method is part of the IMEX method ARK548L2SA.</span>
 <span class="sd">    """</span>
 
@@ -923,7 +932,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SAERK2">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ARK548L2SAERK2</span><span class="p">(</span><span class="n">ARK548L2SAESDIRK2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Explicit embedded pair of Runge-Kutta methods of orders 5 and 4 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
+<span class="sd">    Explicit part of ARK548L2SA: an explicit embedded Runge-Kutta pair of orders 5 and 4.</span>
+<span class="sd">    Taken from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
 <span class="sd">    This method is part of the IMEX method ARK548L2SA.</span>
 <span class="sd">    """</span>
 
@@ -936,7 +946,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK548L2SA">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ARK548L2SA</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    IMEX Runge-Kutta method of order 5 based on the explicit method ARK548L2SAERK2 and the implicit method</span>
+<span class="sd">    Newer order-5 IMEX Runge-Kutta method ARK5(4)8L[2]SA of Kennedy and Carpenter, an alternative to ARK54.</span>
+<span class="sd">    It is based on the explicit method ARK548L2SAERK2 and the implicit method</span>
 <span class="sd">    ARK548L2SAESDIRK2 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).</span>
 
 <span class="sd">    According to Kennedy and Carpenter (see reference), the two IMEX RK methods of order 5 are the only ones available</span>
@@ -964,6 +975,10 @@
 <div class="viewcode-block" id="ARK324L2SAERK">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAERK">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ARK324L2SAERK</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Explicit part of ARK32: an explicit embedded Runge-Kutta pair of orders 3 and 2.</span>
+<span class="sd">    """</span>
+
     <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">"ARK324L2SAERK"</span><span class="p">]()</span>
     <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
@@ -980,6 +995,10 @@
 <div class="viewcode-block" id="ARK324L2SAESDIRK">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK324L2SAESDIRK">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ARK324L2SAESDIRK</span><span class="p">(</span><span class="n">ARK324L2SAERK</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Implicit part of ARK32: an L-stable, stiffly accurate ESDIRK pair of orders 3 and 2.</span>
+<span class="sd">    """</span>
+
     <span class="n">generator</span> <span class="o">=</span> <span class="n">RK_SCHEMES</span><span class="p">[</span><span class="s2">"ARK324L2SAESDIRK"</span><span class="p">]()</span>
     <span class="n">matrix</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">Q</span></div>
 
@@ -988,6 +1007,10 @@
 <div class="viewcode-block" id="ARK32">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.ARK32">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ARK32</span><span class="p">(</span><span class="n">RungeKuttaIMEX</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Embedded IMEX Runge-Kutta method ARK3(2)4L[2]SA of Kennedy and Carpenter, of orders 3 and 2.</span>
+<span class="sd">    """</span>
+
     <span class="n">ButcherTableauClass</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
     <span class="n">ButcherTableauClass_explicit</span> <span class="o">=</span> <span class="n">ButcherTableauEmbedded</span>
 

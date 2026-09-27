@@ -52,8 +52,7 @@
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">EstimateExtrapolationErrorBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
-<section id="abstract-base-class-for-extrapolated-error-estimates">
-<h2>Abstract base class for extrapolated error estimates<a class="headerlink" href="#abstract-base-class-for-extrapolated-error-estimates" title="Link to this heading">¶</a></h2>
+<p>Abstract base class for error estimates by Taylor extrapolation of solutions and right-hand sides from other times.</p>
 <p>This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.
 In particular, child classes need to implement how to make these solutions available, which works differently for
 MPI and non-MPI versions.</p>
@@ -167,7 +166,6 @@ node on the finest level at the moment.</p>
 </dl>
 </dd></dl>
 
-</section>
 </dd></dl>
 
 <dl class="py class">
@@ -295,8 +293,8 @@ where only values are used for extrapolation which are in memory of other proces
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">EstimateExtrapolationErrorWithinQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorWithinQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase" title="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase</span></code></a></p>
-<p>This convergence controller estimates the local error based on comparing the SDC solution to an extrapolated
-solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination
+<p>Estimate the local error by comparing the converged SDC solution to an extrapolation from other quadrature nodes.
+Collocation methods compute a high order solution from a linear combination
 of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don’t share the order of
 accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of
 nodes + 1 (locally). This is because the solution to the collocation problem is a polynomial approximation of order

@@ -51,6 +51,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">fenics_heat</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Forced 1D heat equation with FEniCS and Dirichlet BCs, IMEX, with the mass matrix inverted in the right-hand side.</span>
+
 <span class="sd">    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions</span>
 
 <span class="sd">    .. math::</span>
@@ -427,6 +429,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">fenics_heat_mass</span><span class="p">(</span><span class="n">fenics_heat</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Forced 1D heat equation with FEniCS and Dirichlet BCs, IMEX, with the mass matrix applied instead of inverted.</span>
+
 <span class="sd">    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions</span>
 
 <span class="sd">    .. math::</span>
@@ -593,6 +597,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass_timebc">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">fenics_heat_mass_timebc</span><span class="p">(</span><span class="n">fenics_heat_mass</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Forced 1D heat equation with FEniCS, IMEX with the mass matrix applied, and time-dependent Dirichlet BCs.</span>
+
 <span class="sd">    Example implementing the forced one-dimensional heat equation with time-dependent Dirichlet boundary conditions</span>
 
 <span class="sd">    .. math::</span>

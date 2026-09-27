@@ -132,12 +132,8 @@
             <span class="n">msg1</span> <span class="o">=</span> <span class="s2">"ERROR for reference value V_ref: V_ref has to be an np.ndarray and/or length of array needs to be equal to number of capacitances"</span>
             <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">assertions_V_ref_1</span><span class="p">),</span> <span class="n">msg1</span>
 
-            <span class="n">assertions_V_ref_2</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="p">(</span><span class="n">alpha</span> <span class="o">&gt;</span> <span class="n">V_ref</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)),</span>
-                <span class="p">(</span><span class="n">V_ref</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)),</span>
-            <span class="p">]</span>
-            <span class="n">msg2</span> <span class="o">=</span> <span class="s2">"ERROR for V_ref: At least one of V_ref is less than zero and/or alpha!"</span>
-            <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">assertions_V_ref_2</span><span class="p">),</span> <span class="n">msg2</span>
+            <span class="n">msg2</span> <span class="o">=</span> <span class="s2">"ERROR for V_ref: every entry of V_ref has to be positive and smaller than alpha!"</span>
+            <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">V_ref</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">V_ref</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">),</span> <span class="n">msg2</span>
 
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
@@ -524,7 +520,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_implicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">battery_implicit</span><span class="p">(</span><span class="n">battery</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Example implementing the battery drain model as above. The method solve_system uses a fully-implicit computation.</span>
+<span class="sd">    Battery drain model with one capacitor, treated fully implicitly with Newton instead of the IMEX splitting.</span>
+<span class="sd">    The method solve_system uses a fully-implicit computation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -548,6 +545,8 @@
 <span class="sd">        Number of maximum iterations for the Newton solver.</span>
 <span class="sd">    newton_tol : float, optional</span>
 <span class="sd">        Tolerance for determination of the Newton solver.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Raise a ``ProblemError`` if Newton's method produces ``nan``, instead of only logging a warning.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -569,9 +568,10 @@
         <span class="n">V_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-11</span><span class="p">,</span>
+        <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ncapacitors</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="n">Rs</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">V_ref</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'newton_maxiter'</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'newton_maxiter'</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">,</span> <span class="s1">'stop_at_nan'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
 
@@ -601,7 +601,7 @@
 
         <span class="k">if</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
-            <span class="n">non_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Vs</span>
+            <span class="n">non_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Vs</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
@@ -642,7 +642,7 @@
 
         <span class="k">if</span> <span class="n">rhs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_switch</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
-            <span class="n">non_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Vs</span>
+            <span class="n">non_f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Vs</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>

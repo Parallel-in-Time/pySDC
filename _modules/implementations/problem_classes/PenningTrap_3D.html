@@ -57,6 +57,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">penningtrap</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Charged particles in a 3D Penning trap with Coulomb interaction, a second-order problem for the Boris integrator.</span>
+
 <span class="sd">    This class implements a standard Penning trap problem on the time interval :math:`[0, t_{end}]`</span>
 <span class="sd">    fully investigated in [1]_. The equations are given by the following equation of motion</span>
 
@@ -248,6 +250,10 @@
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Routine to compute the starting values for the particles.</span>
 
+<span class="sd">        The first particle starts at ``u0``. The others are shifted from it by random amounts in :math:`[-1, 0)` in</span>
+<span class="sd">        each position component and in :math:`[-5, -4)` in each velocity component, drawn after seeding</span>
+<span class="sd">        ``np.random`` with the number of particles.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        u : dtype_u</span>
@@ -281,13 +287,13 @@
         <span class="n">comz</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
-            <span class="c1"># draw 3 random variables in [-1,1] to shift positions</span>
+            <span class="c1"># draw 3 random variables in [-1, 0) to shift positions</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
 
-            <span class="c1"># draw 3 random variables in [-5,5] to shift velocities</span>
+            <span class="c1"># draw 3 random variables in [-5, -4) to shift velocities</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span>
             <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>

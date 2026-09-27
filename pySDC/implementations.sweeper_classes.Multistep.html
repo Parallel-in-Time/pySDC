@@ -52,7 +52,7 @@
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">AdamsBashforthExplicit1Step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#AdamsBashforthExplicit1Step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep" title="implementations.sweeper_classes.Multistep.MultiStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiStep</span></code></a></p>
-<p>This is just forward Euler.</p>
+<p>One-step Adams-Bashforth method, which is just forward Euler.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.alpha">
 <span class="sig-name descname"><span class="pre">alpha</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-1.0]</span></span><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsBashforthExplicit1Step.alpha" title="Link to this definition">¶</a></dt>
@@ -86,7 +86,7 @@
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">AdamsMoultonImplicit2Step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#AdamsMoultonImplicit2Step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep" title="implementations.sweeper_classes.Multistep.MultiStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiStep</span></code></a></p>
-<p>Third order implicit scheme</p>
+<p>Third-order implicit two-step Adams-Moulton method, started with a trapezoidal rule step.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.alpha">
 <span class="sig-name descname"><span class="pre">alpha</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.0,</span> <span class="pre">-1.0]</span></span><a class="headerlink" href="#implementations.sweeper_classes.Multistep.AdamsMoultonImplicit2Step.alpha" title="Link to this definition">¶</a></dt>
@@ -109,7 +109,8 @@
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.BackwardEuler">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">BackwardEuler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#BackwardEuler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.BackwardEuler" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.sweeper_classes.Multistep.MultiStep" title="implementations.sweeper_classes.Multistep.MultiStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiStep</span></code></a></p>
-<p>Almost as old, impressive and beloved as Koelner Dom.</p>
+<p>Backward Euler written as a one-step implicit multistep method.
+Almost as old, impressive and beloved as Koelner Dom.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.BackwardEuler.alpha">
 <span class="sig-name descname"><span class="pre">alpha</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-1.0]</span></span><a class="headerlink" href="#implementations.sweeper_classes.Multistep.BackwardEuler.alpha" title="Link to this definition">¶</a></dt>
@@ -181,6 +182,7 @@
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MultiStep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Multistep.html#MultiStep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sweeper</span></code></p>
+<p>Base class for linear multistep methods, given by alpha and beta coefficients and a cache of previous steps.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Multistep.MultiStep.alpha">
 <span class="sig-name descname"><span class="pre">alpha</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#implementations.sweeper_classes.Multistep.MultiStep.alpha" title="Link to this definition">¶</a></dt>

@@ -171,7 +171,8 @@ For IMEX time-stepping, <span class="math notranslate nohighlight">\(A_I u\)</sp
 <dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.testequation0d">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">testequation0d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useGPU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#testequation0d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.testequation0d" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
-<p>This class implements the simple test equation of the form</p>
+<p>Dahlquist test equation for many values of <span class="math notranslate nohighlight">\(\lambda\)</span> at once, treated fully implicitly.</p>
+<p>It is of the form</p>
 <div class="math notranslate nohighlight">
 \[\frac{d u(t)}{dt} = A u(t)\]</div>
 <p>for <span class="math notranslate nohighlight">\(A = diag(\lambda_1, .. ,\lambda_n)\)</span>.</p>

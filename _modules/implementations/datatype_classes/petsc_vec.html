@@ -45,6 +45,8 @@
 <div class="viewcode-block" id="petsc_vec">
 <a class="viewcode-back" href="../../../pySDC/implementations.datatype_classes.petsc_vec.html#implementations.datatype_classes.petsc_vec.petsc_vec">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">petsc_vec</span><span class="p">(</span><span class="n">PETSc</span><span class="o">.</span><span class="n">Vec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""PETSc ``Vec`` datatype, created from a ``DMDA`` or copied from another vector."""</span>
+
     <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># otherwise rmul with float64 does not work (don't ask, won't tell)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>

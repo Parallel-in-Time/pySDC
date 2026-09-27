@@ -118,7 +118,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RungeKuttaNystrom">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RungeKuttaNystrom</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Runge-Kutta scheme that fits the interface of a sweeper.</span>
+<span class="sd">    Base class for Runge-Kutta-Nystrom methods for second-order problems on particle data, as a sweeper.</span>
 <span class="sd">    Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions</span>
 <span class="sd">    at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.</span>
 
@@ -265,6 +265,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.RKN">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RKN</span><span class="p">(</span><span class="n">RungeKuttaNystrom</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Classical fourth-order Runge-Kutta-Nystrom method, with the nodes and weights of RK4.</span>
+
 <span class="sd">    Runge-Kutta-Nystrom method</span>
 <span class="sd">    https://link.springer.com/book/10.1007/978-3-540-78862-1</span>
 <span class="sd">    page: 284</span>
@@ -290,6 +292,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.Runge_Kutta_Nystrom.html#implementations.sweeper_classes.Runge_Kutta_Nystrom.Velocity_Verlet">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Velocity_Verlet</span><span class="p">(</span><span class="n">RungeKuttaNystrom</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Second-order velocity-Verlet scheme as a Runge-Kutta-Nystrom method, using a Boris solver for the velocity.</span>
+
 <span class="sd">    Velocity-Verlet scheme</span>
 <span class="sd">    https://de.wikipedia.org/wiki/Verlet-Algorithmus</span>
 <span class="sd">    """</span>

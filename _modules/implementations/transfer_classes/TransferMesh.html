@@ -68,7 +68,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.transfer_classes.TransferMesh.html#implementations.transfer_classes.TransferMesh.mesh_to_mesh">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">mesh_to_mesh</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Custom base_transfer class, implements Transfer.py</span>
+<span class="sd">    Space transfer between nd meshes by sparse interpolation matrices of even order, restricting by their transpose.</span>
 
 <span class="sd">    This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries</span>
 <span class="sd">    via matrix-vector products.</span>
@@ -152,7 +152,7 @@
             <span class="n">Pspace</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)):</span>
                 <span class="c1"># if number of variables is the same on both levels, Rspace and Pspace are identity</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                     <span class="n">Rspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
                     <span class="n">Pspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
                 <span class="c1"># assemble restriction as transpose of interpolation</span>

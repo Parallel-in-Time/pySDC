@@ -48,8 +48,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityBase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdaptivityBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Abstract base class for convergence controllers that implement adaptivity based on arbitrary local error estimates</span>
-<span class="sd">    and update rules.</span>
+<span class="sd">    Abstract base class for adaptivity from arbitrary local error estimates and step size update rules.</span>
 <span class="sd">    """</span>
 
 <div class="viewcode-block" id="AdaptivityBase.setup">
@@ -214,6 +213,10 @@
 <div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdaptivityForConvergedCollocationProblems</span><span class="p">(</span><span class="n">AdaptivityBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Base class for adaptivity from error estimates that need a converged collocation problem, restarting if it is not.</span>
+<span class="sd">    """</span>
+
 <div class="viewcode-block" id="AdaptivityForConvergedCollocationProblems.dependencies">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityForConvergedCollocationProblems.dependencies">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -898,8 +901,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityExtrapolationWithinQ">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdaptivityExtrapolationWithinQ</span><span class="p">(</span><span class="n">AdaptivityForConvergedCollocationProblems</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Class to compute time step size adaptively based on error estimate obtained from extrapolation within the quadrature</span>
-<span class="sd">    nodes.</span>
+<span class="sd">    Compute the step size adaptively from an error estimate by extrapolation within the quadrature nodes.</span>
 
 <span class="sd">    This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.</span>
 <span class="sd">    """</span>
@@ -1007,8 +1009,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.adaptivity.html#implementations.convergence_controller_classes.adaptivity.AdaptivityPolynomialError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AdaptivityPolynomialError</span><span class="p">(</span><span class="n">AdaptivityForConvergedCollocationProblems</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Class to compute time step size adaptively based on error estimate obtained from interpolation within the quadrature</span>
-<span class="sd">    nodes.</span>
+<span class="sd">    Compute the step size adaptively from an error estimate by interpolation within the quadrature nodes.</span>
 
 <span class="sd">    This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.</span>
 <span class="sd">    """</span>

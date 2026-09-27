@@ -105,7 +105,7 @@
 <dt class="sig sig-object py" id="core.hooks.Hooks">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Hooks</span></span><a class="reference internal" href="../_modules/core/hooks.html#Hooks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.hooks.Hooks" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)</p>
+<p>Base class for hooks, with methods the controller calls around each run, step, iteration and sweep to record stats.</p>
 <p>When deriving a custom hook from this class make sure to always call the parent method using e.g.
 <cite>super().post_step(step, level_number)</cite>. Otherwise bugs may arise when using <cite>filer_recomputed</cite> from the stats
 helper for post processing.</p>

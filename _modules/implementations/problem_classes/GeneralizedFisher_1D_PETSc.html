@@ -285,6 +285,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_multiimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">petsc_fisher_multiimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D generalized Fisher equation with PETSc finite differences, multi-implicit: diffusion (CG), reaction (SNES).</span>
+
 <span class="sd">    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can</span>
 <span class="sd">    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov</span>
 <span class="sd">    problem [1]_ using periodic boundary conditions</span>
@@ -672,6 +674,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">petsc_fisher_fullyimplicit</span><span class="p">(</span><span class="n">petsc_fisher_multiimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D generalized Fisher equation with PETSc finite differences, fully implicit with PETSc's SNES.</span>
+
 <span class="sd">    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can</span>
 <span class="sd">    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov</span>
 <span class="sd">    problem [1]_ using periodic boundary conditions</span>
@@ -779,6 +783,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_semiimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">petsc_fisher_semiimplicit</span><span class="p">(</span><span class="n">petsc_fisher_multiimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D generalized Fisher equation with PETSc finite differences, IMEX with diffusion implicit, reaction explicit.</span>
+
 <span class="sd">    The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can</span>
 <span class="sd">    be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov</span>
 <span class="sd">    problem [1]_ using periodic boundary conditions</span>

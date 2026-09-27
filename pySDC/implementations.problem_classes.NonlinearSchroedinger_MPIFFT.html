@@ -53,12 +53,16 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nonlinearschroedinger_fully_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lintol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liniter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/NonlinearSchroedinger_MPIFFT.html#nonlinearschroedinger_fully_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex" title="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex"><code class="xref py py-class docutils literal notranslate"><span class="pre">nonlinearschroedinger_imex</span></code></a></p>
+<p>Periodic nonlinear Schrödinger equation with mpi4py-fft, fully implicit with SciPy’s Newton-Krylov solver.</p>
 <p>Example implementing the <span class="math notranslate nohighlight">\(N\)</span>-dimensional nonlinear Schrödinger equation with periodic boundary conditions</p>
 <div class="math notranslate nohighlight">
-\[\frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u\]</div>
-<p>for fixed parameter <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(N=2, 3\)</span>. The linear parts of the problem will be discretized using
-<code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. For time-stepping, the problem will be solved <em>fully-implicitly</em>, i.e., the nonlinear system containing
-the full right-hand side is solved by a Newton-Krylov method <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+\[\frac{\partial u}{\partial t} = i \Delta u + 2 N c i |u|^2 u\]</div>
+<p>for fixed parameter <span class="math notranslate nohighlight">\(c \in \{0, 1\}\)</span> and <span class="math notranslate nohighlight">\(N=2, 3\)</span>, on <span class="math notranslate nohighlight">\([0, 2\pi]^N\)</span>. The factor <span class="math notranslate nohighlight">\(N\)</span> makes
+the one-dimensional breather solution (39) of <a class="reference external" href="https://doi.org/10.1007/BF01017105">https://doi.org/10.1007/BF01017105</a>, taken along
+<span class="math notranslate nohighlight">\(x_1 + \dots + x_N\)</span> and at time <span class="math notranslate nohighlight">\(N t\)</span>, an exact solution. The period <span class="math notranslate nohighlight">\(2\pi\)</span> is fixed and cannot
+be passed as <code class="docutils literal notranslate"><span class="pre">L</span></code>. The linear parts of the problem will be discretized using <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. For
+time-stepping, the problem will be solved <em>fully-implicitly</em>, i.e., the nonlinear system containing the full
+right-hand side is solved by a Newton-Krylov method <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -145,18 +149,22 @@ solver, see <a class="reference external" href="https://docs.scipy.org/doc/scipy
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nonlinearschroedinger_imex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/NonlinearSchroedinger_MPIFFT.html#nonlinearschroedinger_imex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IMEX_Laplacian_MPIFFT</span></code></p>
+<p>Periodic nonlinear Schrödinger equation with mpi4py-fft, IMEX with the Laplacian implicit, nonlinearity explicit.</p>
 <p>Example implementing the <span class="math notranslate nohighlight">\(N\)</span>-dimensional nonlinear Schrödinger equation with periodic boundary conditions</p>
 <div class="math notranslate nohighlight">
-\[\frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u\]</div>
-<p>for fixed parameter <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(N=2, 3\)</span>. The linear parts of the problem will be solved using
-<code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id6" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. <em>Semi-explicit</em> time-stepping is used here to solve the problem in the temporal dimension, i.e., the
-Laplacian will be handled implicitly.</p>
+\[\frac{\partial u}{\partial t} = i \Delta u + 2 N c i |u|^2 u\]</div>
+<p>for fixed parameter <span class="math notranslate nohighlight">\(c \in \{0, 1\}\)</span> and <span class="math notranslate nohighlight">\(N=2, 3\)</span>, on <span class="math notranslate nohighlight">\([0, 2\pi]^N\)</span>. The factor <span class="math notranslate nohighlight">\(N\)</span> makes
+the one-dimensional breather solution (39) of <a class="reference external" href="https://doi.org/10.1007/BF01017105">https://doi.org/10.1007/BF01017105</a>, taken along
+<span class="math notranslate nohighlight">\(x_1 + \dots + x_N\)</span> and at time <span class="math notranslate nohighlight">\(N t\)</span>, an exact solution. The period <span class="math notranslate nohighlight">\(2\pi\)</span> is fixed and cannot
+be passed as <code class="docutils literal notranslate"><span class="pre">L</span></code>. The linear parts of the problem will be solved using <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id6" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. <em>Semi-explicit</em>
+time-stepping is used here to solve the problem in the temporal dimension, i.e., the Laplacian will be handled
+implicitly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nvars</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Spatial resolution</p></li>
 <li><p><strong>spectral</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the solution is computed in spectral space.</p></li>
-<li><p><strong>c</strong> (<em>float</em><em>, </em><em>optional</em>) – Nonlinearity parameter.</p></li>
+<li><p><strong>c</strong> (<em>float</em><em>, </em><em>optional</em>) – Nonlinearity parameter, either 0 or 1.</p></li>
 <li><p><strong>comm</strong> (<em>MPI.COMM_World</em>) – Communicator for parallelisation.</p></li>
 </ul>
 </dd>

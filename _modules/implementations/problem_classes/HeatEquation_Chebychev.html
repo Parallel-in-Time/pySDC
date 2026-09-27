@@ -290,7 +290,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DChebychev">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Heat2DChebychev</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.</span>
+<span class="sd">    2D heat equation, periodic (FFT) or Dirichlet (Chebychev) in each direction, in first-order formulation.</span>
+
+<span class="sd">    Discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.</span>
 <span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -407,7 +409,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.HeatEquation_Chebychev.html#implementations.problem_classes.HeatEquation_Chebychev.Heat2DUltraspherical">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Heat2DUltraspherical</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.</span>
+<span class="sd">    2D heat equation, periodic (FFT) or Dirichlet (ultraspherical) in each direction, in second-order formulation.</span>
+
+<span class="sd">    Discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.</span>
 <span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>

@@ -45,6 +45,10 @@
 <div class="viewcode-block" id="imex_1st_order_MPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.imex_1st_order_MPI.html#implementations.sweeper_classes.imex_1st_order_MPI.imex_1st_order_MPI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">imex_1st_order_MPI</span><span class="p">(</span><span class="n">SweeperMPI</span><span class="p">,</span> <span class="n">imex_1st_order</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Node-parallel IMEX-SDC sweeper, one collocation node per MPI rank, so far only with Picard for the explicit part.</span>
+<span class="sd">    """</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">assert</span> <span class="p">(</span>

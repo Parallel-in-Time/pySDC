@@ -45,7 +45,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeLimiter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StepSizeLimiter</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Class to set limits to adaptive step size computation during run time</span>
+<span class="sd">    Clip the new step size to [`dt_min`, `dt_max`], and add a `StepSizeSlopeLimiter` if slope limits are given.</span>
 
 <span class="sd">    Please supply dt_min or dt_max in the params to limit in either direction</span>
 <span class="sd">    """</span>
@@ -141,7 +141,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.step_size_limiter.html#implementations.convergence_controller_classes.step_size_limiter.StepSizeSlopeLimiter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StepSizeSlopeLimiter</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Class to set limits to adaptive step size computation during run time</span>
+<span class="sd">    Bound `dt_new / dt` to [`dt_slope_min`, `dt_slope_max`], keeping `dt` if the change is below `dt_rel_min_slope`.</span>
 
 <span class="sd">    Please supply `dt_slope_min` or `dt_slope_max` in the params to limit in either direction.</span>
 <span class="sd">    You can also supply `dt_rel_min_slope` in order to keep the old step size in case the relative change is smaller</span>

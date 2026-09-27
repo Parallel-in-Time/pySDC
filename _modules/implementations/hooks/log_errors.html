@@ -45,8 +45,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LogError</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Base class with functions to add the local and global error to the stats, which can be inherited by hooks logging</span>
-<span class="sd">    these at specific places.</span>
+<span class="sd">    Base class for hooks that log the local or global error with respect to the `u_exact` of the problem.</span>
 
 <span class="sd">    Errors are computed with respect to `u_exact` defined in the problem class.</span>
 <span class="sd">    Be aware that this requires the problems to be compatible with this. We need some kind of "exact" solution for this</span>
@@ -144,6 +143,10 @@
 <div class="viewcode-block" id="LogGlobalErrorPostStep">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostStep">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LogGlobalErrorPostStep</span><span class="p">(</span><span class="n">LogError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Log the global error with respect to `u_exact` at the end of each step as "e_global_post_step".</span>
+<span class="sd">    """</span>
+
 <div class="viewcode-block" id="LogGlobalErrorPostStep.post_step">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostStep.post_step">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>

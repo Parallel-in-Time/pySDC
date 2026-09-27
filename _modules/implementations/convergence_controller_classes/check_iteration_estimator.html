@@ -45,6 +45,10 @@
 <div class="viewcode-block" id="CheckIterationEstimatorNonMPI">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.check_iteration_estimator.html#implementations.convergence_controller_classes.check_iteration_estimator.CheckIterationEstimatorNonMPI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CheckIterationEstimatorNonMPI</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Stop iterating once the contraction of the increments predicts that `errtol` is reached, for the non-MPI controller.</span>
+<span class="sd">    """</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine</span>

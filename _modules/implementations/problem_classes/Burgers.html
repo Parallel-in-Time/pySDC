@@ -47,6 +47,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers1D">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Burgers1D</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    1D viscous Burgers equation with Dirichlet BCs and a Chebychev method, IMEX with diffusion implicit, advection</span>
+<span class="sd">    explicit.</span>
+
 <span class="sd">    See https://en.wikipedia.org/wiki/Burgers'_equation for the equation that is solved.</span>
 <span class="sd">    Discretization is done with a Chebychev method, which requires a first order derivative formulation.</span>
 <span class="sd">    Feel free to do a more efficient implementation using an ultraspherical method to avoid the first order business.</span>
@@ -207,6 +210,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Burgers.html#implementations.problem_classes.Burgers.Burgers2D">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Burgers2D</span><span class="p">(</span><span class="n">GenericSpectralLinear</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    2D viscous Burgers equation, periodic in x (FFT) and Dirichlet in z (Chebychev), diffusion implicit, advection</span>
+<span class="sd">    explicit.</span>
+
 <span class="sd">    See https://en.wikipedia.org/wiki/Burgers'_equation for the equation that is solved.</span>
 <span class="sd">    This implementation is discretized with FFTs in x and Chebychev in z.</span>
 

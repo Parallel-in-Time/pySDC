@@ -51,9 +51,11 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">grayscott_imex_diffusion</span><span class="p">(</span><span class="n">IMEX_Laplacian_MPIFFT</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Periodic Gray-Scott system with mpi4py-fft FFTs, IMEX with diffusion implicit and the reaction explicit.</span>
+
 <span class="sd">    The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
-<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
-<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces</span>
+<span class="sd">    :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for</span>
 <span class="sd">    :math:`u,\, v`. Here, the process is described by the :math:`N`-dimensional model</span>
 
 <span class="sd">    .. math::</span>
@@ -78,9 +80,9 @@
 <span class="sd">    Dv : float, optional</span>
 <span class="sd">        Diffusion rate for :math:`v`.</span>
 <span class="sd">    A : float, optional</span>
-<span class="sd">        Feed rate for :math:`v`.</span>
+<span class="sd">        Feed rate for :math:`u`.</span>
 <span class="sd">    B : float, optional</span>
-<span class="sd">        Overall decay rate for :math:`u`.</span>
+<span class="sd">        Removal rate for :math:`v`.</span>
 <span class="sd">    spectral : bool, optional</span>
 <span class="sd">        If True, the solution is computed in spectral space.</span>
 <span class="sd">    L : float, optional</span>
@@ -416,23 +418,26 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">grayscott_imex_linear</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Periodic Gray-Scott system with mpi4py-fft, IMEX with diffusion and linear reaction terms implicit, rest explicit.</span>
+
 <span class="sd">    The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
-<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
-<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
-<span class="sd">    :math:`u,\, v`. The model with linear (reaction) part is described by the :math:`N`-dimensional model</span>
+<span class="sd">    where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces</span>
+<span class="sd">    :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This is the same model as in ``grayscott_imex_diffusion``, with the linear reaction terms grouped with the</span>
+<span class="sd">    diffusion:</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{d u}{d t} = D_u \Delta u - u v^2 + A,</span>
+<span class="sd">        \frac{d u}{d t} = (D_u \Delta - A) u - u v^2 + A,</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{d v}{d t} = D_v \Delta v + u v^2</span>
+<span class="sd">        \frac{d v}{d t} = (D_v \Delta - B) v + u v^2</span>
 
 <span class="sd">    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using</span>
 <span class="sd">    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also</span>
 <span class="sd">    https://mpi4py-fft.readthedocs.io/en/latest/.</span>
 
-<span class="sd">    This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and linear</span>
-<span class="sd">    part is computed in an explicit way).</span>
+<span class="sd">    This class implements the problem for *semi-explicit* time-stepping (diffusion and the linear reaction terms are</span>
+<span class="sd">    treated implicitly, the rest of the reaction explicitly).</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -500,16 +505,18 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">grayscott_mi_diffusion</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Periodic Gray-Scott system with mpi4py-fft, multi-implicit: diffusion by FFT, reaction by Newton.</span>
+
 <span class="sd">    The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
-<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
-<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces</span>
+<span class="sd">    :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for</span>
 <span class="sd">    :math:`u,\, v`. Here, the process is described by the :math:`N`-dimensional model</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B v</span>
 
 <span class="sd">    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using</span>
 <span class="sd">    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also</span>
@@ -527,9 +534,9 @@
 <span class="sd">    Dv : float, optional</span>
 <span class="sd">        Diffusion rate for :math:`v`.</span>
 <span class="sd">    A : float, optional</span>
-<span class="sd">        Feed rate for :math:`v`.</span>
+<span class="sd">        Feed rate for :math:`u`.</span>
 <span class="sd">    B : float, optional</span>
-<span class="sd">        Overall decay rate for :math:`u`.</span>
+<span class="sd">        Removal rate for :math:`v`.</span>
 <span class="sd">    spectral : bool, optional</span>
 <span class="sd">        If True, the solution is computed in spectral space.</span>
 <span class="sd">    L : float, optional</span>
@@ -540,6 +547,8 @@
 <span class="sd">        Maximum number of iterations for the Newton solver.</span>
 <span class="sd">    newton_tol : float, optional</span>
 <span class="sd">        Tolerance for Newton's method to terminate.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Raise a ``ProblemError`` if Newton's method produces ``nan``, instead of only logging a warning.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -568,6 +577,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+        <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Initialization routine"""</span>
@@ -577,7 +587,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Du</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Dv</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'newton_maxiter'</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">'newton_maxiter'</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">,</span> <span class="s1">'stop_at_nan'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="grayscott_mi_diffusion.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.eval_f">[docs]</a>
@@ -761,23 +773,27 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">grayscott_mi_linear</span><span class="p">(</span><span class="n">grayscott_imex_linear</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Periodic Gray-Scott system with mpi4py-fft, multi-implicit: diffusion and linear terms by FFT, the rest by Newton.</span>
+
 <span class="sd">    The original Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
-<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
-<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
-<span class="sd">    :math:`u,\, v`. The model with linear (reaction) part is described by the :math:`N`-dimensional model</span>
+<span class="sd">    where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces</span>
+<span class="sd">    :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This is the same model as in ``grayscott_imex_diffusion``, with the linear reaction terms grouped with the</span>
+<span class="sd">    diffusion:</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A,</span>
+<span class="sd">        \frac{\partial u}{\partial t} = (D_u \Delta - A) u - u v^2 + A,</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2</span>
+<span class="sd">        \frac{\partial v}{\partial t} = (D_v \Delta - B) v + u v^2</span>
 
 <span class="sd">    in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using</span>
 <span class="sd">    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also</span>
 <span class="sd">    https://mpi4py-fft.readthedocs.io/en/latest/.</span>
 
-<span class="sd">    The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., for the system containing</span>
-<span class="sd">    the diffusion part will be solved by FFT, and for the linear part a Newton solver is used.</span>
+<span class="sd">    The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., the system for the</span>
+<span class="sd">    diffusion and the linear reaction terms is solved by FFT, and the one for the rest of the reaction by a Newton</span>
+<span class="sd">    solver.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -786,6 +802,8 @@
 <span class="sd">    newton_tol : float, optional</span>
 <span class="sd">        Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residuals of both</span>
 <span class="sd">        components in real space.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Raise a ``ProblemError`` if Newton's method produces ``nan``, instead of only logging a warning.</span>
 <span class="sd">    **kwargs</span>
 <span class="sd">        Passed on to ``grayscott_imex_diffusion``, see there: ``Du``, ``Dv``, ``A``, ``B``, ``L``, ``num_blobs``,</span>
 <span class="sd">        ``nvars``, ``spectral``, ``comm`` and ``useGPU``. The Newton solver runs on a single process only, so</span>
@@ -805,6 +823,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+        <span class="n">stop_at_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Initialization routine"""</span>
@@ -814,7 +833,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Du</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Dv</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'newton_maxiter'</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">'newton_maxiter'</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">,</span> <span class="s1">'stop_at_nan'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="grayscott_mi_linear.eval_f">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.eval_f">[docs]</a>

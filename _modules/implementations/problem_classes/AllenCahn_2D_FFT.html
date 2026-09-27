@@ -49,6 +49,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn2d_imex</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Allen-Cahn equation with FFTs, IMEX with the Laplacian implicit and the reaction explicit.</span>
+
 <span class="sd">    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
@@ -80,8 +82,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    nvars : List of int tuples, optional</span>
-<span class="sd">        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.</span>
+<span class="sd">    nvars : tuple of int, optional</span>
+<span class="sd">        Number of unknowns in each spatial direction, e.g. ``nvars=(128, 128)``.</span>
 <span class="sd">    nu : int, optional</span>
 <span class="sd">        Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.</span>
 <span class="sd">    eps : float, optional</span>
@@ -306,6 +308,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn2d_imex_stab</span><span class="p">(</span><span class="n">allencahn2d_imex</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Allen-Cahn equation with FFTs, IMEX with a stabilizing linear term shifted into the implicit part.</span>
+
 <span class="sd">    This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
@@ -343,8 +347,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    nvars : List of int tuples, optional</span>
-<span class="sd">        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.</span>
+<span class="sd">    nvars : tuple of int, optional</span>
+<span class="sd">        Number of unknowns in each spatial direction, e.g. ``nvars=(128, 128)``.</span>
 <span class="sd">    nu : int, optional</span>
 <span class="sd">        Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.</span>
 <span class="sd">    eps : float, optional</span>
@@ -374,7 +378,7 @@
 <span class="w">        </span><span class="sd">"""Initialization routine"""</span>
 
         <span class="k">if</span> <span class="n">nvars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">nvars</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">)]</span>
+            <span class="n">nvars</span> <span class="o">=</span> <span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">init_type</span><span class="p">,</span> <span class="n">useGPU</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lap</span> <span class="o">-=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span>

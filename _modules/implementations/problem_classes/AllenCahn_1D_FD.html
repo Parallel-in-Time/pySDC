@@ -51,6 +51,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_fullyimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_front_fullyimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D Allen-Cahn front with driving force, Dirichlet BCs and finite differences, fully implicit with Newton.</span>
+
 <span class="sd">    Example implementing the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
 <span class="sd">    boundary conditions</span>
 
@@ -308,6 +310,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_semiimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_front_semiimplicit</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D Allen-Cahn front with driving force, Dirichlet BCs and finite differences, IMEX with Laplacian implicit.</span>
+
 <span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
 <span class="sd">    boundary conditions</span>
 
@@ -397,6 +401,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_front_finel</span><span class="p">(</span><span class="n">allencahn_front_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D Allen-Cahn front with driving force and Dirichlet BCs, fully implicit with Newton, using Finel's trick.</span>
+
 <span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet</span>
 <span class="sd">    boundary conditions</span>
 
@@ -551,6 +557,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_fullyimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_periodic_fullyimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D Allen-Cahn equation with driving force, periodic BCs and finite differences, fully implicit with Newton.</span>
+
 <span class="sd">    Example implementing the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
 
 <span class="sd">    .. math::</span>
@@ -776,6 +784,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_semiimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_periodic_semiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D Allen-Cahn equation with driving force, periodic BCs and finite differences, IMEX with Laplacian implicit.</span>
+
 <span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
 
 <span class="sd">    .. math::</span>
@@ -888,6 +898,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_periodic_multiimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_periodic_multiimplicit</span><span class="p">(</span><span class="n">allencahn_periodic_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    1D periodic Allen-Cahn equation with driving force, multi-implicit: linear solve for Laplacian, Newton for rest.</span>
+
 <span class="sd">    This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions</span>
 
 <span class="sd">    .. math::</span>

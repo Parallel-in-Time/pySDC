@@ -48,6 +48,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_imex</span><span class="p">(</span><span class="n">IMEX_Laplacian_MPIFFT</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Periodic Allen-Cahn equation with driving force and mpi4py-fft FFTs, IMEX with the Laplacian implicit.</span>
+
 <span class="sd">    Example implementing the :math:`2`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
@@ -222,6 +224,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_MPIFFT.html#implementations.problem_classes.AllenCahn_MPIFFT.allencahn_imex_timeforcing">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_imex_timeforcing</span><span class="p">(</span><span class="n">allencahn_imex</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Periodic Allen-Cahn equation with mpi4py-fft FFTs, IMEX, with a time-dependent, mass-conserving driving force.</span>
+
 <span class="sd">    Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 <span class="sd">    using time-dependent forcing</span>

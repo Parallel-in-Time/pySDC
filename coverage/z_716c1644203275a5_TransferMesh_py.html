@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_716c1644203275a5_TransferMesh_FFT_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-27 08:21 +0000
+            created at 2026-09-27 13:42 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -109,7 +109,7 @@
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t"><span class="key">class</span> <span class="nam">mesh_to_mesh</span><span class="op">(</span><span class="nam">SpaceTransfer</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="str">    Custom base_transfer class, implements Transfer.py</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="str">    Space transfer between nd meshes by sparse interpolation matrices of even order, restricting by their transpose.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t"><span class="str">    This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t"><span class="str">    via matrix-vector products.</span>&nbsp;</span><span class="r"></span></p>
@@ -193,7 +193,7 @@
     <p class="run"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t">            <span class="nam">Pspace</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">            <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">len</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">nvars</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">                <span class="com"># if number of variables is the same on both levels, Rspace and Pspace are identity</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">                <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">nvars</span> <span class="op">==</span> <span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">nvars</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">                <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">nvars</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span> <span class="op">==</span> <span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">nvars</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t">                    <span class="nam">Rspace</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">sp</span><span class="op">.</span><span class="nam">eye</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">coarse_prob</span><span class="op">.</span><span class="nam">nvars</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t">                    <span class="nam">Pspace</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">sp</span><span class="op">.</span><span class="nam">eye</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">fine_prob</span><span class="op">.</span><span class="nam">nvars</span><span class="op">[</span><span class="nam">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t">                <span class="com"># assemble restriction as transpose of interpolation</span>&nbsp;</span><span class="r"></span></p>
@@ -334,7 +334,7 @@
             <a class="nav" href="z_716c1644203275a5_TransferMesh_FFT_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-27 08:21 +0000
+            created at 2026-09-27 13:42 +0000
         </p>
     </div>
 </footer>

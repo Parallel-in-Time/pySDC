@@ -44,6 +44,10 @@
 <div class="viewcode-block" id="PlottingHook">
 <a class="viewcode-back" href="../../../pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlottingHook">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PlottingHook</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Base class for hooks that plot the solution with the problem's `plot` method, optionally saving each figure.</span>
+<span class="sd">    """</span>
+
     <span class="n">save_plot</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Supply a string to the path where you want to save</span>
     <span class="n">live_plot</span> <span class="o">=</span> <span class="mf">1e-9</span>  <span class="c1"># Supply `None` if you don't want live plotting</span>
 

@@ -49,7 +49,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">controller_ParaDiag_nonMPI</span><span class="p">(</span><span class="n">ParaDiag</span><span class="p">,</span> <span class="n">controller_nonMPI</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 
-<span class="sd">    ParaDiag controller, running serialized version.</span>
+<span class="sd">    ParaDiag controller with the time steps of a block emulated serially in one process.</span>
 
 <span class="sd">    This is `controller_nonMPI` with a different iteration: where PFASST sweeps and cascades through</span>
 <span class="sd">    the levels, ParaDiag diagonalizes across the steps. Everything around the iteration -- blocks,</span>

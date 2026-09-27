@@ -49,7 +49,9 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.Van_der_Pol_implicit.html#implementations.problem_classes.Van_der_Pol_implicit.vanderpol">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">vanderpol</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    This class implements the stiff Van der Pol oscillator given by the equation</span>
+<span class="sd">    Stiff Van der Pol oscillator as a system of two first-order ODEs, fully implicit with Newton.</span>
+
+<span class="sd">    It is given by the equation</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        \frac{d^2 u(t)}{d t^2} - \mu (1 - u(t)^2) \frac{d u(t)}{dt} + u(t) = 0.</span>

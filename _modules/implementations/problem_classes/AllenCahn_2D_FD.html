@@ -54,6 +54,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_fullyimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_fullyimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Allen-Cahn equation with finite differences, fully implicit with Newton.</span>
+
 <span class="sd">    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
@@ -398,6 +400,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_semiimplicit</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Allen-Cahn equation with finite differences, IMEX with Laplacian implicit, reaction explicit.</span>
+
 <span class="sd">    This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
@@ -530,6 +534,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_semiimplicit_v2">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_semiimplicit_v2</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Allen-Cahn equation with finite differences, IMEX with Laplacian and cubic term implicit.</span>
+
 <span class="sd">    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
@@ -654,6 +660,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_multiimplicit</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Allen-Cahn equation with finite differences, multi-implicit: Laplacian (CG), reaction (Newton).</span>
+
 <span class="sd">    Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
@@ -819,6 +827,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.AllenCahn_2D_FD.html#implementations.problem_classes.AllenCahn_2D_FD.allencahn_multiimplicit_v2">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">allencahn_multiimplicit_v2</span><span class="p">(</span><span class="n">allencahn_fullyimplicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Allen-Cahn with finite differences, multi-implicit: Laplacian plus cubic term, linear term.</span>
+
 <span class="sd">    This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two</span>
 <span class="sd">    phases at :math:`u = 0` and :math:`u = 1`</span>
 
