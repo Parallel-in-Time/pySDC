@@ -60,8 +60,8 @@ class ProtheroRobinson(Problem):
     stop_at_nan : bool, optional
         Wheter to stop or not solve_system when getting NAN. The default is True.
 
-    Reference
-    ---------
+    References
+    ----------
     A. Prothero and A. Robinson, On the stability and accuracy of one-step methods for solving
     stiff systems of ordinary differential equations, Mathematics of Computation, 28 (1974),
     pp. 145–162.

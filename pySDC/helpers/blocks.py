@@ -17,6 +17,7 @@ class BlockDecomposition(object):
         - Hybrid : approach minimizing interface communication, inspired from
           the `[Hybrid CFD solver] <https://web.stanford.edu/group/ctr/ResBriefs07/5_larsson1_pp47_58.pdf>`_.
         - ChatGPT : quickly generated using `[ChatGPT] <https://chatgpt.com>`_.
+
         The default is "Hybrid".
     gRank : int, optional
         If provided, the global rank that will determine the local block distribution. Default is None.

@@ -125,9 +125,11 @@ class ConvergenceController(object):
         parameters by adding the convergence controller manually.
         This relies on children classes to return a composite dictionary from their defaults and from the result of this
         function, so you should write
-        ```
-        return {**defaults, **super().setup(controller, params, description, **kwargs)}
-        ```
+
+        .. code-block:: python
+
+            return {**defaults, **super().setup(controller, params, description, **kwargs)}
+
         when overloading this method in a child class, with `defaults` a dictionary containing default parameters.
 
         Args:

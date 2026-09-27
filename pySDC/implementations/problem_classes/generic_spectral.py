@@ -190,12 +190,12 @@ class GenericSpectralLinear(Problem):
 
         The argument is meant to be a dictionary with the line you want to write the equation in as the key and the relationship between components as another dictionary. For instance, you can add an algebraic condition capturing a first derivative relationship between u and ux as follows:
 
-        ```
-        Dx = self.get_differentiation_matrix(axes=(0,))
-        I = self.get_Id()
-        LHS = {'ux': {'u': Dx, 'ux': -I}}
-        self.setup_L(LHS)
-        ```
+        .. code-block:: python
+
+            Dx = self.get_differentiation_matrix(axes=(0,))
+            I = self.get_Id()
+            LHS = {'ux': {'u': Dx, 'ux': -I}}
+            self.setup_L(LHS)
 
         If you put zero as right hand side for the solver in the line for ux, ux will contain the x-derivative of u afterwards.
 

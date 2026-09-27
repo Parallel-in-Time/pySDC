@@ -1428,6 +1428,7 @@ class SpectralHelper:
         preconditioning:
 
         .. code-block:: python
+
             helper = SpectralHelper()
 
             helper.add_axis(base='chebychev', N=8)

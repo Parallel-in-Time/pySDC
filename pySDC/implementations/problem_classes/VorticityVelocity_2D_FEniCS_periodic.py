@@ -17,7 +17,7 @@ class fenics_vortex_2d(Problem):
         \frac{\partial w}{\partial t} = \nu \Delta w
 
     for some parameter :math:`\nu`. In this class the problem is implemented that the spatial part is solved
-    using ``FEniCS`` [1]_. Hence, the problem is reformulated to the *weak formulation*
+    using ``FEniCS`` [#]_. Hence, the problem is reformulated to the *weak formulation*
 
     .. math::
         \int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx
@@ -32,7 +32,7 @@ class fenics_vortex_2d(Problem):
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
-        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [#]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
@@ -55,9 +55,9 @@ class fenics_vortex_2d(Problem):
 
     References
     ----------
-    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+    .. [#] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
         C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
-    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+    .. [#] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
         Wells and others. Springer (2012).
     """
 
@@ -248,13 +248,14 @@ class fenics_vortex_2d(Problem):
         Routine to apply mass matrix.
 
         Parameters
+        ----------
         u : dtype_u
             Current values of the numerical solution.
 
         Returns
         -------
         me : dtype_u
-            The product :math:` M\vec{u}`.
+            The product :math:`M\vec{u}`.
         """
 
         me = self.dtype_u(self.V)
@@ -333,7 +334,7 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
         \frac{\partial w}{\partial t} = \nu \Delta w
 
     for some parameter :math:`\nu`. In this class the problem is implemented that the spatial part is solved
-    using ``FEniCS`` [1]_. Hence, the problem is reformulated to the *weak formulation*
+    using ``FEniCS`` [#]_. Hence, the problem is reformulated to the *weak formulation*
 
     .. math::
         \int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx
@@ -348,7 +349,7 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
-        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [#]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
@@ -371,9 +372,9 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
 
     References
     ----------
-    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+    .. [#] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
         C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
-    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+    .. [#] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
         Wells and others. Springer (2012).
     """
 
