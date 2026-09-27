@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import numpy as np
+from pySDC.tutorial.step_7.torch_heat import HeatEquationModel
 
 
 class Train_pySDC:
@@ -68,47 +69,6 @@ class Train_pySDC:
         ax.plot(self.problem.xvalues, model_prediction.detach().numpy(), label='model')
         ax.set_title(f't={t:.2e}, dt={dt:.2e}')
         ax.legend()
-
-
-class HeatEquationModel(nn.Module):
-    """
-    Very simple model to learn the heat equation. Beware! It's too simple.
-    Some machine learning expert please fix this!
-    """
-
-    def __init__(self, problem, hidden_size=64):
-        self.input_size = problem.nvars * 3
-        self.output_size = problem.nvars
-        self.problem = problem
-
-        super().__init__()
-
-        self.fc1 = nn.Linear(self.input_size, hidden_size)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size, self.output_size)
-
-        # Initialize weights (example)
-        nn.init.xavier_uniform_(self.fc1.weight)
-        nn.init.xavier_uniform_(self.fc2.weight)
-
-    def forward(self, x, t, dt):
-        # prepare individual tensors
-        x = x.float()
-        _t = torch.ones(x.shape) * dt
-        _dt = torch.ones(x.shape) * dt
-
-        # Concatenate t and dt with the input x
-        _x = torch.cat((x, _t, _dt), dim=0)
-
-        _x = self.fc1(_x)
-        _x = self.relu(_x)
-        _x = self.fc2(_x)
-        return _x
-
-    def __call__(self, *args, **kwargs):
-        me = self.problem.u_init
-        me[:] = super().__call__(*args, **kwargs)
-        return me
 
 
 def train_at_collocation_nodes():
