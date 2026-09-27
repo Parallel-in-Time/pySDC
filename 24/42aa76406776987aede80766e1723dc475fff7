@@ -1,0 +1,19 @@
+pySDC/tests/test_sweepers/test_ParaDiag_sweepers.py
+  s_6435d1fae13e27::t_5a18dd87d57d41 116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2442aa76406776987aede80766e1723dc475fff7",
+  "prompts": {},
+  "sessions": {
+    "s_6435d1fae13e27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79d56209-5811-4846-8ee3-ed8d7bdb952b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
