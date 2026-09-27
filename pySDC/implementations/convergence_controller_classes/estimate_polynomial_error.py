@@ -175,14 +175,18 @@ class EstimatePolynomialError(ConvergenceController):
                 rank = estimate_on_node - 1
                 L.status.order_embedded_estimate = coll.num_nodes * 1
 
-            rescale = float(abs(u_inter).max()) if self.params.rel_error else 1
+            if not self.comm or self.comm.rank == rank:
+                error = abs(u_inter - high_order_sol)
+                if self.params.rel_error:
+                    # the norm of the datatype, as for the error: `u_inter` may be a bare array
+                    error /= abs(high_order_sol)
 
             if self.comm:
-                buf = np.array(abs(u_inter - high_order_sol) / rescale if self.comm.rank == rank else 0.0)
+                buf = np.array(error if self.comm.rank == rank else 0.0)
                 self.comm.Bcast(buf, root=rank)
                 L.status.error_embedded_estimate = float(buf)
             else:
-                L.status.error_embedded_estimate = abs(u_inter - high_order_sol) / rescale
+                L.status.error_embedded_estimate = error
 
             self.debug(
                 f'Obtained error estimate: {L.status.error_embedded_estimate:.2e} of order {L.status.order_embedded_estimate}',
