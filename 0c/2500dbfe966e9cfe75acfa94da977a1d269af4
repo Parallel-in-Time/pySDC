@@ -1,0 +1,75 @@
+pySDC/projects/soft_failure/README.rst
+  s_619b2228c15391::t_f3326aee0a4ac0 27
+  s_619b2228c15391::t_6f4ff27c8b0895 28-30
+docs/source/publications.json
+  s_619b2228c15391::t_c6b637bd03681d 6,70,75,83,86
+CITATION.cff
+  s_619b2228c15391::t_72f6cb916fe67c 60
+pySDC/projects/FastWaveSlowWave/plotgmrescounter_boussinesq.py
+  s_619b2228c15391::t_667ad827fd6a0e 46
+pySDC/projects/gallery.yml
+  s_619b2228c15391::t_667ad827fd6a0e 15,80-81,84,92,99
+  s_619b2228c15391::t_f3326aee0a4ac0 20
+pySDC/projects/README.rst
+  s_619b2228c15391::t_667ad827fd6a0e 5
+docs/source/index.rst
+  s_619b2228c15391::t_667ad827fd6a0e 45
+docs/source/conf.py
+  s_619b2228c15391::t_3afc860bf51fa7 228,367,381-382,384
+  s_619b2228c15391::t_e3615057abfdeb 383,385
+  s_619b2228c15391::t_667ad827fd6a0e 214,227,247
+pySDC/tutorial/README.rst
+  s_619b2228c15391::t_667ad827fd6a0e 5-7
+CHANGELOG.md
+  s_619b2228c15391::t_5ebe3c9763ea61 318
+  s_619b2228c15391::t_303232ce6b85fe 293
+pySDC/tutorial/step_7/README.rst
+  s_619b2228c15391::t_667ad827fd6a0e 16
+pySDC/projects/AllenCahn_Bayreuth/README.rst
+  s_619b2228c15391::t_667ad827fd6a0e 28
+  s_619b2228c15391::t_303232ce6b85fe 5
+README.md
+  s_619b2228c15391::t_b925805d6cdae1 61-62,102-103
+  s_619b2228c15391::t_72f6cb916fe67c 95
+  s_619b2228c15391::t_303232ce6b85fe 120
+docs/convert_markdown.py
+  s_619b2228c15391::t_27e5dbd6d0d415 8,77
+  s_619b2228c15391::t_2427ba6b68457d 71-76,78-81,117
+  s_619b2228c15391::t_667ad827fd6a0e 83
+pySDC/projects/RDC/README.rst
+  s_619b2228c15391::t_303232ce6b85fe 4
+pySDC/projects/GPU/heat.py
+  s_619b2228c15391::t_667ad827fd6a0e 82,85,89
+pySDC/projects/TOMS/README.rst
+  s_619b2228c15391::t_72f6cb916fe67c 5
+  s_619b2228c15391::t_f3326aee0a4ac0 24,43,54-56
+pySDC/core/collocation.py
+  s_619b2228c15391::t_303232ce6b85fe 33
+pySDC/projects/GPU/README.rst
+  s_619b2228c15391::t_667ad827fd6a0e 44,48-49
+  s_619b2228c15391::t_303232ce6b85fe 30,36,43,51-52,54
+pySDC/projects/parallelSDC_reloaded/README.rst
+  s_619b2228c15391::t_667ad827fd6a0e 8-13
+pySDC/core/sweeper.py
+  s_619b2228c15391::t_303232ce6b85fe 46
+docs/source/api.rst
+  s_619b2228c15391::t_667ad827fd6a0e 5-7
+docs/update_publications.py
+  s_619b2228c15391::t_57a4322bd21fce 14,32-43,71-72,74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0c2500dbfe966e9cfe75acfa94da977a1d269af4",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
