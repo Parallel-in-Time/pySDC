@@ -132,6 +132,12 @@ class QDiagonalization(generic_implicit):
         return None
 
     def eval_f_at_all_nodes(self):
+        """
+        Evaluate the right hand side at all collocation nodes, since the solve does not do this by default.
+
+        Returns:
+            None
+        """
         L = self.level
         P = self.level.prob
         for m in range(self.coll.num_nodes):
@@ -158,6 +164,16 @@ class QDiagonalization(generic_implicit):
         return residual
 
     def compute_residual(self, *args, **kwargs):
+        """
+        Evaluate the right hand side at all nodes and then compute the residual as in the base class.
+
+        Args:
+            *args: passed on to the base class method, typically the stage (str)
+            **kwargs: passed on to the base class method
+
+        Returns:
+            None
+        """
         self.eval_f_at_all_nodes()
         return super().compute_residual(*args, **kwargs)
 

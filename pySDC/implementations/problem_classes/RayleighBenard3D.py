@@ -223,6 +223,21 @@ class RayleighBenard3D(GenericSpectralLinear):
         self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, *args, **kwargs):
+        """
+        Evaluate the right hand side, split into an implicit and an explicit part.
+
+        The implicit part is -L u, i.e. diffusion, pressure gradient, buoyancy and, in the pressure line, the negative
+        divergence, converted back to the Chebychev-T basis. The explicit part is the advection -(u d/dx + v d/dy + w
+        d/dz) of u, v, w and T, computed in physical space on a grid padded by the dealiasing factor.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+            *args: Not used, the right hand side does not depend on time
+            **kwargs: Not used, the right hand side does not depend on time
+
+        Returns:
+            dtype_f: The right hand side, in the same space as `u`
+        """
         f = self.f_init
 
         if self.spectral_space:
@@ -277,6 +292,19 @@ class RayleighBenard3D(GenericSpectralLinear):
         return f
 
     def u_exact(self, t=0, noise_level=1e-3, seed=99):
+        """
+        Initial conditions, which are only available at t=0 and for Lz=1. Velocities and temperature are linear in z
+        between their boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly
+        distributed noise, multiplied by `noise_level` and (z - 1) (z + 1).
+
+        Args:
+            t (float): Time, has to be 0
+            noise_level (float): Amplitude of the noise
+            seed (int): Seed for the random number generator
+
+        Returns:
+            dtype_u: Initial conditions, in spectral space if `spectral_space` is set, else in physical space
+        """
         assert t == 0
         assert (
             self.BCs['v_top'] == self.BCs['v_bottom']
@@ -471,6 +499,17 @@ class RayleighBenard3D(GenericSpectralLinear):
         return xp.array(unique_k_all), spectrum
 
     def get_vertical_profiles(self, u, components):
+        """
+        Compute horizontally averaged vertical profiles from the horizontal mean mode of each component, transformed to
+        physical space in z and broadcast from rank 0, which holds the mean mode.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+            components (list of str): Names of the components you want the profiles of
+
+        Returns:
+            dict: Profile along z for each component, as xp.ndarray
+        """
         if self.spectral_space:
             u_hat = u.copy()
         else:

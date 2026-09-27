@@ -56,6 +56,12 @@ class DataChecker:
     """
 
     def __init__(self, filePath):
+        """
+        Parameters
+        ----------
+        filePath : str
+            Absolute path of the calling script, usually `__file__`. The data files are in its directory.
+        """
         path = '/' + os.path.join(*filePath.split('/')[:-1])
         self._data = {}  # cache for data
         self._dataRef = None  # cache for reference data

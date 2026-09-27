@@ -77,6 +77,7 @@ class ProtheroRobinsonAutonomous(Problem):
     dtype_f = mesh
 
     def __init__(self, epsilon=1e-3, nonLinear=False, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
+        """Initialization routine"""
         nvars = 2
         super().__init__((nvars, None, np.dtype('float64')))
 
@@ -92,35 +93,171 @@ class ProtheroRobinsonAutonomous(Problem):
     # g function (analytical solution), and its first and second derivative
     # -------------------------------------------------------------------------
     def g(self, t):
+        r"""
+        Function :math:`g(t) = \cos(t)`, which is the exact solution.
+
+        Parameters
+        ----------
+        t : float
+            Time.
+
+        Returns
+        -------
+        float
+            The value of :math:`g(t)`.
+        """
         return np.cos(t)
 
     def dg(self, t):
+        r"""
+        First derivative :math:`g'(t) = -\sin(t)` of :math:`g`.
+
+        Parameters
+        ----------
+        t : float
+            Time.
+
+        Returns
+        -------
+        float
+            The value of :math:`g'(t)`.
+        """
         return -np.sin(t)
 
     def dg2(self, t):
+        r"""
+        Second derivative :math:`g''(t) = -\cos(t)` of :math:`g`.
+
+        Parameters
+        ----------
+        t : float
+            Time.
+
+        Returns
+        -------
+        float
+            The value of :math:`g''(t)`.
+        """
         return -np.cos(t)
 
     # -------------------------------------------------------------------------
     # f(u,t) and Jacobian functions
     # -------------------------------------------------------------------------
     def f(self, u, t):
+        """
+        Right-hand side of the first component, replaced in ``__init__`` by ``f_LIN`` or ``f_NONLIN``.
+
+        Parameters
+        ----------
+        u : float
+            First solution component :math:`u`.
+        t : float
+            Second solution component :math:`v`, which equals the time.
+
+        Raises
+        ------
+        NotImplementedError
+            Always.
+        """
         raise NotImplementedError()
 
     def f_LIN(self, u, t):
+        r"""
+        Right-hand side :math:`-(u - g(v)) / \epsilon + g'(v)` of the first component in the linear form.
+
+        Parameters
+        ----------
+        u : float
+            First solution component :math:`u`.
+        t : float
+            Second solution component :math:`v`, which equals the time.
+
+        Returns
+        -------
+        float
+            The right-hand side of the first component.
+        """
         return -self.epsilon ** (-1) * (u - self.g(t)) + self.dg(t)
 
     def f_NONLIN(self, u, t):
+        r"""
+        Right-hand side :math:`-(u^3 - g(v)^3) / \epsilon + g'(v)` of the first component in the nonlinear form.
+
+        Parameters
+        ----------
+        u : float
+            First solution component :math:`u`.
+        t : float
+            Second solution component :math:`v`, which equals the time.
+
+        Returns
+        -------
+        float
+            The right-hand side of the first component.
+        """
         return -self.epsilon ** (-1) * (u**3 - self.g(t) ** 3) + self.dg(t)
 
     def dgInv(self, u, t):
+        """
+        Inverse Jacobian of the Newton function, replaced in ``__init__`` by ``dgInv_LIN`` or ``dgInv_NONLIN``, which
+        also take the step size ``dt``.
+
+        Parameters
+        ----------
+        u : float
+            First solution component :math:`u`.
+        t : float
+            Second solution component :math:`v`, which equals the time.
+
+        Raises
+        ------
+        NotImplementedError
+            Always.
+        """
         raise NotImplementedError()
 
     def dgInv_LIN(self, u, t, dt):
+        r"""
+        Inverse of the Jacobian of the Newton function :math:`G(u, v) = (u, v) - dt f(u, v) - rhs` of ``solve_system``
+        for the linear form, which does not depend on :math:`u`.
+
+        Parameters
+        ----------
+        u : float
+            First solution component :math:`u`.
+        t : float
+            Second solution component :math:`v`, which equals the time.
+        dt : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+
+        Returns
+        -------
+        np.2darray
+            The inverse of the :math:`2 \times 2` Jacobian.
+        """
         e = self.epsilon
         g1, g2 = self.dg(t), self.dg2(t)
         return np.array([[1 / (dt / e + 1), (dt * g2 + dt * g1 / e) / (dt / e + 1)], [0, 1]])
 
     def dgInv_NONLIN(self, u, t, dt):
+        r"""
+        Inverse of the Jacobian of the Newton function :math:`G(u, v) = (u, v) - dt f(u, v) - rhs` of ``solve_system``
+        for the nonlinear form.
+
+        Parameters
+        ----------
+        u : float
+            First solution component :math:`u`.
+        t : float
+            Second solution component :math:`v`, which equals the time.
+        dt : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+
+        Returns
+        -------
+        np.2darray
+            The inverse of the :math:`2 \times 2` Jacobian.
+        """
         e = self.epsilon
         g, g1, g2 = self.g(t), self.dg(t), self.dg2(t)
         return np.array(
@@ -272,6 +409,7 @@ class Kaps(Problem):
     dtype_f = mesh
 
     def __init__(self, epsilon=1e-3, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
+        """Initialization routine"""
         nvars = 2
         super().__init__((nvars, None, np.dtype('float64')))
 
@@ -426,6 +564,7 @@ class ChemicalReaction3Var(Problem):
     dtype_f = mesh
 
     def __init__(self, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
+        """Initialization routine"""
         nvars = 3
         u0 = (0.990731920827, 1.009264413846, -0.366532612659e-5)
         super().__init__((nvars, None, np.dtype('float64')))
@@ -774,6 +913,7 @@ class JacobiElliptic(Problem):
     dtype_f = mesh
 
     def __init__(self, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
+        """Initialization routine"""
         nvars = 3
         u0 = (0.0, 1.0, 1.0)
         super().__init__((nvars, None, np.dtype('float64')))

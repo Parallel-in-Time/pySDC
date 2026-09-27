@@ -64,6 +64,17 @@ class LogSDCIterations(Hooks):
     name = 'k'
 
     def post_step(self, step, level_number):
+        """
+        Add the number of iterations of the step to the stats under the type ``name``, via ``increment_stats``, so the
+        value is added to an entry with the same metadata if one exists.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         super().post_step(step, level_number)
 
         L = step.levels[level_number]

@@ -72,6 +72,13 @@ class ButcherTableau(object):
 
     @property
     def globally_stiffly_accurate(self):
+        """
+        Whether the last row of the Butcher matrix equals the weights, such that the last stage is the solution of the
+        step.
+
+        Returns:
+            bool: True if the method is stiffly accurate
+        """
         return np.allclose(self.Qmat[-1, 1:], self.weights)
 
 
@@ -90,6 +97,13 @@ class ButcherTableauEmbedded(ButcherTableau):
 
     @property
     def globally_stiffly_accurate(self):
+        """
+        Whether the last row of the Butcher matrix equals the weights of the primary (higher order) method, such that
+        the last stage is the solution of the step.
+
+        Returns:
+            bool: True if the method is stiffly accurate
+        """
         return np.allclose(self.Qmat[-1, 1:], self.weights[0])
 
 
@@ -166,10 +180,23 @@ class RungeKutta(Sweeper):
 
     @classmethod
     def get_Q_matrix(cls):
+        """
+        Get the quadrature matrix of the scheme, i.e. the Butcher matrix padded with a leading row and column of zeros
+        for the initial conditions.
+
+        Returns:
+            numpy.ndarray: the quadrature matrix
+        """
         return cls.get_Butcher_tableau().Qmat
 
     @classmethod
     def get_Butcher_tableau(cls):
+        """
+        Build the Butcher tableau from the class attributes ``weights``, ``nodes`` and ``matrix``.
+
+        Returns:
+            ButcherTableau: an instance of ``ButcherTableauClass``
+        """
         return cls.ButcherTableauClass(cls.weights, cls.nodes, cls.matrix)
 
     @classmethod
@@ -183,6 +210,13 @@ class RungeKutta(Sweeper):
 
     @classmethod
     def is_embedded(cls):
+        """
+        Whether the scheme is an embedded pair, i.e. uses ``ButcherTableauEmbedded`` and has a secondary solution for
+        error estimation.
+
+        Returns:
+            bool: True if the scheme is embedded
+        """
         return cls.ButcherTableauClass == ButcherTableauEmbedded
 
     def get_full_f(self, f):
@@ -390,6 +424,12 @@ class RungeKuttaIMEX(RungeKutta):
 
     @classmethod
     def get_Butcher_tableau_explicit(cls):
+        """
+        Build the Butcher tableau of the explicit part from ``weights_explicit``, ``nodes`` and ``matrix_explicit``.
+
+        Returns:
+            ButcherTableau: an instance of ``ButcherTableauClass_explicit``
+        """
         return cls.ButcherTableauClass_explicit(cls.weights_explicit, cls.nodes, cls.matrix_explicit)
 
     def integrate(self):
@@ -606,6 +646,12 @@ class Heun_Euler(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of forward Euler.
+
+        Returns:
+            int: 2
+        """
         return 2
 
 
@@ -620,6 +666,12 @@ class Cash_Karp(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -636,6 +688,12 @@ class DIRK43(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -671,6 +729,12 @@ class ESDIRK53(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -686,6 +750,12 @@ class ESDIRK43(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -700,6 +770,12 @@ class ARK548L2SAERK(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -732,6 +808,12 @@ class ARK54(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -749,6 +831,12 @@ class ARK548L2SAESDIRK2(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -784,6 +872,12 @@ class ARK548L2SA(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -798,6 +892,12 @@ class ARK324L2SAERK(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the second order secondary method.
+
+        Returns:
+            int: 3
+        """
         return 3
 
 
@@ -826,6 +926,12 @@ class ARK32(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the second order secondary method.
+
+        Returns:
+            int: 3
+        """
         return 3
 
 

@@ -95,9 +95,31 @@ class Sweeper(object):
                 delattr(self, name)
 
     def buildGenerator(self, qdType: str) -> QDeltaGenerator:
+        """
+        Build the qmat generator of QDelta coefficients for the collocation nodes of this sweeper.
+
+        Args:
+            qdType (str): Name or alias of the QDelta type, a key of `qmat.qdelta.QDELTA_GENERATORS`
+
+        Returns:
+            qmat.qdelta.QDeltaGenerator: Generator for these nodes and left interval boundary
+        """
         return QDELTA_GENERATORS[qdType](qGen=self.coll.generator, tLeft=self.coll.tleft)
 
     def get_Qdelta_implicit(self, qd_type: str, k: Optional[int] = None) -> np.ndarray:
+        """
+        Get a QDelta matrix of implicit type, i.e. lower triangular with zeros in the first row and column.
+
+        The generator is cached as `self.genQI` and only rebuilt if `qd_type` is not an alias of the cached one. Sets
+        `self.parallelizable` to True if the matrix is diagonal, but never back to False.
+
+        Args:
+            qd_type (str): Name or alias of the QDelta type
+            k (int, optional): Sweep index, for QDelta types whose coefficients change with the sweep
+
+        Returns:
+            numpy.ndarray: QDelta matrix of shape (num_nodes + 1, num_nodes + 1)
+        """
         QDmat = np.zeros_like(self.coll.Qmat)
         if not hasattr(self, "genQI") or qd_type not in QDELTA_GENERATORS_ALIASES[type(self.genQI)]:
             self.genQI: QDeltaGenerator = self.buildGenerator(qd_type)
@@ -110,6 +132,21 @@ class Sweeper(object):
         return QDmat
 
     def get_Qdelta_explicit(self, qd_type: str, k: Optional[int] = None) -> np.ndarray:
+        """
+        Get a QDelta matrix of explicit type, i.e. strictly lower triangular, with the distances of the nodes to the
+        left
+        interval boundary in the first column and zeros in the first row.
+
+        The generator is cached as `self.genQE` and only rebuilt if `qd_type` is not an alias of the cached one. Sets
+        `self.parallelizable` to True if the matrix is diagonal, but never back to False.
+
+        Args:
+            qd_type (str): Name or alias of the QDelta type
+            k (int, optional): Sweep index, for QDelta types whose coefficients change with the sweep
+
+        Returns:
+            numpy.ndarray: QDelta matrix of shape (num_nodes + 1, num_nodes + 1)
+        """
         coll = self.coll
         QDmat = np.zeros(coll.Qmat.shape, dtype=float)
         if not hasattr(self, "genQE") or qd_type not in QDELTA_GENERATORS_ALIASES[type(self.genQE)]:
@@ -257,6 +294,7 @@ class Sweeper(object):
 
     @property
     def rank(self) -> int:
+        """Rank of this sweeper in the communicator across nodes: always 0 here, overridden by the MPI sweepers."""
         return 0
 
     def updateVariableCoeffs(self, k: int) -> None:

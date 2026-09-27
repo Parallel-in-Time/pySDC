@@ -159,6 +159,7 @@ class Controller(object):
             self.__hooks += [hook()]
 
     def welcome_message(self) -> None:
+        """Log the pySDC welcome banner at info level."""
         out = (
             "Welcome to the one and only, really very astonishing and 87.3% bug free"
             + "\n"

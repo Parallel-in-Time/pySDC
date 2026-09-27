@@ -91,6 +91,7 @@ class penningtrap(Problem):
     dtype_f = fields
 
     def __init__(self, omega_B, omega_E, u0, nparts, sig):
+        """Initialization routine"""
         # invoke super init, passing nparts, dtype_u and dtype_f
         super().__init__(((3, nparts), None, np.dtype('float64')))
         self._makeAttributeAndRegister('nparts', localVars=locals(), readOnly=True)

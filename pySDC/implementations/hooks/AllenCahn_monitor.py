@@ -29,6 +29,7 @@ class AllenCahnMonitor(Hooks):
     default_phase_thresh = 0.5
 
     def __init__(self):
+        """Start with no initial radius or dimension; both are filled in by :meth:`pre_run`."""
         super().__init__()
 
         self.init_radius = None
@@ -65,9 +66,11 @@ class AllenCahnMonitor(Hooks):
         return max(self.init_radius**2 - 2.0 * (self.ndim - 1) * t, 0)
 
     def exact_radius(self, t):
+        """Exact radius at time ``t`` under mean curvature flow, clipped at zero once the blob has vanished."""
         return np.sqrt(self.exact_radius_squared(t))
 
     def exact_volume(self, t):
+        """Exact area (2D) or volume (3D) of the blob at time ``t``."""
         r2 = self.exact_radius_squared(t)
         return np.pi * r2 if self.ndim == 2 else np.pi * 4.0 / 3.0 * r2**1.5
 
@@ -101,6 +104,15 @@ class AllenCahnMonitor(Hooks):
         return diagnostics
 
     def record(self, step, L, t, diagnostics):
+        """
+        Add each diagnostic to the stats, with its key as ``type``, on level ``-1``.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            L (pySDC.Level.level): the finest level
+            t (float): the time the diagnostics refer to
+            diagnostics (dict): stats entries as returned by :meth:`get_diagnostics`
+        """
         for key, value in diagnostics.items():
             self.add_to_stats(
                 process=step.status.slot,
@@ -113,6 +125,14 @@ class AllenCahnMonitor(Hooks):
             )
 
     def pre_run(self, step, level_number):
+        """
+        Read the initial radius, phase threshold and dimension off the problem, and record the diagnostics of the
+        initial condition if the run starts at :math:`t = 0`.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
         super().pre_run(step, level_number)
         L = step.levels[0]
 
@@ -124,6 +144,13 @@ class AllenCahnMonitor(Hooks):
             self.record(step, L, L.time, self.get_diagnostics(L, L.u[0], 0.0))
 
     def post_step(self, step, level_number):
+        """
+        Record the diagnostics of the solution at the end of the step, at time ``L.time + L.dt``.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
         super().post_step(step, level_number)
         L = step.levels[0]
 

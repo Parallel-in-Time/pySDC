@@ -137,6 +137,14 @@ class GenericSpectralLinear(Problem):
         self.logger.debug('Finished GenericSpectralLinear __init__')
 
     def heterogeneous_setup(self):
+        """
+        Prepare the operators for heterogeneous runs, once and only if `heterogeneous` is set. On GPU, the BC matrices
+        `BC_line_zero_matrix` and `BCs` of the spectral helper are moved to the CPU, and CPU copies of `Pl`, `Pr`, `L`
+        and `M` are stored with the suffix `_CPU`. On CPU, the `_CPU` attributes refer to the operators themselves.
+
+        Returns:
+            None
+        """
         if self.heterogeneous and not self.__heterogeneous_setup:
 
             CPU_only = ['BC_line_zero_matrix', 'BCs']
@@ -417,6 +425,12 @@ class GenericSpectralLinear(Problem):
             return sol
 
     def setUpFieldsIO(self):
+        """
+        Set up the MPI mode of `Rectilinear` output files with the local slice of this problem in physical space.
+
+        Returns:
+            None
+        """
         Rectilinear.setupMPI(
             comm=self.comm.commMPI if self.useGPU else self.comm,
             iLoc=[me.start for me in self.local_slice(False)],
@@ -424,6 +438,15 @@ class GenericSpectralLinear(Problem):
         )
 
     def getOutputFile(self, fileName):
+        """
+        Set up a `Rectilinear` output file on the grid of this problem, with one variable per component.
+
+        Args:
+            fileName (str): Name of the file
+
+        Returns:
+            pySDC.helpers.fieldsIO.Rectilinear: The initialized output file
+        """
         self.setUpFieldsIO()
 
         coords = [me.get_1dgrid() for me in self.spectral.axes]
@@ -438,6 +461,15 @@ class GenericSpectralLinear(Problem):
         return fOut
 
     def processSolutionForOutput(self, u):
+        """
+        Prepare a solution for output: its real part in physical space, moved to the CPU if running on GPU.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+
+        Returns:
+            numpy.ndarray: The solution as contiguous array
+        """
         if self.spectral_space:
             u = self.itransform(u).real
         else:

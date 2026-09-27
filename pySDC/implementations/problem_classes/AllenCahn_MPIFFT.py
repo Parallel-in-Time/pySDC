@@ -72,6 +72,7 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         init_type='circle',
         **kwargs,
     ):
+        """Initialization routine. ``kwargs`` are passed on to ``IMEX_Laplacian_MPIFFT``."""
         kwargs['L'] = kwargs.get('L', 1.0)
         kwargs['x0'] = kwargs.get('x0', -kwargs['L'] / 2.0)
         super().__init__(alpha=1.0, dtype=np.dtype('float'), **kwargs)

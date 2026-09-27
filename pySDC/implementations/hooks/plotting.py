@@ -11,14 +11,38 @@ class PlottingHook(Hooks):  # pragma: no cover
     live_plot = 1e-9  # Supply `None` if you don't want live plotting
 
     def __init__(self):
+        """Start counting the plots from zero."""
         super().__init__()
         self.plot_counter = 0
 
     def pre_run(self, step, level_number):
+        """
+        Get the figure to plot into from the problem's ``get_fig`` method.
+
+        Args:
+            step (pySDC.Step.step): The current step
+            level_number (int): Number of current level
+
+        Returns:
+            None
+        """
         prob = step.levels[level_number].prob
         self.fig = prob.get_fig()
 
     def plot(self, step, level_number, plot_ic=False):
+        """
+        Plot the initial conditions or the solution at the end of the step with the problem's ``plot`` method. The
+        figure is saved to ``<save_plot>_<counter>.png`` if ``save_plot`` is set, and shown for ``live_plot`` seconds if
+        that is not ``None``.
+
+        Args:
+            step (pySDC.Step.step): The current step
+            level_number (int): Number of current level
+            plot_ic (bool): plot the initial conditions ``u[0]`` instead of the end point
+
+        Returns:
+            None
+        """
         level = step.levels[level_number]
         prob = level.prob
 
@@ -49,10 +73,21 @@ class PlotPostStep(PlottingHook):  # pragma: no cover
     plot_every = 1
 
     def __init__(self):
+        """Start counting the steps since the last plot from zero."""
         super().__init__()
         self.skip_counter = 0
 
     def pre_run(self, step, level_number):
+        """
+        Set up the figure and plot the initial conditions, on the finest level only.
+
+        Args:
+            step (pySDC.Step.step): The current step
+            level_number (int): Number of current level
+
+        Returns:
+            None
+        """
         if level_number > 0:
             return
         super().pre_run(step, level_number)

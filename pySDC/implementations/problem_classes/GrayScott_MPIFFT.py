@@ -82,6 +82,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         num_blobs=1,
         **kwargs,
     ):
+        """Initialization routine. ``kwargs`` are passed on to ``IMEX_Laplacian_MPIFFT``."""
         super().__init__(dtype='d', alpha=1.0, x0=-L / 2.0, L=L, **kwargs)
 
         # prepare the array with two components
@@ -389,6 +390,15 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
     """
 
     def __init__(self, **kwargs):
+        """
+        Initialization routine
+
+        Parameters
+        ----------
+        **kwargs
+            Passed on to ``grayscott_imex_diffusion``, see there. The linear reaction terms :math:`-A u` and
+            :math:`-B v` are then added to the implicit operators ``Ku`` and ``Kv``.
+        """
         super().__init__(**kwargs)
         self.Ku -= self.A
         self.Kv -= self.B

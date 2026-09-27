@@ -195,6 +195,21 @@ class RayleighBenard(GenericSpectralLinear):
         self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, *args, **kwargs):
+        """
+        Evaluate the right hand side, split into an implicit and an explicit part.
+
+        The implicit part is -L u, i.e. diffusion, pressure gradient, buoyancy and, in the pressure line, the negative
+        divergence, converted back to the Chebychev-T basis. The explicit part is the advection -(u d/dx + v d/dz) of u,
+        v and T, computed in physical space on a grid padded by the dealiasing factor.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+            *args: Not used, the right hand side does not depend on time
+            **kwargs: Not used, the right hand side does not depend on time
+
+        Returns:
+            dtype_f: The right hand side, in the same space as `u`
+        """
         f = self.f_init
 
         if self.spectral_space:
@@ -248,6 +263,19 @@ class RayleighBenard(GenericSpectralLinear):
         return f
 
     def u_exact(self, t=0, noise_level=1e-3, seed=99):
+        """
+        Initial conditions, which are only available at t=0. Velocities and temperature are linear in z between their
+        boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly distributed noise,
+        multiplied by `noise_level` and (z - z0) (z - z0 + Lz).
+
+        Args:
+            t (float): Time, has to be 0
+            noise_level (float): Amplitude of the noise
+            seed (int): Seed for the random number generator
+
+        Returns:
+            dtype_u: Initial conditions, in spectral space if `spectral_space` is set, else in physical space
+        """
         assert t == 0
         assert (
             self.BCs['v_top'] == self.BCs['v_bottom']
@@ -376,6 +404,15 @@ class RayleighBenard(GenericSpectralLinear):
         fig.colorbar(imV, self.cax[1])
 
     def compute_vorticity(self, u):
+        """
+        Compute the vorticity by spectral differentiation, as Dx v + Dz u.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+
+        Returns:
+            xp.ndarray: Vorticity in physical space
+        """
         if self.spectral_space:
             u_hat = u.copy()
         else:
@@ -390,6 +427,16 @@ class RayleighBenard(GenericSpectralLinear):
         return self.itransform(vorticity_hat)[0].real
 
     def getOutputFile(self, fileName):
+        """
+        Set up a `Rectilinear` output file on the grid of this problem, with one variable per component plus the
+        vorticity, see `processSolutionForOutput`.
+
+        Args:
+            fileName (str): Name of the file
+
+        Returns:
+            pySDC.helpers.fieldsIO.Rectilinear: The initialized output file
+        """
         from pySDC.helpers.fieldsIO import Rectilinear
 
         self.setUpFieldsIO()
@@ -403,6 +450,16 @@ class RayleighBenard(GenericSpectralLinear):
         return fOut
 
     def processSolutionForOutput(self, u):
+        """
+        Prepare a solution for output: the real parts of all components in physical space, with the vorticity appended
+        as the last variable.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+
+        Returns:
+            numpy.ndarray: Components u, v, T, p and the vorticity
+        """
         vorticity = self.compute_vorticity(u)
 
         if self.spectral_space:
@@ -472,6 +529,17 @@ class RayleighBenard(GenericSpectralLinear):
         }
 
     def compute_viscous_dissipation(self, u):
+        """
+        Compute the pointwise viscous dissipation ``abs(u Lap(u) + v Lap(v))``, the velocity times its Laplacian, where
+        the
+        Laplacian is computed by spectral differentiation.
+
+        Args:
+            u (dtype_u): Solution in physical space
+
+        Returns:
+            xp.ndarray: Viscous dissipation in physical space
+        """
         iu, iv = self.index(['u', 'v'])
 
         Lap_u_hat = self.spectral.u_init_forward
@@ -487,6 +555,15 @@ class RayleighBenard(GenericSpectralLinear):
         return abs(u[iu] * Lap_u[iu] + u[iv] * Lap_u[iv])
 
     def compute_buoyancy_generation(self, u):
+        """
+        Compute the pointwise buoyancy production ``abs(Rayleigh v T)``.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+
+        Returns:
+            xp.ndarray: Buoyancy production in physical space
+        """
         if self.spectral_space:
             u = self.itransform(u)
         iv, iT = self.index(['v', 'T'])
@@ -496,6 +573,17 @@ class RayleighBenard(GenericSpectralLinear):
 class CFLLimit(ConvergenceController):
 
     def dependencies(self, controller, *args, **kwargs):
+        """
+        Add the hooks `LogCFL` and `LogStepSize` to the controller to record the CFL limit and the step size.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            *args: Not used, e.g. the description
+            **kwargs: Not used, e.g. the description
+
+        Returns:
+            None
+        """
         from pySDC.implementations.hooks.log_step_size import LogStepSize
 
         controller.add_hook(LogCFL)
@@ -537,6 +625,19 @@ class CFLLimit(ConvergenceController):
 
     @staticmethod
     def compute_max_step_size(P, u):
+        """
+        Compute the largest step size allowed by the CFL condition with CFL number 1: the minimum over the grid of the
+        grid spacing divided by the absolute velocity, in x and in z, reduced over the space communicator of the
+        problem. The vertical grid spacing is the distance between the midpoints of neighbouring Chebychev nodes, with
+        the domain [0, Lz].
+
+        Args:
+            P (RayleighBenard): The problem
+            u (dtype_u): Solution, in spectral space if `P.spectral_space` is set, else in physical space
+
+        Returns:
+            float: Maximal step size
+        """
         grid_spacing_x = P.X[1, 0] - P.X[0, 0]
 
         cell_wallz = P.xp.zeros(P.nz + 1)
@@ -559,6 +660,18 @@ class CFLLimit(ConvergenceController):
         return float(max_step_size)
 
     def get_new_step_size(self, controller, step, **kwargs):
+        """
+        Once the step has converged, compute the CFL limit at the end point of the finest level, store `cfl` times it in
+        the level status for `LogCFL` and limit the new step size to it. If no other convergence controller has set a
+        new step size, max(`dt_max`, current step size) is limited instead. The result is at least `dt_min`.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            step (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
         if not CheckConvergence.check_convergence(step):
             return None
 
