@@ -1,0 +1,30 @@
+pySDC/playgrounds/ML_initial_guess/heat.py
+  s_619b2228c15391::t_62068043860799 4
+pySDC/playgrounds/ML_initial_guess/ml_heat.py
+  s_619b2228c15391::t_62068043860799 6
+pySDC/tutorial/step_7/torch_heat.py
+  s_619b2228c15391::t_62068043860799 1-374
+pySDC/tutorial/step_7/D_pySDC_with_PyTorch.py
+  s_619b2228c15391::t_62068043860799 32
+  s_619b2228c15391::t_2c3ba129703160 24-25
+pySDC/tutorial/step_7/README.rst
+  s_619b2228c15391::t_2de509277a4c85 10-11
+pySDC/playgrounds/ML_initial_guess/tensor.py
+  s_619b2228c15391::t_62068043860799 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c1f6536cb2ae4845bfb98bd26f3847d3469e8d1",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
