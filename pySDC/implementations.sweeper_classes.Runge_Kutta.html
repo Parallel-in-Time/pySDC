@@ -1268,7 +1268,8 @@ error estimation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.get_Butcher_tableau_explicit">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_Butcher_tableau_explicit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/Runge_Kutta.html#RungeKuttaIMEX.get_Butcher_tableau_explicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.get_Butcher_tableau_explicit" title="Link to this definition">¶</a></dt>
-<dd><p>Build the Butcher tableau of the explicit part from <code class="docutils literal notranslate"><span class="pre">weights_explicit</span></code>, <code class="docutils literal notranslate"><span class="pre">nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">matrix_explicit</span></code>.</p>
+<dd><p>Build the Butcher tableau of the explicit part from <code class="docutils literal notranslate"><span class="pre">weights_explicit</span></code>, <code class="docutils literal notranslate"><span class="pre">nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">matrix_explicit</span></code>.
+Without <code class="docutils literal notranslate"><span class="pre">weights_explicit</span></code>, the explicit part uses the implicit <code class="docutils literal notranslate"><span class="pre">weights</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>an instance of <code class="docutils literal notranslate"><span class="pre">ButcherTableauClass_explicit</span></code></p>

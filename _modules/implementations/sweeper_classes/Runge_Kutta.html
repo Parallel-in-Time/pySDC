@@ -214,7 +214,6 @@
         <span class="c1"># set parameters to their actual values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Butcher_tableau</span><span class="p">()</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">'initial_guess'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'zero'</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">'collocation_class'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ButcherTableauClass</span><span class="p">)</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
 
         <span class="c1"># disable residual computation by default</span>
@@ -487,7 +486,6 @@
 <span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
 <span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
-        <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">weights_explicit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_explicit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights_explicit</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Butcher_tableau_explicit</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll_explicit</span><span class="o">.</span><span class="n">Qmat</span>
 
@@ -517,11 +515,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_Butcher_tableau_explicit</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Build the Butcher tableau of the explicit part from ``weights_explicit``, ``nodes`` and ``matrix_explicit``.</span>
+<span class="sd">        Without ``weights_explicit``, the explicit part uses the implicit ``weights``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            ButcherTableau: an instance of ``ButcherTableauClass_explicit``</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ButcherTableauClass_explicit</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">weights_explicit</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">matrix_explicit</span><span class="p">)</span></div>
+        <span class="n">weights</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">weights</span> <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">weights_explicit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">cls</span><span class="o">.</span><span class="n">weights_explicit</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ButcherTableauClass_explicit</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">matrix_explicit</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RungeKuttaIMEX.integrate">

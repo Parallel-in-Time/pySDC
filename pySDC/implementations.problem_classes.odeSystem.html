@@ -447,14 +447,14 @@ pp. 145–162.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv">
-<span class="sig-name descname"><span class="pre">dgInv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.dgInv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv" title="Link to this definition">¶</a></dt>
-<dd><p>Inverse Jacobian of the Newton function, replaced in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> by <code class="docutils literal notranslate"><span class="pre">dgInv_LIN</span></code> or <code class="docutils literal notranslate"><span class="pre">dgInv_NONLIN</span></code>, which
-also take the step size <code class="docutils literal notranslate"><span class="pre">dt</span></code>.</p>
+<span class="sig-name descname"><span class="pre">dgInv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/odeSystem.html#ProtheroRobinsonAutonomous.dgInv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv" title="Link to this definition">¶</a></dt>
+<dd><p>Inverse Jacobian of the Newton function, replaced in <code class="docutils literal notranslate"><span class="pre">__init__</span></code> by <code class="docutils literal notranslate"><span class="pre">dgInv_LIN</span></code> or <code class="docutils literal notranslate"><span class="pre">dgInv_NONLIN</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>u</strong> (<em>float</em>) – First solution component <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Second solution component <span class="math notranslate nohighlight">\(v\)</span>, which equals the time.</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Step size of the implicit Euler step solved by <code class="docutils literal notranslate"><span class="pre">solve_system</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>

@@ -138,7 +138,7 @@ check it out to see all available coefficient types.</p>
 left
 interval boundary in the first column and zeros in the first row.</p>
 <p>The generator is cached as <cite>self.genQE</cite> and only rebuilt if <cite>qd_type</cite> is not an alias of the cached one. Sets
-<cite>self.parallelizable</cite> to True if the matrix is diagonal, but never back to False.</p>
+<cite>self.parallelizable</cite>, see <cite>_update_parallelizable</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -160,7 +160,7 @@ interval boundary in the first column and zeros in the first row.</p>
 <span class="sig-name descname"><span class="pre">get_Qdelta_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qd_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/core/sweeper.html#Sweeper.get_Qdelta_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.sweeper.Sweeper.get_Qdelta_implicit" title="Link to this definition">¶</a></dt>
 <dd><p>Get a QDelta matrix of implicit type, i.e. lower triangular with zeros in the first row and column.</p>
 <p>The generator is cached as <cite>self.genQI</cite> and only rebuilt if <cite>qd_type</cite> is not an alias of the cached one. Sets
-<cite>self.parallelizable</cite> to True if the matrix is diagonal, but never back to False.</p>
+<cite>self.parallelizable</cite>, see <cite>_update_parallelizable</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

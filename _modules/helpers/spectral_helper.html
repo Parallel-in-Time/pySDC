@@ -166,25 +166,24 @@
 
 <div class="viewcode-block" id="SpectralHelper1D.setup_CPU">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.setup_CPU">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup_CPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">useFFTW</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_CPU</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">useFFTW</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""switch to CPU modules"""</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span>
 
         <span class="k">if</span> <span class="n">useFFTW</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py_fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">fftw</span>
 
-            <span class="bp">cls</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'fftw'</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">fftw</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'fftw'</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">fftw</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'scipy'</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">fft</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'scipy'</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">fft</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">fft_comm_backend</span> <span class="o">=</span> <span class="s1">'MPI'</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">mesh</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fft_comm_backend</span> <span class="o">=</span> <span class="s1">'MPI'</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">mesh</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper1D.get_Id">
@@ -1029,7 +1028,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_lib</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'mpi4py_fft.fftw'</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">'axes'</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">'axes'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">'axes'</span><span class="p">])</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plans</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plans</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1202,25 +1201,24 @@
 
 <div class="viewcode-block" id="SpectralHelper.setup_CPU">
 <a class="viewcode-back" href="../../pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.setup_CPU">[docs]</a>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup_CPU</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">useFFTW</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_CPU</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">useFFTW</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""switch to CPU modules"""</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_lib</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span>
 
         <span class="k">if</span> <span class="n">useFFTW</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py_fft</span><span class="w"> </span><span class="kn">import</span> <span class="n">fftw</span>
 
-            <span class="bp">cls</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'fftw'</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">fftw</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'fftw'</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">fftw</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'scipy'</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">fft</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span> <span class="o">=</span> <span class="s1">'scipy'</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fft_lib</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">fft</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="n">fft_comm_backend</span> <span class="o">=</span> <span class="s1">'MPI'</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">mesh</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fft_comm_backend</span> <span class="o">=</span> <span class="s1">'MPI'</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">mesh</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -2127,13 +2125,8 @@
         <span class="n">pfft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pfft</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newDistArray</span><span class="p">(</span><span class="n">pfft</span><span class="p">,</span> <span class="n">forward_output</span><span class="o">=</span><span class="n">forward_output</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s1">'Dist'</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">and</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">u</span><span class="o">.</span><span class="n">redistribute</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">_arr</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">_arr</span>
-            <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
-                <span class="k">pass</span>
-
+        <span class="c1"># the transforms are complex to complex, so the local shapes in physical and spectral space agree and the</span>
+        <span class="c1"># alignment can be inferred from the physical shapes either way</span>
         <span class="n">u_alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_alignment</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">forward_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">alignment</span> <span class="ow">in</span> <span class="n">u_alignment</span><span class="p">:</span>
             <span class="n">_arr</span> <span class="o">=</span> <span class="n">_arr</span><span class="o">.</span><span class="n">redistribute</span><span class="p">(</span><span class="n">alignment</span><span class="p">)</span>
@@ -2165,6 +2158,8 @@
         <span class="n">pfft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pfft</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">pfft</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">padding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">me</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">padding</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Padding is only implemented for distributed FFTs in more than one dimension'</span><span class="p">)</span>
             <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="k">if</span> <span class="n">axes</span> <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
             <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
@@ -2213,6 +2208,8 @@
 
         <span class="n">pfft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pfft</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">pfft</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">padding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">me</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">padding</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Padding is only implemented for distributed FFTs in more than one dimension'</span><span class="p">)</span>
             <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="k">if</span> <span class="n">axes</span> <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
             <span class="n">u_hat</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>

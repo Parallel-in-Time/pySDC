@@ -53,6 +53,12 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">CrashBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/crash.html#CrashBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.crash.CrashBase" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
 <p>Base class for convergence controllers that raise a <cite>ConvergenceError</cite> on all ranks as soon as one rank crashes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.convergence_controller_classes.crash.CrashBase.comm">
+<span class="sig-name descname"><span class="pre">comm</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#implementations.convergence_controller_classes.crash.CrashBase.comm" title="Link to this definition">¶</a></dt>
+<dd><p>communicator across the sweeper, which subclasses set up in <cite>setup</cite></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.crash.CrashBase.communicate_crash">
 <span class="sig-name descname"><span class="pre">communicate_crash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/crash.html#CrashBase.communicate_crash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.crash.CrashBase.communicate_crash" title="Link to this definition">¶</a></dt>
@@ -189,6 +195,7 @@ This class is useful when running with MPI in the sweeper or controller.</p>
     <ul>
 <li><a class="reference internal" href="#">implementations.convergence_controller_classes.crash module</a><ul>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.crash.CrashBase"><code class="docutils literal notranslate"><span class="pre">CrashBase</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.convergence_controller_classes.crash.CrashBase.comm"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
 <li><a class="reference internal" href="#implementations.convergence_controller_classes.crash.CrashBase.communicate_crash"><code class="docutils literal notranslate"><span class="pre">communicate_crash()</span></code></a></li>
 </ul>
 </li>

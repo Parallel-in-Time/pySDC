@@ -63,7 +63,8 @@ will be ignored in the solves and the node-zero value will be used as initial co
 parallel algorithm outside ParaDiag, you should set this parameter to false, which is not the default!</p>
 <p>Similarly, in ParaDiag, the solution is in Fourier space right after the solve. It therefore makes little sense to
 evaluate the right hand side directly after. By default, this is not done! Set <cite>update_f_evals=True</cite> in the
-parameters if you want to use this sweeper in SDC.</p>
+parameters if you want to use this sweeper in SDC. With <cite>ignore_ic</cite>, the solve gives only an increment, which is
+added to the solution later, so there is nothing to evaluate the right hand side at and <cite>update_f_evals</cite> is ignored.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">computeDiagonalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/ParaDiagSweepers.html#QDiagonalization.computeDiagonalization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.computeDiagonalization" title="Link to this definition">¶</a></dt>

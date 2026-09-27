@@ -50,6 +50,8 @@
 <span class="sd">    Base class for convergence controllers that raise a `ConvergenceError` on all ranks as soon as one rank crashes.</span>
 <span class="sd">    """</span>
 
+    <span class="n">comm</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1">#: communicator across the sweeper, which subclasses set up in `setup`</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialization routine, which additionally prepares the logical or for communicating crashes with MPI</span>

@@ -321,8 +321,8 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.get_interpolated_solution">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_interpolated_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Get the interpolated solution for Firedrake data types</span>
-<span class="sd">        We are not 100% sure that you don't need to invert the mass matrix here, but should be fine.</span>
+<span class="sd">        Get the interpolated solution for Firedrake data types. The nodes hold solutions, not mass matrix applied to</span>
+<span class="sd">        them, so interpolating them needs no mass matrix.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            L (pySDC.level): The level holding the solutions at the collocation nodes</span>
@@ -338,7 +338,6 @@
         <span class="k">return</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation_matrix</span><span class="p">,</span> <span class="n">u</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
 </div>
 
-        <span class="c1"># return L.prob.invert_mass_matrix(self.matmul(self.interpolation_matrix, u)[0])</span>
 </pre></div>
 
             <div class="clearer"></div>

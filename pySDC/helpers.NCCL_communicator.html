@@ -119,11 +119,16 @@ controller uses are left to fall through to MPI, where tags mean what they say.<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helpers.NCCL_communicator.NCCLComm.get_op">
-<span class="sig-name descname"><span class="pre">get_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MPI_op</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_op" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MPI_op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/NCCL_communicator.html#NCCLComm.get_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.NCCL_communicator.NCCLComm.get_op" title="Link to this definition">¶</a></dt>
 <dd><p>Translate an MPI reduction operation to the NCCL one.</p>
+<p>Complex data is reduced as twice as many reals, which is only right for sums: the product of two complex
+numbers is not the pairwise product of their parts, and they have no order for <cite>MAX</cite> and <cite>MIN</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>MPI_op</strong> (<em>mpi4py.MPI.Op</em>) – One of <cite>MPI.SUM</cite>, <cite>MPI.PROD</cite>, <cite>MPI.MAX</cite> and <cite>MPI.MIN</cite></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>MPI_op</strong> (<em>mpi4py.MPI.Op</em>) – One of <cite>MPI.SUM</cite>, <cite>MPI.PROD</cite>, <cite>MPI.MAX</cite> and <cite>MPI.MIN</cite></p></li>
+<li><p><strong>data</strong> (<em>cupy.ndarray</em><em>, </em><em>optional</em>) – The data to be reduced, to check that the operation works for its dtype</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>NCCL reduction operation</p>

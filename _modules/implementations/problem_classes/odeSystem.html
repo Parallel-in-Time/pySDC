@@ -258,10 +258,9 @@
 
 <div class="viewcode-block" id="ProtheroRobinsonAutonomous.dgInv">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.odeSystem.html#implementations.problem_classes.odeSystem.ProtheroRobinsonAutonomous.dgInv">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">dgInv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dgInv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Inverse Jacobian of the Newton function, replaced in ``__init__`` by ``dgInv_LIN`` or ``dgInv_NONLIN``, which</span>
-<span class="sd">        also take the step size ``dt``.</span>
+<span class="sd">        Inverse Jacobian of the Newton function, replaced in ``__init__`` by ``dgInv_LIN`` or ``dgInv_NONLIN``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -269,6 +268,8 @@
 <span class="sd">            First solution component :math:`u`.</span>
 <span class="sd">        t : float</span>
 <span class="sd">            Second solution component :math:`v`, which equals the time.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Step size of the implicit Euler step solved by ``solve_system``.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>

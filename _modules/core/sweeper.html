@@ -131,6 +131,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">level</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Qdelta_diagonal</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"genQI"</span><span class="p">,</span> <span class="s2">"genQE"</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
                 <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
@@ -157,7 +158,7 @@
 <span class="sd">        Get a QDelta matrix of implicit type, i.e. lower triangular with zeros in the first row and column.</span>
 
 <span class="sd">        The generator is cached as `self.genQI` and only rebuilt if `qd_type` is not an alias of the cached one. Sets</span>
-<span class="sd">        `self.parallelizable` to True if the matrix is diagonal, but never back to False.</span>
+<span class="sd">        `self.parallelizable`, see `_update_parallelizable`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            qd_type (str): Name or alias of the QDelta type</span>
@@ -173,8 +174,7 @@
 
         <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">'Lower triangular matrix expected!'</span>
         <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">QDmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">QDmat</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">err_msg</span><span class="o">=</span><span class="n">err_msg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">QDmat</span><span class="p">)),</span> <span class="n">QDmat</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_parallelizable</span><span class="p">((</span><span class="s1">'implicit'</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="p">)),</span> <span class="n">QDmat</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">QDmat</span></div>
 
 
@@ -187,7 +187,7 @@
 <span class="sd">        interval boundary in the first column and zeros in the first row.</span>
 
 <span class="sd">        The generator is cached as `self.genQE` and only rebuilt if `qd_type` is not an alias of the cached one. Sets</span>
-<span class="sd">        `self.parallelizable` to True if the matrix is diagonal, but never back to False.</span>
+<span class="sd">        `self.parallelizable`, see `_update_parallelizable`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            qd_type (str): Name or alias of the QDelta type</span>
@@ -204,10 +204,18 @@
 
         <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">'Strictly lower triangular matrix expected!'</span>
         <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">QDmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">QDmat</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">err_msg</span><span class="o">=</span><span class="n">err_msg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">QDmat</span><span class="p">)),</span> <span class="n">QDmat</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># for PIC ;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_parallelizable</span><span class="p">((</span><span class="s1">'explicit'</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="p">)),</span> <span class="n">QDmat</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">QDmat</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_parallelizable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">QDmat</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The sweeper is parallelizable if every QDelta matrix it has built is diagonal, which for explicit ones means</span>
+<span class="sd">        zero (PIC). Matrices are remembered by kind and generator, so rebuilding one, for instance with a new sweep</span>
+<span class="sd">        index, replaces its entry, and a sweeper with QI='MIN-SR-S' and QE='EE' is not parallelizable.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Qdelta_diagonal</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">QDmat</span><span class="p">)),</span> <span class="n">QDmat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Qdelta_diagonal</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
 <div class="viewcode-block" id="Sweeper.predict">
 <a class="viewcode-back" href="../../pySDC/core.sweeper.html#core.sweeper.Sweeper.predict">[docs]</a>

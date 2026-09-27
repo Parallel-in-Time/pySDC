@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_c28af68f8f845bbd_hotrod_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-27 14:36 +0000
+            created at 2026-09-27 15:31 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -336,8 +336,8 @@
     <p class="pln"><span class="n"><a id="t254" href="#t254">254</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t255" href="#t255">255</a></span><span class="t">    <span class="key">def</span> <span class="nam">get_interpolated_solution</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">L</span><span class="op">,</span> <span class="nam">xp</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t256" href="#t256">256</a></span><span class="t">        <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t257" href="#t257">257</a></span><span class="t"><span class="str">        Get the interpolated solution for Firedrake data types</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t258" href="#t258">258</a></span><span class="t"><span class="str">        We are not 100% sure that you don&#x27;t need to invert the mass matrix here, but should be fine.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t257" href="#t257">257</a></span><span class="t"><span class="str">        Get the interpolated solution for Firedrake data types. The nodes hold solutions, not mass matrix applied to</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t258" href="#t258">258</a></span><span class="t"><span class="str">        them, so interpolating them needs no mass matrix.</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t259" href="#t259">259</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t260" href="#t260">260</a></span><span class="t"><span class="str">        Args:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t261" href="#t261">261</a></span><span class="t"><span class="str">            L (pySDC.level): The level holding the solutions at the collocation nodes</span>&nbsp;</span><span class="r"></span></p>
@@ -351,7 +351,6 @@
     <p class="run run2"><span class="n"><a id="t269" href="#t269">269</a></span><span class="t">            <span class="key">if</span> <span class="nam">i</span> <span class="op">!=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">estimate_on_node</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t270" href="#t270">270</a></span><span class="t">        <span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t271" href="#t271">271</a></span><span class="t">        <span class="key">return</span> <span class="nam">L</span><span class="op">.</span><span class="nam">prob</span><span class="op">.</span><span class="nam">dtype_u</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">matmul</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">interpolation_matrix</span><span class="op">,</span> <span class="nam">u</span><span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t272" href="#t272">272</a></span><span class="t">        <span class="com"># return L.prob.invert_mass_matrix(self.matmul(self.interpolation_matrix, u)[0])</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -361,7 +360,7 @@
             <a class="nav" href="z_c28af68f8f845bbd_hotrod_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-27 14:36 +0000
+            created at 2026-09-27 15:31 +0000
         </p>
     </div>
 </footer>

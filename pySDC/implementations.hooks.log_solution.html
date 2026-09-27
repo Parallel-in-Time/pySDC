@@ -344,7 +344,8 @@ counter. Nothing is written on coarser levels or if <code class="docutils litera
 <dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.pre_run">
 <span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.pre_run" title="Link to this definition">¶</a></dt>
 <dd><p>Write the initial conditions to file, stored with the time <code class="docutils literal notranslate"><span class="pre">L.time</span></code> at the start of the run. Sets <code class="docutils literal notranslate"><span class="pre">L.uend</span></code>
-to the initial conditions for this.</p>
+to the initial conditions for this, since <code class="docutils literal notranslate"><span class="pre">process_solution</span></code> reads <code class="docutils literal notranslate"><span class="pre">L.uend</span></code>; the first end point computed in
+the run replaces it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
