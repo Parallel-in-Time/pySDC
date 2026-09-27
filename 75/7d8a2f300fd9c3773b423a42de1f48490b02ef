@@ -1,0 +1,38 @@
+docs/source/.gitignore
+  s_619b2228c15391::t_9eca7231c6f22c 7
+docs/source/index.rst
+  s_619b2228c15391::t_9eca7231c6f22c 78
+docs/update_publications.py
+  s_619b2228c15391::t_fa512675195c73 1-73
+docs/contrib/07_release_guide.md
+  s_619b2228c15391::t_4026517e4067bb 18
+docs/source/publications.json
+  s_619b2228c15391::t_e989fd34524b3c 1-138
+docs/source/publications.rst
+  s_619b2228c15391::t_9eca7231c6f22c 1-7
+docs/update_apidocs.sh
+  s_619b2228c15391::t_9eca7231c6f22c 34-36
+docs/source/conf.py
+  s_619b2228c15391::t_d4437ff71d616b 299-300,302-327,329-349,352-370,373-387,389-391,397
+  s_619b2228c15391::t_3097bf53eae4f6 114-115,301,328,350-351,371-372,388
+CHANGELOG.md
+  s_619b2228c15391::t_12cea3479f3b29 5,7-317
+CITATION.cff
+  s_619b2228c15391::t_9c41320973d978 58-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "757d8a2f300fd9c3773b423a42de1f48490b02ef",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "unknown"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
