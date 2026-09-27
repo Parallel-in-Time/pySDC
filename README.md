@@ -73,6 +73,7 @@
 | pySDC/implementations/hooks/log\_solution.py                                                        |      137 |       15 |     89% |132, 186-193, 196-205, 222, 247, 265 |
 | pySDC/implementations/hooks/log\_step\_size.py                                                      |        6 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_work.py                                                            |       18 |        0 |    100% |           |
+| pySDC/implementations/hooks/plotting.py                                                             |        2 |        2 |      0% |       1-2 |
 | pySDC/implementations/problem\_classes/AcousticAdvection\_1D\_FD\_imex.py                           |       52 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/AdvectionDiffusionEquation\_1D\_FFT.py                       |       63 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/AdvectionEquation\_ND\_FD.py                                 |       23 |        8 |     65% |   114-124 |
@@ -114,7 +115,7 @@
 | pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |100, 321, 420, 468 |
 | pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      255 |       15 |     94% |97, 295, 315, 433, 478, 489, 619-634 |
 | pySDC/implementations/problem\_classes/TestEquation\_0D.py                                          |      101 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        1 |     98% |       180 |
+| pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        2 |     97% |  180, 183 |
 | pySDC/implementations/problem\_classes/VorticityVelocity\_2D\_FEniCS\_periodic.py                   |      108 |      108 |      0% |     1-483 |
 | pySDC/implementations/problem\_classes/acoustic\_helpers/buildWave1DMatrix.py                       |       24 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/acoustic\_helpers/standard\_integrators.py                   |      259 |       11 |     96% |   301-313 |
@@ -355,8 +356,8 @@
 | pySDC/projects/parallelSDC\_reloaded/vanderpol\_accuracy.py                                         |       62 |        0 |    100% |           |
 | pySDC/projects/parallelSDC\_reloaded/vanderpol\_setup.py                                            |       36 |        0 |    100% |           |
 | pySDC/projects/soft\_failure/FaultHooks.py                                                          |       20 |        0 |    100% |           |
-| pySDC/projects/soft\_failure/generate\_statistics.py                                                |      199 |       49 |     75% |26-63, 71-111, 169, 171, 211, 213 |
-| pySDC/projects/soft\_failure/implicit\_sweeper\_faults.py                                           |      144 |        5 |     97% |44, 159-161, 258 |
+| pySDC/projects/soft\_failure/generate\_statistics.py                                                |      206 |       50 |     76% |26-63, 71-111, 169, 171, 211, 213, 285 |
+| pySDC/projects/soft\_failure/implicit\_sweeper\_faults.py                                           |      144 |        8 |     94% |44, 159-161, 201-204, 258 |
 | pySDC/projects/soft\_failure/visualization\_helper.py                                               |       54 |        0 |    100% |           |
 | pySDC/tutorial/step\_1/A\_spatial\_problem\_setup.py                                                |       21 |        0 |    100% |           |
 | pySDC/tutorial/step\_1/B\_spatial\_accuracy\_check.py                                               |       81 |        0 |    100% |           |
@@ -383,10 +384,11 @@
 | pySDC/tutorial/step\_7/A\_pySDC\_with\_FEniCS.py                                                    |      105 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/B\_pySDC\_with\_mpi4pyfft.py                                                 |       88 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/C\_pySDC\_with\_PETSc.py                                                     |       92 |        2 |     98% |    35, 43 |
-| pySDC/tutorial/step\_7/D\_pySDC\_with\_PyTorch.py                                                   |       43 |        0 |    100% |           |
+| pySDC/tutorial/step\_7/D\_pySDC\_with\_PyTorch.py                                                   |       42 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/E\_pySDC\_with\_Firedrake.py                                                 |      105 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/F\_pySDC\_with\_Gusto.py                                                     |      112 |       10 |     91% |137-142, 206-213, 341 |
 | pySDC/tutorial/step\_7/G\_pySDC\_on\_GPU.py                                                         |       43 |        0 |    100% |           |
+| pySDC/tutorial/step\_7/torch\_heat.py                                                               |      133 |       28 |     79% |15-16, 77-81, 99, 113, 126-127, 211-212, 241, 259-262, 280-282, 289-297, 360 |
 | pySDC/tutorial/step\_8/A\_visualize\_residuals.py                                                   |       32 |        0 |    100% |           |
 | pySDC/tutorial/step\_8/B\_multistep\_SDC.py                                                         |       98 |        0 |    100% |           |
 | pySDC/tutorial/step\_8/C\_iteration\_estimator.py                                                   |      179 |        0 |    100% |           |
@@ -396,9 +398,9 @@
 | pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       88 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       77 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       16 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32394** | **4286** | **87%** |           |
+| **TOTAL**                                                                                           | **32535** | **4321** | **87%** |           |
 
-41 empty files skipped.
+42 empty files skipped.
 
 
 ## Setup coverage badge
