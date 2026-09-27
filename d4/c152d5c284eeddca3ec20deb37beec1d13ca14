@@ -1,0 +1,33 @@
+pySDC/implementations/problem_classes/GrayScott_MPIFFT.py
+  s_4635c976c08496::t_486ef352cd7472 40,42,466,468
+  s_4635c976c08496::t_0d2ff608d7ddb4 14-15,361-364,367,370,376-377,440-441,448,689-692,695,698,704-706
+pySDC/implementations/problem_classes/NonlinearSchroedinger_MPIFFT.py
+  s_4635c976c08496::t_9e7854ecbaad7a 112-114
+  s_4635c976c08496::t_850cec19194342 16,18-19,32,107-110
+  s_4635c976c08496::t_2a353b71c9f7ea 20,111
+  s_4635c976c08496::t_13dde83d8ae926 21-23
+pySDC/implementations/problem_classes/Brusselator.py
+  s_4635c976c08496::t_01795c9627c830 13,15
+  s_4635c976c08496::t_1ac4f0742fa677 14
+pySDC/implementations/problem_classes/PenningTrap_3D.py
+  s_4635c976c08496::t_9e7854ecbaad7a 236,242
+  s_4635c976c08496::t_57b6bcf20c7e3a 199-202
+pySDC/implementations/problem_classes/AllenCahn_Temp_MPIFFT.py
+  s_4635c976c08496::t_c2f1e5d3c99381 17-18,20-24,32-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d4c152d5c284eeddca3ec20deb37beec1d13ca14",
+  "prompts": {},
+  "sessions": {
+    "s_4635c976c08496": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f09ffcac-1bb6-468a-8482-42d83e6ac4f0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
