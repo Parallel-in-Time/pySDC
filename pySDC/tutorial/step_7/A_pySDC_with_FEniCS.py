@@ -112,7 +112,7 @@ def setup(t0=None, ml=None):
 # - `'mass_inv'`: the right-hand side includes the inverse of the mass matrix, with the problem class `fenics_heat`,
 #   so that the standard IMEX sweeper works unchanged.
 # - `'mass'`: the mass matrix stays on the left, with `fenics_heat_mass` and the sweeper `imex_1st_order_mass`, which
-#   also uses it in the tau-correction.
+#   applies it to the initial value and in the residual.
 # - `'mass_timebc'`: as `'mass'`, but with time-dependent boundary conditions, `fenics_heat_mass_timebc`.
 #
 # Each run prints the error, statistics of the iterations and the time to solution, and appends them to
@@ -209,7 +209,8 @@ def run_variants(variant=None, ml=None, num_procs=None):
 
 
 # %% [markdown]
-# SDC and MLSDC with all three variants, and PFASST on 5 processes with the inverted mass matrix. All other PFASST
+# SDC and MLSDC with all three variants, and PFASST with 5 steps in parallel, emulated in one process, with the inverted
+# mass matrix. All other PFASST
 # variants do not work, either because of FEniCS restrictions (weak forms with different meshes will not work
 # together) or because of inconsistent use of the mass matrix (the locality condition for the tau correction is not
 # satisfied, and the mass matrix does not commute with restriction).
@@ -240,7 +241,9 @@ if __name__ == "__main__":
 # :::
 #
 # :::{admonition} Important things to note
-# - This example shows that even core routines like the `BaseTransfer` can be overwritten if needed.
+# - Even core routines can be replaced where a method needs it: for the mass-matrix formulation, pySDC also has
+#   `base_transfer_mass`, which applies the mass matrix in the tau-correction. This example keeps the standard
+#   `BaseTransfer`.
 # - It is also valuable to check out the data type and transfer classes required to work with FEniCS. Both can be
 #   found in the `implementations` folder.
 # :::

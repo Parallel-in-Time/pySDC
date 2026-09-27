@@ -373,13 +373,18 @@ def williamson_5(
 # ## Running it
 #
 # The script supports space-time parallelism, as well as running the Gusto SDC implementation or the pySDC-Gusto
-# coupling. Run it with `--help` to learn how to configure it. Afterwards, `F_2_plot_pySDC_with_Gusto_result.py`, next
-# to this tutorial, plots the results.
+# coupling. Run it with `--help` to learn how to configure it. Afterwards,
+# [`F_2_plot_pySDC_with_Gusto_result.py`](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/F_2_plot_pySDC_with_Gusto_result.py),
+# next to this tutorial, plots the results.
 
 # %%
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description=__doc__, formatter_class=ArgumentDefaultsHelpFormatter)
+    parser = ArgumentParser(
+        description='Williamson 5 (flow over a mountain) with pySDC as the time discretization of Gusto, or with '
+        "Gusto's own SDC implementation for comparison.",
+        formatter_class=ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument(
         '--ncells_per_edge',
         help="The number of cells per edge of icosahedron",

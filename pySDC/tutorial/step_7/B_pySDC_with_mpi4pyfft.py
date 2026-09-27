@@ -166,7 +166,8 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
 # %% [markdown]
 # ## All runs
 #
-# SDC, MLSDC and PFASST with 10 processes in time, each in real and in spectral space. The code runs in serial with
+# SDC, MLSDC and PFASST with 10 steps in parallel (emulated in one process by `controller_nonMPI`), each in real
+# and in spectral space. The code runs in serial with
 # `python B_pySDC_with_mpi4pyfft.py`, and in parallel in space with, e.g., `mpirun -np 2 python
 # B_pySDC_with_mpi4pyfft.py`.
 

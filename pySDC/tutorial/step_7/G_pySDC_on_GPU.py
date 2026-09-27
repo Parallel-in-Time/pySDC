@@ -116,7 +116,7 @@ def run(description, comm=None, num_procs=1, Tend=8e-2):
         prob = controller.MS[0].levels[0].prob
     else:
         # the parallel-in-time controller sends the solution from one time rank to the next as a
-        # GPU array, which needs MPI to have been told to expect device pointers -- see the README
+        # GPU array, which needs MPI to have been told to expect device pointers -- see the note at the end
         controller = controller_MPI(controller_params=controller_params, description=description, comm=comm)
         prob = controller.S.levels[0].prob
 

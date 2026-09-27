@@ -16,6 +16,6 @@ In the following, we show a few examples of pySDC + X.
 - **Part G: pySDC on GPUs.** The same heat equation with SDC, MLSDC and PFASST, all of it on the device.
 
 Each part is a Python script in `jupytext <https://jupytext.readthedocs.io>`_ "percent" format: run it with ``python``
-(or ``mpirun``) in an environment with the library it needs, open it as a notebook in Jupyter, or read it on the
-website. None of them runs in the browser or in the environment the website is built in; where the CI produces
+(or ``mpirun``) in an environment with the library it needs, or read it on the website. Parts A, B, D, F and G also
+open as notebooks in Jupyter; C and E read their process layout from the command line and only run as scripts. None of them runs in the browser or in the environment the website is built in; where the CI produces
 results, the pages show them.

@@ -25,6 +25,8 @@
 # helper module `torch_heat.py` next to this tutorial.
 
 # %%
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -118,6 +120,7 @@ def train_at_collocation_nodes():
         out += f'Error of prediction at {dt:.2e} after training: {abs(target_condition-model_prediction):.2e}\n'
 
     print(out)
+    Path('data').mkdir(parents=True, exist_ok=True)
     with open('data/step_7_D_out.txt', 'w') as file:
         file.write(out)
 

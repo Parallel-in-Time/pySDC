@@ -22,8 +22,8 @@
 # ## Single level, serial or parallel across the nodes
 #
 # SDC with the diagonal preconditioner `MIN-SR-S`, whose nodes can be solved in parallel. The space-time parallelism
-# comes from a Firedrake ensemble: with 3 or more ranks, the ranks are split across the 3 collocation nodes, and the
-# ranks of each node share the spatial problem. See the
+# comes from a Firedrake ensemble: with `--useMPIsweeper` and a multiple of 3 ranks, the ranks are split across the
+# 3 collocation nodes, and the ranks of each node share the spatial problem. See the
 # [Firedrake documentation on parallelism](https://www.firedrakeproject.org/firedrake/parallelism.html).
 
 # %%
