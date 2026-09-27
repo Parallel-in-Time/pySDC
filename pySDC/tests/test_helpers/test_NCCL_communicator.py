@@ -69,6 +69,28 @@ def test_operations_translate_to_their_NCCL_equivalents():
 
 
 @pytest.mark.cupy
+def test_complex_data_can_only_be_summed():
+    """Complex data travels as pairs of reals, so only the sum of the pairs is the sum of the complex numbers."""
+    import cupy as cp
+    from mpi4py import MPI
+
+    from pySDC.helpers.NCCL_communicator import NCCLComm
+
+    comm = NCCLComm(MPI.COMM_WORLD)
+    data = cp.ones(4, dtype='complex128') * (1 + 1j)
+
+    total = cp.empty_like(data)
+    comm.Allreduce(data, total, op=MPI.SUM)
+    assert cp.allclose(total, comm.size * data)
+
+    for op in [MPI.PROD, MPI.MAX, MPI.MIN]:
+        with pytest.raises(NotImplementedError):
+            comm.Allreduce(data, cp.empty_like(data), op=op)
+        with pytest.raises(NotImplementedError):
+            comm.Reduce(data, cp.empty_like(data), op=op)
+
+
+@pytest.mark.cupy
 @pytest.mark.parallel(2)
 def test_host_buffers_are_handed_back_to_MPI():
     """Only device buffers can go through NCCL; anything else has to reach MPI unchanged."""
