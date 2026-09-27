@@ -74,7 +74,7 @@ html_theme = 'pydata_sphinx_theme'
 html_title = 'pySDC'
 html_static_path = ['_static']
 html_css_files = ['custom.css']
-html_js_files = [('run-in-browser.js', {'type': 'module'}), ('landing-demo.js', {'type': 'module'})]
+html_js_files = [('run-in-browser.js', {'type': 'module'})]
 
 # Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, FEniCS,
 # PETSc, ...), was measured by running every tutorial there. The wheels are built by docs/update_apidocs.sh;
@@ -422,6 +422,9 @@ LANDING_DEMO = """
      <p class="demo-status">{status}</p>
      <img class="demo-plot" alt="Residual over the iterations of the runs so far" hidden>
    </div>
+   <!-- Only here: it imports run-in-browser.js without the ?v= Sphinx adds, i.e. a second copy of it, which on a
+        tutorial page would answer "Run in browser" a second time -->
+   <script type="module" src="_static/landing-demo.js"></script>
 """
 
 
