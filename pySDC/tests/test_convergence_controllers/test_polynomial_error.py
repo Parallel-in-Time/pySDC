@@ -302,7 +302,7 @@ def test_polynomial_error_firedrake_in_run():
     """
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
     from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
         EstimatePolynomialErrorFiredrake,
     )
@@ -310,7 +310,7 @@ def test_polynomial_error_firedrake_in_run():
     description = {
         'problem_class': Heat1DForcedFiredrake,
         'problem_params': {'n': 8},
-        'sweeper_class': generic_implicit,
+        'sweeper_class': imex_1st_order,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3},
         'level_params': {'dt': 0.1, 'restol': 1e-10},
         'step_params': {'maxiter': 10},
