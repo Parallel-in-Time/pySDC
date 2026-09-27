@@ -111,6 +111,8 @@ html_theme_options = {
     'footer_start': ['copyright'],
     'footer_end': ['theme-version'],
 }
+# pages without subpages have nothing to show in the primary sidebar
+html_sidebars = {'publications': []}
 html_context = {
     'github_user': 'Parallel-in-Time',
     'github_repo': 'pySDC',
@@ -294,8 +296,102 @@ def add_api_overview(app, docname, source):
     source[0] = source[0].replace('.. api-overview', '\n'.join(lines))
 
 
+def _bibtex(kind, key, fields):
+    body = ',\n'.join(f'    {name} = {{{value}}}' for name, value in fields.items() if value)
+    return [f'      @{kind}{{{key},'] + ['      ' + line for line in body.split('\n')] + ['      }']
+
+
+def add_publications(app, docname, source):
+    """Replace the placeholder on publications.rst with how to cite pySDC and the publications that use it"""
+    if docname != 'publications':
+        return
+    import json
+    import yaml
+
+    cff_file, publications_file = Path(ROOT, 'CITATION.cff'), Path(app.srcdir, 'publications.json')
+    app.env.note_dependency(cff_file)
+    app.env.note_dependency(publications_file)
+    cff = yaml.safe_load(cff_file.read_text(encoding='utf-8'))
+    paper = cff['preferred-citation']
+
+    def names(authors, bibtex=False):
+        return (' and ' if bibtex else ', ').join(
+            f"{a['family-names']}, {a['given-names']}" if bibtex else f"{a['given-names']} {a['family-names']}"
+            for a in authors
+        )
+
+    lines = [
+        'Cite pySDC',
+        '----------',
+        '',
+        "If you use pySDC for your work, please cite the paper, and the version of the software you used.",
+        '',
+    ]
+    lines += ['.. grid:: 1 1 2 2', '   :gutter: 3', '']
+    lines += ['   .. grid-item-card:: The paper', '']
+    lines += [
+        f"      {names(paper['authors'])}, **{paper['title']}**, *{paper['journal']}* {paper['volume']}({paper['issue']}),"
+    ]
+    lines += [f"      {paper['start']}–{paper['end']}, {paper['year']}, https://doi.org/{paper['doi']}", '']
+    lines += ['      .. code-block:: bibtex', '']
+    lines += [
+        '   ' + line
+        for line in _bibtex(
+            'article',
+            'speck2019pysdc',
+            {
+                'author': names(paper['authors'], bibtex=True),
+                'title': paper['title'].replace('pySDC', '{pySDC}'),
+                'journal': paper['journal'],
+                'volume': paper['volume'],
+                'number': paper['issue'],
+                'pages': f"{paper['start']}--{paper['end']}",
+                'year': paper['year'],
+                'doi': paper['doi'],
+            },
+        )
+    ]
+    lines += ['', f"   .. grid-item-card:: The software, version {cff['version']}", '']
+    lines += [
+        f"      {names(cff['authors'])}, **{cff['title']}**, version {cff['version']}, {cff['date-released'].year},"
+    ]
+    lines += [f"      https://doi.org/{cff['doi']} (this DOI resolves to the latest version on Zenodo)", '']
+    lines += ['      .. code-block:: bibtex', '']
+    lines += [
+        '   ' + line
+        for line in _bibtex(
+            'software',
+            'pysdc',
+            {
+                'author': names(cff['authors'], bibtex=True),
+                'title': cff['title'],
+                'version': cff['version'],
+                'year': cff['date-released'].year,
+                'doi': cff['doi'],
+                'url': cff['repository-code'],
+            },
+        )
+    ]
+
+    publications = json.loads(publications_file.read_text(encoding='utf-8'))
+    lines += ['', 'Publications using pySDC', '------------------------', '']
+    lines += ['Research that mentions or cites pySDC, as listed in the `Helmholtz Research Software Directory']
+    lines += ['<https://helmholtz.software/software/pysdc>`__. To add a publication, add it as a mention there.', '']
+    year = None
+    for publication in publications:
+        if publication['year'] != year:
+            year = publication['year']
+            lines += [f'.. rubric:: {year or "Undated"}', '']
+        link = f"https://doi.org/{publication['doi']}" if publication['doi'] else publication['url']
+        title = f"`{publication['title']} <{link}>`__" if link else publication['title']
+        venue = f", *{publication['venue']}*" if publication['venue'] else ''
+        lines += [f"- {publication['authors'] or ''}: {title}{venue}", '']
+    source[0] = source[0].replace('.. publications-page', '\n'.join(lines))
+
+
 def setup(app):
     app.connect('build-finished', write_notebooks)
     app.connect('html-page-context', add_run_in_browser)
     app.connect('source-read', add_project_gallery)
     app.connect('source-read', add_api_overview)
+    app.connect('source-read', add_publications)

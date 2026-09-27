@@ -15,7 +15,7 @@ First, create a `new-release` branch (or choose a similar name), either on your 
 1. modify the project version number and, if necessary, the list of authors in `pyproject.toml`
 2. modify the documentation release number in `docs/source/conf.py`, and the version number for minor and major release. Also, if necessary, adapt the list of authors.
 3. modify the version number, release date and, if necessary, the list of authors  in `CITATION.cff`
-4. (for minor and major release **only**) add the release description in the `CHANGELOG.md` file, following the level of details you can find there
+4. (for minor and major release **only**) add the release description at the top of `CHANGELOG.md`, as a new `## Version X.Y — Month D, YYYY` section, following the level of details you can find there
 
 Commit with the message: `bump version to x.x.x` where `x.x.x` is the new version. 
 Then create a pull request, and once all tests passed, you can `Merge and Squash`,

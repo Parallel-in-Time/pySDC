@@ -55,3 +55,18 @@ message: "If you use this software, please cite it using these metadata."
 repository-code: https://github.com/Parallel-in-Time/pySDC
 title: "Parallel-in-Time/pySDC"
 cff-version: 1.2.0
+preferred-citation:
+  type: article
+  title: "Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections"
+  authors:
+    - family-names: Speck
+      given-names: Robert
+      orcid: https://orcid.org/0000-0002-3879-1210
+  journal: "ACM Transactions on Mathematical Software"
+  volume: 45
+  issue: 3
+  start: 1
+  end: 23
+  year: 2019
+  month: 8
+  doi: 10.1145/3310410

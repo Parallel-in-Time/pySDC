@@ -4,4 +4,5 @@
 !tutorial/*.rst
 !api.rst
 !development.rst
+!publications.rst
 _static/wheels/

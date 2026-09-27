@@ -75,4 +75,5 @@ Where to go
    tutorial/index
    projects/index
    api
+   publications
    development
