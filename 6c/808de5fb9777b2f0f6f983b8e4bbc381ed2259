@@ -1,0 +1,28 @@
+docs/source/conf.py
+  s_619b2228c15391::t_228f5f32b13d3d 478-499,513
+docs/source/publications.json
+  s_619b2228c15391::t_2a22cf28785dd7 74-80
+  s_619b2228c15391::t_aedbf0b41e270c 81
+docs/convert_markdown.py
+  s_619b2228c15391::t_6a976e1ddf54f4 91-95,119-120
+docs/update_publications.py
+  s_619b2228c15391::t_2a22cf28785dd7 26-38,93-101
+docs/update_apidocs.sh
+  s_619b2228c15391::t_07161cc967473d 26-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6c808de5fb9777b2f0f6f983b8e4bbc381ed2259",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
