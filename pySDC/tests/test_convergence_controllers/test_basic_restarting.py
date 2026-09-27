@@ -379,3 +379,55 @@ def basic_restarting_single_test(**kwargs):
         np.isclose(times_restarted[i], expected_restarts[i], atol=arguments['dt'] / 10)
         for i in range(len(expected_restarts))
     ), f"Didn\'t get the restarts we expected! Got {times_restarted}, expected {expected_restarts}"
+
+
+def max_restarts_single_test(crash_after_max_restarts, **kwargs):
+    """
+    With `restart_from_first_step`, a block may be restarted `max_restarts` times in a row, no matter which step asks.
+    Beyond that, we either move on or, if the first step asks for another restart, crash on all steps.
+    """
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.core.errors import ConvergenceError
+
+    # t=5 is the second or third step of its block, t=first the first one
+    first = 3.0 if kwargs['num_procs'] == 3 else 4.0
+    arguments = {
+        'restarts': [first if crash_after_max_restarts else 5.0] * 4,
+        'dt': 1.0,
+        'n_steps': 8,
+        'max_restarts': 2,
+        'restart_from_first_step': True,
+        'crash_after_max_restarts': crash_after_max_restarts,
+        **kwargs,
+    }
+
+    if crash_after_max_restarts:
+        with pytest.raises(ConvergenceError):
+            run_problem(**arguments)
+        return
+
+    stats = run_problem(**arguments)
+    comm = None
+    if arguments['useMPI']:
+        from mpi4py import MPI
+
+        comm = MPI.COMM_WORLD
+
+    restarts = [me for me in get_sorted(stats, type='restart', comm=comm) if me[1] and abs(me[0] - 5.0) < 1e-8]
+    assert len(restarts) == arguments['max_restarts'], f'Restarted t=5 {len(restarts)} times'
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel([3, 4])
+@pytest.mark.parametrize('crash_after_max_restarts', [0, 1])
+def test_max_restarts_MPI(crash_after_max_restarts):
+    from mpi4py import MPI
+
+    max_restarts_single_test(crash_after_max_restarts, useMPI=True, num_procs=MPI.COMM_WORLD.size)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('num_procs', [3, 4])
+@pytest.mark.parametrize('crash_after_max_restarts', [False, True])
+def test_max_restarts_nonMPI(num_procs, crash_after_max_restarts):
+    max_restarts_single_test(crash_after_max_restarts, useMPI=False, num_procs=num_procs)
