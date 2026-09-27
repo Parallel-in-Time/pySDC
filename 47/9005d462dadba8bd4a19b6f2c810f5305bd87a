@@ -1,0 +1,27 @@
+pySDC/tests/test_convergence_controllers/test_adaptivity.py
+  s_6435d1fae13e27::t_d8731e114ad1a7 219,221-231
+  s_6435d1fae13e27::t_bb1279adc5e6d2 220
+  s_6435d1fae13e27::t_5f20c67ab07b30 232-233
+pySDC/tests/test_convergence_controllers/test_crash.py
+  s_6435d1fae13e27::t_22af3ee53cce57 142-153
+pySDC/implementations/convergence_controller_classes/crash.py
+  s_6435d1fae13e27::t_1ba2d489bab943 12-13
+pySDC/implementations/convergence_controller_classes/adaptivity.py
+  s_6435d1fae13e27::t_1ba2d489bab943 216-217,229-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "479005d462dadba8bd4a19b6f2c810f5305bd87a",
+  "prompts": {},
+  "sessions": {
+    "s_6435d1fae13e27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79d56209-5811-4846-8ee3-ed8d7bdb952b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
