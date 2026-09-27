@@ -23,6 +23,15 @@ class DiscontinuousTestODE(Problem):
     where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) < 0`, i.e. :math:`t \leq t^*`, the exact solution is
     :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e. :math:`t \geq t^*`, the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.
 
+    Parameters
+    ----------
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method.
+    newton_tol : float, optional
+        Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residual.
+    stop_at_nan : bool, optional
+        Indicates that the Newton solver should stop if ``nan`` values arise.
+
     Attributes
     ----------
     t_switch_exact : float
@@ -228,6 +237,14 @@ class ExactDiscontinuousTestODE(DiscontinuousTestODE):
     r"""
     Dummy ODE problem for testing the ``SwitchEstimator`` class. The problem contains the exact dynamics
     of the problem class ``DiscontinuousTestODE``.
+
+    Parameters
+    ----------
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method. Not used here, since ``solve_system`` returns the exact
+        solution.
+    newton_tol : float, optional
+        Tolerance for Newton's method to terminate. Not used here, since ``solve_system`` returns the exact solution.
     """
 
     def __init__(self, newton_maxiter=100, newton_tol=1e-8):

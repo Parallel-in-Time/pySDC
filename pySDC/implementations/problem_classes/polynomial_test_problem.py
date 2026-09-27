@@ -8,6 +8,15 @@ class polynomial_testequation(Problem):
     """
     Dummy problem for tests only! In particular, the `solve_system` function just returns the exact solution instead of
     solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.
+
+    Parameters
+    ----------
+    degree : int, optional
+        Number of coefficients of the polynomial, i.e., the polynomial has degree ``degree - 1``.
+    seed : int, optional
+        Seed for ``np.random.RandomState``, which draws the coefficients uniformly from :math:`[0, 1)`.
+    useGPU : bool, optional
+        Use ``CuPy`` for the solution. This switches the data types of the class, not only of this instance.
     """
 
     dtype_u = mesh

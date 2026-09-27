@@ -28,28 +28,32 @@ class allencahn_temp_imex(Problem):
     *semi-implicitly*, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand
     side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
 
-    Attributes
+    Parameters
     ----------
-    nvars : List of int tuples, optional
-        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (64, 64)]``.
+    nvars : tuple of int
+        Number of unknowns in each spatial direction, e.g. ``nvars=(128, 128)``. Has to be a tuple of at least two
+        entries. The default ``None`` is replaced by the list ``[(128, 128)]``, which fails this check, so ``nvars``
+        has to be given.
     eps : float, optional
-        Scaling parameter :math:`\varepsilon`.
+        Scaling parameter :math:`\varepsilon`. For ``eps <= 0``, the reaction terms are dropped.
     radius : float, optional
-        Radius of the circles.
+        Radius of the circle for ``init_type='circle'``.
     spectral : bool, optional
-        Indicates if spectral initial condition is used.
+        If True, the solution is computed in spectral space. ``None`` means False.
     TM : float, optional
-        Problem parameter :math:`T_M`.
+        Reference temperature :math:`T_M` of the driving force, which vanishes where the temperature equals :math:`T_M`.
     D : float, optional
-        Problem parameter :math:`D`.
+        Diffusion coefficient :math:`D` of the temperature, the second component of the solution. The phase field
+        :math:`u` diffuses with coefficient one, and its right-hand side is the source of the temperature equation.
     dw : float, optional
-        Driving force.
+        Driving force :math:`d_w`.
     L : float, optional
-        Denotes the period of the function to be approximated for the Fourier transform.
+        Length of the periodic domain :math:`[-L/2, L/2]` in each direction.
     init_type : str, optional
-        Initialises type of initial state.
-    comm : bool, optional
-        Communicator.
+        Initial condition of the phase field, either ``'circle'`` or ``'circle_rand'`` (``int(L)**2`` circles with
+        random radii, 2D only). The temperature starts at one in both cases.
+    comm : MPI.Intracomm, optional
+        Communicator for ``mpi4py-fft``.
 
     Attributes
     ----------

@@ -327,6 +327,28 @@ class battery(battery_n_capacitors):
 
     where :math:`i_L` denotes the function of the current over time :math:`t`.
 
+    Parameters
+    ----------
+    ncapacitors : int, optional
+        Number of capacitors in the circuit. Has to be one here, since the right-hand side and the solver are
+        implemented for a single capacitor only.
+    Vs : float, optional
+        Voltage at the voltage source :math:`V_s`.
+    Rs : float, optional
+        Resistance of the resistor :math:`R_s` at the voltage source.
+    C : np.1darray, optional
+        Capacitance of the capacitor as an array of length one. ``None`` means ``np.array([1.0])``.
+    R : float, optional
+        Resistance for the load :math:`R_\ell`.
+    L : float, optional
+        Inductance of inductor :math:`L`.
+    alpha : float, optional
+        Factor greater than zero to describe the storage of the capacitor. The initial voltage of the capacitor is
+        :math:`\alpha V_{ref, 0}`.
+    V_ref : np.1darray, optional
+        Reference value :math:`V_{ref, 0}` greater than zero for the battery to switch to the voltage source, as an
+        array of length one. ``None`` means ``np.array([1.0])``.
+
     Note
     ----
     This class has the same attributes as the class it inherits from.

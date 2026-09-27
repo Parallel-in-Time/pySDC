@@ -107,6 +107,19 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     ``mpi4py-fft`` [#]_. For time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing
     the full right-hand side is solved by a Newton-Krylov method [#]_.
 
+    Parameters
+    ----------
+    lintol : float, optional
+        Absolute tolerance for the ``SciPy`` Newton-Krylov solver, passed as ``x_tol``, i.e., applied to the
+        maximum norm of the Newton step. ``SciPy`` additionally requires the maximum norm of the residual to be below
+        its default ``f_tol`` of about ``6e-6``.
+    liniter : int, optional
+        Maximum number of Newton iterations of the Newton-Krylov solver, passed as ``maxiter``. If the solver does not
+        converge, the last iterate is used without a warning.
+    **kwargs
+        Passed on to ``nonlinearschroedinger_imex``, see there: ``c``, ``nvars``, ``spectral`` and ``comm``.
+        ``useGPU`` has to be False.
+
     References
     ----------
     .. [#] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.

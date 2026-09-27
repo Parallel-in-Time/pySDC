@@ -21,12 +21,12 @@ class auzinger(Problem):
     .. math::
         (y_1(t), y_2(t))^T = (\cos(t), \sin(t))^T.
 
-    Attributes
+    Parameters
     ----------
     newton_maxiter : int, optional
         Maximum number of iterations for Newton's method.
     newton_tol : float, optional
-        Tolerance for Newton's method to terminate.
+        Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residual.
 
     References
     ----------
