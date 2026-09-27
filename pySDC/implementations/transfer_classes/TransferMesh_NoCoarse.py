@@ -3,7 +3,7 @@ from pySDC.core.space_transfer import SpaceTransfer
 
 class mesh_to_mesh(SpaceTransfer):
     """
-    Custom base_transfer class, implements Transfer.py
+    Identity space transfer for levels on the same mesh, copying the data in both directions.
 
     This implementation is for identical fine and coarse meshes: both directions just copy the data.
     """

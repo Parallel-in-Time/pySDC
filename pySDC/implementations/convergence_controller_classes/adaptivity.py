@@ -7,8 +7,7 @@ from pySDC.implementations.convergence_controller_classes.step_size_limiter impo
 
 class AdaptivityBase(ConvergenceController):
     """
-    Abstract base class for convergence controllers that implement adaptivity based on arbitrary local error estimates
-    and update rules.
+    Abstract base class for adaptivity from arbitrary local error estimates and step size update rules.
     """
 
     def setup(self, controller, params, description, **kwargs):
@@ -152,6 +151,10 @@ class AdaptivityBase(ConvergenceController):
 
 
 class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
+    """
+    Base class for adaptivity from error estimates that need a converged collocation problem, restarting if it is not.
+    """
+
     def dependencies(self, controller, description, **kwargs):
         """
         Load interpolation between restarts.
@@ -740,8 +743,7 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
 
 class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
     """
-    Class to compute time step size adaptively based on error estimate obtained from extrapolation within the quadrature
-    nodes.
+    Compute the step size adaptively from an error estimate by extrapolation within the quadrature nodes.
 
     This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.
     """
@@ -831,8 +833,7 @@ class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
 
 class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
     """
-    Class to compute time step size adaptively based on error estimate obtained from interpolation within the quadrature
-    nodes.
+    Compute the step size adaptively from an error estimate by interpolation within the quadrature nodes.
 
     This error estimate depends on solving the collocation problem exactly, so make sure you set a sufficient stopping criterion.
     """

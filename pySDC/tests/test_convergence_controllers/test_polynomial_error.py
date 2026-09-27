@@ -211,7 +211,8 @@ def test_interpolation_error_GPU(num_nodes, quad_type):
 @pytest.mark.mpi4py
 @pytest.mark.parallel([2, 5])
 @pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
-def test_interpolation_error_MPI(quad_type):
+@pytest.mark.parametrize('rel_error', [True, False])
+def test_interpolation_error_MPI(quad_type, rel_error):
     import numpy as np
     from mpi4py import MPI
 
@@ -220,7 +221,7 @@ def test_interpolation_error_MPI(quad_type):
         useMPI=True,
         num_nodes=MPI.COMM_WORLD.size,
         quad_type=quad_type,
-        rel_error=False,
+        rel_error=rel_error,
     )
 
 
@@ -296,7 +297,8 @@ def test_polynomial_error_firedrake(dt=1.0, num_nodes=3, useMPI=False):
 
 
 @pytest.mark.firedrake
-def test_polynomial_error_firedrake_in_run():
+@pytest.mark.parametrize('rel_error', [False, True])
+def test_polynomial_error_firedrake_in_run(rel_error):
     """
     The estimate through a run of the controller, which calls get_interpolated_solution the way the base class does
     """
@@ -314,7 +316,7 @@ def test_polynomial_error_firedrake_in_run():
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3},
         'level_params': {'dt': 0.1, 'restol': 1e-10},
         'step_params': {'maxiter': 10},
-        'convergence_controllers': {EstimatePolynomialErrorFiredrake: {}},
+        'convergence_controllers': {EstimatePolynomialErrorFiredrake: {'rel_error': rel_error}},
     }
     controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
     prob = controller.MS[0].levels[0].prob

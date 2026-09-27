@@ -4,6 +4,8 @@ from pySDC.implementations.datatype_classes.container import MultiComponentConta
 
 
 class petsc_vec(PETSc.Vec):
+    """PETSc ``Vec`` datatype, created from a ``DMDA`` or copied from another vector."""
+
     __array_priority__ = 1000  # otherwise rmul with float64 does not work (don't ask, won't tell)
 
     def __new__(cls, init=None, val=0.0):

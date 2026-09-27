@@ -175,8 +175,12 @@ class CuPyMultiComponentMesh(MultiComponentMeshMixin, cupy_mesh):
 
 
 class imex_cupy_mesh(CuPyMultiComponentMesh):
+    """CuPy mesh with an implicit part ``impl`` and an explicit part ``expl``, for IMEX right-hand sides."""
+
     components = ['impl', 'expl']
 
 
 class comp2_cupy_mesh(CuPyMultiComponentMesh):
+    """CuPy mesh with two parts ``comp1`` and ``comp2``, for multi-implicit right-hand sides."""
+
     components = ['comp1', 'comp2']

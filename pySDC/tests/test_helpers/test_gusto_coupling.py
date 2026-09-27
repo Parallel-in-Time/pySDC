@@ -184,6 +184,32 @@ def test_generic_gusto_problem(setup):
     ), f'Backward Euler does not match reference implementation! Got relative difference of {error}'
 
 
+@pytest.mark.firedrake
+def test_generic_gusto_imex_work(setup):
+    from pySDC.implementations.problem_classes.GenericGusto import GenericGustoImex
+
+    eqns, domain, spatial_methods, setup = get_gusto_advection_setup(False, True, setup)
+    problem = GenericGustoImex(eqns)
+
+    u = problem.u_init
+    u.interpolate(setup.f_init)
+
+    problem.eval_f(u)
+    for factor in [0.1, 0.2]:
+        problem.solve_system(u, factor, u)
+
+    # one solver for each of the two labels and one for each factor
+    assert problem.work_counters['solver_setup'].niter == 4
+
+    # a cached solver solves once per call
+    calls = []
+    solver = problem.solvers[0.1]
+    solve = solver.solve
+    solver.solve = lambda: calls.append(solve())
+    problem.solve_system(u, 0.1, u)
+    assert len(calls) == 1
+
+
 class Method(object):
     imex = False
 

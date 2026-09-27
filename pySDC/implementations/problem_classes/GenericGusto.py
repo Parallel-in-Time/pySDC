@@ -12,7 +12,9 @@ import numpy as np
 
 class GenericGusto(Problem):
     """
-    Set up solvers based on the equation. Keep in mind that you probably want to use the pySDC-Gusto coupling via
+    Problem class wrapping a Gusto (Firedrake) equation, with all terms of its residual treated implicitly.
+
+    Keep in mind that you probably want to use the pySDC-Gusto coupling via
     the `pySDC_integrator` class in the helpers in order to get spatial methods rather than interfacing with this
     class directly.
 
@@ -181,6 +183,10 @@ class GenericGusto(Problem):
 
 
 class GenericGustoImex(GenericGusto):
+    """
+    Problem class wrapping a Gusto (Firedrake) equation, IMEX with the terms labeled implicit and explicit split.
+    """
+
     dtype_f = IMEX_firedrake_mesh
     rhs_n_labels = 2
 
@@ -204,7 +210,7 @@ class GenericGustoImex(GenericGusto):
             self.solvers[label] = fd.NonlinearVariationalSolver(
                 problem, solver_parameters=self.solver_parameters, options_prefix=solver_name
             )
-            self.work_counters['solver_setup'] = WorkCounter()
+            self.work_counters['solver_setup']()
 
         self.solvers[label].solve()
         return self.x_out
@@ -249,9 +255,8 @@ class GenericGustoImex(GenericGusto):
             self.solvers[factor] = fd.NonlinearVariationalSolver(
                 problem, solver_parameters=self.solver_parameters, options_prefix=solver_name
             )
-            self.work_counters['solver_setup'] = WorkCounter()
+            self.work_counters['solver_setup']()
 
-        self.solvers[factor].solve()
         try:
             self.solvers[factor].solve()
         except fd.exceptions.ConvergenceError as error:

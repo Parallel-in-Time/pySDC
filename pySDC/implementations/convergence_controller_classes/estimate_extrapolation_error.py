@@ -9,8 +9,8 @@ from pySDC.implementations.hooks.log_extrapolated_error_estimate import LogExtra
 
 class EstimateExtrapolationErrorBase(ConvergenceController):
     """
-    Abstract base class for extrapolated error estimates
-    ----------------------------------------------------
+    Abstract base class for error estimates by Taylor extrapolation of solutions and right-hand sides from other times.
+
     This error estimate extrapolates a solution based on Taylor expansions using solutions at other times. Child
     classes decide where these come from: EstimateExtrapolationErrorNonMPI uses previous time steps, and
     EstimateExtrapolationErrorWithinQ the collocation nodes of the current step. There is no MPI version.
@@ -401,8 +401,8 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
 class EstimateExtrapolationErrorWithinQ(EstimateExtrapolationErrorBase):
     """
-    This convergence controller estimates the local error based on comparing the SDC solution to an extrapolated
-    solution within the quadrature matrix. Collocation methods compute a high order solution from a linear combination
+    Estimate the local error by comparing the converged SDC solution to an extrapolation from other quadrature nodes.
+    Collocation methods compute a high order solution from a linear combination
     of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don't share the order of
     accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of
     nodes + 1 (locally). This is because the solution to the collocation problem is a polynomial approximation of order

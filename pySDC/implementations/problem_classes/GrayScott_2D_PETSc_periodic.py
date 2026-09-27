@@ -284,6 +284,8 @@ class GS_reaction(object):
 
 class petsc_grayscott_multiimplicit(Problem):
     r"""
+    2D periodic Gray-Scott system with PETSc finite differences, multi-implicit: diffusion (CG), reaction (SNES).
+
     The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
@@ -654,6 +656,8 @@ class petsc_grayscott_multiimplicit(Problem):
 
 class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
     r"""
+    2D periodic Gray-Scott system with PETSc finite differences, fully implicit with PETSc's SNES.
+
     The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
@@ -741,6 +745,8 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
 
 class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
     r"""
+    2D periodic Gray-Scott system with PETSc finite differences, IMEX with diffusion implicit, reaction explicit.
+
     The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for

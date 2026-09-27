@@ -22,7 +22,7 @@ Entry = namedtuple('Entry', meta_data.keys())
 # noinspection PyUnusedLocal,PyShadowingBuiltins,PyShadowingNames
 class Hooks(object):
     """
-    Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
+    Base class for hooks, with methods the controller calls around each run, step, iteration and sweep to record stats.
 
     When deriving a custom hook from this class make sure to always call the parent method using e.g.
     `super().post_step(step, level_number)`. Otherwise bugs may arise when using `filer_recomputed` from the stats

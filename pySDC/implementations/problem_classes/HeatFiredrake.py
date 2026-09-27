@@ -7,6 +7,8 @@ from mpi4py import MPI
 
 class Heat1DForcedFiredrake(Problem):
     r"""
+    Forced 1D heat equation with Dirichlet BCs and Firedrake finite elements, IMEX with diffusion implicit.
+
     Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
     .. math::
@@ -108,7 +110,7 @@ class Heat1DForcedFiredrake(Problem):
             The evaluated right hand side
         """
         # construct and cache a solver for the implicit part of the right hand side evaluation
-        if not hasattr(self, '__solv_eval_f_implicit'):
+        if not hasattr(self, '_solv_eval_f_implicit'):
             v = fd.TestFunction(self.V)
             u_trial = fd.TrialFunction(self.V)
 
@@ -118,13 +120,13 @@ class Heat1DForcedFiredrake(Problem):
             bcs = [fd.bcs.DirichletBC(self.V, fd.Constant(0), area) for area in [1, 2]]
 
             prob = fd.LinearVariationalProblem(a, L_impl, self.tmp_out, bcs=bcs)
-            self.__solv_eval_f_implicit = fd.LinearVariationalSolver(prob)
+            self._solv_eval_f_implicit = fd.LinearVariationalSolver(prob)
 
         # copy the solution we want to evaluate at into the input buffer
         self.tmp_in.assign(u.functionspace)
 
         # perform the solve using the cached solver
-        self.__solv_eval_f_implicit.solve()
+        self._solv_eval_f_implicit.solve()
 
         me = self.dtype_f(self.init)
 

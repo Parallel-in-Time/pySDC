@@ -8,6 +8,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class allencahn2d_imex(Problem):
     r"""
+    2D periodic Allen-Cahn equation with FFTs, IMEX with the Laplacian implicit and the reaction explicit.
+
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -39,8 +41,8 @@ class allencahn2d_imex(Problem):
 
     Parameters
     ----------
-    nvars : List of int tuples, optional
-        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
+    nvars : tuple of int, optional
+        Number of unknowns in each spatial direction, e.g. ``nvars=(128, 128)``.
     nu : int, optional
         Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.
     eps : float, optional
@@ -247,6 +249,8 @@ class allencahn2d_imex(Problem):
 
 class allencahn2d_imex_stab(allencahn2d_imex):
     r"""
+    2D periodic Allen-Cahn equation with FFTs, IMEX with a stabilizing linear term shifted into the implicit part.
+
     This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -284,8 +288,8 @@ class allencahn2d_imex_stab(allencahn2d_imex):
 
     Parameters
     ----------
-    nvars : List of int tuples, optional
-        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (128, 128)]``.
+    nvars : tuple of int, optional
+        Number of unknowns in each spatial direction, e.g. ``nvars=(128, 128)``.
     nu : int, optional
         Exponent of the double well; :math:`\nu = 2` is the standard Allen-Cahn nonlinearity.
     eps : float, optional
@@ -315,7 +319,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         """Initialization routine"""
 
         if nvars is None:
-            nvars = [(256, 256), (64, 64)]
+            nvars = (256, 256)
 
         super().__init__(nvars, nu, eps, radius, L, init_type, useGPU)
         self.lap -= 2.0 / self.eps**2

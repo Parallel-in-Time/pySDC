@@ -4,7 +4,7 @@ from pySDC.core.convergence_controller import ConvergenceController
 
 class StepSizeLimiter(ConvergenceController):
     """
-    Class to set limits to adaptive step size computation during run time
+    Clip the new step size to [`dt_min`, `dt_max`], and add a `StepSizeSlopeLimiter` if slope limits are given.
 
     Please supply dt_min or dt_max in the params to limit in either direction
     """
@@ -88,7 +88,7 @@ class StepSizeLimiter(ConvergenceController):
 
 class StepSizeSlopeLimiter(ConvergenceController):
     """
-    Class to set limits to adaptive step size computation during run time
+    Bound `dt_new / dt` to [`dt_slope_min`, `dt_slope_max`], keeping `dt` if the change is below `dt_rel_min_slope`.
 
     Please supply `dt_slope_min` or `dt_slope_max` in the params to limit in either direction.
     You can also supply `dt_rel_min_slope` in order to keep the old step size in case the relative change is smaller

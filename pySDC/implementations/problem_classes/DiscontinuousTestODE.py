@@ -235,7 +235,9 @@ class DiscontinuousTestODE(Problem):
 
 class ExactDiscontinuousTestODE(DiscontinuousTestODE):
     r"""
-    Dummy ODE problem for testing the ``SwitchEstimator`` class. The problem contains the exact dynamics
+    Variant of ``DiscontinuousTestODE`` whose ``solve_system`` returns the exact solution, to test the
+    ``SwitchEstimator``.
+    The problem contains the exact dynamics
     of the problem class ``DiscontinuousTestODE``.
 
     Parameters
@@ -273,7 +275,7 @@ class ExactDiscontinuousTestODE(DiscontinuousTestODE):
         t_switch = np.inf if self.t_switch is None else self.t_switch
         h = u[0] - 5
         if h >= 0 or t >= t_switch:
-            f[:] = 1
+            f[:] = 4 / self.t_switch_exact
         else:
             f[:] = np.exp(t)
         return f

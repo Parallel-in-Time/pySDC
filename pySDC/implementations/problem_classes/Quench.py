@@ -12,6 +12,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class Quench(Problem):
     """
+    1D heat equation with a nonlinear heat source, modelling a magnet quench, fully implicit with Newton.
+
     This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
     However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment
     sufficiently, there will be a runaway effect heating up the entire magnet.
@@ -141,16 +143,6 @@ class Quench(Problem):
             'liniter',
             'inexact_linear_ratio',
             'min_lintol',
-            localVars=locals(),
-            readOnly=False,
-        )
-
-        self._makeAttributeAndRegister(
-            'newton_tol',
-            'newton_maxiter',
-            'lintol',
-            'liniter',
-            'direct_solver',
             localVars=locals(),
             readOnly=False,
         )
@@ -473,6 +465,8 @@ class Quench(Problem):
 
 class QuenchIMEX(Quench):
     """
+    1D heat equation with a nonlinear heat source, modelling a magnet quench, IMEX with diffusion implicit.
+
     This is a toy problem [1]_ to emulate a magnet that has been cooled to temperatures where superconductivity is possible.
     However, there is a leak! Some point in the domain is constantly heated and when this has heated up its environment
     sufficiently, there will be a runaway effect heating up the entire magnet.

@@ -4,6 +4,10 @@ from pySDC.implementations.convergence_controller_classes.store_uold import Stor
 
 
 class CheckIterationEstimatorNonMPI(ConvergenceController):
+    """
+    Stop iterating once the contraction of the increments predicts that `errtol` is reached, for the non-MPI controller.
+    """
+
     def __init__(self, controller, params, description, **kwargs):
         """
         Initialization routine

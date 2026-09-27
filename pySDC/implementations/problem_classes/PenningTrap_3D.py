@@ -16,6 +16,8 @@ from pySDC.implementations.datatype_classes.particles import particles, fields, 
 # noinspection PyUnusedLocal
 class penningtrap(Problem):
     r"""
+    Charged particles in a 3D Penning trap with Coulomb interaction, a second-order problem for the Boris integrator.
+
     This class implements a standard Penning trap problem on the time interval :math:`[0, t_{end}]`
     fully investigated in [1]_. The equations are given by the following equation of motion
 
@@ -196,6 +198,10 @@ class penningtrap(Problem):
         """
         Routine to compute the starting values for the particles.
 
+        The first particle starts at ``u0``. The others are shifted from it by random amounts in :math:`[-1, 0)` in
+        each position component and in :math:`[-5, -4)` in each velocity component, drawn after seeding
+        ``np.random`` with the number of particles.
+
         Returns
         -------
         u : dtype_u
@@ -229,13 +235,13 @@ class penningtrap(Problem):
         comz = u.pos[2, 0]
 
         for n in range(1, N):
-            # draw 3 random variables in [-1,1] to shift positions
+            # draw 3 random variables in [-1, 0) to shift positions
             r = np.random.random_sample(3) - 1
             u.pos[0, n] = r[0] + u0[0][0]
             u.pos[1, n] = r[1] + u0[0][1]
             u.pos[2, n] = r[2] + u0[0][2]
 
-            # draw 3 random variables in [-5,5] to shift velocities
+            # draw 3 random variables in [-5, -4) to shift velocities
             r = np.random.random_sample(3) - 5
             u.vel[0, n] = r[0] + u0[1][0]
             u.vel[1, n] = r[1] + u0[1][1]

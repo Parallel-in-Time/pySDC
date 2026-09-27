@@ -94,13 +94,8 @@ class ButcherTableauEmbedded(ButcherTableau):
 
 
 class RungeKutta(Sweeper):
-    nodes = None
-    weights = None
-    matrix = None
-    ButcherTableauClass = ButcherTableau
-
     """
-    Runge-Kutta scheme that fits the interface of a sweeper.
+    Base class for Runge-Kutta methods with lower triangular Butcher tableaux, wrapped in the sweeper interface.
     Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
     at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.
 
@@ -124,6 +119,11 @@ class RungeKutta(Sweeper):
 
     The entries of the Butcher tableau are stored as class attributes.
     """
+
+    nodes = None
+    weights = None
+    matrix = None
+    ButcherTableauClass = ButcherTableau
 
     def __init__(self, params, level):
         """
@@ -524,7 +524,9 @@ class BackwardEuler(RungeKutta):
 
 class IMEXEuler(RungeKuttaIMEX):
     """
-    Lie splitting of a backward Euler step for fI and a forward Euler step for fE from its result:
+    First-order IMEX Euler with one backward Euler stage, at which both parts of the right hand side are evaluated.
+
+    This is a Lie splitting of a backward Euler step for fI and a forward Euler step for fE from its result:
     u1 = u0 + dt fI(u1), u = u1 + dt fE(u1, t + dt). The explicit tableau has node 1 and matrix entry 0, so fE is
     evaluated at the new time and the implicit stage, not at the start of the step. For the variant with fE at the
     start of the step, see IMEXEulerStifflyAccurate.
@@ -539,6 +541,7 @@ class IMEXEuler(RungeKuttaIMEX):
 
 class IMEXEulerStifflyAccurate(RungeKuttaIMEX):
     """
+    IMEX Euler with the explicit part evaluated at the start of the step, as a stiffly accurate two-stage method.
     This implements u = fI^-1(u0 + fE(u0)) rather than IMEXEuler's u = fI^-1(u0) + fE(fI^-1(u0)).
     This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly
     accurate and suitable for some DAEs.
@@ -713,7 +716,9 @@ class ARK548L2SAESDIRK(ARK548L2SAERK):
 
 class ARK54(RungeKuttaIMEX):
     """
-    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from [here](https://doi.org/10.1016/S0168-9274(02)00138-1).
+    IMEX Runge-Kutta method ARK5(4)8L[2]SA of Kennedy and Carpenter, combining ARK548L2SAERK and ARK548L2SAESDIRK.
+    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from
+    [here](https://doi.org/10.1016/S0168-9274(02)00138-1).
     """
 
     ButcherTableauClass = ButcherTableauEmbedded
@@ -732,7 +737,9 @@ class ARK54(RungeKuttaIMEX):
 
 class ARK548L2SAESDIRK2(RungeKutta):
     """
-    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
+    Implicit part of ARK548L2SA: an L-stable, stiffly accurate ESDIRK pair of orders 5 and 4.
+    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit
+    first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
     This method is part of the IMEX method ARK548L2SA.
     """
 
@@ -747,7 +754,8 @@ class ARK548L2SAESDIRK2(RungeKutta):
 
 class ARK548L2SAERK2(ARK548L2SAESDIRK2):
     """
-    Explicit embedded pair of Runge-Kutta methods of orders 5 and 4 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
+    Explicit part of ARK548L2SA: an explicit embedded Runge-Kutta pair of orders 5 and 4.
+    Taken from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
     This method is part of the IMEX method ARK548L2SA.
     """
 
@@ -757,7 +765,8 @@ class ARK548L2SAERK2(ARK548L2SAESDIRK2):
 
 class ARK548L2SA(RungeKuttaIMEX):
     """
-    IMEX Runge-Kutta method of order 5 based on the explicit method ARK548L2SAERK2 and the implicit method
+    Newer order-5 IMEX Runge-Kutta method ARK5(4)8L[2]SA of Kennedy and Carpenter, an alternative to ARK54.
+    It is based on the explicit method ARK548L2SAERK2 and the implicit method
     ARK548L2SAESDIRK2 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
 
     According to Kennedy and Carpenter (see reference), the two IMEX RK methods of order 5 are the only ones available
@@ -779,6 +788,10 @@ class ARK548L2SA(RungeKuttaIMEX):
 
 
 class ARK324L2SAERK(RungeKutta):
+    """
+    Explicit part of ARK32: an explicit embedded Runge-Kutta pair of orders 3 and 2.
+    """
+
     generator = RK_SCHEMES["ARK324L2SAERK"]()
     nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
@@ -789,11 +802,19 @@ class ARK324L2SAERK(RungeKutta):
 
 
 class ARK324L2SAESDIRK(ARK324L2SAERK):
+    """
+    Implicit part of ARK32: an L-stable, stiffly accurate ESDIRK pair of orders 3 and 2.
+    """
+
     generator = RK_SCHEMES["ARK324L2SAESDIRK"]()
     matrix = generator.Q
 
 
 class ARK32(RungeKuttaIMEX):
+    """
+    Embedded IMEX Runge-Kutta method ARK3(2)4L[2]SA of Kennedy and Carpenter, of orders 3 and 2.
+    """
+
     ButcherTableauClass = ButcherTableauEmbedded
     ButcherTableauClass_explicit = ButcherTableauEmbedded
 

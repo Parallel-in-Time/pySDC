@@ -36,7 +36,7 @@ class auzinger(Problem):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, newton_maxiter=1e-12, newton_tol=100):
+    def __init__(self, newton_maxiter=100, newton_tol=1e-12):
         """Initialization routine"""
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2

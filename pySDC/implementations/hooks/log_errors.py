@@ -4,8 +4,7 @@ from pySDC.core.hooks import Hooks
 
 class LogError(Hooks):
     """
-    Base class with functions to add the local and global error to the stats, which can be inherited by hooks logging
-    these at specific places.
+    Base class for hooks that log the local or global error with respect to the `u_exact` of the problem.
 
     Errors are computed with respect to `u_exact` defined in the problem class.
     Be aware that this requires the problems to be compatible with this. We need some kind of "exact" solution for this
@@ -94,6 +93,10 @@ class LogError(Hooks):
 
 
 class LogGlobalErrorPostStep(LogError):
+    """
+    Log the global error with respect to `u_exact` at the end of each step as "e_global_post_step".
+    """
+
     def post_step(self, step, level_number):
         super().post_step(step, level_number)
         self.log_global_error(step, level_number, '_post_step')

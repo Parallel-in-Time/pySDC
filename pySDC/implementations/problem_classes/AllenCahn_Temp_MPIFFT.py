@@ -5,19 +5,26 @@ from pySDC.core.errors import ProblemError
 from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
+from mpi4py import MPI
 from mpi4py_fft import newDistArray
 
 
 class allencahn_temp_imex(Problem):
     r"""
+    Periodic Allen-Cahn equation coupled to a temperature equation, mpi4py-fft FFTs, IMEX with both Laplacians implicit.
+
     This class implements the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = D \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
-            - 6 d_w \frac{u - T_M}{T_M}u (1 - u)
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w \frac{T - T_M}{T_M}u (1 - u),
 
-    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, with driving force :math:`d_w`, and :math:`N=2,3`. :math:`D` and
+    .. math::
+        \frac{\partial T}{\partial t} = D \Delta T + \frac{\partial u}{\partial t}
+
+    for the phase field :math:`u` and the temperature :math:`T` on a spatial domain
+    :math:`[-\frac{L}{2}, \frac{L}{2}]^N`, with driving force :math:`d_w`, and :math:`N=2,3`. :math:`D` and
     :math:`T_M` are fixed parameters. Different initial conditions can be used, for example, circles of the form
 
     .. math::
@@ -25,21 +32,20 @@ class allencahn_temp_imex(Problem):
         {\sqrt{2}\varepsilon}\right)\right),
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
-    *semi-implicitly*, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand
-    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
+    *semi-implicitly*, i.e., the diffusion of both components is treated implicitly and solved by Fast Fourier Transform
+    (FFT) using ``mpi4py-fft`` [1]_, and the reaction terms are treated explicitly.
 
     Parameters
     ----------
-    nvars : tuple of int
+    nvars : tuple of int, optional
         Number of unknowns in each spatial direction, e.g. ``nvars=(128, 128)``. Has to be a tuple of at least two
-        entries. The default ``None`` is replaced by the list ``[(128, 128)]``, which fails this check, so ``nvars``
-        has to be given.
+        entries.
     eps : float, optional
         Scaling parameter :math:`\varepsilon`. For ``eps <= 0``, the reaction terms are dropped.
     radius : float, optional
         Radius of the circle for ``init_type='circle'``.
     spectral : bool, optional
-        If True, the solution is computed in spectral space. ``None`` means False.
+        If True, the solution is computed in spectral space.
     TM : float, optional
         Reference temperature :math:`T_M` of the driving force, which vanishes where the temperature equals :math:`T_M`.
     D : float, optional
@@ -81,18 +87,18 @@ class allencahn_temp_imex(Problem):
         nvars=None,
         eps=0.04,
         radius=0.25,
-        spectral=None,
+        spectral=False,
         TM=1.0,
         D=10.0,
         dw=0.0,
         L=1.0,
         init_type='circle',
-        comm=None,
+        comm=MPI.COMM_WORLD,
     ):
         """Initialization routine"""
 
         if nvars is None:
-            nvars = [(128, 128)]
+            nvars = (128, 128)
 
         if not (isinstance(nvars, tuple) and len(nvars) > 1):
             raise ProblemError('Need at least two dimensions')

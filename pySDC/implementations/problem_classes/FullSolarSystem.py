@@ -7,6 +7,8 @@ from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_s
 # noinspection PyUnusedLocal
 class full_solar_system(outer_solar_system):
     r"""
+    Gravitational N-body problem of the sun, the eight planets (Earth and Moon as one body) and Pluto.
+
     The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem is
     based on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
 
