@@ -56,6 +56,17 @@ templates_path = ['_templates']
 add_module_names = False
 toc_object_entries_show_parents = 'hide'
 suppress_warnings = ['image.nonlocal_uri']
+# Attributes sections become fields, so that they do not describe the attributes autodoc documents a second time
+napoleon_use_ivar = True
+# Every problem class has its own dtype_u and dtype_f, and "matrix" names no class: link the generic ones instead of
+# letting Sphinx pick one of the ~70 candidates
+napoleon_preprocess_types = True
+napoleon_use_rtype = False  # the aliases do not reach the separate return-type field
+napoleon_type_aliases = {
+    'dtype_u': ':py:attr:`~pySDC.core.problem.Problem.dtype_u`',
+    'dtype_f': ':py:attr:`~pySDC.core.problem.Problem.dtype_f`',
+    'matrix': 'matrix',
+}
 autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy', 'firedrake', 'gusto', 'vtk', 'vtkmodules']
 
 html_theme = 'pydata_sphinx_theme'
