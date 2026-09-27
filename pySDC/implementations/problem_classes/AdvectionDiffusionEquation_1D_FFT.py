@@ -211,7 +211,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
         tmp = self.nu * self.lap * tmp_u - self.c * self.ddx * tmp_u
         f[:] = np.fft.irfft(tmp)
 
-        self.work_counters['rhs']
+        self.work_counters['rhs']()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
