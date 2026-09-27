@@ -14,10 +14,14 @@ class allencahn_temp_imex(Problem):
     phases at :math:`u = 0` and :math:`u = 1`
 
     .. math::
-        \frac{\partial u}{\partial t} = D \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
-            - 6 d_w \frac{u - T_M}{T_M}u (1 - u)
+        \frac{\partial u}{\partial t} = \Delta u - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
+            - 6 d_w \frac{T - T_M}{T_M}u (1 - u),
 
-    on a spatial domain :math:`[-\frac{L}{2}, \frac{L}{2}]^2`, with driving force :math:`d_w`, and :math:`N=2,3`. :math:`D` and
+    .. math::
+        \frac{\partial T}{\partial t} = D \Delta T + \frac{\partial u}{\partial t}
+
+    for the phase field :math:`u` and the temperature :math:`T` on a spatial domain
+    :math:`[-\frac{L}{2}, \frac{L}{2}]^N`, with driving force :math:`d_w`, and :math:`N=2,3`. :math:`D` and
     :math:`T_M` are fixed parameters. Different initial conditions can be used, for example, circles of the form
 
     .. math::
@@ -25,8 +29,8 @@ class allencahn_temp_imex(Problem):
         {\sqrt{2}\varepsilon}\right)\right),
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, the problem is treated
-    *semi-implicitly*, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand
-    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.
+    *semi-implicitly*, i.e., the diffusion of both components is treated implicitly and solved by Fast Fourier Transform
+    (FFT) using ``mpi4py-fft`` [1]_, and the reaction terms are treated explicitly.
 
     Parameters
     ----------

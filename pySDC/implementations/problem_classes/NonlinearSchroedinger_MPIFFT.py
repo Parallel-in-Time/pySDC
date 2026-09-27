@@ -13,11 +13,14 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
     Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::
-        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u
+        \frac{\partial u}{\partial t} = i \Delta u + 2 N c i |u|^2 u
 
-    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be solved using
-    ``mpi4py-fft`` [#]_. *Semi-explicit* time-stepping is used here to solve the problem in the temporal dimension, i.e., the
-    Laplacian will be handled implicitly.
+    for fixed parameter :math:`c \in \{0, 1\}` and :math:`N=2, 3`, on :math:`[0, 2\pi]^N`. The factor :math:`N` makes
+    the one-dimensional breather solution (39) of https://doi.org/10.1007/BF01017105, taken along
+    :math:`x_1 + \dots + x_N` and at time :math:`N t`, an exact solution. The period :math:`2\pi` is fixed and cannot
+    be passed as ``L``. The linear parts of the problem will be solved using ``mpi4py-fft`` [#]_. *Semi-explicit*
+    time-stepping is used here to solve the problem in the temporal dimension, i.e., the Laplacian will be handled
+    implicitly.
 
     Parameters
     ----------
@@ -26,7 +29,7 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
     spectral : bool, optional
         If True, the solution is computed in spectral space.
     c : float, optional
-        Nonlinearity parameter.
+        Nonlinearity parameter, either 0 or 1.
     comm : MPI.COMM_World
         Communicator for parallelisation.
 
@@ -101,11 +104,14 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::
-        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u
+        \frac{\partial u}{\partial t} = i \Delta u + 2 N c i |u|^2 u
 
-    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be discretized using
-    ``mpi4py-fft`` [#]_. For time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing
-    the full right-hand side is solved by a Newton-Krylov method [#]_.
+    for fixed parameter :math:`c \in \{0, 1\}` and :math:`N=2, 3`, on :math:`[0, 2\pi]^N`. The factor :math:`N` makes
+    the one-dimensional breather solution (39) of https://doi.org/10.1007/BF01017105, taken along
+    :math:`x_1 + \dots + x_N` and at time :math:`N t`, an exact solution. The period :math:`2\pi` is fixed and cannot
+    be passed as ``L``. The linear parts of the problem will be discretized using ``mpi4py-fft`` [#]_. For
+    time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing the full
+    right-hand side is solved by a Newton-Krylov method [#]_.
 
     Parameters
     ----------
