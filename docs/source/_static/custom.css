@@ -72,3 +72,9 @@ div.highlight-text pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .bd-container__inner:has(> .bd-sidebar-primary.hide-on-wide) > .bd-main { max-width: 72rem; margin: 0 auto; }
 /* a row of images from a README, e.g. of a project, keeps some distance from the text after it */
 .bd-article img[style*="width"] { margin-bottom: 0.75rem; }
+
+/* The wordmark next to the logo: "py" in the logo's colour, "SDC" bold, as in _static/pysdc-logo.svg */
+.navbar-brand .logo__title { font-weight: 700; letter-spacing: -0.01em; }
+.navbar-brand .logo__py { font-weight: 500; color: #0f7b83; }
+html[data-theme="dark"] .navbar-brand .logo__py { color: #5cc4ca; }
+.navbar-brand .logo__image { height: 2.5rem; }

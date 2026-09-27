@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>pySDC</title>
+  <!-- The collocation interval with three fine nodes above and two coarse ones below, joined by the transfer -->
+  <path d="M17 12 H10 V52 H17" stroke="#1d2327" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M47 12 H54 V52 H47" stroke="#1d2327" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M21 25 L26.5 41 M32 25 L26.5 41 M32 25 L37.5 41 M43 25 L37.5 41" stroke="#0f7b83" stroke-opacity="0.45" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="21" cy="25" r="5" fill="#0f7b83"/>
+  <circle cx="32" cy="25" r="5" fill="#0f7b83"/>
+  <circle cx="43" cy="25" r="5" fill="#e0692a"/>
+  <circle cx="26.5" cy="41" r="4" fill="#1d2327"/>
+  <circle cx="37.5" cy="41" r="4" fill="#1d2327"/>
+</svg>
