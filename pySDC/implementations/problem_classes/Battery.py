@@ -474,6 +474,8 @@ class battery_implicit(battery):
         Number of maximum iterations for the Newton solver.
     newton_tol : float, optional
         Tolerance for determination of the Newton solver.
+    stop_at_nan : bool, optional
+        Raise a ``ProblemError`` if Newton's method produces ``nan``, instead of only logging a warning.
 
     Attributes
     ----------
@@ -495,9 +497,10 @@ class battery_implicit(battery):
         V_ref=None,
         newton_maxiter=100,
         newton_tol=1e-11,
+        stop_at_nan=True,
     ):
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
-        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True)
 
         self.work_counters['newton'] = WorkCounter()
 

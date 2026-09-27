@@ -475,6 +475,8 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         Maximum number of iterations for the Newton solver.
     newton_tol : float, optional
         Tolerance for Newton's method to terminate.
+    stop_at_nan : bool, optional
+        Raise a ``ProblemError`` if Newton's method produces ``nan``, instead of only logging a warning.
 
     Attributes
     ----------
@@ -503,6 +505,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         self,
         newton_maxiter=100,
         newton_tol=1e-12,
+        stop_at_nan=True,
         **kwargs,
     ):
         """Initialization routine"""
@@ -512,7 +515,9 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         self.work_counters['newton'] = WorkCounter()
         self.Ku = -self.Du * self.K2
         self.Kv = -self.Dv * self.K2
-        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=False)
+        self._makeAttributeAndRegister(
+            'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=False
+        )
 
     def eval_f(self, u, t):
         """
@@ -709,6 +714,8 @@ class grayscott_mi_linear(grayscott_imex_linear):
     newton_tol : float, optional
         Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residuals of both
         components in real space.
+    stop_at_nan : bool, optional
+        Raise a ``ProblemError`` if Newton's method produces ``nan``, instead of only logging a warning.
     **kwargs
         Passed on to ``grayscott_imex_diffusion``, see there: ``Du``, ``Dv``, ``A``, ``B``, ``L``, ``num_blobs``,
         ``nvars``, ``spectral``, ``comm`` and ``useGPU``. The Newton solver runs on a single process only, so
@@ -728,6 +735,7 @@ class grayscott_mi_linear(grayscott_imex_linear):
         self,
         newton_maxiter=100,
         newton_tol=1e-12,
+        stop_at_nan=True,
         **kwargs,
     ):
         """Initialization routine"""
@@ -737,7 +745,9 @@ class grayscott_mi_linear(grayscott_imex_linear):
         self.work_counters['newton'] = WorkCounter()
         self.Ku = -self.Du * self.K2 - self.A
         self.Kv = -self.Dv * self.K2 - self.B
-        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=False)
+        self._makeAttributeAndRegister(
+            'newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=False
+        )
 
     def eval_f(self, u, t):
         """
