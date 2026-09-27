@@ -56,6 +56,7 @@ class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
 
         Args:
             mat: square LxL matrix with L number of steps
+            quantity (str): The quantity the matrix is applied to, `'residual'` or `'increment'`
         """
         L = len(self.MS)
         assert np.allclose(mat.shape, L)

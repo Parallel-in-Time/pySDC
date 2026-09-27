@@ -51,6 +51,8 @@ class LorenzAttractor(Problem):
         Tolerance for Newton for termination.
     newton_maxiter : int, optional
         Maximum number of iterations for Newton's method.
+    stop_at_nan : bool, optional
+        Indicates that the Newton solver should raise an error if ``nan`` values arise, instead of only warning.
 
     Attributes
     ----------
@@ -114,7 +116,7 @@ class LorenzAttractor(Problem):
         ----------
         rhs : dtype_f
             Right-hand side for the nonlinear system.
-        factor : float
+        dt : float
             Abbrev. for the local stepsize (or any other factor required).
         u0 : dtype_u
             Initial guess for the iterative solver

@@ -51,6 +51,12 @@ class heatNd_unforced(GenericNDimFinDiff):
                 \right)^2
                 }
 
+    dtype : dtype-like, optional
+        Precision the state is stored at, ``float64`` by default. See :class:`GenericNDimFinDiff` for how the
+        operators follow it.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
+
     Attributes
     ----------
     A : sparse matrix (CSC)

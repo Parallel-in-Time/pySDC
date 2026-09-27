@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 Generic utility class to write and read cartesian grid field solutions into binary files.
-It implements the base file handler class :class:`FieldsIO`, that is specialized into :
+It implements the base file handler class :class:`~pySDC.helpers.fieldsIO.FieldsIO`, that is specialized into :
 
-- :class:`Scalar` : for 0D fields (scalar) with a given number of variables
-- :class:`Rectilinear` : for fields on N-dimensional rectilinear grids
+- :class:`~pySDC.helpers.fieldsIO.Scalar` : for 0D fields (scalar) with a given number of variables
+- :class:`~pySDC.helpers.fieldsIO.Rectilinear` : for fields on N-dimensional rectilinear grids
 
 While each file handler need to be setup with specific parameters (grid, ...),
 each written file can be read using the same interface implemented in the
@@ -39,7 +39,7 @@ Example
 
 Notes
 -----
-🚀 :class:`Rectilinear` is compatible with a MPI-based cartesian decomposition.
+🚀 :class:`~pySDC.helpers.fieldsIO.Rectilinear` is compatible with a MPI-based cartesian decomposition.
 See :class:`pySDC.helpers.fieldsIO.writeFields_MPI` for an illustrative example.
 
 Warning
@@ -152,7 +152,7 @@ class FieldsIO:
 
         Returns
         -------
-        fieldsIO : :class:`FieldsIO`
+        fieldsIO : :class:`~pySDC.helpers.fieldsIO.FieldsIO`
             The specialized `FieldsIO` adapted to the file.
         """
         if not os.path.isfile(fileName):

@@ -28,7 +28,10 @@ class harmonic_oscillator(Problem):
         Phase of the oscillation.
     amp : float, optional
         Amplitude of the oscillation.
-    Source: https://beltoforion.de/en/harmonic_oscillator/
+
+    References
+    ----------
+    .. [1] https://beltoforion.de/en/harmonic_oscillator/
     """
 
     dtype_u = particles

@@ -210,7 +210,7 @@ class SpectralHelper1D:
 
         Args:
             kind (str): The type of BC you want to implement please refer to the implementations of this method in the
-            individual 1D bases for what is implemented
+                individual 1D bases for what is implemented
 
         Returns:
             self.xp.array: Boundary condition
@@ -434,6 +434,7 @@ class ChebychevHelper(SpectralHelper1D):
         Args:
             u: Data you want to transform
             axes (tuple): Axes you want to transform along
+            shape (tuple): Shape of the result along `axes`, passed on as `s` to the FFT library
 
         Returns:
             Data in spectral space
@@ -489,6 +490,7 @@ class ChebychevHelper(SpectralHelper1D):
         Args:
             u: Data you want to transform
             axes (tuple): Axes you want to transform along
+            shape (tuple): Shape of the result along `axes`, passed on as `s` to the FFT library
 
         Returns:
             Data in physical space
@@ -854,6 +856,7 @@ class FFTHelper(SpectralHelper1D):
         Args:
             u: Data you want to transform
             axes (tuple): Axes you want to transform over
+            shape (tuple): Shape of the result along `axes`, passed on as `s` to the FFT library
 
         Returns:
             transformed data
@@ -870,6 +873,7 @@ class FFTHelper(SpectralHelper1D):
         Args:
             u: Data you want to transform
             axes (tuple): Axes over which to transform
+            shape (tuple): Shape of the result along `axes`, passed on as `s` to the FFT library
 
         Returns:
             transformed data
@@ -1228,7 +1232,6 @@ class SpectralHelper:
             equation (str): Name of the equation for the component you want to put the BC in
             axis (int): Axis you want to add the BC to
             kind (str): kind of BC, e.g. Dirichlet
-            v: Value of the BC
             line (int): Line you want the BC to go in
             scalar (bool): Put the BC in all space positions in the other direction
         """

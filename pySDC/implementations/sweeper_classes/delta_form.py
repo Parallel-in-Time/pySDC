@@ -38,8 +38,9 @@ Three node-local strategies are supported, selected automatically:
 
 fallback
     Otherwise the substitution :math:`y = u^k_m + \delta_m` reduces the correction equation to the
-    ordinary implicit solve. Always correct and identical to :class:`generic_implicit`, but the
-    solver sees an :math:`\mathcal{O}(1)` unknown, so there is no precision benefit.
+    ordinary implicit solve. Always correct and identical to
+    :class:`~pySDC.implementations.sweeper_classes.generic_implicit.generic_implicit`, but the solver sees an
+    :math:`\mathcal{O}(1)` unknown, so there is no precision benefit.
 
 ``correction_precision`` additionally stores the small quantities
 (:math:`\varepsilon`, :math:`\delta`, :math:`\Delta f`) in a reduced-precision datatype built from
@@ -55,8 +56,8 @@ The same sweeper serves any number of levels, and which it is doing is decided b
 by the choice of sweeper. On the finest level it computes its own residual, which is where the
 accuracy of the whole iteration is set. Given a transfer that hands one down -- by setting
 ``eps_in`` on the level's sweeper -- it uses that instead and advances it in place, so nothing is
-ever rebuilt out of :math:`\mathcal{O}(1)` coarse state. :class:`BaseTransfer` hands nothing down,
-so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.
+ever rebuilt out of :math:`\mathcal{O}(1)` coarse state. :class:`~pySDC.core.base_transfer.BaseTransfer` hands
+nothing down, so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.
 """
 
 import numpy as np
@@ -423,7 +424,7 @@ class DeltaFormMixin:
 
 class delta_implicit(DeltaFormMixin, generic_implicit):
     """
-    Delta-form counterpart of :class:`generic_implicit`.
+    Delta-form counterpart of :class:`~pySDC.implementations.sweeper_classes.generic_implicit.generic_implicit`.
 
     Mathematically identical to the standard sweep; see the module docstring for the sweeper
     parameters ``correction_precision`` and ``linear_implicit``.
@@ -474,7 +475,7 @@ class delta_implicit(DeltaFormMixin, generic_implicit):
 
 class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
     """
-    Delta-form counterpart of :class:`imex_1st_order`.
+    Delta-form counterpart of :class:`~pySDC.implementations.sweeper_classes.imex_1st_order.imex_1st_order`.
 
     The correction equation contains only differences of ``f``, never a Jacobian, so the
     explicit/implicit splitting is untouched.
@@ -484,7 +485,8 @@ class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
         """
         Perform one delta-form IMEX sweep over all collocation nodes.
 
-        ``QE`` is strictly lower triangular, which :class:`imex_1st_order` already enforces, so the
+        ``QE`` is strictly lower triangular, which
+        :class:`~pySDC.implementations.sweeper_classes.imex_1st_order.imex_1st_order` already enforces, so the
         explicit part never contributes to the node-local solve.
 
         Returns

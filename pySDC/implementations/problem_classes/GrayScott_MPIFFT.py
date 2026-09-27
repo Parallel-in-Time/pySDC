@@ -34,7 +34,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. ``nvars=(127, 127)``.
     Du : float, optional
         Diffusion rate for :math:`u`.
-    Dv: float, optional
+    Dv : float, optional
         Diffusion rate for :math:`v`.
     A : float, optional
         Feed rate for :math:`v`.
@@ -42,7 +42,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         Overall decay rate for :math:`u`.
     spectral : bool, optional
         If True, the solution is computed in spectral space.
-    L : int, optional
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
     comm : COMM_WORLD, optional
         Communicator for ``mpi4py-fft``.
@@ -193,6 +193,8 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         ----------
         t : float
             Time of the exact solution.
+        seed : int, optional
+            Seed for the random number generator that places the blobs or rectangles.
 
         Returns
         -------
@@ -450,7 +452,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. ``nvars=(127, 127)``.
     Du : float, optional
         Diffusion rate for :math:`u`.
-    Dv: float, optional
+    Dv : float, optional
         Diffusion rate for :math:`v`.
     A : float, optional
         Feed rate for :math:`v`.
@@ -458,10 +460,14 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         Overall decay rate for :math:`u`.
     spectral : bool, optional
         If True, the solution is computed in spectral space.
-    L : int, optional
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
     comm : COMM_WORLD, optional
         Communicator for ``mpi4py-fft``.
+    newton_maxiter : int, optional
+        Maximum number of iterations for the Newton solver.
+    newton_tol : float, optional
+        Tolerance for Newton's method to terminate.
 
     Attributes
     ----------
@@ -577,7 +583,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         ----------
         rhs : dtype_f
             Right-hand side for the linear system.
-        factor float
+        factor : float
             Abbrev. for the node-to-node stepsize (or any other factor required).
         u0 : dtype_u
             Initial guess for the iterative solver (not used here so far).

@@ -65,11 +65,8 @@ class penningtrap(Problem):
     omega_E : float
         Amplitude of electric field.
     u0 : np.1darray
-        Initial condition for position, and for velocity.
-    q : np.1darray
-        Particle's charge.
-    m : np.1darray
-        Mass.
+        Initial condition ``[pos, vel, [q], [m]]``: position and velocity (three components each) around which the
+        particles are placed, and the particles' charge and mass (so far only :math:`q = m = 1` is implemented).
     nparts : int
         The number of particles.
     sig : float

@@ -21,6 +21,8 @@ class testequation0d(Problem):
         List of lambda parameters.
     u0 : sequence of array_like, optional
         Initial condition.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
 
     Attributes
     ----------

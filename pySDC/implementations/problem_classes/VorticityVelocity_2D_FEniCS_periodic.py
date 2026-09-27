@@ -27,8 +27,8 @@ class fenics_vortex_2d(Problem):
 
     Parameters
     ----------
-    c_nvars : List of int tuple, optional
-        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. ``c_nvars=[(128, 128)]``.
+    c_nvars : tuple of int, optional
+        Number of cells of the coarse mesh in :math:`x` and :math:`y` direction, e.g. ``c_nvars=(128, 128)``.
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
@@ -40,9 +40,9 @@ class fenics_vortex_2d(Problem):
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
     rho : int, optional
-        Problem parameter.
+        Steepness of the shear layers in the initial condition.
     delta : float, optional
-        Problem parameter.
+        Amplitude of the perturbation in the initial condition.
 
     Attributes
     ----------
@@ -52,6 +52,10 @@ class fenics_vortex_2d(Problem):
         Mass matrix for FENiCS.
     K : scalar, vector, matrix or higher rank tensor
         Stiffness matrix including diffusion coefficient (and correct sign).
+    dtype_u : fenics_mesh
+        FEniCS mesh data type.
+    dtype_f : rhs_fenics_mesh
+        FEniCS mesh data type with implicit and explicit parts.
 
     References
     ----------
@@ -65,14 +69,7 @@ class fenics_vortex_2d(Problem):
     dtype_f = rhs_fenics_mesh
 
     def __init__(self, c_nvars=None, family='CG', order=4, refinements=None, nu=0.01, rho=50, delta=0.05):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: FEniCS mesh data type (will be passed to parent class)
-            dtype_f: FEniCS mesh data data type with implicit and explicit parts (will be passed to parent class)
-        """
+        """Initialization routine"""
 
         if c_nvars is None:
             c_nvars = [(32, 32)]
@@ -343,8 +340,8 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
 
     Parameters
     ----------
-    c_nvars : List of int tuple, optional
-        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. ``c_nvars=[(128, 128)]``.
+    c_nvars : tuple of int, optional
+        Number of cells of the coarse mesh in :math:`x` and :math:`y` direction, e.g. ``c_nvars=(128, 128)``.
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
@@ -356,9 +353,9 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
     rho : int, optional
-        Problem parameter.
+        Steepness of the shear layers in the initial condition.
     delta : float, optional
-        Problem parameter.
+        Amplitude of the perturbation in the initial condition.
 
     Attributes
     ----------
@@ -368,6 +365,10 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
         Mass matrix for FENiCS.
     K : scalar, vector, matrix or higher rank tensor
         Stiffness matrix including diffusion coefficient (and correct sign).
+    dtype_u : fenics_mesh
+        FEniCS mesh data type.
+    dtype_f : rhs_fenics_mesh
+        FEniCS mesh data type with implicit and explicit parts.
 
     References
     ----------

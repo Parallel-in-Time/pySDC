@@ -485,9 +485,10 @@ class ConvergenceController(object):
         Args:
             comm (mpi4py.MPI.Intracomm): Communicator
             source (int): Where to look for receiving
+            buffer: Buffer to receive the data into
 
         Returns:
-            whatever has been received
+            None, the data is received into `buffer`
         """
         kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
 
