@@ -1,0 +1,21 @@
+pySDC/tests/test_problems/test_Auzinger.py
+  s_4635c976c08496::t_38ed9f2102ebd2 1-18
+pySDC/implementations/problem_classes/Auzinger_implicit.py
+  s_4635c976c08496::t_773b3739931e66 39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "da6d1d304181a71a134b19be63b99d1f4556c6d5",
+  "prompts": {},
+  "sessions": {
+    "s_4635c976c08496": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f09ffcac-1bb6-468a-8482-42d83e6ac4f0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
