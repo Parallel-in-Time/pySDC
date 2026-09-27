@@ -145,16 +145,6 @@ class Quench(Problem):
             readOnly=False,
         )
 
-        self._makeAttributeAndRegister(
-            'newton_tol',
-            'newton_maxiter',
-            'lintol',
-            'liniter',
-            'direct_solver',
-            localVars=locals(),
-            readOnly=False,
-        )
-
         # setup finite difference discretization from problem helper
         self.dx, xvalues = problem_helper.get_1d_grid(size=self.nvars, bc=self.bc)
 
