@@ -178,20 +178,20 @@ class MultiComponentMeshMixin:
     ``mesh`` and ``CuPyMultiComponentMesh`` does for ``cupy_mesh``. To make a specific multi-component mesh, derive
     from one of those and list the components as strings in the class attribute ``components``. An example:
 
-    ```
-    class imex_mesh(MultiComponentMesh):
-        components = ['impl', 'expl']
-    ```
+    .. code-block:: python
+
+        class imex_mesh(MultiComponentMesh):
+            components = ['impl', 'expl']
 
     Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access
     to the components with ``.``. Continuing the above example:
 
-    ```
-    init = ((100,), None, numpy.dtype('d'))
-    f = imex_mesh(init)
-    f.shape  # (2, 100)
-    f.expl.shape  # (100,)
-    ```
+    .. code-block:: python
+
+        init = ((100,), None, numpy.dtype('d'))
+        f = imex_mesh(init)
+        f.shape  # (2, 100)
+        f.expl.shape  # (100,)
 
     The components are properties, generated when the subclass is created. Both ``f.expl[:] = ...`` and
     ``f.expl = ...`` write into the mesh; the component is never replaced by an unrelated object. Because the
@@ -240,8 +240,12 @@ class MultiComponentMesh(MultiComponentMeshMixin, mesh):
 
 
 class imex_mesh(MultiComponentMesh):
+    """NumPy mesh with an implicit part ``impl`` and an explicit part ``expl``, for IMEX right-hand sides."""
+
     components = ['impl', 'expl']
 
 
 class comp2_mesh(MultiComponentMesh):
+    """NumPy mesh with two parts ``comp1`` and ``comp2``, for multi-implicit right-hand sides."""
+
     components = ['comp1', 'comp2']

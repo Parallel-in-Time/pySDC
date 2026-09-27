@@ -32,7 +32,7 @@ class _Pars(FrozenClass):
 
 class Controller(object):
     """
-    Base abstract controller class
+    Abstract base class of the controllers, which set up hooks and convergence controllers and run the steps in time.
     """
 
     def __init__(
@@ -43,6 +43,8 @@ class Controller(object):
 
         Args:
             controller_params (dict): parameter set for the controller and the steps
+            description (dict): description of the problem, sweeper, levels, ... passed to the steps
+            useMPI (bool): whether the controller communicates via MPI
         """
         self.useMPI: Optional[bool] = useMPI
         self.description: Dict[str, Any] = description

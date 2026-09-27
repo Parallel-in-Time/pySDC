@@ -6,7 +6,7 @@ import time
 
 class CrashBase(ConvergenceController):
     """
-    Crash the code across all ranks
+    Base class for convergence controllers that raise a `ConvergenceError` on all ranks as soon as one rank crashes.
     """
 
     def __init__(self, controller, params, description, **kwargs):
@@ -22,6 +22,7 @@ class CrashBase(ConvergenceController):
 
         Args:
             crash (bool): If this rank wants to crash
+            msg (str): Message of the `ConvergenceError` raised on a crash
             comm (mpi4py.MPI.Intracomm or None): Communicator of the controller, if applicable:
         """
 
@@ -39,7 +40,7 @@ class CrashBase(ConvergenceController):
 
 class StopAtNan(CrashBase):
     """
-    Crash the code when the norm of the solution exceeds some limit or contains nan.
+    Crash all ranks when the solution contains nan or inf, or when its norm reaches the optional threshold `thresh`.
     This class is useful when running with MPI in the sweeper or controller.
     """
 

@@ -8,7 +8,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
     """
 
-    ParaDiag controller, running serialized version.
+    ParaDiag controller with the time steps of a block emulated serially in one process.
 
     This is `controller_nonMPI` with a different iteration: where PFASST sweeps and cascades through
     the levels, ParaDiag diagonalizes across the steps. Everything around the iteration -- blocks,
@@ -56,6 +56,7 @@ class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
 
         Args:
             mat: square LxL matrix with L number of steps
+            quantity (str): The quantity the matrix is applied to, `'residual'` or `'increment'`
         """
         L = len(self.MS)
         assert np.allclose(mat.shape, L)

@@ -11,6 +11,8 @@ from pySDC.core.problem import WorkCounter
 
 class RayleighBenard3D(GenericSpectralLinear):
     """
+    3D Rayleigh-Benard convection, FFT in x and y and ultraspherical in z, IMEX with the nonlinear advection explicit.
+
     Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes.
 
     The equations we solve are
@@ -73,11 +75,15 @@ class RayleighBenard3D(GenericSpectralLinear):
             Prandtl (float): Prandtl number
             Rayleigh (float): Rayleigh number
             nx (int): Resolution in x-direction
+            ny (int): Resolution in y-direction
             nz (int): Resolution in z direction
             BCs (dict): Vertical boundary conditions
             dealiasing (float): Dealiasing for evaluating the non-linear part in real space
             comm (mpi4py.Intracomm): Space communicator
-            Lx (float): Horizontal length of the domain
+            Lz (float): Vertical length of the domain
+            Lx (float): Horizontal length of the domain in x-direction
+            Ly (float): Horizontal length of the domain in y-direction
+            useGPU (bool): Run on GPU or CPU
         """
         BCs = {} if BCs is None else BCs
         BCs = {

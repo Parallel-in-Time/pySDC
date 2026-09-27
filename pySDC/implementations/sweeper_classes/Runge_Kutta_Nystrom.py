@@ -74,7 +74,7 @@ class ButcherTableauNoCollUpdate(object):
 
 class RungeKuttaNystrom(RungeKutta):
     """
-    Runge-Kutta scheme that fits the interface of a sweeper.
+    Base class for Runge-Kutta-Nystrom methods for second-order problems on particle data, as a sweeper.
     Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
     at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.
 
@@ -206,6 +206,8 @@ class RungeKuttaNystrom(RungeKutta):
 
 class RKN(RungeKuttaNystrom):
     """
+    Classical fourth-order Runge-Kutta-Nystrom method, with the nodes and weights of RK4.
+
     Runge-Kutta-Nystrom method
     https://link.springer.com/book/10.1007/978-3-540-78862-1
     page: 284
@@ -228,6 +230,8 @@ class RKN(RungeKuttaNystrom):
 
 class Velocity_Verlet(RungeKuttaNystrom):
     """
+    Second-order velocity-Verlet scheme as a Runge-Kutta-Nystrom method, using a Boris solver for the velocity.
+
     Velocity-Verlet scheme
     https://de.wikipedia.org/wiki/Verlet-Algorithmus
     """

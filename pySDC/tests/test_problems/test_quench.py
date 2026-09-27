@@ -45,5 +45,14 @@ def test_solver(t):
     assert np.allclose(u, u_backwards), 'Inconsistent solver and RHS evaluation in quench!'
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('name', ['Quench', 'QuenchIMEX'])
+def test_parameters_registered_once(name):
+    from pySDC.implementations.problem_classes import Quench
+
+    prob = getattr(Quench, name)()
+    assert not prob._parNamesReadOnly & prob._parNames, 'parameters registered as read-only and as writable'
+
+
 if __name__ == '__main__':
     test_solver_imex()

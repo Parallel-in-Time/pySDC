@@ -4,6 +4,10 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
 class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
+    """
+    Node-parallel IMEX-SDC sweeper, one collocation node per MPI rank, so far only with Picard for the explicit part.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         assert (

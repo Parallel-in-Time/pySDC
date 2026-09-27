@@ -187,5 +187,21 @@ def test_mesh_to_mesh_identity_without_coarsening(ndim):
     assert np.allclose(transfer.Rspace.toarray(), np.eye(size)), 'Restriction is not the identity'
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('nvars_fine, nvars_coarse', [((32, 16), (16, 16)), ((32, 16), (32, 8))])
+def test_mesh_to_mesh_coarsening_only_some_dimensions(nvars_fine, nvars_coarse):
+    """A dimension that keeps its resolution has to be transferred by the identity, whatever the others do."""
+    from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+
+    transfer = mesh_to_mesh(
+        get_problem(nvars_fine), get_problem(nvars_coarse), {'iorder': 4, 'rorder': 4, 'periodic': True}
+    )
+
+    P = transfer.Pspace.toarray()
+    R = transfer.Rspace.toarray()
+    assert np.allclose(P @ np.ones(P.shape[1]), 1.0), 'Interpolation does not reproduce a constant'
+    assert np.allclose(R @ np.ones(R.shape[1]), 1.0), 'Restriction does not reproduce a constant'
+
+
 if __name__ == '__main__':
     test_multicomponent_mesh('mesh_to_mesh_fft2d', 'prolong')

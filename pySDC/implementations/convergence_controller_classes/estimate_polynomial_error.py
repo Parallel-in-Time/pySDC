@@ -120,8 +120,8 @@ class EstimatePolynomialError(ConvergenceController):
         Get the interpolated solution for numpy or cupy data types
 
         Args:
-            u_vec (array): Vector of solutions
-            prob (pySDC.problem): Problem
+            L (pySDC.level): The level holding the solutions at the collocation nodes
+            xp: The array module of the data, numpy or cupy
         """
         coll = L.sweep.coll
 
@@ -175,14 +175,18 @@ class EstimatePolynomialError(ConvergenceController):
                 rank = estimate_on_node - 1
                 L.status.order_embedded_estimate = coll.num_nodes * 1
 
-            rescale = float(abs(u_inter).max()) if self.params.rel_error else 1
+            if not self.comm or self.comm.rank == rank:
+                error = abs(u_inter - high_order_sol)
+                if self.params.rel_error:
+                    # the norm of the datatype, as for the error: `u_inter` may be a bare array
+                    error /= abs(high_order_sol)
 
             if self.comm:
-                buf = np.array(abs(u_inter - high_order_sol) / rescale if self.comm.rank == rank else 0.0)
+                buf = np.array(error if self.comm.rank == rank else 0.0)
                 self.comm.Bcast(buf, root=rank)
                 L.status.error_embedded_estimate = float(buf)
             else:
-                L.status.error_embedded_estimate = abs(u_inter - high_order_sol) / rescale
+                L.status.error_embedded_estimate = error
 
             self.debug(
                 f'Obtained error estimate: {L.status.error_embedded_estimate:.2e} of order {L.status.order_embedded_estimate}',
@@ -209,6 +213,10 @@ class EstimatePolynomialError(ConvergenceController):
 
 
 class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
+    """
+    Polynomial interpolation error estimate for Firedrake functions, combining the node solutions term by term.
+    """
+
     def matmul(self, A, b):
         """
         Matrix vector multiplication, possibly MPI parallel.
@@ -244,14 +252,14 @@ class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
 
             return res
 
-    def get_interpolated_solution(self, L):
+    def get_interpolated_solution(self, L, xp=None):
         """
         Get the interpolated solution for Firedrake data types
         We are not 100% sure that you don't need to invert the mass matrix here, but should be fine.
 
         Args:
-            u_vec (array): Vector of solutions
-            prob (pySDC.problem): Problem
+            L (pySDC.level): The level holding the solutions at the collocation nodes
+            xp: Not used, Firedrake data is not an array; accepted because the base class passes it
         """
         coll = L.sweep.coll
 

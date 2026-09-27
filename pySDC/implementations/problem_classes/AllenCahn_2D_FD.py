@@ -13,6 +13,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 # noinspection PyUnusedLocal
 class allencahn_fullyimplicit(Problem):
     r"""
+    2D periodic Allen-Cahn equation with finite differences, fully implicit with Newton.
+
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -48,6 +50,8 @@ class allencahn_fullyimplicit(Problem):
         Tolerance for linear solver to terminate.
     lin_maxiter : int, optional
         Maximum number of iterations for the linear solver.
+    inexact_linear_ratio : float, optional
+        Ratio of tolerance of linear solver to the Newton residual, overrides ``lin_tol`` if set.
     radius : float, optional
         Radius of the circles.
     order : int, optional
@@ -296,6 +300,10 @@ class allencahn_fullyimplicit(Problem):
         ----------
         t : float
             Time of the exact solution.
+        u_init : dtype_u, optional
+            Initial conditions for getting the exact solution.
+        t_init : float, optional
+            The starting time.
 
         Returns
         -------
@@ -321,6 +329,8 @@ class allencahn_fullyimplicit(Problem):
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
     r"""
+    2D periodic Allen-Cahn equation with finite differences, IMEX with Laplacian implicit, reaction explicit.
+
     This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -415,6 +425,10 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         ----------
         t : float
             Time of the exact solution.
+        u_init : dtype_u, optional
+            Initial conditions for getting the exact solution.
+        t_init : float, optional
+            The starting time.
 
         Returns
         -------
@@ -437,6 +451,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     r"""
+    2D periodic Allen-Cahn equation with finite differences, IMEX with Laplacian and cubic term implicit.
+
     This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -552,6 +568,8 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
     r"""
+    2D periodic Allen-Cahn equation with finite differences, multi-implicit: Laplacian (CG), reaction (Newton).
+
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -705,6 +723,8 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     r"""
+    2D periodic Allen-Cahn with finite differences, multi-implicit: Laplacian plus cubic term, linear term.
+
     This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 

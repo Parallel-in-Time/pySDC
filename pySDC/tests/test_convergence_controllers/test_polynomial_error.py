@@ -211,7 +211,8 @@ def test_interpolation_error_GPU(num_nodes, quad_type):
 @pytest.mark.mpi4py
 @pytest.mark.parallel([2, 5])
 @pytest.mark.parametrize('quad_type', ['RADAU-RIGHT', 'GAUSS'])
-def test_interpolation_error_MPI(quad_type):
+@pytest.mark.parametrize('rel_error', [True, False])
+def test_interpolation_error_MPI(quad_type, rel_error):
     import numpy as np
     from mpi4py import MPI
 
@@ -220,7 +221,7 @@ def test_interpolation_error_MPI(quad_type):
         useMPI=True,
         num_nodes=MPI.COMM_WORLD.size,
         quad_type=quad_type,
-        rel_error=False,
+        rel_error=rel_error,
     )
 
 
@@ -293,3 +294,33 @@ def test_polynomial_error_firedrake(dt=1.0, num_nodes=3, useMPI=False):
     u_inter = cont.get_interpolated_solution(L)
     error = abs(u_inter - L.u[estimate_on_node])
     assert np.isclose(error, 0)
+
+
+@pytest.mark.firedrake
+@pytest.mark.parametrize('rel_error', [False, True])
+def test_polynomial_error_firedrake_in_run(rel_error):
+    """
+    The estimate through a run of the controller, which calls get_interpolated_solution the way the base class does
+    """
+    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+    from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
+        EstimatePolynomialErrorFiredrake,
+    )
+
+    description = {
+        'problem_class': Heat1DForcedFiredrake,
+        'problem_params': {'n': 8},
+        'sweeper_class': imex_1st_order,
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3},
+        'level_params': {'dt': 0.1, 'restol': 1e-10},
+        'step_params': {'maxiter': 10},
+        'convergence_controllers': {EstimatePolynomialErrorFiredrake: {'rel_error': rel_error}},
+    }
+    controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+    prob = controller.MS[0].levels[0].prob
+    controller.run(u0=prob.u_exact(0), t0=0, Tend=0.1)
+
+    error = controller.MS[0].levels[0].status.error_embedded_estimate
+    assert error is not None and error > 0, f'Got no error estimate: {error}'

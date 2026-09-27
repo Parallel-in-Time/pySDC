@@ -10,6 +10,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 
 class allencahn_front_fullyimplicit(Problem):
     r"""
+    1D Allen-Cahn front with driving force, Dirichlet BCs and finite differences, fully implicit with Newton.
+
     Example implementing the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
     boundary conditions
 
@@ -42,6 +44,9 @@ class allencahn_front_fullyimplicit(Problem):
         Interval of spatial domain.
     stop_at_nan : bool, optional
         Indicates that the Newton solver should stop if ``nan`` values arise.
+    stop_at_maxiter : bool, optional
+        Indicates that the Newton solver should raise an error instead of only warning if it has not converged after
+        ``newton_maxiter`` iterations.
 
     Attributes
     ----------
@@ -252,6 +257,8 @@ class allencahn_front_fullyimplicit(Problem):
 
 class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
     r"""
+    1D Allen-Cahn front with driving force, Dirichlet BCs and finite differences, IMEX with Laplacian implicit.
+
     This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
     boundary conditions
 
@@ -332,6 +339,8 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
 
 class allencahn_front_finel(allencahn_front_fullyimplicit):
     r"""
+    1D Allen-Cahn front with driving force and Dirichlet BCs, fully implicit with Newton, using Finel's trick.
+
     This class implements the one-dimensional Allen-Cahn equation with driving force using inhomogeneous Dirichlet
     boundary conditions
 
@@ -477,6 +486,8 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
 
 class allencahn_periodic_fullyimplicit(Problem):
     r"""
+    1D Allen-Cahn equation with driving force, periodic BCs and finite differences, fully implicit with Newton.
+
     Example implementing the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions
 
     .. math::
@@ -690,6 +701,8 @@ class allencahn_periodic_fullyimplicit(Problem):
 
 class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
     r"""
+    1D Allen-Cahn equation with driving force, periodic BCs and finite differences, IMEX with Laplacian implicit.
+
     This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions
 
     .. math::
@@ -705,6 +718,25 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
     with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated
     in *semi-implicit* way, i.e., the part containing the Laplacian is treated implicitly, and the rest of the right-hand
     side is only evaluated at each time.
+
+    Parameters
+    ----------
+    nvars : int, optional
+        Number of unknowns in the problem, i.e., points of the periodic grid. Has to be even.
+    dw : float, optional
+        Driving force :math:`d_w`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method. Not used here, since the implicit part is linear.
+    newton_tol : float, optional
+        Tolerance for Newton's method to terminate. Not used here, since the implicit part is linear.
+    interval : list, optional
+        Interval of spatial domain.
+    radius : float, optional
+        Radius of the circles.
+    stop_at_nan : bool, optional
+        Indicates that the Newton solver should stop if ``nan`` values arise. Not used here.
     """
 
     dtype_f = imex_mesh
@@ -774,6 +806,8 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
 
 class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
     r"""
+    1D periodic Allen-Cahn equation with driving force, multi-implicit: linear solve for Laplacian, Newton for rest.
+
     This class implements the one-dimensional Allen-Cahn equation with driving force and periodic boundary conditions
 
     .. math::
@@ -790,6 +824,25 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
     in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a
     linear solver provided by a ``SciPy`` routine, and the nonlinear system including the rest of the right-hand side is solved by
     Newton's method.
+
+    Parameters
+    ----------
+    nvars : int, optional
+        Number of unknowns in the problem, i.e., points of the periodic grid. Has to be even.
+    dw : float, optional
+        Driving force :math:`d_w`.
+    eps : float, optional
+        Scaling parameter :math:`\varepsilon`.
+    newton_maxiter : int, optional
+        Maximum number of iterations for Newton's method in ``solve_system_2``.
+    newton_tol : float, optional
+        Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residual.
+    interval : list, optional
+        Interval of spatial domain.
+    radius : float, optional
+        Radius of the circles.
+    stop_at_nan : bool, optional
+        Indicates that the Newton solver should stop if ``nan`` values arise.
     """
 
     dtype_f = comp2_mesh

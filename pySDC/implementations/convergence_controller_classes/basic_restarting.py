@@ -8,9 +8,12 @@ import numpy as np
 
 class BasicRestarting(ConvergenceController):
     """
-    Class with some utilities for restarting. The specific functions are:
-     - Telling each step after one that requested a restart to get restarted as well
-     - Allowing each step to be restarted a limited number of times in a row before just moving on anyways
+    Restart every step after one that requests a restart, and limit how often a step may be restarted in a row.
+    The specific functions are:
+
+    - Telling each step after one that requested a restart to get restarted as well
+    - Allowing each step to be restarted a limited number of times in a row, before raising a ``ConvergenceError``
+      or, with ``crash_after_max_restarts=False``, moving on
 
     Default control order is 95.
     """
@@ -133,7 +136,7 @@ class BasicRestarting(ConvergenceController):
 
 class BasicRestartingNonMPI(BasicRestarting):
     """
-    Non-MPI specific version of basic restarting
+    Basic restarting for the non-MPI controller, which passes restart requests between steps through shared buffers.
     """
 
     def reset_buffers_nonMPI(self, controller, **kwargs):
@@ -217,7 +220,7 @@ on...",
 
 class BasicRestartingMPI(BasicRestarting):
     """
-    MPI specific version of basic restarting
+    Basic restarting for the MPI controller, which passes restart requests on to the following ranks with MPI.
     """
 
     def __init__(self, controller, params, description, **kwargs):
@@ -284,7 +287,8 @@ on...",
             self.Send(comm, dest=S.status.slot + 1, buffer=[buff, self.MPI_BOOL])
 
         if self.params.restart_from_first_step:
-            max_restart_reached = comm.bcast(S.status.restarts_in_a_row > self.params.max_restarts, root=0)
+            # only the first step knows whether we lost patience, and whether to crash
+            max_restart_reached, crash_now = comm.bcast((self.buffers.max_restart_reached, crash_now), root=0)
             S.status.restart = comm.allreduce(S.status.restart, op=self.OR) and not max_restart_reached
 
         if crash_now:

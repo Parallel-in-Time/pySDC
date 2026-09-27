@@ -7,6 +7,8 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 # noinspection PyUnusedLocal
 class outer_solar_system(Problem):
     r"""
+    Gravitational N-body problem of the outer solar system: the sun, Jupiter, Saturn, Uranus, Neptune and Pluto.
+
     The :math:`N`-body problem describes the mutual influence of the motion of :math:`N` bodies. Formulation of the problem is
     based on Newton's second law. Therefore, the :math:`N`-body problem is formulated as
 
@@ -53,7 +55,8 @@ class outer_solar_system(Problem):
         ----------
         u : dtype_u
             The particles.
-        t (float): Current time at which the particles are computed (not used here).
+        t : float
+            Current time at which the particles are computed (not used here).
 
         Returns
         -------

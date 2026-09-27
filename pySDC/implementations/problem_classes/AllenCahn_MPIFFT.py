@@ -7,6 +7,8 @@ from mpi4py_fft import newDistArray
 
 class allencahn_imex(IMEX_Laplacian_MPIFFT):
     r"""
+    Periodic Allen-Cahn equation with driving force and mpi4py-fft FFTs, IMEX with the Laplacian implicit.
+
     Example implementing the :math:`2`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -41,7 +43,7 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
         Denotes the period of the function to be approximated for the Fourier transform.
     init_type : str, optional
         Initialises type of initial state.
-    comm : bool, optional
+    comm : MPI.Intracomm, optional
         Communicator for parallelization.
 
     Attributes
@@ -172,6 +174,8 @@ class allencahn_imex(IMEX_Laplacian_MPIFFT):
 
 class allencahn_imex_timeforcing(allencahn_imex):
     r"""
+    Periodic Allen-Cahn equation with mpi4py-fft FFTs, IMEX, with a time-dependent, mass-conserving driving force.
+
     Example implementing the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
     using time-dependent forcing

@@ -27,6 +27,12 @@ class IMEX_Laplacian_MPIFFT(Problem):
         Multiplicative factor before the Laplacian
     comm : MPI.COMM_World
         Communicator for parallelisation.
+    dtype : numpy.dtype or str, optional
+        Datatype of the solution in real space, e.g. ``'d'`` for real or ``'D'`` for complex problems.
+    useGPU : bool, optional
+        Run on the GPU with CuPy and NCCL instead of on the CPU with NumPy and MPI.
+    x0 : float, optional
+        Coordinate of the left boundary of the domain in each direction.
 
     Attributes
     ----------

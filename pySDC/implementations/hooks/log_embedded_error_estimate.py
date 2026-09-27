@@ -34,6 +34,7 @@ class LogEmbeddedErrorEstimate(Hooks):
         Args:
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
+            appendix (str): suffix appended to the type of the recorded statistics
 
         Returns:
             None

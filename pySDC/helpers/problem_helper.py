@@ -11,7 +11,6 @@ def get_steps(derivative, order, stencil_type):
         derivative (int): Order of the derivative
         order (int): Order of accuracy
         stencil_type (str): Type of the stencil
-        steps (list): Provide specific steps, overrides `stencil_type`
 
     Returns:
         int: The number of elements in the stencil
@@ -107,6 +106,8 @@ def get_finite_difference_matrix(
         dim (int): Number of dimensions
         bc (str): Boundary conditions for both sides
         cupy (bool): Construct a GPU ready matrix if yes
+        bc_params (dict or list of dicts): Parameters `val`, `neumann_bc_order` and `reduce` of Dirichlet and Neumann
+            BCs, for both sides or one dict per side
 
     Returns:
         Sparse matrix: Finite difference matrix

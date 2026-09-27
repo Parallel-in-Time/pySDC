@@ -5,7 +5,7 @@ from pySDC.implementations.datatype_classes.particles import particles, fields, 
 
 class particles_to_particles(SpaceTransfer):
     """
-    Custom transfer class, implements SpaceTransfer.py
+    Identity space transfer for particles, fields and accelerations, copying the data in both directions.
 
     This implementation is just a dummy for particles with no direct functionality, i.e. the number of particles is not
     reduced on the coarse problem

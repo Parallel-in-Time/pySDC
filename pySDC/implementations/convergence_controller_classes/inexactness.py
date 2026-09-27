@@ -64,7 +64,7 @@ class NewtonInexactness(ConvergenceController):
 
         Args:
             controller (pySDC.Controller.controller): The controller
-            S (pySDC.Step): The current step
+            step (pySDC.Step): The current step
 
         Returns:
             None
