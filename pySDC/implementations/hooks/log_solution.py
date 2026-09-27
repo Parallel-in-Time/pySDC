@@ -199,13 +199,15 @@ class LogToPickleFile(Hooks):
         Returns:
             None
         """
+        super().post_step(step, level_number)
         L = step.levels[level_number]
         self.log_to_file(step, level_number, type(self).logging_condition(L))
 
     def pre_run(self, step, level_number):
         """
         Write the initial conditions to file, stored with the time ``L.time`` at the start of the run. Sets ``L.uend``
-        to the initial conditions for this.
+        to the initial conditions for this, since ``process_solution`` reads ``L.uend``; the first end point computed in
+        the run replaces it.
 
         Args:
             step (pySDC.Step.step): the current step
@@ -214,6 +216,7 @@ class LogToPickleFile(Hooks):
         Returns:
             None
         """
+        super().pre_run(step, level_number)
         L = step.levels[level_number]
         L.uend = L.u[0]
 
@@ -282,6 +285,9 @@ class LogToPickleFileAfterXS(LogToPickleFile):
         if L.time + L.dt >= self.t_next_log and not step.status.restart:
             super().post_step(step, level_number)
             self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
+        else:
+            # skip writing in the parent class, but not the rest of the chain
+            super(LogToPickleFile, self).post_step(step, level_number)
 
     def pre_run(self, step, level_number):
         """
@@ -294,6 +300,8 @@ class LogToPickleFileAfterXS(LogToPickleFile):
         Returns:
             None
         """
+        # replaces the writing in the parent class, but not the rest of the chain
+        super(LogToPickleFile, self).pre_run(step, level_number)
         L = step.levels[level_number]
         L.uend = L.u[0]
 
@@ -335,6 +343,7 @@ class LogToFile(Hooks):
         Returns:
             None
         """
+        super().pre_run(step, level_number)
         if level_number > 0:
             return None
         L = step.levels[level_number]
@@ -374,6 +383,7 @@ class LogToFile(Hooks):
         Raises:
             DataError: if the file already has a solution at this time and ``allow_overwriting`` is not set
         """
+        super().post_step(step, level_number)
         if level_number > 0:
             return None
 
@@ -402,6 +412,7 @@ class LogToFile(Hooks):
         Returns:
             None
         """
+        super().post_run(step, level_number)
         if level_number > 0:
             return None
 

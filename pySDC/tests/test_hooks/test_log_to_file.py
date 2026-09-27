@@ -72,6 +72,55 @@ def test_errors_pickle(tmp_path):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('hook_name', ['LogToPickleFile', 'LogToPickleFileAfterXS', 'LogToFile'])
+def test_hooks_pass_calls_on_to_the_next_class(tmp_path, hook_name):
+    """Combined with another hook by inheritance, the other hook still records its stats."""
+    import pySDC.implementations.hooks.log_solution as log_solution
+    from pySDC.implementations.hooks.log_solution import LogSolution
+    from pySDC.helpers.stats_helper import get_sorted
+
+    attrs = {'path': str(tmp_path), 'filename': f'{tmp_path}/combined.pySDC', 'time_increment': 1.0, 'counter': 0}
+    hook = type('Combined', (getattr(log_solution, hook_name), LogSolution), attrs)
+
+    _, stats = run(hook, Tend=0.03)
+    assert len(get_sorted(stats, type='u')) == 3
+
+
+@pytest.mark.base
+def test_plots_are_labelled_with_their_time():
+    """The initial conditions are plotted at the start of the run and the solution at the end of each step."""
+    import numpy as np
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.hooks.plotting import PlotPostStep
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+    times = []
+
+    class RecordingProblem(testequation0d):
+        def get_fig(self):
+            return None
+
+        def plot(self, u, t=None, fig=None):
+            times.append(t)
+
+    hook = type('Plot', (PlotPostStep,), {'live_plot': None})
+    description = {
+        'problem_class': RecordingProblem,
+        'problem_params': {},
+        'sweeper_class': generic_implicit,
+        'sweeper_params': {'num_nodes': 1, 'quad_type': 'GAUSS'},
+        'level_params': {'dt': 0.1},
+        'step_params': {'maxiter': 1},
+    }
+    controller = controller_nonMPI(1, {'hook_class': hook, 'logger_level': 30}, description)
+    prob = controller.MS[0].levels[0].prob
+    controller.run(prob.u_exact(0), t0=1.0, Tend=1.3)
+
+    assert np.allclose(times, [1.0, 1.1, 1.2, 1.3]), times
+
+
+@pytest.mark.base
 def test_errors_FieldsIO(tmpdir):
     from pySDC.implementations.hooks.log_solution import LogToFile
     from pySDC.core.errors import DataError
