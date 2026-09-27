@@ -197,10 +197,9 @@ class ProtheroRobinsonAutonomous(Problem):
         """
         return -self.epsilon ** (-1) * (u**3 - self.g(t) ** 3) + self.dg(t)
 
-    def dgInv(self, u, t):
+    def dgInv(self, u, t, dt):
         """
-        Inverse Jacobian of the Newton function, replaced in ``__init__`` by ``dgInv_LIN`` or ``dgInv_NONLIN``, which
-        also take the step size ``dt``.
+        Inverse Jacobian of the Newton function, replaced in ``__init__`` by ``dgInv_LIN`` or ``dgInv_NONLIN``.
 
         Parameters
         ----------
@@ -208,6 +207,8 @@ class ProtheroRobinsonAutonomous(Problem):
             First solution component :math:`u`.
         t : float
             Second solution component :math:`v`, which equals the time.
+        dt : float
+            Step size of the implicit Euler step solved by ``solve_system``.
 
         Raises
         ------

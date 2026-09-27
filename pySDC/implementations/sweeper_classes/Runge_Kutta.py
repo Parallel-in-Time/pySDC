@@ -158,7 +158,6 @@ class RungeKutta(Sweeper):
         # set parameters to their actual values
         self.coll = self.get_Butcher_tableau()
         params['initial_guess'] = 'zero'
-        params['collocation_class'] = type(self.ButcherTableauClass)
         params['num_nodes'] = self.coll.num_nodes
 
         # disable residual computation by default
@@ -401,7 +400,6 @@ class RungeKuttaIMEX(RungeKutta):
             level (pySDC.Level.level): the level that uses this sweeper
         """
         super().__init__(params, level)
-        type(self).weights_explicit = self.weights if self.weights_explicit is None else self.weights_explicit
         self.coll_explicit = self.get_Butcher_tableau_explicit()
         self.QE = self.coll_explicit.Qmat
 
@@ -426,11 +424,13 @@ class RungeKuttaIMEX(RungeKutta):
     def get_Butcher_tableau_explicit(cls):
         """
         Build the Butcher tableau of the explicit part from ``weights_explicit``, ``nodes`` and ``matrix_explicit``.
+        Without ``weights_explicit``, the explicit part uses the implicit ``weights``.
 
         Returns:
             ButcherTableau: an instance of ``ButcherTableauClass_explicit``
         """
-        return cls.ButcherTableauClass_explicit(cls.weights_explicit, cls.nodes, cls.matrix_explicit)
+        weights = cls.weights if cls.weights_explicit is None else cls.weights_explicit
+        return cls.ButcherTableauClass_explicit(weights, cls.nodes, cls.matrix_explicit)
 
     def integrate(self):
         """
