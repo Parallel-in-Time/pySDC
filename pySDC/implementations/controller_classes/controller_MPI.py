@@ -8,6 +8,8 @@ from pySDC.implementations.convergence_controller_classes.basic_restarting impor
 class controller_MPI(Controller):
     """
 
+    Controller running SDC, MLSDC and PFASST with each time step of a block on its own MPI rank.
+
     PFASST controller, running parallel version of PFASST in blocks (MG-style)
 
     """

@@ -24,7 +24,7 @@ class _Pars(FrozenClass):
 
 class BaseTransfer(object):
     """
-    Standard base_transfer class
+    Space-time transfer between two levels, interpolating across collocation nodes and computing the FAS correction.
 
     Attributes:
         logger: custom logger for sweeper-related logging

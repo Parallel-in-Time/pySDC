@@ -11,6 +11,8 @@ from mpi4py_fft import newDistArray
 
 class allencahn_temp_imex(Problem):
     r"""
+    Periodic Allen-Cahn equation coupled to a temperature equation, mpi4py-fft FFTs, IMEX with both Laplacians implicit.
+
     This class implements the :math:`N`-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 

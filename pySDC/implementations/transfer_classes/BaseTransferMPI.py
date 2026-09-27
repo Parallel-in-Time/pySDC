@@ -6,7 +6,7 @@ from pySDC.core.base_transfer import BaseTransfer
 
 class base_transfer_MPI(BaseTransfer):
     """
-    Standard base_transfer class
+    Node-parallel space-time transfer for sweepers where each MPI rank holds one collocation node.
 
     Attributes:
         logger: custom logger for sweeper-related logging

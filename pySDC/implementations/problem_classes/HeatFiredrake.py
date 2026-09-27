@@ -7,6 +7,8 @@ from mpi4py import MPI
 
 class Heat1DForcedFiredrake(Problem):
     r"""
+    Forced 1D heat equation with Dirichlet BCs and Firedrake finite elements, IMEX with diffusion implicit.
+
     Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
     .. math::

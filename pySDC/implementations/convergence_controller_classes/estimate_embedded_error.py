@@ -8,6 +8,7 @@ from pySDC.implementations.sweeper_classes.Runge_Kutta import RungeKutta
 
 class EstimateEmbeddedError(ConvergenceController):
     """
+    Estimate the local error as the difference between two solutions of different order, such as two consecutive sweeps.
     The embedded error is obtained by computing two solutions of different accuracy and pretending the more accurate
     one is an exact solution from the point of view of the less accurate solution. In practice, we like to compute the
     solutions with different order methods, meaning that in SDC we can just subtract two consecutive sweeps, as long as
@@ -153,6 +154,10 @@ class EstimateEmbeddedError(ConvergenceController):
 
 
 class EstimateEmbeddedErrorLinearizedNonMPI(EstimateEmbeddedError):
+    """
+    Local error in a block of steps as the embedded estimate minus that of the step before, for the non-MPI controller.
+    """
+
     def __init__(self, controller, params, description, **kwargs):
         """
         Initialisation routine. Add the buffers for communication.
@@ -230,6 +235,10 @@ level")
 
 
 class EstimateEmbeddedErrorLinearizedMPI(EstimateEmbeddedError):
+    """
+    Local error in a block of steps as the embedded estimate minus that of the step before, for the MPI controller.
+    """
+
     def __init__(self, controller, params, description, **kwargs):
         """
         Initialisation routine. Add the buffers for communication.

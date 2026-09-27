@@ -446,7 +446,8 @@ class battery(battery_n_capacitors):
 
 class battery_implicit(battery):
     r"""
-    Example implementing the battery drain model as above. The method solve_system uses a fully-implicit computation.
+    Battery drain model with one capacitor, treated fully implicitly with Newton instead of the IMEX splitting.
+    The method solve_system uses a fully-implicit computation.
 
     Parameters
     ----------

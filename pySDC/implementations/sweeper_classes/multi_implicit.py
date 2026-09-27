@@ -3,7 +3,7 @@ from pySDC.core.sweeper import Sweeper
 
 class multi_implicit(Sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
+    SDC sweeper for right hand sides with two parts, each treated implicitly with its own solver and preconditioner.
 
     First-order multi-implicit sweeper for two components
 

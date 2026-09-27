@@ -240,8 +240,12 @@ class MultiComponentMesh(MultiComponentMeshMixin, mesh):
 
 
 class imex_mesh(MultiComponentMesh):
+    """NumPy mesh with an implicit part ``impl`` and an explicit part ``expl``, for IMEX right-hand sides."""
+
     components = ['impl', 'expl']
 
 
 class comp2_mesh(MultiComponentMesh):
+    """NumPy mesh with two parts ``comp1`` and ``comp2``, for multi-implicit right-hand sides."""
+
     components = ['comp1', 'comp2']

@@ -4,7 +4,7 @@ from pySDC.core.hooks import Hooks
 
 class DefaultHooks(Hooks):
     """
-    Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
+    Hook added to every controller, recording the residuals and the number of iterations of each step.
     """
 
     def post_sweep(self, step, level_number):

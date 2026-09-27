@@ -206,6 +206,10 @@ class LogToPickleFileAfterXS(LogToPickleFile):
 
 
 class LogToFile(Hooks):
+    """
+    Write the solution every `time_increment` to one `FieldsIO` file set up by the problem, resuming an existing file.
+    """
+
     filename = 'myRun.pySDC'
     time_increment = 0
     allow_overwriting = False

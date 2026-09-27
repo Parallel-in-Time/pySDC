@@ -10,6 +10,8 @@ from mpi4py_fft import newDistArray
 
 class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
     r"""
+    Periodic Gray-Scott system with mpi4py-fft FFTs, IMEX with diffusion implicit and the reaction explicit.
+
     The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces
     :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for
@@ -357,6 +359,8 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
     r"""
+    Periodic Gray-Scott system with mpi4py-fft, IMEX with diffusion and linear reaction terms implicit, rest explicit.
+
     The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces
     :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for
@@ -436,6 +440,8 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
     r"""
+    Periodic Gray-Scott system with mpi4py-fft, multi-implicit: diffusion by FFT, reaction by Newton.
+
     The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces
     :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for
@@ -690,6 +696,8 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
 class grayscott_mi_linear(grayscott_imex_linear):
     r"""
+    Periodic Gray-Scott system with mpi4py-fft, multi-implicit: diffusion and linear terms by FFT, the rest by Newton.
+
     The original Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. :math:`u` is fed with rate :math:`A` and used up by the reaction, which produces
     :math:`v`, and :math:`v` is removed with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for

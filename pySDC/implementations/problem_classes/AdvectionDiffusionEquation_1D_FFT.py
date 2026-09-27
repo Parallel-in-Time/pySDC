@@ -8,6 +8,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class advectiondiffusion1d_imex(Problem):
     r"""
+    Periodic 1D advection-diffusion equation with FFTs, IMEX with diffusion implicit and advection explicit.
+
     Example implementing the unforced one-dimensional advection diffusion equation
 
     .. math::
@@ -163,6 +165,8 @@ class advectiondiffusion1d_imex(Problem):
 
 class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
     r"""
+    Periodic 1D advection-diffusion equation with FFTs, fully implicit in advection and diffusion.
+
     Example implementing the unforced one-dimensional advection diffusion equation
 
     .. math::

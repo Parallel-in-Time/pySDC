@@ -8,6 +8,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class allencahn2d_imex(Problem):
     r"""
+    2D periodic Allen-Cahn equation with FFTs, IMEX with the Laplacian implicit and the reaction explicit.
+
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -247,6 +249,8 @@ class allencahn2d_imex(Problem):
 
 class allencahn2d_imex_stab(allencahn2d_imex):
     r"""
+    2D periodic Allen-Cahn equation with FFTs, IMEX with a stabilizing linear term shifted into the implicit part.
+
     This implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 

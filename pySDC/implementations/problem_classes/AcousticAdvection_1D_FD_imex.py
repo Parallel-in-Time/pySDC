@@ -13,6 +13,8 @@ from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix im
 # noinspection PyUnusedLocal
 class acoustic_1d_imex(Problem):
     r"""
+    Periodic 1D acoustic-advection system with finite differences, acoustic waves implicit and advection explicit.
+
     This class implements the one-dimensional acoustics advection equation on a periodic domain :math:`[0, 1]`
     fully investigated in [1]_. The equations are given by
 

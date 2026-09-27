@@ -5,7 +5,7 @@ from pySDC.core.sweeper import Sweeper
 
 class verlet(Sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
+    SDC sweeper for second-order problems with velocity-independent forces, with velocity-Verlet as base integrator.
 
     Second-order sweeper using velocity-Verlet as base integrator
 

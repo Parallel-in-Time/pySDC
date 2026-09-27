@@ -235,7 +235,9 @@ class DiscontinuousTestODE(Problem):
 
 class ExactDiscontinuousTestODE(DiscontinuousTestODE):
     r"""
-    Dummy ODE problem for testing the ``SwitchEstimator`` class. The problem contains the exact dynamics
+    Variant of ``DiscontinuousTestODE`` whose ``solve_system`` returns the exact solution, to test the
+    ``SwitchEstimator``.
+    The problem contains the exact dynamics
     of the problem class ``DiscontinuousTestODE``.
 
     Parameters

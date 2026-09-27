@@ -8,7 +8,9 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 # noinspection PyUnusedLocal
 class vanderpol(Problem):
     r"""
-    This class implements the stiff Van der Pol oscillator given by the equation
+    Stiff Van der Pol oscillator as a system of two first-order ODEs, fully implicit with Newton.
+
+    It is given by the equation
 
     .. math::
         \frac{d^2 u(t)}{d t^2} - \mu (1 - u(t)^2) \frac{d u(t)}{dt} + u(t) = 0.

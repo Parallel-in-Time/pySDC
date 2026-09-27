@@ -6,8 +6,9 @@ from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_
 
 class Brusselator(IMEX_Laplacian_MPIFFT):
     r"""
-    Two-dimensional Brusselator from [1]_.
-    This is a reaction-diffusion equation with non-autonomous source term:
+    2D periodic Brusselator reaction-diffusion system with mpi4py-fft, IMEX with diffusion implicit, reactions explicit.
+
+    This Brusselator from [1]_ is a reaction-diffusion equation with non-autonomous source term:
 
     .. math::
         \frac{\partial u}{\partial t} = \alpha \Delta u + 1 + u^2 v - 4.4u + f(x,y,t),

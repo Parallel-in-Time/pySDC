@@ -3,7 +3,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 class imex_1st_order_mass(imex_1st_order):
     """
-    Custom sweeper class, implements Sweeper.py
+    IMEX-SDC sweeper for problems M u' = f(u) with a mass matrix M, as they arise from finite elements.
 
     First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix
     """
