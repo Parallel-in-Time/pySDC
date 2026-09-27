@@ -325,8 +325,7 @@ class RayleighBenard(GenericSpectralLinear):
         import matplotlib.pyplot as plt
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-        plt.rcParams['figure.constrained_layout.use'] = True
-        self.fig, axs = plt.subplots(2, 1, sharex=True, sharey=True, figsize=((10, 5)))
+        self.fig, axs = plt.subplots(2, 1, sharex=True, sharey=True, figsize=((10, 5)), constrained_layout=True)
         self.cax = []
         divider = make_axes_locatable(axs[0])
         self.cax += [divider.append_axes('right', size='3%', pad=0.03)]
