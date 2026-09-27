@@ -1,0 +1,21 @@
+pySDC/tests/test_helpers/test_gusto_coupling.py
+  s_dd65e9d467ee66::t_af1bc5ff873802 187-212
+pySDC/implementations/problem_classes/GenericGusto.py
+  s_dd65e9d467ee66::t_af1bc5ff873802 207,252
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0d5bf5c889679cb87379067f14f82ccdb02e6dde",
+  "prompts": {},
+  "sessions": {
+    "s_dd65e9d467ee66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dd5efbb1-bf67-4877-926b-42698f1be818",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
