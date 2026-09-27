@@ -77,10 +77,10 @@ class LogToPickleFile(Hooks):
     Please configure the hook to your liking by setting class attributes on a subclass, so that other runs in the same
     process are not affected. You must set a custom path to a directory like so:
 
-    ```
-    class MyLogToPickleFile(LogToPickleFile):
-        path = '/my/directory/'
-    ```
+    .. code-block:: python
+
+        class MyLogToPickleFile(LogToPickleFile):
+            path = '/my/directory/'
 
     Keep in mind that the hook will overwrite files without warning!
     You can give a custom file name by setting the ``file_name`` class attribute and give a custom way of rendering the

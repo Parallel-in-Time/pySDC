@@ -125,9 +125,11 @@ class ConvergenceController(object):
         parameters by adding the convergence controller manually.
         This relies on children classes to return a composite dictionary from their defaults and from the result of this
         function, so you should write
-        ```
-        return {**defaults, **super().setup(controller, params, description, **kwargs)}
-        ```
+
+        .. code-block:: python
+
+            return {**defaults, **super().setup(controller, params, description, **kwargs)}
+
         when overloading this method in a child class, with `defaults` a dictionary containing default parameters.
 
         Args:
@@ -485,9 +487,10 @@ class ConvergenceController(object):
         Args:
             comm (mpi4py.MPI.Intracomm): Communicator
             source (int): Where to look for receiving
+            buffer: Buffer to receive the data into
 
         Returns:
-            whatever has been received
+            None, the data is received into `buffer`
         """
         kwargs['tag'] = kwargs.get('tag', abs(self.params.control_order))
 

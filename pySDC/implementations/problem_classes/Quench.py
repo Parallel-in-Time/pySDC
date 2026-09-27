@@ -113,14 +113,7 @@ class Quench(Problem):
         min_lintol=1e-12,
         reference_sol_type='scipy',
     ):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
-        """
+        """Initialization routine"""
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(
@@ -369,6 +362,10 @@ class Quench(Problem):
         ----------
         t : float
             Time of the exact solution.
+        u_init : dtype_u, optional
+            Initial conditions for getting the exact solution.
+        t_init : float, optional
+            The starting time.
 
         Returns
         -------
@@ -548,6 +545,10 @@ class QuenchIMEX(Quench):
         ----------
         t : float
             Time of the exact solution.
+        u_init : dtype_u, optional
+            Initial conditions for getting the exact solution.
+        t_init : float, optional
+            The starting time.
 
         Returns
         -------

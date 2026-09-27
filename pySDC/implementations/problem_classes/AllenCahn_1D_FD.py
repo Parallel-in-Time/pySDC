@@ -42,6 +42,9 @@ class allencahn_front_fullyimplicit(Problem):
         Interval of spatial domain.
     stop_at_nan : bool, optional
         Indicates that the Newton solver should stop if ``nan`` values arise.
+    stop_at_maxiter : bool, optional
+        Indicates that the Newton solver should raise an error instead of only warning if it has not converged after
+        ``newton_maxiter`` iterations.
 
     Attributes
     ----------

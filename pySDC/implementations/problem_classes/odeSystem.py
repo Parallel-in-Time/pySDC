@@ -66,8 +66,8 @@ class ProtheroRobinsonAutonomous(Problem):
     stop_at_nan : bool, optional
         Wheter to stop or not solve_system when getting NAN. The default is True.
 
-    Reference
-    ---------
+    References
+    ----------
     A. Prothero and A. Robinson, On the stability and accuracy of one-step methods for solving
     stiff systems of ordinary differential equations, Mathematics of Computation, 28 (1974),
     pp. 145–162.
@@ -261,8 +261,8 @@ class Kaps(Problem):
     stop_at_nan : bool, optional
         Wheter to stop or not solve_system when getting NAN. The default is True.
 
-    Reference
-    ---------
+    References
+    ----------
     Van der Houwen, P. J., & Sommeijer, B. P. (1991). Iterated Runge–Kutta methods
     on parallel computers. SIAM journal on scientific and statistical computing,
     12(5), 1000-1028.
@@ -415,8 +415,8 @@ class ChemicalReaction3Var(Problem):
     stop_at_nan : bool, optional
         Wheter to stop or not solve_system when getting NAN. The default is True.
 
-    Reference
-    ---------
+    References
+    ----------
     Van der Houwen, P. J., & Sommeijer, B. P. (1991). Iterated Runge–Kutta methods
     on parallel computers. SIAM journal on scientific and statistical computing,
     12(5), 1000-1028.
@@ -762,8 +762,8 @@ class JacobiElliptic(Problem):
     stop_at_nan : bool, optional
         Wheter to stop or not solve_system when getting NAN. The default is True.
 
-    Reference
-    ---------
+    References
+    ----------
     Van Der Houwen, P. J., Sommeijer, B. P., & Van Der Veen, W. A. (1995).
     Parallel iteration across the steps of high-order Runge-Kutta methods for
     nonstiff initial value problems. Journal of computational and applied

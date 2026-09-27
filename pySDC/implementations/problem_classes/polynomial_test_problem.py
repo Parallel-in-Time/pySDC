@@ -93,10 +93,9 @@ class polynomial_testequation(Problem):
         ----------
         t : float
             Time of the exact solution.
-        u_init : pySDC.problem.testequation0d.dtype_u
-            Initial solution.
-        t_init : float
-            The initial time.
+        **kwargs
+            Takes ``u_init`` and ``t_init`` of the generic interface, which are ignored since the polynomial is known
+            everywhere.
 
         Returns
         -------

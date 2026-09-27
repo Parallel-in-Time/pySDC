@@ -10,7 +10,7 @@ from mpi4py_fft import newDistArray
 
 class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
     r"""
-    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
     :math:`u,\, v`. Here, the process is described by the :math:`N`-dimensional model
@@ -22,7 +22,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B v
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
-    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
+    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also
     https://mpi4py-fft.readthedocs.io/en/latest/.
 
     This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and reaction
@@ -34,7 +34,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. ``nvars=(127, 127)``.
     Du : float, optional
         Diffusion rate for :math:`u`.
-    Dv: float, optional
+    Dv : float, optional
         Diffusion rate for :math:`v`.
     A : float, optional
         Feed rate for :math:`v`.
@@ -42,7 +42,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
         Overall decay rate for :math:`u`.
     spectral : bool, optional
         If True, the solution is computed in spectral space.
-    L : int, optional
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
     comm : COMM_WORLD, optional
         Communicator for ``mpi4py-fft``.
@@ -64,11 +64,10 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
     References
     ----------
-    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+    .. [#] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
         of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
-    .. [2] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+    .. [#] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
         Journal of Parallel and Distributed Computing (2019).
-    .. [3] https://www.chebfun.org/examples/pde/GrayScott.html
     """
 
     def __init__(
@@ -187,12 +186,15 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
     def u_exact(self, t, seed=10700000):
         r"""
-        Routine to compute the exact solution at time :math:`t = 0`, see [3]_.
+        Routine to compute the exact solution at time :math:`t = 0`, see
+        `Chebfun's Gray-Scott example <https://www.chebfun.org/examples/pde/GrayScott.html>`__.
 
         Parameters
         ----------
         t : float
             Time of the exact solution.
+        seed : int, optional
+            Seed for the random number generator that places the blobs or rectangles.
 
         Returns
         -------
@@ -355,7 +357,7 @@ class grayscott_imex_diffusion(IMEX_Laplacian_MPIFFT):
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
     r"""
-    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
     :math:`u,\, v`. The model with linear (reaction) part is described by the :math:`N`-dimensional model
@@ -367,11 +369,18 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
         \frac{d v}{d t} = D_v \Delta v + u v^2
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
-    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
+    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also
     https://mpi4py-fft.readthedocs.io/en/latest/.
 
     This class implements the problem for *semi-explicit* time-stepping (diffusion is treated implicitly, and linear
     part is computed in an explicit way).
+
+    References
+    ----------
+    .. [#] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
+    .. [#] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+        Journal of Parallel and Distributed Computing (2019).
     """
 
     def __init__(self, **kwargs):
@@ -426,7 +435,7 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
     r"""
-    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    The Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
     :math:`u,\, v`. Here, the process is described by the :math:`N`-dimensional model
@@ -438,7 +447,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
-    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
+    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also
     https://mpi4py-fft.readthedocs.io/en/latest/.
 
     This class implements the problem for *multi-implicit* time-stepping, i.e., both diffusion and reaction part will be treated
@@ -450,7 +459,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         Spatial resolution, i.e., number of degrees of freedom in space. Should be a tuple, e.g. ``nvars=(127, 127)``.
     Du : float, optional
         Diffusion rate for :math:`u`.
-    Dv: float, optional
+    Dv : float, optional
         Diffusion rate for :math:`v`.
     A : float, optional
         Feed rate for :math:`v`.
@@ -458,10 +467,14 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         Overall decay rate for :math:`u`.
     spectral : bool, optional
         If True, the solution is computed in spectral space.
-    L : int, optional
+    L : float, optional
         Denotes the period of the function to be approximated for the Fourier transform.
     comm : COMM_WORLD, optional
         Communicator for ``mpi4py-fft``.
+    newton_maxiter : int, optional
+        Maximum number of iterations for the Newton solver.
+    newton_tol : float, optional
+        Tolerance for Newton's method to terminate.
 
     Attributes
     ----------
@@ -478,9 +491,9 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
     References
     ----------
-    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+    .. [#] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
         of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
-    .. [2] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+    .. [#] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
         Journal of Parallel and Distributed Computing (2019).
     """
 
@@ -577,7 +590,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         ----------
         rhs : dtype_f
             Right-hand side for the linear system.
-        factor float
+        factor : float
             Abbrev. for the node-to-node stepsize (or any other factor required).
         u0 : dtype_u
             Initial guess for the iterative solver (not used here so far).
@@ -671,7 +684,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
 class grayscott_mi_linear(grayscott_imex_linear):
     r"""
-    The original Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
+    The original Gray-Scott system [#]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
     where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
     whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
     :math:`u,\, v`. The model with linear (reaction) part is described by the :math:`N`-dimensional model
@@ -683,7 +696,7 @@ class grayscott_mi_linear(grayscott_imex_linear):
         \frac{\partial v}{\partial t} = D_v \Delta v + u v^2
 
     in :math:`x \in \Omega:=[-L/2, L/2]^N` with :math:`N=2,3`. Spatial discretization is done by using
-    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [2]_, see also
+    Fast Fourier transformation for solving the linear parts provided by ``mpi4py-fft`` [#]_, see also
     https://mpi4py-fft.readthedocs.io/en/latest/.
 
     The problem in this class will be treated in a *multi-implicit* way for time-stepping, i.e., for the system containing
@@ -700,6 +713,13 @@ class grayscott_mi_linear(grayscott_imex_linear):
         Passed on to ``grayscott_imex_diffusion``, see there: ``Du``, ``Dv``, ``A``, ``B``, ``L``, ``num_blobs``,
         ``nvars``, ``spectral``, ``comm`` and ``useGPU``. The Newton solver runs on a single process only, so
         ``comm`` has to have size one.
+
+    References
+    ----------
+    .. [#] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms
+        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).
+    .. [#] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+        Journal of Parallel and Distributed Computing (2019).
     """
 
     dtype_f = comp2_mesh

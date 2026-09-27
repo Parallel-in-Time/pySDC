@@ -43,7 +43,7 @@ class boussinesq_2d_imex(Problem):
         Domain in x-direction.
     z_bounds : list, optional
         Domain in z-direction.
-    order_upwind : int, optional
+    order_upw : int, optional
         Order of upwind scheme for discretization.
     order : int, optional
         Order for discretization.

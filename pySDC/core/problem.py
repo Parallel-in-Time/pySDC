@@ -48,15 +48,15 @@ class Problem(RegisterParams):
     ----------
     init : list of args
         Argument(s) used to initialize data types.
-    dtype_u : type
-        Variable data type. Should generate a data variable using dtype_u(init).
-    dtype_f : type
-        RHS data type. Should generate a data variable using dtype_f(init).
 
     Attributes
     ----------
     logger: logging.Logger
         custom logger for problem-related logging.
+    dtype_u : type
+        Variable data type. Should generate a data variable using dtype_u(init).
+    dtype_f : type
+        RHS data type. Should generate a data variable using dtype_f(init).
 
     Notes
     -----

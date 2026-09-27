@@ -78,6 +78,8 @@ class GenericSpectralLinear(Problem):
             left_preconditioner (bool): Reverse the Kronecker product if yes
             solver_type (str): Solver for linear systems
             solver_args (dict): Arguments for linear solver
+            preconditioner_args (dict): Arguments for the incomplete LU preconditioner of the `ilu` solver types,
+                passed to `spilu`. `drop_tol` (default 1e-3) is scaled by the step size, `fill_factor` defaults to 100
             useGPU (bool): Run on GPU or CPU
             max_cached_factorizations (int): Number of matrix decompositions to cache before starting eviction
             spectral_space (bool): If yes, the solution will not be transformed back after solving and evaluating the RHS, and is expected as input in spectral space to these functions
@@ -190,12 +192,12 @@ class GenericSpectralLinear(Problem):
 
         The argument is meant to be a dictionary with the line you want to write the equation in as the key and the relationship between components as another dictionary. For instance, you can add an algebraic condition capturing a first derivative relationship between u and ux as follows:
 
-        ```
-        Dx = self.get_differentiation_matrix(axes=(0,))
-        I = self.get_Id()
-        LHS = {'ux': {'u': Dx, 'ux': -I}}
-        self.setup_L(LHS)
-        ```
+        .. code-block:: python
+
+            Dx = self.get_differentiation_matrix(axes=(0,))
+            I = self.get_Id()
+            LHS = {'ux': {'u': Dx, 'ux': -I}}
+            self.setup_L(LHS)
 
         If you put zero as right hand side for the solver in the line for ux, ux will contain the x-derivative of u afterwards.
 

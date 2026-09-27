@@ -120,8 +120,8 @@ class EstimatePolynomialError(ConvergenceController):
         Get the interpolated solution for numpy or cupy data types
 
         Args:
-            u_vec (array): Vector of solutions
-            prob (pySDC.problem): Problem
+            L (pySDC.level): The level holding the solutions at the collocation nodes
+            xp: The array module of the data, numpy or cupy
         """
         coll = L.sweep.coll
 

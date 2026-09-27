@@ -73,6 +73,8 @@ class GenericNDimFinDiff(Problem):
         Default is None, which takes the default values for each parameters.
         You can also define a tuple to set different parameters for each
         side.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
 
     Attributes
     ----------

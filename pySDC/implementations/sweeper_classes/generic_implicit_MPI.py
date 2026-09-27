@@ -10,9 +10,9 @@ class SweeperMPI(Sweeper):
     MPI based sweeper where each rank administers one collocation node. Adapt sweepers to MPI by use of multiple inheritance.
     See for example the `generic_implicit_MPI` sweeper, which has a class definition:
 
-    ```
-    class generic_implicit_MPI(SweeperMPI, generic_implicit):
-    ```
+    .. code-block:: python
+
+        class generic_implicit_MPI(SweeperMPI, generic_implicit):
 
     this means in inherits both from `SweeperMPI` and `generic_implicit`. The hierarchy works such that functions are first
     called from `SweeperMPI` and then from `generic_implicit`. For instance, in the `__init__` function, the `SweeperMPI`

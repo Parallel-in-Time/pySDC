@@ -150,10 +150,8 @@ class Heat1DForcedFiredrake(Problem):
             Right-hand side for the nonlinear system.
         factor : float
             Abbrev. for the node-to-node stepsize (or any other factor required).
-        u0 : dtype_u
-            Initial guess for the iterative solver (not used here so far).
-        t : float
-            Current time.
+        *args, **kwargs
+            Take the initial guess ``u0`` and the current time ``t`` of the generic interface, neither is used here.
 
         Returns
         -------

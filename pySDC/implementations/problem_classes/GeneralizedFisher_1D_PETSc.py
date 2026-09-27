@@ -139,8 +139,6 @@ class Fisher_reaction(object):
         Contains problem information for ``PETSc``.
     factor : float
         Temporal factor :math:`\Delta t Q_\Delta`.
-    dx : float
-        Grid spacing in x direction.
 
     Attributes
     ----------
