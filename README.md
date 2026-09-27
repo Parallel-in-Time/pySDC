@@ -99,6 +99,9 @@ can help you with this. Also, we would greatly appreciate a citation of
 The current software release can be cited using Zenodo:
 [![zenodo](https://zenodo.org/badge/26165004.svg)](https://zenodo.org/badge/latestdoi/26165004)
 
+BibTeX for the paper and the software is on the [website](https://parallel-in-time.org/pySDC/publications.html),
+and in GitHub's "Cite this repository".
+
 ## Contributing
 
 `pySDC` code was originally developed by [Robert Speck (@pancetta)](https://github.com/pancetta),
