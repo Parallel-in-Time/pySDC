@@ -8,7 +8,7 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 # noinspection PyUnusedLocal
 class harmonic_oscillator(Problem):
     r"""
-    Example implementing the harmonic oscillator with mass :math:`1`
+    Example implementing the harmonic oscillator [#]_ with mass :math:`1`
 
     .. math::
         \frac{d^2 x}{dt^2} = -kx - \mu \frac{d x}{dt},
@@ -31,7 +31,7 @@ class harmonic_oscillator(Problem):
 
     References
     ----------
-    .. [1] https://beltoforion.de/en/harmonic_oscillator/
+    .. [#] https://beltoforion.de/en/harmonic_oscillator/
     """
 
     dtype_u = particles
