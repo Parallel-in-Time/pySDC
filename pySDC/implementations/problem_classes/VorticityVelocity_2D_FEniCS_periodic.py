@@ -72,7 +72,7 @@ class fenics_vortex_2d(Problem):
         """Initialization routine"""
 
         if c_nvars is None:
-            c_nvars = [(32, 32)]
+            c_nvars = (32, 32)
 
         if refinements is None:
             refinements = 1
