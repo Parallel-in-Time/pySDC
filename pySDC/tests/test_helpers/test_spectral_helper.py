@@ -836,3 +836,24 @@ def test_cache_memory_leaks():
         function()
 
     assert track[0] == 0, "possible memory leak with the @cache"
+
+
+@pytest.mark.base
+def test_padding_without_distributed_FFT_is_not_ignored():
+    import numpy as np
+    from pySDC.helpers.spectral_helper import SpectralHelper
+
+    helper = SpectralHelper(comm=None)
+    helper.add_axis(base='fft', N=8)
+    helper.add_axis(base='cheby', N=8)
+    helper.setup_fft()
+
+    u = helper.u_init
+    u[...] = np.random.random(u.shape)
+
+    # no padding is fine
+    assert np.allclose(helper.itransform(helper.transform(u, padding=(1, 1)), padding=(1, 1)), u)
+
+    for transform in [helper.transform, helper.itransform]:
+        with pytest.raises(NotImplementedError):
+            transform(u, padding=(1.5, 1.5))

@@ -117,25 +117,24 @@ class SpectralHelper1D:
         self.linalg = linalg
         self.fft_lib = fft_lib
 
-    @classmethod
-    def setup_CPU(cls, useFFTW=False):
+    def setup_CPU(self, useFFTW=False):
         """switch to CPU modules"""
 
-        cls.xp = np
-        cls.sparse_lib = scipy.sparse
-        cls.linalg = scipy.sparse.linalg
+        self.xp = np
+        self.sparse_lib = scipy.sparse
+        self.linalg = scipy.sparse.linalg
 
         if useFFTW:
             from mpi4py_fft import fftw
 
-            cls.fft_backend = 'fftw'
-            cls.fft_lib = fftw
+            self.fft_backend = 'fftw'
+            self.fft_lib = fftw
         else:
-            cls.fft_backend = 'scipy'
-            cls.fft_lib = scipy.fft
+            self.fft_backend = 'scipy'
+            self.fft_lib = scipy.fft
 
-        cls.fft_comm_backend = 'MPI'
-        cls.dtype = mesh
+        self.fft_comm_backend = 'MPI'
+        self.dtype = mesh
 
     def get_Id(self):
         """
@@ -860,7 +859,7 @@ class FFTHelper(SpectralHelper1D):
         if self.fft_lib.__name__ == 'mpi4py_fft.fftw':
             if 'axes' in kwargs.keys():
                 kwargs['axes'] = tuple(kwargs['axes'])
-            key = (forward, u.shape, args, *(me for me in kwargs.values()))
+            key = (forward, u.shape, u.dtype, args, *(me for me in kwargs.values()))
             if key in self.plans.keys():
                 return self.plans[key]
             else:
@@ -1009,25 +1008,24 @@ class SpectralHelper:
 
         self.dtype = cupy_mesh
 
-    @classmethod
-    def setup_CPU(cls, useFFTW=False):
+    def setup_CPU(self, useFFTW=False):
         """switch to CPU modules"""
 
-        cls.xp = np
-        cls.sparse_lib = scipy.sparse
-        cls.linalg = scipy.sparse.linalg
+        self.xp = np
+        self.sparse_lib = scipy.sparse
+        self.linalg = scipy.sparse.linalg
 
         if useFFTW:
             from mpi4py_fft import fftw
 
-            cls.fft_backend = 'fftw'
-            cls.fft_lib = fftw
+            self.fft_backend = 'fftw'
+            self.fft_lib = fftw
         else:
-            cls.fft_backend = 'scipy'
-            cls.fft_lib = scipy.fft
+            self.fft_backend = 'scipy'
+            self.fft_lib = scipy.fft
 
-        cls.fft_comm_backend = 'MPI'
-        cls.dtype = mesh
+        self.fft_comm_backend = 'MPI'
+        self.dtype = mesh
 
     def __init__(self, comm=None, useGPU=False, debug=False):
         """
@@ -1856,13 +1854,8 @@ class SpectralHelper:
         pfft = self.get_pfft(**kwargs)
         _arr = self.newDistArray(pfft, forward_output=forward_output)
 
-        if 'Dist' in type(u).__name__ and False:
-            try:
-                u.redistribute(out=_arr)
-                return _arr
-            except AssertionError:
-                pass
-
+        # the transforms are complex to complex, so the local shapes in physical and spectral space agree and the
+        # alignment can be inferred from the physical shapes either way
         u_alignment = self.infer_alignment(u, forward_output=False, **kwargs)
         for alignment in u_alignment:
             _arr = _arr.redistribute(alignment)
@@ -1891,6 +1884,8 @@ class SpectralHelper:
         pfft = self.get_pfft(*args, axes=axes, padding=padding, **kwargs)
 
         if pfft is None:
+            if padding is not None and any(me != 1 for me in padding):
+                raise NotImplementedError('Padding is only implemented for distributed FFTs in more than one dimension')
             axes = axes if axes else tuple(i for i in range(self.ndim))
             u_hat = u.copy()
             for i in axes:
@@ -1936,6 +1931,8 @@ class SpectralHelper:
 
         pfft = self.get_pfft(*args, axes=axes, padding=padding, **kwargs)
         if pfft is None:
+            if padding is not None and any(me != 1 for me in padding):
+                raise NotImplementedError('Padding is only implemented for distributed FFTs in more than one dimension')
             axes = axes if axes else tuple(i for i in range(self.ndim))
             u_hat = u.copy()
             for i in axes:
