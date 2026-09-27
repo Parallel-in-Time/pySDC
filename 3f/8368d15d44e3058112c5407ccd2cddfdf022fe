@@ -1,0 +1,21 @@
+README.md
+  s_619b2228c15391::t_1263658b75892e 102-104
+pySDC/tests/test_citation.py
+  s_619b2228c15391::t_9e0dde651b77ef 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3f8368d15d44e3058112c5407ccd2cddfdf022fe",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
