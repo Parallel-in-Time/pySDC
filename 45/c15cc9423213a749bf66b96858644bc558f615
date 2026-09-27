@@ -1,0 +1,27 @@
+pySDC/implementations/problem_classes/Brusselator.py
+  s_619b2228c15391::t_81b29c6bbc5415 153
+pySDC/implementations/problem_classes/Burgers.py
+  s_619b2228c15391::t_294a8f493de946 118,289
+pySDC/implementations/problem_classes/GrayScott_MPIFFT.py
+  s_619b2228c15391::t_c88255965c9145 313,317
+pySDC/implementations/problem_classes/RayleighBenard.py
+  s_619b2228c15391::t_b58570278fad34 328
+pySDC/tests/test_problems/test_get_fig.py
+  s_619b2228c15391::t_af1c09c75e518f 1-3,8,12,16,33-40,42-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "45c15cc9423213a749bf66b96858644bc558f615",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
