@@ -115,7 +115,7 @@ class RayleighBenard(GenericSpectralLinear):
 
         bases = [
             {'base': 'fft', 'N': nx, 'x0': 0, 'x1': self.Lx},
-            {'base': 'ultraspherical', 'N': nz, 'x0': self.z0, 'x1': self.Lz},
+            {'base': 'ultraspherical', 'N': nz, 'x0': self.z0, 'x1': self.z0 + self.Lz},
         ]
         components = ['u', 'v', 'T', 'p']
         super().__init__(bases, components, comm=comm, **kwargs)
@@ -266,7 +266,7 @@ class RayleighBenard(GenericSpectralLinear):
         """
         Initial conditions, which are only available at t=0. Velocities and temperature are linear in z between their
         boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly distributed noise,
-        multiplied by `noise_level` and (z - z0) (z - z0 + Lz).
+        multiplied by `noise_level` and (z - z0) (z - z0 - Lz), which vanishes at both plates.
 
         Args:
             t (float): Time, has to be 0
@@ -296,7 +296,7 @@ class RayleighBenard(GenericSpectralLinear):
         noise = self.spectral.u_init
         noise[iT] = rng.random(size=me[iT].shape)
 
-        me[iT] += noise[iT].real * noise_level * (self.Z - self.z0) * (self.Z - self.z0 + self.Lz)
+        me[iT] += noise[iT].real * noise_level * (self.Z - self.z0) * (self.Z - self.z0 - self.Lz)
 
         if self.spectral_space:
             me_hat = self.spectral.u_init_forward
@@ -423,7 +423,7 @@ class RayleighBenard(GenericSpectralLinear):
         iu, iv = self.index(['u', 'v'])
 
         vorticity_hat = self.spectral.u_init_forward
-        vorticity_hat[0] = (Dx * u_hat[iv].flatten() + Dz @ u_hat[iu].flatten()).reshape(u_hat[iu].shape)
+        vorticity_hat[0] = (Dx * u_hat[iv].flatten() - Dz @ u_hat[iu].flatten()).reshape(u_hat[iu].shape)
         return self.itransform(vorticity_hat)[0].real
 
     def getOutputFile(self, fileName):
@@ -546,6 +546,8 @@ class RayleighBenard(GenericSpectralLinear):
 
         if self.spectral_space:
             u_hat = u.copy()
+            u = self.spectral.u_init
+            u[...] = self.itransform(u_hat).real
         else:
             u_hat = self.transform(u)
         Lap_u_hat[iu] = ((self.Dzz + self.Dxx) @ u_hat[iu].flatten()).reshape(u_hat[iu].shape)
@@ -629,7 +631,7 @@ class CFLLimit(ConvergenceController):
         Compute the largest step size allowed by the CFL condition with CFL number 1: the minimum over the grid of the
         grid spacing divided by the absolute velocity, in x and in z, reduced over the space communicator of the
         problem. The vertical grid spacing is the distance between the midpoints of neighbouring Chebychev nodes, with
-        the domain [0, Lz].
+        the domain [z0, z0 + Lz].
 
         Args:
             P (RayleighBenard): The problem
@@ -641,8 +643,8 @@ class CFLLimit(ConvergenceController):
         grid_spacing_x = P.X[1, 0] - P.X[0, 0]
 
         cell_wallz = P.xp.zeros(P.nz + 1)
-        cell_wallz[0] = P.Lz
-        cell_wallz[-1] = 0
+        cell_wallz[0] = P.z0 + P.Lz
+        cell_wallz[-1] = P.z0
         cell_wallz[1:-1] = (P.Z[0, :-1] + P.Z[0, 1:]) / 2
         grid_spacing_z = cell_wallz[:-1] - cell_wallz[1:]
 
@@ -683,8 +685,8 @@ class CFLLimit(ConvergenceController):
 
         L.status.CFL_limit = self.params.cfl * max_step_size
 
-        dt_new = L.status.dt_new if L.status.dt_new else max([self.params.dt_max, L.params.dt])
-        L.status.dt_new = min([dt_new, self.params.cfl * max_step_size])
+        dt_new = L.status.dt_new if L.status.dt_new else self.params.dt_max
+        L.status.dt_new = min([dt_new, self.params.dt_max, self.params.cfl * max_step_size])
         L.status.dt_new = max([self.params.dt_min, L.status.dt_new])
 
         self.log(f'dt max: {max_step_size:.2e} -> New step size: {L.status.dt_new:.2e}', step)

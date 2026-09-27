@@ -122,6 +122,20 @@ def test_Burgers2D_f(mode, direction, plotting=False):
 
 
 @pytest.mark.base
+def test_Burgers2D_vorticity():
+    import numpy as np
+    from pySDC.implementations.problem_classes.Burgers import Burgers2D
+
+    P = Burgers2D(nx=2**4, nz=2**4)
+    iu, iv = P.index(['u', 'v'])
+
+    u = P.u_init
+    u[iu] = P.Z**3
+    u[iv] = np.sin(P.X)
+    assert np.allclose(P.compute_vorticity(u), np.cos(P.X) - 3 * P.Z**2)
+
+
+@pytest.mark.base
 @pytest.mark.parametrize('mode', ['T2U'])
 def test_Burgers2D_solver(mode, nx=2**6, nz=2**6, plotting=False):
     import numpy as np
