@@ -91,12 +91,8 @@ class battery_n_capacitors(Problem):
             msg1 = "ERROR for reference value V_ref: V_ref has to be an np.ndarray and/or length of array needs to be equal to number of capacitances"
             assert all(assertions_V_ref_1), msg1
 
-            assertions_V_ref_2 = [
-                (alpha > V_ref[k] for k in range(n)),
-                (V_ref[k] > 0 for k in range(n)),
-            ]
-            msg2 = "ERROR for V_ref: At least one of V_ref is less than zero and/or alpha!"
-            assert all(assertions_V_ref_2), msg2
+            msg2 = "ERROR for V_ref: every entry of V_ref has to be positive and smaller than alpha!"
+            assert np.all(V_ref > 0) and np.all(V_ref < alpha), msg2
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -528,7 +524,7 @@ class battery_implicit(battery):
 
         if u[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
-            non_f[0] = self.Vs
+            non_f[0] = self.Vs / self.L
 
         else:
             self.A[1, 1] = -1 / (self.C[0] * self.R)
@@ -566,7 +562,7 @@ class battery_implicit(battery):
 
         if rhs[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
-            non_f[0] = self.Vs
+            non_f[0] = self.Vs / self.L
 
         else:
             self.A[1, 1] = -1 / (self.C[0] * self.R)
