@@ -69,28 +69,32 @@
 <span class="sd">    *semi-implicitly*, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand</span>
 <span class="sd">    side will be treated explicitly using ``mpi4py-fft`` [1]_ to solve them.</span>
 
-<span class="sd">    Attributes</span>
+<span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    nvars : List of int tuples, optional</span>
-<span class="sd">        Number of unknowns in the problem, e.g. ``nvars=[(128, 128), (64, 64)]``.</span>
+<span class="sd">    nvars : tuple of int</span>
+<span class="sd">        Number of unknowns in each spatial direction, e.g. ``nvars=(128, 128)``. Has to be a tuple of at least two</span>
+<span class="sd">        entries. The default ``None`` is replaced by the list ``[(128, 128)]``, which fails this check, so ``nvars``</span>
+<span class="sd">        has to be given.</span>
 <span class="sd">    eps : float, optional</span>
-<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`. For ``eps &lt;= 0``, the reaction terms are dropped.</span>
 <span class="sd">    radius : float, optional</span>
-<span class="sd">        Radius of the circles.</span>
+<span class="sd">        Radius of the circle for ``init_type='circle'``.</span>
 <span class="sd">    spectral : bool, optional</span>
-<span class="sd">        Indicates if spectral initial condition is used.</span>
+<span class="sd">        If True, the solution is computed in spectral space. ``None`` means False.</span>
 <span class="sd">    TM : float, optional</span>
-<span class="sd">        Problem parameter :math:`T_M`.</span>
+<span class="sd">        Reference temperature :math:`T_M` of the driving force, which vanishes where the temperature equals :math:`T_M`.</span>
 <span class="sd">    D : float, optional</span>
-<span class="sd">        Problem parameter :math:`D`.</span>
+<span class="sd">        Diffusion coefficient :math:`D` of the temperature, the second component of the solution. The phase field</span>
+<span class="sd">        :math:`u` diffuses with coefficient one, and its right-hand side is the source of the temperature equation.</span>
 <span class="sd">    dw : float, optional</span>
-<span class="sd">        Driving force.</span>
+<span class="sd">        Driving force :math:`d_w`.</span>
 <span class="sd">    L : float, optional</span>
-<span class="sd">        Denotes the period of the function to be approximated for the Fourier transform.</span>
+<span class="sd">        Length of the periodic domain :math:`[-L/2, L/2]` in each direction.</span>
 <span class="sd">    init_type : str, optional</span>
-<span class="sd">        Initialises type of initial state.</span>
-<span class="sd">    comm : bool, optional</span>
-<span class="sd">        Communicator.</span>
+<span class="sd">        Initial condition of the phase field, either ``'circle'`` or ``'circle_rand'`` (``int(L)**2`` circles with</span>
+<span class="sd">        random radii, 2D only). The temperature starts at one in both cases.</span>
+<span class="sd">    comm : MPI.Intracomm, optional</span>
+<span class="sd">        Communicator for ``mpi4py-fft``.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>

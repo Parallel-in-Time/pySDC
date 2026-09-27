@@ -53,6 +53,33 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">test_equation_IMEX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas_implicit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas_explicit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/TestEquation_0D.html#test_equation_IMEX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
+<p>Test equation with the right-hand side split into an implicit and an explicit part</p>
+<div class="math notranslate nohighlight">
+\[\frac{d u(t)}{dt} = A_I u(t) + A_E u(t)\]</div>
+<p>for <span class="math notranslate nohighlight">\(A_I = diag(\lambda_{I,1}, .. ,\lambda_{I,n})\)</span> and <span class="math notranslate nohighlight">\(A_E = diag(\lambda_{E,1}, .. ,\lambda_{E,n})\)</span>.
+For IMEX time-stepping, <span class="math notranslate nohighlight">\(A_I u\)</span> is treated implicitly and <span class="math notranslate nohighlight">\(A_E u\)</span> explicitly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lambdas_implicit</strong> (<em>sequence</em><em> of </em><em>array_like</em><em>, </em><em>optional</em>) – Flat list of the parameters <span class="math notranslate nohighlight">\(\lambda_{I,k}\)</span> of the implicit part. <code class="docutils literal notranslate"><span class="pre">None</span></code> means 2500 complex values
+<span class="math notranslate nohighlight">\(a + b i\)</span> with integers <span class="math notranslate nohighlight">\(a \in [-30, 19]\)</span> and <span class="math notranslate nohighlight">\(b \in [-50, 49]\)</span>.</p></li>
+<li><p><strong>lambdas_explicit</strong> (<em>sequence</em><em> of </em><em>array_like</em><em>, </em><em>optional</em>) – Flat list of the parameters <span class="math notranslate nohighlight">\(\lambda_{E,k}\)</span> of the explicit part, of the same shape as
+<code class="docutils literal notranslate"><span class="pre">lambdas_implicit</span></code>. <code class="docutils literal notranslate"><span class="pre">None</span></code> means a copy of <code class="docutils literal notranslate"><span class="pre">lambdas_implicit</span></code>.</p></li>
+<li><p><strong>u0</strong> (<em>sequence</em><em> of </em><em>array_like</em><em>, </em><em>optional</em>) – Initial condition at <span class="math notranslate nohighlight">\(t = 0\)</span>, either a scalar or one value per equation.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.A" title="Link to this definition">¶</a></dt>
+<dd><p>Diagonal matrix containing the implicit parameters <span class="math notranslate nohighlight">\(\lambda_{I,1},..,\lambda_{I,n}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scipy.sparse.dia_matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_f" title="Link to this definition">¶</a></dt>
@@ -153,6 +180,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lambdas</strong> (<em>sequence</em><em> of </em><em>array_like</em><em>, </em><em>optional</em>) – List of lambda parameters.</p></li>
 <li><p><strong>u0</strong> (<em>sequence</em><em> of </em><em>array_like</em><em>, </em><em>optional</em>) – Initial condition.</p></li>
+<li><p><strong>useGPU</strong> (<em>bool</em><em>, </em><em>optional</em>) – Run on the GPU with CuPy instead of on the CPU with NumPy.</p></li>
 </ul>
 </dd>
 </dl>
@@ -284,6 +312,7 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.TestEquation_0D module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX"><code class="docutils literal notranslate"><span class="pre">test_equation_IMEX</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.A"><code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.TestEquation_0D.test_equation_IMEX.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

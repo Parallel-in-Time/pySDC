@@ -99,6 +99,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            mat: square LxL matrix with L number of steps</span>
+<span class="sd">            quantity (str): The quantity the matrix is applied to, `'residual'` or `'increment'`</span>
 <span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>

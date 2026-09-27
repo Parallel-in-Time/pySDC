@@ -62,28 +62,14 @@
 <p>with initial condition <span class="math notranslate nohighlight">\((y_1(t), y_2(t))^T = (1, 0)^T\)</span> for <span class="math notranslate nohighlight">\(t \in [0, 10]\)</span>. The exact solution of this problem is</p>
 <div class="math notranslate nohighlight">
 \[(y_1(t), y_2(t))^T = (\cos(t), \sin(t))^T.\]</div>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger.newton_maxiter">
-<span class="sig-name descname"><span class="pre">newton_maxiter</span></span><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.newton_maxiter" title="Link to this definition">¶</a></dt>
-<dd><p>Maximum number of iterations for Newton’s method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int, optional</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for Newton’s method.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Absolute tolerance for Newton’s method to terminate, applied to the maximum norm of the residual.</p></li>
+</ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.Auzinger_implicit.auzinger.newton_tol">
-<span class="sig-name descname"><span class="pre">newton_tol</span></span><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.newton_tol" title="Link to this definition">¶</a></dt>
-<dd><p>Tolerance for Newton’s method to terminate.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
 <p class="rubric">References</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
@@ -178,8 +164,6 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.Auzinger_implicit module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.Auzinger_implicit.auzinger"><code class="docutils literal notranslate"><span class="pre">auzinger</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.Auzinger_implicit.auzinger.newton_maxiter"><code class="docutils literal notranslate"><span class="pre">newton_maxiter</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.Auzinger_implicit.auzinger.newton_tol"><code class="docutils literal notranslate"><span class="pre">newton_tol</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Auzinger_implicit.auzinger.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Auzinger_implicit.auzinger.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.Auzinger_implicit.auzinger.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>

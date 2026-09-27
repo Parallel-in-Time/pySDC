@@ -172,8 +172,8 @@
 <span class="sd">        Get the interpolated solution for numpy or cupy data types</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            u_vec (array): Vector of solutions</span>
-<span class="sd">            prob (pySDC.problem): Problem</span>
+<span class="sd">            L (pySDC.level): The level holding the solutions at the collocation nodes</span>
+<span class="sd">            xp: The array module of the data, numpy or cupy</span>
 <span class="sd">        """</span>
         <span class="n">coll</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span>
 
@@ -311,14 +311,14 @@
 
 <div class="viewcode-block" id="EstimatePolynomialErrorFiredrake.get_interpolated_solution">
 <a class="viewcode-back" href="../../../pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialErrorFiredrake.get_interpolated_solution">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_interpolated_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_interpolated_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the interpolated solution for Firedrake data types</span>
 <span class="sd">        We are not 100% sure that you don't need to invert the mass matrix here, but should be fine.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            u_vec (array): Vector of solutions</span>
-<span class="sd">            prob (pySDC.problem): Problem</span>
+<span class="sd">            L (pySDC.level): The level holding the solutions at the collocation nodes</span>
+<span class="sd">            xp: Not used, Firedrake data is not an array; accepted because the base class passes it</span>
 <span class="sd">        """</span>
         <span class="n">coll</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span>
 

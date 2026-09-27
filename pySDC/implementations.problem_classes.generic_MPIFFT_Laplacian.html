@@ -63,6 +63,9 @@ Works in two and three dimensions.</p>
 <li><p><strong>L</strong> (<em>float</em><em>, </em><em>optional</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
 <li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Multiplicative factor before the Laplacian</p></li>
 <li><p><strong>comm</strong> (<em>MPI.COMM_World</em>) – Communicator for parallelisation.</p></li>
+<li><p><strong>dtype</strong> (<em>numpy.dtype</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Datatype of the solution in real space, e.g. <code class="docutils literal notranslate"><span class="pre">'d'</span></code> for real or <code class="docutils literal notranslate"><span class="pre">'D'</span></code> for complex problems.</p></li>
+<li><p><strong>useGPU</strong> (<em>bool</em><em>, </em><em>optional</em>) – Run on the GPU with CuPy and NCCL instead of on the CPU with NumPy and MPI.</p></li>
+<li><p><strong>x0</strong> (<em>float</em><em>, </em><em>optional</em>) – Coordinate of the left boundary of the domain in each direction.</p></li>
 </ul>
 </dd>
 </dl>

@@ -62,6 +62,8 @@
 <span class="sd">        List of lambda parameters.</span>
 <span class="sd">    u0 : sequence of array_like, optional</span>
 <span class="sd">        Initial condition.</span>
+<span class="sd">    useGPU : bool, optional</span>
+<span class="sd">        Run on the GPU with CuPy instead of on the CPU with NumPy.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -219,6 +221,32 @@
 <div class="viewcode-block" id="test_equation_IMEX">
 <a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.TestEquation_0D.html#implementations.problem_classes.TestEquation_0D.test_equation_IMEX">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">test_equation_IMEX</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Test equation with the right-hand side split into an implicit and an explicit part</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{d u(t)}{dt} = A_I u(t) + A_E u(t)</span>
+
+<span class="sd">    for :math:`A_I = diag(\lambda_{I,1}, .. ,\lambda_{I,n})` and :math:`A_E = diag(\lambda_{E,1}, .. ,\lambda_{E,n})`.</span>
+<span class="sd">    For IMEX time-stepping, :math:`A_I u` is treated implicitly and :math:`A_E u` explicitly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lambdas_implicit : sequence of array_like, optional</span>
+<span class="sd">        Flat list of the parameters :math:`\lambda_{I,k}` of the implicit part. ``None`` means 2500 complex values</span>
+<span class="sd">        :math:`a + b i` with integers :math:`a \in [-30, 19]` and :math:`b \in [-50, 49]`.</span>
+<span class="sd">    lambdas_explicit : sequence of array_like, optional</span>
+<span class="sd">        Flat list of the parameters :math:`\lambda_{E,k}` of the explicit part, of the same shape as</span>
+<span class="sd">        ``lambdas_implicit``. ``None`` means a copy of ``lambdas_implicit``.</span>
+<span class="sd">    u0 : sequence of array_like, optional</span>
+<span class="sd">        Initial condition at :math:`t = 0`, either a scalar or one value per equation.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : scipy.sparse.dia_matrix</span>
+<span class="sd">        Diagonal matrix containing the implicit parameters :math:`\lambda_{I,1},..,\lambda_{I,n}`.</span>
+<span class="sd">    """</span>
+
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
     <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span>

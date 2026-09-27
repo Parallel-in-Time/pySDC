@@ -81,7 +81,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -104,8 +104,8 @@ unsplit right-hand side, which is the wrong type here and silently the wrong ans
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – The base state, unused: the implicit part is linear.</p></li>
-<li><p><strong>delta</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – The correction.</p></li>
+<li><p><strong>base</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – The base state, unused: the implicit part is linear.</p></li>
+<li><p><strong>delta</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – The correction.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time, accepted for interface compatibility.</p></li>
 </ul>
 </dd>
@@ -136,7 +136,7 @@ unsplit right-hand side, which is the wrong type here and silently the wrong ans
 <dd class="field-even"><p><strong>sol</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -179,6 +179,9 @@ consider several dimensions, e.g <code class="docutils literal notranslate"><spa
     \right)^2
     }\]</div>
 </p></li>
+<li><p><strong>dtype</strong> (<em>dtype-like</em><em>, </em><em>optional</em>) – Precision the state is stored at, <code class="docutils literal notranslate"><span class="pre">float64</span></code> by default. See <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericNDimFinDiff</span></code> for how the
+operators follow it.</p></li>
+<li><p><strong>useGPU</strong> (<em>bool</em><em>, </em><em>optional</em>) – Run on the GPU with CuPy instead of on the CPU with NumPy.</p></li>
 </ul>
 </dd>
 </dl>
@@ -216,7 +219,7 @@ consider several dimensions, e.g <code class="docutils literal notranslate"><spa
 <dd class="field-even"><p><strong>sol</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>

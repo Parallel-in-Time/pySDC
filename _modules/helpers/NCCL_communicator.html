@@ -84,7 +84,7 @@
 <span class="sd">        When performing any operations that depend on data, we have to synchronize host and device beforehand.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            Name (str): Name of the requested attribute</span>
+<span class="sd">            name (str): Name of the requested attribute</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'size'</span><span class="p">,</span> <span class="s1">'rank'</span><span class="p">,</span> <span class="s1">'Get_rank'</span><span class="p">,</span> <span class="s1">'Get_size'</span><span class="p">,</span> <span class="s1">'Split'</span><span class="p">,</span> <span class="s1">'Create_cart'</span><span class="p">,</span> <span class="s1">'Is_inter'</span><span class="p">,</span> <span class="s1">'Get_topology'</span><span class="p">]:</span>
             <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_current_stream</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>

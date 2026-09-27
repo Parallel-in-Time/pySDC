@@ -40,9 +40,9 @@
 <span></span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">Space-time transfer for the delta-form hierarchy.</span>
 
-<span class="sd">:class:`BaseTransfer` makes a coarse level rebuild its own residual from :math:`\mathcal{O}(1)`</span>
-<span class="sd">coarse data and recovers the coarse-grid correction as :math:`u_G - u_G^{\mathrm{old}}`. Both have</span>
-<span class="sd">exact algebraic replacements -- :math:`\varepsilon_G = R\varepsilon_F`, which is what the FAS</span>
+<span class="sd">:class:`~pySDC.core.base_transfer.BaseTransfer` makes a coarse level rebuild its own residual from</span>
+<span class="sd">:math:`\mathcal{O}(1)` coarse data and recovers the coarse-grid correction as :math:`u_G - u_G^{\mathrm{old}}`.</span>
+<span class="sd">Both have exact algebraic replacements -- :math:`\varepsilon_G = R\varepsilon_F`, which is what the FAS</span>
 <span class="sd">:math:`\tau` is *for*, and the correction is the sum of the sweep's own increments -- and this</span>
 <span class="sd">transfer uses those instead. It is what decides whether a level rebuilds its residual or is handed</span>
 <span class="sd">one: the delta-form sweepers do both, and this is what hands one down.</span>
@@ -55,8 +55,8 @@
 <span class="sd">twice. What is skipped is materialising :math:`\tau` as an array, since the quantity it exists to</span>
 <span class="sd">produce arrives directly.</span>
 
-<span class="sd">Identical to :class:`BaseTransfer` up to round-off at backend precision, verified for two, three and</span>
-<span class="sd">four levels and for PFASST -- and against a control with :math:`\tau` genuinely zeroed, which does</span>
+<span class="sd">Identical to :class:`~pySDC.core.base_transfer.BaseTransfer` up to round-off at backend precision, verified</span>
+<span class="sd">for two, three and four levels and for PFASST -- and against a control with :math:`\tau` genuinely zeroed, which does</span>
 <span class="sd">not converge at all. It is also slightly cheaper, because nothing then reads :math:`\tau` except</span>
 <span class="sd">:meth:`compute_end_point` in the quadrature-update case: see :meth:`delta_transfer.restrict`.</span>
 
@@ -77,8 +77,8 @@
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Space-time transfer that passes a residual down and an accumulated correction up.</span>
 
-<span class="sd">    Drop-in for :class:`BaseTransfer`, and identical to it up to round-off when every level is at</span>
-<span class="sd">    backend precision. Falls back to the stock prolongation when the coarse level has banked no</span>
+<span class="sd">    Drop-in for :class:`~pySDC.core.base_transfer.BaseTransfer`, and identical to it up to round-off when every</span>
+<span class="sd">    level is at backend precision. Falls back to the stock prolongation when the coarse level has banked no</span>
 <span class="sd">    corrections, so a hierarchy mixing delta-form and stock sweepers still runs.</span>
 <span class="sd">    """</span>
 

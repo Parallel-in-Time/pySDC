@@ -48,10 +48,10 @@
   <section id="module-helpers.fieldsIO">
 <span id="helpers-fieldsio-module"></span><h1>helpers.fieldsIO module<a class="headerlink" href="#module-helpers.fieldsIO" title="Link to this heading">¶</a></h1>
 <p>Generic utility class to write and read cartesian grid field solutions into binary files.
-It implements the base file handler class <a class="reference internal" href="#helpers.fieldsIO.FieldsIO" title="helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a>, that is specialized into :</p>
+It implements the base file handler class <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code>, that is specialized into :</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#helpers.fieldsIO.Scalar" title="helpers.fieldsIO.Scalar"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scalar</span></code></a> : for 0D fields (scalar) with a given number of variables</p></li>
-<li><p><a class="reference internal" href="#helpers.fieldsIO.Rectilinear" title="helpers.fieldsIO.Rectilinear"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear</span></code></a> : for fields on N-dimensional rectilinear grids</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Scalar</span></code> : for 0D fields (scalar) with a given number of variables</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear</span></code> : for fields on N-dimensional rectilinear grids</p></li>
 </ul>
 <p>While each file handler need to be setup with specific parameters (grid, …),
 each written file can be read using the same interface implemented in the
@@ -83,7 +83,7 @@ base abstract class.</p>
 </pre></div>
 </div>
 <p class="rubric">Notes</p>
-<p>🚀 <a class="reference internal" href="#helpers.fieldsIO.Rectilinear" title="helpers.fieldsIO.Rectilinear"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear</span></code></a> is compatible with a MPI-based cartesian decomposition.
+<p>🚀 <code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear</span></code> is compatible with a MPI-based cartesian decomposition.
 See <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.helpers.fieldsIO.writeFields_MPI</span></code> for an illustrative example.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -150,7 +150,7 @@ field type (structure).</p>
 <dd class="field-even"><p><strong>fieldsIO</strong> – The specialized <cite>FieldsIO</cite> adapted to the file.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helpers.fieldsIO.FieldsIO" title="helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></p>
 </dd>
 </dl>
 </dd></dl>

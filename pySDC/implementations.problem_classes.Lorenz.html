@@ -83,6 +83,7 @@ as to provoke instability of steady convection.</p>
 <li><p><strong>u0</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Initial solution <span class="math notranslate nohighlight">\(u_0\)</span> of the problem.</p></li>
 <li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton for termination.</p></li>
 <li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for Newton’s method.</p></li>
+<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that the Newton solver should raise an error if <code class="docutils literal notranslate"><span class="pre">nan</span></code> values arise, instead of only warning.</p></li>
 </ul>
 </dd>
 </dl>
@@ -137,7 +138,7 @@ as to provoke instability of steady convection.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.Lorenz.LorenzAttractor.dtype_f" title="implementations.problem_classes.Lorenz.LorenzAttractor.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the nonlinear system.</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
 <li><p><strong>u0</strong> (<a class="reference internal" href="#implementations.problem_classes.Lorenz.LorenzAttractor.dtype_u" title="implementations.problem_classes.Lorenz.LorenzAttractor.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>

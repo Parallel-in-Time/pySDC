@@ -180,12 +180,12 @@ class attributes of the spectral helper. This class will automatically switch th
 <span class="sig-name descname"><span class="pre">setup_L</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">LHS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.setup_L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_L" title="Link to this definition">¶</a></dt>
 <dd><p>Setup the left hand side of the linear operator L and store it in <code class="docutils literal notranslate"><span class="pre">self.L</span></code>.</p>
 <p>The argument is meant to be a dictionary with the line you want to write the equation in as the key and the relationship between components as another dictionary. For instance, you can add an algebraic condition capturing a first derivative relationship between u and ux as follows:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">Dx</span> <span class="pre">=</span> <span class="pre">self.get_differentiation_matrix(axes=(0,))</span>
-<span class="pre">I</span> <span class="pre">=</span> <span class="pre">self.get_Id()</span>
-<span class="pre">LHS</span> <span class="pre">=</span> <span class="pre">{'ux':</span> <span class="pre">{'u':</span> <span class="pre">Dx,</span> <span class="pre">'ux':</span> <span class="pre">-I}}</span>
-<span class="pre">self.setup_L(LHS)</span>
-<span class="pre">`</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_differentiation_matrix</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+<span class="n">I</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Id</span><span class="p">()</span>
+<span class="n">LHS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'ux'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'u'</span><span class="p">:</span> <span class="n">Dx</span><span class="p">,</span> <span class="s1">'ux'</span><span class="p">:</span> <span class="o">-</span><span class="n">I</span><span class="p">}}</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">setup_L</span><span class="p">(</span><span class="n">LHS</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>If you put zero as right hand side for the solver in the line for ux, ux will contain the x-derivative of u afterwards.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

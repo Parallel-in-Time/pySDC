@@ -84,6 +84,8 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller_params (dict): parameter set for the controller and the steps</span>
+<span class="sd">            description (dict): description of the problem, sweeper, levels, ... passed to the steps</span>
+<span class="sd">            useMPI (bool): whether the controller communicates via MPI</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">useMPI</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span>

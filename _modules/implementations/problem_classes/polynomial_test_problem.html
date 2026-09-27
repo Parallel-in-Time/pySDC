@@ -49,6 +49,15 @@
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Dummy problem for tests only! In particular, the `solve_system` function just returns the exact solution instead of</span>
 <span class="sd">    solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    degree : int, optional</span>
+<span class="sd">        Number of coefficients of the polynomial, i.e., the polynomial has degree ``degree - 1``.</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        Seed for ``np.random.RandomState``, which draws the coefficients uniformly from :math:`[0, 1)`.</span>
+<span class="sd">    useGPU : bool, optional</span>
+<span class="sd">        Use ``CuPy`` for the solution. This switches the data types of the class, not only of this instance.</span>
 <span class="sd">    """</span>
 
     <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">mesh</span>
@@ -133,10 +142,9 @@
 <span class="sd">        ----------</span>
 <span class="sd">        t : float</span>
 <span class="sd">            Time of the exact solution.</span>
-<span class="sd">        u_init : pySDC.problem.testequation0d.dtype_u</span>
-<span class="sd">            Initial solution.</span>
-<span class="sd">        t_init : float</span>
-<span class="sd">            The initial time.</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Takes ``u_init`` and ``t_init`` of the generic interface, which are ignored since the polynomial is known</span>
+<span class="sd">            everywhere.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

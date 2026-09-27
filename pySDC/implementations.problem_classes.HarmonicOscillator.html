@@ -53,7 +53,7 @@
 <dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">harmonic_oscillator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
-<p>Example implementing the harmonic oscillator with mass <span class="math notranslate nohighlight">\(1\)</span></p>
+<p>Example implementing the harmonic oscillator <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> with mass <span class="math notranslate nohighlight">\(1\)</span></p>
 <div class="math notranslate nohighlight">
 \[\frac{d^2 x}{dt^2} = -kx - \mu \frac{d x}{dt},\]</div>
 <p>which is a second-order problem. The unknown function <span class="math notranslate nohighlight">\(x\)</span> denotes the position of the mass, and the
@@ -66,10 +66,16 @@ derivative is the velocity. <span class="math notranslate nohighlight">\(\mu\)</
 <li><p><strong>u0</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Initial condition for the position, and the velocity. Should be a tuple, e.g. <code class="docutils literal notranslate"><span class="pre">u0=(1,</span> <span class="pre">0)</span></code>.</p></li>
 <li><p><strong>phase</strong> (<em>float</em><em>, </em><em>optional</em>) – Phase of the oscillation.</p></li>
 <li><p><strong>amp</strong> (<em>float</em><em>, </em><em>optional</em>) – Amplitude of the oscillation.</p></li>
-<li><p><strong>Source</strong> (<a class="reference external" href="https://beltoforion.de/en/harmonic_oscillator/">https://beltoforion.de/en/harmonic_oscillator/</a>)</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://beltoforion.de/en/harmonic_oscillator/">https://beltoforion.de/en/harmonic_oscillator/</a></p>
+</aside>
+</aside>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.dtype_f" title="Link to this definition">¶</a></dt>

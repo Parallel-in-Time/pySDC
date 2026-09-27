@@ -83,6 +83,9 @@
 <span class="sd">        Interval of spatial domain.</span>
 <span class="sd">    stop_at_nan : bool, optional</span>
 <span class="sd">        Indicates that the Newton solver should stop if ``nan`` values arise.</span>
+<span class="sd">    stop_at_maxiter : bool, optional</span>
+<span class="sd">        Indicates that the Newton solver should raise an error instead of only warning if it has not converged after</span>
+<span class="sd">        ``newton_maxiter`` iterations.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -788,6 +791,25 @@
 <span class="sd">    with :math:`v = 3 \sqrt{2} \varepsilon d_w` and radius :math:`r` of the circles. For time-stepping, the problem is treated</span>
 <span class="sd">    in *semi-implicit* way, i.e., the part containing the Laplacian is treated implicitly, and the rest of the right-hand</span>
 <span class="sd">    side is only evaluated at each time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int, optional</span>
+<span class="sd">        Number of unknowns in the problem, i.e., points of the periodic grid. Has to be even.</span>
+<span class="sd">    dw : float, optional</span>
+<span class="sd">        Driving force :math:`d_w`.</span>
+<span class="sd">    eps : float, optional</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
+<span class="sd">    newton_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for Newton's method. Not used here, since the implicit part is linear.</span>
+<span class="sd">    newton_tol : float, optional</span>
+<span class="sd">        Tolerance for Newton's method to terminate. Not used here, since the implicit part is linear.</span>
+<span class="sd">    interval : list, optional</span>
+<span class="sd">        Interval of spatial domain.</span>
+<span class="sd">    radius : float, optional</span>
+<span class="sd">        Radius of the circles.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Indicates that the Newton solver should stop if ``nan`` values arise. Not used here.</span>
 <span class="sd">    """</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">imex_mesh</span>
@@ -882,6 +904,25 @@
 <span class="sd">    in a *multi-implicit* fashion, i.e., the nonlinear system containing the part with the Laplacian is solved with a</span>
 <span class="sd">    linear solver provided by a ``SciPy`` routine, and the nonlinear system including the rest of the right-hand side is solved by</span>
 <span class="sd">    Newton's method.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : int, optional</span>
+<span class="sd">        Number of unknowns in the problem, i.e., points of the periodic grid. Has to be even.</span>
+<span class="sd">    dw : float, optional</span>
+<span class="sd">        Driving force :math:`d_w`.</span>
+<span class="sd">    eps : float, optional</span>
+<span class="sd">        Scaling parameter :math:`\varepsilon`.</span>
+<span class="sd">    newton_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for Newton's method in ``solve_system_2``.</span>
+<span class="sd">    newton_tol : float, optional</span>
+<span class="sd">        Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residual.</span>
+<span class="sd">    interval : list, optional</span>
+<span class="sd">        Interval of spatial domain.</span>
+<span class="sd">    radius : float, optional</span>
+<span class="sd">        Radius of the circles.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Indicates that the Newton solver should stop if ``nan`` values arise.</span>
 <span class="sd">    """</span>
 
     <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">comp2_mesh</span>

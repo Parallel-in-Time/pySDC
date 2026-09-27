@@ -154,14 +154,7 @@
         <span class="n">min_lintol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
         <span class="n">reference_sol_type</span><span class="o">=</span><span class="s1">'scipy'</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Initialization routine</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            problem_params (dict): custom parameters for the example</span>
-<span class="sd">            dtype_u: mesh data type (will be passed parent class)</span>
-<span class="sd">            dtype_f: mesh data type (will be passed parent class)</span>
-<span class="sd">        """</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'float64'</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
@@ -424,6 +417,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        t : float</span>
 <span class="sd">            Time of the exact solution.</span>
+<span class="sd">        u_init : dtype_u, optional</span>
+<span class="sd">            Initial conditions for getting the exact solution.</span>
+<span class="sd">        t_init : float, optional</span>
+<span class="sd">            The starting time.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -615,6 +612,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        t : float</span>
 <span class="sd">            Time of the exact solution.</span>
+<span class="sd">        u_init : dtype_u, optional</span>
+<span class="sd">            Initial conditions for getting the exact solution.</span>
+<span class="sd">        t_init : float, optional</span>
+<span class="sd">            The starting time.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

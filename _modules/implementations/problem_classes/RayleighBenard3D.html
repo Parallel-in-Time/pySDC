@@ -114,11 +114,15 @@
 <span class="sd">            Prandtl (float): Prandtl number</span>
 <span class="sd">            Rayleigh (float): Rayleigh number</span>
 <span class="sd">            nx (int): Resolution in x-direction</span>
+<span class="sd">            ny (int): Resolution in y-direction</span>
 <span class="sd">            nz (int): Resolution in z direction</span>
 <span class="sd">            BCs (dict): Vertical boundary conditions</span>
 <span class="sd">            dealiasing (float): Dealiasing for evaluating the non-linear part in real space</span>
 <span class="sd">            comm (mpi4py.Intracomm): Space communicator</span>
-<span class="sd">            Lx (float): Horizontal length of the domain</span>
+<span class="sd">            Lz (float): Vertical length of the domain</span>
+<span class="sd">            Lx (float): Horizontal length of the domain in x-direction</span>
+<span class="sd">            Ly (float): Horizontal length of the domain in y-direction</span>
+<span class="sd">            useGPU (bool): Run on GPU or CPU</span>
 <span class="sd">        """</span>
         <span class="n">BCs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">BCs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">BCs</span>
         <span class="n">BCs</span> <span class="o">=</span> <span class="p">{</span>

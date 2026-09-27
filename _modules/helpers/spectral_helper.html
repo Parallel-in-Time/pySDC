@@ -286,7 +286,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            kind (str): The type of BC you want to implement please refer to the implementations of this method in the</span>
-<span class="sd">            individual 1D bases for what is implemented</span>
+<span class="sd">                individual 1D bases for what is implemented</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            self.xp.array: Boundary condition</span>
@@ -546,6 +546,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            u: Data you want to transform</span>
 <span class="sd">            axes (tuple): Axes you want to transform along</span>
+<span class="sd">            shape (tuple): Shape of the result along `axes`, passed on as `s` to the FFT library</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Data in spectral space</span>
@@ -604,6 +605,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            u: Data you want to transform</span>
 <span class="sd">            axes (tuple): Axes you want to transform along</span>
+<span class="sd">            shape (tuple): Shape of the result along `axes`, passed on as `s` to the FFT library</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Data in physical space</span>
@@ -1026,6 +1028,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            u: Data you want to transform</span>
 <span class="sd">            axes (tuple): Axes you want to transform over</span>
+<span class="sd">            shape (tuple): Shape of the result along `axes`, passed on as `s` to the FFT library</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            transformed data</span>
@@ -1045,6 +1048,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            u: Data you want to transform</span>
 <span class="sd">            axes (tuple): Axes over which to transform</span>
+<span class="sd">            shape (tuple): Shape of the result along `axes`, passed on as `s` to the FFT library</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            transformed data</span>
@@ -1439,7 +1443,6 @@
 <span class="sd">            equation (str): Name of the equation for the component you want to put the BC in</span>
 <span class="sd">            axis (int): Axis you want to add the BC to</span>
 <span class="sd">            kind (str): kind of BC, e.g. Dirichlet</span>
-<span class="sd">            v: Value of the BC</span>
 <span class="sd">            line (int): Line you want the BC to go in</span>
 <span class="sd">            scalar (bool): Put the BC in all space positions in the other direction</span>
 <span class="sd">        """</span>
@@ -1660,6 +1663,7 @@
 <span class="sd">        preconditioning:</span>
 
 <span class="sd">        .. code-block:: python</span>
+
 <span class="sd">            helper = SpectralHelper()</span>
 
 <span class="sd">            helper.add_axis(base='chebychev', N=8)</span>

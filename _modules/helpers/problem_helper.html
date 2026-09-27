@@ -52,7 +52,6 @@
 <span class="sd">        derivative (int): Order of the derivative</span>
 <span class="sd">        order (int): Order of accuracy</span>
 <span class="sd">        stencil_type (str): Type of the stencil</span>
-<span class="sd">        steps (list): Provide specific steps, overrides `stencil_type`</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        int: The number of elements in the stencil</span>
@@ -154,6 +153,8 @@
 <span class="sd">        dim (int): Number of dimensions</span>
 <span class="sd">        bc (str): Boundary conditions for both sides</span>
 <span class="sd">        cupy (bool): Construct a GPU ready matrix if yes</span>
+<span class="sd">        bc_params (dict or list of dicts): Parameters `val`, `neumann_bc_order` and `reduce` of Dirichlet and Neumann</span>
+<span class="sd">            BCs, for both sides or one dict per side</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Sparse matrix: Finite difference matrix</span>

@@ -64,6 +64,15 @@
 <span class="sd">    where :math:`t^* = \log(5) \approx 1.6094379`. For :math:`h(u) &lt; 0`, i.e. :math:`t \leq t^*`, the exact solution is</span>
 <span class="sd">    :math:`u(t) = \exp(t)`; for :math:`h(u) \geq 0`, i.e. :math:`t \geq t^*`, the exact solution is :math:`u(t) = \frac{4 t}{t^*} + 1`.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    newton_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for Newton's method.</span>
+<span class="sd">    newton_tol : float, optional</span>
+<span class="sd">        Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residual.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Indicates that the Newton solver should stop if ``nan`` values arise.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    t_switch_exact : float</span>
@@ -287,6 +296,14 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Dummy ODE problem for testing the ``SwitchEstimator`` class. The problem contains the exact dynamics</span>
 <span class="sd">    of the problem class ``DiscontinuousTestODE``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    newton_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for Newton's method. Not used here, since ``solve_system`` returns the exact</span>
+<span class="sd">        solution.</span>
+<span class="sd">    newton_tol : float, optional</span>
+<span class="sd">        Tolerance for Newton's method to terminate. Not used here, since ``solve_system`` returns the exact solution.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newton_maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">newton_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>

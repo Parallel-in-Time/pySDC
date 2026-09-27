@@ -186,9 +186,11 @@
 <span class="sd">        parameters by adding the convergence controller manually.</span>
 <span class="sd">        This relies on children classes to return a composite dictionary from their defaults and from the result of this</span>
 <span class="sd">        function, so you should write</span>
-<span class="sd">        ```</span>
-<span class="sd">        return {**defaults, **super().setup(controller, params, description, **kwargs)}</span>
-<span class="sd">        ```</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            return {**defaults, **super().setup(controller, params, description, **kwargs)}</span>
+
 <span class="sd">        when overloading this method in a child class, with `defaults` a dictionary containing default parameters.</span>
 
 <span class="sd">        Args:</span>
@@ -609,9 +611,10 @@
 <span class="sd">        Args:</span>
 <span class="sd">            comm (mpi4py.MPI.Intracomm): Communicator</span>
 <span class="sd">            source (int): Where to look for receiving</span>
+<span class="sd">            buffer: Buffer to receive the data into</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            whatever has been received</span>
+<span class="sd">            None, the data is received into `buffer`</span>
 <span class="sd">        """</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">'tag'</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'tag'</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span><span class="p">))</span>
 

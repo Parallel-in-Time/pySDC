@@ -41,10 +41,10 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">"""</span>
 <span class="sd">Generic utility class to write and read cartesian grid field solutions into binary files.</span>
-<span class="sd">It implements the base file handler class :class:`FieldsIO`, that is specialized into :</span>
+<span class="sd">It implements the base file handler class :class:`~pySDC.helpers.fieldsIO.FieldsIO`, that is specialized into :</span>
 
-<span class="sd">- :class:`Scalar` : for 0D fields (scalar) with a given number of variables</span>
-<span class="sd">- :class:`Rectilinear` : for fields on N-dimensional rectilinear grids</span>
+<span class="sd">- :class:`~pySDC.helpers.fieldsIO.Scalar` : for 0D fields (scalar) with a given number of variables</span>
+<span class="sd">- :class:`~pySDC.helpers.fieldsIO.Rectilinear` : for fields on N-dimensional rectilinear grids</span>
 
 <span class="sd">While each file handler need to be setup with specific parameters (grid, ...),</span>
 <span class="sd">each written file can be read using the same interface implemented in the</span>
@@ -78,7 +78,7 @@
 
 <span class="sd">Notes</span>
 <span class="sd">-----</span>
-<span class="sd">🚀 :class:`Rectilinear` is compatible with a MPI-based cartesian decomposition.</span>
+<span class="sd">🚀 :class:`~pySDC.helpers.fieldsIO.Rectilinear` is compatible with a MPI-based cartesian decomposition.</span>
 <span class="sd">See :class:`pySDC.helpers.fieldsIO.writeFields_MPI` for an illustrative example.</span>
 
 <span class="sd">Warning</span>
@@ -195,7 +195,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        fieldsIO : :class:`FieldsIO`</span>
+<span class="sd">        fieldsIO : :class:`~pySDC.helpers.fieldsIO.FieldsIO`</span>
 <span class="sd">            The specialized `FieldsIO` adapted to the file.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>

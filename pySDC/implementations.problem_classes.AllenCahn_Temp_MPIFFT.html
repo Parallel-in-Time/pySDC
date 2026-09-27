@@ -66,116 +66,26 @@ phases at <span class="math notranslate nohighlight">\(u = 0\)</span> and <span 
 <p>for <span class="math notranslate nohighlight">\(i, j=0,..,N-1\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of spatial grid points. For time-stepping, the problem is treated
 <em>semi-implicitly</em>, i.e., the nonlinear system is solved by Fast-Fourier Tranform (FFT) and the linear parts in the right-hand
 side will be treated explicitly using <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> to solve them.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.nvars">
-<span class="sig-name descname"><span class="pre">nvars</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.nvars" title="Link to this definition">¶</a></dt>
-<dd><p>Number of unknowns in the problem, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=[(128,</span> <span class="pre">128),</span> <span class="pre">(64,</span> <span class="pre">64)]</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of int tuples, optional</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nvars</strong> (<em>tuple</em><em> of </em><em>int</em>) – Number of unknowns in each spatial direction, e.g. <code class="docutils literal notranslate"><span class="pre">nvars=(128,</span> <span class="pre">128)</span></code>. Has to be a tuple of at least two
+entries. The default <code class="docutils literal notranslate"><span class="pre">None</span></code> is replaced by the list <code class="docutils literal notranslate"><span class="pre">[(128,</span> <span class="pre">128)]</span></code>, which fails this check, so <code class="docutils literal notranslate"><span class="pre">nvars</span></code>
+has to be given.</p></li>
+<li><p><strong>eps</strong> (<em>float</em><em>, </em><em>optional</em>) – Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>. For <code class="docutils literal notranslate"><span class="pre">eps</span> <span class="pre">&lt;=</span> <span class="pre">0</span></code>, the reaction terms are dropped.</p></li>
+<li><p><strong>radius</strong> (<em>float</em><em>, </em><em>optional</em>) – Radius of the circle for <code class="docutils literal notranslate"><span class="pre">init_type='circle'</span></code>.</p></li>
+<li><p><strong>spectral</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the solution is computed in spectral space. <code class="docutils literal notranslate"><span class="pre">None</span></code> means False.</p></li>
+<li><p><strong>TM</strong> (<em>float</em><em>, </em><em>optional</em>) – Reference temperature <span class="math notranslate nohighlight">\(T_M\)</span> of the driving force, which vanishes where the temperature equals <span class="math notranslate nohighlight">\(T_M\)</span>.</p></li>
+<li><p><strong>D</strong> (<em>float</em><em>, </em><em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(D\)</span> of the temperature, the second component of the solution. The phase field
+<span class="math notranslate nohighlight">\(u\)</span> diffuses with coefficient one, and its right-hand side is the source of the temperature equation.</p></li>
+<li><p><strong>dw</strong> (<em>float</em><em>, </em><em>optional</em>) – Driving force <span class="math notranslate nohighlight">\(d_w\)</span>.</p></li>
+<li><p><strong>L</strong> (<em>float</em><em>, </em><em>optional</em>) – Length of the periodic domain <span class="math notranslate nohighlight">\([-L/2, L/2]\)</span> in each direction.</p></li>
+<li><p><strong>init_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Initial condition of the phase field, either <code class="docutils literal notranslate"><span class="pre">'circle'</span></code> or <code class="docutils literal notranslate"><span class="pre">'circle_rand'</span></code> (<code class="docutils literal notranslate"><span class="pre">int(L)**2</span></code> circles with
+random radii, 2D only). The temperature starts at one in both cases.</p></li>
+<li><p><strong>comm</strong> (<em>MPI.Intracomm</em><em>, </em><em>optional</em>) – Communicator for <code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code>.</p></li>
+</ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.eps">
-<span class="sig-name descname"><span class="pre">eps</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.eps" title="Link to this definition">¶</a></dt>
-<dd><p>Scaling parameter <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.radius">
-<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.radius" title="Link to this definition">¶</a></dt>
-<dd><p>Radius of the circles.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.spectral">
-<span class="sig-name descname"><span class="pre">spectral</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.spectral" title="Link to this definition">¶</a></dt>
-<dd><p>Indicates if spectral initial condition is used.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.TM">
-<span class="sig-name descname"><span class="pre">TM</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.TM" title="Link to this definition">¶</a></dt>
-<dd><p>Problem parameter <span class="math notranslate nohighlight">\(T_M\)</span>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.D">
-<span class="sig-name descname"><span class="pre">D</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.D" title="Link to this definition">¶</a></dt>
-<dd><p>Problem parameter <span class="math notranslate nohighlight">\(D\)</span>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dw">
-<span class="sig-name descname"><span class="pre">dw</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dw" title="Link to this definition">¶</a></dt>
-<dd><p>Driving force.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.L">
-<span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.L" title="Link to this definition">¶</a></dt>
-<dd><p>Denotes the period of the function to be approximated for the Fourier transform.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.init_type">
-<span class="sig-name descname"><span class="pre">init_type</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.init_type" title="Link to this definition">¶</a></dt>
-<dd><p>Initialises type of initial state.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.comm">
-<span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.comm" title="Link to this definition">¶</a></dt>
-<dd><p>Communicator.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.fft">
 <span class="sig-name descname"><span class="pre">fft</span></span><a class="headerlink" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.fft" title="Link to this definition">¶</a></dt>
@@ -325,16 +235,6 @@ side will be treated explicitly using <code class="docutils literal notranslate"
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.AllenCahn_Temp_MPIFFT module</a><ul>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex"><code class="docutils literal notranslate"><span class="pre">allencahn_temp_imex</span></code></a><ul>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.nvars"><code class="docutils literal notranslate"><span class="pre">nvars</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.eps"><code class="docutils literal notranslate"><span class="pre">eps</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.radius"><code class="docutils literal notranslate"><span class="pre">radius</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.spectral"><code class="docutils literal notranslate"><span class="pre">spectral</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.TM"><code class="docutils literal notranslate"><span class="pre">TM</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.D"><code class="docutils literal notranslate"><span class="pre">D</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.dw"><code class="docutils literal notranslate"><span class="pre">dw</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.L"><code class="docutils literal notranslate"><span class="pre">L</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.init_type"><code class="docutils literal notranslate"><span class="pre">init_type</span></code></a></li>
-<li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.comm"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.fft"><code class="docutils literal notranslate"><span class="pre">fft</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.X"><code class="docutils literal notranslate"><span class="pre">X</span></code></a></li>
 <li><a class="reference internal" href="#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.K2"><code class="docutils literal notranslate"><span class="pre">K2</span></code></a></li>

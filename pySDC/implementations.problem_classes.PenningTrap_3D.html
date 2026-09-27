@@ -90,9 +90,8 @@ For to solve nonlinear equation of system, Boris trick is used (see <a class="fo
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>omega_B</strong> (<em>float</em>) – Amplitude of magnetic field.</p></li>
 <li><p><strong>omega_E</strong> (<em>float</em>) – Amplitude of electric field.</p></li>
-<li><p><strong>u0</strong> (<em>np.1darray</em>) – Initial condition for position, and for velocity.</p></li>
-<li><p><strong>q</strong> (<em>np.1darray</em>) – Particle’s charge.</p></li>
-<li><p><strong>m</strong> (<em>np.1darray</em>) – Mass.</p></li>
+<li><p><strong>u0</strong> (<em>np.1darray</em>) – Initial condition <code class="docutils literal notranslate"><span class="pre">[pos,</span> <span class="pre">vel,</span> <span class="pre">[q],</span> <span class="pre">[m]]</span></code>: position and velocity (three components each) around which the
+particles are placed, and the particles’ charge and mass (so far only <span class="math notranslate nohighlight">\(q = m = 1\)</span> is implemented).</p></li>
 <li><p><strong>nparts</strong> (<em>int</em>) – The number of particles.</p></li>
 <li><p><strong>sig</strong> (<em>float</em>) – The smoothing parameter <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>.</p></li>
 </ul>

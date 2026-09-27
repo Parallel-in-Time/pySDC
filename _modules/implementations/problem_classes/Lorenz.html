@@ -92,6 +92,8 @@
 <span class="sd">        Tolerance for Newton for termination.</span>
 <span class="sd">    newton_maxiter : int, optional</span>
 <span class="sd">        Maximum number of iterations for Newton's method.</span>
+<span class="sd">    stop_at_nan : bool, optional</span>
+<span class="sd">        Indicates that the Newton solver should raise an error if ``nan`` values arise, instead of only warning.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -160,7 +162,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        rhs : dtype_f</span>
 <span class="sd">            Right-hand side for the nonlinear system.</span>
-<span class="sd">        factor : float</span>
+<span class="sd">        dt : float</span>
 <span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
 <span class="sd">        u0 : dtype_u</span>
 <span class="sd">            Initial guess for the iterative solver</span>

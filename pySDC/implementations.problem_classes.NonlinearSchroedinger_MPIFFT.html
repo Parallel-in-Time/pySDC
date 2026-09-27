@@ -57,12 +57,30 @@
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u\]</div>
 <p>for fixed parameter <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(N=2, 3\)</span>. The linear parts of the problem will be discretized using
-<code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a href="#id6"><span class="problematic" id="id1">[1]_</span></a>. For time-stepping, the problem will be solved <em>fully-implicitly</em>, i.e., the nonlinear system containing
-the full right-hand side is solved by GMRES method.</p>
+<code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. For time-stepping, the problem will be solved <em>fully-implicitly</em>, i.e., the nonlinear system containing
+the full right-hand side is solved by a Newton-Krylov method <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lintol</strong> (<em>float</em><em>, </em><em>optional</em>) – Absolute tolerance for the <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> Newton-Krylov solver, passed as <code class="docutils literal notranslate"><span class="pre">x_tol</span></code>, i.e., applied to the
+maximum norm of the Newton step. <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> additionally requires the maximum norm of the residual to be below
+its default <code class="docutils literal notranslate"><span class="pre">f_tol</span></code> of about <code class="docutils literal notranslate"><span class="pre">6e-6</span></code>.</p></li>
+<li><p><strong>liniter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of Newton iterations of the Newton-Krylov solver, passed as <code class="docutils literal notranslate"><span class="pre">maxiter</span></code>. If the solver does not
+converge, the last iterate is used without a warning.</p></li>
+<li><p><strong>**kwargs</strong> – Passed on to <code class="docutils literal notranslate"><span class="pre">nonlinearschroedinger_imex</span></code>, see there: <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">nvars</span></code>, <code class="docutils literal notranslate"><span class="pre">spectral</span></code> and <code class="docutils literal notranslate"><span class="pre">comm</span></code>.
+<code class="docutils literal notranslate"><span class="pre">useGPU</span></code> has to be False.</p></li>
+</ul>
+</dd>
+</dl>
 <p class="rubric">References</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id2" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+Journal of Parallel and Distributed Computing (2019).</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html</a></p>
 </aside>
 </aside>
@@ -102,7 +120,7 @@ the full right-hand side is solved by GMRES method.</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/NonlinearSchroedinger_MPIFFT.html#nonlinearschroedinger_fully_implicit.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_fully_implicit.solve_system" title="Link to this definition">¶</a></dt>
 <dd><p>Solve the nonlinear system <span class="math notranslate nohighlight">\((1 - factor \cdot f)(\vec{u}) = \vec{rhs}\)</span> using a <code class="docutils literal notranslate"><span class="pre">SciPy</span></code> Newton-Krylov
-solver. See page <a href="#id7"><span class="problematic" id="id3">[1]_</span></a> for details on the solver.</p>
+solver, see <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html">scipy.optimize.newton_krylov</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -131,14 +149,13 @@ solver. See page <a href="#id7"><span class="problematic" id="id3">[1]_</span></
 <div class="math notranslate nohighlight">
 \[\frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u\]</div>
 <p>for fixed parameter <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(N=2, 3\)</span>. The linear parts of the problem will be solved using
-<code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a href="#id8"><span class="problematic" id="id4">[1]_</span></a>. <em>Semi-explicit</em> time-stepping is used here to solve the problem in the temporal dimension, i.e., the
+<code class="docutils literal notranslate"><span class="pre">mpi4py-fft</span></code> <a class="footnote-reference brackets" href="#id6" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. <em>Semi-explicit</em> time-stepping is used here to solve the problem in the temporal dimension, i.e., the
 Laplacian will be handled implicitly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nvars</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Spatial resolution</p></li>
 <li><p><strong>spectral</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the solution is computed in spectral space.</p></li>
-<li><p><strong>L</strong> (<em>float</em><em>, </em><em>optional</em>) – Denotes the period of the function to be approximated for the Fourier transform.</p></li>
 <li><p><strong>c</strong> (<em>float</em><em>, </em><em>optional</em>) – Nonlinearity parameter.</p></li>
 <li><p><strong>comm</strong> (<em>MPI.COMM_World</em>) – Communicator for parallelisation.</p></li>
 </ul>
@@ -179,8 +196,8 @@ Laplacian will be handled implicitly.</p>
 
 <p class="rubric">References</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id5" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">3</a><span class="fn-bracket">]</span></span>
 <p>Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
 Journal of Parallel and Distributed Computing (2019).</p>
 </aside>
@@ -197,7 +214,7 @@ Journal of Parallel and Distributed Computing (2019).</p>
 <dd class="field-even"><p><strong>u</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>

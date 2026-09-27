@@ -67,6 +67,15 @@ the solution changes when the state function <span class="math notranslate nohig
 </div></blockquote>
 <p>where <span class="math notranslate nohighlight">\(t^* = \log(5) \approx 1.6094379\)</span>. For <span class="math notranslate nohighlight">\(h(u) &lt; 0\)</span>, i.e. <span class="math notranslate nohighlight">\(t \leq t^*\)</span>, the exact solution is
 <span class="math notranslate nohighlight">\(u(t) = \exp(t)\)</span>; for <span class="math notranslate nohighlight">\(h(u) \geq 0\)</span>, i.e. <span class="math notranslate nohighlight">\(t \geq t^*\)</span>, the exact solution is <span class="math notranslate nohighlight">\(u(t) = \frac{4 t}{t^*} + 1\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for Newton’s method.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Absolute tolerance for Newton’s method to terminate, applied to the maximum norm of the residual.</p></li>
+<li><p><strong>stop_at_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates that the Newton solver should stop if <code class="docutils literal notranslate"><span class="pre">nan</span></code> values arise.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact">
 <span class="sig-name descname"><span class="pre">t_switch_exact</span></span><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.t_switch_exact" title="Link to this definition">¶</a></dt>
@@ -225,6 +234,15 @@ step.</p>
 <dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE" title="implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscontinuousTestODE</span></code></a></p>
 <p>Dummy ODE problem for testing the <code class="docutils literal notranslate"><span class="pre">SwitchEstimator</span></code> class. The problem contains the exact dynamics
 of the problem class <code class="docutils literal notranslate"><span class="pre">DiscontinuousTestODE</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>newton_maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for Newton’s method. Not used here, since <code class="docutils literal notranslate"><span class="pre">solve_system</span></code> returns the exact
+solution.</p></li>
+<li><p><strong>newton_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Tolerance for Newton’s method to terminate. Not used here, since <code class="docutils literal notranslate"><span class="pre">solve_system</span></code> returns the exact solution.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.DiscontinuousTestODE.ExactDiscontinuousTestODE.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/DiscontinuousTestODE.html#ExactDiscontinuousTestODE.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.DiscontinuousTestODE.ExactDiscontinuousTestODE.eval_f" title="Link to this definition">¶</a></dt>
@@ -232,7 +250,7 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Exact value of u.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Exact value of u.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time <span class="math notranslate nohighlight">\(t\)</span>.</p></li>
 </ul>
 </dd>
@@ -240,7 +258,7 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
 <dd class="field-even"><p><strong>f</strong> – Derivative.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_f" title="core.problem.Problem.dtype_f">dtype_f</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id0" title="core.problem.Problem.dtype_f">dtype_f</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -252,9 +270,9 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_f" title="core.problem.Problem.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
+<li><p><strong>rhs</strong> (<a class="reference internal" href="core.problem.html#id0" title="core.problem.Problem.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -262,7 +280,7 @@ of the problem class <code class="docutils literal notranslate"><span class="pre
 <dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>

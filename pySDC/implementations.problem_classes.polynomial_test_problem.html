@@ -13,6 +13,7 @@
     <script src="../_static/documentation_options.js?v=cd132f8b"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -54,6 +55,15 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></p>
 <p>Dummy problem for tests only! In particular, the <cite>solve_system</cite> function just returns the exact solution instead of
 solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>degree</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of coefficients of the polynomial, i.e., the polynomial has degree <code class="docutils literal notranslate"><span class="pre">degree</span> <span class="pre">-</span> <span class="pre">1</span></code>.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Seed for <code class="docutils literal notranslate"><span class="pre">np.random.RandomState</span></code>, which draws the coefficients uniformly from <span class="math notranslate nohighlight">\([0, 1)\)</span>.</p></li>
+<li><p><strong>useGPU</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use <code class="docutils literal notranslate"><span class="pre">CuPy</span></code> for the solution. This switches the data types of the class, not only of this instance.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f">
 <span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#implementations.problem_classes.polynomial_test_problem.polynomial_testequation.dtype_f" title="Link to this definition">¶</a></dt>
@@ -116,8 +126,8 @@ solving an appropriate system. This class is indented to be used for tests of op
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>float</em>) – Time of the exact solution.</p></li>
-<li><p><strong>u_init</strong> (<em>pySDC.problem.testequation0d.dtype_u</em>) – Initial solution.</p></li>
-<li><p><strong>t_init</strong> (<em>float</em>) – The initial time.</p></li>
+<li><p><strong>**kwargs</strong> – Takes <code class="docutils literal notranslate"><span class="pre">u_init</span></code> and <code class="docutils literal notranslate"><span class="pre">t_init</span></code> of the generic interface, which are ignored since the polynomial is known
+everywhere.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -155,7 +165,7 @@ Keep in mind that you still cannot Really perform any solves.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>

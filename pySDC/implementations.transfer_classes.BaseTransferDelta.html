@@ -50,9 +50,9 @@
   <section id="module-implementations.transfer_classes.BaseTransferDelta">
 <span id="implementations-transfer-classes-basetransferdelta-module"></span><h1>implementations.transfer_classes.BaseTransferDelta module<a class="headerlink" href="#module-implementations.transfer_classes.BaseTransferDelta" title="Link to this heading">¶</a></h1>
 <p>Space-time transfer for the delta-form hierarchy.</p>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> makes a coarse level rebuild its own residual from <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span>
-coarse data and recovers the coarse-grid correction as <span class="math notranslate nohighlight">\(u_G - u_G^{\mathrm{old}}\)</span>. Both have
-exact algebraic replacements – <span class="math notranslate nohighlight">\(\varepsilon_G = R\varepsilon_F\)</span>, which is what the FAS
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> makes a coarse level rebuild its own residual from
+<span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> coarse data and recovers the coarse-grid correction as <span class="math notranslate nohighlight">\(u_G - u_G^{\mathrm{old}}\)</span>.
+Both have exact algebraic replacements – <span class="math notranslate nohighlight">\(\varepsilon_G = R\varepsilon_F\)</span>, which is what the FAS
 <span class="math notranslate nohighlight">\(\tau\)</span> is <em>for</em>, and the correction is the sum of the sweep’s own increments – and this
 transfer uses those instead. It is what decides whether a level rebuilds its residual or is handed
 one: the delta-form sweepers do both, and this is what hands one down.</p>
@@ -63,8 +63,8 @@ identically and leaves <span class="math notranslate nohighlight">\(R\varepsilon
 precisely the FAS-corrected problem – and must <em>not</em> also add <span class="math notranslate nohighlight">\(\tau\)</span>, which would count it
 twice. What is skipped is materialising <span class="math notranslate nohighlight">\(\tau\)</span> as an array, since the quantity it exists to
 produce arrives directly.</p>
-<p>Identical to <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> up to round-off at backend precision, verified for two, three and
-four levels and for PFASST – and against a control with <span class="math notranslate nohighlight">\(\tau\)</span> genuinely zeroed, which does
+<p>Identical to <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> up to round-off at backend precision, verified
+for two, three and four levels and for PFASST – and against a control with <span class="math notranslate nohighlight">\(\tau\)</span> genuinely zeroed, which does
 not converge at all. It is also slightly cheaper, because nothing then reads <span class="math notranslate nohighlight">\(\tau\)</span> except
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_end_point()</span></code> in the quadrature-update case: see <a class="reference internal" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict" title="implementations.transfer_classes.BaseTransferDelta.delta_transfer.restrict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delta_transfer.restrict()</span></code></a>.</p>
 <p>What the reformulation buys is that every coarse-level quantity becomes proportional to the fine
@@ -77,8 +77,8 @@ below backend precision without capping the accuracy of the iteration.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">delta_transfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.level.html#core.level.Level" title="core.level.Level"><span class="pre">Level</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core.level.html#core.level.Level" title="core.level.Level"><span class="pre">Level</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_transfer_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransferDelta.html#delta_transfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransferDelta.delta_transfer" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code></p>
 <p>Space-time transfer that passes a residual down and an accumulated correction up.</p>
-<p>Drop-in for <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code>, and identical to it up to round-off when every level is at
-backend precision. Falls back to the stock prolongation when the coarse level has banked no
+<p>Drop-in for <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code>, and identical to it up to round-off when every
+level is at backend precision. Falls back to the stock prolongation when the coarse level has banked no
 corrections, so a hierarchy mixing delta-form and stock sweepers still runs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.transfer_classes.BaseTransferDelta.delta_transfer.coarse_reads_tau">

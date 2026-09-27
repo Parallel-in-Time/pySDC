@@ -179,9 +179,11 @@
 <span class="sd">            v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.</span>
 
 <span class="sd">        :math:`max_{index}` is initialized to :math:`-1`. List "switch" contains a True if :math:`v_k \leq V_{ref,k-1}` is satisfied.</span>
-<span class="sd">            - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.</span>
-<span class="sd">            - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.</span>
-<span class="sd">              So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.</span>
+
+<span class="sd">        - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.</span>
+<span class="sd">        - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.</span>
+<span class="sd">          So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.</span>
+
 <span class="sd">        In case of using the switch estimator, we count the number of switches which illustrates in which case of voltage source we are.</span>
 
 <span class="sd">        Parameters</span>
@@ -386,6 +388,28 @@
 <span class="sd">        \frac{d v_1(t)}{dt} = 0,</span>
 
 <span class="sd">    where :math:`i_L` denotes the function of the current over time :math:`t`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ncapacitors : int, optional</span>
+<span class="sd">        Number of capacitors in the circuit. Has to be one here, since the right-hand side and the solver are</span>
+<span class="sd">        implemented for a single capacitor only.</span>
+<span class="sd">    Vs : float, optional</span>
+<span class="sd">        Voltage at the voltage source :math:`V_s`.</span>
+<span class="sd">    Rs : float, optional</span>
+<span class="sd">        Resistance of the resistor :math:`R_s` at the voltage source.</span>
+<span class="sd">    C : np.1darray, optional</span>
+<span class="sd">        Capacitance of the capacitor as an array of length one. ``None`` means ``np.array([1.0])``.</span>
+<span class="sd">    R : float, optional</span>
+<span class="sd">        Resistance for the load :math:`R_\ell`.</span>
+<span class="sd">    L : float, optional</span>
+<span class="sd">        Inductance of inductor :math:`L`.</span>
+<span class="sd">    alpha : float, optional</span>
+<span class="sd">        Factor greater than zero to describe the storage of the capacitor. The initial voltage of the capacitor is</span>
+<span class="sd">        :math:`\alpha V_{ref, 0}`.</span>
+<span class="sd">    V_ref : np.1darray, optional</span>
+<span class="sd">        Reference value :math:`V_{ref, 0}` greater than zero for the battery to switch to the voltage source, as an</span>
+<span class="sd">        array of length one. ``None`` means ``np.array([1.0])``.</span>
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>

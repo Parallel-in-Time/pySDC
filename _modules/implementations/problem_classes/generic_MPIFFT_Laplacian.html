@@ -68,6 +68,12 @@
 <span class="sd">        Multiplicative factor before the Laplacian</span>
 <span class="sd">    comm : MPI.COMM_World</span>
 <span class="sd">        Communicator for parallelisation.</span>
+<span class="sd">    dtype : numpy.dtype or str, optional</span>
+<span class="sd">        Datatype of the solution in real space, e.g. ``'d'`` for real or ``'D'`` for complex problems.</span>
+<span class="sd">    useGPU : bool, optional</span>
+<span class="sd">        Run on the GPU with CuPy and NCCL instead of on the CPU with NumPy and MPI.</span>
+<span class="sd">    x0 : float, optional</span>
+<span class="sd">        Coordinate of the left boundary of the domain in each direction.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>

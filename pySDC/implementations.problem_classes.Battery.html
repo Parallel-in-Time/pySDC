@@ -68,6 +68,23 @@ the following equations:</p>
 <div class="math notranslate nohighlight">
 \[\frac{d v_1(t)}{dt} = 0,\]</div>
 <p>where <span class="math notranslate nohighlight">\(i_L\)</span> denotes the function of the current over time <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ncapacitors</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of capacitors in the circuit. Has to be one here, since the right-hand side and the solver are
+implemented for a single capacitor only.</p></li>
+<li><p><strong>Vs</strong> (<em>float</em><em>, </em><em>optional</em>) – Voltage at the voltage source <span class="math notranslate nohighlight">\(V_s\)</span>.</p></li>
+<li><p><strong>Rs</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance of the resistor <span class="math notranslate nohighlight">\(R_s\)</span> at the voltage source.</p></li>
+<li><p><strong>C</strong> (<em>np.1darray</em><em>, </em><em>optional</em>) – Capacitance of the capacitor as an array of length one. <code class="docutils literal notranslate"><span class="pre">None</span></code> means <code class="docutils literal notranslate"><span class="pre">np.array([1.0])</span></code>.</p></li>
+<li><p><strong>R</strong> (<em>float</em><em>, </em><em>optional</em>) – Resistance for the load <span class="math notranslate nohighlight">\(R_\ell\)</span>.</p></li>
+<li><p><strong>L</strong> (<em>float</em><em>, </em><em>optional</em>) – Inductance of inductor <span class="math notranslate nohighlight">\(L\)</span>.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Factor greater than zero to describe the storage of the capacitor. The initial voltage of the capacitor is
+<span class="math notranslate nohighlight">\(\alpha V_{ref, 0}\)</span>.</p></li>
+<li><p><strong>V_ref</strong> (<em>np.1darray</em><em>, </em><em>optional</em>) – Reference value <span class="math notranslate nohighlight">\(V_{ref, 0}\)</span> greater than zero for the battery to switch to the voltage source, as an
+array of length one. <code class="docutils literal notranslate"><span class="pre">None</span></code> means <code class="docutils literal notranslate"><span class="pre">np.array([1.0])</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This class has the same attributes as the class it inherits from.</p>
@@ -85,7 +102,7 @@ the following equations:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -107,7 +124,7 @@ the following equations:</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.Battery.battery.dtype_f" title="implementations.problem_classes.Battery.battery.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the linear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -115,7 +132,7 @@ the following equations:</p>
 <dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -132,7 +149,7 @@ the following equations:</p>
 <dd class="field-even"><p><strong>me</strong> – The exact solution.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -184,7 +201,7 @@ the following equations:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
+<li><p><strong>u</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Current values of the numerical solution.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time of the numerical solution is computed.</p></li>
 </ul>
 </dd>
@@ -206,7 +223,7 @@ the following equations:</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rhs</strong> (<a class="reference internal" href="#implementations.problem_classes.Battery.battery_implicit.dtype_f" title="implementations.problem_classes.Battery.battery_implicit.dtype_f"><em>dtype_f</em></a>) – Right-hand side for the nonlinear system.</p></li>
 <li><p><strong>factor</strong> (<em>float</em>) – Abbrev. for the local stepsize (or any other factor required).</p></li>
-<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver</p></li>
+<li><p><strong>u0</strong> (<a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u"><em>dtype_u</em></a>) – Initial guess for the iterative solver</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Current time (e.g. for time-dependent BCs).</p></li>
 </ul>
 </dd>
@@ -214,7 +231,7 @@ the following equations:</p>
 <dd class="field-even"><p><strong>me</strong> – The solution as mesh.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -344,14 +361,12 @@ with reference value <span class="math notranslate nohighlight">\(V_{ref, k-1}\)
 <p><span class="math notranslate nohighlight">\(V_s\)</span> supplies energy if:</p>
 <div class="math notranslate nohighlight">
 \[v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.\]</div>
-<dl class="simple">
-<dt><span class="math notranslate nohighlight">\(max_{index}\)</span> is initialized to <span class="math notranslate nohighlight">\(-1\)</span>. List “switch” contains a True if <span class="math notranslate nohighlight">\(v_k \leq V_{ref,k-1}\)</span> is satisfied.</dt><dd><ul class="simple">
+<p><span class="math notranslate nohighlight">\(max_{index}\)</span> is initialized to <span class="math notranslate nohighlight">\(-1\)</span>. List “switch” contains a True if <span class="math notranslate nohighlight">\(v_k \leq V_{ref,k-1}\)</span> is satisfied.</p>
+<ul class="simple">
 <li><p>Is no True there (i.e., <span class="math notranslate nohighlight">\(max_{index}=-1\)</span>), we are in the first case.</p></li>
 <li><p><span class="math notranslate nohighlight">\(max_{index}=k\geq 0\)</span> means we are in the <span class="math notranslate nohighlight">\((k+1)\)</span>-th case.
 So, the actual RHS has key <span class="math notranslate nohighlight">\(max_{index}\)</span>-1 in the dictionary self.switch_f.</p></li>
 </ul>
-</dd>
-</dl>
 <p>In case of using the switch estimator, we count the number of switches which illustrates in which case of voltage source we are.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

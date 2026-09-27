@@ -106,11 +106,8 @@
 <span class="sd">    omega_E : float</span>
 <span class="sd">        Amplitude of electric field.</span>
 <span class="sd">    u0 : np.1darray</span>
-<span class="sd">        Initial condition for position, and for velocity.</span>
-<span class="sd">    q : np.1darray</span>
-<span class="sd">        Particle's charge.</span>
-<span class="sd">    m : np.1darray</span>
-<span class="sd">        Mass.</span>
+<span class="sd">        Initial condition ``[pos, vel, [q], [m]]``: position and velocity (three components each) around which the</span>
+<span class="sd">        particles are placed, and the particles' charge and mass (so far only :math:`q = m = 1` is implemented).</span>
 <span class="sd">    nparts : int</span>
 <span class="sd">        The number of particles.</span>
 <span class="sd">    sig : float</span>

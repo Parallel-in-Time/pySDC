@@ -78,8 +78,9 @@ solver a small unknown.</p>
 <span class="math notranslate nohighlight">\(\alpha f(0, t)\)</span> is removed from the right-hand side. No problem class needs changing.</p>
 </dd>
 <dt>fallback</dt><dd><p>Otherwise the substitution <span class="math notranslate nohighlight">\(y = u^k_m + \delta_m\)</span> reduces the correction equation to the
-ordinary implicit solve. Always correct and identical to <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code>, but the
-solver sees an <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> unknown, so there is no precision benefit.</p>
+ordinary implicit solve. Always correct and identical to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code>, but the solver sees an
+<span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> unknown, so there is no precision benefit.</p>
 </dd>
 </dl>
 <p><code class="docutils literal notranslate"><span class="pre">correction_precision</span></code> additionally stores the small quantities
@@ -94,8 +95,8 @@ backend precision.</p>
 by the choice of sweeper. On the finest level it computes its own residual, which is where the
 accuracy of the whole iteration is set. Given a transfer that hands one down – by setting
 <code class="docutils literal notranslate"><span class="pre">eps_in</span></code> on the level’s sweeper – it uses that instead and advances it in place, so nothing is
-ever rebuilt out of <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> coarse state. <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> hands nothing down,
-so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.</p>
+ever rebuilt out of <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> coarse state. <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code> hands
+nothing down, so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.delta_form.DeltaFormMixin">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DeltaFormMixin</span></span><a class="reference internal" href="../_modules/implementations/sweeper_classes/delta_form.html#DeltaFormMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.delta_form.DeltaFormMixin" title="Link to this definition">¶</a></dt>
@@ -225,14 +226,14 @@ parameters <code class="docutils literal notranslate"><span class="pre">correcti
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prob</strong> (<em>pySDC.core.problem.Problem</em>) – The problem the increment belongs to.</p></li>
-<li><p><strong>increment</strong> (<a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_f" title="core.problem.Problem.dtype_f"><em>dtype_f</em></a>) – The increment, possibly split into <code class="docutils literal notranslate"><span class="pre">impl</span></code> and <code class="docutils literal notranslate"><span class="pre">expl</span></code>.</p></li>
+<li><p><strong>increment</strong> (<a class="reference internal" href="core.problem.html#id0" title="core.problem.Problem.dtype_f"><em>dtype_f</em></a>) – The increment, possibly split into <code class="docutils literal notranslate"><span class="pre">impl</span></code> and <code class="docutils literal notranslate"><span class="pre">expl</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The sum of the parts.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -54,9 +54,9 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sweeper</span></code></p>
 <p>MPI based sweeper where each rank administers one collocation node. Adapt sweepers to MPI by use of multiple inheritance.
 See for example the <cite>generic_implicit_MPI</cite> sweeper, which has a class definition:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">class</span> <span class="pre">generic_implicit_MPI(SweeperMPI,</span> <span class="pre">generic_implicit):</span>
-<span class="pre">`</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">generic_implicit_MPI</span><span class="p">(</span><span class="n">SweeperMPI</span><span class="p">,</span> <span class="n">generic_implicit</span><span class="p">):</span>
+</pre></div>
+</div>
 <p>this means in inherits both from <cite>SweeperMPI</cite> and <cite>generic_implicit</cite>. The hierarchy works such that functions are first
 called from <cite>SweeperMPI</cite> and then from <cite>generic_implicit</cite>. For instance, in the <cite>__init__</cite> function, the <cite>SweeperMPI</cite>
 class adds a communicator and nothing else. The <cite>generic_implicit</cite> implicit class adds a preconditioner and so on.
@@ -152,7 +152,7 @@ Please supply a communicator as <cite>comm</cite> to the parameters!</p>
 <dd class="field-even"><p>containing the integral as values</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of <a class="reference internal" href="core.problem.html#core.problem.Problem.dtype_u" title="core.problem.Problem.dtype_u">dtype_u</a></p>
+<dd class="field-odd"><p>list of <a class="reference internal" href="core.problem.html#id1" title="core.problem.Problem.dtype_u">dtype_u</a></p>
 </dd>
 </dl>
 </dd></dl>

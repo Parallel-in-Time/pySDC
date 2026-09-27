@@ -89,6 +89,8 @@
 <span class="sd">        Tolerance for linear solver to terminate.</span>
 <span class="sd">    lin_maxiter : int, optional</span>
 <span class="sd">        Maximum number of iterations for the linear solver.</span>
+<span class="sd">    inexact_linear_ratio : float, optional</span>
+<span class="sd">        Ratio of tolerance of linear solver to the Newton residual, overrides ``lin_tol`` if set.</span>
 <span class="sd">    radius : float, optional</span>
 <span class="sd">        Radius of the circles.</span>
 <span class="sd">    order : int, optional</span>
@@ -363,6 +365,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        t : float</span>
 <span class="sd">            Time of the exact solution.</span>
+<span class="sd">        u_init : dtype_u, optional</span>
+<span class="sd">            Initial conditions for getting the exact solution.</span>
+<span class="sd">        t_init : float, optional</span>
+<span class="sd">            The starting time.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -494,6 +500,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        t : float</span>
 <span class="sd">            Time of the exact solution.</span>
+<span class="sd">        u_init : dtype_u, optional</span>
+<span class="sd">            Initial conditions for getting the exact solution.</span>
+<span class="sd">        t_init : float, optional</span>
+<span class="sd">            The starting time.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

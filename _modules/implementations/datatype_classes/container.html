@@ -53,11 +53,11 @@
 <span class="sd">    To make a specific multi-component datatype, derive from this class, list the components as strings in</span>
 <span class="sd">    ``components``, and say what a single component is in ``component_type``. An example:</span>
 
-<span class="sd">    ```</span>
-<span class="sd">    class rhs_fenics_mesh(MultiComponentContainer):</span>
-<span class="sd">        components = ['impl', 'expl']</span>
-<span class="sd">        component_type = fenics_mesh</span>
-<span class="sd">    ```</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        class rhs_fenics_mesh(MultiComponentContainer):</span>
+<span class="sd">            components = ['impl', 'expl']</span>
+<span class="sd">            component_type = fenics_mesh</span>
 
 <span class="sd">    Instantiating such a datatype builds one component of ``component_type`` per name, either by copying the</span>
 <span class="sd">    components of another instance or by passing ``init`` and ``val`` on to each of them. The arithmetic is</span>

@@ -77,8 +77,9 @@
 
 <span class="sd">fallback</span>
 <span class="sd">    Otherwise the substitution :math:`y = u^k_m + \delta_m` reduces the correction equation to the</span>
-<span class="sd">    ordinary implicit solve. Always correct and identical to :class:`generic_implicit`, but the</span>
-<span class="sd">    solver sees an :math:`\mathcal{O}(1)` unknown, so there is no precision benefit.</span>
+<span class="sd">    ordinary implicit solve. Always correct and identical to</span>
+<span class="sd">    :class:`~pySDC.implementations.sweeper_classes.generic_implicit.generic_implicit`, but the solver sees an</span>
+<span class="sd">    :math:`\mathcal{O}(1)` unknown, so there is no precision benefit.</span>
 
 <span class="sd">``correction_precision`` additionally stores the small quantities</span>
 <span class="sd">(:math:`\varepsilon`, :math:`\delta`, :math:`\Delta f`) in a reduced-precision datatype built from</span>
@@ -94,8 +95,8 @@
 <span class="sd">by the choice of sweeper. On the finest level it computes its own residual, which is where the</span>
 <span class="sd">accuracy of the whole iteration is set. Given a transfer that hands one down -- by setting</span>
 <span class="sd">``eps_in`` on the level's sweeper -- it uses that instead and advances it in place, so nothing is</span>
-<span class="sd">ever rebuilt out of :math:`\mathcal{O}(1)` coarse state. :class:`BaseTransfer` hands nothing down,</span>
-<span class="sd">so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.</span>
+<span class="sd">ever rebuilt out of :math:`\mathcal{O}(1)` coarse state. :class:`~pySDC.core.base_transfer.BaseTransfer` hands</span>
+<span class="sd">nothing down, so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.</span>
 <span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -482,7 +483,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.delta_implicit">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">delta_implicit</span><span class="p">(</span><span class="n">DeltaFormMixin</span><span class="p">,</span> <span class="n">generic_implicit</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Delta-form counterpart of :class:`generic_implicit`.</span>
+<span class="sd">    Delta-form counterpart of :class:`~pySDC.implementations.sweeper_classes.generic_implicit.generic_implicit`.</span>
 
 <span class="sd">    Mathematically identical to the standard sweep; see the module docstring for the sweeper</span>
 <span class="sd">    parameters ``correction_precision`` and ``linear_implicit``.</span>
@@ -536,7 +537,7 @@
 <a class="viewcode-back" href="../../../pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.delta_imex_1st_order">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">delta_imex_1st_order</span><span class="p">(</span><span class="n">DeltaFormMixin</span><span class="p">,</span> <span class="n">imex_1st_order</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Delta-form counterpart of :class:`imex_1st_order`.</span>
+<span class="sd">    Delta-form counterpart of :class:`~pySDC.implementations.sweeper_classes.imex_1st_order.imex_1st_order`.</span>
 
 <span class="sd">    The correction equation contains only differences of ``f``, never a Jacobian, so the</span>
 <span class="sd">    explicit/implicit splitting is untouched.</span>
@@ -546,7 +547,8 @@
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Perform one delta-form IMEX sweep over all collocation nodes.</span>
 
-<span class="sd">        ``QE`` is strictly lower triangular, which :class:`imex_1st_order` already enforces, so the</span>
+<span class="sd">        ``QE`` is strictly lower triangular, which</span>
+<span class="sd">        :class:`~pySDC.implementations.sweeper_classes.imex_1st_order.imex_1st_order` already enforces, so the</span>
 <span class="sd">        explicit part never contributes to the node-local solve.</span>
 
 <span class="sd">        Returns</span>

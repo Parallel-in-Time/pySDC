@@ -87,6 +87,8 @@ Keep in mind that the boundary conditions may require further modification of th
 <li><p><strong>dim</strong> (<em>int</em>) – Number of dimensions</p></li>
 <li><p><strong>bc</strong> (<em>str</em>) – Boundary conditions for both sides</p></li>
 <li><p><strong>cupy</strong> (<em>bool</em>) – Construct a GPU ready matrix if yes</p></li>
+<li><p><strong>bc_params</strong> (<em>dict</em><em> or </em><em>list</em><em> of </em><em>dicts</em>) – Parameters <cite>val</cite>, <cite>neumann_bc_order</cite> and <cite>reduce</cite> of Dirichlet and Neumann
+BCs, for both sides or one dict per side</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -132,7 +134,6 @@ numpy.ndarray: The offsets for the stencil</p>
 <li><p><strong>derivative</strong> (<em>int</em>) – Order of the derivative</p></li>
 <li><p><strong>order</strong> (<em>int</em>) – Order of accuracy</p></li>
 <li><p><strong>stencil_type</strong> (<em>str</em>) – Type of the stencil</p></li>
-<li><p><strong>steps</strong> (<em>list</em>) – Provide specific steps, overrides <cite>stencil_type</cite></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

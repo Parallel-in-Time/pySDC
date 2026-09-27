@@ -63,20 +63,18 @@
 <p>Mix this into a mesh datatype to obtain the multi-component version of it, as <code class="docutils literal notranslate"><span class="pre">MultiComponentMesh</span></code> does for
 <code class="docutils literal notranslate"><span class="pre">mesh</span></code> and <code class="docutils literal notranslate"><span class="pre">CuPyMultiComponentMesh</span></code> does for <code class="docutils literal notranslate"><span class="pre">cupy_mesh</span></code>. To make a specific multi-component mesh, derive
 from one of those and list the components as strings in the class attribute <code class="docutils literal notranslate"><span class="pre">components</span></code>. An example:</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
-class imex_mesh(MultiComponentMesh):</p>
-<blockquote>
-<div><p>components = [‘impl’, ‘expl’]</p>
-</div></blockquote>
-<p><a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">imex_mesh</span><span class="p">(</span><span class="n">MultiComponentMesh</span><span class="p">):</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'impl'</span><span class="p">,</span> <span class="s1">'expl'</span><span class="p">]</span>
+</pre></div>
+</div>
 <p>Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access
 to the components with <code class="docutils literal notranslate"><span class="pre">.</span></code>. Continuing the above example:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">init</span> <span class="pre">=</span> <span class="pre">((100,),</span> <span class="pre">None,</span> <span class="pre">numpy.dtype('d'))</span>
-<span class="pre">f</span> <span class="pre">=</span> <span class="pre">imex_mesh(init)</span>
-<span class="pre">f.shape</span>&#160; <span class="pre">#</span> <span class="pre">(2,</span> <span class="pre">100)</span>
-<span class="pre">f.expl.shape</span>&#160; <span class="pre">#</span> <span class="pre">(100,)</span>
-<span class="pre">`</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">init</span> <span class="o">=</span> <span class="p">((</span><span class="mi">100</span><span class="p">,),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">'d'</span><span class="p">))</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">imex_mesh</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># (2, 100)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># (100,)</span>
+</pre></div>
+</div>
 <p>The components are properties, generated when the subclass is created. Both <code class="docutils literal notranslate"><span class="pre">f.expl[:]</span> <span class="pre">=</span> <span class="pre">...</span></code> and
 <code class="docutils literal notranslate"><span class="pre">f.expl</span> <span class="pre">=</span> <span class="pre">...</span></code> write into the mesh; the component is never replaced by an unrelated object. Because the
 properties live on the class, you cannot name a component like something that is already an attribute of the

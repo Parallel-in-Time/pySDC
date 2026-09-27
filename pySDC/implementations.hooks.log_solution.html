@@ -176,12 +176,10 @@
 <p>Hook for logging the solution to file after the step using pickle.</p>
 <p>Please configure the hook to your liking by setting class attributes on a subclass, so that other runs in the same
 process are not affected. You must set a custom path to a directory like so:</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
-class MyLogToPickleFile(LogToPickleFile):</p>
-<blockquote>
-<div><p>path = ‘/my/directory/’</p>
-</div></blockquote>
-<p><a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyLogToPickleFile</span><span class="p">(</span><span class="n">LogToPickleFile</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s1">'/my/directory/'</span>
+</pre></div>
+</div>
 <p>Keep in mind that the hook will overwrite files without warning!
 You can give a custom file name by setting the <code class="docutils literal notranslate"><span class="pre">file_name</span></code> class attribute and give a custom way of rendering the
 index associated with individual files by giving a different function <code class="docutils literal notranslate"><span class="pre">format_index</span></code> class attribute. This should

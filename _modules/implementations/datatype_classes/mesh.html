@@ -231,20 +231,20 @@
 <span class="sd">    ``mesh`` and ``CuPyMultiComponentMesh`` does for ``cupy_mesh``. To make a specific multi-component mesh, derive</span>
 <span class="sd">    from one of those and list the components as strings in the class attribute ``components``. An example:</span>
 
-<span class="sd">    ```</span>
-<span class="sd">    class imex_mesh(MultiComponentMesh):</span>
-<span class="sd">        components = ['impl', 'expl']</span>
-<span class="sd">    ```</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        class imex_mesh(MultiComponentMesh):</span>
+<span class="sd">            components = ['impl', 'expl']</span>
 
 <span class="sd">    Instantiating such a mesh will expand the mesh along an added first dimension for each component and allow access</span>
 <span class="sd">    to the components with ``.``. Continuing the above example:</span>
 
-<span class="sd">    ```</span>
-<span class="sd">    init = ((100,), None, numpy.dtype('d'))</span>
-<span class="sd">    f = imex_mesh(init)</span>
-<span class="sd">    f.shape  # (2, 100)</span>
-<span class="sd">    f.expl.shape  # (100,)</span>
-<span class="sd">    ```</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        init = ((100,), None, numpy.dtype('d'))</span>
+<span class="sd">        f = imex_mesh(init)</span>
+<span class="sd">        f.shape  # (2, 100)</span>
+<span class="sd">        f.expl.shape  # (100,)</span>
 
 <span class="sd">    The components are properties, generated when the subclass is created. Both ``f.expl[:] = ...`` and</span>
 <span class="sd">    ``f.expl = ...`` write into the mesh; the component is never replaced by an unrelated object. Because the</span>

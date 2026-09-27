@@ -130,10 +130,10 @@
 <span class="sd">    Please configure the hook to your liking by setting class attributes on a subclass, so that other runs in the same</span>
 <span class="sd">    process are not affected. You must set a custom path to a directory like so:</span>
 
-<span class="sd">    ```</span>
-<span class="sd">    class MyLogToPickleFile(LogToPickleFile):</span>
-<span class="sd">        path = '/my/directory/'</span>
-<span class="sd">    ```</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        class MyLogToPickleFile(LogToPickleFile):</span>
+<span class="sd">            path = '/my/directory/'</span>
 
 <span class="sd">    Keep in mind that the hook will overwrite files without warning!</span>
 <span class="sd">    You can give a custom file name by setting the ``file_name`` class attribute and give a custom way of rendering the</span>

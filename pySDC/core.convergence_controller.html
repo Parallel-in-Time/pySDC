@@ -62,10 +62,11 @@ count and time step size.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>comm</strong> (<em>mpi4py.MPI.Intracomm</em>) – Communicator</p></li>
 <li><p><strong>source</strong> (<em>int</em>) – Where to look for receiving</p></li>
+<li><p><strong>buffer</strong> – Buffer to receive the data into</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>whatever has been received</p>
+<dd class="field-even"><p>None, the data is received into <cite>buffer</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -503,11 +504,11 @@ manually, that is of course the same and nothing happens. If, on the other hand,
 added automatically, the <cite>params</cite> passed here will come from whatever added it and you can now override
 parameters by adding the convergence controller manually.
 This relies on children classes to return a composite dictionary from their defaults and from the result of this
-function, so you should write
-<code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">return</span> <span class="pre">{**defaults,</span> <span class="pre">**super().setup(controller,</span> <span class="pre">params,</span> <span class="pre">description,</span> <span class="pre">**kwargs)}</span>
-<span class="pre">`</span></code>
-when overloading this method in a child class, with <cite>defaults</cite> a dictionary containing default parameters.</p>
+function, so you should write</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span>
+</pre></div>
+</div>
+<p>when overloading this method in a child class, with <cite>defaults</cite> a dictionary containing default parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

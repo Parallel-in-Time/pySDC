@@ -58,13 +58,11 @@ a FEniCS <code class="docutils literal notranslate"><span class="pre">Function</
 cannot be views into one contiguous array and have to be separate objects instead.</p>
 <p>To make a specific multi-component datatype, derive from this class, list the components as strings in
 <code class="docutils literal notranslate"><span class="pre">components</span></code>, and say what a single component is in <code class="docutils literal notranslate"><span class="pre">component_type</span></code>. An example:</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
-class rhs_fenics_mesh(MultiComponentContainer):</p>
-<blockquote>
-<div><p>components = [‘impl’, ‘expl’]
-component_type = fenics_mesh</p>
-</div></blockquote>
-<p><a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">rhs_fenics_mesh</span><span class="p">(</span><span class="n">MultiComponentContainer</span><span class="p">):</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'impl'</span><span class="p">,</span> <span class="s1">'expl'</span><span class="p">]</span>
+    <span class="n">component_type</span> <span class="o">=</span> <span class="n">fenics_mesh</span>
+</pre></div>
+</div>
 <p>Instantiating such a datatype builds one component of <code class="docutils literal notranslate"><span class="pre">component_type</span></code> per name, either by copying the
 components of another instance or by passing <code class="docutils literal notranslate"><span class="pre">init</span></code> and <code class="docutils literal notranslate"><span class="pre">val</span></code> on to each of them. The arithmetic is
 applied component by component, so the component type is what decides which operands it accepts.</p>

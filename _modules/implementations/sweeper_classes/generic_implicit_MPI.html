@@ -51,9 +51,9 @@
 <span class="sd">    MPI based sweeper where each rank administers one collocation node. Adapt sweepers to MPI by use of multiple inheritance.</span>
 <span class="sd">    See for example the `generic_implicit_MPI` sweeper, which has a class definition:</span>
 
-<span class="sd">    ```</span>
-<span class="sd">    class generic_implicit_MPI(SweeperMPI, generic_implicit):</span>
-<span class="sd">    ```</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        class generic_implicit_MPI(SweeperMPI, generic_implicit):</span>
 
 <span class="sd">    this means in inherits both from `SweeperMPI` and `generic_implicit`. The hierarchy works such that functions are first</span>
 <span class="sd">    called from `SweeperMPI` and then from `generic_implicit`. For instance, in the `__init__` function, the `SweeperMPI`</span>

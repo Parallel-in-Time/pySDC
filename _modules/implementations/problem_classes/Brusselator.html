@@ -58,6 +58,15 @@
 <span class="sd">    We discretize in a periodic domain of length 1 and solve with an IMEX scheme based on a spectral method for the</span>
 <span class="sd">    Laplacian which we invert implicitly. We treat the reaction and source terms explicitly.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    alpha : float, optional</span>
+<span class="sd">        Diffusion coefficient in front of the Laplacian, the same for both components.</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Passed on to ``IMEX_Laplacian_MPIFFT``: ``nvars`` (tuple of two int, spatial resolution), ``comm``</span>
+<span class="sd">        (communicator for ``mpi4py-fft``), ``useGPU`` and ``x0`` (left end of the domain :math:`[x_0, x_0 + 1]^2`).</span>
+<span class="sd">        ``spectral=False``, ``L=1.0`` and ``dtype='d'`` are fixed and cannot be passed.</span>
+
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] https://link.springer.com/book/10.1007/978-3-642-05221-7</span>
