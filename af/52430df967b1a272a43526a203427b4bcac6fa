@@ -1,0 +1,25 @@
+pySDC/helpers/firedrake_ensemble_communicator.py
+  s_6435d1fae13e27::t_6b313edc16fae2 6-20,41-42,48-50,97,101,103,106,110,113-118
+pySDC/helpers/pySDC_as_gusto_time_discretization.py
+  s_6435d1fae13e27::t_5515cd1aed77b0 29,108-110
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_6435d1fae13e27::t_9e2fac8105dea8 198-238
+pySDC/implementations/convergence_controller_classes/estimate_polynomial_error.py
+  s_6435d1fae13e27::t_5515cd1aed77b0 257-258
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "af52430df967b1a272a43526a203427b4bcac6fa",
+  "prompts": {},
+  "sessions": {
+    "s_6435d1fae13e27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79d56209-5811-4846-8ee3-ed8d7bdb952b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
