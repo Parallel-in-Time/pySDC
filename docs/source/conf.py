@@ -70,6 +70,8 @@ napoleon_type_aliases = {
     'matrix': 'matrix',
 }
 autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy', 'firedrake', 'gusto', 'vtk', 'vtkmodules']
+# the source of members imported from mocked modules (Firedrake, Gusto, ...) is not there to show
+viewcode_follow_imported_members = False
 
 html_theme = 'pydata_sphinx_theme'
 html_title = 'pySDC'
