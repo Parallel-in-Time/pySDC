@@ -110,7 +110,7 @@ class StopAtMaxRuntime(CrashBase):
         Define parameters here.
 
         Default parameters are:
-         - max_runtime (float): Crash the code when the norm of the runtime exceeds this threshold
+         - max_runtime (float): Crash the code when the wall time since this setup exceeds this many seconds
 
         Args:
             controller (pySDC.Controller): The controller

@@ -525,6 +525,11 @@ class BackwardEuler(RungeKutta):
 class IMEXEuler(RungeKuttaIMEX):
     """
     First-order IMEX Euler with one backward Euler stage, at which both parts of the right hand side are evaluated.
+
+    This is a Lie splitting of a backward Euler step for fI and a forward Euler step for fE from its result:
+    u1 = u0 + dt fI(u1), u = u1 + dt fE(u1, t + dt). The explicit tableau has node 1 and matrix entry 0, so fE is
+    evaluated at the new time and the implicit stage, not at the start of the step. For the variant with fE at the
+    start of the step, see IMEXEulerStifflyAccurate.
     """
 
     nodes = BackwardEuler.nodes
@@ -537,7 +542,7 @@ class IMEXEuler(RungeKuttaIMEX):
 class IMEXEulerStifflyAccurate(RungeKuttaIMEX):
     """
     IMEX Euler with the explicit part evaluated at the start of the step, as a stiffly accurate two-stage method.
-    This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.
+    This implements u = fI^-1(u0 + fE(u0)) rather than IMEXEuler's u = fI^-1(u0) + fE(fI^-1(u0)).
     This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly
     accurate and suitable for some DAEs.
     """
@@ -700,7 +705,9 @@ class ARK548L2SAERK(RungeKutta):
 
 class ARK548L2SAESDIRK(ARK548L2SAERK):
     """
-    Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.
+    Implicit part of the ARK54 scheme. As Kennedy and Carpenter state, the embedded method has order 4 and the main
+    method order 5. The fifth-order conditions of the embedded method are violated only by about 1e-4, however, so it
+    can look like order 5 in convergence tests at moderate step sizes.
     """
 
     generator_IMP = RK_SCHEMES["ARK548L2SAESDIRK"]()

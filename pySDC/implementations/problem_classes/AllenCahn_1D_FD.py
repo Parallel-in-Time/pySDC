@@ -367,7 +367,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
     .. math::
         \frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[
                 \frac{1 - a}{1 - a (2u - 1)^2} - 1
-            \right] (2u - 1).
+            \right] (2u - 1) - 6 d_w u (1 - u).
 
     For time-stepping, this problem will be treated in a *fully-implicit* way. The nonlinear system is solved using Newton.
     """

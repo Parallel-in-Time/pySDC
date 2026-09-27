@@ -230,7 +230,8 @@ class petsc_fisher_multiimplicit(Problem):
 
     The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
     be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
-    problem [1]_ using periodic boundary conditions
+    problem [1]_ on a finite interval, where the first and last grid points keep their initial values (Dirichlet
+    boundary conditions)
 
     .. math::
         \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)
@@ -601,7 +602,8 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
 
     The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
     be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
-    problem [1]_ using periodic boundary conditions
+    problem [1]_ on a finite interval, where the first and last grid points keep their initial values (Dirichlet
+    boundary conditions)
 
     .. math::
         \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)
@@ -701,7 +703,8 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
 
     The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
     be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
-    problem [1]_ using periodic boundary conditions
+    problem [1]_ on a finite interval, where the first and last grid points keep their initial values (Dirichlet
+    boundary conditions)
 
     .. math::
         \frac{\partial u}{\partial t} = \Delta u + \lambda_0^2 u (1 - u^\nu)
