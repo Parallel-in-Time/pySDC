@@ -27,7 +27,7 @@ def _unit_grid(nvars, periodic):
 
 class mesh_to_mesh(SpaceTransfer):
     """
-    Custom base_transfer class, implements Transfer.py
+    Space transfer between nd meshes by sparse interpolation matrices of even order, restricting by their transpose.
 
     This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries
     via matrix-vector products.

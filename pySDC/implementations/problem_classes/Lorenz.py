@@ -6,7 +6,7 @@ from pySDC.core.errors import ConvergenceError
 
 class LorenzAttractor(Problem):
     r"""
-    Simple script to run a Lorenz attractor problem.
+    Lorenz system of three chaotic ODEs, treated fully implicitly with a Newton solver.
 
     The Lorenz attractor is a system of three ordinary differential equations (ODEs) that exhibits some chaotic behaviour.
     It is well known for the "Butterfly Effect", because the solution looks like a butterfly (solve to :math:`T_{end} = 100`

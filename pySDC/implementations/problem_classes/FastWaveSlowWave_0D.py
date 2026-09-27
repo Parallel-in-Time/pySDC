@@ -8,6 +8,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class swfw_scalar(Problem):
     r"""
+    Scalar test equation with a fast and a slow wave, IMEX with the fast part implicit and the slow part explicit.
+
     This class implements the fast-wave-slow-wave scalar problem fully investigated in [1]_. It is defined by
 
     .. math::

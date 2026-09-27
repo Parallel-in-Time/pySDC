@@ -231,7 +231,9 @@ class Heat1DUltraspherical(GenericSpectralLinear):
 
 class Heat2DChebychev(GenericSpectralLinear):
     """
-    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.
+    2D heat equation, periodic (FFT) or Dirichlet (Chebychev) in each direction, in first-order formulation.
+
+    Discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.
     """
 
     dtype_u = mesh
@@ -339,7 +341,9 @@ class Heat2DChebychev(GenericSpectralLinear):
 
 class Heat2DUltraspherical(GenericSpectralLinear):
     """
-    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.
+    2D heat equation, periodic (FFT) or Dirichlet (ultraspherical) in each direction, in second-order formulation.
+
+    Discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.
     """
 
     dtype_u = mesh

@@ -9,6 +9,10 @@ if TYPE_CHECKING:
 
 # short helper class to add params as attributes
 class Pars(FrozenClass):
+    """
+    Frozen parameters of a convergence controller as attributes, with defaults for `control_order` and `useMPI`.
+    """
+
     def __init__(self, params: Dict[str, Any]) -> None:
         self.control_order: int = 0  # integer that determines the order in which the convergence controllers are called
         self.useMPI: Optional[bool] = None  # depends on the controller
@@ -22,6 +26,7 @@ class Pars(FrozenClass):
 # short helper class to store status variables
 class Status(FrozenClass):
     """
+    Frozen container for named variables of a convergence controller.
     Initialize status variables with None, since at the time of instantiation of the convergence controllers, not all
     relevant information about the controller are known.
     """
@@ -34,8 +39,7 @@ class Status(FrozenClass):
 
 class ConvergenceController(object):
     """
-    Base abstract class for convergence controller, which is plugged into the controller to determine the iteration
-    count and time step size.
+    Abstract base class for convergence controllers, which plug into the controller to steer iterations and step sizes.
     """
 
     def __init__(

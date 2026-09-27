@@ -16,6 +16,8 @@ from pySDC.implementations.datatype_classes.particles import particles, fields, 
 # noinspection PyUnusedLocal
 class penningtrap(Problem):
     r"""
+    Charged particles in a 3D Penning trap with Coulomb interaction, a second-order problem for the Boris integrator.
+
     This class implements a standard Penning trap problem on the time interval :math:`[0, t_{end}]`
     fully investigated in [1]_. The equations are given by the following equation of motion
 

@@ -208,7 +208,7 @@ class particles(object):
 
 
 class acceleration(mesh):
-    pass
+    """Mesh holding the accelerations of the particles, the right-hand side type for ``particles``."""
 
 
 class fields(MultiComponentMesh):

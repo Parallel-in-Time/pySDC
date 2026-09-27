@@ -32,7 +32,7 @@ class _Pars(FrozenClass):
 
 class Controller(object):
     """
-    Base abstract controller class
+    Abstract base class of the controllers, which set up hooks and convergence controllers and run the steps in time.
     """
 
     def __init__(

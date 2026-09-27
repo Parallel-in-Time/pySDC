@@ -4,8 +4,7 @@ from pySDC.core.convergence_controller import ConvergenceController
 
 class SpreadStepSizesBlockwise(ConvergenceController):
     """
-    Take the step size from the last step in the block and spread it to all steps in the next block such that every step
-    in a block always has the same step size.
+    Give all steps of the next block the same step size, taken from the last step or from the first restarted one.
     By block we refer to a composite collocation problem, which is solved in pipelined SDC parallel-in-time.
 
     Also, we overrule the step size control here, if we get close to the final time and we would take too large of a
@@ -82,7 +81,7 @@ class SpreadStepSizesBlockwise(ConvergenceController):
 
 class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwise):
     """
-    Non-MPI version
+    Spread one step size to all steps of the next block for the non-MPI controller, reading the steps directly.
     """
 
     def get_step_from_which_to_spread(self, MS, S):
@@ -157,7 +156,7 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwise):
 
 class SpreadStepSizesBlockwiseMPI(SpreadStepSizesBlockwise):
     """
-    MPI version
+    Spread one step size to all steps of the next block for the MPI controller, with collectives across the time ranks.
     """
 
     def get_step_from_which_to_spread(self, comm, S):

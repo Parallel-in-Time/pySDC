@@ -19,7 +19,7 @@ class _Pars(FrozenClass):
 
 class SpaceTransfer(object):
     """
-    Abstract SpaceTransfer class
+    Abstract base class for the restriction and prolongation of data in space between a fine and a coarse problem.
 
     Attributes:
         params (__Pars): parameters given by the user

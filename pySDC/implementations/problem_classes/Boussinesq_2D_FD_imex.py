@@ -13,7 +13,9 @@ from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import u
 # noinspection PyUnusedLocal
 class boussinesq_2d_imex(Problem):
     r"""
-    This class implements the two-dimensional Boussinesq equations for different boundary conditions with
+    Linearized 2D Boussinesq equations with finite differences, IMEX with waves implicit (GMRES), advection explicit.
+
+    The equations, for different boundary conditions, are
 
     .. math::
         \frac{\partial u}{\partial t} + U \frac{\partial u}{\partial x} + \frac{\partial p}{\partial x} = 0,

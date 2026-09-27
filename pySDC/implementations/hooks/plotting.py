@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 
 
 class PlottingHook(Hooks):  # pragma: no cover
+    """
+    Base class for hooks that plot the solution with the problem's `plot` method, optionally saving each figure.
+    """
+
     save_plot = None  # Supply a string to the path where you want to save
     live_plot = 1e-9  # Supply `None` if you don't want live plotting
 

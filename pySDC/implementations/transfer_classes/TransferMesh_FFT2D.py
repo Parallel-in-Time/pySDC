@@ -6,7 +6,7 @@ from pySDC.core.space_transfer import SpaceTransfer
 
 class mesh_to_mesh_fft2d(SpaceTransfer):
     """
-    Custon base_transfer class, implements Transfer.py
+    Space transfer between periodic square 2d meshes: injection to restrict, Fourier interpolation to prolong.
 
     This implementation can restrict and prolong between 2d meshes with FFT for periodic boundaries
 

@@ -209,6 +209,10 @@ class EstimatePolynomialError(ConvergenceController):
 
 
 class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
+    """
+    Polynomial interpolation error estimate for Firedrake functions, combining the node solutions term by term.
+    """
+
     def matmul(self, A, b):
         """
         Matrix vector multiplication, possibly MPI parallel.

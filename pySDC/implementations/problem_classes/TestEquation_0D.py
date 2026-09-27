@@ -8,7 +8,9 @@ from pySDC.helpers.fieldsIO import Scalar
 
 class testequation0d(Problem):
     r"""
-    This class implements the simple test equation of the form
+    Dahlquist test equation for many values of :math:`\lambda` at once, treated fully implicitly.
+
+    It is of the form
 
     .. math::
         \frac{d u(t)}{dt} = A u(t)

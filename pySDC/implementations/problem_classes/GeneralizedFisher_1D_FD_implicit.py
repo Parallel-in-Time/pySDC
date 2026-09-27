@@ -11,6 +11,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 # noinspection PyUnusedLocal
 class generalized_fisher(Problem):
     r"""
+    1D generalized Fisher equation with finite differences and Dirichlet BCs, fully implicit with Newton.
+
     The following one-dimensional problem is an example of a reaction-diffusion equation with traveling waves, and can
     be seen as a generalized Fisher equation. This class implements a special case of the Kolmogorov-Petrovskii-Piskunov
     problem [1]_

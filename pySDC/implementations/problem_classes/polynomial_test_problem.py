@@ -6,6 +6,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 class polynomial_testequation(Problem):
     """
+    Scalar ODE whose exact solution is a random polynomial in time, to test operations exact on polynomials.
+
     Dummy problem for tests only! In particular, the `solve_system` function just returns the exact solution instead of
     solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.
 

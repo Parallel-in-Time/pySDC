@@ -10,6 +10,8 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_
 # noinspection PyUnusedLocal
 class fenics_vortex_2d(Problem):
     r"""
+    2D periodic vorticity-velocity problem with FEniCS, IMEX (diffusion implicit), with the mass matrix inverted.
+
     This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions
     in :math:`[0, 1]^2`
 
@@ -324,6 +326,8 @@ class fenics_vortex_2d(Problem):
 
 class fenics_vortex_2d_mass(fenics_vortex_2d):
     r"""
+    2D periodic vorticity-velocity problem with FEniCS, IMEX (diffusion implicit), with the mass matrix applied.
+
     This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions
     in :math:`[0, 1]^2`
 

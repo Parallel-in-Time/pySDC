@@ -8,9 +8,12 @@ import numpy as np
 
 class BasicRestarting(ConvergenceController):
     """
-    Class with some utilities for restarting. The specific functions are:
-     - Telling each step after one that requested a restart to get restarted as well
-     - Allowing each step to be restarted a limited number of times in a row before just moving on anyways
+    Restart every step after one that requests a restart, and limit how often a step may be restarted in a row.
+    The specific functions are:
+
+    - Telling each step after one that requested a restart to get restarted as well
+    - Allowing each step to be restarted a limited number of times in a row, before raising a ``ConvergenceError``
+      or, with ``crash_after_max_restarts=False``, moving on
 
     Default control order is 95.
     """
@@ -133,7 +136,7 @@ class BasicRestarting(ConvergenceController):
 
 class BasicRestartingNonMPI(BasicRestarting):
     """
-    Non-MPI specific version of basic restarting
+    Basic restarting for the non-MPI controller, which passes restart requests between steps through shared buffers.
     """
 
     def reset_buffers_nonMPI(self, controller, **kwargs):
@@ -217,7 +220,7 @@ on...",
 
 class BasicRestartingMPI(BasicRestarting):
     """
-    MPI specific version of basic restarting
+    Basic restarting for the MPI controller, which passes restart requests on to the following ranks with MPI.
     """
 
     def __init__(self, controller, params, description, **kwargs):

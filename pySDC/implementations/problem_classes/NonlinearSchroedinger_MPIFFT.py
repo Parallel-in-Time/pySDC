@@ -10,6 +10,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
     r"""
+    Periodic nonlinear Schrödinger equation with mpi4py-fft, IMEX with the Laplacian implicit, nonlinearity explicit.
+
     Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::
@@ -98,6 +100,8 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
 
 class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     r"""
+    Periodic nonlinear Schrödinger equation with mpi4py-fft, fully implicit with SciPy's Newton-Krylov solver.
+
     Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::

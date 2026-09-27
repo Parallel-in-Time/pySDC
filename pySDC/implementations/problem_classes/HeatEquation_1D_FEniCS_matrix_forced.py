@@ -10,6 +10,8 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_
 # noinspection PyUnusedLocal
 class fenics_heat(Problem):
     r"""
+    Forced 1D heat equation with FEniCS and Dirichlet BCs, IMEX, with the mass matrix inverted in the right-hand side.
+
     Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
     .. math::
@@ -365,6 +367,8 @@ class fenics_heat(Problem):
 # noinspection PyUnusedLocal
 class fenics_heat_mass(fenics_heat):
     r"""
+    Forced 1D heat equation with FEniCS and Dirichlet BCs, IMEX, with the mass matrix applied instead of inverted.
+
     Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
     .. math::
@@ -519,6 +523,8 @@ class fenics_heat_mass(fenics_heat):
 # noinspection PyUnusedLocal
 class fenics_heat_mass_timebc(fenics_heat_mass):
     r"""
+    Forced 1D heat equation with FEniCS, IMEX with the mass matrix applied, and time-dependent Dirichlet BCs.
+
     Example implementing the forced one-dimensional heat equation with time-dependent Dirichlet boundary conditions
 
     .. math::

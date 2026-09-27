@@ -11,6 +11,8 @@ from pySDC.core.problem import WorkCounter
 
 class RayleighBenard3D(GenericSpectralLinear):
     """
+    3D Rayleigh-Benard convection, FFT in x and y and ultraspherical in z, IMEX with the nonlinear advection explicit.
+
     Rayleigh-Benard Convection is a variation of incompressible Navier-Stokes.
 
     The equations we solve are
