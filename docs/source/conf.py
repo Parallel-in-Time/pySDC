@@ -1,5 +1,6 @@
 # Sphinx configuration for the pySDC website, https://parallel-in-time.org/pySDC
 
+import hashlib
 import os
 import re
 import sys
@@ -156,6 +157,25 @@ def add_run_in_browser(app, pagename, templatename, context, doctree):
     context['browser_wheels'] = BROWSER_WHEELS
 
 
+def _excerpt(app, excerpt):
+    """The literalinclude of a gallery card's excerpt; the texts that delimit a passage of code have to be in the file"""
+    lines = [
+        f"      .. literalinclude:: /../../{excerpt['file']}",
+        f"         :language: {excerpt.get('language', 'python')}",
+    ]
+    if 'lines' in excerpt:  # an output the tests write in CI, which the docs job fails on if it is missing
+        return lines + [f"         :lines: {excerpt['lines']}"]
+    file = Path(ROOT, excerpt['file'])
+    app.env.note_dependency(file)
+    text = file.read_text(encoding='utf-8')
+    for option in ('start-at', 'end-at', 'end-before'):
+        if option in excerpt:
+            if excerpt[option] not in text:
+                raise ValueError(f"The gallery excerpt of {excerpt['file']} needs {excerpt[option]!r}, which is gone")
+            lines.append(f'         :{option}: {excerpt[option]}')
+    return lines + ['         :dedent:']
+
+
 def add_project_gallery(app, docname, source):
     """Replace the placeholder on the projects page with the cards and the toctree from pySDC/projects/gallery.yml"""
     if docname != 'projects/index':
@@ -181,6 +201,8 @@ def add_project_gallery(app, docname, source):
             ]
             if 'image' in project:
                 lines += [f"      :img-top: /../../{project['image']}", f"      :img-alt: {project['title']}"]
+            elif 'excerpt' in project:
+                lines += ['      :class-card: excerpt-card', ''] + _excerpt(app, project['excerpt'])
             else:
                 lines += ['      :class-card: no-image']
             lines += ['', f"      {project['summary']}", '']
@@ -422,9 +444,7 @@ LANDING_DEMO = """
      <p class="demo-status">{status}</p>
      <img class="demo-plot" alt="Residual over the iterations of the runs so far" hidden>
    </div>
-   <!-- Only here: it imports run-in-browser.js without the ?v= Sphinx adds, i.e. a second copy of it, which on a
-        tutorial page would answer "Run in browser" a second time -->
-   <script type="module" src="_static/landing-demo.js"></script>
+   <script type="module" src="_static/landing-demo.js?v={version}"></script>
 """
 
 
@@ -437,7 +457,9 @@ def add_landing_demo(app, docname, source):
         if BROWSER_WHEELS
         else 'The demo needs the pySDC wheels, which docs/update_apidocs.sh builds.'
     )
-    demo = LANDING_DEMO.format(wheels=' '.join(BROWSER_WHEELS), status=status)
+    # the ?v= Sphinx gives its own scripts, so that browsers fetch the script again when it changes
+    version = hashlib.md5(Path(app.srcdir, '_static', 'landing-demo.js').read_bytes()).hexdigest()[:8]
+    demo = LANDING_DEMO.format(wheels=' '.join(BROWSER_WHEELS), status=status, version=version)
     if not BROWSER_WHEELS:
         demo = demo.replace('class="btn btn-sm demo-run"', 'class="btn btn-sm demo-run" disabled')
     source[0] = source[0].replace('.. landing-demo', demo)

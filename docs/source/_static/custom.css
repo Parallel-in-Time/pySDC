@@ -42,6 +42,12 @@ table.api-overview { table-layout: fixed; }
 table.api-overview td:first-child code, table.api-overview td:first-child .pre { white-space: normal; word-break: break-all; }
 table.api-overview td { font-size: 0.9rem; overflow-wrap: anywhere; }
 
+/* Gallery cards that show an excerpt of the code or its output instead of a plot: the excerpt takes the plot's place */
+.project-gallery .excerpt-card .sd-card-body { display: flex; flex-direction: column; }
+.project-gallery .excerpt-card .sd-card-body > div[class*="highlight"] { order: -1; margin: -1rem -1rem 0.75rem; }
+.project-gallery .excerpt-card pre { height: 11rem; overflow: hidden; margin: 0; font-size: 0.68rem; line-height: 1.35;
+  border: none; border-bottom: 1px solid var(--pst-color-border); border-radius: 0; }
+
 /* Landing page demo, see landing-demo.js */
 .landing-demo form { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: flex-end; margin: 0.5rem 0; }
 .landing-demo label { display: flex; flex-direction: column; font-size: 0.85rem; color: var(--pst-color-text-muted); }

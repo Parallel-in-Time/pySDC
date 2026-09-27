@@ -58,7 +58,9 @@ To add yours:
 3. Add an entry to [`pySDC/projects/gallery.yml`](./../../pySDC/projects/gallery.yml), with a title,
    a one-line summary and the name of that page. For the card's image, name a plot your tests write into `data/`.
    The CI builds the website after the tests, so the card always shows what the current code produces,
-   and it fails if the plot is missing.
+   and it fails if the plot is missing. If your tests make no plot, give an `excerpt` instead: a text file they write
+   (with `lines`), or a representative passage of your code, between a `start-at` and an `end-at` or `end-before`
+   text; the website build stops if those texts are no longer in the file. See the entries in `gallery.yml`.
 
 ## Getting a DOI of pySDC for publication
 

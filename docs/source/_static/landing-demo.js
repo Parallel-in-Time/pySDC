@@ -1,8 +1,10 @@
 // The demo on the landing page: SDC or MLSDC for one step of the 1D Allen-Cahn equation, run in the browser with
 // the same Pyodide worker as "Run in browser". The Python side is landing_demo.py; the form comes from conf.py.
-import { startPython, runCode } from './run-in-browser.js';
+// Import run-in-browser.js by the URL the page loaded it with, ?v= included: the same module, not a second copy, and
+// never a stale one from the cache after an update
+const { startPython, runCode } = await import(document.querySelector('script[src*="run-in-browser.js"]').src);
 
-document.addEventListener('DOMContentLoaded', () => {
+function setUp() {
   const demo = document.querySelector('.landing-demo');
   if (!demo) return;
   const form = demo.querySelector('form');
@@ -58,4 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     plot.hidden = true;
     status('Cleared. Choose a setup and press Run.');
   });
-});
+}
+
+// the await above may have outlasted DOMContentLoaded
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setUp);
+else setUp();

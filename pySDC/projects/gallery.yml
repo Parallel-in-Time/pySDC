@@ -2,7 +2,9 @@
 #
 # One entry per project: the title and the one-line summary on its card, and the page it links to (in
 # docs/source/projects/). The optional image is a path from the repository root, usually a plot the project's
-# tests write into data/ in CI, so that the card shows what the current code produces. See
+# tests write into data/ in CI, so that the card shows what the current code produces. Without one, the optional
+# excerpt shows a text file the tests write (with lines) or a passage of the code (between start-at and end-at or
+# end-before, texts that have to be in the file). See
 # docs/contrib/06_new_project.md for adding a project.
 
 - section: Methods and analysis
@@ -17,6 +19,10 @@
       summary: Strategies to parallelize SDC across the collocation nodes, within each iteration.
     - title: Improving parallelism across the method
       page: parallelSDC_reloaded
+      excerpt:
+        file: pySDC/projects/parallelSDC_reloaded/scripts/fig05_allenCahn.py
+        start-at: 'def getCost(counters):'
+        end-before: '# The reference solution depends only'
       summary: The numerical experiments of the paper on parallel SDC by Čaklović, Lunet, Götschel and Ruprecht.
     - title: Fast-wave slow-wave SDC
       page: fwsw
@@ -24,6 +30,10 @@
       summary: Semi-implicit SDC for fast waves, compared with RK-IMEX and DIRK schemes, and its stability.
     - title: Rational deferred corrections
       page: RDC
+      excerpt:
+        file: pySDC/projects/RDC/equidistant_RDC.py
+        start-at: 'for k in range(0, n + 1):'
+        end-at: 'w[k] = np.sum(y)'
       summary: The RDC method of Güttel and Klein, with equidistant nodes and a blended barycentric interpolant.
     - title: Asymptotic convergence of PFASST
       page: asymp_conv
@@ -31,9 +41,17 @@
       summary: How PFASST converges for linear problems, in the stiff and in the non-stiff limit.
     - title: Matrix-based PFASST
       page: matrixPFASST
+      excerpt:
+        file: data/comparison_matrix_vs_propagator_detail.txt
+        lines: 1-4
+        language: text
       summary: PFASST for linear problems, written as a two-grid method and as a propagation matrix.
     - title: SDC for second-order problems
       page: second_order
+      excerpt:
+        file: pySDC/projects/Second_orderSDC/stability_simulation.py
+        start-at: '# Define Collocation matrix to find for the stability function'
+        end-before: '# Zeros matrices to store'
       summary: The figures of the paper by Akramov, Götschel, Minion, Ruprecht and Speck.
     - title: Hamiltonian systems with Verlet-SDC
       page: Hamiltonian
@@ -45,6 +63,10 @@
       summary: Fully, semi- and multi-implicit SDC with PETSc, for the Fisher and the Gray-Scott equations.
     - title: Differential-algebraic equations
       page: DAE
+      excerpt:
+        file: pySDC/projects/DAE/sweepers/fullyImplicitDAE.py
+        start-at: '# do the sweep'
+        end-at: 'L.u[m + 1] = L.u[0] + integral[m]'
       summary: Sweepers, problems and scripts for solving differential-algebraic equations with SDC.
 
 - section: Applications
@@ -63,9 +85,17 @@
       summary: Exponential SDC for the monodomain equation of cardiac electrophysiology.
     - title: Rayleigh-Bénard convection
       page: RayleighBenard
+      excerpt:
+        file: pySDC/projects/RayleighBenard/RBC3D_configs.py
+        start-at: 'desc[''sweeper_params''][''quad_type''] = ''RADAU-RIGHT'''
+        end-at: 'desc[''problem_params''][''dealiasing''] = self.dealiasing'
       summary: 3D convection at Rayleigh numbers up to 1e7, with SDC and Runge-Kutta, on CPUs and GPUs.
     - title: StrömungsRaum
       page: StroemungsRaum
+      excerpt:
+        file: pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_FEniCS.py
+        start-at: 'F = df.dot(u, self.v) * df.dx'
+        end-at: 'self.step = NewtonStep(F, df.derivative(F, self.w))'
       summary: Space-time parallel methods for fluid dynamics on heterogeneous exascale hardware.
 
 - section: High-performance computing
@@ -88,4 +118,8 @@
       summary: Compressing the data SDC keeps at the collocation nodes, and what it costs in accuracy.
     - title: pySDC on GPUs
       page: GPU
+      excerpt:
+        file: pySDC/projects/GPU/heat.py
+        start-at: '# change description dictionary for GPU problem'
+        end-at: 'assert abs(uend_gpu.get() - uend_cpu)'
       summary: Running pySDC on GPUs with CuPy, up to large problems, and the plots of Thomas Baumann's thesis.
