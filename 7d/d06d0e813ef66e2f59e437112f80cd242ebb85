@@ -1,0 +1,29 @@
+docs/source/_static/custom.css
+  s_619b2228c15391::t_7f8d5acd2e5441 45-50
+docs/source/_static/landing-demo.js
+  s_619b2228c15391::t_6fd0d4f56a80cc 3-5
+  s_619b2228c15391::t_e246adb37ae5d5 7,63-67
+pySDC/projects/gallery.yml
+  s_619b2228c15391::t_ee91d297888b8d 5-7,22-25,33-36,44-47,51-54,66-69,88-91,95-98,121-124
+docs/contrib/06_new_project.md
+  s_619b2228c15391::t_315a2b6dd22289 61-63
+docs/source/conf.py
+  s_619b2228c15391::t_7f8d5acd2e5441 160-178,204-205
+  s_619b2228c15391::t_6fd0d4f56a80cc 3,447,460-462
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7dd06d0e813ef66e2f59e437112f80cd242ebb85",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
