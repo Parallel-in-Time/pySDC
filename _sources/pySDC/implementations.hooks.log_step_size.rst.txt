@@ -1,0 +1,7 @@
+implementations.hooks.log\_step\_size module
+============================================
+
+.. automodule:: implementations.hooks.log_step_size
+   :members:
+   :show-inheritance:
+   :undoc-members:

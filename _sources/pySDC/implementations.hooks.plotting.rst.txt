@@ -1,0 +1,7 @@
+implementations.hooks.plotting module
+=====================================
+
+.. automodule:: implementations.hooks.plotting
+   :members:
+   :show-inheritance:
+   :undoc-members:

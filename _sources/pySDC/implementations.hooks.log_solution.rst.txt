@@ -1,0 +1,7 @@
+implementations.hooks.log\_solution module
+==========================================
+
+.. automodule:: implementations.hooks.log_solution
+   :members:
+   :show-inheritance:
+   :undoc-members:

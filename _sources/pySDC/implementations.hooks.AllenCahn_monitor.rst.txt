@@ -1,0 +1,7 @@
+implementations.hooks.AllenCahn\_monitor module
+===============================================
+
+.. automodule:: implementations.hooks.AllenCahn_monitor
+   :members:
+   :show-inheritance:
+   :undoc-members:

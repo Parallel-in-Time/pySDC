@@ -1,0 +1,7 @@
+implementations.hooks.log\_GPU\_timings module
+==============================================
+
+.. automodule:: implementations.hooks.log_GPU_timings
+   :members:
+   :show-inheritance:
+   :undoc-members:

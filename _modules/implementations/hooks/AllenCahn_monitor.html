@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.hooks.AllenCahn_monitor &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.hooks.AllenCahn_monitor</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.hooks.AllenCahn_monitor</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hooks</span>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AllenCahnMonitor</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Track the shrinking circle (or sphere) of an Allen-Cahn run.</span>
+
+<span class="sd">    Under mean curvature flow a blob of initial radius :math:`R_0` obeys</span>
+<span class="sd">    :math:`R(t)^2 = R_0^2 - 2 (d - 1) t`, so comparing the measured radius against that is the</span>
+<span class="sd">    standard diagnostic for these problems. This hook records ``computed_radius``,</span>
+<span class="sd">    ``exact_radius``, ``computed_volume`` and ``exact_volume`` at :math:`t = 0` and after every</span>
+<span class="sd">    step, plus ``interface_width`` where that is well defined.</span>
+
+<span class="sd">    The volume is the number of cells in the high phase times the cell volume. Counting is used</span>
+<span class="sd">    rather than integrating the field, even though pySDC's phase fields run from :math:`0` to</span>
+<span class="sd">    :math:`1` and so integrate straight to a volume: the integral also picks up the diffuse</span>
+<span class="sd">    interface, which biases it by :math:`O(\varepsilon)` no matter how fine the mesh, whereas</span>
+<span class="sd">    counting is consistent and its :math:`O(\Delta x)` bias refines away.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    phase_thresh : float</span>
+<span class="sd">        Cells above this count towards the high phase. Taken from the problem when it says, and</span>
+<span class="sd">        :math:`0.5` -- the midpoint of the two wells -- otherwise.</span>
+<span class="sd">    """</span>
+
+    <span class="n">default_phase_thresh</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_radius</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase_thresh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_phase_thresh</span>
+
+<div class="viewcode-block" id="AllenCahnMonitor.get_real_space">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_real_space">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_real_space</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Undo the transform if the problem carries its solution in spectral space."""</span>
+        <span class="k">return</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="s1">'spectral'</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">else</span> <span class="n">u</span><span class="p">[:]</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.get_volume">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_volume">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Volume of the high phase, summed over the space communicator if there is one."""</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_real_space</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_thresh</span><span class="p">))</span>
+
+        <span class="n">comm</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="s1">'comm'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+
+            <span class="n">count</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendobj</span><span class="o">=</span><span class="n">count</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">count</span> <span class="o">*</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.radius_from_volume">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.radius_from_volume">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">radius_from_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Radius of the ball of this volume."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vol</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">vol</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Can only monitor 2D and 3D problems, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1">D'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.exact_radius_squared">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_radius_squared">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exact_radius_squared</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Mean curvature flow shrinks the blob as :math:`R(t)^2 = R_0^2 - 2 (d - 1) t`."""</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_radius</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.exact_radius">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_radius">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exact_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exact_radius_squared</span><span class="p">(</span><span class="n">t</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.exact_volume">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_volume">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exact_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exact_radius_squared</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">r2</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">r2</span><span class="o">**</span><span class="mf">1.5</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.measures_interface_width">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.measures_interface_width">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">measures_interface_width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Only a 2D field held whole on this rank can be cut across to measure the interface."""</span>
+        <span class="n">comm</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="s1">'comm'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="p">(</span><span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.get_interface_width">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_interface_width">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_interface_width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Width of the transition, in units of epsilon, along a cut through the middle."""</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">rows1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.005</span><span class="p">)</span>
+        <span class="n">rows2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.995</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">rows2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">rows1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">eps</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.get_diagnostics">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_diagnostics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Everything worth recording about ``u``, as a dict of stats entries."""</span>
+        <span class="n">vol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_volume</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+        <span class="n">diagnostics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">'computed_radius'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius_from_volume</span><span class="p">(</span><span class="n">vol</span><span class="p">),</span>
+            <span class="s1">'exact_radius'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exact_radius</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
+            <span class="s1">'computed_volume'</span><span class="p">:</span> <span class="n">vol</span><span class="p">,</span>
+            <span class="s1">'exact_volume'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exact_volume</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">measures_interface_width</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+            <span class="n">diagnostics</span><span class="p">[</span><span class="s1">'interface_width'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_interface_width</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_real_space</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">u</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">diagnostics</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.record">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.record">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">diagnostics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+                <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+                <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+                <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.pre_run">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.pre_run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pre_run</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_radius</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase_thresh</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="s1">'phase_thresh'</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_phase_thresh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_real_space</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_diagnostics</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="AllenCahnMonitor.post_step">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.post_step">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_diagnostics</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="p">))</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.hooks.AllenCahn_monitor</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

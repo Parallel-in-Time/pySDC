@@ -218,10 +218,10 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.AdvectionEquation_ND_FD.html#implementations.problem_classes.AdvectionEquation_ND_FD.advectionNd">advectionNd (class in implementations.problem_classes.AdvectionEquation_ND_FD)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex">allencahn2d_imex (class in implementations.problem_classes.AllenCahn_2D_FFT)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_2D_FFT.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab">allencahn2d_imex_stab (class in implementations.problem_classes.AllenCahn_2D_FFT)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_1D_FD.html#implementations.problem_classes.AllenCahn_1D_FD.allencahn_front_finel">allencahn_front_finel (class in implementations.problem_classes.AllenCahn_1D_FD)</a>
@@ -252,7 +252,11 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex">allencahn_temp_imex (class in implementations.problem_classes.AllenCahn_Temp_MPIFFT)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor">AllenCahnMonitor (class in implementations.hooks.AllenCahn_monitor)</a>
+</li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE">ALLOW_OVERWRITE (FieldsIO attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.allow_overwriting">allow_overwriting (LogToFile attribute)</a>
 </li>
       <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.Allreduce">Allreduce() (NCCLComm method)</a>
 </li>
@@ -886,6 +890,12 @@
         <li><a href="pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.DiscontinuousTestODE.count_switches">(DiscontinuousTestODE method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.counter">counter (LogToFile attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.counter">(LogToPickleFile attribute)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.timings.html#core.timings.CPUTimings">CPUTimings (class in core.timings)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.CrankNicolson">CrankNicolson (class in implementations.sweeper_classes.Runge_Kutta)</a>
@@ -924,6 +934,8 @@
         <li><a href="pySDC/implementations.controller_classes.controller_nonMPI.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default">(controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.default_phase_thresh">default_phase_thresh (AllenCahnMonitor attribute)</a>
+</li>
       <li><a href="pySDC/core.default_hook.html#core.default_hook.DefaultHooks">DefaultHooks (class in core.default_hook)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.delta_form.html#implementations.sweeper_classes.delta_form.DeltaFormMixin.delta_acc">delta_acc (DeltaFormMixin attribute)</a>
@@ -1584,6 +1596,12 @@
 </li>
       <li><a href="pySDC/core.collocation.html#core.collocation.CollBase.evaluate">evaluate() (CollBase static method)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_radius">exact_radius() (AllenCahnMonitor method)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_radius_squared">exact_radius_squared() (AllenCahnMonitor method)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.exact_volume">exact_volume() (AllenCahnMonitor method)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.DiscontinuousTestODE.html#implementations.problem_classes.DiscontinuousTestODE.ExactDiscontinuousTestODE">ExactDiscontinuousTestODE (class in implementations.problem_classes.DiscontinuousTestODE)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.expand_matrix_ND">expand_matrix_ND() (SpectralHelper method)</a>
@@ -1708,10 +1726,10 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.fft_backend">(SpectralHelper attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.fft_cache">fft_cache (SpectralHelper attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.generic_MPIFFT_Laplacian.html#implementations.problem_classes.generic_MPIFFT_Laplacian.IMEX_Laplacian_MPIFFT.fft_comm_backend">fft_comm_backend (IMEX_Laplacian_MPIFFT attribute)</a>
 
       <ul>
@@ -1739,6 +1757,10 @@
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize">figsize() (in module helpers.plot_helper)</a>
 </li>
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.figsize_by_journal">figsize_by_journal() (in module helpers.plot_helper)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.file_name">file_name (LogToPickleFile attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.filename">filename (LogToFile attribute)</a>
 </li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.fileSize">fileSize (FieldsIO property)</a>
 </li>
@@ -1769,6 +1791,8 @@
       <li><a href="pySDC/implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.fix_residual">fix_residual() (fenics_heat_mass method)</a>
 </li>
       <li><a href="pySDC/core.level.html#core.level.Level.fold">fold (Level attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.format_index">format_index() (LogToPickleFile method)</a>
 </li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.formatIndex">formatIndex() (FieldsIO method)</a>
 </li>
@@ -1970,6 +1994,8 @@
         <li><a href="pySDC/core.problem.html#core.problem.Problem.get_default_sweeper_class">(Problem class method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_diagnostics">get_diagnostics() (AllenCahnMonitor method)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_differentiation_matrix">get_differentiation_matrix() (ChebychevHelper method)</a>
 
       <ul>
@@ -2076,8 +2102,6 @@
       </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_constant">get_integration_constant() (UltrasphericalHelper method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integration_matrix">get_integration_matrix() (ChebychevHelper method)</a>
 
       <ul>
@@ -2090,6 +2114,8 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.UltrasphericalHelper.get_integration_matrix">(UltrasphericalHelper method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_integration_weights">get_integration_weights() (ChebychevHelper method)</a>
 
       <ul>
@@ -2099,6 +2125,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">get_interactions() (penningtrap method)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_interface_width">get_interface_width() (AllenCahnMonitor method)</a>
 </li>
       <li><a href="pySDC/implementations.convergence_controller_classes.estimate_polynomial_error.html#implementations.convergence_controller_classes.estimate_polynomial_error.EstimatePolynomialError.get_interpolated_solution">get_interpolated_solution() (EstimatePolynomialError method)</a>
 
@@ -2164,6 +2192,8 @@
 </li>
       <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm.get_op">get_op() (NCCLComm method)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.get_path">get_path() (LogToPickleFile class method)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.get_pfft">get_pfft() (SpectralHelper method)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.FFTHelper.get_plan">get_plan() (FFTHelper method)</a>
@@ -2175,6 +2205,8 @@
       <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.get_Qdelta_explicit">get_Qdelta_explicit() (Sweeper method)</a>
 </li>
       <li><a href="pySDC/core.sweeper.html#core.sweeper.Sweeper.get_Qdelta_implicit">get_Qdelta_implicit() (Sweeper method)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_real_space">get_real_space() (AllenCahnMonitor static method)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.ParaDiagSweepers.html#implementations.sweeper_classes.ParaDiagSweepers.QDiagonalization.get_residual">get_residual() (QDiagonalization method)</a>
 </li>
@@ -2256,6 +2288,8 @@
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard3D.html#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.get_vertical_profiles">get_vertical_profiles() (RayleighBenard3D method)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.get_volume">get_volume() (AllenCahnMonitor method)</a>
+</li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.ChebychevHelper.get_wavenumbers">get_wavenumbers() (ChebychevHelper method)</a>
 
       <ul>
@@ -2315,6 +2349,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.Boussinesq_2D_FD_imex.html#implementations.problem_classes.Boussinesq_2D_FD_imex.boussinesq_2d_imex.gmres_logger">gmres_logger (boussinesq_2d_imex attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_GPU_timings.html#implementations.hooks.log_GPU_timings.GPUTimings">GPUTimings (class in implementations.hooks.log_GPU_timings)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion">grayscott_imex_diffusion (class in implementations.problem_classes.GrayScott_MPIFFT)</a>
 </li>
@@ -2757,6 +2793,83 @@
 </li>
       </ul></li>
       <li>
+    implementations.hooks
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.html#module-implementations.hooks">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.AllenCahn_monitor
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#module-implementations.hooks.AllenCahn_monitor">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.log_embedded_error_estimate
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_embedded_error_estimate.html#module-implementations.hooks.log_embedded_error_estimate">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.log_errors
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_errors.html#module-implementations.hooks.log_errors">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.log_extrapolated_error_estimate
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_extrapolated_error_estimate.html#module-implementations.hooks.log_extrapolated_error_estimate">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.log_GPU_timings
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_GPU_timings.html#module-implementations.hooks.log_GPU_timings">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.log_restarts
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_restarts.html#module-implementations.hooks.log_restarts">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.log_solution
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#module-implementations.hooks.log_solution">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.log_step_size
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_step_size.html#module-implementations.hooks.log_step_size">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.log_work
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_work.html#module-implementations.hooks.log_work">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.hooks.plotting
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.plotting.html#module-implementations.hooks.plotting">module</a>
+</li>
+      </ul></li>
+      <li>
     implementations.problem_classes
 
       <ul>
@@ -2973,6 +3086,8 @@
         <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#module-implementations.problem_classes.GeneralizedFisher_1D_PETSc">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.generic_MPIFFT_Laplacian
 
@@ -3008,8 +3123,6 @@
         <li><a href="pySDC/implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#module-implementations.problem_classes.GrayScott_2D_PETSc_periodic">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_MPIFFT
 
@@ -3626,10 +3739,16 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.linalg">(SpectralHelper1D attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlottingHook.live_plot">live_plot (PlottingHook attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.load">load() (LogToFile class method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.load">(LogToPickleFile class method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.local_slice">local_slice() (SpectralHelper method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.blocks.html#helpers.blocks.BlockDecomposition.localBounds">localBounds (BlockDecomposition property)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.Fisher_full.localX">localX (Fisher_full attribute)</a>
@@ -3648,9 +3767,27 @@
       </ul></li>
       <li><a href="pySDC/core.convergence_controller.html#core.convergence_controller.ConvergenceController.log">log() (ConvergenceController method)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.log_embedded_error_estimate.html#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimate.log_error">log_error() (LogEmbeddedErrorEstimate method)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogError.log_global_error">log_global_error() (LogError method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogError.log_local_error">log_local_error() (LogError method)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.log_to_file">log_to_file() (LogToPickleFile method)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogAnalysisVariables">LogAnalysisVariables (class in implementations.problem_classes.RayleighBenard)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogCFL">LogCFL (class in implementations.problem_classes.RayleighBenard)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_embedded_error_estimate.html#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimate">LogEmbeddedErrorEstimate (class in implementations.hooks.log_embedded_error_estimate)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_embedded_error_estimate.html#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimatePostIter">LogEmbeddedErrorEstimatePostIter (class in implementations.hooks.log_embedded_error_estimate)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogError">LogError (class in implementations.hooks.log_errors)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_extrapolated_error_estimate.html#implementations.hooks.log_extrapolated_error_estimate.LogExtrapolationErrorEstimate">LogExtrapolationErrorEstimate (class in implementations.hooks.log_extrapolated_error_estimate)</a>
 </li>
       <li><a href="pySDC/implementations.transfer_classes.BaseTransfer_mass.html#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.logger">logger (base_transfer_mass attribute)</a>
 
@@ -3672,7 +3809,37 @@
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.helper_classes.html#implementations.problem_classes.boussinesq_helpers.helper_classes.logging">logging (class in implementations.problem_classes.boussinesq_helpers.helper_classes)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.logging_condition">logging_condition() (LogToPickleFile method)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostIter">LogGlobalErrorPostIter (class in implementations.hooks.log_errors)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostRun">LogGlobalErrorPostRun (class in implementations.hooks.log_errors)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostStep">LogGlobalErrorPostStep (class in implementations.hooks.log_errors)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.LogisticEquation.html#implementations.problem_classes.LogisticEquation.logistics_equation">logistics_equation (class in implementations.problem_classes.LogisticEquation)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogLocalErrorPostIter">LogLocalErrorPostIter (class in implementations.hooks.log_errors)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogLocalErrorPostStep">LogLocalErrorPostStep (class in implementations.hooks.log_errors)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_restarts.html#implementations.hooks.log_restarts.LogRestarts">LogRestarts (class in implementations.hooks.log_restarts)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogSDCIterations">LogSDCIterations (class in implementations.hooks.log_work)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogSolution">LogSolution (class in implementations.hooks.log_solution)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogSolutionAfterIteration">LogSolutionAfterIteration (class in implementations.hooks.log_solution)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_step_size.html#implementations.hooks.log_step_size.LogStepSize">LogStepSize (class in implementations.hooks.log_step_size)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile">LogToFile (class in implementations.hooks.log_solution)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile">LogToPickleFile (class in implementations.hooks.log_solution)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFileAfterXS">LogToPickleFileAfterXS (class in implementations.hooks.log_solution)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogWork">LogWork (class in implementations.hooks.log_work)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.Lorenz.html#implementations.problem_classes.Lorenz.LorenzAttractor">LorenzAttractor (class in implementations.problem_classes.Lorenz)</a>
 </li>
@@ -3802,6 +3969,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.Runge_Kutta.html#implementations.sweeper_classes.Runge_Kutta.RungeKuttaIMEX.matrix_explicit">(RungeKuttaIMEX attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.measures_interface_width">measures_interface_width() (AllenCahnMonitor method)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.AcousticAdvection_1D_FD_imex.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.mesh">mesh (acoustic_1d_imex attribute)</a>
 
       <ul>
@@ -3951,6 +4120,28 @@
         <li><a href="pySDC/implementations.datatype_classes.particles.html#module-implementations.datatype_classes.particles">implementations.datatype_classes.particles</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.petsc_vec.html#module-implementations.datatype_classes.petsc_vec">implementations.datatype_classes.petsc_vec</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.html#module-implementations.hooks">implementations.hooks</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#module-implementations.hooks.AllenCahn_monitor">implementations.hooks.AllenCahn_monitor</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_embedded_error_estimate.html#module-implementations.hooks.log_embedded_error_estimate">implementations.hooks.log_embedded_error_estimate</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_errors.html#module-implementations.hooks.log_errors">implementations.hooks.log_errors</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_extrapolated_error_estimate.html#module-implementations.hooks.log_extrapolated_error_estimate">implementations.hooks.log_extrapolated_error_estimate</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_GPU_timings.html#module-implementations.hooks.log_GPU_timings">implementations.hooks.log_GPU_timings</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_restarts.html#module-implementations.hooks.log_restarts">implementations.hooks.log_restarts</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#module-implementations.hooks.log_solution">implementations.hooks.log_solution</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_step_size.html#module-implementations.hooks.log_step_size">implementations.hooks.log_step_size</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_work.html#module-implementations.hooks.log_work">implementations.hooks.log_work</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.plotting.html#module-implementations.hooks.plotting">implementations.hooks.plotting</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.html#module-implementations.problem_classes">implementations.problem_classes</a>
 </li>
@@ -4171,6 +4362,8 @@
         <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper1D.N">(SpectralHelper1D attribute)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogSDCIterations.name">name (LogSDCIterations attribute)</a>
+</li>
       <li><a href="pySDC/helpers.NCCL_communicator.html#helpers.NCCL_communicator.NCCLComm">NCCLComm (class in helpers.NCCL_communicator)</a>
 </li>
       <li><a href="pySDC/helpers.spectral_helper.html#helpers.spectral_helper.SpectralHelper.ncomponents">ncomponents (SpectralHelper property)</a>
@@ -4355,6 +4548,8 @@
 </li>
       <li><a href="pySDC/implementations.transfer_classes.TransferParticles_NoCoarse.html#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles">particles_to_particles (class in implementations.transfer_classes.TransferParticles_NoCoarse)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.path">path (LogToPickleFile attribute)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.PenningTrap_3D.html#implementations.problem_classes.PenningTrap_3D.penningtrap">penningtrap (class in implementations.problem_classes.PenningTrap_3D)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.GeneralizedFisher_1D_PETSc.html#implementations.problem_classes.GeneralizedFisher_1D_PETSc.petsc_fisher_fullyimplicit">petsc_fisher_fullyimplicit (class in implementations.problem_classes.GeneralizedFisher_1D_PETSc)</a>
@@ -4383,6 +4578,8 @@
       </ul></li>
       <li><a href="pySDC/helpers.fft_helper.html#helpers.fft_helper.PFFT">PFFT (class in helpers.fft_helper)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.phase_thresh">phase_thresh (AllenCahnMonitor attribute)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.Piline.html#implementations.problem_classes.Piline.piline">piline (class in implementations.problem_classes.Piline)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.generic_spectral.html#implementations.problem_classes.generic_spectral.GenericSpectralLinear.Pl">Pl (GenericSpectralLinear attribute)</a>
@@ -4396,11 +4593,19 @@
 </li>
         <li><a href="pySDC/implementations.problem_classes.GrayScott_MPIFFT.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.plot">(grayscott_imex_diffusion method)</a>
 </li>
+        <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlottingHook.plot">(PlottingHook method)</a>
+</li>
         <li><a href="pySDC/core.problem.html#core.problem.Problem.plot">(Problem method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.RayleighBenard.plot">(RayleighBenard method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlotPostStep.plot_every">plot_every (PlotPostStep attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlotPostStep">PlotPostStep (class in implementations.hooks.plotting)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlottingHook">PlottingHook (class in implementations.hooks.plotting)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation">polynomial_testequation (class in implementations.problem_classes.polynomial_test_problem)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.polynomial_test_problem.html#implementations.problem_classes.polynomial_test_problem.polynomial_testequation_IMEX">polynomial_testequation_IMEX (class in implementations.problem_classes.polynomial_test_problem)</a>
@@ -4417,6 +4622,14 @@
 
       <ul>
         <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_iteration">(Hooks method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_embedded_error_estimate.html#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimatePostIter.post_iteration">(LogEmbeddedErrorEstimatePostIter method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostIter.post_iteration">(LogGlobalErrorPostIter method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogLocalErrorPostIter.post_iteration">(LogLocalErrorPostIter method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogSolutionAfterIteration.post_iteration">(LogSolutionAfterIteration method)</a>
 </li>
         <li><a href="pySDC/core.timings.html#core.timings.Timings.post_iteration">(Timings method)</a>
 </li>
@@ -4468,6 +4681,10 @@
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_run">post_run() (Hooks method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostRun.post_run">(LogGlobalErrorPostRun method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.post_run">(LogToFile method)</a>
+</li>
         <li><a href="pySDC/core.timings.html#core.timings.Timings.post_run">(Timings method)</a>
 </li>
       </ul></li>
@@ -4489,14 +4706,46 @@
         <li><a href="pySDC/implementations.convergence_controller_classes.store_uold.html#implementations.convergence_controller_classes.store_uold.StoreUOld.post_spread_processing">(StoreUOld method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.default_hook.html#core.default_hook.DefaultHooks.post_step">post_step() (DefaultHooks method)</a>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.post_step">post_step() (AllenCahnMonitor method)</a>
 
       <ul>
+        <li><a href="pySDC/core.default_hook.html#core.default_hook.DefaultHooks.post_step">(DefaultHooks method)</a>
+</li>
         <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.post_step">(Hooks method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogAnalysisVariables.post_step">(LogAnalysisVariables method)</a>
 </li>
         <li><a href="pySDC/implementations.problem_classes.RayleighBenard.html#implementations.problem_classes.RayleighBenard.LogCFL.post_step">(LogCFL method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_embedded_error_estimate.html#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimate.post_step">(LogEmbeddedErrorEstimate method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_embedded_error_estimate.html#implementations.hooks.log_embedded_error_estimate.LogEmbeddedErrorEstimatePostIter.post_step">(LogEmbeddedErrorEstimatePostIter method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_extrapolated_error_estimate.html#implementations.hooks.log_extrapolated_error_estimate.LogExtrapolationErrorEstimate.post_step">(LogExtrapolationErrorEstimate method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostRun.post_step">(LogGlobalErrorPostRun method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogGlobalErrorPostStep.post_step">(LogGlobalErrorPostStep method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_errors.html#implementations.hooks.log_errors.LogLocalErrorPostStep.post_step">(LogLocalErrorPostStep method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_restarts.html#implementations.hooks.log_restarts.LogRestarts.post_step">(LogRestarts method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogSDCIterations.post_step">(LogSDCIterations method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogSolution.post_step">(LogSolution method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_step_size.html#implementations.hooks.log_step_size.LogStepSize.post_step">(LogStepSize method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.post_step">(LogToFile method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.post_step">(LogToPickleFile method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFileAfterXS.post_step">(LogToPickleFileAfterXS method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogWork.post_step">(LogWork method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlotPostStep.post_step">(PlotPostStep method)</a>
 </li>
         <li><a href="pySDC/core.timings.html#core.timings.Timings.post_step">(Timings method)</a>
 </li>
@@ -4539,9 +4788,21 @@
         <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_predict">(Timings method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_run">pre_run() (Hooks method)</a>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.pre_run">pre_run() (AllenCahnMonitor method)</a>
 
       <ul>
+        <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_run">(Hooks method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.pre_run">(LogToFile method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.pre_run">(LogToPickleFile method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFileAfterXS.pre_run">(LogToPickleFileAfterXS method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlotPostStep.pre_run">(PlotPostStep method)</a>
+</li>
+        <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlottingHook.pre_run">(PlottingHook method)</a>
+</li>
         <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_run">(Timings method)</a>
 </li>
       </ul></li>
@@ -4554,6 +4815,8 @@
       <li><a href="pySDC/core.hooks.html#core.hooks.Hooks.pre_step">pre_step() (Hooks method)</a>
 
       <ul>
+        <li><a href="pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogWork.pre_step">(LogWork method)</a>
+</li>
         <li><a href="pySDC/core.timings.html#core.timings.Timings.pre_step">(Timings method)</a>
 </li>
       </ul></li>
@@ -4579,8 +4842,12 @@
         <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.predict">(SweeperMPI method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.timings.html#core.timings.Timings.prefix">prefix (Timings attribute)</a>
+      <li><a href="pySDC/implementations.hooks.log_GPU_timings.html#implementations.hooks.log_GPU_timings.GPUTimings.prefix">prefix (GPUTimings attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/core.timings.html#core.timings.Timings.prefix">(Timings attribute)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.controller_classes.controller_MPI.html#implementations.controller_classes.controller_MPI.controller_MPI.prepare_convergence_check">prepare_convergence_check() (controller_MPI method)</a>
 
       <ul>
@@ -4628,6 +4895,8 @@
       <li><a href="pySDC/core.errors.html#core.errors.ProblemError">ProblemError</a>
 </li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Entry.process">process (Entry attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFile.process_solution">process_solution() (LogToPickleFile method)</a>
 </li>
       <li><a href="pySDC/core.hooks.html#core.hooks.Entry.process_sweeper">process_sweeper (Entry attribute)</a>
 </li>
@@ -4741,6 +5010,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.AllenCahn_Temp_MPIFFT.html#implementations.problem_classes.AllenCahn_Temp_MPIFFT.allencahn_temp_imex.radius">radius (allencahn_temp_imex attribute)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.radius_from_volume">radius_from_volume() (AllenCahnMonitor method)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.generic_implicit_MPI.html#implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI.rank">rank (generic_implicit_MPI attribute)</a>
 
       <ul>
@@ -4786,6 +5057,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.errors.html#core.errors.ReadOnlyError">ReadOnlyError</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.AllenCahn_monitor.html#implementations.hooks.AllenCahn_monitor.AllenCahnMonitor.record">record() (AllenCahnMonitor method)</a>
 </li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.Rectilinear">Rectilinear (class in helpers.fieldsIO)</a>
 </li>
@@ -4946,6 +5219,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.sweeper_classes.boris_2nd_order.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.S">S (boris_2nd_order attribute)</a>
+</li>
+      <li><a href="pySDC/implementations.hooks.plotting.html#implementations.hooks.plotting.PlottingHook.save_plot">save_plot (PlottingHook attribute)</a>
 </li>
       <li><a href="pySDC/helpers.plot_helper.html#helpers.plot_helper.savefig">savefig() (in module helpers.plot_helper)</a>
 </li>
@@ -5419,6 +5694,8 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFileAfterXS.t_next_log">t_next_log (LogToPickleFileAfterXS attribute)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.Battery.html#implementations.problem_classes.Battery.battery_n_capacitors.t_switch">t_switch (battery_n_capacitors attribute)</a>
 
       <ul>
@@ -5445,6 +5722,12 @@
       </ul></li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.time">time() (FieldsIO method)</a>
 </li>
+      <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToFile.time_increment">time_increment (LogToFile attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.hooks.log_solution.html#implementations.hooks.log_solution.LogToPickleFileAfterXS.time_increment">(LogToPickleFileAfterXS attribute)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/helpers.fieldsIO.html#helpers.fieldsIO.FieldsIO.times">times (FieldsIO property)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.standard_integrators.html#implementations.problem_classes.acoustic_helpers.standard_integrators.bdf2.timestep">timestep() (bdf2 method)</a>, <a href="pySDC/implementations.problem_classes.boussinesq_helpers.standard_integrators.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.timestep">[1]</a>

@@ -1,0 +1,27 @@
+implementations.hooks package
+=============================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   implementations.hooks.AllenCahn_monitor
+   implementations.hooks.log_GPU_timings
+   implementations.hooks.log_embedded_error_estimate
+   implementations.hooks.log_errors
+   implementations.hooks.log_extrapolated_error_estimate
+   implementations.hooks.log_restarts
+   implementations.hooks.log_solution
+   implementations.hooks.log_step_size
+   implementations.hooks.log_work
+   implementations.hooks.plotting
+
+Module contents
+---------------
+
+.. automodule:: implementations.hooks
+   :members:
+   :show-inheritance:
+   :undoc-members:

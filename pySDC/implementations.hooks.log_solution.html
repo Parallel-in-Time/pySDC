@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>implementations.hooks.log_solution module &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c40552b6" />
+    
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.hooks.log_step_size module" href="implementations.hooks.log_step_size.html" />
+    <link rel="prev" title="implementations.hooks.log_restarts module" href="implementations.hooks.log_restarts.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.hooks.log_step_size.html" title="implementations.hooks.log_step_size module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.hooks.log_restarts.html" title="implementations.hooks.log_restarts module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.hooks.html" accesskey="U">implementations.hooks package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.hooks.log_solution module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-implementations.hooks.log_solution">
+<span id="implementations-hooks-log-solution-module"></span><h1>implementations.hooks.log_solution module<a class="headerlink" href="#module-implementations.hooks.log_solution" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogSolution">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LogSolution</span></span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogSolution" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></p>
+<p>Store the solution at the end of each step as “u”.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogSolution.post_step">
+<span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogSolution.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogSolution.post_step" title="Link to this definition">¶</a></dt>
+<dd><p>Record solution at the end of the step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogSolutionAfterIteration">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LogSolutionAfterIteration</span></span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogSolutionAfterIteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogSolutionAfterIteration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></p>
+<p>Store the solution at the end of each iteration as “u”.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogSolutionAfterIteration.post_iteration">
+<span class="sig-name descname"><span class="pre">post_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogSolutionAfterIteration.post_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogSolutionAfterIteration.post_iteration" title="Link to this definition">¶</a></dt>
+<dd><p>Record solution at the end of the iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LogToFile</span></span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.allow_overwriting">
+<span class="sig-name descname"><span class="pre">allow_overwriting</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.allow_overwriting" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.counter">
+<span class="sig-name descname"><span class="pre">counter</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.counter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'myRun.pySDC'</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.filename" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.load">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.load" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.post_run">
+<span class="sig-name descname"><span class="pre">post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile.post_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.post_run" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.post_step">
+<span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.post_step" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each step or block</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.pre_run">
+<span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToFile.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.pre_run" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before time-loop starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToFile.time_increment">
+<span class="sig-name descname"><span class="pre">time_increment</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToFile.time_increment" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LogToPickleFile</span></span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></p>
+<p>Hook for logging the solution to file after the step using pickle.</p>
+<p>Please configure the hook to your liking by setting class attributes on a subclass, so that other runs in the same
+process are not affected. You must set a custom path to a directory like so:</p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
+class MyLogToPickleFile(LogToPickleFile):</p>
+<blockquote>
+<div><p>path = ‘/my/directory/’</p>
+</div></blockquote>
+<p><a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+<p>Keep in mind that the hook will overwrite files without warning!
+You can give a custom file name by setting the <code class="docutils literal notranslate"><span class="pre">file_name</span></code> class attribute and give a custom way of rendering the
+index associated with individual files by giving a different function <code class="docutils literal notranslate"><span class="pre">format_index</span></code> class attribute. This should
+accept one index and return one string.</p>
+<p>You can also give a custom <code class="docutils literal notranslate"><span class="pre">logging_condition</span></code> function, accepting the current level if you want to log selectively.</p>
+<p>Importantly, you may need to change <code class="docutils literal notranslate"><span class="pre">process_solution</span></code>. By default, this will return a numpy view of the solution.
+Of course, if you are not using numpy, you need to change this. Again, this is a function accepting the level.</p>
+<p>After the fact, you can use the classmethod <cite>get_path</cite> to get the path to a certain data or the <cite>load</cite> function to
+directly load the solution at a given index. Just configure the hook like you did when you recorded the data
+beforehand.</p>
+<p>Finally, be aware that using this hook with MPI parallel runs may lead to different tasks overwriting files. Make
+sure to give a different <cite>file_name</cite> for each task that writes files.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.counter">
+<span class="sig-name descname"><span class="pre">counter</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.counter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.file_name">
+<span class="sig-name descname"><span class="pre">file_name</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'solution'</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.file_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.format_index">
+<span class="sig-name descname"><span class="pre">format_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.format_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.format_index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.get_path">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.get_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.get_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.load">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.load" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.log_to_file">
+<span class="sig-name descname"><span class="pre">log_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_solution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.log_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.log_to_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.logging_condition">
+<span class="sig-name descname"><span class="pre">logging_condition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.logging_condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.logging_condition" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.path">
+<span class="sig-name descname"><span class="pre">path</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.post_step">
+<span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.post_step" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each step or block</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.pre_run">
+<span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.pre_run" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before time-loop starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFile.process_solution">
+<span class="sig-name descname"><span class="pre">process_solution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFile.process_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFile.process_solution" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFileAfterXS">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LogToPickleFileAfterXS</span></span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFileAfterXS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile" title="implementations.hooks.log_solution.LogToPickleFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogToPickleFile</span></code></a></p>
+<p>Log to file after certain amount of time has passed instead of after every step</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFileAfterXS.post_step">
+<span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFileAfterXS.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.post_step" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called after each step or block</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFileAfterXS.pre_run">
+<span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/hooks/log_solution.html#LogToPickleFileAfterXS.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.pre_run" title="Link to this definition">¶</a></dt>
+<dd><p>Default routine called before time-loop starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFileAfterXS.t_next_log">
+<span class="sig-name descname"><span class="pre">t_next_log</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.t_next_log" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="implementations.hooks.log_solution.LogToPickleFileAfterXS.time_increment">
+<span class="sig-name descname"><span class="pre">time_increment</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.time_increment" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">implementations.hooks.log_solution module</a><ul>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogSolution"><code class="docutils literal notranslate"><span class="pre">LogSolution</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogSolution.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogSolutionAfterIteration"><code class="docutils literal notranslate"><span class="pre">LogSolutionAfterIteration</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogSolutionAfterIteration.post_iteration"><code class="docutils literal notranslate"><span class="pre">post_iteration()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile"><code class="docutils literal notranslate"><span class="pre">LogToFile</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile.allow_overwriting"><code class="docutils literal notranslate"><span class="pre">allow_overwriting</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile.counter"><code class="docutils literal notranslate"><span class="pre">counter</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile.filename"><code class="docutils literal notranslate"><span class="pre">filename</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile.post_run"><code class="docutils literal notranslate"><span class="pre">post_run()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile.pre_run"><code class="docutils literal notranslate"><span class="pre">pre_run()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToFile.time_increment"><code class="docutils literal notranslate"><span class="pre">time_increment</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile"><code class="docutils literal notranslate"><span class="pre">LogToPickleFile</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.counter"><code class="docutils literal notranslate"><span class="pre">counter</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.file_name"><code class="docutils literal notranslate"><span class="pre">file_name</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.format_index"><code class="docutils literal notranslate"><span class="pre">format_index()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.get_path"><code class="docutils literal notranslate"><span class="pre">get_path()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.log_to_file"><code class="docutils literal notranslate"><span class="pre">log_to_file()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.logging_condition"><code class="docutils literal notranslate"><span class="pre">logging_condition()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.path"><code class="docutils literal notranslate"><span class="pre">path</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.pre_run"><code class="docutils literal notranslate"><span class="pre">pre_run()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFile.process_solution"><code class="docutils literal notranslate"><span class="pre">process_solution()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS"><code class="docutils literal notranslate"><span class="pre">LogToPickleFileAfterXS</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.pre_run"><code class="docutils literal notranslate"><span class="pre">pre_run()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.t_next_log"><code class="docutils literal notranslate"><span class="pre">t_next_log</span></code></a></li>
+<li><a class="reference internal" href="#implementations.hooks.log_solution.LogToPickleFileAfterXS.time_increment"><code class="docutils literal notranslate"><span class="pre">time_increment</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.hooks.log_restarts.html"
+                          title="previous chapter">implementations.hooks.log_restarts module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.hooks.log_step_size.html"
+                          title="next chapter">implementations.hooks.log_step_size module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.hooks.log_solution.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.hooks.log_step_size.html" title="implementations.hooks.log_step_size module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.hooks.log_restarts.html" title="implementations.hooks.log_restarts module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="implementations.hooks.html" >implementations.hooks package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.hooks.log_solution module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

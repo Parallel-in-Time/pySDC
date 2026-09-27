@@ -10,6 +10,7 @@ Subpackages
    implementations.controller_classes
    implementations.convergence_controller_classes
    implementations.datatype_classes
+   implementations.hooks
    implementations.problem_classes
    implementations.sweeper_classes
    implementations.transfer_classes

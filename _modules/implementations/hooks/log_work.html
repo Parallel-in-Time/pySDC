@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.hooks.log_work &#8212; pySDC 5.8 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c40552b6" />
+    
+    <script src="../../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.hooks.log_work</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.hooks.log_work</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hooks</span>
+
+
+<div class="viewcode-block" id="LogWork">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogWork">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogWork</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Log the increment of all work counters in the problem between steps</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialize the variables for the work recorded in the last step</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__work_last_step</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="LogWork.pre_step">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogWork.pre_step">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pre_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Store the current values of the work counters</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">level_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__work_last_step</span><span class="p">[</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">niter</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">work_counters</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">))</span>
+            <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="LogWork.post_step">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogWork.post_step">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add the difference between current values of counters and their values before the iteration to the stats.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step (pySDC.Step.step): the current step</span>
+<span class="sd">            level_number (int): the current level number</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_last_step</span><span class="p">[</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">][</span><span class="n">level_number</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+                <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+                <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+                <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+                <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+                <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s1">'work_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">niter</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_last_step</span><span class="p">[</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">][</span><span class="n">level_number</span><span class="p">][</span><span class="n">key</span><span class="p">],</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LogSDCIterations">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogSDCIterations">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogSDCIterations</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Log the number of SDC iterations between steps.</span>
+<span class="sd">    You can control the name in the stats via the class attribute ``name``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">'k'</span>
+
+<div class="viewcode-block" id="LogSDCIterations.post_step">
+<a class="viewcode-back" href="../../../pySDC/implementations.hooks.log_work.html#implementations.hooks.log_work.LogSDCIterations.post_step">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">increment_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.8 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.hooks.log_work</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
