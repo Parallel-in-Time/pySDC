@@ -23,6 +23,19 @@ SOFTWARE = '11b0ba71-a474-4bde-8b06-6e878b968f55'  # pySDC in the directory
 FIELDS = 'id,doi,url,title,authors,publisher,journal,publication_year,mention_type'
 OUT = Path(__file__).parent / 'source' / 'publications.json'
 
+# Corrections to the directory's data, until they are made there (by DOI or, without one, by URL). None drops an
+# entry: e.g. a preprint whose published version is listed as well.
+CORRECTIONS = {
+    'http://arxiv.org/pdf/2103.12571.pdf': None,  # the preprint of 10.2140/camcos.2023.18.55
+    '10.48550/arxiv.2002.07555': {  # the preprint; this is the published version
+        'title': 'Convergence of multilevel spectral deferred corrections',
+        'year': 2021,
+        'venue': 'Communications in Applied Mathematics and Computational Science',
+        'doi': '10.2140/camcos.2021.16.227',
+        'url': 'https://doi.org/10.2140/camcos.2021.16.227',
+    },
+}
+
 
 def get(query):
     with urllib.request.urlopen(f'{API}/{query}', timeout=30) as response:
@@ -77,6 +90,15 @@ def main():
         }
         for p in publications.values()
     ]
+    corrected = []
+    for entry in entries:
+        key = entry['doi'] or entry['url']
+        if key in CORRECTIONS:
+            if CORRECTIONS[key] is None:
+                continue
+            entry = {**entry, **CORRECTIONS[key]}
+        corrected.append(entry)
+    entries = corrected
     entries.sort(key=lambda entry: (-(entry['year'] or 0), entry['title'].lower()))
     OUT.write_text(json.dumps(entries, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
     print(f'Wrote {len(entries)} publications to {OUT}')

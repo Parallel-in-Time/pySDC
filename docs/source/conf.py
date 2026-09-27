@@ -475,6 +475,28 @@ def add_landing_demo(app, docname, source):
     source[0] = source[0].replace('.. landing-demo', demo)
 
 
+def link_tutorial_parts(app, docname, source):
+    """On a step's page, make each "Part X: ..." of its README the link to that part, instead of a second list"""
+    match = re.fullmatch(r'tutorial/(step_\d+)', docname)
+    if not match:
+        return
+    step = match.group(1)
+    readme = Path(app.srcdir, 'tutorial', step, 'README.rst')
+    app.env.note_dependency(readme)
+    parts = {Path(entry).name[0]: entry for entry in re.findall(rf'^\s+({step}/[A-Z]_\S+)$', source[0], re.M)}
+
+    def link(m):
+        letter, title, rest = m.groups()
+        if letter not in parts:
+            return m.group(0)
+        return f'- :doc:`Part {letter}: {title} <{parts[letter]}>`.{rest}'
+
+    text = re.sub(r'^- \*\*Part ([A-Z]): (.+?)\.\*\*(.*)$', link, readme.read_text(encoding='utf-8'), flags=re.M)
+    source[0] = (
+        source[0].replace(f'.. include:: {step}/README.rst', text).replace('.. toctree::', '.. toctree::\n   :hidden:')
+    )
+
+
 def skip_modules(app, what, name, obj, skip, options):
     """Class attributes such as `xp = numpy` would be documented as the module, with the path it was imported from"""
     return True if inspect.ismodule(obj) else None
@@ -488,3 +510,4 @@ def setup(app):
     app.connect('source-read', add_publications)
     app.connect('source-read', add_landing_demo)
     app.connect('autodoc-skip-member', skip_modules)
+    app.connect('source-read', link_tutorial_parts)

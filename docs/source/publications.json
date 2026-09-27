@@ -64,14 +64,6 @@
   "url": "https://doi.org/10.1016%2Fj.parco.2023.103050"
  },
  {
-  "title": "A parallel implementation of a diagonalization-based parallel-in-time integrator.",
-  "authors": "Gayatri Caklovic, Robert Speck, Martin Frank",
-  "year": 2021,
-  "venue": "",
-  "doi": null,
-  "url": "http://arxiv.org/pdf/2103.12571.pdf"
- },
- {
   "title": "Algorithm 1016: PyMGRIT: A Python Package for the Parallel-in-time Method MGRIT",
   "authors": "Jens Hahne, Stephanie Friedhoff, Matthias Bolten",
   "year": 2021,
@@ -80,20 +72,20 @@
   "url": "https://doi.org/10.1145%2F3446979"
  },
  {
+  "title": "Convergence of multilevel spectral deferred corrections",
+  "authors": "Gitte Kremling, Robert Speck",
+  "year": 2021,
+  "venue": "Communications in Applied Mathematics and Computational Science",
+  "doi": "10.2140/camcos.2021.16.227",
+  "url": "https://doi.org/10.2140/camcos.2021.16.227"
+ },
+ {
   "title": "Using Performance Analysis Tools for a Parallel-in-Time Integrator: Does My Time-Parallel Code Do What I Think It Does?",
   "authors": "Robert Speck, Michael Knobloch, Sebastian Lührs, Andreas Gocht",
   "year": 2021,
   "venue": "Springer Proceedings in Mathematics & Statistics, Parallel-in-Time Integration Methods",
   "doi": "10.1007/978-3-030-75933-9_3",
   "url": "https://doi.org/10.1007%2F978-3-030-75933-9_3"
- },
- {
-  "title": "Convergence analysis of multi-level spectral deferred corrections",
-  "authors": "Gitte Kremling, Robert Speck",
-  "year": 2020,
-  "venue": "arXiv",
-  "doi": "10.48550/arxiv.2002.07555",
-  "url": "https://doi.org/10.48550%2Farxiv.2002.07555"
  },
  {
   "title": "Deferred Correction Methods for Ordinary Differential Equations",

@@ -88,6 +88,11 @@ def linkReadmeToIndex(rst):
     return rst.replace('<./README>', '<./index>')
 
 
+def titleOverview(rst):
+    """On the website, the README is the Overview, as the navigation bar calls it; GitHub keeps its welcome"""
+    return rst.replace('Welcome to pySDC!\n=================\n', 'Overview\n========\n', 1)
+
+
 def linkFilesToGitHub(text, md):
     """m2r2 turns every relative link into a :doc: reference, which only works for other Markdown pages"""
 
@@ -111,6 +116,8 @@ def convert(md, orphan=False, sectionRefs=True):
         rst = addOrphanTag(rst)
     rst = setImgPath(rst, md)
     rst = linkReadmeToIndex(rst)
+    if md == 'README.md':
+        rst = titleOverview(rst)
     with open(f'{docSources}/{baseName}.rst', 'w') as f:
         f.write(rst)
     print(f'Converted {md} to {docSources}/{baseName}.rst')
