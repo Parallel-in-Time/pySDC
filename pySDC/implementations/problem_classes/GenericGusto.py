@@ -210,7 +210,7 @@ class GenericGustoImex(GenericGusto):
             self.solvers[label] = fd.NonlinearVariationalSolver(
                 problem, solver_parameters=self.solver_parameters, options_prefix=solver_name
             )
-            self.work_counters['solver_setup'] = WorkCounter()
+            self.work_counters['solver_setup']()
 
         self.solvers[label].solve()
         return self.x_out
@@ -255,9 +255,8 @@ class GenericGustoImex(GenericGusto):
             self.solvers[factor] = fd.NonlinearVariationalSolver(
                 problem, solver_parameters=self.solver_parameters, options_prefix=solver_name
             )
-            self.work_counters['solver_setup'] = WorkCounter()
+            self.work_counters['solver_setup']()
 
-        self.solvers[factor].solve()
         try:
             self.solvers[factor].solve()
         except fd.exceptions.ConvergenceError as error:
