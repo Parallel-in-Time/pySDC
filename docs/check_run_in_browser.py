@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Presses "Run in browser" on every page of the built website that has the button, in headless Chromium, and fails
-if a page does not finish, a cell raises, the page logs a JavaScript error, or the figures are not all recomputed.
+Presses "Run in browser" on every page of the built website that has the button, and runs the landing page demo, in
+headless Chromium. Fails if a page does not finish, a cell raises, the page logs a JavaScript error, the figures are
+not all recomputed, or the demo does not converge.
 This is what readers get: Pyodide from jsDelivr, the wheels next to the pages, and run-in-browser.js.
 
     python -m pip install playwright && python -m playwright install chromium
@@ -59,6 +60,36 @@ def check_unavailable(page, url):
     return problems
 
 
+def check_demo(page, url):
+    """The landing page demo has to run SDC and MLSDC with its default setup, and plot them"""
+    js_errors = []
+    page.on('pageerror', lambda error: 'demo' in (error.stack or '') and js_errors.append(error.message))
+    page.goto(url)
+    problems = []
+    for levels in ['1', '2']:
+        page.select_option('.landing-demo select[name="levels"]', levels)
+        before = page.locator('.demo-status').inner_text()
+        page.click('.demo-run')
+        try:
+            page.wait_for_function(
+                "before => { const t = document.querySelector('.demo-status').textContent;"
+                " return t !== before && !/^(Starting|Loading|Installing|Running)/.test(t) }",
+                arg=before,
+                timeout=TIMEOUT,
+            )
+        except TimeoutError:
+            pass
+        status = page.locator('.demo-status').inner_text()
+        if 'converged in' not in status:
+            problems.append(f'{levels} level(s): {status}')
+            break
+    if page.locator('.demo-plot').is_hidden():
+        problems.append('no plot')
+    problems += [f'JavaScript error: {error}' for error in js_errors]
+    page.close()
+    return problems
+
+
 def main(site):
     html = {p.relative_to(site).as_posix(): p.read_text() for p in site.rglob('*.html')}
     pages = sorted(name for name, text in html.items() if 'run-in-browser"' in text)
@@ -87,6 +118,18 @@ def main(site):
             for problem in problems:
                 print('     ' + problem.replace('\n', '\n     '))
             failed |= bool(problems)
+        if 'landing-demo"' in html.get('index.html', ''):
+            url = f'http://127.0.0.1:{server.server_port}/index.html'
+            problems = check_demo(context.new_page(), url)
+            if problems and any('Could not start' in p for p in problems):
+                problems = check_demo(context.new_page(), url)
+            print(f'{"FAIL" if problems else "ok  "} index.html (landing page demo)')
+            for problem in problems:
+                print('     ' + problem)
+            failed |= bool(problems)
+        else:
+            print('FAIL index.html has no landing page demo')
+            failed = True
         for name in unavailable:
             problems = check_unavailable(context.new_page(), f'http://127.0.0.1:{server.server_port}/{name}')
             print(f'{"FAIL" if problems else "n/a "} {name} (does not run in the browser)')

@@ -41,3 +41,15 @@
 table.api-overview { table-layout: fixed; }
 table.api-overview td:first-child code, table.api-overview td:first-child .pre { white-space: normal; word-break: break-all; }
 table.api-overview td { font-size: 0.9rem; overflow-wrap: anywhere; }
+
+/* Landing page demo, see landing-demo.js */
+.landing-demo form { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: flex-end; margin: 0.5rem 0; }
+.landing-demo label { display: flex; flex-direction: column; font-size: 0.85rem; color: var(--pst-color-text-muted); }
+.landing-demo select { margin-top: 0.2rem; padding: 0.2rem 0.4rem; border: 1px solid var(--pst-color-border); border-radius: 4px;
+  background: var(--pst-color-background); color: var(--pst-color-text-base); }
+.landing-demo .demo-buttons { display: flex; gap: 0.4rem; }
+.landing-demo .btn { border: 1px solid var(--pst-color-border); border-radius: 999px; font-size: 0.85rem; }
+.landing-demo .demo-run { background: var(--pst-color-primary); color: var(--pst-color-background); border-color: var(--pst-color-primary); }
+.landing-demo .btn:disabled { opacity: 0.6; }
+.landing-demo .demo-status { font-size: 0.85rem; color: var(--pst-color-text-muted); min-height: 1.3em; }
+.landing-demo .demo-plot { max-width: 100%; background: #fff; border-radius: 4px; }

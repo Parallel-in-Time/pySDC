@@ -4,7 +4,7 @@
 let worker, nextId = 0;
 const pending = new Map();
 
-function startPython(button, status) {
+export function startPython(button, status) {
   worker = new Worker(new URL('run-in-browser-worker.js', import.meta.url), { type: 'module' });
   const wheels = button.dataset.wheels.split(' ').map(w => new URL(button.dataset.wheelsUrl + w, location.href).href);
   return new Promise((resolve, reject) => {
@@ -18,7 +18,7 @@ function startPython(button, status) {
   });
 }
 
-function runCode(code) {
+export function runCode(code) {
   const id = nextId++;
   return new Promise(resolve => { pending.set(id, resolve); worker.postMessage({ type: 'run', id, code }); });
 }

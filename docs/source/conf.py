@@ -74,7 +74,7 @@ html_theme = 'pydata_sphinx_theme'
 html_title = 'pySDC'
 html_static_path = ['_static']
 html_css_files = ['custom.css']
-html_js_files = [('run-in-browser.js', {'type': 'module'})]
+html_js_files = [('run-in-browser.js', {'type': 'module'}), ('landing-demo.js', {'type': 'module'})]
 
 # Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, FEniCS,
 # PETSc, ...), was measured by running every tutorial there. The wheels are built by docs/update_apidocs.sh;
@@ -389,9 +389,61 @@ def add_publications(app, docname, source):
     source[0] = source[0].replace('.. publications-page', '\n'.join(lines))
 
 
+LANDING_DEMO = """
+.. raw:: html
+
+   <div class="landing-demo" data-wheels="{wheels}" data-wheels-url="_static/wheels/">
+     <form>
+       <label><span>Time step Δt</span>
+         <select name="dt"><option>0.001</option><option>0.01</option><option selected>0.1</option><option>1</option>
+         </select></label>
+       <label><span>Preconditioner Q<sub>Δ</sub></span>
+         <select name="QI">
+           <option value="IE">implicit Euler (IE)</option>
+           <option value="LU" selected>LU trick (LU)</option>
+           <option value="MIN-SR-S">MIN-SR-S (diagonal)</option>
+           <option value="MIN-SR-NS">MIN-SR-NS (diagonal)</option>
+           <option value="MIN-SR-FLEX">MIN-SR-FLEX (diagonal, per sweep)</option>
+           <option value="PIC">Picard (explicit)</option>
+         </select></label>
+       <label><span>Collocation nodes M</span>
+         <select name="num_nodes"><option>2</option><option selected>3</option><option>4</option><option>5</option>
+         </select></label>
+       <label><span>Levels</span>
+         <select name="levels"><option value="1" selected>1 (SDC)</option><option value="2">2 (MLSDC)</option>
+         </select></label>
+       <label><span>Interface width ε</span>
+         <select name="eps"><option>0.02</option><option selected>0.04</option><option>0.08</option></select></label>
+       <div class="demo-buttons">
+         <button type="submit" class="btn btn-sm demo-run"><i class="fa-solid fa-play"></i> Run</button>
+         <button type="button" class="btn btn-sm demo-clear" disabled>Clear</button>
+       </div>
+     </form>
+     <p class="demo-status">{status}</p>
+     <img class="demo-plot" alt="Residual over the iterations of the runs so far" hidden>
+   </div>
+"""
+
+
+def add_landing_demo(app, docname, source):
+    """Replace the placeholder on the landing page with the demo's form, which landing-demo.js runs"""
+    if docname != 'index':
+        return
+    status = (
+        'Choose a setup and press Run. Each run adds a curve, so you can compare setups.'
+        if BROWSER_WHEELS
+        else 'The demo needs the pySDC wheels, which docs/update_apidocs.sh builds.'
+    )
+    demo = LANDING_DEMO.format(wheels=' '.join(BROWSER_WHEELS), status=status)
+    if not BROWSER_WHEELS:
+        demo = demo.replace('class="btn btn-sm demo-run"', 'class="btn btn-sm demo-run" disabled')
+    source[0] = source[0].replace('.. landing-demo', demo)
+
+
 def setup(app):
     app.connect('build-finished', write_notebooks)
     app.connect('html-page-context', add_run_in_browser)
     app.connect('source-read', add_project_gallery)
     app.connect('source-read', add_api_overview)
     app.connect('source-read', add_publications)
+    app.connect('source-read', add_landing_demo)
