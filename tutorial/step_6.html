@@ -387,13 +387,13 @@ This is demonstrated here, where the code from Part A is called again with odd n
 <p>Since PFASST is actually a parallel algorithm, executing it in parallel e.g. using MPI might be an interesting exercise.
 To do this, pySDC comes with the MPI-parallelized controller, namely <code class="docutils literal notranslate"><span class="pre">controller_MPI</span></code>.
 It is supposed to yield the same results as the non-MPI counterpart and this is what we are demonstrating here (at least for one particular example).
-The code is the same as in Parts A and B – it imports <code class="docutils literal notranslate"><span class="pre">set_parameters</span></code> from Part A so that all runs use the same parameters – with <code class="docutils literal notranslate"><span class="pre">controller_MPI</span></code> in place of the non-MPI controller.</p>
+The code is the same as in Parts A and B – it imports <code class="docutils literal notranslate"><span class="pre">set_parameters_ml</span></code> from Part A so that all runs use the same parameters – with <code class="docutils literal notranslate"><span class="pre">controller_MPI</span></code> in place of the non-MPI controller.</p>
 <p>Run it as you would run any MPI program, with one rank per parallel step:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">4</span> <span class="n">python</span> <span class="n">C_MPI_parallelization</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>The number of parallel steps is simply the size of <code class="docutils literal notranslate"><span class="pre">MPI.COMM_WORLD</span></code>, so there is nothing to configure: run it on 4 ranks for 4 parallel steps, on 3 for 3, and so on.
-We can use the results of Parts A and B to compare with and we expect the same number of iterations, the same accuracy and the same difference between the two flavors as in Part A (up to machine precision).</p>
+We can use the results of Parts A and B to compare with and we expect the same number of iterations, and the same accuracy as in Parts A and B (up to machine precision).</p>
 <p>Important things to note:</p>
 <ul class="simple">
 <li><p>This example also shows how the statistics of multiple MPI processes can be gathered and processed by rank 0.</p></li>
