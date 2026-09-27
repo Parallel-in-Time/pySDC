@@ -58,6 +58,7 @@ Part D: pySDC and PyTorch
 
 PyTorch is a library for machine learning. The data structure is called tensor and allows to run on CPUs as well as GPUs in addition to access to various machine learning methods.
 Since the potential for use in pySDC is very large, we have started on a datatype that allows to use PyTorch tensors throughout pySDC.
+The datatype, a heat equation problem using it and the network live in the helper module `torch_heat.py` next to this tutorial.
 
 This example trains a network to predict the results of implicit Euler solves for the heat equation. It is too simple to do anything useful, but demonstrates how to use tensors in pySDC and then apply the enormous PyTorch infrastructure.
 This is work in progress in very early stages! The tensor datatype is the simplest possible implementation, rather than an efficient one.

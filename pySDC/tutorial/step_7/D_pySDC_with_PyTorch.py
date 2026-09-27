@@ -2,8 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from pySDC.playgrounds.ML_initial_guess.ml_heat import HeatEquationModel, Train_pySDC
-from pySDC.playgrounds.ML_initial_guess.heat import Heat1DFDTensor
+from pySDC.tutorial.step_7.torch_heat import Heat1DFDTensor, HeatEquationModel
 
 
 def train_at_collocation_nodes():
