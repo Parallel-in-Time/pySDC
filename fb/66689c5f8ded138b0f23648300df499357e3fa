@@ -1,0 +1,22 @@
+pySDC/helpers/NCCL_communicator.py
+  s_6435d1fae13e27::t_3ea99df46bf073 80,84-86,89,94-96,143,170
+pySDC/tests/test_helpers/test_NCCL_communicator.py
+  s_6435d1fae13e27::t_3ea99df46bf073 72-92
+  s_6435d1fae13e27::t_7ea4629cb6f814 71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fb66689c5f8ded138b0f23648300df499357e3fa",
+  "prompts": {},
+  "sessions": {
+    "s_6435d1fae13e27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79d56209-5811-4846-8ee3-ed8d7bdb952b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
