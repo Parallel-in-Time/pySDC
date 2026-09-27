@@ -1,0 +1,23 @@
+pySDC/tests/test_problems/test_stop_at_nan.py
+  s_4635c976c08496::t_a0c1129fedcec8 1-39
+pySDC/implementations/problem_classes/Battery.py
+  s_4635c976c08496::t_b6a26f92d4e379 477-478,500,503
+pySDC/implementations/problem_classes/GrayScott_MPIFFT.py
+  s_4635c976c08496::t_b6a26f92d4e379 478-479,508,518-520,717-718,738,748-750
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7f04849157849dd7a4a1c900acbc6afc9ec438da",
+  "prompts": {},
+  "sessions": {
+    "s_4635c976c08496": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f09ffcac-1bb6-468a-8482-42d83e6ac4f0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
