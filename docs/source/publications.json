@@ -3,7 +3,7 @@
   "title": "Resilience Against Soft Faults Through Adaptivity in Spectral Deferred Correction",
   "authors": "Thomas Saupe, Sebastian Götschel, Thibaut Lunet, Daniel Ruprecht, Robert Speck",
   "year": 2026,
-  "venue": null,
+  "venue": "",
   "doi": "10.1007/978-3-032-17810-7_2",
   "url": "https://doi.org/10.1007/978-3-032-17810-7_2"
  },
@@ -67,12 +67,12 @@
   "title": "A parallel implementation of a diagonalization-based parallel-in-time integrator.",
   "authors": "Gayatri Caklovic, Robert Speck, Martin Frank",
   "year": 2021,
-  "venue": null,
+  "venue": "",
   "doi": null,
   "url": "http://arxiv.org/pdf/2103.12571.pdf"
  },
  {
-  "title": "Algorithm 1016",
+  "title": "Algorithm 1016: PyMGRIT: A Python Package for the Parallel-in-time Method MGRIT",
   "authors": "Jens Hahne, Stephanie Friedhoff, Matthias Bolten",
   "year": 2021,
   "venue": "ACM Transactions on Mathematical Software",
@@ -80,10 +80,10 @@
   "url": "https://doi.org/10.1145%2F3446979"
  },
  {
-  "title": "Using Performance Analysis Tools for a Parallel-in-Time Integrator",
+  "title": "Using Performance Analysis Tools for a Parallel-in-Time Integrator: Does My Time-Parallel Code Do What I Think It Does?",
   "authors": "Robert Speck, Michael Knobloch, Sebastian Lührs, Andreas Gocht",
   "year": 2021,
-  "venue": "Springer Proceedings in Mathematics &amp; Statistics, Parallel-in-Time Integration Methods",
+  "venue": "Springer Proceedings in Mathematics & Statistics, Parallel-in-Time Integration Methods",
   "doi": "10.1007/978-3-030-75933-9_3",
   "url": "https://doi.org/10.1007%2F978-3-030-75933-9_3"
  },

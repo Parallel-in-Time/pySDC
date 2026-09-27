@@ -211,7 +211,7 @@ def add_project_gallery(app, docname, source):
     source[0] = source[0].replace('.. project-gallery', '\n'.join(lines))
 
 
-# The API overview on api.rst: one table per role in a run, with the first paragraph of each class's docstring. The
+# The API overview on api.rst: one table per role in a run, with the first sentence of each class's docstring. The
 # classes are read with ast, so that modules whose imports are missing here (FEniCS, PETSc, ...) are listed too.
 API_CATEGORIES = [
     (
@@ -224,7 +224,8 @@ API_CATEGORIES = [
         'Sweepers',
         'implementations/sweeper_classes',
         ['Sweeper'],
-        'The integrators within a step: SDC with its preconditioners, IMEX and multi-implicit splittings, Runge-Kutta.',
+        'The integrators within a step: SDC with its preconditioners and splittings, second-order and multistep methods, '
+        'Runge-Kutta and ParaDiag.',
     ),
     (
         'Controllers',
@@ -243,7 +244,7 @@ API_CATEGORIES = [
         'Transfer',
         'implementations/transfer_classes',
         ['SpaceTransfer', 'BaseTransfer'],
-        'Move data between the levels of MLSDC and PFASST, in space and between them.',
+        'Move data between the levels of MLSDC and PFASST: restriction and interpolation in space, and the FAS correction.',
     ),
     ('Data types', 'implementations/datatype_classes', None, 'What solutions and right-hand sides are stored in.'),
     ('Core', 'core', None, 'The base classes everything above derives from, and the step and level they run on.'),
@@ -363,7 +364,7 @@ def add_publications(app, docname, source):
             'speck2019pysdc',
             {
                 'author': names(paper['authors'], bibtex=True),
-                'title': paper['title'].replace('pySDC', '{pySDC}'),
+                'title': paper['title'].replace('pySDC', '{pySDC}').replace('—', '---'),
                 'journal': paper['journal'],
                 'volume': paper['volume'],
                 'number': paper['issue'],
@@ -377,7 +378,11 @@ def add_publications(app, docname, source):
     lines += [
         f"      {names(cff['authors'])}, **{cff['title']}**, version {cff['version']}, {cff['date-released'].year},"
     ]
-    lines += [f"      https://doi.org/{cff['doi']} (this DOI resolves to the latest version on Zenodo)", '']
+    lines += [f"      https://doi.org/{cff['doi']}", '']
+    lines += [
+        '      This DOI always leads to the latest version. For the DOI of the exact version you used, see the list'
+    ]
+    lines += [f"      of versions on `Zenodo <https://doi.org/{cff['doi']}>`__.", '']
     lines += ['      .. code-block:: bibtex', '']
     lines += [
         '   ' + line

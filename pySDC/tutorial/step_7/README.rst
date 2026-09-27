@@ -13,7 +13,7 @@ In the following, we show a few examples of pySDC + X.
   on three levels.
 - **Part F: pySDC and Gusto.** pySDC as a time discretization for Gusto, in the Williamson 5 test case;
   ``F_2_plot_pySDC_with_Gusto_result.py`` plots its results.
-- **Part G: pySDC on GPUs.** The same heat equation with SDC, MLSDC and PFASST, all of it on the device.
+- **Part G: pySDC on GPUs.** A heat equation in finite differences with SDC, MLSDC and PFASST, all of it on the device.
 
 Each part is a Python script in `jupytext <https://jupytext.readthedocs.io>`_ "percent" format: run it with ``python``
 (or ``mpirun``) in an environment with the library it needs, or read it on the website. Parts A, B, D, F and G also

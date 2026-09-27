@@ -5,6 +5,7 @@ Created on Tue Jan 17 19:47:56 2023
 
 @author: telu
 """
+
 import os
 import re
 import glob
@@ -67,8 +68,19 @@ def completeRefLinks(rst, baseName):
     return rst
 
 
+def linkLocalAnchors(rst, baseName):
+    """addSectionRefs replaces a section's id by its label, so point the page's own #anchor links to the label"""
+    labels = set(re.findall(rf'^\.\. _{re.escape(baseName)}/(\S+):$', rst, re.M))
+
+    def toRef(match):
+        text, anchor = match.groups()
+        return f':ref:`{text} <{anchor}>`' if anchor in labels else match.group(0)  # completeRefLinks adds baseName
+
+    return re.sub(r'`([^`<]+?) <#([^>]+)>`_', toRef, rst)
+
+
 def addOrphanTag(rst):
-    return '\n:orphan:\n' + rst
+    return '\n:orphan:\n\n' + rst
 
 
 def setImgPath(rst):
@@ -102,6 +114,7 @@ def convert(md, orphan=False, sectionRefs=True):
     rst = wrappEmojis(rst)
     if sectionRefs:
         rst = addSectionRefs(rst, baseName)
+        rst = linkLocalAnchors(rst, baseName)
     rst = completeRefLinks(rst, baseName)
     if orphan:
         rst = addOrphanTag(rst)

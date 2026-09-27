@@ -5,11 +5,12 @@ Python scripts of the numerical experiment for the following paper:
 
 .. code-block:: tex
 
-    @misc{caklovicXXXXimproving,
-        title={Improving Parallelism Across the Method for Spectral Deferred Corrections},
-        author={Gayatri \v{C}aklovi\'c and Lunet Thibaut and Götschel Sebastian and Ruprecht Daniel},
-        year={2023},
-        comment={to be submitted to SISC},
+    @article{caklovic2025improving,
+        title={Improving Efficiency of Parallel Across the Method Spectral Deferred Corrections},
+        author={\v{C}aklovi\'c, Gayatri and Lunet, Thibaut and G\"otschel, Sebastian and Ruprecht, Daniel},
+        journal={SIAM Journal on Scientific Computing},
+        year={2025},
+        doi={10.1137/24M1649800},
     }
 
 Figures for the manuscript

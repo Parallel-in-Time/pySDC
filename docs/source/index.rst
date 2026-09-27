@@ -42,7 +42,7 @@ One time step of the Allen-Cahn equation
    \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial x^2} - \frac{2}{\varepsilon^2} u (1 - u) (1 - 2u)
 
 on 128 periodic grid points, with the collocation problem solved by SDC, or by two-level MLSDC with 64 points on the
-coarse level. The equation is nonlinear and, for a thin interface ε, stiff; each node is solved with Newton's method.
+coarse level. The equation is nonlinear and, for a thin interface ε, stiff; the implicit preconditioners solve each node with Newton's method.
 The plot shows the residual of the collocation problem after each iteration. It runs in your browser, with
 `Pyodide <https://pyodide.org>`__; nothing is installed. The code is
 `landing_demo.py <https://github.com/Parallel-in-Time/pySDC/blob/master/docs/source/_static/landing_demo.py>`__.

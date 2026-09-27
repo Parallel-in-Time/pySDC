@@ -43,7 +43,7 @@ def plot_buoyancy(cwd=''):
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
     plt.xlabel('x [km]', fontsize=fs, labelpad=0)
-    plt.ylabel('Bouyancy', fontsize=fs, labelpad=1)
+    plt.ylabel('Buoyancy', fontsize=fs, labelpad=1)
     filename = 'data/boussinesq.png'
     plt.savefig(filename, bbox_inches='tight')
 

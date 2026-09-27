@@ -11,6 +11,7 @@ add a publication to the page, add it as a mention there.
 If the directory cannot be reached, the committed file is left alone, so that the website still builds.
 """
 
+import html
 import json
 import re
 import sys
@@ -26,6 +27,18 @@ OUT = Path(__file__).parent / 'source' / 'publications.json'
 def get(query):
     with urllib.request.urlopen(f'{API}/{query}', timeout=30) as response:
         return json.load(response)
+
+
+def complete_title(title, doi):
+    """The directory keeps only Crossref's title, e.g. "Algorithm 1016" without the subtitle that says what it is"""
+    if not doi:
+        return title
+    try:
+        with urllib.request.urlopen(f'https://api.crossref.org/works/{doi}', timeout=30) as response:
+            subtitle = (json.load(response)['message'].get('subtitle') or [''])[0]
+    except (OSError, ValueError, KeyError):
+        return title
+    return f'{title}: {subtitle}' if subtitle and subtitle.lower() not in title.lower() else title
 
 
 def main():
@@ -55,10 +68,10 @@ def main():
 
     entries = [
         {
-            'title': p['title'],
-            'authors': p['authors'],
+            'title': complete_title(html.unescape(p['title']), p['doi']),
+            'authors': html.unescape(p['authors'] or ''),
             'year': p['publication_year'],
-            'venue': p['journal'] or p['publisher'],
+            'venue': html.unescape(p['journal'] or p['publisher'] or ''),
             'doi': p['doi'],
             'url': p['url'],
         }

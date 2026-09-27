@@ -290,7 +290,7 @@ release contains major changes to the code and its structure:
     implementation of PFASST and the likes. Initialization has been
     simplified a lot, too.
 -   **Collocation-based coarsening** As the standard PFASST
-    libraries [libpfasst](https://bitbucket.org/memmett/libpfasst)
+    libraries [libpfasst](https://github.com/libpfasst/LibPFASST)
     and [PFASST++](https://github.com/Parallel-in-Time/PFASST)
     `pySDC` now offers collocation-based coarsening,
     i.e. the number of collocation nodes can be reduced during
@@ -315,4 +315,5 @@ release contains major changes to the code and its structure:
         expected
     -   Reworked many of the internal structures for consistency and
         simplicity
+
 :arrow_left: [Back to main page](./README.md)

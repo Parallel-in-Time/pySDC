@@ -27,32 +27,31 @@ Changes in the problem_classes
 A problem class does not need a GPU twin. It keeps one implementation and takes a ``useGPU``
 argument, and a ``setup_GPU`` classmethod swaps what the class computes with: ``xp`` from NumPy to
 CuPy, ``xsp`` and ``linalg`` from SciPy's sparse modules to ``cupyx``'s, and the datatypes to
-`cupy_mesh <../../implementations/datatype_classes/cupy_mesh.py>`_. The body of the class then
+`cupy_mesh <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/datatype_classes/cupy_mesh.py>`_. The body of the class then
 calls ``self.xp.sin`` where it used to call ``numpy.sin``, and works either way.
 
 A `comparison table <https://docs.cupy.dev/en/latest/reference/comparison.html>`_ is given by CuPy
 for translating the calls themselves.
 
-`generic_ND_FD.py <../../implementations/problem_classes/generic_ND_FD.py>`_ is the example to
+`generic_ND_FD.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/generic_ND_FD.py>`_ is the example to
 copy: every finite-difference problem derived from it -- the heat equation that ``heat.py`` runs,
 and advection -- became GPU-capable when the base class was ported, without a line of their own.
 Now you are ready to run ``pySDC`` on the GPU.
 
 Run pySDC on the GPU
 --------------------
-You have to configure a script to run it. You can see at the file `heat.py <heat.py>`_ that the
-parameters are the same for GPU and CPU. Only the import for the problem_class changed.
+You have to configure a script to run it. You can see at the file `heat.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/GPU/heat.py>`_ that the
+parameters are the same for GPU and CPU: the problem class stays, and ``useGPU=True`` in its parameters moves it to the GPU.
 
 More examples
 -------------
-Further examples can found with Allen-Cahn. These take the other route: rather than a separate
-``_gpu`` module, one class serves both and a ``useGPU`` flag switches the array, sparse and solver
-modules and the datatypes over to CuPy.
+Further examples can be found with Allen-Cahn. As everywhere, one class serves both, and the ``useGPU`` flag switches
+the array, sparse and solver modules and the datatypes over to CuPy.
 
-* problem: `AllenCahn_2D_FD.py <../../implementations/problem_classes/AllenCahn_2D_FD.py>`_, with ``useGPU=True``
-* problem: `AllenCahn_2D_FFT.py <../../implementations/problem_classes/AllenCahn_2D_FFT.py>`_, with ``useGPU=True``
+* problem: `AllenCahn_2D_FD.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/AllenCahn_2D_FD.py>`_, with ``useGPU=True``
+* problem: `AllenCahn_2D_FFT.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/AllenCahn_2D_FFT.py>`_, with ``useGPU=True``
 
-  * Script to run pySDC: `ac_fft.py <ac_fft.py>`_
+  * Script to run pySDC: `ac_fft.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/GPU/ac_fft.py>`_
 
 
 Running large problems on GPU

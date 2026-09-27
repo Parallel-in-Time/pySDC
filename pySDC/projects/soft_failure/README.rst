@@ -24,9 +24,10 @@ Statistics for the van der Pol oscillator
 
 ``generate_statistics.py`` runs one time step of the van der Pol oscillator with :math:`\mu = 18` without faults, to
 get the number of iterations, and then 500 times with faults.
-It writes the detector's true and false positives, false negatives and F-score (after Sloan, Kumar and Bronevetsky,
-2012) into ``data/vanderpol_500_runs_Statistics.txt``, and plots the residual of the last run, the smallest, largest,
-mean and median residual over all runs, and a histogram of the number of iterations:
+It writes the detector's true and false positives and negatives, its F-score, precision, true and false positive rates
+(after Sloan, Kumar and Bronevetsky, 2012) into ``data/vanderpol_500_runs_Statistics.txt``, and plots the residual of
+the last run, the smallest, largest, mean and median residual over all runs, and a histogram of the number of
+iterations:
 
 .. image:: ../../../data/vanderpol_500_runs_residuals.png
     :width: 32%

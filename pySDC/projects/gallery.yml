@@ -12,12 +12,12 @@
     - title: The pySDC paper
       page: TOMS
       image: data/runtimes_matrix_heat.png
-      summary: SDC variants for the Allen-Cahn equation, and space-time parallel runs with PETSc, from ACM TOMS.
+      summary: SDC variants for the Allen-Cahn equation, and space-time parallel heat equation runs with PETSc, from ACM TOMS.
     - title: Parallel SDC
       page: parallelSDC
       image: data/parallelSDC_preconditioner_heat.png
       summary: Strategies to parallelize SDC across the collocation nodes, within each iteration.
-    - title: Improving parallelism across the method
+    - title: Parallel SDC across the method, reloaded
       page: parallelSDC_reloaded
       excerpt:
         file: pySDC/projects/parallelSDC_reloaded/scripts/fig05_allenCahn.py
@@ -77,11 +77,11 @@
       summary: Allen-Cahn-type problems from materials science, for correctness, parallelization and benchmarks.
     - title: Energy systems with discrete events
       page: PinTSimE
-      image: data/buck_converter_model_solution.png
-      summary: Microgrids and other systems with switches, and an estimator that restarts SDC at the events.
+      image: data/detection_and_adaptivity_battery_dt=0.01_M=4.png
+      summary: Components of DC microgrids and a battery, with switches, and an estimator that restarts SDC at the events.
     - title: Exponential SDC for the heart
       page: monodomain
-      image: data_monodomain/stability_domain_IMEXEXP.png
+      image: data_monodomain/stability_domain_IMEXEXP_EXPRK.png
       summary: Exponential SDC for the monodomain equation of cardiac electrophysiology.
     - title: Rayleigh-Bénard convection
       page: RayleighBenard
@@ -89,14 +89,14 @@
         file: pySDC/projects/RayleighBenard/RBC3D_configs.py
         start-at: 'desc[''sweeper_params''][''quad_type''] = ''RADAU-RIGHT'''
         end-at: 'desc[''problem_params''][''dealiasing''] = self.dealiasing'
-      summary: 3D convection at Rayleigh numbers up to 1e7, with SDC and Runge-Kutta, on CPUs and GPUs.
+      summary: 3D convection with spectral methods, SDC and Runge-Kutta, from CPUs to large GPU runs.
     - title: StrömungsRaum
       page: StroemungsRaum
       excerpt:
         file: pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_FEniCS.py
         start-at: 'F = df.dot(u, self.v) * df.dx'
         end-at: 'self.step = NewtonStep(F, df.derivative(F, self.w))'
-      summary: Space-time parallel methods for fluid dynamics on heterogeneous exascale hardware.
+      summary: SDC with FEniCS for heat, convection-diffusion and incompressible Navier-Stokes flows.
 
 - section: High-performance computing
   projects:

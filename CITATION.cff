@@ -57,7 +57,7 @@ title: "Parallel-in-Time/pySDC"
 cff-version: 1.2.0
 preferred-citation:
   type: article
-  title: "Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections"
+  title: "Algorithm 997: pySDC—Prototyping Spectral Deferred Corrections"
   authors:
     - family-names: Speck
       given-names: Robert
