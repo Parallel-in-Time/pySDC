@@ -1,0 +1,32 @@
+README.md
+  s_619b2228c15391::t_bde9e851ade48f 9
+docs/convert_markdown.py
+  s_619b2228c15391::t_0a7f247fb96066 82-84,112
+docs/contrib/02_continuous_integration.md
+  s_619b2228c15391::t_bde9e851ade48f 3
+docs/source/conf.py
+  s_619b2228c15391::t_0a7f247fb96066 79
+  s_619b2228c15391::t_37e1302ae31003 4,80,120,122,478-482,490
+pySDC/projects/Resilience/README.rst
+  s_619b2228c15391::t_bde9e851ade48f 25,27,29,31,37,39,41,99
+docs/source/_static/custom.css
+  s_619b2228c15391::t_37e1302ae31003 42,62-71
+  s_619b2228c15391::t_7bfc0e8faa5ba9 72
+  s_619b2228c15391::t_bde9e851ade48f 73-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c004db8444c3892e57ca4d01ac09baf3d3940fd2",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
