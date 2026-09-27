@@ -1,0 +1,20 @@
+docs/source/conf.py
+  s_619b2228c15391::t_cedc059b3106f2 64
+  s_619b2228c15391::t_036f1647a7b976 59-63,65-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e11d34e1be9d84a723eb82df84ef9011a61a098a",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
