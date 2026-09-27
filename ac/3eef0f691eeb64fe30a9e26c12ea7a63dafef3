@@ -1,0 +1,19 @@
+pySDC/tests/test_convergence_controllers/test_adaptivity.py
+  s_6435d1fae13e27::t_bb1279adc5e6d2 220
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ac3eef0f691eeb64fe30a9e26c12ea7a63dafef3",
+  "prompts": {},
+  "sessions": {
+    "s_6435d1fae13e27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79d56209-5811-4846-8ee3-ed8d7bdb952b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
