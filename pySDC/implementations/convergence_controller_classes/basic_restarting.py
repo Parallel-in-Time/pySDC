@@ -284,7 +284,8 @@ on...",
             self.Send(comm, dest=S.status.slot + 1, buffer=[buff, self.MPI_BOOL])
 
         if self.params.restart_from_first_step:
-            max_restart_reached = comm.bcast(S.status.restarts_in_a_row > self.params.max_restarts, root=0)
+            # only the first step knows whether we lost patience, and whether to crash
+            max_restart_reached, crash_now = comm.bcast((self.buffers.max_restart_reached, crash_now), root=0)
             S.status.restart = comm.allreduce(S.status.restart, op=self.OR) and not max_restart_reached
 
         if crash_now:
