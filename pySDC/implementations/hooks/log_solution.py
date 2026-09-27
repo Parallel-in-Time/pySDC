@@ -105,15 +105,43 @@ class LogToPickleFile(Hooks):
     counter = 0
 
     def logging_condition(L):
+        """
+        Decide whether to log after a step. Called on the class, not an instance; the default logs every step.
+
+        Args:
+            L (pySDC.Level.level): the level to log
+
+        Returns:
+            bool: whether to write a file
+        """
         return True
 
     def process_solution(L):
+        """
+        Data to store in a file. Called on the class, not an instance.
+
+        Args:
+            L (pySDC.Level.level): the level to log
+
+        Returns:
+            dict: the time ``t`` at the end of the step and a numpy view ``u`` of ``L.uend``
+        """
         return {'t': L.time + L.dt, 'u': L.uend.view(np.ndarray)}
 
     def format_index(index):
+        """
+        Render the file index for the file name. Called on the class, not an instance.
+
+        Args:
+            index (int): the index of the file
+
+        Returns:
+            str: the index padded with zeros to six digits
+        """
         return f'{index:06d}'
 
     def __init__(self):
+        """Check that ``path`` is set and is not a file, and create the directory if it does not exist."""
         super().__init__()
 
         if self.path is None:
@@ -128,6 +156,19 @@ class LogToPickleFile(Hooks):
             os.makedirs(self.path, exist_ok=True)
 
     def log_to_file(self, step, level_number, condition, process_solution=None):
+        """
+        Pickle the processed solution of the finest level to the file of the current ``counter`` and increment the
+        counter. Nothing is written on coarser levels or if ``condition`` is false.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+            condition (bool): whether to write the file
+            process_solution (callable): replaces the class's ``process_solution`` if given
+
+        Returns:
+            None
+        """
         if level_number > 0:
             return None
 
@@ -148,10 +189,31 @@ class LogToPickleFile(Hooks):
             type(self).counter += 1
 
     def post_step(self, step, level_number):
+        """
+        Write the solution at the end of the step to file if ``logging_condition`` allows it.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         L = step.levels[level_number]
         self.log_to_file(step, level_number, type(self).logging_condition(L))
 
     def pre_run(self, step, level_number):
+        """
+        Write the initial conditions to file, stored with the time ``L.time`` at the start of the run. Sets ``L.uend``
+        to the initial conditions for this.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         L = step.levels[level_number]
         L.uend = L.u[0]
 
@@ -165,10 +227,28 @@ class LogToPickleFile(Hooks):
 
     @classmethod
     def get_path(cls, index):
+        """
+        Get the path to the file with a given index.
+
+        Args:
+            index (int): the index of the file
+
+        Returns:
+            str: the path
+        """
         return f'{cls.path}/{cls.file_name}_{cls.format_index(index)}.pickle'
 
     @classmethod
     def load(cls, index):
+        """
+        Load the data stored in the file with a given index.
+
+        Args:
+            index (int): the index of the file
+
+        Returns:
+            dict: the data as returned by ``process_solution`` when it was written
+        """
         path = cls.get_path(index)
         with open(path, 'rb') as file:
             return pickle.load(file)
@@ -183,6 +263,17 @@ class LogToPickleFileAfterXS(LogToPickleFile):
     t_next_log = 0
 
     def post_step(self, step, level_number):
+        """
+        Write the solution to file once the end of the step has reached the next logging time and the step is not
+        restarted, then move the next logging time on by ``time_increment``.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         L = step.levels[level_number]
 
         if self.t_next_log == 0:
@@ -193,6 +284,16 @@ class LogToPickleFileAfterXS(LogToPickleFile):
             self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
 
     def pre_run(self, step, level_number):
+        """
+        Write the initial conditions to file like the parent class, but only if ``logging_condition`` allows it.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         L = step.levels[level_number]
         L.uend = L.u[0]
 
@@ -216,12 +317,24 @@ class LogToFile(Hooks):
     counter = 0  # number of stored time points in the file
 
     def __init__(self):
+        """Set up without an output file and allow overwriting in ``FieldsIO`` according to ``allow_overwriting``."""
         super().__init__()
         self.outfile = None
         self.t_next_log = 0
         FieldsIO.ALLOW_OVERWRITE = self.allow_overwriting
 
     def pre_run(self, step, level_number):
+        """
+        Set up the output file on the finest level. If the file exists and the run does not start at :math:`t=0`, it is
+        opened to append to it. Otherwise, the problem creates a new file and the initial conditions are written to it.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         if level_number > 0:
             return None
         L = step.levels[level_number]
@@ -247,6 +360,20 @@ class LogToFile(Hooks):
         self.logger.info(f'Will write to disk every {self.time_increment:.4e} time units')
 
     def post_step(self, step, level_number):
+        """
+        Write the solution of the finest level to file once the end of the step has reached the next logging time and
+        the step is not restarted, then move the next logging time on by ``time_increment``.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+
+        Raises:
+            DataError: if the file already has a solution at this time and ``allow_overwriting`` is not set
+        """
         if level_number > 0:
             return None
 
@@ -265,6 +392,16 @@ class LogToFile(Hooks):
             type(self).counter = len(self.outfile.times)
 
     def post_run(self, step, level_number):
+        """
+        Write the final solution of the finest level to file unless the file has it already.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         if level_number > 0:
             return None
 
@@ -279,6 +416,15 @@ class LogToFile(Hooks):
 
     @classmethod
     def load(cls, index):
+        """
+        Load a solution from ``filename``.
+
+        Args:
+            index (int): the index of the time point in the file
+
+        Returns:
+            dict: the time ``t`` and the solution ``u``
+        """
         data = {}
         file = FieldsIO.fromFile(cls.filename)
         file_entry = file.readField(idx=index)

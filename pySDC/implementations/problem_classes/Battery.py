@@ -496,6 +496,7 @@ class battery_implicit(battery):
         newton_tol=1e-11,
         stop_at_nan=True,
     ):
+        """Initialization routine"""
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
         self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True)
 

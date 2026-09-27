@@ -10,6 +10,14 @@ class CrashBase(ConvergenceController):
     """
 
     def __init__(self, controller, params, description, **kwargs):
+        """
+        Initialization routine, which additionally prepares the logical or for communicating crashes with MPI
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+        """
         super().__init__(controller, params, description, **kwargs)
         if self.comm or self.params.useMPI:
             from mpi4py import MPI

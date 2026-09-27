@@ -81,12 +81,31 @@ class GenericGusto(Problem):
 
     @property
     def bcs(self):
+        """
+        Boundary conditions of the prognostic field of the equation.
+
+        Returns:
+            list of :class:`DirichletBC`: The boundary conditions, or None if `apply_bcs` is False
+        """
         if not self.apply_bcs:
             return None
         else:
             return self.equation.bcs[self.equation.field_name]
 
     def invert_mass_matrix(self, rhs):
+        """
+        Solve the variational problem M x = M rhs with the boundary conditions, where M is the mass form made of the
+        time derivative terms of the residual. The solver is set up once and cached.
+
+        Since the mass form is applied to `rhs` on the right hand side as well, this returns `rhs` with the boundary
+        conditions imposed, not the inverse mass matrix applied to `rhs`.
+
+        Args:
+            rhs (dtype_u): Right hand side
+
+        Returns:
+            dtype_u: The solution x
+        """
         self._u.assign(rhs.functionspace)
 
         if 'mass_matrix' not in self.solvers.keys():
@@ -113,6 +132,18 @@ class GenericGusto(Problem):
         return self.dtype_u(self.x_out)
 
     def eval_f(self, u, *args):
+        """
+        Evaluate the right hand side f(u) by solving M f = -R(u), where M is the mass form (the time derivative terms of
+        the residual) and R(u) are all other terms of the residual evaluated at `u`. The solver is set up once and
+        cached.
+
+        Args:
+            u (dtype_u): Solution at which to evaluate
+            *args: Not used, the time is not passed on to Gusto
+
+        Returns:
+            dtype_f: The right hand side
+        """
         self._u.assign(u.functionspace)
 
         if 'eval_rhs' not in self.solvers.keys():
@@ -140,6 +171,22 @@ class GenericGusto(Problem):
         return self.dtype_f(self.x_out)
 
     def solve_system(self, rhs, factor, u0, *args):
+        """
+        Solve the nonlinear system (M - factor f)(u) = M rhs, i.e. M u + factor R(u) = M rhs with R the terms of the
+        residual other than the time derivative, with a Firedrake nonlinear variational solver starting from `u0`.
+
+        The solvers are cached per `factor`. When the cache is full, the oldest one for a factor is evicted. If the
+        solver does not converge, the error is raised if `stop_at_divergence` is set and only logged otherwise.
+
+        Args:
+            rhs (dtype_u): Right hand side
+            factor (float): Prefactor of the right hand side f, e.g. the node-to-node step size
+            u0 (dtype_u): Initial guess
+            *args: Not used, typically the time
+
+        Returns:
+            dtype_u: The solution
+        """
         self.x_out.assign(u0.functionspace)  # set initial guess
         self._u.assign(rhs.functionspace)
 
@@ -191,6 +238,18 @@ class GenericGustoImex(GenericGusto):
     rhs_n_labels = 2
 
     def evaluate_labeled_term(self, u, label):
+        """
+        Evaluate the part of the right hand side made of the terms carrying `label`, by solving M x = -R_label(u), where
+        M is the mass form and R_label are the terms of the residual with `label` and without the time derivative label.
+        One solver per label is set up and cached.
+
+        Args:
+            u (dtype_u): Solution at which to evaluate
+            label (:class:`Label`): Gusto label, e.g. `implicit` or `explicit`
+
+        Returns:
+            firedrake.Function: The result, in the output buffer `self.x_out` that is overwritten by the next solve
+        """
         self._u.assign(u.functionspace)
 
         if label not in self.solvers.keys():
@@ -216,6 +275,17 @@ class GenericGustoImex(GenericGusto):
         return self.x_out
 
     def eval_f(self, u, *args):
+        """
+        Evaluate the right hand side with the terms labeled `implicit` in the implicit part and the terms labeled
+        `explicit` in the explicit part. Terms carrying neither label are left out.
+
+        Args:
+            u (dtype_u): Solution at which to evaluate
+            *args: Not used, the time is not passed on to Gusto
+
+        Returns:
+            dtype_f: The right hand side, with `impl` and `expl` parts
+        """
         me = self.dtype_f(self.init)
         me.impl.assign(self.evaluate_labeled_term(u, implicit))
         me.expl.assign(self.evaluate_labeled_term(u, explicit))
@@ -223,6 +293,20 @@ class GenericGustoImex(GenericGusto):
         return me
 
     def solve_system(self, rhs, factor, u0, *args):
+        """
+        Solve the nonlinear system (M - factor f_I)(u) = M rhs, i.e. M u + factor R_I(u) = M rhs with R_I the terms of
+        the residual labeled `implicit`, with a Firedrake nonlinear variational solver starting from `u0`. The explicit
+        terms are left out. Caching and convergence failures are handled as in `GenericGusto.solve_system`.
+
+        Args:
+            rhs (dtype_u): Right hand side
+            factor (float): Prefactor of the implicit part f_I, e.g. the node-to-node step size
+            u0 (dtype_u): Initial guess
+            *args: Not used, typically the time
+
+        Returns:
+            dtype_u: The solution
+        """
         self.x_out.assign(u0.functionspace)  # set initial guess
         self._u.assign(rhs.functionspace)
 

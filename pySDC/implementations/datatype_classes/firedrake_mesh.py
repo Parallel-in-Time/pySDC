@@ -14,6 +14,16 @@ class firedrake_mesh(object):
     """
 
     def __init__(self, init, val=0.0):
+        """
+        Args:
+            init (firedrake.FunctionSpace, firedrake.Function or firedrake_mesh): Function space to create a function
+                on, or
+                data to copy
+            val (float): Value to assign if `init` is a function space, ignored otherwise
+
+        Raises:
+            DataError: If `init` has none of these types
+        """
         if fd.functionspaceimpl.WithGeometry in type(init).__mro__:
             self.functionspace = fd.Function(init)
             self.functionspace.assign(val)

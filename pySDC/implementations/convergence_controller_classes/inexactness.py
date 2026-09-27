@@ -81,7 +81,27 @@ class NewtonInexactness(ConvergenceController):
             self.log(f'Changed tolerance to {tol:.2e}', step)
 
     def set_tolerance(self, lvl, tol):
+        """
+        Set the tolerance of the Newton solver of the problem.
+
+        Args:
+            lvl (pySDC.Level): The level whose problem to change
+            tol (float): The new tolerance
+
+        Returns:
+            None
+        """
         lvl.prob.newton_tol = tol
 
     def set_maxiter(self, description, maxiter):
+        """
+        Set the maximum number of Newton iterations in the problem parameters of the description.
+
+        Args:
+            description (dict): The description object used to instantiate the controller
+            maxiter (int): The maximum number of Newton iterations
+
+        Returns:
+            None
+        """
         description['problem_params']['newton_maxiter'] = maxiter

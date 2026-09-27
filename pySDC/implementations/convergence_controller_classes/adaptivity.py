@@ -183,6 +183,16 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
         return None
 
     def get_convergence(self, controller, S, **kwargs):
+        """
+        Check if the collocation problem is converged. Needs to be implemented by the child class.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            bool: Whether the collocation problem is converged
+        """
         raise NotImplementedError("Please implement a way to check if the collocation problem is converged!")
 
     def setup(self, controller, params, description, **kwargs):
@@ -225,6 +235,20 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
         return defaults
 
     def determine_restart(self, controller, S, **kwargs):
+        """
+        Once the collocation problem is converged, restart with a smaller step size if the residual is still above
+        ``restol`` (with ``restart_at_maxiter``, unless the increment is below ``e_tol``), or restart if the local error
+        estimate exceeds ``e_tol``. Before convergence, restart with a smaller step size if the residual
+        grows between iterations (only without parallelism across steps and with ``abort_at_growing_residual``) or
+        exceeds ``residual_max_tol``.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
         if self.get_convergence(controller, S, **kwargs):
             self.res_last_iter = np.inf
 
@@ -262,6 +286,16 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
         self.res_last_iter = S.levels[0].status.residual * 1.0
 
     def trigger_restart_upon_nonconvergence(self, S):
+        """
+        Restart the step and stop iterating, dividing the step size on all levels by ``factor_if_not_converged``. No
+        interpolation is done for the restarted step.
+
+        Args:
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
         S.status.restart = True
         S.status.force_done = True
         for L in S.levels:
@@ -429,6 +463,18 @@ class AdaptivityRK(Adaptivity):
     """
 
     def setup(self, controller, params, description, **kwargs):
+        """
+        Add the order of the embedded error estimate of the Runge-Kutta method, from the sweeper's ``get_update_order``,
+        as default for the parameter ``update_order``.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            (dict): The updated params dictionary
+        """
         defaults = {}
         defaults['update_order'] = params.get('update_order', description['sweeper_class'].get_update_order())
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
@@ -625,11 +671,29 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         return defaults
 
     def setup_status_variables(self, controller, **kwargs):
+        """
+        Set up empty lists for the error estimates and orders of the collocation problems solved in the current step.
+
+        Args:
+            controller (pySDC.Controller): The controller
+
+        Returns:
+            None
+        """
         self.status = Status(['error', 'order'])
         self.status.error = []
         self.status.order = []
 
     def reset_status_variables(self, controller, **kwargs):
+        """
+        Empty the lists of error estimates and orders, e.g. when restarting.
+
+        Args:
+            controller (pySDC.Controller): The controller
+
+        Returns:
+            None
+        """
         self.setup_status_variables(controller, **kwargs)
 
     def dependencies(self, controller, description, **kwargs):
@@ -655,6 +719,16 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         )
 
     def get_convergence(self, controller, S, **kwargs):
+        """
+        The step is converged once all collocation problems have been solved.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            bool: Whether all ``num_colls`` collocation problems have been solved
+        """
         return len(self.status.order) == self.params.num_colls
 
     def get_local_error_estimate(self, controller, S, **kwargs):
@@ -687,6 +761,17 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
             self.status.order += [lvl.sweep.coll.order]
 
     def get_new_step_size(self, controller, S, **kwargs):
+        """
+        Once all collocation problems have been solved, compute the new step size from the error estimate, using as
+        order one more than the lower order of the last two collocation methods.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        """
         if len(self.status.order) == self.params.num_colls:
             lvl = S.levels[0]
 
@@ -749,6 +834,18 @@ class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
     """
 
     def setup(self, controller, params, description, **kwargs):
+        """
+        Add the default ``high_Taylor_order=False`` to the parameters and use the regular convergence check to determine
+        if the collocation problem is converged.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            (dict): The updated params dictionary
+        """
         from pySDC.core.check_convergence import CheckConvergence
 
         defaults = {
@@ -760,6 +857,17 @@ class AdaptivityExtrapolationWithinQ(AdaptivityForConvergedCollocationProblems):
         return {**defaults, **super().setup(controller, params, description, **kwargs)}
 
     def get_convergence(self, controller, S, **kwargs):
+        """
+        Check if the step is converged with the regular convergence criteria, i.e. residual, increment or maximum number
+        of iterations.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            bool: Whether the step is converged
+        """
         return self.check_convergence(S)
 
     def dependencies(self, controller, description, **kwargs):
@@ -839,6 +947,18 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
     """
 
     def setup(self, controller, params, description, **kwargs):
+        """
+        Add defaults for the mesh type of the problem, which selects the error estimator, and ``rel_error``, and use the
+        regular convergence check to determine if the collocation problem is converged.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            (dict): The updated params dictionary
+        """
         from pySDC.core.check_convergence import CheckConvergence
 
         defaults = {
@@ -853,6 +973,17 @@ class AdaptivityPolynomialError(AdaptivityForConvergedCollocationProblems):
         return defaults
 
     def get_convergence(self, controller, S, **kwargs):
+        """
+        Check if the step is converged with the regular convergence criteria, i.e. residual, increment or maximum number
+        of iterations.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            bool: Whether the step is converged
+        """
         return self.check_convergence(S)
 
     def dependencies(self, controller, description, **kwargs):

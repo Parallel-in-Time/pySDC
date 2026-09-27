@@ -32,6 +32,7 @@ class Timings(Hooks):
         raise NotImplementedError
 
     def __init__(self):
+        """Start with all start and end times unset."""
         super().__init__()
         self.__t0_setup = None
         self.__t0_run = None

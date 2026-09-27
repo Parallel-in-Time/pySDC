@@ -14,6 +14,10 @@ class Pars(FrozenClass):
     """
 
     def __init__(self, params: Dict[str, Any]) -> None:
+        """
+        Args:
+            params (dict): Parameters to store as attributes, overriding the defaults
+        """
         self.control_order: int = 0  # integer that determines the order in which the convergence controllers are called
         self.useMPI: Optional[bool] = None  # depends on the controller
 
@@ -32,6 +36,10 @@ class Status(FrozenClass):
     """
 
     def __init__(self, status_variabes: List[str]) -> None:
+        """
+        Args:
+            status_variabes (list of str): Names of the status variables, all initialized to None
+        """
         [setattr(self, key, None) for key in status_variabes]
 
         self._freeze()
@@ -506,6 +514,19 @@ class ConvergenceController(object):
         return data
 
     def add_status_variable_to_step(self, key, value=None):
+        """
+        Add a status variable to the steps of the controller and optionally set its value on all of them.
+
+        The variable is registered on the class of the step status, see `FrozenClass.add_attr`, so it exists on every
+        step.
+
+        Args:
+            key (str): Name of the status variable
+            value: Value to set on all steps, which is skipped if None
+
+        Returns:
+            None
+        """
         steps = self.controller.steps
 
         steps[0].status.add_attr(key)
@@ -514,12 +535,35 @@ class ConvergenceController(object):
             self.set_step_status_variable(key, value)
 
     def set_step_status_variable(self, key, value):
+        """
+        Set a status variable on all steps of the controller.
+
+        Args:
+            key (str): Name of the status variable, which must have been added already
+            value: Value to set
+
+        Returns:
+            None
+        """
         steps = self.controller.steps
 
         for S in steps:
             S.status.__dict__[key] = value
 
     def add_status_variable_to_level(self, key, value=None):
+        """
+        Add a status variable to the levels of the controller and optionally set its value on all of them.
+
+        The variable is registered on the class of the level status, see `FrozenClass.add_attr`, so it exists on every
+        level.
+
+        Args:
+            key (str): Name of the status variable
+            value: Value to set on all levels of all steps, which is skipped if None
+
+        Returns:
+            None
+        """
         steps = self.controller.steps
 
         steps[0].levels[0].status.add_attr(key)
@@ -528,6 +572,16 @@ class ConvergenceController(object):
             self.set_level_status_variable(key, value)
 
     def set_level_status_variable(self, key, value):
+        """
+        Set a status variable on all levels of all steps of the controller.
+
+        Args:
+            key (str): Name of the status variable, which must have been added already
+            value: Value to set
+
+        Returns:
+            None
+        """
         steps = self.controller.steps
 
         for S in steps:
