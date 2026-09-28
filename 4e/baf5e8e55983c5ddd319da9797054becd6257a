@@ -1,0 +1,35 @@
+.github/workflows/ci_pipeline.yml
+  s_619b2228c15391::t_8b748579d1419b 404-406
+  s_619b2228c15391::t_a28c9a22794ed3 237,407
+etc/modal_gpu_tests.py
+  s_619b2228c15391::t_a28c9a22794ed3 30-33,188-189,212-216
+pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py
+  s_619b2228c15391::t_89dc42a39bafc2 226-229,259-264
+  s_619b2228c15391::t_bfc0caa288ca68 30-31,199-208
+  s_619b2228c15391::t_9b4d18fa870a62 209
+pySDC/tests/test_tutorials/test_step_7.py
+  s_619b2228c15391::t_92dad69f92e8db 97-107,136-140
+  s_619b2228c15391::t_c384b44c320f2a 141-144
+  s_619b2228c15391::t_be9615fee42603 145
+pySDC/tutorial/step_7/G_pySDC_on_GPU.py
+  s_619b2228c15391::t_8b748579d1419b 175-180
+pySDC/tutorial/step_7/F_pySDC_with_Gusto.py
+  s_619b2228c15391::t_92dad69f92e8db 445,447-450
+  s_619b2228c15391::t_c384b44c320f2a 446
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4ebaf5e8e55983c5ddd319da9797054becd6257a",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
