@@ -34,7 +34,7 @@
 | pySDC/helpers/stats\_helper.py                                                                      |       36 |        0 |    100% |           |
 | pySDC/helpers/testing.py                                                                            |       30 |        0 |    100% |           |
 | pySDC/helpers/transfer\_helper.py                                                                   |      142 |        0 |    100% |           |
-| pySDC/helpers/visualization\_tools.py                                                               |       40 |        0 |    100% |           |
+| pySDC/helpers/visualization\_tools.py                                                               |       33 |        0 |    100% |           |
 | pySDC/helpers/vtkIO.py                                                                              |       51 |        1 |     98% |        90 |
 | pySDC/implementations/controller\_classes/ParaDiag.py                                               |       55 |        3 |     95% |50, 57, 116 |
 | pySDC/implementations/controller\_classes/controller\_MPI.py                                        |      299 |       46 |     85% |72, 238, 262, 284, 436, 446, 454, 458, 463, 484, 517, 550, 554, 574, 579, 603-623, 636, 649, 669-685 |
@@ -115,7 +115,7 @@
 | pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |107, 357, 456, 515 |
 | pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      257 |       14 |     95% |99, 325, 345, 492, 570, 736-751 |
 | pySDC/implementations/problem\_classes/TestEquation\_0D.py                                          |      101 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        1 |     98% |       182 |
+| pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        2 |     97% |  182, 185 |
 | pySDC/implementations/problem\_classes/VorticityVelocity\_2D\_FEniCS\_periodic.py                   |      108 |       51 |     53% |164-169, 188-197, 216-221, 240-243, 260-263, 280-282, 298-324, 407-412, 431-441, 460-464, 486-489 |
 | pySDC/implementations/problem\_classes/acoustic\_helpers/buildWave1DMatrix.py                       |       24 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/acoustic\_helpers/standard\_integrators.py                   |      259 |       11 |     96% |   301-313 |
@@ -356,49 +356,51 @@
 | pySDC/projects/parallelSDC\_reloaded/vanderpol\_accuracy.py                                         |       62 |        0 |    100% |           |
 | pySDC/projects/parallelSDC\_reloaded/vanderpol\_setup.py                                            |       36 |        0 |    100% |           |
 | pySDC/projects/soft\_failure/FaultHooks.py                                                          |       20 |        0 |    100% |           |
-| pySDC/projects/soft\_failure/generate\_statistics.py                                                |      206 |       49 |     76% |26-63, 71-111, 169, 171, 211, 213 |
-| pySDC/projects/soft\_failure/implicit\_sweeper\_faults.py                                           |      144 |        5 |     97% |44, 159-161, 258 |
+| pySDC/projects/soft\_failure/generate\_statistics.py                                                |      206 |       50 |     76% |26-63, 71-111, 169, 171, 211, 213, 285 |
+| pySDC/projects/soft\_failure/implicit\_sweeper\_faults.py                                           |      144 |        8 |     94% |44, 159-161, 201-204, 258 |
 | pySDC/projects/soft\_failure/visualization\_helper.py                                               |       54 |        0 |    100% |           |
-| pySDC/tutorial/step\_1/A\_spatial\_problem\_setup.py                                                |       21 |        0 |    100% |           |
-| pySDC/tutorial/step\_1/B\_spatial\_accuracy\_check.py                                               |       81 |        0 |    100% |           |
-| pySDC/tutorial/step\_1/C\_collocation\_problem\_setup.py                                            |       26 |        0 |    100% |           |
-| pySDC/tutorial/step\_1/D\_collocation\_accuracy\_check.py                                           |       86 |        0 |    100% |           |
-| pySDC/tutorial/step\_2/A\_step\_data\_structure.py                                                  |       38 |        0 |    100% |           |
-| pySDC/tutorial/step\_2/B\_my\_first\_sweeper.py                                                     |       54 |        0 |    100% |           |
-| pySDC/tutorial/step\_2/C\_using\_pySDCs\_frontend.py                                                |       43 |        0 |    100% |           |
-| pySDC/tutorial/step\_3/A\_getting\_statistics.py                                                    |       54 |        0 |    100% |           |
-| pySDC/tutorial/step\_3/B\_adding\_statistics.py                                                     |       55 |        0 |    100% |           |
-| pySDC/tutorial/step\_3/C\_study\_collocations.py                                                    |       63 |        0 |    100% |           |
+| pySDC/tutorial/step\_1/A\_spatial\_problem\_setup.py                                                |       32 |        0 |    100% |           |
+| pySDC/tutorial/step\_1/B\_spatial\_accuracy\_check.py                                               |       46 |        0 |    100% |           |
+| pySDC/tutorial/step\_1/C\_collocation\_problem\_setup.py                                            |       30 |        0 |    100% |           |
+| pySDC/tutorial/step\_1/D\_collocation\_accuracy\_check.py                                           |       50 |        0 |    100% |           |
+| pySDC/tutorial/step\_2/A\_step\_data\_structure.py                                                  |       23 |        0 |    100% |           |
+| pySDC/tutorial/step\_2/B\_my\_first\_sweeper.py                                                     |       42 |        0 |    100% |           |
+| pySDC/tutorial/step\_2/C\_using\_pySDCs\_frontend.py                                                |       35 |        0 |    100% |           |
+| pySDC/tutorial/step\_3/A\_getting\_statistics.py                                                    |       42 |        0 |    100% |           |
+| pySDC/tutorial/step\_3/B\_adding\_statistics.py                                                     |       31 |        0 |    100% |           |
+| pySDC/tutorial/step\_3/C\_study\_collocations.py                                                    |       42 |        0 |    100% |           |
 | pySDC/tutorial/step\_3/HookClass\_Particles.py                                                      |       49 |        0 |    100% |           |
-| pySDC/tutorial/step\_4/A\_spatial\_transfer\_operators.py                                           |       45 |        0 |    100% |           |
-| pySDC/tutorial/step\_4/B\_multilevel\_hierarchy.py                                                  |       43 |        0 |    100% |           |
-| pySDC/tutorial/step\_4/C\_SDC\_vs\_MLSDC.py                                                         |       80 |        0 |    100% |           |
-| pySDC/tutorial/step\_4/D\_MLSDC\_with\_particles.py                                                 |       78 |        0 |    100% |           |
-| pySDC/tutorial/step\_4/PenningTrap\_3D\_coarse.py                                                   |       11 |        0 |    100% |           |
-| pySDC/tutorial/step\_5/A\_multistep\_multilevel\_hierarchy.py                                       |       32 |        0 |    100% |           |
-| pySDC/tutorial/step\_5/B\_my\_first\_PFASST\_run.py                                                 |       72 |        0 |    100% |           |
-| pySDC/tutorial/step\_5/C\_advection\_and\_PFASST.py                                                 |       81 |        0 |    100% |           |
-| pySDC/tutorial/step\_6/A\_run\_non\_MPI\_controller.py                                              |       97 |        0 |    100% |           |
-| pySDC/tutorial/step\_6/B\_odd\_temporal\_distribution.py                                            |        3 |        0 |    100% |           |
-| pySDC/tutorial/step\_6/C\_MPI\_parallelization.py                                                   |       37 |        0 |    100% |           |
+| pySDC/tutorial/step\_4/A\_spatial\_transfer\_operators.py                                           |       51 |        0 |    100% |           |
+| pySDC/tutorial/step\_4/B\_multilevel\_hierarchy.py                                                  |       18 |        0 |    100% |           |
+| pySDC/tutorial/step\_4/C\_SDC\_vs\_MLSDC.py                                                         |       58 |        0 |    100% |           |
+| pySDC/tutorial/step\_4/D\_MLSDC\_with\_particles.py                                                 |       58 |        0 |    100% |           |
+| pySDC/tutorial/step\_4/PenningTrap\_3D\_coarse.py                                                   |       12 |        0 |    100% |           |
+| pySDC/tutorial/step\_5/A\_multistep\_multilevel\_hierarchy.py                                       |       29 |        0 |    100% |           |
+| pySDC/tutorial/step\_5/B\_my\_first\_PFASST\_run.py                                                 |       50 |        0 |    100% |           |
+| pySDC/tutorial/step\_5/C\_advection\_and\_PFASST.py                                                 |       53 |        0 |    100% |           |
+| pySDC/tutorial/step\_6/A\_run\_non\_MPI\_controller.py                                              |       13 |        0 |    100% |           |
+| pySDC/tutorial/step\_6/B\_odd\_temporal\_distribution.py                                            |       10 |        0 |    100% |           |
+| pySDC/tutorial/step\_6/C\_MPI\_parallelization.py                                                   |       36 |        0 |    100% |           |
+| pySDC/tutorial/step\_6/pfasst\_setup.py                                                             |      100 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/A\_pySDC\_with\_FEniCS.py                                                    |      105 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/B\_pySDC\_with\_mpi4pyfft.py                                                 |       88 |        0 |    100% |           |
-| pySDC/tutorial/step\_7/C\_pySDC\_with\_PETSc.py                                                     |       92 |        2 |     98% |    35, 43 |
-| pySDC/tutorial/step\_7/D\_pySDC\_with\_PyTorch.py                                                   |       42 |        0 |    100% |           |
-| pySDC/tutorial/step\_7/E\_pySDC\_with\_Firedrake.py                                                 |      105 |        0 |    100% |           |
-| pySDC/tutorial/step\_7/F\_pySDC\_with\_Gusto.py                                                     |      112 |       10 |     91% |137-142, 206-213, 341 |
+| pySDC/tutorial/step\_7/C\_pySDC\_with\_PETSc.py                                                     |       92 |        2 |     98% |    63, 71 |
+| pySDC/tutorial/step\_7/D\_pySDC\_with\_PyTorch.py                                                   |       44 |        0 |    100% |           |
+| pySDC/tutorial/step\_7/E\_pySDC\_with\_Firedrake.py                                                 |      112 |        0 |    100% |           |
+| pySDC/tutorial/step\_7/F\_pySDC\_with\_Gusto.py                                                     |      112 |       10 |     91% |157-162, 226-233, 361 |
 | pySDC/tutorial/step\_7/G\_pySDC\_on\_GPU.py                                                         |       43 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/torch\_heat.py                                                               |      133 |       28 |     79% |15-16, 77-81, 99, 113, 126-127, 211-212, 241, 259-262, 280-282, 289-297, 360 |
-| pySDC/tutorial/step\_8/A\_visualize\_residuals.py                                                   |       32 |        0 |    100% |           |
-| pySDC/tutorial/step\_8/B\_multistep\_SDC.py                                                         |       98 |        0 |    100% |           |
-| pySDC/tutorial/step\_8/C\_iteration\_estimator.py                                                   |      179 |        0 |    100% |           |
+| pySDC/tutorial/step\_8/A\_adaptive\_time\_stepping.py                                               |       70 |        0 |    100% |           |
+| pySDC/tutorial/step\_8/B\_multistep\_SDC.py                                                         |       71 |        0 |    100% |           |
+| pySDC/tutorial/step\_8/C\_iteration\_estimator.py                                                   |      110 |        0 |    100% |           |
 | pySDC/tutorial/step\_8/HookClass\_error\_output.py                                                  |       30 |        0 |    100% |           |
-| pySDC/tutorial/step\_9/A\_paradiag\_for\_linear\_problems.py                                        |      111 |        0 |    100% |           |
-| pySDC/tutorial/step\_9/B\_paradiag\_for\_nonlinear\_problems.py                                     |       83 |        1 |     99% |       109 |
-| pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       88 |        0 |    100% |           |
-| pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       77 |        0 |    100% |           |
-| pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       16 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32542** | **4215** | **87%** |           |
+| pySDC/tutorial/step\_9/A\_paradiag\_for\_linear\_problems.py                                        |       96 |        0 |    100% |           |
+| pySDC/tutorial/step\_9/B\_paradiag\_for\_nonlinear\_problems.py                                     |       76 |        1 |     99% |       108 |
+| pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       95 |        0 |    100% |           |
+| pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
+| pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
+| pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
+| **TOTAL**                                                                                           | **32241** | **4220** | **87%** |           |
 
 42 empty files skipped.
 
