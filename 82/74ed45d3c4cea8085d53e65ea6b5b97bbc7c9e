@@ -1,0 +1,21 @@
+.pre-commit-config.yaml
+  s_619b2228c15391::t_e7472ed2d8ad6d 21
+etc/environment-lint.yml
+  s_619b2228c15391::t_53a6ea7cc5ad16 13-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8274ed45d3c4cea8085d53e65ea6b5b97bbc7c9e",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
