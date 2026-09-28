@@ -5,6 +5,7 @@
 *sdc.txt
 *detail.txt
 data/*
+pySDC/projects/StroemungsRaum/data/
 step_*.png
 *.pkl
 *.swp
