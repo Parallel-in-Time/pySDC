@@ -2,6 +2,20 @@
 
 :arrow_left: [Back to main page](./README.md)
 
+-   September 28, 2026: Version 5.9 brings pySDC to real GPUs and puts its correctness first. The finite-difference
+    problems and `mesh_to_mesh` run on GPUs with `useGPU`, so multilevel runs work there, the time-parallel
+    controller runs across GPUs with NCCL, and CI tests all of it on four GPUs on every push. The new delta-form
+    sweepers and their multilevel hierarchy solve for the correction rather than the solution, which lets a level
+    run in low precision. A review of every docstring against the code documented each public function and method,
+    and turned up bugs that gave wrong results without an error, now fixed, e.g. implicit Runge-Kutta stages on IMEX
+    problems, the source term of `battery_implicit`, IMEX Runge-Kutta classes inheriting their parent's explicit
+    weights, and the Rayleigh-Bénard diagnostics. A review of the tests made those that could not fail able
+    to, and the MPI tests now run under mpi-pytest. pySDC works with NumPy 1 and 2, and numba is optional, so pySDC
+    installs and runs in the browser. Two changes are **not backward compatible**: the Allen-Cahn problems share
+    one convention, the 0…1 field on `[-L/2, L/2)` (`nu != 2` raises, `newton_itercount` and `lin_itercount` are
+    gone in favour of the work counters), and the GPU-only duplicates `AllenCahn_2D_FD_gpu`,
+    `AllenCahn_2D_FFT_gpu` and `HeatEquation_ND_FD_CuPy` are removed in favour of `useGPU=True`.
+
 -   September 7, 2026: Version 5.8 makes ParaDiag actually parallel. The new MPI controller puts one time step per rank
     and circulates the diagonalization around a ring instead of gathering it, so the memory per rank no longer grows
     with the block, while `alpha` may now vary with the iteration, letting the outer loop start well-conditioned and
