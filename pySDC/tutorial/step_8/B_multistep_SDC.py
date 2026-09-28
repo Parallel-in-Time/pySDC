@@ -165,8 +165,9 @@ fig.tight_layout()
 
 # %% [markdown]
 # Parallel multi-step SDC needs more and more iterations along the block, up to more than twice as many as PFASST.
-# The serial variant needs fewer, but its steps wait for each other. The residuals, with the helper from
-# [Part A](A_visualize_residuals), for the parallel and then the serial variant:
+# The serial variant needs fewer, but its steps wait for each other. The residuals, with the helper
+# `show_residual_across_simulation` from `pySDC.helpers.visualization_tools`, for the parallel and then the serial
+# variant, over the processes (rows) and iterations (columns):
 
 # %%
 Path("data").mkdir(parents=True, exist_ok=True)

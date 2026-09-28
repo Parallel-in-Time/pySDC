@@ -5,7 +5,7 @@ Since we now have explored the basic features of pySDC, we are actually ready to
 projects). However, we gather here further interesting cases, e.g. special flags or more alternative implementations
 of components.
 
-- **Part A: Visualizing residuals.** The residuals of a PFASST block over processes and iterations, in one call.
+- **Part A: Adaptive time-stepping.** Step sizes from an embedded error estimate, with restarts, against fixed steps.
 - **Part B: Multi-step SDC.** Parallel time steps on a single level, in a parallel and a serial variant.
 - **Part C: Iteration estimator.** Stopping when the estimated error, not the residual, is small enough.
 
