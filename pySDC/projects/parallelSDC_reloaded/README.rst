@@ -1,16 +1,9 @@
 Numerical experiment scripts for the parallel SDC paper
 ==============================================================
 
-Python scripts of the numerical experiment for the following paper:
-
-.. code-block:: tex
-
-    @misc{caklovicXXXXimproving,
-        title={Improving Parallelism Across the Method for Spectral Deferred Corrections},
-        author={Gayatri \v{C}aklovi\'c and Lunet Thibaut and Götschel Sebastian and Ruprecht Daniel},
-        year={2023},
-        comment={to be submitted to SISC},
-    }
+Python scripts of the numerical experiments of the paper
+`Improving Efficiency of Parallel Across the Method Spectral Deferred Corrections <https://doi.org/10.1137/24M1649800>`_
+by Čaklović, Lunet, Götschel and Ruprecht (SIAM Journal on Scientific Computing, 2025).
 
 Figures for the manuscript
 --------------------------

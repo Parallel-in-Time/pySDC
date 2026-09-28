@@ -1,3 +1,30 @@
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+#   language_info:
+#     name: python
+# ---
+
+# %% [markdown]
+# # Part B: mpi4py-fft for parallel Fourier transforms
+#
+# The most prominent parallel solver is, probably, the FFT. While many implementations or wrappers for Python exist,
+# we decided to use [mpi4py-fft](https://mpi4py-fft.readthedocs.io/en/latest/), which provided the easiest
+# installation, a simple API and good parallel scaling. As an example, we solve the nonlinear Schrödinger equation in
+# 2D, with the IMEX sweeper treating the nonlinear parts explicitly. The code works both in real and in spectral
+# space, the latter usually being faster. This example tests SDC, MLSDC and PFASST.
+#
+# ## One run
+#
+# The problem class `nonlinearschroedinger_imex` gets the MPI communicator, over which mpi4py-fft distributes the
+# grid, and `fft_to_fft` transfers between the levels. Each run appends its error, statistics of the iterations and
+# the time to solution to `data/step_7_B_out.txt`, from rank 0.
+
+# %%
 import numpy as np
 from pathlib import Path
 from mpi4py import MPI
@@ -136,6 +163,16 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
         f.close()
 
 
+# %% [markdown]
+# ## All runs
+#
+# SDC, MLSDC and PFASST with 10 steps in parallel (emulated in one process by `controller_nonMPI`), each in real
+# and in spectral space. The code runs in serial with
+# `python B_pySDC_with_mpi4pyfft.py`, and in parallel in space with, e.g., `mpirun -np 2 python
+# B_pySDC_with_mpi4pyfft.py`.
+
+
+# %%
 def main():
     """
     Little helper routine to run the whole thing
@@ -152,3 +189,18 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# %% [markdown]
+# ## Results
+#
+# mpi4py-fft does not run in the browser, nor in the environment this website is built in. These are the results of
+# our CI, which runs this part in an environment with mpi4py-fft, in the run that built this page:
+#
+# :::{literalinclude} /../../data/step_7_B_out.txt
+# :language: text
+# :::
+#
+# :::{admonition} Important things to note
+# - The nonlinear Schrödinger example is not expected to work well with PFASST. In fact, SDC and MLSDC converge for
+#   larger time steps, but PFASST does not.
+# :::

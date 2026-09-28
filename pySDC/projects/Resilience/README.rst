@@ -22,23 +22,23 @@ The last plot was made without Hot Rod, meaning the last sweep is taken to be th
 These plots were generated with serial SDC.
 
 .. image:: ../../../data/piline_solution_adaptive.png
-    :width: 20%
+    :width: 48%
 .. image:: ../../../data/piline_hotrod_adaptive_1procs.png
-    :width: 24%
+    :width: 48%
 .. image:: ../../../data/piline_hotrod_1procs.png
-    :width: 24%
+    :width: 48%
 .. image:: ../../../data/error_estimate_order.png
-    :width: 23%
+    :width: 48%
 
 We also have an implementation for Block Gauss-Seidel multi-step SDC in a simulated parallelism version without MPI.
 You can see the results below, except for the solution, which looks the same as the serial solution to the naked eye.
  
 .. image:: ../../../data/piline_hotrod_adaptive_4procs.png
-    :width: 24%
+    :width: 32%
 .. image:: ../../../data/piline_hotrod_4procs.png
-    :width: 24%
+    :width: 32%
 .. image:: ../../../data/error_estimate_order_parallel.png
-    :width: 23%
+    :width: 32%
 
 
 Reproduction of the plots in the adaptive SDC paper
@@ -96,7 +96,7 @@ To run the resilience experiments, run
     mpirun -np 4 python fault_stats.py prob run_RBC
 
 Please be aware that generating the fault data for Rayleigh-Benard requires generating reference solutions, which may take several hours.
-To run the experiments on computational efficiency, run for the choices of problems `vdp`, `Lorenz``, `GS`, `RBC` the following commands
+To run the experiments on computational efficiency, run for the choices of problems `vdp`, `Lorenz`, `GS`, `RBC` the following commands
 
 .. code-block:: bash
 

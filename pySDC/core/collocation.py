@@ -30,7 +30,7 @@ class CollBase(object):
     boundary) and LOBATTO (inclusion of left and right boundary).
 
     All coefficients are generated using
-    `qmat <https://qmat.readthedocs.io/en/latest/autoapi/qmat/qcoeff/collocation/index.html>`_.
+    `qmat <https://qmat.readthedocs.io/en/latest/api/qmat/qcoeff/collocation/index.html>`_.
 
     Attributes:
         num_nodes (int): number of collocation nodes

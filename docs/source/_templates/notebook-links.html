@@ -1,0 +1,16 @@
+{%- if page_source_suffix == '.py' %}
+{%- set notebook = pagename.split('/')[-1] ~ '.ipynb' %}
+<div class="notebook-links">
+  {%- if run_in_browser %}
+  <button class="btn btn-sm run-in-browser" data-wheels="{{ browser_wheels|join(' ') }}" data-wheels-url="{{ pathto('_static/wheels/', 1) }}"><i class="fa-solid fa-play"></i> Run in browser</button>
+  {%- elif run_unavailable %}
+  <button class="btn btn-sm run-in-browser-unavailable" disabled title="Not in the browser: {{ run_unavailable }}"><i class="fa-solid fa-play"></i> Run in browser</button>
+  {%- endif %}
+  <a class="btn btn-sm" href="{{ notebook }}" download><i class="fa-solid fa-download"></i> Notebook</a>
+  {%- if colab %}
+  <a class="btn btn-sm" href="https://colab.research.google.com/github/Parallel-in-Time/pySDC/blob/gh-pages/{{ pagename }}.ipynb" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Open in Colab</a>
+  {%- endif %}
+  {%- if run_in_browser %}<p class="rib-status" aria-live="polite"></p>{%- endif %}
+  {%- if run_unavailable %}<p class="rib-status rib-unavailable">This part does not run in the browser, and was not run for this page either: {{ run_unavailable }}</p>{%- endif %}
+</div>
+{%- endif %}

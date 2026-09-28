@@ -1,13 +1,7 @@
-import matplotlib
-
-matplotlib.use('Agg')
-
-from pySDC.helpers.stats_helper import filter_stats
-
+import matplotlib.pyplot as plt
 import numpy as np
 
-from matplotlib import rc
-import matplotlib.pyplot as plt
+from pySDC.helpers.stats_helper import filter_stats
 
 
 # noinspection PyShadowingBuiltins
@@ -18,6 +12,9 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
     Args:
         stats (dict): statistics object from a PFASST run
         fname (str): filename
+
+    Returns:
+        matplotlib.figure.Figure: the figure, which is also saved to `fname`
     """
 
     # get residuals of the run
@@ -43,27 +40,22 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
         if iter != -1:
             residual[iter - 1, step] = np.log10(v)
 
-    # Set up plotting stuff and fonts
-    rc('font', **{"sans-serif": ["Arial"], "size": 30})
-    rc('legend', fontsize='small')
-    rc('xtick', labelsize='small')
-    rc('ytick', labelsize='small')
+    # large fonts for this figure only, not for every figure made after it
+    with plt.rc_context(
+        {'font.size': 30, 'legend.fontsize': 'small', 'xtick.labelsize': 'small', 'ytick.labelsize': 'small'}
+    ):
+        fig, ax = plt.subplots(figsize=(15, 10))
 
-    # create plot and save
-    fig, ax = plt.subplots(figsize=(15, 10))
+        mesh = ax.pcolor(residual.T, cmap=plt.get_cmap('Reds'), vmin=minres, vmax=maxres)
+        fig.colorbar(mesh, ax=ax).set_label('log10(residual)')
 
-    cmap = plt.get_cmap('Reds')
-    plt.pcolor(residual.T, cmap=cmap, vmin=minres, vmax=maxres)
+        ax.set_xlabel('iteration')
+        ax.set_ylabel('process')
 
-    cax = plt.colorbar()
-    cax.set_label('log10(residual)')
+        ax.set_xticks(np.arange(maxiter) + 0.5, minor=False)
+        ax.set_yticks(np.arange(maxprocs + 1) + 0.5, minor=False)
+        ax.set_xticklabels(np.arange(maxiter) + 1, minor=False)
+        ax.set_yticklabels(np.arange(maxprocs + 1), minor=False)
 
-    ax.set_xlabel('iteration')
-    ax.set_ylabel('process')
-
-    ax.set_xticks(np.arange(maxiter) + 0.5, minor=False)
-    ax.set_yticks(np.arange(maxprocs + 1) + 0.5, minor=False)
-    ax.set_xticklabels(np.arange(maxiter) + 1, minor=False)
-    ax.set_yticklabels(np.arange(maxprocs + 1), minor=False)
-
-    plt.savefig(fname, transparent=True, bbox_inches='tight')
+        fig.savefig(fname, transparent=True, bbox_inches='tight')
+    return fig

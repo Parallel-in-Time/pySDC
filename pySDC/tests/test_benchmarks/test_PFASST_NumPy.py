@@ -1,8 +1,12 @@
+import runpy
+
 import pytest
 
 
 @pytest.mark.benchmark
 def test_B(benchmark):
-    from pySDC.tutorial.step_5.B_my_first_PFASST_run import main as main_B
+    import matplotlib.pyplot as plt
 
-    benchmark(main_B)
+    # tutorial step 5 B is a notebook-style script: running it is the benchmark, including its one figure
+    benchmark(runpy.run_module, 'pySDC.tutorial.step_5.B_my_first_PFASST_run', run_name='__main__')
+    plt.close('all')

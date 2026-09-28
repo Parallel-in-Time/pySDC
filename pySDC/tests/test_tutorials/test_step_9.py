@@ -32,31 +32,32 @@ def _collect_mpi_output(stem, sizes):
                 out.write(part.read())
 
 
-@pytest.mark.base
-def test_step_9_A():
-    import pySDC.tutorial.step_9.A_paradiag_for_linear_problems
+def _run(part):
+    """The parts are notebook-style scripts, so running one is the test: afresh every time, and closing its figures"""
+    import runpy
+
+    import matplotlib.pyplot as plt
+
+    try:
+        runpy.run_module(f'pySDC.tutorial.step_9.{part}', run_name='__main__')
+    finally:
+        plt.close('all')
 
 
 @pytest.mark.base
-def test_step_9_B():
-    import pySDC.tutorial.step_9.B_paradiag_for_nonlinear_problems
-
-
-@pytest.mark.base
-@pytest.mark.parametrize('problem', ['advection', 'vdp'])
-def test_step_9_C(problem):
-
-    from pySDC.tutorial.step_9.C_paradiag_in_pySDC import compare_ParaDiag_and_PFASST
-
-    compare_ParaDiag_and_PFASST(n_steps=16, problem=problem)
+@pytest.mark.parametrize(
+    'part', ['A_paradiag_for_linear_problems', 'B_paradiag_for_nonlinear_problems', 'C_paradiag_in_pySDC']
+)
+def test_step_9_ABC(part):
+    _run(part)
 
 
 @pytest.mark.mpi4py
 def test_step_9_D():
     """Part D is serial: the alpha comparison with the virtually parallel controller."""
-    from pySDC.tutorial.step_9.D_adaptive_alpha import alpha_settings, main as main_D
+    from pySDC.tutorial.step_9.paradiag_setup import alpha_settings
 
-    main_D()
+    _run('D_adaptive_alpha')
 
     results = _parse(_read('step_9_D_out.txt'))
     assert len(results) == len(alpha_settings), 'ERROR: expected one line per alpha, got %s' % len(results)
@@ -75,19 +76,10 @@ BLOCK_SIZES = [1, 2, 4]
 @pytest.mark.mpi4py
 @pytest.mark.parallel(BLOCK_SIZES)
 def test_step_9_E_MPI():
-    """One rank per time-step, so the communicator size is the block size."""
-    from pathlib import Path
-    from mpi4py import MPI
-    from pySDC.tutorial.step_9.E_paradiag_MPI import main
+    """One rank per time-step, so the communicator size is the block size. Each writes data/step_9_E_np<size>.txt"""
+    import runpy
 
-    comm = MPI.COMM_WORLD
-    fname = f'step_9_E_np{comm.size}.txt'
-    if comm.rank == comm.size - 1:
-        Path('data').mkdir(parents=True, exist_ok=True)
-        open('data/' + fname, 'w').close()
-    comm.Barrier()
-
-    main(fname)
+    runpy.run_module('pySDC.tutorial.step_9.E_paradiag_MPI', run_name='__main__')
 
 
 @pytest.mark.mpi4py
@@ -97,7 +89,7 @@ def test_step_9_E():
 
     Runs after the rank passes above, which is where the per-block-size files come from.
     """
-    from pySDC.tutorial.step_9.D_adaptive_alpha import alpha_settings, num_steps_total
+    from pySDC.tutorial.step_9.paradiag_setup import alpha_settings, num_steps_total
 
     block_sizes = BLOCK_SIZES
     _collect_mpi_output('step_9_E', block_sizes)

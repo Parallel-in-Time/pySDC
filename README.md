@@ -6,7 +6,7 @@
 [![SQAaaS badge shields.io](https://img.shields.io/badge/sqaaas%20software-silver-lightgrey)](https://api.eu.badgr.io/public/assertions/aS8J0NDTTjCyYP6iVufviQ "SQAaaS silver badge achieved")
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/pySDC?logo=pypi)](https://pypistats.org/packages/pysdc)
 [![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)](https://go.fzj.de/CodePromo)
-[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC)
+[![SWH](https://img.shields.io/badge/Software_Heritage-archived-orange)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC)
 [![validated with aidecl](https://img.shields.io/badge/ai%20declaration%20format-aidecl-blue)](https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml)
 
 # Welcome to pySDC!
@@ -58,8 +58,8 @@ If you want to install the developer version using `pip` directly from the GitHu
 # optionally use venv
 python3 -m venv name_of_pySDC_env
 . ./name_of_pySDC_env/bin/activate
-# drop @5.5.0 if you want to install the develop version
-pip install git+https://github.com/Parallel-in-Time/pySDC@5.5.0
+# drop @v5.9 if you want to install the develop version
+pip install git+https://github.com/Parallel-in-Time/pySDC@v5.9
 ```
 
 To check your installation, run
@@ -92,12 +92,15 @@ If you use pySDC or parts of it for your work, great! Let us know if we
 can help you with this. Also, we would greatly appreciate a citation of
 [this paper](https://doi.org/10.1145/3310410):
 
-> Robert Speck, **Algorithm 997: pySDC - Prototyping Spectral Deferred
+> Robert Speck, **Algorithm 997: pySDC—Prototyping Spectral Deferred
 > Corrections**, ACM Transactions on Mathematical Software (TOMS),
 > Volume 45 Issue 3, August 2019, <https://doi.org/10.1145/3310410>
 
 The current software release can be cited using Zenodo:
 [![zenodo](https://zenodo.org/badge/26165004.svg)](https://zenodo.org/badge/latestdoi/26165004)
+
+BibTeX for the paper and for the software is on the [website](https://parallel-in-time.org/pySDC/publications.html);
+GitHub's "Cite this repository" gives the paper.
 
 ## Contributing
 
@@ -114,7 +117,7 @@ Any contribution is dearly welcome! If you want to contribute, please take the t
 
 This project has received funding from the [European High-Performance
 Computing Joint Undertaking](https://eurohpc-ju.europa.eu/) (JU) under
-grant agreement No 955701 ([TIME-X](https://www.time-x-eurohpc.eu/))
+grant agreement No 955701 ([TIME-X](https://time-x-eurohpc.eu/))
 and grant agreement No 101118139. 
 The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
