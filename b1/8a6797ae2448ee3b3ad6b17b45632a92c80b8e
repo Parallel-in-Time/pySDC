@@ -1,0 +1,27 @@
+pySDC/projects/StroemungsRaum/data/navier_stokes/Cylinder_pressure.xdmf
+  s_f7ba080f6ae9bc::t_1bd25b574029f5 1-127
+pySDC/projects/StroemungsRaum/data/navier_stokes/Cylinder_velocity.xdmf
+  s_f7ba080f6ae9bc::t_4a543cea527a79 1-127
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_TaylorGreen_FEniCS.py
+  s_f7ba080f6ae9bc::t_6cdf81bc2c64fd 8-9
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_equations_monolithic_FEniCS.py
+  s_f7ba080f6ae9bc::t_ffe200af020a50 3
+pySDC/projects/StroemungsRaum/sweepers/generic_implicit_mass_diffbc.py
+  s_f7ba080f6ae9bc::t_ad968e7a7789b7 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b18a6797ae2448ee3b3ad6b17b45632a92c80b8e",
+  "prompts": {},
+  "sessions": {
+    "s_f7ba080f6ae9bc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "613cd850-a16c-4a71-8fea-0a5703957a96",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
