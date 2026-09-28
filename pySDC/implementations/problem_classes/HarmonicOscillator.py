@@ -97,7 +97,6 @@ class harmonic_oscillator(Problem):
 
         U_0 = self.u0
         alpha = np.sqrt(np.abs(delta**2 - omega**2))
-        print(self.mu)
         if delta > omega:
             """
             Overdamped case
