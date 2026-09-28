@@ -51,8 +51,11 @@ ai_usage:
       ai_involvement: significant
       tools_used:
         - GitHub Copilot
-    - name: Controller and convergence-control layer
-      description: pySDC/core, controller classes and their tests (~1800 lines)
+    - name: Controller reworking
+      description: >-
+        Reworking of the human-written controllers in pySDC/core and controller_classes, and their tests
+        (~1800 lines): dispatch on the steps a controller owns, the two PFASST controllers made to agree, the MPI
+        ParaDiag controller, and ParaDiag as an iteration
       ai_involvement: significant
       tools_used:
         - Claude

@@ -4,21 +4,13 @@
 
 ## Version 5.9 — September 28, 2026
 
-Version 5.9 brings a new website, runs pySDC on real GPUs and puts its correctness first. The
-[website](https://parallel-in-time.org/pySDC) has tutorials that run in the browser, a gallery of the projects with
-the papers done with them, the publications that use pySDC, and a demo on its landing page. Behind it, numba became
-optional, so that pySDC installs and runs in the browser. The finite-difference problems and `mesh_to_mesh` run on
-GPUs with `useGPU`, so multilevel runs work there, the time-parallel controller runs across GPUs with NCCL, and CI
-tests all of it on four GPUs on every push. The new delta-form sweepers and their multilevel hierarchy solve for the
-correction rather than the solution, which lets a level run in low precision. A review of every docstring against
-the code documented each public function and method, and turned up bugs that gave wrong results without an error,
-now fixed, e.g. implicit Runge-Kutta stages on IMEX problems, the source term of `battery_implicit`, IMEX
-Runge-Kutta classes inheriting their parent's explicit weights, and the Rayleigh-Bénard diagnostics. A review of the
-tests made those that could not fail able to, the MPI tests now run under mpi-pytest, and pySDC works with NumPy 1
-and 2. Two changes are **not backward compatible**: the Allen-Cahn problems share one convention, the 0…1 field on
-`[-L/2, L/2)` (`nu != 2` raises, `newton_itercount` and `lin_itercount` are gone in favour of the work counters),
-and the GPU-only duplicates `AllenCahn_2D_FD_gpu`, `AllenCahn_2D_FFT_gpu` and `HeatEquation_ND_FD_CuPy` are removed
-in favour of `useGPU=True`.
+Version 5.9 comes with a new [website](https://parallel-in-time.org/pySDC), with tutorials that run in the browser,
+a gallery of the projects and the publications that use pySDC; numba is now optional, so pySDC installs there too.
+On GPUs, the finite-difference problems and `mesh_to_mesh` run with `useGPU` and the time-parallel controller with
+NCCL, tested on real hardware on every push. New delta-form sweepers solve for the correction, which lets a level run
+in low precision. A review of all docstrings against the code fixed several bugs that silently gave wrong results.
+Two changes are **not backward compatible**: the Allen-Cahn problems share one convention, the 0…1 field on
+`[-L/2, L/2)`, and the GPU-only duplicates of problem classes are removed in favour of `useGPU=True`.
 
 ## Version 5.8 — September 7, 2026
 
