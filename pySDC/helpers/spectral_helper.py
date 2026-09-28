@@ -117,25 +117,24 @@ class SpectralHelper1D:
         self.linalg = linalg
         self.fft_lib = fft_lib
 
-    @classmethod
-    def setup_CPU(cls, useFFTW=False):
+    def setup_CPU(self, useFFTW=False):
         """switch to CPU modules"""
 
-        cls.xp = np
-        cls.sparse_lib = scipy.sparse
-        cls.linalg = scipy.sparse.linalg
+        self.xp = np
+        self.sparse_lib = scipy.sparse
+        self.linalg = scipy.sparse.linalg
 
         if useFFTW:
             from mpi4py_fft import fftw
 
-            cls.fft_backend = 'fftw'
-            cls.fft_lib = fftw
+            self.fft_backend = 'fftw'
+            self.fft_lib = fftw
         else:
-            cls.fft_backend = 'scipy'
-            cls.fft_lib = scipy.fft
+            self.fft_backend = 'scipy'
+            self.fft_lib = scipy.fft
 
-        cls.fft_comm_backend = 'MPI'
-        cls.dtype = mesh
+        self.fft_comm_backend = 'MPI'
+        self.dtype = mesh
 
     def get_Id(self):
         """
@@ -156,9 +155,21 @@ class SpectralHelper1D:
         return 0 * self.get_Id()
 
     def get_differentiation_matrix(self):
+        """
+        Get the differentiation matrix of this basis. Implemented by the derived bases.
+
+        Returns:
+            sparse differentiation matrix
+        """
         raise NotImplementedError()
 
     def get_integration_matrix(self):
+        """
+        Get the integration matrix of this basis. Implemented by the derived bases.
+
+        Returns:
+            sparse integration matrix
+        """
         raise NotImplementedError()
 
     def get_integration_weights(self):
@@ -831,10 +842,24 @@ class FFTHelper(SpectralHelper1D):
         return weights
 
     def get_plan(self, u, forward, *args, **kwargs):
+        """
+        Get a callable that computes the FFT of data like `u`.
+
+        With FFTW, the planned transform is cached in `self.plans` by direction, shape of `u` and the other arguments.
+        Otherwise, this is `fftn` or `ifftn` of the FFT library with the `norm` from `kwargs`, "backward" and "forward"
+        by default, so that neither direction normalizes.
+
+        Args:
+            u: Data to transform
+            forward (bool): Forward transform if True, inverse transform otherwise
+
+        Returns:
+            callable transform
+        """
         if self.fft_lib.__name__ == 'mpi4py_fft.fftw':
             if 'axes' in kwargs.keys():
                 kwargs['axes'] = tuple(kwargs['axes'])
-            key = (forward, u.shape, args, *(me for me in kwargs.values()))
+            key = (forward, u.shape, u.dtype, args, *(me for me in kwargs.values()))
             if key in self.plans.keys():
                 return self.plans[key]
             else:
@@ -983,25 +1008,24 @@ class SpectralHelper:
 
         self.dtype = cupy_mesh
 
-    @classmethod
-    def setup_CPU(cls, useFFTW=False):
+    def setup_CPU(self, useFFTW=False):
         """switch to CPU modules"""
 
-        cls.xp = np
-        cls.sparse_lib = scipy.sparse
-        cls.linalg = scipy.sparse.linalg
+        self.xp = np
+        self.sparse_lib = scipy.sparse
+        self.linalg = scipy.sparse.linalg
 
         if useFFTW:
             from mpi4py_fft import fftw
 
-            cls.fft_backend = 'fftw'
-            cls.fft_lib = fftw
+            self.fft_backend = 'fftw'
+            self.fft_lib = fftw
         else:
-            cls.fft_backend = 'scipy'
-            cls.fft_lib = scipy.fft
+            self.fft_backend = 'scipy'
+            self.fft_lib = scipy.fft
 
-        cls.fft_comm_backend = 'MPI'
-        cls.dtype = mesh
+        self.fft_comm_backend = 'MPI'
+        self.dtype = mesh
 
     def __init__(self, comm=None, useGPU=False, debug=False):
         """
@@ -1064,10 +1088,12 @@ class SpectralHelper:
 
     @property
     def ndim(self):
+        """Number of dimensions, i.e. of 1D bases"""
         return len(self.axes)
 
     @property
     def ncomponents(self):
+        """Number of solution components"""
         return len(self.components)
 
     @property
@@ -1515,10 +1541,31 @@ class SpectralHelper:
         return self.xp.meshgrid(*grids, indexing='ij')
 
     def get_indices(self, forward_output=True):
+        """
+        Get the global indices of the modes or grid points held by this rank in each axis.
+
+        Args:
+            forward_output (bool): Indices in spectral space if True, in physical space otherwise
+
+        Returns:
+            list of self.xp.ndarray: Indices in each axis
+        """
         return [self.xp.arange(self.axes[i].N)[self.local_slice(forward_output)[i]] for i in range(len(self.axes))]
 
     @cache
     def get_pfft(self, axes=None, padding=None, grid=None):
+        """
+        Get a cached distributed transform object from mpi4py-fft, planned by one forward and backward transform.
+        Axes that are not in `axes` are not transformed. The arguments must be hashable, e.g. tuples.
+
+        Args:
+            axes (tuple): Axes to transform, all by default
+            padding (tuple): Padding factor in each axis for dealiasing, none by default
+            grid (tuple): Processor grid, passed on to `PFFT`
+
+        Returns:
+            pySDC.helpers.fft_helper.PFFT: Transform object, or None in 1D or without a communicator
+        """
         if self.ndim == 1 or self.comm is None:
             return None
         from mpi4py_fft import newDistArray
@@ -1623,12 +1670,30 @@ class SpectralHelper:
         return self.fft_cache[key]
 
     def local_slice(self, forward_output=True):
+        """
+        Get the slices of the global data held by this rank.
+
+        Args:
+            forward_output (bool): Slices in spectral space if True, in physical space otherwise
+
+        Returns:
+            list of slice: Local slice in each axis
+        """
         if self.fft_obj:
             return self.get_pfft().local_slice(forward_output=forward_output)
         else:
             return [slice(0, me.N) for me in self.axes]
 
     def global_slice(self, forward_output=True):
+        """
+        Get slices spanning the global data.
+
+        Args:
+            forward_output (bool): Slices in spectral space if True, in physical space otherwise
+
+        Returns:
+            list of slice: Global slice in each axis
+        """
         if self.fft_obj:
             return [slice(0, me) for me in self.fft_obj.global_shape(forward_output=forward_output)]
         else:
@@ -1717,6 +1782,20 @@ class SpectralHelper:
         return z.v if view else z
 
     def infer_alignment(self, u, forward_output, padding=None, **kwargs):
+        """
+        Find the axes in which `u` is not distributed, by comparing its local shape to the global shape of arrays of the
+        transform object from `get_pfft`. With `padding`, transforms padded in subsets of the axes are tried until one
+        fits.
+
+        Args:
+            u: Data with the solution components in the first axis
+            forward_output (bool): Compare to arrays in spectral space if True, in physical space otherwise
+            padding (tuple): Padding factor in each axis
+            **kwargs: Passed on to `get_pfft`
+
+        Returns:
+            list of int: Aligned axes, not counting the component axis, or [0] without a communicator
+        """
         if self.comm is None:
             return [0]
 
@@ -1757,19 +1836,26 @@ class SpectralHelper:
         return aligned_axes
 
     def redistribute(self, u, axis, forward_output, **kwargs):
+        """
+        Copy `u` into a new distributed array aligned in `axis`, i.e. not distributed in that axis.
+
+        Args:
+            u: Data with the solution components in the first axis
+            axis (int): Axis to align in
+            forward_output (bool): Layout of the new array: spectral space if True, physical space otherwise
+            **kwargs: Passed on to `get_pfft`, e.g. `padding`
+
+        Returns:
+            mpi4py_fft.DistArray: Redistributed copy of `u`, or `u` itself without a communicator
+        """
         if self.comm is None:
             return u
 
         pfft = self.get_pfft(**kwargs)
         _arr = self.newDistArray(pfft, forward_output=forward_output)
 
-        if 'Dist' in type(u).__name__ and False:
-            try:
-                u.redistribute(out=_arr)
-                return _arr
-            except AssertionError:
-                pass
-
+        # the transforms are complex to complex, so the local shapes in physical and spectral space agree and the
+        # alignment can be inferred from the physical shapes either way
         u_alignment = self.infer_alignment(u, forward_output=False, **kwargs)
         for alignment in u_alignment:
             _arr = _arr.redistribute(alignment)
@@ -1782,9 +1868,24 @@ class SpectralHelper:
         )
 
     def transform(self, u, *args, axes=None, padding=None, **kwargs):
+        """
+        Transform all solution components from physical to spectral space along `axes`.
+        With a distributed transform, `u` is first redistributed if its local shape does not fit.
+
+        Args:
+            u: Data with the solution components in the first axis
+            axes (tuple): Axes to transform, all by default
+            padding (tuple): Padding factor in each axis for dealiasing, only used with a distributed transform
+            **kwargs: Passed on to `get_pfft`
+
+        Returns:
+            Transformed data in a new array, which is distributed if the transform is
+        """
         pfft = self.get_pfft(*args, axes=axes, padding=padding, **kwargs)
 
         if pfft is None:
+            if padding is not None and any(me != 1 for me in padding):
+                raise NotImplementedError('Padding is only implemented for distributed FFTs in more than one dimension')
             axes = axes if axes else tuple(i for i in range(self.ndim))
             u_hat = u.copy()
             for i in axes:
@@ -1808,6 +1909,21 @@ class SpectralHelper:
         return _out
 
     def itransform(self, u, *args, axes=None, padding=None, **kwargs):
+        """
+        Transform all solution components from spectral to physical space along `axes`, the inverse of `transform`.
+        With a distributed transform, `u` is first redistributed if its local shape does not fit.
+
+        Args:
+            u: Data with the solution components in the first axis
+            axes (tuple): Axes to transform, all by default
+            padding (tuple): Padding factor in each axis for dealiasing, only used with a distributed transform. The
+                padded
+                resolution must be an integer.
+            **kwargs: Passed on to `get_pfft`
+
+        Returns:
+            Transformed data in a new array, which is distributed if the transform is
+        """
         if padding is not None:
             assert all(
                 (self.axes[i].N * padding[i]) % 1 == 0 for i in range(self.ndim)
@@ -1815,6 +1931,8 @@ class SpectralHelper:
 
         pfft = self.get_pfft(*args, axes=axes, padding=padding, **kwargs)
         if pfft is None:
+            if padding is not None and any(me != 1 for me in padding):
+                raise NotImplementedError('Padding is only implemented for distributed FFTs in more than one dimension')
             axes = axes if axes else tuple(i for i in range(self.ndim))
             u_hat = u.copy()
             for i in axes:
@@ -1853,6 +1971,17 @@ class SpectralHelper:
         return M.tocsc()[self.local_slice(True)[axis], self.local_slice(True)[axis]]
 
     def expand_matrix_ND(self, matrix, aligned):
+        """
+        Expand a global 1D matrix acting along axis `aligned` to the local part of the ND matrix, by Kronecker products
+        with identities in the other axes. Uses the local slices in spectral space in every axis.
+
+        Args:
+            matrix (sparse matrix): Global 1D matrix
+            aligned (int): Axis the matrix acts along
+
+        Returns:
+            sparse local ND matrix in CSC format
+        """
         sp = self.sparse_lib
         axes = np.delete(np.arange(self.ndim), aligned)
         ndim = len(axes) + 1

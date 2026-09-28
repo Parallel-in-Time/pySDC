@@ -98,6 +98,16 @@ class LogGlobalErrorPostStep(LogError):
     """
 
     def post_step(self, step, level_number):
+        """
+        Record the global error after the step as ``e_global_post_step`` and ``e_global_rel_post_step``.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         super().post_step(step, level_number)
         self.log_global_error(step, level_number, '_post_step')
 
@@ -210,6 +220,16 @@ class LogLocalErrorPostStep(LogError):
     """
 
     def post_step(self, step, level_number):
+        """
+        Record the local error after the step as ``e_local_post_step``.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         super().post_step(step, level_number)
         self.log_local_error(step, level_number, suffix='_post_step')
 

@@ -9,7 +9,17 @@ class CrashBase(ConvergenceController):
     Base class for convergence controllers that raise a `ConvergenceError` on all ranks as soon as one rank crashes.
     """
 
+    comm = None  #: communicator across the sweeper, which subclasses set up in `setup`
+
     def __init__(self, controller, params, description, **kwargs):
+        """
+        Initialization routine, which additionally prepares the logical or for communicating crashes with MPI
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+        """
         super().__init__(controller, params, description, **kwargs)
         if self.comm or self.params.useMPI:
             from mpi4py import MPI
@@ -110,7 +120,7 @@ class StopAtMaxRuntime(CrashBase):
         Define parameters here.
 
         Default parameters are:
-         - max_runtime (float): Crash the code when the norm of the runtime exceeds this threshold
+         - max_runtime (float): Crash the code when the wall time since this setup exceeds this many seconds
 
         Args:
             controller (pySDC.Controller): The controller

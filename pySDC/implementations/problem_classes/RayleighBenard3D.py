@@ -23,7 +23,8 @@ class RayleighBenard3D(GenericSpectralLinear):
         v_t - nu (v_xx + v_yy + v_zz) + p_y = -uv_x - vv_y - wv_z
         w_t - nu (w_xx + w_yy + w_zz) + p_z - T = -uw_x - vw_y - ww_z
 
-    with u the horizontal velocity, v the vertical velocity (in z-direction), T the temperature, p the pressure, indices
+    with u and v the horizontal velocities (in x and y), w the vertical velocity (in z), T the temperature, p the
+    pressure, indices
     denoting derivatives, kappa=(Rayleigh * Prandtl)**(-1/2) and nu = (Rayleigh / Prandtl)**(-1/2). Everything on the left
     hand side, that is the viscous part, the pressure gradient and the buoyancy due to temperature are treated
     implicitly, while the non-linear convection part on the right hand side is integrated explicitly.
@@ -33,7 +34,7 @@ class RayleighBenard3D(GenericSpectralLinear):
         Omega = [0, Lx) x [0, Ly] x (0, Lz)
         T(z=+1) = 0
         T(z=-1) = Lz
-        u(z=+-1) = v(z=+-1) = 0
+        u(z=+-1) = v(z=+-1) = w(z=+-1) = 0
         integral over p = 0
 
     The spectral discretization uses FFT horizontally, implying periodic BCs, and an ultraspherical method vertically to
@@ -212,7 +213,7 @@ class RayleighBenard3D(GenericSpectralLinear):
                     component=component, equation=component, axis=0, kind='Nyquist', line=int(Nyquist_mode_index), v=0
                 )
         if ny % 2 == 0:
-            Nyquist_mode_index = self.axes[0].get_Nyquist_mode_index()
+            Nyquist_mode_index = self.axes[1].get_Nyquist_mode_index()
             for component in self.components:
                 self.add_BC(
                     component=component, equation=component, axis=1, kind='Nyquist', line=int(Nyquist_mode_index), v=0
@@ -222,6 +223,21 @@ class RayleighBenard3D(GenericSpectralLinear):
         self.work_counters['rhs'] = WorkCounter()
 
     def eval_f(self, u, *args, **kwargs):
+        """
+        Evaluate the right hand side, split into an implicit and an explicit part.
+
+        The implicit part is -L u, i.e. diffusion, pressure gradient, buoyancy and, in the pressure line, the negative
+        divergence, converted back to the Chebychev-T basis. The explicit part is the advection -(u d/dx + v d/dy + w
+        d/dz) of u, v, w and T, computed in physical space on a grid padded by the dealiasing factor.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+            *args: Not used, the right hand side does not depend on time
+            **kwargs: Not used, the right hand side does not depend on time
+
+        Returns:
+            dtype_f: The right hand side, in the same space as `u`
+        """
         f = self.f_init
 
         if self.spectral_space:
@@ -276,10 +292,24 @@ class RayleighBenard3D(GenericSpectralLinear):
         return f
 
     def u_exact(self, t=0, noise_level=1e-3, seed=99):
+        """
+        Initial conditions, which are only available at t=0 and for Lz=1. Velocities and temperature are linear in z
+        between their boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly
+        distributed noise, multiplied by `noise_level` and z (z - Lz), which vanishes at both plates. The vertical
+        velocity w has to have equal boundary values, since a linear w is not divergence free.
+
+        Args:
+            t (float): Time, has to be 0
+            noise_level (float): Amplitude of the noise
+            seed (int): Seed for the random number generator
+
+        Returns:
+            dtype_u: Initial conditions, in spectral space if `spectral_space` is set, else in physical space
+        """
         assert t == 0
         assert (
-            self.BCs['v_top'] == self.BCs['v_bottom']
-        ), 'Initial conditions are only implemented for zero velocity gradient'
+            self.BCs['w_top'] == self.BCs['w_bottom']
+        ), 'Initial conditions are only implemented for zero vertical velocity gradient'
 
         me = self.spectral.u_init
         iu, iw, iT, ip = self.index(['u', 'w', 'T', 'p'])
@@ -297,7 +327,7 @@ class RayleighBenard3D(GenericSpectralLinear):
         noise = self.spectral.u_init
         noise[iT] = rng.random(size=me[iT].shape)
 
-        me[iT] += noise[iT].real * noise_level * (self.Z - 1) * (self.Z + 1)
+        me[iT] += noise[iT].real * noise_level * self.Z * (self.Z - self.Lz)
 
         if self.spectral_space:
             me_hat = self.spectral.u_init_forward
@@ -339,7 +369,7 @@ class RayleighBenard3D(GenericSpectralLinear):
                 self.xp.copyto(_D_u_hat[i], (D @ u_hat_flat[i]).reshape(_D_u_hat[i].shape))
             derivatives.append(
                 self.itransform(_D_u_hat).real
-            )  # derivatives[0] contains x derivatives, [2] is y and [3] is z
+            )  # derivatives[0] contains x derivatives, [1] is y and [2] is z
 
         DzT_hat = (self.Dz @ u_hat[iT].flatten()).reshape(u_hat[iT].shape)
 
@@ -355,16 +385,16 @@ class RayleighBenard3D(GenericSpectralLinear):
 
         # compute thermal dissipation
         thermal_dissipation = self.u_init_physical
-        thermal_dissipation[0, ...] = (
-            self.kappa * (derivatives[0][iT].real + derivatives[1][iT].real + derivatives[2][iT].real) ** 2
+        thermal_dissipation[0, ...] = self.kappa * (
+            derivatives[0][iT] ** 2 + derivatives[1][iT] ** 2 + derivatives[2][iT] ** 2
         )
         thermal_dissipation_hat = self.transform(thermal_dissipation)[0]
 
         # compute kinetic energy dissipation
         kinetic_energy_dissipation = self.u_init_physical
         for i in [iu, iv, iw]:
-            kinetic_energy_dissipation[0, ...] += (
-                self.nu * (derivatives[0][i].real + derivatives[1][i].real + derivatives[2][i].real) ** 2
+            kinetic_energy_dissipation[0, ...] += self.nu * (
+                derivatives[0][i] ** 2 + derivatives[1][i] ** 2 + derivatives[2][i] ** 2
             )
         kinetic_energy_dissipation_hat = self.transform(kinetic_energy_dissipation)[0]
 
@@ -470,6 +500,17 @@ class RayleighBenard3D(GenericSpectralLinear):
         return xp.array(unique_k_all), spectrum
 
     def get_vertical_profiles(self, u, components):
+        """
+        Compute horizontally averaged vertical profiles from the horizontal mean mode of each component, transformed to
+        physical space in z and broadcast from rank 0, which holds the mean mode.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+            components (list of str): Names of the components you want the profiles of
+
+        Returns:
+            dict: Profile along z for each component, as xp.ndarray
+        """
         if self.spectral_space:
             u_hat = u.copy()
         else:

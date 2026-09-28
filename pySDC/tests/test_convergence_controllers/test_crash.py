@@ -140,6 +140,18 @@ def single_test(MPIsweeper=False, MPIcontroller=False):
 
 
 @pytest.mark.base
+def test_crash_base_works_without_a_communicator():
+    """Subclasses that have no communicator across the sweeper need not set one up."""
+    from pySDC.core.errors import ConvergenceError
+    from pySDC.implementations.convergence_controller_classes.crash import CrashBase
+
+    crash = CrashBase(get_controller(False, False), {}, {})
+    crash.communicate_crash(False)
+    with pytest.raises(ConvergenceError):
+        crash.communicate_crash(True)
+
+
+@pytest.mark.base
 def test_stop_at_nan():
     single_test()
 

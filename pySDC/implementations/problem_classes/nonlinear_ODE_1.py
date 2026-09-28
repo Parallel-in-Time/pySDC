@@ -43,6 +43,7 @@ class nonlinear_ODE_1(Problem):
     dtype_f = mesh
 
     def __init__(self, u0=0.0, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
+        """Initialization routine"""
         nvars = 1
         super().__init__((nvars, None, np.dtype('float64')))
         self._makeAttributeAndRegister(

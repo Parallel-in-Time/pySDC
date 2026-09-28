@@ -77,7 +77,23 @@ class NCCLComm(object):
         else:
             return data.size
 
-    def get_op(self, MPI_op):
+    def get_op(self, MPI_op, data=None):
+        """
+        Translate an MPI reduction operation to the NCCL one.
+
+        Complex data is reduced as twice as many reals, which is only right for sums: the product of two complex
+        numbers is not the pairwise product of their parts, and they have no order for `MAX` and `MIN`.
+
+        Args:
+            MPI_op (mpi4py.MPI.Op): One of `MPI.SUM`, `MPI.PROD`, `MPI.MAX` and `MPI.MIN`
+            data (cupy.ndarray, optional): The data to be reduced, to check that the operation works for its dtype
+
+        Returns:
+            NCCL reduction operation
+        """
+        if data is not None and cp.iscomplexobj(data) and MPI_op != MPI.SUM:
+            raise NotImplementedError('NCCL can only sum complex data, since it reduces it as pairs of reals!')
+
         if MPI_op == MPI.SUM:
             return nccl.NCCL_SUM
         elif MPI_op == MPI.PROD:
@@ -90,6 +106,7 @@ class NCCLComm(object):
             raise NotImplementedError('Don\'t know what NCCL operation to use to replace this MPI operation!')
 
     def reduce(self, sendobj, op=MPI.SUM, root=0):
+        """Wrap mpi4py's pickle-based `reduce`, synchronizing the device first if `sendobj` holds CuPy data."""
         sync = False
         if hasattr(sendobj, 'data'):
             if hasattr(sendobj.data, 'ptr'):
@@ -100,6 +117,7 @@ class NCCLComm(object):
         return self.commMPI.reduce(sendobj, op=op, root=root)
 
     def allreduce(self, sendobj, op=MPI.SUM):
+        """Wrap mpi4py's pickle-based `allreduce`, synchronizing the device first if `sendobj` holds CuPy data."""
         sync = False
         if hasattr(sendobj, 'data'):
             if hasattr(sendobj.data, 'ptr'):
@@ -110,12 +128,19 @@ class NCCLComm(object):
         return self.commMPI.allreduce(sendobj, op=op)
 
     def Reduce(self, sendbuf, recvbuf, op=MPI.SUM, root=0):
+        """
+        Wrap mpi4py's `Reduce`, going through NCCL if `sendbuf` is a CuPy array and through MPI otherwise.
+
+        The NCCL reduction is enqueued on the current CuPy stream without synchronizing. It reduces complex data as
+        pairs of
+        reals, so `MPI.PROD` is not the complex product. `recvbuf` may be None on ranks other than `root`.
+        """
         if not hasattr(sendbuf.data, 'ptr'):
             return self.commMPI.Reduce(sendbuf=sendbuf, recvbuf=recvbuf, op=op, root=root)
 
         dtype = self.get_dtype(sendbuf)
         count = self.get_count(sendbuf)
-        op = self.get_op(op)
+        op = self.get_op(op, sendbuf)
         recvbuf = cp.empty(1) if recvbuf is None else recvbuf
         stream = cp.cuda.get_current_stream()
 
@@ -130,12 +155,19 @@ class NCCLComm(object):
         )
 
     def Allreduce(self, sendbuf, recvbuf, op=MPI.SUM):
+        """
+        Wrap mpi4py's `Allreduce`, going through NCCL if `sendbuf` is a CuPy array and through MPI otherwise.
+
+        The NCCL reduction is enqueued on the current CuPy stream without synchronizing. It reduces complex data as
+        pairs of
+        reals, so `MPI.PROD` is not the complex product.
+        """
         if not hasattr(sendbuf.data, 'ptr'):
             return self.commMPI.Allreduce(sendbuf=sendbuf, recvbuf=recvbuf, op=op)
 
         dtype = self.get_dtype(sendbuf)
         count = self.get_count(sendbuf)
-        op = self.get_op(op)
+        op = self.get_op(op, sendbuf)
         stream = cp.cuda.get_current_stream()
 
         self.commNCCL.allReduce(
@@ -143,6 +175,10 @@ class NCCLComm(object):
         )
 
     def Bcast(self, buf, root=0):
+        """
+        Wrap mpi4py's `Bcast`, going through NCCL on the current CuPy stream, without synchronizing, if `buf` is a CuPy
+        array and through MPI otherwise.
+        """
         if not hasattr(buf.data, 'ptr'):
             return self.commMPI.Bcast(buf=buf, root=root)
 
@@ -180,5 +216,6 @@ class NCCLComm(object):
         stream.synchronize()
 
     def Barrier(self):
+        """Synchronize the current CuPy stream, then wrap mpi4py's `Barrier`."""
         cp.cuda.get_current_stream().synchronize()
         self.commMPI.Barrier()

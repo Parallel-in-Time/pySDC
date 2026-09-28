@@ -11,9 +11,9 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
     """
     Abstract base class for error estimates by Taylor extrapolation of solutions and right-hand sides from other times.
 
-    This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.
-    In particular, child classes need to implement how to make these solutions available, which works differently for
-    MPI and non-MPI versions.
+    This error estimate extrapolates a solution based on Taylor expansions using solutions at other times. Child
+    classes decide where these come from: EstimateExtrapolationErrorNonMPI uses previous time steps, and
+    EstimateExtrapolationErrorWithinQ the collocation nodes of the current step. There is no MPI version.
     """
 
     def __init__(self, controller, params, description, **kwargs):

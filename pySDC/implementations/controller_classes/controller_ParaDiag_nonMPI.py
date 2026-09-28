@@ -151,6 +151,16 @@ class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
                 S.levels[0].u[m + 1] += S.levels[0].increment[m]
 
     def prepare_Jacobians(self, local_MS_running):
+        """
+        Average the solution over the steps of the block, node by node, for constructing average Jacobians.
+
+        Does nothing unless `average_jacobian` is set. Stores the list of averages as `u_avg` on the finest level of
+        every
+        running step, which all share the same list.
+
+        Args:
+            local_MS_running (list): list of currently running steps
+        """
         # get solutions for constructing average Jacobians
         if self.params.average_jacobian:
             level = local_MS_running[0].levels[0]

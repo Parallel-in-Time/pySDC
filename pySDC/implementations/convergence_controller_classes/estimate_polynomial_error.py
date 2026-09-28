@@ -14,7 +14,7 @@ class EstimatePolynomialError(ConvergenceController):
     instance.
     If the last node is not the end point, we can interpolate to that node, which is an order M approximation and compare
     to the order 2M approximation we get from the extrapolation step.
-    By default, we interpolate to the second to last node.
+    By default, we interpolate to the second to last node, or to the end point for Gauss nodes, where it is not a node.
     """
 
     def setup(self, controller, params, description, **kwargs):
@@ -254,8 +254,8 @@ class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
 
     def get_interpolated_solution(self, L, xp=None):
         """
-        Get the interpolated solution for Firedrake data types
-        We are not 100% sure that you don't need to invert the mass matrix here, but should be fine.
+        Get the interpolated solution for Firedrake data types. The nodes hold solutions, not mass matrix applied to
+        them, so interpolating them needs no mass matrix.
 
         Args:
             L (pySDC.level): The level holding the solutions at the collocation nodes
@@ -269,4 +269,3 @@ class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
             if i != self.params.estimate_on_node
         ]
         return L.prob.dtype_u(self.matmul(self.interpolation_matrix, u)[0])
-        # return L.prob.invert_mass_matrix(self.matmul(self.interpolation_matrix, u)[0])

@@ -197,6 +197,14 @@ class Heat1DForcedFiredrake(Problem):
 
     @fd.utils.cached_property
     def x(self):
+        """
+        Spatial coordinate of the mesh, cached after the first access.
+
+        Returns
+        -------
+        x : ufl.SpatialCoordinate
+            Symbolic spatial coordinate, used to interpolate expressions on the mesh.
+        """
         return fd.SpatialCoordinate(self.mesh)
 
     def u_exact(self, t):

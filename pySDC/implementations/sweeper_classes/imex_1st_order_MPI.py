@@ -9,6 +9,13 @@ class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialization routine for the sweeper, which additionally checks that the explicit preconditioner is Picard
+
+        Args:
+            *args: passed on to the parent classes, i.e. the parameters for the sweeper and the level
+            **kwargs: passed on to the parent classes
+        """
         super().__init__(*args, **kwargs)
         assert (
             self.params.QE == 'PIC'

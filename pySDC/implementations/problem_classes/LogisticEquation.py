@@ -39,6 +39,7 @@ class logistics_equation(Problem):
     dtype_f = mesh
 
     def __init__(self, u0=0.5, newton_maxiter=100, newton_tol=1e-12, direct=True, lam=1, stop_at_nan=True):
+        """Initialization routine"""
         nvars = 1
 
         super().__init__((nvars, None, np.dtype('float64')))

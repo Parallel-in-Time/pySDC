@@ -118,6 +118,13 @@ class RungeKuttaNystrom(RungeKutta):
 
     @classmethod
     def get_Butcher_tableau_bar(cls):
+        """
+        Build the Butcher tableau for the positions from the class attributes ``weights_bar``, ``nodes`` and
+        ``matrix_bar``.
+
+        Returns:
+            ButcherTableauNoCollUpdate: an instance of ``ButcherTableauClass``
+        """
         return cls.ButcherTableauClass(cls.weights_bar, cls.nodes, cls.matrix_bar)
 
     def get_full_f(self, f):

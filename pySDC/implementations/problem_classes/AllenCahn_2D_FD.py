@@ -380,7 +380,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
+        Pointwise solver for :math:`\vec{u} - factor \cdot \frac{1}{2\varepsilon^2}(2\vec{u} - 1) = \vec{rhs}`.
 
         Parameters
         ----------
@@ -743,8 +743,9 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
     is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{2\varepsilon^2}(2u - 1)^3`
-    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{2\varepsilon^2}(2u - 1)`
-    is solved by a linear solver provided by a ``SciPy`` routine.
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. The linear reaction
+    term :math:`\frac{1}{2\varepsilon^2}(2u - 1)` acts pointwise, so its implicit system is solved by a pointwise
+    division.
     """
 
     dtype_f = comp2_mesh

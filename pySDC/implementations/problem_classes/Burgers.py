@@ -68,6 +68,25 @@ class Burgers1D(GenericSpectralLinear):
         self.setup_BCs()
 
     def u_exact(self, t=0, *args, **kwargs):
+        r"""
+        Routine to return the initial conditions at :math:`t=0` or the stationary solution for :math:`t=\infty`.
+
+        At :math:`t=0`, ``u`` is the linear function through the boundary values multiplied by :math:`\cos(\pi f x)`,
+        and ``ux`` is its derivative. For ``t=np.inf``, which requires ``f=0`` and ``BCl=-BCr``, ``u`` is the stationary
+        viscous shock connecting the boundary values and ``ux`` is left zero. Other times are not implemented.
+
+        Parameters
+        ----------
+        t : float, optional
+            Time, either ``0`` or ``np.inf``.
+        *args, **kwargs
+            Not used.
+
+        Returns
+        -------
+        me : dtype_u
+            The solution in physical space.
+        """
         me = self.u_init
 
         # x = (self.x + 1) / 2
@@ -96,6 +115,25 @@ class Burgers1D(GenericSpectralLinear):
         return me
 
     def eval_f(self, u, *args, **kwargs):
+        r"""
+        Routine to evaluate the right-hand side, split into diffusion and advection.
+
+        The implicit part of the ``u`` equation is the diffusion :math:`\varepsilon \partial_x u_x`, computed by
+        applying the Chebychev differentiation matrix to the auxiliary component ``ux``. The explicit part is the
+        advection :math:`-u u_x`, computed pointwise. The algebraic ``ux`` equation gets zero in both parts.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution, in physical space.
+        *args, **kwargs
+            Not used, the right-hand side does not depend on time.
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side, with ``impl`` and ``expl`` parts.
+        """
         f = self.f_init
         iu, iux = self.index('u'), self.index('ux')
 
@@ -164,11 +202,11 @@ class Burgers2D(GenericSpectralLinear):
        nx (int): Spatial resolution in x direction
        nz (int): Spatial resolution in z direction
        epsilon (float): viscosity
-       BCl (float): Value at left boundary
-       BCr (float): Value at right boundary
        fux (int): Frequency of the initial conditions in x-direction
        fuz (int): Frequency of the initial conditions in z-direction
        mode (str): 'T2U' or 'T2T'. Use 'T2U' to get sparse differentiation matrices
+
+    The boundary conditions are fixed: u = 0 at z = -1 and z = 1, v = -1 at z = -1 and v = 1 at z = 1.
     """
 
     dtype_u = mesh
@@ -236,6 +274,27 @@ class Burgers2D(GenericSpectralLinear):
         self.setup_BCs()
 
     def u_exact(self, t=0, *args, noise_level=0, **kwargs):
+        r"""
+        Routine to return the initial conditions, which are only implemented for :math:`t=0`.
+
+        ``u`` is :math:`\cos(f_{ux} x) \sin(\pi f_{uz} z)` plus ``BCtopu``, ``v`` is linear in :math:`z` between
+        ``BCbottom`` and ``BCtop``, and the derivative components are set accordingly. Seeded normally distributed
+        noise, multiplied by :math:`(z-1)(z+1)`, can be added to ``v``; its derivatives are not updated for the noise.
+
+        Parameters
+        ----------
+        t : float, optional
+            Time, has to be ``0``.
+        *args, **kwargs
+            Not used.
+        noise_level : float, optional
+            Amplitude of the noise added to ``v``.
+
+        Returns
+        -------
+        me : dtype_u
+            The initial conditions in physical space.
+        """
         me = self.u_init
 
         iu, iv, iux, iuz, ivx, ivz = self.index(self.components)
@@ -257,6 +316,26 @@ class Burgers2D(GenericSpectralLinear):
         return me
 
     def eval_f(self, u, *args, **kwargs):
+        r"""
+        Routine to evaluate the right-hand side, split into diffusion and advection.
+
+        The implicit part is the diffusion :math:`\varepsilon (\partial_x w_x + \partial_z w_z)` of both velocity
+        components :math:`w=u,v`, computed by spectral differentiation of the auxiliary derivative components. The
+        explicit part is the advection :math:`-(u \partial_x w + v \partial_z w)`, computed pointwise. The algebraic
+        derivative equations get zero in both parts.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution, in physical space.
+        *args, **kwargs
+            Not used, the right-hand side does not depend on time.
+
+        Returns
+        -------
+        f : dtype_f
+            The right-hand side, with ``impl`` and ``expl`` parts.
+        """
         f = self.f_init
         iu, iv, iux, iuz, ivx, ivz = self.index(self.components)
 
@@ -275,12 +354,26 @@ class Burgers2D(GenericSpectralLinear):
         return f
 
     def compute_vorticity(self, u):
+        r"""
+        Compute the vorticity from the velocity components by spectral differentiation, as :math:`\partial_x v +
+        \partial_z u`.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Solution in physical space.
+
+        Returns
+        -------
+        vorticity : np.2darray
+            The vorticity in physical space.
+        """
         me = self.u_init_forward
 
         u_hat = self.transform(u)
         iu, iv = self.index(['u', 'v'])
 
-        me[iu] = (self.Dx @ u_hat[iv].flatten() + self.Dz @ u_hat[iu].flatten()).reshape(u[iu].shape)
+        me[iu] = (self.Dx @ u_hat[iv].flatten() - self.Dz @ u_hat[iu].flatten()).reshape(u[iu].shape)
         return self.itransform(me)[iu].real
 
     def get_fig(self):  # pragma: no cover

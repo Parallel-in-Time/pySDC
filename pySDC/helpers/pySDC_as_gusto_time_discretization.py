@@ -19,6 +19,14 @@ class LogTime(Hooks):
     """
 
     def post_step(self, step, level_number):
+        """
+        Record the time at the end of the step, `L.time + L.dt`, with type `_time`.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
+        super().post_step(step, level_number)
         L = step.levels[level_number]
         self.add_to_stats(
             process=step.status.slot,
@@ -98,20 +106,34 @@ class pySDC_integrator(TimeDiscretisation):
 
         if useMPIController:
             assert (
+                controller_communicator is not None
+            ), 'You need to supply a communicator when using the MPI controller!'
+            assert (
                 type(self.controller_communicator).__name__ == 'FiredrakeEnsembleCommunicator'
             ), f'Need to give a FiredrakeEnsembleCommunicator here, not {type(self.controller_communicator)}'
             if n_steps > 1:
                 logging.getLogger(type(self).__name__).warning(
                     f'Warning: You selected {n_steps=}, which will be ignored when using the MPI controller!'
                 )
-            assert (
-                controller_communicator is not None
-            ), 'You need to supply a communicator when using the MPI controller!'
             self.n_steps = controller_communicator.size
         else:
             self.n_steps = n_steps
 
     def setup(self, equation, apply_bcs=True, *active_labels):
+        """
+        Set up the time discretisation for the equation and construct the pySDC controller.
+
+        Modifies `self.description` and `self.controller_params` in place: sets the problem class, `GenericGustoImex` if
+        any
+        term is labelled explicit or `imex` was set and `GenericGusto` otherwise, the problem parameters and the step
+        size
+        `domain.dt / n_steps`, and adds the `LogTime` hook.
+
+        Args:
+            equation (:class:`PrognosticEquation`): the model's equation
+            apply_bcs (bool, optional): whether to apply the equation's boundary conditions. Defaults to True.
+            *active_labels (:class:`Label`): labels indicating which terms of the equation to include
+        """
         super().setup(equation, apply_bcs, *active_labels)
 
         # Check if any terms are explicit

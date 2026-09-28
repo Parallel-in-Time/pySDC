@@ -77,6 +77,7 @@ class allencahn_front_fullyimplicit(Problem):
         stop_at_nan=True,
         stop_at_maxiter=False,
     ):
+        """Initialization routine"""
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (nvars + 1) % 2:
             raise ProblemError('setup requires nvars = 2^p - 1')
@@ -367,7 +368,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
     .. math::
         \frac{\partial u}{\partial t} = A u - \frac{1}{\Delta x^2} \left[
                 \frac{1 - a}{1 - a (2u - 1)^2} - 1
-            \right] (2u - 1).
+            \right] (2u - 1) - 6 d_w u (1 - u).
 
     For time-stepping, this problem will be treated in a *fully-implicit* way. The nonlinear system is solved using Newton.
     """
@@ -549,6 +550,7 @@ class allencahn_periodic_fullyimplicit(Problem):
         radius=0.25,
         stop_at_nan=True,
     ):
+        """Initialization routine"""
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (nvars) % 2:
             raise ProblemError('setup requires nvars = 2^p')
@@ -752,6 +754,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         radius=0.25,
         stop_at_nan=True,
     ):
+        """Initialization routine"""
         super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
 
     def solve_system(self, rhs, factor, u0, t):
@@ -858,6 +861,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         radius=0.25,
         stop_at_nan=True,
     ):
+        """Initialization routine"""
         super().__init__(nvars, dw, eps, newton_maxiter, newton_tol, interval, radius, stop_at_nan)
 
     def solve_system_1(self, rhs, factor, u0, t):

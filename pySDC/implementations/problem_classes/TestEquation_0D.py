@@ -151,12 +151,38 @@ class testequation0d(Problem):
         return me
 
     def getOutputFile(self, fileName):
+        r"""
+        Set up a ``Scalar`` output file for complex values, with one variable per :math:`\lambda`.
+
+        Parameters
+        ----------
+        fileName : str
+            Name of the output file.
+
+        Returns
+        -------
+        fOut : pySDC.helpers.fieldsIO.Scalar
+            The initialized output file.
+        """
         fOut = Scalar(np.complex128, fileName=fileName)
         fOut.setHeader(self.lambdas.size)
         fOut.initialize()
         return fOut
 
     def processSolutionForOutput(self, u):
+        """
+        Flatten the solution for output.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Solution to be written.
+
+        Returns
+        -------
+        np.1darray
+            The flattened solution.
+        """
         return u.flatten()
 
 

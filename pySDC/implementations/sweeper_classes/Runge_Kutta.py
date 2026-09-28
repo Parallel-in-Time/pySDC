@@ -72,6 +72,13 @@ class ButcherTableau(object):
 
     @property
     def globally_stiffly_accurate(self):
+        """
+        Whether the last row of the Butcher matrix equals the weights, such that the last stage is the solution of the
+        step.
+
+        Returns:
+            bool: True if the method is stiffly accurate
+        """
         return np.allclose(self.Qmat[-1, 1:], self.weights)
 
 
@@ -90,6 +97,13 @@ class ButcherTableauEmbedded(ButcherTableau):
 
     @property
     def globally_stiffly_accurate(self):
+        """
+        Whether the last row of the Butcher matrix equals the weights of the primary (higher order) method, such that
+        the last stage is the solution of the step.
+
+        Returns:
+            bool: True if the method is stiffly accurate
+        """
         return np.allclose(self.Qmat[-1, 1:], self.weights[0])
 
 
@@ -144,7 +158,6 @@ class RungeKutta(Sweeper):
         # set parameters to their actual values
         self.coll = self.get_Butcher_tableau()
         params['initial_guess'] = 'zero'
-        params['collocation_class'] = type(self.ButcherTableauClass)
         params['num_nodes'] = self.coll.num_nodes
 
         # disable residual computation by default
@@ -166,10 +179,23 @@ class RungeKutta(Sweeper):
 
     @classmethod
     def get_Q_matrix(cls):
+        """
+        Get the quadrature matrix of the scheme, i.e. the Butcher matrix padded with a leading row and column of zeros
+        for the initial conditions.
+
+        Returns:
+            numpy.ndarray: the quadrature matrix
+        """
         return cls.get_Butcher_tableau().Qmat
 
     @classmethod
     def get_Butcher_tableau(cls):
+        """
+        Build the Butcher tableau from the class attributes ``weights``, ``nodes`` and ``matrix``.
+
+        Returns:
+            ButcherTableau: an instance of ``ButcherTableauClass``
+        """
         return cls.ButcherTableauClass(cls.weights, cls.nodes, cls.matrix)
 
     @classmethod
@@ -183,6 +209,13 @@ class RungeKutta(Sweeper):
 
     @classmethod
     def is_embedded(cls):
+        """
+        Whether the scheme is an embedded pair, i.e. uses ``ButcherTableauEmbedded`` and has a secondary solution for
+        error estimation.
+
+        Returns:
+            bool: True if the scheme is embedded
+        """
         return cls.ButcherTableauClass == ButcherTableauEmbedded
 
     def get_full_f(self, f):
@@ -367,7 +400,6 @@ class RungeKuttaIMEX(RungeKutta):
             level (pySDC.Level.level): the level that uses this sweeper
         """
         super().__init__(params, level)
-        type(self).weights_explicit = self.weights if self.weights_explicit is None else self.weights_explicit
         self.coll_explicit = self.get_Butcher_tableau_explicit()
         self.QE = self.coll_explicit.Qmat
 
@@ -390,7 +422,15 @@ class RungeKuttaIMEX(RungeKutta):
 
     @classmethod
     def get_Butcher_tableau_explicit(cls):
-        return cls.ButcherTableauClass_explicit(cls.weights_explicit, cls.nodes, cls.matrix_explicit)
+        """
+        Build the Butcher tableau of the explicit part from ``weights_explicit``, ``nodes`` and ``matrix_explicit``.
+        Without ``weights_explicit``, the explicit part uses the implicit ``weights``.
+
+        Returns:
+            ButcherTableau: an instance of ``ButcherTableauClass_explicit``
+        """
+        weights = cls.weights if cls.weights_explicit is None else cls.weights_explicit
+        return cls.ButcherTableauClass_explicit(weights, cls.nodes, cls.matrix_explicit)
 
     def integrate(self):
         """
@@ -525,6 +565,11 @@ class BackwardEuler(RungeKutta):
 class IMEXEuler(RungeKuttaIMEX):
     """
     First-order IMEX Euler with one backward Euler stage, at which both parts of the right hand side are evaluated.
+
+    This is a Lie splitting of a backward Euler step for fI and a forward Euler step for fE from its result:
+    u1 = u0 + dt fI(u1), u = u1 + dt fE(u1, t + dt). The explicit tableau has node 1 and matrix entry 0, so fE is
+    evaluated at the new time and the implicit stage, not at the start of the step. For the variant with fE at the
+    start of the step, see IMEXEulerStifflyAccurate.
     """
 
     nodes = BackwardEuler.nodes
@@ -537,7 +582,7 @@ class IMEXEuler(RungeKuttaIMEX):
 class IMEXEulerStifflyAccurate(RungeKuttaIMEX):
     """
     IMEX Euler with the explicit part evaluated at the start of the step, as a stiffly accurate two-stage method.
-    This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.
+    This implements u = fI^-1(u0 + fE(u0)) rather than IMEXEuler's u = fI^-1(u0) + fE(fI^-1(u0)).
     This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly
     accurate and suitable for some DAEs.
     """
@@ -601,6 +646,12 @@ class Heun_Euler(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of forward Euler.
+
+        Returns:
+            int: 2
+        """
         return 2
 
 
@@ -615,6 +666,12 @@ class Cash_Karp(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -631,6 +688,12 @@ class DIRK43(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -666,6 +729,12 @@ class ESDIRK53(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -681,6 +750,12 @@ class ESDIRK43(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -695,12 +770,20 @@ class ARK548L2SAERK(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
 class ARK548L2SAESDIRK(ARK548L2SAERK):
     """
-    Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.
+    Implicit part of the ARK54 scheme. As Kennedy and Carpenter state, the embedded method has order 4 and the main
+    method order 5. The fifth-order conditions of the embedded method are violated only by about 1e-4, however, so it
+    can look like order 5 in convergence tests at moderate step sizes.
     """
 
     generator_IMP = RK_SCHEMES["ARK548L2SAESDIRK"]()
@@ -725,6 +808,12 @@ class ARK54(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -742,6 +831,12 @@ class ARK548L2SAESDIRK2(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -777,6 +872,12 @@ class ARK548L2SA(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -791,6 +892,12 @@ class ARK324L2SAERK(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the second order secondary method.
+
+        Returns:
+            int: 3
+        """
         return 3
 
 
@@ -819,6 +926,12 @@ class ARK32(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the second order secondary method.
+
+        Returns:
+            int: 3
+        """
         return 3
 
 
