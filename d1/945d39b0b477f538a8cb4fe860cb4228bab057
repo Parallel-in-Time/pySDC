@@ -1,0 +1,30 @@
+pySDC/tests/test_tutorials/test_step_8.py
+  s_619b2228c15391::t_48ce585a969631 8
+pySDC/tutorial/step_8/A_adaptive_time_stepping.py
+  s_619b2228c15391::t_5069524a3f3c01 37,44,56,60,63-67,70,76,99-100,167
+  s_619b2228c15391::t_b961a57e012f36 13,18,21-23,68,80-86,88-91,95,101,103-109,113,115-118,125,127,129,137,141-152,156-160,162-163,166,169-170,175-176,179,182-194,197-213
+  s_619b2228c15391::t_3a0a994da19629 138-140,153-155,195-196
+  s_619b2228c15391::t_8167a6687bcb90 1-12,14-17,19-20,24-36,38-43,45-55,57-59,61-62,69,71-75,77-79,87,92-94,96-98,102,110-112,114,119-124,126,128,130-136,161,164-165,168,171-174,177-178,180-181
+docs/source/tutorial/step_8.rst
+  s_619b2228c15391::t_48ce585a969631 6
+pySDC/tutorial/step_8/B_multistep_SDC.py
+  s_619b2228c15391::t_48ce585a969631 168-170
+pySDC/tutorial/step_8/README.rst
+  s_619b2228c15391::t_885300d46b3562 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d1945d39b0b477f538a8cb4fe860cb4228bab057",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
