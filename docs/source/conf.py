@@ -102,7 +102,7 @@ NOT_IN_BROWSER = {
 nb_execution_excludepatterns = [f'{page}.py' for page in NOT_IN_BROWSER]
 BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
-    'logo': {'text': 'pySDC', 'image_light': '_static/pysdc-logo.svg', 'image_dark': '_static/pysdc-logo-dark.svg'},
+    'logo': {'image_light': '_static/pysdc-logo.svg', 'image_dark': '_static/pysdc-logo-dark.svg', 'alt_text': 'pySDC'},
     'icon_links': [
         {'name': 'GitHub', 'url': 'https://github.com/Parallel-in-Time/pySDC', 'icon': 'fa-brands fa-github'},
         {'name': 'PyPI', 'url': 'https://pypi.org/project/pySDC', 'icon': 'fa-brands fa-python'},
