@@ -1,6 +1,6 @@
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_FEniCS import fenics_NSE_2D_Monolithic
-from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass import generic_implicit_mass
+from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
 
 
 def setup(t0=0):
