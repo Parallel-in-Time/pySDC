@@ -1,0 +1,27 @@
+pySDC/projects/gallery.yml
+  s_f7ba080f6ae9bc::t_e66dd69d9092ad 91-92
+pySDC/projects/FEM_with_FEniCS/tests/test_examples.py
+  s_f7ba080f6ae9bc::t_acedbd9ef42246 166-195
+  s_f7ba080f6ae9bc::t_9201e8f7c9a3f8 165
+pySDC/projects/FEM_with_FEniCS/run_examples.py
+  s_f7ba080f6ae9bc::t_f7dcc11f1aded4 3-4,120-166,181,188-190
+pySDC/projects/FEM_with_FEniCS/README.rst
+  s_f7ba080f6ae9bc::t_24a30894c7f6b3 48-50,82-83
+  s_f7ba080f6ae9bc::t_9108a6bec92447 84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0e5a1e46f718533d603ff5cd353ef630cab9df39",
+  "prompts": {},
+  "sessions": {
+    "s_f7ba080f6ae9bc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "613cd850-a16c-4a71-8fea-0a5703957a96",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
