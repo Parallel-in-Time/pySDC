@@ -257,6 +257,8 @@ if __name__ == "__main__":
 # :::{admonition} Important things to note
 # - Even core routines can be replaced where a method needs it: for the mass-matrix formulation, pySDC also has
 #   `base_transfer_mass`, which the mass variants here use for MLSDC and PFASST.
+# - The project [Finite elements, the mass-matrix route](../../projects/FEM_with_FEniCS) takes the mass-matrix
+#   formulation further: nonlinear problems, discontinuous elements, three levels, and which coarsening pays.
 # - It is also valuable to check out the data type and transfer classes required to work with FEniCS. Both can be
 #   found in the `implementations` folder.
 # :::
