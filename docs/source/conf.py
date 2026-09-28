@@ -579,3 +579,6 @@ def setup(app):
     app.connect('source-read', add_landing_demo)
     app.connect('autodoc-skip-member', skip_modules)
     app.connect('source-read', link_tutorial_parts)
+    # the hooks only read the environment or rewrite the source they are given, so sphinx-build -j can execute
+    # the tutorials in parallel
+    return {'parallel_read_safe': True, 'parallel_write_safe': True}
