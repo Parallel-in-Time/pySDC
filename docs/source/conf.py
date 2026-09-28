@@ -19,8 +19,8 @@ author = (
     'Robert Speck, Thibaut Lunet, Thomas Baumann, Lisa Wimmer, Ikrom Akramov, Giacomo Rosilho De Souza, '
     'Jakob Fritz, Jemma Shipton, Abdelouahed Ouardghi, Gayatri Čaklović'
 )
-version = '5.8'
-release = '5.8'
+version = '5.9'
+release = '5.9'
 
 extensions = [
     'sphinx.ext.autodoc',

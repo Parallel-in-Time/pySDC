@@ -2,7 +2,7 @@ schema_version: 1.0.0
 project:
   name: pySDC
   repository: github.com/Parallel-in-Time/pySDC
-  version: '5.8'
+  version: '5.9'
   license: BSD-2-Clause
   content_type: software
 ai_usage:
@@ -29,17 +29,17 @@ ai_usage:
         - 'Counts as AI-generated: PRs authored by the Copilot coding agent'
         - 'Counts as AI-assisted: human-authored PRs it reviewed'
   code_proportion:
-    ai_generated_percent: 12
+    ai_generated_percent: 19
     ai_assisted_percent: 2
-    human_only_percent: 86
+    human_only_percent: 79
     method: audit_estimated
     estimation_notes: >-
-      Ballpark, from git blame over all tracked code files on master (~158k lines, .py/.sh/.yml/.toml/.cfg),
+      Ballpark, from git blame over all tracked code files on master (~166k lines, .py/.sh/.yml/.toml/.cfg),
       attributing each surviving line to the commit that last touched it. AI-generated counts Claude Code
       commits and PRs authored by the Copilot coding agent; AI-assisted counts human-authored PRs reviewed
       by Copilot. pySDC dates from 2014 and no AI was used before 2026, so the whole-repository figures are
       dominated by pre-2026 code. Restricted to code last touched in 2026 the split is roughly
-      79% AI-generated, 13% AI-assisted, 8% human-only. Reproduce with etc/aidecl_audit.py.
+      85% AI-generated, 9% AI-assisted, 6% human-only. Reproduce with etc/aidecl_audit.py.
   components:
     - name: PINN and FNO playgrounds
       description: pySDC/playgrounds/PINN and pySDC/playgrounds/learned_qdelta (~7100 lines)
@@ -51,8 +51,11 @@ ai_usage:
       ai_involvement: significant
       tools_used:
         - GitHub Copilot
-    - name: Controller and convergence-control layer
-      description: pySDC/core, controller classes and their tests (~1800 lines)
+    - name: Controller reworking
+      description: >-
+        Reworking of the human-written controllers in pySDC/core and controller_classes, and their tests
+        (~1800 lines): dispatch on the steps a controller owns, the two PFASST controllers made to agree, the MPI
+        ParaDiag controller, and ParaDiag as an iteration
       ai_involvement: significant
       tools_used:
         - Claude
@@ -73,6 +76,45 @@ ai_usage:
       notes: >-
         Replaced one mpirun per test case with mpi-pytest, moving the rank counts onto the tests
         themselves. Tutorial step 6 part C and step 9 parts D and E were rewritten along with it.
+    - name: Delta-form sweepers and their transfer classes
+      description: >-
+        sweeper_classes/delta_form*.py, which sweep for the correction instead of the solution, and
+        transfer_classes/BaseTransferDelta*.py, which carry that form through the levels of MLSDC; the Problem hooks
+        and Level.u0_reference they need, and the dtype option of the finite-difference problems for levels in
+        reduced precision (~1100 lines)
+      ai_involvement: significant
+      tools_used:
+        - Claude
+      notes: A variant on top of SDC and MLSDC, whose sweepers and transfer classes are human-written.
+    - name: GPU ports and the GPU CI job
+      description: >-
+        useGPU for the finite-difference problems (replacing HeatEquation_ND_FD_CuPy) and the Allen-Cahn Newton
+        solves, mesh_to_mesh on GPUs, sharing one NCCL communicator per MPI communicator, tutorial step 7 G, and
+        the CI job on real GPUs (etc/modal_gpu_tests.py, etc/gpu_bind.py)
+      ai_involvement: significant
+      tools_used:
+        - Claude
+      notes: >-
+        Extends the GPU support that is human-written: cupy_mesh, the NCCL communicator, the GPU problems and the
+        GPU project.
+    - name: Website, and the tutorials rewritten as notebooks
+      description: >-
+        The website (docs/: its Sphinx configuration, the in-browser runtime, the landing demo, the project gallery
+        and publication pages and the scripts that feed them), and the nine tutorials rewritten as notebook-style
+        scripts. The audit counts only the Python and configuration files of it, not the JavaScript, CSS or pages.
+      ai_involvement: significant
+      tools_used:
+        - Claude
+      notes: >-
+        The tutorials' examples and their results are the human-written ones; Claude restructured them and rewrote
+        their text. Step 8 A (adaptive time-stepping) is new, built on the human-written adaptivity.
+    - name: Repairs to existing tests
+      description: >-
+        Tests that could not fail, loose tolerances, and tests depending on each other or on stale files, across
+        pySDC/tests and the projects
+      ai_involvement: significant
+      tools_used:
+        - Claude
     - name: StroemungsRaum and Rayleigh-Benard projects
       description: FEniCS flow examples and RBC project (~3100 lines)
       ai_involvement: minimal
@@ -81,10 +123,15 @@ ai_usage:
       notes: Human-written; Copilot only reviewed the pull requests.
     - name: SDC core, sweepers, problem classes, remaining projects
       description: The bulk of the library, written 2014-2025, less the files the components above name
-      ai_involvement: none
+      ai_involvement: minimal
+      tools_used:
+        - Claude
+      notes: >-
+        Human-written. In 2026, Claude wrote the docstrings that were missing or contradicted the code, and
+        fixed the bugs that review turned up, in pull requests of their own.
   summary: >-
     Reviewing PRs, adding new features, increased testing coverage, refactoring, code analysis and simplification,
     removing code smell
 declaration:
   declared_by: Robert Speck
-  date: '2026-09-21'
+  date: '2026-09-28'

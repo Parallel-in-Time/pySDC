@@ -41,9 +41,9 @@ authors:
     orcid: https://orcid.org/0000-0002-1897-8993
 
 
-version: 5.8
+version: 5.9
 doi: 10.5281/zenodo.594191
-date-released: 2026-09-07
+date-released: 2026-09-28
 keywords: 
   - "parallel-in-time"
   - "spectral deferred corrections"

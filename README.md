@@ -58,8 +58,8 @@ If you want to install the developer version using `pip` directly from the GitHu
 # optionally use venv
 python3 -m venv name_of_pySDC_env
 . ./name_of_pySDC_env/bin/activate
-# drop @5.8 if you want to install the develop version
-pip install git+https://github.com/Parallel-in-Time/pySDC@5.8
+# drop @v5.9 if you want to install the develop version
+pip install git+https://github.com/Parallel-in-Time/pySDC@v5.9
 ```
 
 To check your installation, run

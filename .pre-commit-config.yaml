@@ -18,6 +18,6 @@ repos:
       - id: ruff
         files: ^pySDC/
   - repo: https://github.com/ai-declaration/cli
-    rev: 8c3eb30170b459e2e19a87f821f299de55dadfda
+    rev: v0.3.0
     hooks:
       - id: aidecl
