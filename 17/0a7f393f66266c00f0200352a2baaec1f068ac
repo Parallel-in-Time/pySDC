@@ -1,0 +1,25 @@
+.github/workflows/ci_pipeline.yml
+  s_619b2228c15391::t_a1c6f0c23e9fa5 431
+.github/workflows/postprocess.yml
+  s_619b2228c15391::t_7e785efd54a832 86
+docs/check_run_in_browser.py
+  s_619b2228c15391::t_f3e8d696d32724 4-5,12,15,20,23,27,32-34,37-38,42,46-47,50,54,56,58,60,62,66,70,73-75,77,85,89,92,96-133,146-149,152-153
+docs/source/conf.py
+  s_619b2228c15391::t_9747b4ba82f1d2 582-584
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "170a7f393f66266c00f0200352a2baaec1f068ac",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
