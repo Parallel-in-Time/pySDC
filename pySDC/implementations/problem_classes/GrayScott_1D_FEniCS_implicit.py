@@ -48,9 +48,10 @@ class fenics_grayscott(Problem):
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [3]_.
     order : int, optional
         Defines the order of the elements in the function space.
-    refinements : list or tuple, optional
-        Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.
-        ``refinements=[2, 2]`` or ``refinements=(2, 2)``.
+    refinements : int, optional
+        How many times the mesh of ``c_nvars`` cells is refined uniformly, halving the cell size each time:
+        ``refinements=2`` gives ``4 * c_nvars`` cells. For a multilevel hierarchy, pass one value per level in the
+        description, e.g. ``[1, 0]``, which the controller splits across the levels. The default is ``0``.
     Du : float, optional
         Diffusion rate for :math:`u`.
     Dv: float, optional
@@ -106,7 +107,7 @@ class fenics_grayscott(Problem):
         t0=0.0,
         family='CG',
         order=4,
-        refinements=None,
+        refinements=0,
         Du=1.0,
         Dv=0.01,
         A=0.09,
@@ -116,9 +117,6 @@ class fenics_grayscott(Problem):
         newton_maxiter=100,
     ):
         """Initialization routine"""
-
-        if refinements is None:
-            refinements = 0
 
         # set logger level for FFC and dolfin
         warning_level = getattr(df, 'WARNING', None)
@@ -134,8 +132,7 @@ class fenics_grayscott(Problem):
 
         # set mesh and refinement (for multilevel)
         mesh = df.IntervalMesh(c_nvars, 0, 100)
-        num_refinements = refinements if isinstance(refinements, int) else sum(refinements)
-        for _ in range(num_refinements):
+        for _ in range(refinements):
             mesh = df.refine(mesh)
 
         # define mixed function space for future reference. `V * V` was removed in DOLFIN 2019.1,
@@ -350,7 +347,7 @@ class fenics_grayscott_mass(fenics_grayscott):
     """
 
     def eval_f(self, u, t):
-        """
+        r"""
         Evaluate the right-hand side in weak (dual) form, without inverting the mass matrix.
 
         Parameters
