@@ -164,6 +164,17 @@ def add_run_in_browser(app, pagename, templatename, context, doctree):
     context['browser_wheels'] = BROWSER_WHEELS
 
 
+def add_section_title(app, pagename, templatename, context, doctree):
+    """The sidebar's title: the top-level section this page is in, e.g. Tutorial, from the toctree"""
+    relations = app.env.collect_relations()
+    page = pagename
+    while relations.get(page, [None])[0] not in (None, app.config.root_doc):
+        page = relations[page][0]
+    if relations.get(page, [None])[0] == app.config.root_doc:
+        context['section_page'] = page
+        context['section_title'] = app.env.titles[page].astext()
+
+
 def _excerpt(app, excerpt):
     """The literalinclude of a gallery card's excerpt; the texts that delimit a passage of code have to be in the file"""
     lines = [
@@ -329,6 +340,59 @@ def add_api_overview(app, docname, source):
 def _bibtex(kind, key, fields):
     body = ',\n'.join(f'    {name} = {{{value}}}' for name, value in fields.items() if value)
     return [f'      @{kind}{{{key},'] + ['      ' + line for line in body.split('\n')] + ['      }']
+
+
+def add_project_papers(app, docname, source):
+    """Append the papers done with a project, from `papers` in pySDC/projects/gallery.yml, to the project's page"""
+    if not docname.startswith('projects/') or docname == 'projects/index':
+        return
+    import json
+    import yaml
+
+    gallery, metadata_file = Path(ROOT, 'pySDC/projects/gallery.yml'), Path(app.srcdir, 'project_papers.json')
+    app.env.note_dependency(gallery)
+    app.env.note_dependency(metadata_file)
+    page = docname.split('/', 1)[1]
+    projects = [
+        project for section in yaml.safe_load(gallery.read_text(encoding='utf-8')) for project in section['projects']
+    ]
+    papers = next((project.get('papers', []) for project in projects if project['page'] == page), [])
+    if not papers:
+        return
+    metadata = json.loads(metadata_file.read_text(encoding='utf-8'))
+    missing = [paper for paper in papers if isinstance(paper, str) and paper not in metadata]
+    if missing:
+        raise ValueError(f'{metadata_file.name} has no metadata for {missing}: run docs/update_publications.py')
+
+    lines = ['', '', 'Papers', '------', '', 'The results of this project are published in:', '']
+    for paper in papers:
+        paper = metadata[paper] if isinstance(paper, str) else paper
+        names = ', '.join(' '.join(reversed(author.split(', '))) for author in paper['authors'])
+        venue = ('PhD thesis, ' if paper['type'] == 'phdthesis' else '') + f"*{paper['venue']}*"
+        venue += f" {paper['volume']}" if paper.get('volume') else ''
+        venue += f"({paper['issue']})" if paper.get('issue') else ''
+        venue += f", {paper['pages'].replace('-', '–')}" if paper.get('pages') else ''
+        link = f"https://doi.org/{paper['doi']}" if paper.get('doi') else paper['url']
+        key = re.sub(r'\W', '', paper['authors'][0].split(',')[0].lower()) + str(paper['year'])
+        key += re.sub(r'\W', '', paper['title'].split()[0].lower())
+        fields = {
+            'author': ' and '.join(paper['authors']),
+            'title': paper['title'],
+            {'article': 'journal', 'phdthesis': 'school', 'mastersthesis': 'school', 'misc': 'howpublished'}.get(
+                paper['type'], 'booktitle'
+            ): paper['venue'],
+            'volume': paper.get('volume'),
+            'number': paper.get('issue'),
+            'pages': (paper.get('pages') or '').replace('-', '--'),
+            'year': paper['year'],
+            'doi': paper.get('doi'),
+            'url': None if paper.get('doi') else paper['url'],
+        }
+        lines += [f"- {names}, **{paper['title']}**, {venue}, {paper['year']}, {link}", '']
+        lines += ['  .. dropdown:: BibTeX', '     :class-container: paper-bibtex', '']
+        lines += ['     .. code-block:: bibtex', '']
+        lines += ['   ' + line for line in _bibtex(paper['type'], key, fields)] + ['']
+    source[0] += '\n'.join(lines)
 
 
 def add_publications(app, docname, source):
@@ -507,9 +571,11 @@ def skip_modules(app, what, name, obj, skip, options):
 def setup(app):
     app.connect('build-finished', write_notebooks)
     app.connect('html-page-context', add_run_in_browser)
+    app.connect('html-page-context', add_section_title)
     app.connect('source-read', add_project_gallery)
     app.connect('source-read', add_api_overview)
     app.connect('source-read', add_publications)
+    app.connect('source-read', add_project_papers)
     app.connect('source-read', add_landing_demo)
     app.connect('autodoc-skip-member', skip_modules)
     app.connect('source-read', link_tutorial_parts)

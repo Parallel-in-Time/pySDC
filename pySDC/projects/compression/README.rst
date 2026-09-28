@@ -1,5 +1,5 @@
 Compression in pySDC
---------------------
+====================
 
 This project aims to implement compression in pySDC in whatever way proves to be useful.
 It is a collaboration between Clemson University, Argonne National Laboratory and Forschungszentrum Juelich under the umbrella of `JLESC <https://jlesc.github.io>`_.

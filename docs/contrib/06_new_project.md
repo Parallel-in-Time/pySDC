@@ -61,6 +61,9 @@ To add yours:
    and it fails if the plot is missing. If your tests make no plot, give an `excerpt` instead: a text file they write
    (with `lines`), or a representative passage of your code, between a `start-at` and an `end-at` or `end-before`
    text; the website build stops if those texts are no longer in the file. See the entries in `gallery.yml`.
+4. Once your project is published, add the DOIs of the papers to the entry's `papers`, and run
+   `docs/update_publications.py`, which fetches their metadata into `docs/source/project_papers.json`. The project's
+   page then lists them, each with its BibTeX, the same way for every project.
 
 ## Getting a DOI of pySDC for publication
 

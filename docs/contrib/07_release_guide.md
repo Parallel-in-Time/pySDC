@@ -35,4 +35,4 @@ For uploading the new release on [PyPI](https://pypi.org/project/pySDC/), this i
 
 :arrow_left: [Back to adding Project](./06_new_project.md) ---
 :arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
-:arrow_right: [Next to a cute picture of cat](https://www.vecteezy.com/photo/2098203-silver-tabby-cat-sitting-on-green-background)
+:arrow_right: [Next to using AI tools](./08_ai_usage.md)

@@ -7,3 +7,8 @@
   <link rel="icon" href="{{ pathto('_static/pysdc-favicon.svg', 1) }}" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{{ pathto('_static/apple-touch-icon.png', 1) }}">
 {% endblock %}
+{#- The landing page's title is the site's title, so "pySDC - pySDC" would repeat it: say what pySDC is instead #}
+{% block htmltitle %}
+  {%- if pagename == root_doc %}<title>{{ docstitle|e }} — Prototyping spectral deferred corrections</title>
+  {%- else %}{{ super() }}{% endif %}
+{% endblock %}

@@ -103,10 +103,19 @@ def linkFilesToGitHub(text, md):
     return re.sub(r'((?<!!)\[[^\]]*\])\((?!<|\w+://|#|mailto:)([^)\s#]+(?<!\.md))\)', toGitHub, text)
 
 
+def dollarMath(text):
+    """m2r2 leaves GitHub's $...$ and $$...$$ math as text, but passes on math code blocks and :math: roles"""
+    parts = re.split(r'(^```.*?^```$|`[^`\n]*`)', text, flags=re.M | re.S)  # leave code alone
+    for i in range(0, len(parts), 2):
+        parts[i] = re.sub(r'^\$\$\n(.*?)\n\$\$$', r'```math\n\1\n```', parts[i], flags=re.M | re.S)
+        parts[i] = re.sub(r'(?<![\w$\\])\$(?=\S)([^$\n]+?)(?<=\S)\$(?![\w$])', r':math:`\1`', parts[i])
+    return ''.join(parts)
+
+
 def convert(md, orphan=False, sectionRefs=True):
     baseName = os.path.splitext(md)[0]
     with open(md) as f:
-        rst = m2r2.convert(linkFilesToGitHub(f.read(), md), parse_relative_links=True)
+        rst = m2r2.convert(dollarMath(linkFilesToGitHub(f.read(), md)), parse_relative_links=True)
     rst = wrappEmojis(rst)
     if sectionRefs:
         rst = addSectionRefs(rst, baseName)

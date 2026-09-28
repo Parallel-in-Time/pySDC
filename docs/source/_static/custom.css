@@ -75,3 +75,8 @@ div.highlight-text pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 /* The logo, mark and wordmark in one image */
 .navbar-brand .logo__image { height: 2.6rem; }
+
+/* the sidebar's title is its section, linked to the section's start page */
+.bd-links__title { font-size: 1.1rem; }
+.bd-links__title a { color: var(--pst-color-text-base); text-decoration: none; }
+.bd-links__title a:hover { color: var(--pst-color-link-hover); text-decoration: underline; }

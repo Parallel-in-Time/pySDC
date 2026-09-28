@@ -8,13 +8,18 @@ The directory lists the reference papers of pySDC (the ACM TOMS paper and the Ze
 its maintainers added as mentions, and the publications that cite a reference paper, which it finds itself. To
 add a publication to the page, add it as a mention there.
 
-If the directory cannot be reached, the committed file is left alone, so that the website still builds.
+It also fetches the metadata of the papers the project gallery names for each project (`papers` in
+pySDC/projects/gallery.yml) from Crossref, or DataCite for arXiv DOIs, into docs/source/project_papers.json, which
+each project's page lists them from.
+
+If a source cannot be reached, the committed file is left alone, so that the website still builds.
 """
 
 import html
 import json
 import re
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -22,6 +27,8 @@ API = 'https://helmholtz.software/api/v1'
 SOFTWARE = '11b0ba71-a474-4bde-8b06-6e878b968f55'  # pySDC in the directory
 FIELDS = 'id,doi,url,title,authors,publisher,journal,publication_year,mention_type'
 OUT = Path(__file__).parent / 'source' / 'publications.json'
+GALLERY = Path(__file__).parents[1] / 'pySDC' / 'projects' / 'gallery.yml'
+PAPERS_OUT = Path(__file__).parent / 'source' / 'project_papers.json'
 
 # Corrections to the directory's data, until they are made there (by DOI or, without one, by URL). None drops an
 # entry: e.g. a preprint whose published version is listed as well.
@@ -34,6 +41,11 @@ CORRECTIONS = {
         'doi': '10.2140/camcos.2021.16.227',
         'url': 'https://doi.org/10.2140/camcos.2021.16.227',
     },
+}
+
+# Corrections to the metadata of the project papers, by DOI
+PAPER_CORRECTIONS = {
+    '10.34734/fzj-2026-03360': {'type': 'phdthesis', 'venue': 'Technische Universität Hamburg'},  # DataCite: a book
 }
 
 
@@ -52,6 +64,75 @@ def complete_title(title, doi):
     except (OSError, ValueError, KeyError):
         return title
     return f'{title}: {subtitle}' if subtitle and subtitle.lower() not in title.lower() else title
+
+
+def fetch_json(url):
+    with urllib.request.urlopen(urllib.request.Request(url, headers={'Accept': 'application/json'}), timeout=30) as r:
+        return json.load(r)
+
+
+def datacite_metadata(doi):
+    a = fetch_json(f'https://api.datacite.org/dois/{doi}')['data']['attributes']
+    publisher = a.get('publisher') or ''
+    return {
+        'doi': doi,
+        'title': a['titles'][0]['title'],
+        'authors': [c['name'] for c in a['creators']],
+        'venue': (
+            'arXiv'
+            if doi.lower().startswith('10.48550/')
+            else publisher.get('name', publisher.get('')) if isinstance(publisher, dict) else publisher
+        ),
+        'year': int(a['publicationYear']),
+        'type': 'phdthesis' if a['types'].get('resourceTypeGeneral') == 'Dissertation' else 'misc',
+    }
+
+
+def paper_metadata(doi):
+    """Title, authors ("Family, Given"), venue, year and BibTeX type of a DOI, from Crossref or else DataCite"""
+    if doi.lower().startswith('10.48550/'):  # arXiv
+        return datacite_metadata(doi)
+    try:
+        m = fetch_json(f'https://api.crossref.org/works/{doi}')['message']
+    except urllib.error.HTTPError as error:
+        if error.code != 404:
+            raise
+        return datacite_metadata(doi)
+    title = m['title'][0] + (f": {m['subtitle'][0]}" if m.get('subtitle') else '')
+    kind = {'journal-article': 'article', 'proceedings-article': 'inproceedings', 'book-chapter': 'incollection'}
+    return {
+        'doi': doi,
+        'title': html.unescape(title),
+        'authors': [f"{a['family']}, {a['given']}" if 'given' in a else a['family'] for a in m.get('author', [])],
+        'venue': html.unescape((m.get('container-title') or [m.get('publisher', '')])[0]),
+        'volume': m.get('volume'),
+        'issue': m.get('issue'),
+        'pages': m.get('page'),
+        'year': (m.get('published-print') or m['issued'])['date-parts'][0][0],
+        'type': kind.get(m['type'], 'misc'),
+    }
+
+
+def project_papers():
+    """The metadata of every DOI in the gallery's `papers` lists; entries without a DOI are given in full there"""
+    import yaml
+
+    dois = sorted(
+        {
+            paper
+            for section in yaml.safe_load(GALLERY.read_text(encoding='utf-8'))
+            for project in section['projects']
+            for paper in project.get('papers', [])
+            if isinstance(paper, str)
+        }
+    )
+    try:
+        papers = {doi: {**paper_metadata(doi), **PAPER_CORRECTIONS.get(doi, {})} for doi in dois}
+    except (OSError, ValueError, KeyError) as error:
+        print(f'Could not fetch the project papers, keeping {PAPERS_OUT.name}: {error}', file=sys.stderr)
+        return
+    PAPERS_OUT.write_text(json.dumps(papers, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
+    print(f'Wrote {len(papers)} project papers to {PAPERS_OUT}')
 
 
 def main():
@@ -106,3 +187,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    project_papers()

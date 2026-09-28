@@ -12,6 +12,7 @@ Development
    docs/contrib/05_documenting_code
    docs/contrib/06_new_project
    docs/contrib/07_release_guide
+   docs/contrib/08_ai_usage
    Code of conduct <CODE_OF_CONDUCT>
 
 Tests
