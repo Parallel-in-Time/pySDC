@@ -1,0 +1,7 @@
+HeatEquation\_1D\_FEniCS\_matrix\_forced
+========================================
+
+.. automodule:: pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced
+   :members:
+   :show-inheritance:
+   :undoc-members:

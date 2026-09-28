@@ -1,0 +1,7 @@
+buildBoussinesq2DMatrix
+=======================
+
+.. automodule:: pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix
+   :members:
+   :show-inheritance:
+   :undoc-members:

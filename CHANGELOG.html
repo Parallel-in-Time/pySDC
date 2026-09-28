@@ -1,46 +1,468 @@
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="./">
+
+<html lang="en" data-content_root="./" data-theme="auto">
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changelog &#8212; pySDC 5.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=2bf1fcf8" />
-    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=c40552b6" />
-    
+    <title>Changelog &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
     <script src="_static/documentation_options.js?v=cd132f8b"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'CHANGELOG';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Changelog</a></li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials" href="tutorial/index.html" />
+    <link rel="prev" title="Publications" href="publications.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  <link rel="icon" href="_static/favicon.ico" sizes="any">
+  <link rel="icon" href="_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="_static/apple-touch-icon.png">
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1"><a href="about.html">About pySDC</a></p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Changelog</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="about.html" class="nav-link">About pySDC</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Changelog</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="changelog">
-<span id="changelog-changelog"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<span id="changelog-changelog"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
 <p>⬅️ <a class="reference internal" href="index.html"><span class="doc">Back to main page</span></a></p>
-<ul>
-<li><p>September 7, 2026: Version 5.8 makes ParaDiag actually parallel. The new MPI controller puts one time step per rank
+<section id="version-5-8-september-7-2026">
+<span id="changelog-version-5-8-september-7-2026"></span><h2>Version 5.8 — September 7, 2026<a class="headerlink" href="#version-5-8-september-7-2026" title="Link to this heading">#</a></h2>
+<p>Version 5.8 makes ParaDiag actually parallel. The new MPI controller puts one time step per rank
 and circulates the diagonalization around a ring instead of gathering it, so the memory per rank no longer grows
 with the block, while <code class="docutils literal notranslate"><span class="pre">alpha</span></code> may now vary with the iteration, letting the outer loop start well-conditioned and
 tighten later. Tutorial step_9 gained parts D and E to go with it. We are happy to welcome
@@ -48,42 +470,66 @@ tighten later. Tutorial step_9 gained parts D and E to go with it. We are happy 
 <a class="reference external" href="https://github.com/caklovicka/pyParaDiag">pyParaDiag</a> and the collocation-ParaDiag paper behind it. The rest is
 controller housekeeping, of which two guards are <strong>not backward compatible</strong>: iteration-dependent QDelta
 coefficients (MIN-SR-FLEX and the Jumpers) are now restricted to single-step, single-level SDC, and serial
-Gauss-Seidel MSSDC rejects <code class="docutils literal notranslate"><span class="pre">nsweeps</span> <span class="pre">&gt;</span> <span class="pre">1</span></code> from the constructor instead of quietly ignoring it.</p></li>
-<li><p>September 4, 2026: Version 5.7 is dominated by spectral methods and Rayleigh-Bénard convection, thanks to
+Gauss-Seidel MSSDC rejects <code class="docutils literal notranslate"><span class="pre">nsweeps</span> <span class="pre">&gt;</span> <span class="pre">1</span></code> from the constructor instead of quietly ignoring it.</p>
+</section>
+<section id="version-5-7-september-4-2026">
+<span id="changelog-version-5-7-september-4-2026"></span><h2>Version 5.7 — September 4, 2026<a class="headerlink" href="#version-5-7-september-4-2026" title="Link to this heading">#</a></h2>
+<p>Version 5.7 is dominated by spectral methods and Rayleigh-Bénard convection, thanks to
 <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a>. The spectral helper was largely rewritten and gained Neumann boundary
 conditions in Chebychev and ultraspherical bases, a VkFFT backend and heterogeneous CPU/GPU computing, while Rayleigh-Bénard
 convection got a 3D problem class and its own project. ParaDiag arrived too, as a serial implementation for collocation methods.
 <a class="reference external" href="https://github.com/Ouardghi">&#64;Ouardghi</a> contributed the new <code class="docutils literal notranslate"><span class="pre">StroemungsRaum</span></code> project, working up from FEniCS heat equation
 examples to incompressible Navier-Stokes. Three changes are <strong>not backward compatible</strong>: sweepers now require the level at
 instantiation, Python 3.9 was dropped (3.13 added), and the framework defaults moved into <code class="docutils literal notranslate"><span class="pre">core</span></code>, which no longer imports its
-own plugins.</p></li>
-<li><p>April 11, 2025: Version 5.6 adds a framework for MPI-parallel I/O, developed by <a class="reference external" href="https://github.com/tlunet">&#64;tlunet</a>, making it easier to visualize the data obtained with pySDC on HPC machines in software such as ParaView.
+own plugins.</p>
+</section>
+<section id="version-5-6-april-11-2025">
+<span id="changelog-version-5-6-april-11-2025"></span><h2>Version 5.6 — April 11, 2025<a class="headerlink" href="#version-5-6-april-11-2025" title="Link to this heading">#</a></h2>
+<p>Version 5.6 adds a framework for MPI-parallel I/O, developed by <a class="reference external" href="https://github.com/tlunet">&#64;tlunet</a>, making it easier to visualize the data obtained with pySDC on HPC machines in software such as ParaView.
 Also, pySDC is now compatible with the finite element library <a class="reference external" href="https://github.com/firedrakeproject/firedrake">Firedrake</a> and the geophysical fluid dynamics library
 <a class="reference external" href="https://github.com/firedrakeproject/gusto">Gusto</a>, thanks to <a class="reference external" href="https://github.com/jshipton">&#64;jshipton</a> and <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a>.
-The former allows to setup PDEs with finite element discretizations in pySDC and then solve in time with SDC and PFASST, while the latter allows to setup a geophysical fluid dynamics problem and then use pySDC with any SDC setup as a timestepper in Gusto.</p></li>
-<li><p>June 24, 2024: Major summer cleanup with Version 5.5. <a class="reference external" href="https://github.com/tlunet">&#64;tlunet</a> extracted all quadrature-related stuff into his new standalone code
+The former allows to setup PDEs with finite element discretizations in pySDC and then solve in time with SDC and PFASST, while the latter allows to setup a geophysical fluid dynamics problem and then use pySDC with any SDC setup as a timestepper in Gusto.</p>
+</section>
+<section id="version-5-5-june-24-2024">
+<span id="changelog-version-5-5-june-24-2024"></span><h2>Version 5.5 — June 24, 2024<a class="headerlink" href="#version-5-5-june-24-2024" title="Link to this heading">#</a></h2>
+<p>Major summer cleanup with Version 5.5. <a class="reference external" href="https://github.com/tlunet">&#64;tlunet</a> extracted all quadrature-related stuff into his new standalone code
 <a class="reference external" href="https://github.com/Parallel-in-Time/qmat">qmat</a>, which makes pySDC much more focussed and both parts easier to maintain.
 <a class="reference external" href="https://github.com/lisawim">&#64;lisawim</a> worked a lot on the DAE sweepers (including an MPI-parallel version), while <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a> has fun with GPUs.
-We also appreciate <a class="reference external" href="https://github.com/jakob-fritz">&#64;jakob-fritz</a> working hard on improving the CI pipeline.</p></li>
-<li><p>January 24, 2024: Version 5.4.0 contains the code for the <a class="reference external" href="https://arxiv.org/abs/2310.08352">second order SDC paper</a> by <a class="reference external" href="https://github.com/ikrom96git">&#64;ikrom96git</a>. It also has some changes to the FEniCS
-part, including correct treatment of boundary conditions and first steps with FEniCS-x.</p></li>
-<li><p>July 28, 2023: For Version 5.3 a lot of pull requests got merged, thanks to <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a>,
+We also appreciate <a class="reference external" href="https://github.com/jakob-fritz">&#64;jakob-fritz</a> working hard on improving the CI pipeline.</p>
+</section>
+<section id="version-5-4-0-january-24-2024">
+<span id="changelog-version-5-4-0-january-24-2024"></span><h2>Version 5.4.0 — January 24, 2024<a class="headerlink" href="#version-5-4-0-january-24-2024" title="Link to this heading">#</a></h2>
+<p>Version 5.4.0 contains the code for the <a class="reference external" href="https://arxiv.org/abs/2310.08352">second order SDC paper</a> by <a class="reference external" href="https://github.com/ikrom96git">&#64;ikrom96git</a>. It also has some changes to the FEniCS
+part, including correct treatment of boundary conditions and first steps with FEniCS-x.</p>
+</section>
+<section id="version-5-3-july-28-2023">
+<span id="changelog-version-5-3-july-28-2023"></span><h2>Version 5.3 — July 28, 2023<a class="headerlink" href="#version-5-3-july-28-2023" title="Link to this heading">#</a></h2>
+<p>For Version 5.3 a lot of pull requests got merged, thanks to <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a>,
 <a class="reference external" href="https://github.com/tlunet">&#64;tlunet</a>, <a class="reference external" href="https://github.com/lisawim">&#64;lisawim</a>, <a class="reference external" href="https://github.com/ikrom96git">&#64;ikrom96git</a> for all the contributions.
 Besides the usual bugfixing and polishing, <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> now comes with linear multistep methods, classical Runge Kutta methods, DAE sweepers, and more/improved projects.
-We have second-order SDC on board, the brand-new switch estimator, a testing ground for compression with <a class="reference external" href="https://github.com/robertu94/libpressio">libpressio</a>, and more.</p></li>
-<li><p>March 24, 2023: Version 5.2 is out and improves the code in multiple directions. The problem class can now define their
+We have second-order SDC on board, the brand-new switch estimator, a testing ground for compression with <a class="reference external" href="https://github.com/robertu94/libpressio">libpressio</a>, and more.</p>
+</section>
+<section id="version-5-2-march-24-2023">
+<span id="changelog-version-5-2-march-24-2023"></span><h2>Version 5.2 — March 24, 2023<a class="headerlink" href="#version-5-2-march-24-2023" title="Link to this heading">#</a></h2>
+<p>Version 5.2 is out and improves the code in multiple directions. The problem class can now define their
 parameters explicitly with the constructor, and not with a dictionary. <code class="docutils literal notranslate"><span class="pre">params</span></code> is now a property of the problem class, that returns the problem parameters into a dictionary,
 and parameters are also automatically stored as problem attribute using the <code class="docutils literal notranslate"><span class="pre">_makeAttributeAndRegister</span></code> method, allowing to define readonly paramters
 (warning: <strong>not backward compatible</strong>).
 The resilience project now comes with the quench problem, resulting a collaboration between &#64;brownbaerchen and &#64;eschnaubelt during the
-TIME-X Apps Hackathon at USI Lugano. Many of the other changes under the hood prepare <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> for Version 6.</p></li>
-<li><p>January 23, 2023: Version 5.1 brings a lot of changes to the documentation, both on Github and on the website.
+TIME-X Apps Hackathon at USI Lugano. Many of the other changes under the hood prepare <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> for Version 6.</p>
+</section>
+<section id="version-5-1-january-23-2023">
+<span id="changelog-version-5-1-january-23-2023"></span><h2>Version 5.1 — January 23, 2023<a class="headerlink" href="#version-5-1-january-23-2023" title="Link to this heading">#</a></h2>
+<p>Version 5.1 brings a lot of changes to the documentation, both on Github and on the website.
 We revived the <a class="reference external" href="https://app.codecov.io/gh/Parallel-in-Time/pySDC">codecov</a> connection and started the
 <a class="reference external" href="https://bestpractices.coreinfrastructure.org/en/projects/6909">OpenSFF Best Practices</a> guide.
 The hook classes and the way they are handled has changed (without breaking the API, hooray), the battery model
 got quite an update and adaptivity plays a more prominent role now. Thanks to <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a>,
-<a class="reference external" href="https://github.com/tlunet">&#64;tlunet</a>, <a class="reference external" href="https://github.com/lisawim">&#64;lisawim</a>!</p></li>
-<li><p>October 7, 2022: Version 5 comes with many changes, both visible and
+<a class="reference external" href="https://github.com/tlunet">&#64;tlunet</a>, <a class="reference external" href="https://github.com/lisawim">&#64;lisawim</a>!</p>
+</section>
+<section id="version-5-october-7-2022">
+<span id="changelog-version-5-october-7-2022"></span><h2>Version 5 — October 7, 2022<a class="headerlink" href="#version-5-october-7-2022" title="Link to this heading">#</a></h2>
+<p>Version 5 comes with many changes, both visible and
 invisible ones. Some of those break the existing API, but if you are
 using tests, you should be fine. Major changes include:</p>
 <ul class="simple">
@@ -128,8 +574,10 @@ source code. After complaints here and there about linting
 “errors” the recommended way now is to run <code class="docutils literal notranslate"><span class="pre">black</span></code> before
 submission.</p></li>
 </ul>
-</li>
-<li><p>December 13, 2021: Version 4.2 brings compatibility with Python 3.9,
+</section>
+<section id="version-4-2-december-13-2021">
+<span id="changelog-version-4-2-december-13-2021"></span><h2>Version 4.2 — December 13, 2021<a class="headerlink" href="#version-4-2-december-13-2021" title="Link to this heading">#</a></h2>
+<p>Version 4.2 brings compatibility with Python 3.9,
 including some code cleanup. The CI test suite seems to run faster
 now, since sorting out the dependencies is faster. Tested
 <a class="reference external" href="https://github.com/mamba-org/mamba">mamba</a>, which for now makes the
@@ -137,8 +585,11 @@ CI pipeline much faster. Also, the CI workflow can now run locally
 using <a class="reference external" href="https://github.com/nektos/act">act</a>. We introduced markers
 for soem of the tests in preparation of distributed tests on
 different platforms. And finally, a LaTeX installation is no longer
-needed use plotting (but recommended).</p></li>
-<li><p>August 11, 2021: Version 4.1 has some more changes under the hood,
+needed use plotting (but recommended).</p>
+</section>
+<section id="version-4-1-august-11-2021">
+<span id="changelog-version-4-1-august-11-2021"></span><h2>Version 4.1 — August 11, 2021<a class="headerlink" href="#version-4-1-august-11-2021" title="Link to this heading">#</a></h2>
+<p>Version 4.1 has some more changes under the hood,
 most of them with no significant impact to users. The CI pipeline
 has been completely rewritten, porting the code to <a class="reference external" href="https://github.com/features/actions">Github
 Actions</a> (away from <a class="reference external" href="https://travis-ci.com/">Travis
@@ -147,8 +598,11 @@ and to <a class="reference external" href="https://pytest.org">pytest</a> (away 
 <a class="reference external" href="https://nose.readthedocs.io">nose</a>). One thing that may have an
 impact on users is that following the changes made in Version 4.0,
 the PETSc data structures are now much easier, removing a lot of
-unnecessary boilerplate code.</p></li>
-<li><p>May 4, 2021: Long time, no see, but this major release 4.0 marks
+unnecessary boilerplate code.</p>
+</section>
+<section id="version-4-0-may-4-2021">
+<span id="changelog-version-4-0-may-4-2021"></span><h2>Version 4.0 — May 4, 2021<a class="headerlink" href="#version-4-0-may-4-2021" title="Link to this heading">#</a></h2>
+<p>Long time, no see, but this major release 4.0 marks
 some improvements under the hood:</p>
 <ul class="simple">
 <li><p><strong>Rewrote</strong> <code class="docutils literal notranslate"><span class="pre">mesh</span></code> <strong>and</strong> <code class="docutils literal notranslate"><span class="pre">particle</span></code> <strong>data type</strong>:
@@ -168,8 +622,10 @@ recent versions of <code class="docutils literal notranslate"><span class="pre">
 </ul>
 <p>This is not much (yet) and if it were not for the API changes, this
 would have been a minor release.</p>
-</li>
-<li><p>August 30, 2019: Version 3.1 adds many more examples like the
+</section>
+<section id="version-3-1-august-30-2019">
+<span id="changelog-version-3-1-august-30-2019"></span><h2>Version 3.1 — August 30, 2019<a class="headerlink" href="#version-3-1-august-30-2019" title="Link to this heading">#</a></h2>
+<p>Version 3.1 adds many more examples like the
 nonlinear Schrödinger equation, more on Gray-Scott and in particular
 Allen-Cahn. Those are many implemented using the parallel FFT
 library
@@ -180,8 +636,11 @@ with <code class="docutils literal notranslate"><span class="pre">pySDC</span></
 been improved after performaning a detailed performance analysis
 using <a class="reference external" href="https://www.vi-hps.org/projects/score-p/">Score-P</a> and
 <a class="reference external" href="https://www.vi-hps.org/Tools/Extrae.html">Extrae</a>. Finally: first
-steps towards error/iteration estimators are taken, too.</p></li>
-<li><p>February 14, 2019: Released version 3 of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>. This
+steps towards error/iteration estimators are taken, too.</p>
+</section>
+<section id="version-3-february-14-2019">
+<span id="changelog-version-3-february-14-2019"></span><h2>Version 3 — February 14, 2019<a class="headerlink" href="#version-3-february-14-2019" title="Link to this heading">#</a></h2>
+<p>Released version 3 of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>. This
 release is accompanied by the <strong>ACM TOMS paper</strong>
 <a class="reference external" href="https://doi.org/10.1145/3310410">“pySDC – Prototyping spectral deferred corrections”</a>.
 It release contains some breaking changes to the API. In detail:</p>
@@ -218,8 +677,10 @@ treatment of <code class="docutils literal notranslate"><span class="pre">u[0]</
 consistent throughout the code.</p></li>
 <li><p>As usual, many bugs have been discovered and fixed.</p></li>
 </ul>
-</li>
-<li><p>May 23, 3018: Version 2.4 adds support for
+</section>
+<section id="version-2-4-may-23-2018">
+<span id="changelog-version-2-4-may-23-2018"></span><h2>Version 2.4 — May 23, 2018<a class="headerlink" href="#version-2-4-may-23-2018" title="Link to this heading">#</a></h2>
+<p>Version 2.4 adds support for
 <a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a>! You can now use
 <a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> data types
 (<code class="docutils literal notranslate"><span class="pre">pySDC</span></code> ships with DMDA for distributed structured
@@ -229,21 +690,30 @@ more detail, including communicator splitting for parallelization in
 space and time. Warning: in order to get this to work you need to
 install petsc4py and mpi4py first! Make sure both use MPICH3
 bindings. Downloading <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> from PyPI does not include
-these packages.</p></li>
-<li><p>February 8, 2018: Ever got annoyed at <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>‘s
+these packages.</p>
+</section>
+<section id="version-2-3-february-8-2018">
+<span id="changelog-version-2-3-february-8-2018"></span><h2>Version 2.3 — February 8, 2018<a class="headerlink" href="#version-2-3-february-8-2018" title="Link to this heading">#</a></h2>
+<p>Ever got annoyed at <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>‘s
 incredibly slow setup phase when multiple time-steps are used?
 Version 2.3 changes this by copying the data structure of the first
 step to all other steps using the <a class="reference external" href="https://pypi.python.org/pypi/dill">dill
 Package</a>. Setup times could be
 reduced by 90% and more for certain problems. We also increase the
 speed for certain calculations, in particular for the Penning trap
-example.</p></li>
-<li><p>November 7, 2017: Version 2.2 contains matrix-based versions of
+example.</p>
+</section>
+<section id="version-2-2-november-7-2017">
+<span id="changelog-version-2-2-november-7-2017"></span><h2>Version 2.2 — November 7, 2017<a class="headerlink" href="#version-2-2-november-7-2017" title="Link to this heading">#</a></h2>
+<p>Version 2.2 contains matrix-based versions of
 PFASST within the project <code class="docutils literal notranslate"><span class="pre">matrixPFASST</span></code>. This involved quite a few
 changes in more or less unexpected places, e.g. in the multigrid
 controller and the transfer base class. The impact of these changes
-on other projects should be negligible, though.</p></li>
-<li><p>October 25, 2017: For the <a class="reference external" href="https://www.ics.usi.ch/index.php/6th-workshop-on-parallel-in-time-methods">6th Workshop on Parallel-in-Time
+on other projects should be negligible, though.</p>
+</section>
+<section id="version-2-1-october-25-2017">
+<span id="changelog-version-2-1-october-25-2017"></span><h2>Version 2.1 — October 25, 2017<a class="headerlink" href="#version-2-1-october-25-2017" title="Link to this heading">#</a></h2>
+<p>For the <a class="reference external" href="https://www.ics.usi.ch/index.php/6th-workshop-on-parallel-in-time-methods">6th Workshop on Parallel-in-Time
 Integration</a>
 <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> has been updated to version 2.1. It is now
 available on PyPI - the Python Package Index, see
@@ -251,8 +721,11 @@ available on PyPI - the Python Package Index, see
 using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pySDC</span></code>. Naturally, this release contains a lot of
 bugfixes and minor improvements. Most notably, the file structure
 has been changed again to meet the standards for Python packaging
-(at least a bit).</p></li>
-<li><p>November 24, 2016: Released version 2 of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>. This
+(at least a bit).</p>
+</section>
+<section id="version-2-november-24-2016">
+<span id="changelog-version-2-november-24-2016"></span><h2>Version 2 — November 24, 2016<a class="headerlink" href="#version-2-november-24-2016" title="Link to this heading">#</a></h2>
+<p>Released version 2 of <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>. This
 release contains major changes to the code and its structure:</p>
 <ul class="simple">
 <li><p><strong>Complete redesign of code structure</strong>: The <code class="docutils literal notranslate"><span class="pre">core</span></code> part of
@@ -277,7 +750,7 @@ parallelisim as well as <code class="docutils literal notranslate"><span class="
 implementation of PFASST and the likes. Initialization has been
 simplified a lot, too.</p></li>
 <li><p><strong>Collocation-based coarsening</strong> As the standard PFASST
-libraries <a class="reference external" href="https://bitbucket.org/memmett/libpfasst">libpfasst</a>
+libraries <a class="reference external" href="https://github.com/libpfasst/LibPFASST">libpfasst</a>
 and <a class="reference external" href="https://github.com/Parallel-in-Time/PFASST">PFASST++</a>
 <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> now offers collocation-based coarsening,
 i.e. the number of collocation nodes can be reduced during
@@ -306,55 +779,151 @@ simplicity</p></li>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
 <p>⬅️ <a class="reference internal" href="index.html"><span class="doc">Back to main page</span></a></p>
+</section>
 </section>
 
 
-            <div class="clearer"></div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="publications.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Publications</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tutorial/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorials</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-8-september-7-2026">Version 5.8 — September 7, 2026</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-7-september-4-2026">Version 5.7 — September 4, 2026</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-6-april-11-2025">Version 5.6 — April 11, 2025</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-5-june-24-2024">Version 5.5 — June 24, 2024</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-4-0-january-24-2024">Version 5.4.0 — January 24, 2024</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-3-july-28-2023">Version 5.3 — July 28, 2023</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-2-march-24-2023">Version 5.2 — March 24, 2023</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-1-january-23-2023">Version 5.1 — January 23, 2023</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-5-october-7-2022">Version 5 — October 7, 2022</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-4-2-december-13-2021">Version 4.2 — December 13, 2021</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-4-1-august-11-2021">Version 4.1 — August 11, 2021</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-4-0-may-4-2021">Version 4.0 — May 4, 2021</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-3-1-august-30-2019">Version 3.1 — August 30, 2019</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-3-february-14-2019">Version 3 — February 14, 2019</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-2-4-may-23-2018">Version 2.4 — May 23, 2018</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-2-3-february-8-2018">Version 2.3 — February 8, 2018</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-2-2-november-7-2017">Version 2.2 — November 7, 2017</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-2-1-october-25-2017">Version 2.1 — October 25, 2017</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-2-november-24-2016">Version 2 — November 24, 2016</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Parallel-in-Time/pySDC/edit/master/docs/source//CHANGELOG.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/CHANGELOG.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/CHANGELOG.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
     </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
     </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pySDC 5.8 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Changelog</a></li> 
-      </ul>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
     </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2024, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    </div>
+  
+</div>
+
+  </footer>
   </body>
 </html>

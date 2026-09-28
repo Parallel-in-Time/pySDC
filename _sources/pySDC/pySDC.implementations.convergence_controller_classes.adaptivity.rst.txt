@@ -1,0 +1,7 @@
+adaptivity
+==========
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.adaptivity
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+log\_GPU\_timings
+=================
+
+.. automodule:: pySDC.implementations.hooks.log_GPU_timings
+   :members:
+   :show-inheritance:
+   :undoc-members:

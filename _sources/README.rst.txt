@@ -31,13 +31,16 @@
    :target: https://go.fzj.de/CodePromo
    :alt: HiRSE Code Promo Badge
 
-.. |m2r-image-ef48412abd47| image:: https://archive.softwareheritage.org/badge/origin/https://github.com/Parallel-in-Time/pySDC/
+.. |m2r-image-87af1b7b8928| image:: https://img.shields.io/badge/Software_Heritage-archived-orange
    :target: https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Parallel-in-Time/pySDC
    :alt: SWH
 
 .. |m2r-image-fb25d818deda| image:: https://img.shields.io/badge/ai%20declaration%20format-aidecl-blue
    :target: https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml
    :alt: validated with aidecl
+
+.. |m2r-link-d3e2db30b591| replace:: \ ``aidecl.yaml``
+.. _m2r-link-d3e2db30b591: https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml
 
 
 |m2r-image-0a52406f8d0c|
@@ -48,11 +51,11 @@
 |m2r-image-7c3a37013b08|
 |m2r-image-a82117459442|
 |m2r-image-c3ff5b0093fc|
-|m2r-image-ef48412abd47|
+|m2r-image-87af1b7b8928|
 |m2r-image-fb25d818deda|
 
-Welcome to pySDC!
-=================
+Overview
+========
 
 The ``pySDC`` project is a Python implementation of the
 spectral deferred correction (SDC) approach and its flavors, esp. the
@@ -105,8 +108,8 @@ If you want to install the developer version using ``pip`` directly from the Git
    # optionally use venv
    python3 -m venv name_of_pySDC_env
    . ./name_of_pySDC_env/bin/activate
-   # drop @5.5.0 if you want to install the develop version
-   pip install git+https://github.com/Parallel-in-Time/pySDC@5.5.0
+   # drop @5.8 if you want to install the develop version
+   pip install git+https://github.com/Parallel-in-Time/pySDC@5.8
 
 To check your installation, run
 
@@ -141,13 +144,16 @@ can help you with this. Also, we would greatly appreciate a citation of
 
 ..
 
-   Robert Speck, **Algorithm 997: pySDC - Prototyping Spectral Deferred
+   Robert Speck, **Algorithm 997: pySDC—Prototyping Spectral Deferred
    Corrections**\ , ACM Transactions on Mathematical Software (TOMS),
    Volume 45 Issue 3, August 2019, https://doi.org/10.1145/3310410
 
 
 The current software release can be cited using Zenodo:
 |m2r-image-06c49abaaed9|
+
+BibTeX for the paper and for the software is on the `website <https://parallel-in-time.org/pySDC/publications.html>`_\ ;
+GitHub's "Cite this repository" gives the paper.
 
 Contributing
 ------------
@@ -156,7 +162,7 @@ Contributing
 and is now maintained and developed by a small community of scientists interested in SDC methods.
 Checkout the :doc:`Changelog <./CHANGELOG>` to see pySDC's evolution since 2016. It has a
 software management plan (SWP), too, see `here <https://smw.dsw.elixir-europe.org/wizard/projects/c3dda921-b7b0-4f4d-b5dc-778b9780552d>`_.
-Parts of the code have been co-authored by AI; see :doc:`aidecl.yaml <./aidecl>` for details.
+Parts of the code have been co-authored by AI; see |m2r-link-d3e2db30b591|_ for details.
 
 Any contribution is dearly welcome! If you want to contribute, please take the time to read our :doc:`Contribution Guidelines <./CONTRIBUTING>`
 (and don't forget to take a peek at our nice :doc:`Code of Conduct <./CODE_OF_CONDUCT>` |:wink:|).
@@ -166,7 +172,7 @@ Acknowledgements
 
 This project has received funding from the `European High-Performance
 Computing Joint Undertaking <https://eurohpc-ju.europa.eu/>`_ (JU) under
-grant agreement No 955701 (\ `TIME-X <https://www.time-x-eurohpc.eu/>`_\ )
+grant agreement No 955701 (\ `TIME-X <https://time-x-eurohpc.eu/>`_\ )
 and grant agreement No 101118139.
 The JU receives support from the European Union's Horizon 2020 research
 and innovation programme and Belgium, France, Germany, and Switzerland.
@@ -179,8 +185,8 @@ The project also received help from the `Joint Lab "Helmholtz Information -  Res
 .. raw:: html
 
    <p align="center">
-     <img src="./_images/docs/img/EuroHPC.jpg" height="105"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-     <img src="./_images/docs/img/LogoTime-X.png" height="105" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-     <img src="./_images/docs/img/Logo-BMFTR-768x512.png" height="105" />
+     <img src="_static/EuroHPC.jpg" height="105"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <img src="_static/LogoTime-X.png" height="105" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <img src="_static/Logo-BMFTR-768x512.png" height="105" />
    </p>
 

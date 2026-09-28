@@ -1,0 +1,24 @@
+pySDC.implementations
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.controller_classes
+   pySDC.implementations.convergence_controller_classes
+   pySDC.implementations.datatype_classes
+   pySDC.implementations.hooks
+   pySDC.implementations.problem_classes
+   pySDC.implementations.sweeper_classes
+   pySDC.implementations.transfer_classes
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations
+   :members:
+   :show-inheritance:
+   :undoc-members:

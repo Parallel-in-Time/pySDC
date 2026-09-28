@@ -1,0 +1,7 @@
+Van\_der\_Pol\_implicit
+=======================
+
+.. automodule:: pySDC.implementations.problem_classes.Van_der_Pol_implicit
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+estimate\_contraction\_factor
+=============================
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.estimate_contraction_factor
+   :members:
+   :show-inheritance:
+   :undoc-members:

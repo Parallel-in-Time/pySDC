@@ -1,0 +1,7 @@
+ParaDiag
+========
+
+.. automodule:: pySDC.implementations.controller_classes.ParaDiag
+   :members:
+   :show-inheritance:
+   :undoc-members:

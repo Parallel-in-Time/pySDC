@@ -1,6 +1,7 @@
 
 :orphan:
 
+
 .. _docs/contrib/01_pull_requests/recommendations-for-pull-requests:
 
 Recommendations for pull requests

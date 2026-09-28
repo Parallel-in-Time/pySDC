@@ -1,7 +1,0 @@
-implementations.convergence\_controller\_classes.step\_size\_limiter module
-===========================================================================
-
-.. automodule:: implementations.convergence_controller_classes.step_size_limiter
-   :members:
-   :show-inheritance:
-   :undoc-members:

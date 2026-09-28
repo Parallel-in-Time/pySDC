@@ -1,0 +1,7 @@
+firedrake\_ensemble\_communicator
+=================================
+
+.. automodule:: pySDC.helpers.firedrake_ensemble_communicator
+   :members:
+   :show-inheritance:
+   :undoc-members:

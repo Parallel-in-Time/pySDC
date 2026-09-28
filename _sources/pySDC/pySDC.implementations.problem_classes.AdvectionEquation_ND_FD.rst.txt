@@ -1,0 +1,7 @@
+AdvectionEquation\_ND\_FD
+=========================
+
+.. automodule:: pySDC.implementations.problem_classes.AdvectionEquation_ND_FD
+   :members:
+   :show-inheritance:
+   :undoc-members:

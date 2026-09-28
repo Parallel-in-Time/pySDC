@@ -1,0 +1,7 @@
+convergence\_controller
+=======================
+
+.. automodule:: pySDC.core.convergence_controller
+   :members:
+   :show-inheritance:
+   :undoc-members:

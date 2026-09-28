@@ -1,0 +1,7 @@
+controller\_nonMPI
+==================
+
+.. automodule:: pySDC.implementations.controller_classes.controller_nonMPI
+   :members:
+   :show-inheritance:
+   :undoc-members:

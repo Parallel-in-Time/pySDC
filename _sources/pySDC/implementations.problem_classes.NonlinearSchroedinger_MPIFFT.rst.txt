@@ -1,7 +1,0 @@
-implementations.problem\_classes.NonlinearSchroedinger\_MPIFFT module
-=====================================================================
-
-.. automodule:: implementations.problem_classes.NonlinearSchroedinger_MPIFFT
-   :members:
-   :show-inheritance:
-   :undoc-members:

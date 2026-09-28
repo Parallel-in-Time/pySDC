@@ -1,0 +1,7 @@
+spectral\_helper
+================
+
+.. automodule:: pySDC.helpers.spectral_helper
+   :members:
+   :show-inheritance:
+   :undoc-members:

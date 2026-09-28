@@ -1,7 +1,0 @@
-helpers.ParaDiagHelper module
-=============================
-
-.. automodule:: helpers.ParaDiagHelper
-   :members:
-   :show-inheritance:
-   :undoc-members:

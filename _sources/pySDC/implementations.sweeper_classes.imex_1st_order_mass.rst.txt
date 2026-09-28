@@ -1,7 +1,0 @@
-implementations.sweeper\_classes.imex\_1st\_order\_mass module
-==============================================================
-
-.. automodule:: implementations.sweeper_classes.imex_1st_order_mass
-   :members:
-   :show-inheritance:
-   :undoc-members:

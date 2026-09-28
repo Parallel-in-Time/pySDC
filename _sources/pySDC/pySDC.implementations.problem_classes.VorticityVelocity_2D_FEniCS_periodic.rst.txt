@@ -1,0 +1,7 @@
+VorticityVelocity\_2D\_FEniCS\_periodic
+=======================================
+
+.. automodule:: pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
+   :members:
+   :show-inheritance:
+   :undoc-members:

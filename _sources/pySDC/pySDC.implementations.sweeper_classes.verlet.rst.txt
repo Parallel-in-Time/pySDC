@@ -1,0 +1,7 @@
+verlet
+======
+
+.. automodule:: pySDC.implementations.sweeper_classes.verlet
+   :members:
+   :show-inheritance:
+   :undoc-members:

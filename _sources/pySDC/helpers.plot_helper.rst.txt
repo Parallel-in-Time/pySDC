@@ -1,7 +1,0 @@
-helpers.plot\_helper module
-===========================
-
-.. automodule:: helpers.plot_helper
-   :members:
-   :show-inheritance:
-   :undoc-members:

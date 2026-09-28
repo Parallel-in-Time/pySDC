@@ -1,7 +1,0 @@
-implementations.problem\_classes.FullSolarSystem module
-=======================================================
-
-.. automodule:: implementations.problem_classes.FullSolarSystem
-   :members:
-   :show-inheritance:
-   :undoc-members:

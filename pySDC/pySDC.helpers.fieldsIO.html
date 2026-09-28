@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>fieldsIO &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'pySDC/pySDC.helpers.fieldsIO';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="firedrake_ensemble_communicator" href="pySDC.helpers.firedrake_ensemble_communicator.html" />
+    <link rel="prev" title="fft_helper" href="pySDC.helpers.fft_helper.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  <link rel="icon" href="../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1"><a href="../api.html">API reference</a></p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="pySDC.core.html">pySDC.core</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.base_transfer.html">base_transfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.check_convergence.html">check_convergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.collocation.html">collocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.common.html">common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.controller.html">controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.convergence_controller.html">convergence_controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.default_hook.html">default_hook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.errors.html">errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.hooks.html">hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.level.html">level</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.problem.html">problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.space_transfer.html">space_transfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.step.html">step</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.sweeper.html">sweeper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.timings.html">timings</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pySDC.implementations.html">pySDC.implementations</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.controller_classes.html">controller_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.ParaDiag.html">ParaDiag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.controller_MPI.html">controller_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.controller_ParaDiag_MPI.html">controller_ParaDiag_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI.html">controller_ParaDiag_nonMPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.controller_nonMPI.html">controller_nonMPI</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.html">convergence_controller_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.adaptive_alpha.html">adaptive_alpha</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.adaptive_collocation.html">adaptive_collocation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.adaptivity.html">adaptivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.basic_restarting.html">basic_restarting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.check_iteration_estimator.html">check_iteration_estimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.crash.html">crash</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.estimate_contraction_factor.html">estimate_contraction_factor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.estimate_embedded_error.html">estimate_embedded_error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html">estimate_extrapolation_error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.estimate_polynomial_error.html">estimate_polynomial_error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.hotrod.html">hotrod</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.inexactness.html">inexactness</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.interpolate_between_restarts.html">interpolate_between_restarts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spread_step_sizes.html">spread_step_sizes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.step_size_limiter.html">step_size_limiter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.store_uold.html">store_uold</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.datatype_classes.html">datatype_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.container.html">container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.cupy_mesh.html">cupy_mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.fenics_mesh.html">fenics_mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.firedrake_mesh.html">firedrake_mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.mesh.html">mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.particles.html">particles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.petsc_vec.html">petsc_vec</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.hooks.html">hooks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.AllenCahn_monitor.html">AllenCahn_monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_GPU_timings.html">log_GPU_timings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_embedded_error_estimate.html">log_embedded_error_estimate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_errors.html">log_errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_extrapolated_error_estimate.html">log_extrapolated_error_estimate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_restarts.html">log_restarts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_solution.html">log_solution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_step_size.html">log_step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_work.html">log_work</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.plotting.html">plotting</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.problem_classes.html">problem_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.acoustic_helpers.html">acoustic_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.boussinesq_helpers.html">boussinesq_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex.html">AcousticAdvection_1D_FD_imex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html">AdvectionDiffusionEquation_1D_FFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AdvectionEquation_ND_FD.html">AdvectionEquation_ND_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_1D_FD.html">AllenCahn_1D_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_2D_FD.html">AllenCahn_2D_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_2D_FFT.html">AllenCahn_2D_FFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_MPIFFT.html">AllenCahn_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_Temp_MPIFFT.html">AllenCahn_Temp_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Auzinger_implicit.html">Auzinger_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Battery.html">Battery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex.html">Boussinesq_2D_FD_imex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Brusselator.html">Brusselator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.BuckConverter.html">BuckConverter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Burgers.html">Burgers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.DiscontinuousTestODE.html">DiscontinuousTestODE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FastWaveSlowWave_0D.html">FastWaveSlowWave_0D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FermiPastaUlamTsingou.html">FermiPastaUlamTsingou</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FullSolarSystem.html">FullSolarSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html">GeneralizedFisher_1D_FD_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc.html">GeneralizedFisher_1D_PETSc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GenericGusto.html">GenericGusto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html">GrayScott_1D_FEniCS_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html">GrayScott_2D_PETSc_periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_MPIFFT.html">GrayScott_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HarmonicOscillator.html">HarmonicOscillator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html">HeatEquation_1D_FEniCS_matrix_forced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced.html">HeatEquation_2D_PETSc_forced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_Chebychev.html">HeatEquation_Chebychev</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_ND_FD.html">HeatEquation_ND_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatFiredrake.html">HeatFiredrake</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HenonHeiles.html">HenonHeiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.LogisticEquation.html">LogisticEquation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Lorenz.html">Lorenz</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html">NonlinearSchroedinger_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.OuterSolarSystem.html">OuterSolarSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.PenningTrap_3D.html">PenningTrap_3D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Piline.html">Piline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Quench.html">Quench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.RayleighBenard.html">RayleighBenard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.RayleighBenard3D.html">RayleighBenard3D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.TestEquation_0D.html">TestEquation_0D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Van_der_Pol_implicit.html">Van_der_Pol_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html">VorticityVelocity_2D_FEniCS_periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian.html">generic_MPIFFT_Laplacian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_ND_FD.html">generic_ND_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_spectral.html">generic_spectral</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.nonlinear_ODE_1.html">nonlinear_ODE_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.odeScalar.html">odeScalar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.odeSystem.html">odeSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.polynomial_test_problem.html">polynomial_test_problem</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.sweeper_classes.html">sweeper_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.Multistep.html">Multistep</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.ParaDiagSweepers.html">ParaDiagSweepers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.Runge_Kutta.html">Runge_Kutta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom.html">Runge_Kutta_Nystrom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.boris_2nd_order.html">boris_2nd_order</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.delta_form.html">delta_form</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.delta_form_MPI.html">delta_form_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.explicit.html">explicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit.html">generic_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit_MPI.html">generic_implicit_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order.html">imex_1st_order</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html">imex_1st_order_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html">imex_1st_order_mass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.multi_implicit.html">multi_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.verlet.html">verlet</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.transfer_classes.html">transfer_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferDelta.html">BaseTransferDelta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferDeltaMPI.html">BaseTransferDeltaMPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferMPI.html">BaseTransferMPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html">BaseTransfer_mass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFenicsMesh.html">TransferFenicsMesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html">TransferFiredrakeMesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh.html">TransferMesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_FFT.html">TransferMesh_FFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_FFT2D.html">TransferMesh_FFT2D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_MPIFFT.html">TransferMesh_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_NoCoarse.html">TransferMesh_NoCoarse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferPETScDMDA.html">TransferPETScDMDA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferParticles_NoCoarse.html">TransferParticles_NoCoarse</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="pySDC.helpers.html">pySDC.helpers</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.NCCL_communicator.html">NCCL_communicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.ParaDiagHelper.html">ParaDiagHelper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.blocks.html">blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.fft_helper.html">fft_helper</a></li>
+<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">fieldsIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.firedrake_ensemble_communicator.html">firedrake_ensemble_communicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.plot_helper.html">plot_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.problem_helper.html">problem_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.pySDC_as_gusto_time_discretization.html">pySDC_as_gusto_time_discretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.pysdc_helper.html">pysdc_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.setup_helper.html">setup_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.spectral_helper.html">spectral_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.stats_helper.html">stats_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.testing.html">testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.transfer_helper.html">transfer_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.visualization_tools.html">visualization_tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.vtkIO.html">vtkIO</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="pySDC.helpers.html" class="nav-link">pySDC.helpers</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">fieldsIO</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pySDC.helpers.fieldsIO">
+<span id="fieldsio"></span><h1>fieldsIO<a class="headerlink" href="#module-pySDC.helpers.fieldsIO" title="Link to this heading">#</a></h1>
+<p>Generic utility class to write and read cartesian grid field solutions into binary files.
+It implements the base file handler class <a class="reference internal" href="#pySDC.helpers.fieldsIO.FieldsIO" title="pySDC.helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a>, that is specialized into :</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#pySDC.helpers.fieldsIO.Scalar" title="pySDC.helpers.fieldsIO.Scalar"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scalar</span></code></a> : for 0D fields (scalar) with a given number of variables</p></li>
+<li><p><a class="reference internal" href="#pySDC.helpers.fieldsIO.Rectilinear" title="pySDC.helpers.fieldsIO.Rectilinear"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear</span></code></a> : for fields on N-dimensional rectilinear grids</p></li>
+</ul>
+<p>While each file handler need to be setup with specific parameters (grid, …),
+each written file can be read using the same interface implemented in the
+base abstract class.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rectilinear</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write some fields in files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fOut</span> <span class="o">=</span> <span class="n">Rectilinear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">"file.pysdc"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fOut</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="n">nVar</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fOut</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xGrid</span><span class="p">,</span> <span class="n">yGrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">"ij"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">xGrid</span><span class="o">*</span><span class="n">yGrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># u0 has shape [2, nX, nY]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="n">fOut</span><span class="o">.</span><span class="n">addField</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="o">*</span><span class="n">u0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Read the file using the generic interface</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldsIO</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fIn</span> <span class="o">=</span> <span class="n">FieldsIO</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="s2">"file.pysdc"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">times</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">times</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="n">fIn</span><span class="o">.</span><span class="n">nFields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tEnd</span><span class="p">,</span> <span class="n">uEnd</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readField</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">tEnd</span> <span class="o">==</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>🚀 <a class="reference internal" href="#pySDC.helpers.fieldsIO.Rectilinear" title="pySDC.helpers.fieldsIO.Rectilinear"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear</span></code></a> is compatible with a MPI-based cartesian decomposition.
+See <a class="reference internal" href="#pySDC.helpers.fieldsIO.writeFields_MPI" title="pySDC.helpers.fieldsIO.writeFields_MPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.helpers.fieldsIO.writeFields_MPI</span></code></a> for an illustrative example.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>To use MPI collective writing, you need to call first the class methods <a class="reference internal" href="#pySDC.helpers.fieldsIO.Rectilinear.setupMPI" title="pySDC.helpers.fieldsIO.Rectilinear.setupMPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear.setupMPI</span></code></a> (cf their docstring).
+Also, <cite>Rectilinear.setHeader</cite> <strong>must be given the global grids coordinates</strong>, whether the code is run in parallel or not.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FieldsIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract IO file handler</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE">
+<span class="sig-name descname"><span class="pre">ALLOW_OVERWRITE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.STRUCTS">
+<span class="sig-name descname"><span class="pre">STRUCTS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{0:</span> <span class="pre">&lt;class</span> <span class="pre">'pySDC.helpers.fieldsIO.Scalar'&gt;,</span> <span class="pre">1:</span> <span class="pre">&lt;class</span> <span class="pre">'pySDC.helpers.fieldsIO.Rectilinear'&gt;}</span></span><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.STRUCTS" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.addField">
+<span class="sig-name descname"><span class="pre">addField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.addField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.addField" title="Link to this definition">#</a></dt>
+<dd><p>Append one field solution at the end of the file with one given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float-like</span></code>) – The associated time of the field solution.</p></li>
+<li><p><strong>field</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The field values.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.fSize">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fSize</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.fSize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.fSize" title="Link to this definition">#</a></dt>
+<dd><p>Full size of a field (in bytes)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.fileSize">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fileSize</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.fileSize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.fileSize" title="Link to this definition">#</a></dt>
+<dd><p>Current size of the file (in bytes)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.formatIndex">
+<span class="sig-name descname"><span class="pre">formatIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.formatIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.formatIndex" title="Link to this definition">#</a></dt>
+<dd><p>Utility method to format a fields index to a positional integer (negative starts from last field index, like python lists)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.fromFile">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fromFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.fromFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.fromFile" title="Link to this definition">#</a></dt>
+<dd><p>Read a file storing fields, and return the <cite>FieldsIO</cite> of the appropriate
+field type (structure).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileName</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the binary file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fieldsIO</strong> (<a class="reference internal" href="#pySDC.helpers.fieldsIO.FieldsIO" title="pySDC.helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a>) – The specialized <cite>FieldsIO</cite> adapted to the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.hBase">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hBase</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.hBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.hBase" title="Link to this definition">#</a></dt>
+<dd><p>Base header into numpy array format</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.hInfos">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hInfos</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.hInfos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.hInfos" title="Link to this definition">#</a></dt>
+<dd><p>(Abstract) Array representing the grid structure to be written in the binary file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.hSize">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hSize</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.hSize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.hSize" title="Link to this definition">#</a></dt>
+<dd><p>Size of the full header (in bytes)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.initialize" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the file handler : create the file with header, removing any existing file with the same name</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.itemSize">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">itemSize</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.itemSize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.itemSize" title="Link to this definition">#</a></dt>
+<dd><p>Size of one field value (in bytes)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.nFields">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nFields</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.nFields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.nFields" title="Link to this definition">#</a></dt>
+<dd><p>Number of fields currently stored in the binary file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.readField">
+<span class="sig-name descname"><span class="pre">readField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.readField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.readField" title="Link to this definition">#</a></dt>
+<dd><p>Read one field stored in the binary file, corresponding to the given
+time index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Positional index of the field.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Stored time for this field.</p></li>
+<li><p><strong>field</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Read fields in a numpy array.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.readHeader">
+<span class="sig-name descname"><span class="pre">readHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.readHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.readHeader" title="Link to this definition">#</a></dt>
+<dd><p>(Abstract) Read the header from the file storing the fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<cite>_io.TextIOWrapper</cite>) – File to read the header from.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.register">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.register" title="Link to this definition">#</a></dt>
+<dd><p>Decorator used to register a new class FieldsIO specialized class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sID</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Unique identifyer for the file, used in the binary file.
+Since it’s encoded on a 8-bytes signed integer,
+it must be between -128 and 127</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># New specialized FieldsIO class</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@FieldsIO</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">sID</span><span class="o">=</span><span class="mi">31</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">HexaMesh2D</span><span class="p">(</span><span class="n">FieldsIO</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">pass</span> <span class="c1"># ... implementation</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.reshape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.reshape" title="Link to this definition">#</a></dt>
+<dd><p>Eventually reshape the field to correspond to the grid structure</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.sID">
+<span class="sig-name descname"><span class="pre">sID</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.sID" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.setHeader">
+<span class="sig-name descname"><span class="pre">setHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.setHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.setHeader" title="Link to this definition">#</a></dt>
+<dd><p>(Abstract) Set the header before creating a new file to store the fields</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.tSize">
+<span class="sig-name descname"><span class="pre">tSize</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></span><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.tSize" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.time">
+<span class="sig-name descname"><span class="pre">time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.time" title="Link to this definition">#</a></dt>
+<dd><p>Time stored at a given field index</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.FieldsIO.times">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">times</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#FieldsIO.times"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.FieldsIO.times" title="Link to this definition">#</a></dt>
+<dd><p>Vector of all times stored in the binary file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Rectilinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pySDC.helpers.fieldsIO.Scalar" title="pySDC.helpers.fieldsIO.Scalar"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scalar</span></code></a></p>
+<p>FieldsIO handler storing a given number of scalar variables on a N-dimensional rectilinear grid</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.MPI_FILE_CLOSE">
+<span class="sig-name descname"><span class="pre">MPI_FILE_CLOSE</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.MPI_FILE_CLOSE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_FILE_CLOSE" title="Link to this definition">#</a></dt>
+<dd><p>Close the binary file in MPI mode</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.MPI_FILE_OPEN">
+<span class="sig-name descname"><span class="pre">MPI_FILE_OPEN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.MPI_FILE_OPEN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_FILE_OPEN" title="Link to this definition">#</a></dt>
+<dd><p>Open the binary file in MPI mode</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.MPI_ON">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MPI_ON</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.MPI_ON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_ON" title="Link to this definition">#</a></dt>
+<dd><p>Wether or not MPI is activated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.MPI_READ_AT_ALL">
+<span class="sig-name descname"><span class="pre">MPI_READ_AT_ALL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.MPI_READ_AT_ALL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_READ_AT_ALL" title="Link to this definition">#</a></dt>
+<dd><p>Read data from the binary file in MPI mode, with a given offset
+<strong>relative to the beginning of the file</strong>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Offset to read at, relative to the beginning of the file, in bytes.</p></li>
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Array on which to read the data from the binary file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.MPI_ROOT">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MPI_ROOT</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.MPI_ROOT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_ROOT" title="Link to this definition">#</a></dt>
+<dd><p>Wether or not the process is MPI Root</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.MPI_SETUP_FILETYPE">
+<span class="sig-name descname"><span class="pre">MPI_SETUP_FILETYPE</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.MPI_SETUP_FILETYPE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_SETUP_FILETYPE" title="Link to this definition">#</a></dt>
+<dd><p>Setup subarray masks for each processes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.MPI_WRITE">
+<span class="sig-name descname"><span class="pre">MPI_WRITE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.MPI_WRITE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_WRITE" title="Link to this definition">#</a></dt>
+<dd><p>Write data (np.ndarray) in the binary file in MPI mode, at the current file cursor position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.MPI_WRITE_AT_ALL">
+<span class="sig-name descname"><span class="pre">MPI_WRITE_AT_ALL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.MPI_WRITE_AT_ALL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_WRITE_AT_ALL" title="Link to this definition">#</a></dt>
+<dd><p>Write data in the binary file in MPI mode, with a given offset
+<strong>relative to the beginning of the file</strong>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Offset to write at, relative to the beginning of the file, in bytes.</p></li>
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Data to be written in the binary file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.addField">
+<span class="sig-name descname"><span class="pre">addField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.addField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.addField" title="Link to this definition">#</a></dt>
+<dd><p>Append one field solution at the end of the file with one given time,
+possibly using MPI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float-like</span></code>) – The associated time of the field solution.</p></li>
+<li><p><strong>field</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – The (local) field values.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a MPI decomposition is used, field <strong>must be</strong> the local field values.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.comm">
+<span class="sig-name descname"><span class="pre">comm</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">mpi4py.MPI.Intracomm</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.comm" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.dim">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dim</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.dim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.dim" title="Link to this definition">#</a></dt>
+<dd><p>Number of grid dimensions</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.gridSizes">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gridSizes</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.gridSizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.gridSizes" title="Link to this definition">#</a></dt>
+<dd><p>Number of points in y direction</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.hInfos">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.hInfos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.hInfos" title="Link to this definition">#</a></dt>
+<dd><p>Array representing the grid structure to be written in the binary file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.initialize" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the binary file (write header) in MPI mode</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.nDoF">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nDoF</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.nDoF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.nDoF" title="Link to this definition">#</a></dt>
+<dd><p>Number of degrees of freedom for one variable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.readField">
+<span class="sig-name descname"><span class="pre">readField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.readField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.readField" title="Link to this definition">#</a></dt>
+<dd><p>Read one field stored in the binary file, corresponding to the given
+time index, using MPI in the eventuality of space parallel decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Positional index of the field.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Stored time for this field.</p></li>
+<li><p><strong>field</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Read (local) fields in a numpy array.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a MPI decomposition is used, it reads and returns the local fields values only.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.readHeader">
+<span class="sig-name descname"><span class="pre">readHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.readHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.readHeader" title="Link to this definition">#</a></dt>
+<dd><p>Read the header from the binary file storing the fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<cite>_io.TextIOWrapper</cite>) – File to read the header from.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.reshape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.reshape" title="Link to this definition">#</a></dt>
+<dd><p>Reshape the fields to a N-d array (inplace operation)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.sID">
+<span class="sig-name descname"><span class="pre">sID</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.sID" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.setHeader">
+<span class="sig-name descname"><span class="pre">setHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.setHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.setHeader" title="Link to this definition">#</a></dt>
+<dd><p>Set the descriptive grid structure to be stored in the file header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nVar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of 1D variables stored.</p></li>
+<li><p><strong>coords</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.1darray</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">list[np.1darray]</span></code>) – The grid coordinates in each dimensions.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When used in MPI decomposition mode, all coordinate <strong>must</strong> be the global grid.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.setupCoords">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setupCoords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">coords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.setupCoords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.setupCoords" title="Link to this definition">#</a></dt>
+<dd><p>Utility function to setup grids in multiple dimensions, given the keyword arguments</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.setupMPI">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setupMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">mpi4py.MPI.Intracomm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iLoc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nLoc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.setupMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.setupMPI" title="Link to this definition">#</a></dt>
+<dd><p>Setup the MPI mode for the files IO, considering a decomposition
+of the 1D grid into contiguous subintervals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">MPI.Intracomm</span></code>) – The space decomposition communicator.</p></li>
+<li><p><strong>iLoc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – Starting index of the local sub-domain in the global coordinates.</p></li>
+<li><p><strong>nLoc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – Number of points in the local sub-domain.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Rectilinear.toVTR">
+<span class="sig-name descname"><span class="pre">toVTR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baseName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">varNames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idxFormat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:06d}'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Rectilinear.toVTR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Rectilinear.toVTR" title="Link to this definition">#</a></dt>
+<dd><p>Convert all 3D fields stored in binary format (FieldsIO) into a list
+of VTR files, that can be read later with Paraview or equivalent to
+make videos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>baseName</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Base name of the VTR file.</p></li>
+<li><p><strong>varNames</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[str]</span></code>) – Variable names of the fields.</p></li>
+<li><p><strong>idxFormat</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>optional</em>) – Formatting string for the index of the VTR file.
+The default is “{:06d}”.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Suppose the FieldsIO object is already written into outputs.pysdc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.utils.fieldsIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rectilinear</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">"vtrFiles"</span><span class="p">)</span>  <span class="c1"># to store all VTR files into a subfolder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rectilinear</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="s2">"outputs.pysdc"</span><span class="p">)</span><span class="o">.</span><span class="n">toVTR</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="n">baseName</span><span class="o">=</span><span class="s2">"vtrFiles/field"</span><span class="p">,</span> <span class="n">varNames</span><span class="o">=</span><span class="p">[</span><span class="s2">"u"</span><span class="p">,</span> <span class="s2">"v"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="s2">"T"</span><span class="p">,</span> <span class="s2">"p"</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Scalar">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Scalar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Scalar" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pySDC.helpers.fieldsIO.FieldsIO" title="pySDC.helpers.fieldsIO.FieldsIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldsIO</span></code></a></p>
+<p>FieldsIO handler storing a given number of scalar</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Scalar.hInfos">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hInfos</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Scalar.hInfos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Scalar.hInfos" title="Link to this definition">#</a></dt>
+<dd><p>Array representing the grid structure to be written in the binary file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Scalar.nVar">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">nVar</span></span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Scalar.nVar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Scalar.nVar" title="Link to this definition">#</a></dt>
+<dd><p>Number of variables in a fields, as described in the header</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Scalar.readHeader">
+<span class="sig-name descname"><span class="pre">readHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Scalar.readHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Scalar.readHeader" title="Link to this definition">#</a></dt>
+<dd><p>Read the header from the binary file storing the fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<cite>_io.TextIOWrapper</cite>) – File to read the header from.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Scalar.sID">
+<span class="sig-name descname"><span class="pre">sID</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#pySDC.helpers.fieldsIO.Scalar.sID" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.Scalar.setHeader">
+<span class="sig-name descname"><span class="pre">setHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#Scalar.setHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.Scalar.setHeader" title="Link to this definition">#</a></dt>
+<dd><p>Set the descriptive grid structure to be stored in the file header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nVar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of scalar variable stored.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.compareFields_MPI">
+<span class="sig-name descname"><span class="pre">compareFields_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nSteps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#compareFields_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.compareFields_MPI" title="Link to this definition">#</a></dt>
+<dd><p>Check that the fields in a file are <cite>u0 * t</cite> for <cite>t = i / nSteps</cite>, raising an AssertionError otherwise.</p>
+<p>Reads the local fields only, so the MPI mode must be set up as in <a class="reference internal" href="#pySDC.helpers.fieldsIO.writeFields_MPI" title="pySDC.helpers.fieldsIO.writeFields_MPI"><code class="xref py py-func docutils literal notranslate"><span class="pre">writeFields_MPI()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fileName</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the file.</p></li>
+<li><p><strong>u0</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Local initial fields, as returned by <a class="reference internal" href="#pySDC.helpers.fieldsIO.writeFields_MPI" title="pySDC.helpers.fieldsIO.writeFields_MPI"><code class="xref py py-func docutils literal notranslate"><span class="pre">writeFields_MPI()</span></code></a>.</p></li>
+<li><p><strong>nSteps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of fields in the file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.initGrid">
+<span class="sig-name descname"><span class="pre">initGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridSizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#initGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.initGrid" title="Link to this definition">#</a></dt>
+<dd><p>Build a test grid on [0, 1)^dim and fields that are products of the coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nVar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of variables.</p></li>
+<li><p><strong>gridSizes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – Number of grid points in each dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>coords</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[np.ndarray]</span></code>) – 1D coordinates in each dimension, without the right boundary.</p></li>
+<li><p><strong>u0</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Fields of shape <code class="docutils literal notranslate"><span class="pre">(nVar,</span> <span class="pre">*gridSizes)</span></code>, variable <cite>i</cite> being <cite>i + 1</cite> times the product of the coordinates.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pySDC.helpers.fieldsIO.writeFields_MPI">
+<span class="sig-name descname"><span class="pre">writeFields_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtypeIdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nSteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nVar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridSizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/fieldsIO.html#writeFields_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.fieldsIO.writeFields_MPI" title="Link to this definition">#</a></dt>
+<dd><p>Write test fields with MPI, decomposing the grid from <a class="reference internal" href="#pySDC.helpers.fieldsIO.initGrid" title="pySDC.helpers.fieldsIO.initGrid"><code class="xref py py-func docutils literal notranslate"><span class="pre">initGrid()</span></code></a> in blocks over <cite>MPI.COMM_WORLD</cite>.</p>
+<p>Sets up the MPI mode of <a class="reference internal" href="#pySDC.helpers.fieldsIO.Rectilinear" title="pySDC.helpers.fieldsIO.Rectilinear"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectilinear</span></code></a> for the local block and writes <cite>nSteps</cite> fields <cite>u0 * t</cite> for
+<cite>t = i / nSteps</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fileName</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of the file.</p></li>
+<li><p><strong>dtypeIdx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Index of the data type in <cite>DTYPES</cite>.</p></li>
+<li><p><strong>algo</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Algorithm for <a class="reference internal" href="pySDC.helpers.blocks.html#pySDC.helpers.blocks.BlockDecomposition" title="pySDC.helpers.blocks.BlockDecomposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.helpers.blocks.BlockDecomposition</span></code></a>.</p></li>
+<li><p><strong>nSteps</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of fields to write.</p></li>
+<li><p><strong>nVar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of variables.</p></li>
+<li><p><strong>gridSizes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[int]</span></code>) – Number of grid points in each dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>u0</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Local block of the initial fields, in the data type of the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pySDC.helpers.fft_helper.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">fft_helper</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pySDC.helpers.firedrake_ensemble_communicator.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">firedrake_ensemble_communicator</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO"><code class="docutils literal notranslate"><span class="pre">FieldsIO</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.ALLOW_OVERWRITE"><code class="docutils literal notranslate"><span class="pre">ALLOW_OVERWRITE</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.STRUCTS"><code class="docutils literal notranslate"><span class="pre">STRUCTS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.addField"><code class="docutils literal notranslate"><span class="pre">addField()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.fSize"><code class="docutils literal notranslate"><span class="pre">fSize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.fileSize"><code class="docutils literal notranslate"><span class="pre">fileSize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.formatIndex"><code class="docutils literal notranslate"><span class="pre">formatIndex()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.fromFile"><code class="docutils literal notranslate"><span class="pre">fromFile()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.hBase"><code class="docutils literal notranslate"><span class="pre">hBase</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.hInfos"><code class="docutils literal notranslate"><span class="pre">hInfos</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.hSize"><code class="docutils literal notranslate"><span class="pre">hSize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.initialize"><code class="docutils literal notranslate"><span class="pre">initialize()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.itemSize"><code class="docutils literal notranslate"><span class="pre">itemSize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.nFields"><code class="docutils literal notranslate"><span class="pre">nFields</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.readField"><code class="docutils literal notranslate"><span class="pre">readField()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.readHeader"><code class="docutils literal notranslate"><span class="pre">readHeader()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.register"><code class="docutils literal notranslate"><span class="pre">register()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.reshape"><code class="docutils literal notranslate"><span class="pre">reshape()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.sID"><code class="docutils literal notranslate"><span class="pre">sID</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.setHeader"><code class="docutils literal notranslate"><span class="pre">setHeader()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.tSize"><code class="docutils literal notranslate"><span class="pre">tSize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.time"><code class="docutils literal notranslate"><span class="pre">time()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.FieldsIO.times"><code class="docutils literal notranslate"><span class="pre">times</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear"><code class="docutils literal notranslate"><span class="pre">Rectilinear</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_FILE_CLOSE"><code class="docutils literal notranslate"><span class="pre">MPI_FILE_CLOSE()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_FILE_OPEN"><code class="docutils literal notranslate"><span class="pre">MPI_FILE_OPEN()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_ON"><code class="docutils literal notranslate"><span class="pre">MPI_ON</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_READ_AT_ALL"><code class="docutils literal notranslate"><span class="pre">MPI_READ_AT_ALL()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_ROOT"><code class="docutils literal notranslate"><span class="pre">MPI_ROOT</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_SETUP_FILETYPE"><code class="docutils literal notranslate"><span class="pre">MPI_SETUP_FILETYPE()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_WRITE"><code class="docutils literal notranslate"><span class="pre">MPI_WRITE()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.MPI_WRITE_AT_ALL"><code class="docutils literal notranslate"><span class="pre">MPI_WRITE_AT_ALL()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.addField"><code class="docutils literal notranslate"><span class="pre">addField()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.comm"><code class="docutils literal notranslate"><span class="pre">comm</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.dim"><code class="docutils literal notranslate"><span class="pre">dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.gridSizes"><code class="docutils literal notranslate"><span class="pre">gridSizes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.hInfos"><code class="docutils literal notranslate"><span class="pre">hInfos</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.initialize"><code class="docutils literal notranslate"><span class="pre">initialize()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.nDoF"><code class="docutils literal notranslate"><span class="pre">nDoF</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.readField"><code class="docutils literal notranslate"><span class="pre">readField()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.readHeader"><code class="docutils literal notranslate"><span class="pre">readHeader()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.reshape"><code class="docutils literal notranslate"><span class="pre">reshape()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.sID"><code class="docutils literal notranslate"><span class="pre">sID</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.setHeader"><code class="docutils literal notranslate"><span class="pre">setHeader()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.setupCoords"><code class="docutils literal notranslate"><span class="pre">setupCoords()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.setupMPI"><code class="docutils literal notranslate"><span class="pre">setupMPI()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Rectilinear.toVTR"><code class="docutils literal notranslate"><span class="pre">toVTR()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Scalar"><code class="docutils literal notranslate"><span class="pre">Scalar</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Scalar.hInfos"><code class="docutils literal notranslate"><span class="pre">hInfos</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Scalar.nVar"><code class="docutils literal notranslate"><span class="pre">nVar</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Scalar.readHeader"><code class="docutils literal notranslate"><span class="pre">readHeader()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Scalar.sID"><code class="docutils literal notranslate"><span class="pre">sID</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.Scalar.setHeader"><code class="docutils literal notranslate"><span class="pre">setHeader()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.compareFields_MPI"><code class="docutils literal notranslate"><span class="pre">compareFields_MPI()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.initGrid"><code class="docutils literal notranslate"><span class="pre">initGrid()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.helpers.fieldsIO.writeFields_MPI"><code class="docutils literal notranslate"><span class="pre">writeFields_MPI()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Parallel-in-Time/pySDC/edit/master/docs/source//pySDC/pySDC.helpers.fieldsIO.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/pySDC/pySDC.helpers.fieldsIO.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

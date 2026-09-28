@@ -1,0 +1,7 @@
+blocks
+======
+
+.. automodule:: pySDC.helpers.blocks
+   :members:
+   :show-inheritance:
+   :undoc-members:

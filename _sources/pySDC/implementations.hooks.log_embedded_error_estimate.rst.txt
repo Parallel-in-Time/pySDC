@@ -1,7 +1,0 @@
-implementations.hooks.log\_embedded\_error\_estimate module
-===========================================================
-
-.. automodule:: implementations.hooks.log_embedded_error_estimate
-   :members:
-   :show-inheritance:
-   :undoc-members:

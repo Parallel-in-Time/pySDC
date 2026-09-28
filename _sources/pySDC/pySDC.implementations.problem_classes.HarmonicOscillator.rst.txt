@@ -1,0 +1,7 @@
+HarmonicOscillator
+==================
+
+.. automodule:: pySDC.implementations.problem_classes.HarmonicOscillator
+   :members:
+   :show-inheritance:
+   :undoc-members:

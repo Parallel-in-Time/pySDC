@@ -1,0 +1,7 @@
+log\_step\_size
+===============
+
+.. automodule:: pySDC.implementations.hooks.log_step_size
+   :members:
+   :show-inheritance:
+   :undoc-members:

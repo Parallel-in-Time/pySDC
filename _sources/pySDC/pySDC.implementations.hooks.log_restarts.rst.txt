@@ -1,0 +1,7 @@
+log\_restarts
+=============
+
+.. automodule:: pySDC.implementations.hooks.log_restarts
+   :members:
+   :show-inheritance:
+   :undoc-members:

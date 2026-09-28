@@ -1,0 +1,7 @@
+collocation
+===========
+
+.. automodule:: pySDC.core.collocation
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+FermiPastaUlamTsingou
+=====================
+
+.. automodule:: pySDC.implementations.problem_classes.FermiPastaUlamTsingou
+   :members:
+   :show-inheritance:
+   :undoc-members:

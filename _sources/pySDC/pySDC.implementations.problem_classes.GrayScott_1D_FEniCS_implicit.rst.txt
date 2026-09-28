@@ -1,0 +1,7 @@
+GrayScott\_1D\_FEniCS\_implicit
+===============================
+
+.. automodule:: pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+adaptive\_collocation
+=====================
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.adaptive_collocation
+   :members:
+   :show-inheritance:
+   :undoc-members:

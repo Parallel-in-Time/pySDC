@@ -1,0 +1,7 @@
+Burgers
+=======
+
+.. automodule:: pySDC.implementations.problem_classes.Burgers
+   :members:
+   :show-inheritance:
+   :undoc-members:

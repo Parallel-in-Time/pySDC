@@ -1,7 +1,0 @@
-implementations.convergence\_controller\_classes.hotrod module
-==============================================================
-
-.. automodule:: implementations.convergence_controller_classes.hotrod
-   :members:
-   :show-inheritance:
-   :undoc-members:

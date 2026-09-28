@@ -1,0 +1,7 @@
+BuckConverter
+=============
+
+.. automodule:: pySDC.implementations.problem_classes.BuckConverter
+   :members:
+   :show-inheritance:
+   :undoc-members:

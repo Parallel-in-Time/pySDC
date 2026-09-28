@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pySDC.implementations.controller_classes.ParaDiag &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../../../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pySDC/implementations/controller_classes/ParaDiag';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../../../../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  <link rel="icon" href="../../../../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../../../../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../../../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../../../../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pySDC.implementations.controller_classes.ParaDiag</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pySDC.implementations.controller_classes.ParaDiag</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="ParaDiag">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParaDiag</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    What ParaDiag is, independently of how the block is spread over processes.</span>
+
+<span class="sd">    Mixed into a controller, this replaces its iteration and leaves everything around it alone:</span>
+
+<span class="sd">        class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI)</span>
+<span class="sd">        class controller_ParaDiag_MPI(ParaDiag, controller_MPI)</span>
+
+<span class="sd">    It deliberately has no `__init__` and no controller of its own to inherit from, so that it can</span>
+<span class="sd">    be mixed into either transport's controller without the two having to agree on a constructor</span>
+<span class="sd">    signature. A concrete ParaDiag controller calls `prepare_ParaDiag_params` on the two</span>
+<span class="sd">    dictionaries and then hands them to its controller's initialisation.</span>
+
+<span class="sd">    What stays with the concrete classes is everything whose implementation depends on where the</span>
+<span class="sd">    other steps are: `apply_matrix`, `prepare_Jacobians`, `compute_all_at_once_residual`,</span>
+<span class="sd">    `update_G_inv` and the block driver.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="ParaDiag.prepare_ParaDiag_params">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.prepare_ParaDiag_params">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_ParaDiag_params</span><span class="p">(</span><span class="n">controller_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">description</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Check and complete the parameters ParaDiag needs, in place.</span>
+
+<span class="sd">        Call this *before* the controller's own initialisation: it only reads and writes the two</span>
+<span class="sd">        dictionaries, and must have run by the time the steps are built.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller_params (dict): parameter set for the controller and the steps</span>
+<span class="sd">            description (dict): all the parameters to set up the rest (levels, problems, ...)</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.ParaDiagSweepers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDiagonalization</span>
+
+        <span class="c1"># A list with more than one entry makes `Step` build more than one level. This has to be</span>
+        <span class="c1"># checked here: the controllers build G^-1 from the sweeper parameters before the steps exist.</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'problem_params'</span><span class="p">,</span> <span class="s1">'level_params'</span><span class="p">,</span> <span class="s1">'sweeper_params'</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ParaDiag does not support multiple levels'</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">QDiagonalization</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="s1">'ignore_ic'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="s1">'update_f_evals'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'controller'</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">'Warning: Your sweeper class </span><span class="si">{</span><span class="n">description</span><span class="p">[</span><span class="s2">"sweeper_class"</span><span class="p">]</span><span class="si">}</span><span class="s1"> is not derived from </span><span class="si">{</span><span class="n">QDiagonalization</span><span class="si">}</span><span class="s1">. You probably want to use another sweeper class.'</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'all_to_done'</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ParaDiag only implemented with option `all_to_done=True`'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">'alpha'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
+
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">'Please supply alpha as a parameter to the ParaDiag controller!'</span><span class="p">)</span>
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">'average_jacobian'</span><span class="p">]</span> <span class="o">=</span> <span class="n">controller_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'average_jacobian'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">controller_params</span><span class="p">[</span><span class="s1">'all_to_done'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------ the iteration</span>
+
+<div class="viewcode-block" id="ParaDiag.get_stages">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.get_stages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ParaDiag has one iteration stage, and no predictor because it has no coarse level.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: stage name -&gt; the method that runs it</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">'SPREAD'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spread</span><span class="p">,</span>
+            <span class="s1">'IT_CHECK'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">it_check</span><span class="p">,</span>
+            <span class="s1">'IT_PARADIAG'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">it_ParaDiag</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.next_iteration_stage">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.next_iteration_stage">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">next_iteration_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Args:</span>
+<span class="sd">            S (pySDC.Step.step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: name of the stage to enter</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="s1">'IT_PARADIAG'</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.compute_residual_after_spread">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.compute_residual_after_spread">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual_after_spread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ParaDiag's residual is the one of the composite collocation problem, which `it_ParaDiag`</span>
+<span class="sd">        computes as part of the iteration. The convergence check runs before the first iteration,</span>
+<span class="sd">        so the initial guess needs its residual here.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            S (pySDC.Step.step): The current step</span>
+<span class="sd">        """</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.step_is_active">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.step_is_active">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step_is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">block_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Tend</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ParaDiag diagonalizes across the whole block, so it cannot drop a step out of one. A block</span>
+<span class="sd">        that starts before `Tend` is run whole, past `Tend` if need be.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            time (float): when this step starts</span>
+<span class="sd">            block_start (float): when the first step of this step's block starts</span>
+<span class="sd">            Tend (float): ending time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: whether this step takes part</span>
+<span class="sd">        """</span>
+        <span class="n">active</span> <span class="o">=</span> <span class="n">block_start</span> <span class="o">&lt;</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+        <span class="k">if</span> <span class="n">active</span> <span class="ow">and</span> <span class="n">time</span> <span class="o">&gt;=</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">'Warning: This controller will solve past your desired end time until the end of its block!'</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">active</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.prepare_convergence_check">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.prepare_convergence_check">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_convergence_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The residual is already current -- `it_ParaDiag` computed it, and recomputing it the way a</span>
+<span class="sd">        sweep-based algorithm does would need initial conditions that have not been communicated</span>
+<span class="sd">        yet. The end point is not, because nothing sent it anywhere, so compute it here: `it_check`</span>
+<span class="sd">        is what publishes `uend` when a step is done.</span>
+
+<span class="sd">        Takes whatever its controller passes -- a block of steps or a communicator -- and needs</span>
+<span class="sd">        none of it, because the steps to do this for are the ones this controller owns.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------ alpha and the transform</span>
+
+<div class="viewcode-block" id="ParaDiag.resolve_alpha">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.resolve_alpha">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_alpha</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Read the alpha for iteration `k` out of whatever the user supplied.</span>
+
+<span class="sd">        `alpha` may be a single number, a sequence indexed by iteration (the last entry is reused once</span>
+<span class="sd">        it runs out), or a callable taking the iteration index. Making it iteration dependent lets the</span>
+<span class="sd">        outer iteration start with a well-conditioned alpha and tighten it later.</span>
+
+<span class="sd">        Static because the steps need an alpha before the controller has parameters to read it from.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            alpha: the alpha parameter as supplied by the user</span>
+<span class="sd">            k (int): iteration index</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: alpha to use for this iteration</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="s1">'__len__'</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.get_alpha">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.get_alpha">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_alpha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the ParaDiag alpha parameter for iteration `k`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k (int): iteration index</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: alpha to use for this iteration</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_alpha</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.get_FFT_matrices">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.get_FFT_matrices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_FFT_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the weighted FFT and iFFT matrices for iteration `k`, rebuilding them only when alpha</span>
+<span class="sd">        actually changes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k (int): iteration index</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: the forward and backward weighted FFT matrices</span>
+<span class="sd">        """</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_alpha</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'_cached_alpha'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">alpha</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ParaDiagHelper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_weighted_FFT_matrix</span><span class="p">,</span> <span class="n">get_weighted_iFFT_matrix</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_FFT_matrix</span> <span class="o">=</span> <span class="n">get_weighted_FFT_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iFFT_matrix</span> <span class="o">=</span> <span class="n">get_weighted_iFFT_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cached_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_FFT_matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iFFT_matrix</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.FFT_in_time">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.FFT_in_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">FFT_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute weighted forward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</span>
+
+<span class="sd">        Note: The implementation via matrix-vector multiplication may be inefficient and less stable compared to an FFT</span>
+<span class="sd">              with transposes!</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (str): the level attribute to transform</span>
+<span class="sd">            k (int): iteration index, for an iteration dependent alpha</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_FFT_matrices</span><span class="p">(</span><span class="n">k</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">quantity</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.iFFT_in_time">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.iFFT_in_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iFFT_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute weighted backward FFT in time. The weighting is determined by the alpha parameter in ParaDiag</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantity (str): the level attribute to transform</span>
+<span class="sd">            k (int): iteration index, for an iteration dependent alpha</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_FFT_matrices</span><span class="p">(</span><span class="n">k</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="n">quantity</span><span class="p">)</span></div>
+
+
+    <span class="c1"># ------------------------------------------------------------------ what the transport supplies</span>
+
+<div class="viewcode-block" id="ParaDiag.apply_matrix">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.apply_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Apply a square matrix across the steps, in place.</span>
+
+<span class="sd">        How this is done depends entirely on where the other steps are, so the concrete controllers</span>
+<span class="sd">        implement it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mat: square matrix with as many rows as there are steps</span>
+<span class="sd">            quantity (str): 'residual' or 'increment', the level attribute to transform</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ParaDiag controllers have to implement apply_matrix'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParaDiag.update_G_inv">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.update_G_inv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_G_inv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Rebuild G^-1 on the local step(s) when alpha changes with the iteration.</span>
+
+<span class="sd">        G^-1 depends on alpha, so an iteration dependent alpha means the sweeper's diagonalization has</span>
+<span class="sd">        to be recomputed. Subclasses implement this because only they know which steps they own.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            k (int): iteration index</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ParaDiag controllers have to implement update_G_inv'</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

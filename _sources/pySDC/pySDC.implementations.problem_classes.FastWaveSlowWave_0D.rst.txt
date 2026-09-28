@@ -1,0 +1,7 @@
+FastWaveSlowWave\_0D
+====================
+
+.. automodule:: pySDC.implementations.problem_classes.FastWaveSlowWave_0D
+   :members:
+   :show-inheritance:
+   :undoc-members:

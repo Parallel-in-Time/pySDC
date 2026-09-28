@@ -1,0 +1,7 @@
+log\_solution
+=============
+
+.. automodule:: pySDC.implementations.hooks.log_solution
+   :members:
+   :show-inheritance:
+   :undoc-members:

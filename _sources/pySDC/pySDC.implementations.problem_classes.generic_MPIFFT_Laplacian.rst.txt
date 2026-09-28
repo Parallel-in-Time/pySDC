@@ -1,0 +1,7 @@
+generic\_MPIFFT\_Laplacian
+==========================
+
+.. automodule:: pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian
+   :members:
+   :show-inheritance:
+   :undoc-members:

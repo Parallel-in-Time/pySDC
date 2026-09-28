@@ -1,6 +1,7 @@
 
 :orphan:
 
+
 .. _docs/contrib/04_custom_implementations/custom-implementation-guidelines:
 
 Custom implementation guidelines
@@ -8,13 +9,13 @@ Custom implementation guidelines
 
 ``pySDC`` solves (non-)linear ODE of the form
 
-$$
-\\frac{du}{dt} = f(u, t), \\quad u(0)=u_0, \\quad t \\in [0, T].
-$$
+.. math::
 
-where $u$ a vector or scalar, representing one or more variables.
+   \frac{du}{dt} = f(u, t), \quad u(0)=u_0, \quad t \in [0, T].
 
-The type of variable, the definition of the right-hand side $f(u,t)$ and initial solution value $u_0$ are defined in a given ``Problem`` class.
+where :math:`u` a vector or scalar, representing one or more variables.
+
+The type of variable, the definition of the right-hand side :math:`f(u,t)` and initial solution value :math:`u_0` are defined in a given ``Problem`` class.
 
 ... to be continued ...
 
@@ -26,10 +27,10 @@ Implementing a custom problem class
 Any problem class inherit from the same base class, that is (currently) the ``ptype`` class from the module ``pySDC.code.Problem``.
 Each custom problem should inherit from this base class, like for the following example template :
 
-* right-hand side $f(u,t)=\\lambda u +  ct$ with
+* right-hand side :math:`f(u,t)=\lambda u +  ct` with
 
-  * $\\lambda$ one or more complex values (in vector form)
-  * $c$ one scalar value
+  * :math:`\lambda` one or more complex values (in vector form)
+  * :math:`c` one scalar value
 
 .. code-block:: python
 

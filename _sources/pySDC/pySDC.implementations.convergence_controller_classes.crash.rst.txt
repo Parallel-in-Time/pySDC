@@ -1,0 +1,7 @@
+crash
+=====
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.crash
+   :members:
+   :show-inheritance:
+   :undoc-members:

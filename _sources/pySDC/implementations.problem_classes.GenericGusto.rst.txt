@@ -1,7 +1,0 @@
-implementations.problem\_classes.GenericGusto module
-====================================================
-
-.. automodule:: implementations.problem_classes.GenericGusto
-   :members:
-   :show-inheritance:
-   :undoc-members:

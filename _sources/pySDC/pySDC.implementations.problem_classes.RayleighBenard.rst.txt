@@ -1,0 +1,7 @@
+RayleighBenard
+==============
+
+.. automodule:: pySDC.implementations.problem_classes.RayleighBenard
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+timings
+=======
+
+.. automodule:: pySDC.core.timings
+   :members:
+   :show-inheritance:
+   :undoc-members:

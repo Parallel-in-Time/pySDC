@@ -1,0 +1,7 @@
+hooks
+=====
+
+.. automodule:: pySDC.core.hooks
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,6 +1,7 @@
 
 :orphan:
 
+
 .. _docs/contrib/05_documenting_code/documenting-code:
 
 Documenting Code

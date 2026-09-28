@@ -1,0 +1,7 @@
+AllenCahn\_2D\_FFT
+==================
+
+.. automodule:: pySDC.implementations.problem_classes.AllenCahn_2D_FFT
+   :members:
+   :show-inheritance:
+   :undoc-members:

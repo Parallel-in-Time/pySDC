@@ -1,0 +1,32 @@
+sweeper\_classes
+================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.sweeper_classes.Multistep
+   pySDC.implementations.sweeper_classes.ParaDiagSweepers
+   pySDC.implementations.sweeper_classes.Runge_Kutta
+   pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom
+   pySDC.implementations.sweeper_classes.boris_2nd_order
+   pySDC.implementations.sweeper_classes.delta_form
+   pySDC.implementations.sweeper_classes.delta_form_MPI
+   pySDC.implementations.sweeper_classes.explicit
+   pySDC.implementations.sweeper_classes.generic_implicit
+   pySDC.implementations.sweeper_classes.generic_implicit_MPI
+   pySDC.implementations.sweeper_classes.imex_1st_order
+   pySDC.implementations.sweeper_classes.imex_1st_order_MPI
+   pySDC.implementations.sweeper_classes.imex_1st_order_mass
+   pySDC.implementations.sweeper_classes.multi_implicit
+   pySDC.implementations.sweeper_classes.verlet
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations.sweeper_classes
+   :members:
+   :show-inheritance:
+   :undoc-members:

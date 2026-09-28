@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../../../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pySDC/implementations/problem_classes/GrayScott_2D_PETSc_periodic';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../../../../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  <link rel="icon" href="../../../../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../../../../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../../../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../../../../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">petsc4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">PETSc</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.petsc_vec</span><span class="w"> </span><span class="kn">import</span> <span class="n">petsc_vec</span><span class="p">,</span> <span class="n">petsc_vec_imex</span><span class="p">,</span> <span class="n">petsc_vec_comp2</span>
+
+
+<div class="viewcode-block" id="GS_full">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GS_full</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Helper class to generate residual and Jacobian matrix for ``PETSc``'s nonlinear solver SNES.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : DMDA object</span>
+<span class="sd">        Object of ``PETSc``.</span>
+<span class="sd">    prob : problem instance</span>
+<span class="sd">        Contains problem information for ``PETSc``.</span>
+<span class="sd">    factor : float</span>
+<span class="sd">        Temporal factor :math:`\Delta t Q_\Delta`.</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Grid spacing in x direction.</span>
+<span class="sd">    dy : float</span>
+<span class="sd">        Grid spacing in y direction.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for ``PETSc``.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
+        <span class="k">assert</span> <span class="n">da</span><span class="o">.</span><span class="n">getDim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">da</span> <span class="o">=</span> <span class="n">da</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="n">dx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="n">dy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">localX</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">createLocalVec</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GS_full.formFunction">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formFunction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS</span>
+<span class="sd">        in the solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        F : PETSc vector object</span>
+<span class="sd">            Output vector :math:`F(X)`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Overwrites F.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">),</span> <span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>  <span class="c1"># center</span>
+                <span class="n">u_e</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>  <span class="c1"># east</span>
+                <span class="n">u_w</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>  <span class="c1"># west</span>
+                <span class="n">u_s</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># south</span>
+                <span class="n">u_n</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># north</span>
+                <span class="n">u_xx</span> <span class="o">=</span> <span class="n">u_e</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">+</span> <span class="n">u_w</span>
+                <span class="n">u_yy</span> <span class="o">=</span> <span class="n">u_n</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">+</span> <span class="n">u_s</span>
+                <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">factor</span>
+                    <span class="o">*</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Du</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_xx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">u_yy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                        <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                        <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">factor</span>
+                    <span class="o">*</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Dv</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_xx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">u_yy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                        <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GS_full.formJacobian">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_full.formJacobian">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Function to return the Jacobian matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        J : PETSc matrix object</span>
+<span class="sd">            Current Jacobian matrix.</span>
+<span class="sd">        P : PETSc matrix object</span>
+<span class="sd">            New Jacobian matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PETSc.Mat.Structure.SAME_NONZERO_PATTERN</span>
+<span class="sd">            Matrix status.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
+        <span class="n">P</span><span class="o">.</span><span class="n">zeroEntries</span><span class="p">()</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">),</span> <span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
+                <span class="c1"># diagnoal 2-by-2 block (for u and v)</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Du</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">A</span>
+                <span class="p">)</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Dv</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">B</span>
+                <span class="p">)</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+                <span class="c1"># coupling through finite difference part</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Du</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Dv</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Du</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Dv</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Du</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Dv</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Du</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">Dv</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">P</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">J</span> <span class="o">!=</span> <span class="n">P</span><span class="p">:</span>
+            <span class="n">J</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>  <span class="c1"># matrix-free operator</span>
+        <span class="k">return</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Structure</span><span class="o">.</span><span class="n">SAME_NONZERO_PATTERN</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GS_reaction">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GS_reaction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Helper class to generate residual and Jacobian matrix for ``PETSc``'s nonlinear solver SNES.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : DMDA object</span>
+<span class="sd">        Object of PETSc.</span>
+<span class="sd">    prob : problem instance</span>
+<span class="sd">        Contains problem information for ``PETSc``.</span>
+<span class="sd">    factor : float</span>
+<span class="sd">        Temporal factor :math:`\Delta t Q_\Delta`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for ``PETSc``.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
+        <span class="k">assert</span> <span class="n">da</span><span class="o">.</span><span class="n">getDim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">da</span> <span class="o">=</span> <span class="n">da</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">localX</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">createLocalVec</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GS_reaction.formFunction">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formFunction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Function to evaluate the residual for the Newton solver. This function should be equal to the RHS</span>
+<span class="sd">        in the solution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        F : PETSc vector object</span>
+<span class="sd">            Output vector :math:`F(X)`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Overwrites F.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">),</span> <span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
+                <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+                <span class="p">)</span>
+                <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="GS_reaction.formJacobian">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.GS_reaction.formJacobian">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formJacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snes</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Function to return the Jacobian matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snes : PETSc solver object</span>
+<span class="sd">            Nonlinear solver object.</span>
+<span class="sd">        X : PETSc vector object</span>
+<span class="sd">            Input vector.</span>
+<span class="sd">        J : PETSc matrix object</span>
+<span class="sd">            Current Jacobian matrix.</span>
+<span class="sd">        P : PETSc matrix object</span>
+<span class="sd">            New Jacobian matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PETSc.Mat.Structure.SAME_NONZERO_PATTERN</span>
+<span class="sd">            Matrix status.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">globalToLocal</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localX</span><span class="p">)</span>
+        <span class="n">P</span><span class="o">.</span><span class="n">zeroEntries</span><span class="p">()</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">),</span> <span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">))</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">P</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">P</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">J</span> <span class="o">!=</span> <span class="n">P</span><span class="p">:</span>
+            <span class="n">J</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>  <span class="c1"># matrix-free operator</span>
+        <span class="k">return</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Structure</span><span class="o">.</span><span class="n">SAME_NONZERO_PATTERN</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">petsc_grayscott_multiimplicit</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Gray-Scott system with PETSc finite differences, multi-implicit: diffusion (CG), reaction (SNES).</span>
+
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by ``PETSc`` [2]_, [3]_. For time-stepping,</span>
+<span class="sd">    the diffusion part is solved by one of ``PETSc``'s linear solver, whereas the reaction part will be solved by a nonlinear</span>
+<span class="sd">    solver.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nvars : tuple of int, optional</span>
+<span class="sd">        Spatial resolution, i.e., number of degrees of freedom in space, e.g. ``nvars=(256, 256)``.</span>
+<span class="sd">    Du : float, optional</span>
+<span class="sd">        Diffusion rate for :math:`u`.</span>
+<span class="sd">    Dv: float, optional</span>
+<span class="sd">        Diffusion rate for :math:`v`.</span>
+<span class="sd">    A : float, optional</span>
+<span class="sd">        Feed rate for :math:`v`.</span>
+<span class="sd">    B : float, optional</span>
+<span class="sd">        Overall decay rate for :math:`u`.</span>
+<span class="sd">    comm : PETSc.COMM_WORLD, optional</span>
+<span class="sd">        Communicator for ``PETSc``.</span>
+<span class="sd">    lsol_tol : float, optional</span>
+<span class="sd">        Tolerance for linear solver to terminate.</span>
+<span class="sd">    nlsol_tol : float, optional</span>
+<span class="sd">        Tolerance for nonlinear solver to terminate.</span>
+<span class="sd">    lsol_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for linear solver.</span>
+<span class="sd">    nlsol_maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations for nonlinear solver.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dx : float</span>
+<span class="sd">        Mesh grid width in x direction.</span>
+<span class="sd">    dy : float</span>
+<span class="sd">        Mesh grid width in y direction.</span>
+<span class="sd">    AMat : PETSc matrix object</span>
+<span class="sd">        Discretization matrix.</span>
+<span class="sd">    Id : PETSc matrix object</span>
+<span class="sd">        Identity matrix.</span>
+<span class="sd">    localX : PETSc vector object</span>
+<span class="sd">        Local vector for solution.</span>
+<span class="sd">    ksp : PETSc solver object</span>
+<span class="sd">        Linear solver object.</span>
+<span class="sd">    snes : PETSc solver object</span>
+<span class="sd">        Nonlinear solver object.</span>
+<span class="sd">    snes_itercount : int</span>
+<span class="sd">        Number of iterations done by nonlinear solver.</span>
+<span class="sd">    snes_ncalls : int</span>
+<span class="sd">        Number of calls of ``PETSc``'s nonlinear solver.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Isolas and other forms</span>
+<span class="sd">        of multistability. P. Gray, S. K. Scott. Chem. Eng. Sci. 38, 1 (1983).</span>
+<span class="sd">    .. [2] PETSc Web page. Satish Balay et al. https://petsc.org/ (2023).</span>
+<span class="sd">    .. [3] Parallel distributed computing using Python. Lisandro D. Dalcin, Rodrigo R. Paz, Pablo A. Kler,</span>
+<span class="sd">        Alejandro Cosimo. Advances in Water Resources (2011).</span>
+<span class="sd">    """</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">petsc_vec</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec_comp2</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">nvars</span><span class="p">,</span>
+        <span class="n">Du</span><span class="p">,</span>
+        <span class="n">Dv</span><span class="p">,</span>
+        <span class="n">A</span><span class="p">,</span>
+        <span class="n">B</span><span class="p">,</span>
+        <span class="n">comm</span><span class="o">=</span><span class="n">PETSc</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">,</span>
+        <span class="n">lsol_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
+        <span class="n">nlsol_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
+        <span class="n">lsol_maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nlsol_maxiter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization routine"""</span>
+        <span class="c1"># create DMDA object which will be used for all grid operations (boundary_type=3 -&gt; periodic BC)</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">DMDA</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+            <span class="n">dof</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">boundary_type</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">stencil_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">da</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">'nvars'</span><span class="p">,</span>
+            <span class="s1">'Du'</span><span class="p">,</span>
+            <span class="s1">'Dv'</span><span class="p">,</span>
+            <span class="s1">'A'</span><span class="p">,</span>
+            <span class="s1">'B'</span><span class="p">,</span>
+            <span class="s1">'comm'</span><span class="p">,</span>
+            <span class="s1">'lsol_tol'</span><span class="p">,</span>
+            <span class="s1">'lsol_maxiter'</span><span class="p">,</span>
+            <span class="s1">'nlsol_tol'</span><span class="p">,</span>
+            <span class="s1">'nlsol_maxiter'</span><span class="p">,</span>
+            <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span>
+            <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># compute dx, dy and get local ranges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xe</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ye</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()</span>
+
+        <span class="c1"># compute discretization matrix A and identity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AMat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_A</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_Id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">localX</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createLocalVec</span><span class="p">()</span>
+
+        <span class="c1"># setup linear solver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">KSP</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">'cg'</span><span class="p">)</span>
+        <span class="n">pc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">getPC</span><span class="p">()</span>
+        <span class="n">pc</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">'none'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">setInitialGuessNonzero</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">setTolerances</span><span class="p">(</span><span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lsol_tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lsol_tol</span><span class="p">,</span> <span class="n">max_it</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lsol_maxiter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># setup nonlinear solver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">SNES</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
+        <span class="c1"># self.snes.getKSP().setType('cg')</span>
+        <span class="c1"># self.snes.setType('ngmres')</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">setTolerances</span><span class="p">(</span>
+            <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nlsol_tol</span><span class="p">,</span>
+            <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nlsol_tol</span><span class="p">,</span>
+            <span class="n">stol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nlsol_tol</span><span class="p">,</span>
+            <span class="n">max_it</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nlsol_maxiter</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_A</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Helper function to assemble ``PETSc`` matrix A.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A : PETSc matrix object</span>
+<span class="sd">            Discretization matrix.</span>
+<span class="sd">        """</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">'aij'</span><span class="p">)</span>  <span class="c1"># sparse</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">setPreallocationNNZ</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+
+        <span class="n">A</span><span class="o">.</span><span class="n">zeroEntries</span><span class="p">()</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
+        <span class="n">mx</span><span class="p">,</span> <span class="n">my</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getSizes</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">),</span> <span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Du</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dv</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+                <span class="c1"># if j &gt; 0:</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Du</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dv</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="c1"># if j &lt; my - 1:</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Du</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dv</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="c1"># if i &gt; 0:</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Du</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dv</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="c1"># if i &lt; mx - 1:</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Du</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">A</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Dv</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">A</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_Id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Helper function to assemble ``PETSc`` identity matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Id : PETSc matrix object</span>
+<span class="sd">            Identity matrix.</span>
+<span class="sd">        """</span>
+
+        <span class="n">Id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="n">Id</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">'aij'</span><span class="p">)</span>  <span class="c1"># sparse</span>
+        <span class="n">Id</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
+        <span class="n">Id</span><span class="o">.</span><span class="n">setPreallocationNNZ</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">Id</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+
+        <span class="n">Id</span><span class="o">.</span><span class="n">zeroEntries</span><span class="p">()</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Mat</span><span class="o">.</span><span class="n">Stencil</span><span class="p">()</span>
+        <span class="n">mx</span><span class="p">,</span> <span class="n">my</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getSizes</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">),</span> <span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getRanges</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ye</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xe</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="n">indx</span>
+                    <span class="n">Id</span><span class="o">.</span><span class="n">setValueStencil</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="n">Id</span><span class="o">.</span><span class="n">assemble</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">Id</span>
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit.eval_f">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
+<span class="sd">        """</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AMat</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">)</span>
+
+        <span class="n">fa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">)</span>
+        <span class="n">xa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xe</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ye</span><span class="p">):</span>
+                <span class="n">fa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                <span class="n">fa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit.solve_system_1">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_1">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Linear solver for :math:`(I - factor \cdot A)\vec{u} = \vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
+<span class="sd">        """</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">setOperators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">AMat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">getIterationNumber</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit.solve_system_2">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.solve_system_2">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Nonlinear solver for :math:`(I - factor \cdot F)(\vec{u}) = \vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
+<span class="sd">        """</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">GS_reaction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span>
+
+        <span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createGlobalVec</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">setFunction</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">formFunction</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
+        <span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">setJacobian</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">formJacobian</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">getIterationNumber</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+
+<div class="viewcode-block" id="petsc_grayscott_multiimplicit.u_exact">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_multiimplicit.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time of the exact solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Exact solution.</span>
+<span class="sd">        """</span>
+
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: u_exact is only valid for the initial solution'</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">xa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xe</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ye</span><span class="p">):</span>
+                <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">j</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">100</span><span class="p">),</span> <span class="mi">100</span>
+                <span class="p">)</span>
+                <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">j</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">100</span><span class="p">),</span> <span class="mi">100</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="petsc_grayscott_fullyimplicit">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">petsc_grayscott_fullyimplicit</span><span class="p">(</span><span class="n">petsc_grayscott_multiimplicit</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Gray-Scott system with PETSc finite differences, fully implicit with PETSc's SNES.</span>
+
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by ``PETSc`` [2]_, [3]_. For time-stepping, the</span>
+<span class="sd">    problem is handled in a *fully-implicit* way, i.e., the nonlinear system containing the full right-hand side will be</span>
+<span class="sd">    solved by PETSc's nonlinear solver.</span>
+<span class="sd">    """</span>
+
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec</span>
+
+<div class="viewcode-block" id="petsc_grayscott_fullyimplicit.eval_f">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
+<span class="sd">        """</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AMat</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="n">fa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">xa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xe</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ye</span><span class="p">):</span>
+                <span class="n">fa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="o">-</span><span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                <span class="n">fa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="petsc_grayscott_fullyimplicit.solve_system">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_fullyimplicit.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Nonlinear solver for :math:`(I - factor \cdot F)(\vec{u}) = \vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
+<span class="sd">        """</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">GS_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+
+        <span class="c1"># assign residual function and Jacobian</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createGlobalVec</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">setFunction</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">formFunction</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
+        <span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">setJacobian</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">formJacobian</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">getIterationNumber</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="petsc_grayscott_semiimplicit">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">petsc_grayscott_semiimplicit</span><span class="p">(</span><span class="n">petsc_grayscott_multiimplicit</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    2D periodic Gray-Scott system with PETSc finite differences, IMEX with diffusion implicit, reaction explicit.</span>
+
+<span class="sd">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>
+<span class="sd">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>
+<span class="sd">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>
+<span class="sd">    :math:`u,\, v`. This process is described by the two-dimensional model using periodic boundary conditions</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>
+
+<span class="sd">    for :math:`x \in \Omega:=[0, 100]`. The spatial solve of the problem is realized by ``PETSc`` [2]_, [3]_. For time-stepping,</span>
+<span class="sd">    the problem is treated *semi-implicitly*, i.e., the system with diffusion part is solved by PETSc's linear solver.</span>
+<span class="sd">    """</span>
+
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">petsc_vec_imex</span>
+
+<div class="viewcode-block" id="petsc_grayscott_semiimplicit.eval_f">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Routine to evaluate the right-hand side of the problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time the numerical solution is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            Right-hand side of the problem.</span>
+<span class="sd">        """</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AMat</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
+
+        <span class="n">fa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
+        <span class="n">xa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xe</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ye</span><span class="p">):</span>
+                <span class="n">fa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                <span class="n">fa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">xa</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="petsc_grayscott_semiimplicit.solve_system">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html#pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.petsc_grayscott_semiimplicit.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Linear solver for :math:`(I - factor \cdot A)\vec{u} = \vec{rhs}`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side for the linear system.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Abbrev. for the local stepsize (or any other factor required).</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess for the iterative solver.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time (e.g. for time-dependent BCs).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            Solution as mesh.</span>
+<span class="sd">        """</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">setOperators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">AMat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp_ncalls</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ksp</span><span class="o">.</span><span class="n">getIterationNumber</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

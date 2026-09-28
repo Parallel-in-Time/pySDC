@@ -1,0 +1,32 @@
+pySDC.core
+==========
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.core.base_transfer
+   pySDC.core.check_convergence
+   pySDC.core.collocation
+   pySDC.core.common
+   pySDC.core.controller
+   pySDC.core.convergence_controller
+   pySDC.core.default_hook
+   pySDC.core.errors
+   pySDC.core.hooks
+   pySDC.core.level
+   pySDC.core.problem
+   pySDC.core.space_transfer
+   pySDC.core.step
+   pySDC.core.sweeper
+   pySDC.core.timings
+
+Module contents
+---------------
+
+.. automodule:: pySDC.core
+   :members:
+   :show-inheritance:
+   :undoc-members:

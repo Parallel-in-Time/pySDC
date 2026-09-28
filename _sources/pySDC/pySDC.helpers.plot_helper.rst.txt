@@ -1,0 +1,7 @@
+plot\_helper
+============
+
+.. automodule:: pySDC.helpers.plot_helper
+   :members:
+   :show-inheritance:
+   :undoc-members:

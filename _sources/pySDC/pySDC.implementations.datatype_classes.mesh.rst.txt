@@ -1,0 +1,7 @@
+mesh
+====
+
+.. automodule:: pySDC.implementations.datatype_classes.mesh
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,7 +1,0 @@
-implementations.datatype\_classes.fenics\_mesh module
-=====================================================
-
-.. automodule:: implementations.datatype_classes.fenics_mesh
-   :members:
-   :show-inheritance:
-   :undoc-members:

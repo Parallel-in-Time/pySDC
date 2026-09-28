@@ -1,6 +1,7 @@
 
 :orphan:
 
+
 .. _docs/contrib/03_naming_conventions/naming-conventions-in-pysdc:
 
 Naming conventions in pySDC

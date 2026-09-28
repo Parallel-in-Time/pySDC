@@ -1,0 +1,7 @@
+multi\_implicit
+===============
+
+.. automodule:: pySDC.implementations.sweeper_classes.multi_implicit
+   :members:
+   :show-inheritance:
+   :undoc-members:

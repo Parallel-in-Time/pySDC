@@ -1,7 +1,0 @@
-implementations.hooks.log\_errors module
-========================================
-
-.. automodule:: implementations.hooks.log_errors
-   :members:
-   :show-inheritance:
-   :undoc-members:

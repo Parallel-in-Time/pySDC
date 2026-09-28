@@ -1,0 +1,19 @@
+acoustic\_helpers
+=================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix
+   pySDC.implementations.problem_classes.acoustic_helpers.standard_integrators
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations.problem_classes.acoustic_helpers
+   :members:
+   :show-inheritance:
+   :undoc-members:

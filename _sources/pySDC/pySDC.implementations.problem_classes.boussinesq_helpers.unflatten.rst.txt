@@ -1,0 +1,7 @@
+unflatten
+=========
+
+.. automodule:: pySDC.implementations.problem_classes.boussinesq_helpers.unflatten
+   :members:
+   :show-inheritance:
+   :undoc-members:

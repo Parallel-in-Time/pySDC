@@ -1,0 +1,244 @@
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+#   language_info:
+#     name: python
+# ---
+
+# %% [markdown]
+# # Part C: Time-parallel pySDC with space-parallel PETSc
+#
+# With rather unfavorable scaling properties, parallel-in-time methods are only really useful when spatial
+# parallelization is maxed out. To work with spatial parallelization, this part shows how to (1) include and work
+# with an external library and (2) set up space- and time-parallel runs. We use the forced heat equation again as our
+# testbed, and [PETSc](https://petsc.org/) for the space-parallel data structures and the linear solver. See
+# `implementations/datatype_classes/petsc_dmda_grid.py` and
+# `implementations/problem_classes/HeatEquation_2D_PETSc_forced.py` for the details of the PETSc bindings.
+#
+# ## Processes in space and in time
+#
+# The world communicator is split twice, by coloring: into space communicators of `num_procs_space` ranks each, which
+# go to the problem class, and across them into time communicators, which go to `controller_MPI`. With 4 ranks and
+# `num_procs_space = 2`, ranks 0 and 1 share space, as do ranks 2 and 3, and ranks 0 and 2 form one time communicator.
+
+# %%
+import sys
+from pathlib import Path
+
+import numpy as np
+from mpi4py import MPI
+
+from pySDC.helpers.stats_helper import get_sorted
+
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced import heat2d_petsc_forced
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
+
+
+def main(num_procs_space=None, fname='step_7_C_out.txt'):
+    """
+    Program to demonstrate usage of PETSc data structures and spatial parallelization,
+    combined with parallelization in time.
+
+    Args:
+        num_procs_space (int): number of ranks to give the space communicator. Defaults to the
+            first command line argument when run as a script, and to 1 otherwise.
+        fname (str): name of the output file written under ``data/``.
+    """
+    # set MPI communicator
+    comm = MPI.COMM_WORLD
+
+    world_rank = comm.Get_rank()
+    world_size = comm.Get_size()
+
+    # split world communicator to create space-communicators
+    if num_procs_space is not None:
+        color = int(world_rank / num_procs_space)
+    else:
+        color = int(world_rank / 1)
+    space_comm = comm.Split(color=color)
+    space_rank = space_comm.Get_rank()
+
+    # split world communicator to create time-communicators
+    if num_procs_space is not None:
+        color = int(world_rank % num_procs_space)
+    else:
+        color = int(world_rank / world_size)
+    time_comm = comm.Split(color=color)
+    time_rank = time_comm.Get_rank()
+
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 0.125
+    level_params['nsweeps'] = [1]
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['num_nodes'] = [3]
+    sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['initial_guess'] = 'zero'
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['nu'] = 1.0  # diffusion coefficient
+    problem_params['freq'] = 2  # frequency for the test value
+    problem_params['cnvars'] = [(65, 65)]  # number of degrees of freedom for the coarsest level
+    problem_params['refine'] = [1, 0]  # number of refinements
+    problem_params['comm'] = space_comm  # pass space-communicator to problem class
+    problem_params['sol_tol'] = 1e-12  # set tolerance to PETSc' linear solver
+
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 50
+
+    # initialize space transfer parameters
+    space_transfer_params = dict()
+    space_transfer_params['rorder'] = 2
+    space_transfer_params['iorder'] = 2
+    space_transfer_params['periodic'] = False
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
+    controller_params['dump_setup'] = False
+
+    # fill description dictionary for easy step instantiation
+    description = dict()
+    description['problem_class'] = heat2d_petsc_forced  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
+    description['space_transfer_class'] = mesh_to_mesh_petsc_dmda  # pass spatial transfer class
+    description['space_transfer_params'] = space_transfer_params  # pass parameters for spatial transfer
+
+    # set time parameters
+    t0 = 0.0
+    Tend = 0.25
+
+    # instantiate controller
+    controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
+
+    # get initial values on finest level
+    P = controller.S.levels[0].prob
+    uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    # compute exact solution and compare
+    uex = P.u_exact(Tend)
+    err = abs(uex - uend)
+
+    # filter statistics by type (number of iterations)
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
+
+    niters = np.array([item[1] for item in iter_counts])
+
+    # limit output to space-rank 0 (as before when setting the logger level)
+    if space_rank == 0:
+        Path("data").mkdir(parents=True, exist_ok=True)
+        f = open('data/' + fname, 'a+')
+
+        out = 'This is time-rank %i...' % time_rank
+        f.write(out + '\n')
+        print(out)
+
+        # compute and print statistics
+        for item in iter_counts:
+            out = 'Number of iterations for time %4.2f: %2i' % item
+            f.write(out + '\n')
+            print(out)
+
+        out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+        f.write(out + '\n')
+        print(out)
+        out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+        f.write(out + '\n')
+        print(out)
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
+        f.write(out + '\n')
+        print(out)
+        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+        f.write(out + '\n')
+        print(out)
+
+        timing = get_sorted(stats, type='timing_run', sortby='time')
+
+        out = 'Time to solution: %6.4f sec.' % timing[0][1]
+        f.write(out + '\n')
+        print(out)
+        out = 'Error vs. PDE solution: %6.4e' % err
+        f.write(out + '\n')
+        print(out)
+
+        f.close()
+
+    assert err < 2e-04, 'ERROR: did not match error tolerance, got %s' % err
+    assert np.mean(niters) <= 12, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
+
+    space_comm.Free()
+    time_comm.Free()
+
+
+# %% [markdown]
+# ## Running it
+#
+# With `mpirun`, giving the number of ranks in space and the output file, e.g. for 2 in time and 2 in space:
+#
+# ```bash
+# mpirun -np 4 python C_pySDC_with_PETSc.py 2 step_7_C_out_2x2.txt
+# ```
+
+# %%
+if __name__ == "__main__":
+    # still runnable straight from the shell, as the tutorial text describes:
+    #   mpirun -np 4 python C_pySDC_with_PETSc.py 2 step_7_C_out_2x2.txt
+    main(
+        num_procs_space=int(sys.argv[1]) if len(sys.argv) >= 2 else None,
+        fname=sys.argv[2] if len(sys.argv) == 3 else 'step_7_C_out.txt',
+    )
+
+# %% [markdown]
+# ## Results
+#
+# PETSc does not run in the browser, nor in the environment this website is built in. Our CI runs this part three
+# times, in an environment with PETSc: with 1 and with 2 processes in space, and with 4 processes, 2 in time and 2 in
+# space. Do not expect scaling, due to the CI environment. These are the results of the run that built this page,
+# with 1 process:
+#
+# :::{literalinclude} /../../data/step_7_C_out_1x1.txt
+# :language: text
+# :::
+#
+# With 2 processes in space:
+#
+# :::{literalinclude} /../../data/step_7_C_out_1x2.txt
+# :language: text
+# :::
+#
+# And with 2 in time and 2 in space:
+#
+# :::{literalinclude} /../../data/step_7_C_out_2x2.txt
+# :language: text
+# :::
+#
+# The iterations and the error agree in all three: distributing the spatial problem over processes changes how it is
+# solved, not what, and running the steps in parallel does not change what PFASST computes. Only the time to solution
+# differs, and each time rank prints its own steps.
+#
+# :::{admonition} Important things to note
+# - We need processors in space and time, which can be achieved by `comm.Split` and coloring. The space communicator
+#   is then passed to the problem class.
+# :::

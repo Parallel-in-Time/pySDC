@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_f7d64113b0673500_paper_plots_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.2">coverage.py v7.16.2</a>,
-            created at 2026-09-28 05:22 +0000
+            created at 2026-09-28 10:31 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -161,14 +161,14 @@
     <p class="exc show_exc"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">&#x27;problem_class&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="nam">heatNd_forced</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">    <span class="nam">description</span><span class="op">[</span><span class="str">&#x27;problem_params&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="nam">description</span><span class="op">[</span><span class="str">&#x27;problem_params&#x27;</span><span class="op">]</span><span class="op">,</span> <span class="nam">useGPU</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">    <span class="com"># instantiate controller cpu</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">    <span class="com"># instantiate controller gpu</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">    <span class="nam">controller</span> <span class="op">=</span> <span class="nam">controller_nonMPI</span><span class="op">(</span><span class="nam">num_procs</span><span class="op">=</span><span class="num">1</span><span class="op">,</span> <span class="nam">controller_params</span><span class="op">=</span><span class="nam">controller_params</span><span class="op">,</span> <span class="nam">description</span><span class="op">=</span><span class="nam">description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">    <span class="com"># get initial values on finest level cpu</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">    <span class="com"># get initial values on finest level gpu</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">    <span class="nam">P</span> <span class="op">=</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">MS</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">prob</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">    <span class="nam">uinit</span> <span class="op">=</span> <span class="nam">P</span><span class="op">.</span><span class="nam">u_exact</span><span class="op">(</span><span class="nam">t0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">    <span class="com"># call main function to get things done on cpu...</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">    <span class="com"># call main function to get things done on gpu...</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">    <span class="nam">uend_gpu</span><span class="op">,</span> <span class="nam">stats_gpu</span> <span class="op">=</span> <span class="nam">controller</span><span class="op">.</span><span class="nam">run</span><span class="op">(</span><span class="nam">u0</span><span class="op">=</span><span class="nam">uinit</span><span class="op">,</span> <span class="nam">t0</span><span class="op">=</span><span class="nam">t0</span><span class="op">,</span> <span class="nam">Tend</span><span class="op">=</span><span class="nam">Tend</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t91" href="#t91">91</a></span><span class="t">    <span class="nam">timing_gpu</span> <span class="op">=</span> <span class="nam">sort_stats</span><span class="op">(</span><span class="nam">filter_stats</span><span class="op">(</span><span class="nam">stats_gpu</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">&#x27;timing_run&#x27;</span><span class="op">)</span><span class="op">,</span> <span class="nam">sortby</span><span class="op">=</span><span class="str">&#x27;time&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t92" href="#t92">92</a></span><span class="t">    <span class="nam">print</span><span class="op">(</span><span class="str">&#x27;Runtime GPU:&#x27;</span><span class="op">,</span> <span class="nam">timing_gpu</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">[</span><span class="num">1</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -187,7 +187,7 @@
             <a class="nav" href="z_f7d64113b0673500_paper_plots_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.2">coverage.py v7.16.2</a>,
-            created at 2026-09-28 05:22 +0000
+            created at 2026-09-28 10:31 +0000
         </p>
     </div>
 </footer>

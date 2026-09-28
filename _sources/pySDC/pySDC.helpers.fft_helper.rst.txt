@@ -1,0 +1,7 @@
+fft\_helper
+===========
+
+.. automodule:: pySDC.helpers.fft_helper
+   :members:
+   :show-inheritance:
+   :undoc-members:

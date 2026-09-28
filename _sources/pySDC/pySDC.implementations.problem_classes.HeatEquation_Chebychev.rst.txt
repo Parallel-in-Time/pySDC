@@ -1,0 +1,7 @@
+HeatEquation\_Chebychev
+=======================
+
+.. automodule:: pySDC.implementations.problem_classes.HeatEquation_Chebychev
+   :members:
+   :show-inheritance:
+   :undoc-members:

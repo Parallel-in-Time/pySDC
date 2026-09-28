@@ -1,0 +1,7 @@
+OuterSolarSystem
+================
+
+.. automodule:: pySDC.implementations.problem_classes.OuterSolarSystem
+   :members:
+   :show-inheritance:
+   :undoc-members:

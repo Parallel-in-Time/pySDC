@@ -1,0 +1,7 @@
+explicit
+========
+
+.. automodule:: pySDC.implementations.sweeper_classes.explicit
+   :members:
+   :show-inheritance:
+   :undoc-members:

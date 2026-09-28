@@ -1,0 +1,7 @@
+GeneralizedFisher\_1D\_PETSc
+============================
+
+.. automodule:: pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc
+   :members:
+   :show-inheritance:
+   :undoc-members:

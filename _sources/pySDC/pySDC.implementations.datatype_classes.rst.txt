@@ -1,0 +1,24 @@
+datatype\_classes
+=================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.datatype_classes.container
+   pySDC.implementations.datatype_classes.cupy_mesh
+   pySDC.implementations.datatype_classes.fenics_mesh
+   pySDC.implementations.datatype_classes.firedrake_mesh
+   pySDC.implementations.datatype_classes.mesh
+   pySDC.implementations.datatype_classes.particles
+   pySDC.implementations.datatype_classes.petsc_vec
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations.datatype_classes
+   :members:
+   :show-inheritance:
+   :undoc-members:

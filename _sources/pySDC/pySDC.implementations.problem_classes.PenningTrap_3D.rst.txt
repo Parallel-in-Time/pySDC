@@ -1,0 +1,7 @@
+PenningTrap\_3D
+===============
+
+.. automodule:: pySDC.implementations.problem_classes.PenningTrap_3D
+   :members:
+   :show-inheritance:
+   :undoc-members:

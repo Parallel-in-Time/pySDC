@@ -1,0 +1,7 @@
+Battery
+=======
+
+.. automodule:: pySDC.implementations.problem_classes.Battery
+   :members:
+   :show-inheritance:
+   :undoc-members:

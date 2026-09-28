@@ -1,0 +1,7 @@
+sweeper
+=======
+
+.. automodule:: pySDC.core.sweeper
+   :members:
+   :show-inheritance:
+   :undoc-members:

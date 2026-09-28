@@ -1,0 +1,7 @@
+Boussinesq\_2D\_FD\_imex
+========================
+
+.. automodule:: pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex
+   :members:
+   :show-inheritance:
+   :undoc-members:

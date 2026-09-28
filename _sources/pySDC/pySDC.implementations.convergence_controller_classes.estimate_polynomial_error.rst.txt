@@ -1,0 +1,7 @@
+estimate\_polynomial\_error
+===========================
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.estimate_polynomial_error
+   :members:
+   :show-inheritance:
+   :undoc-members:

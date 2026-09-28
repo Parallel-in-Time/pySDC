@@ -1,0 +1,7 @@
+build2DFDMatrix
+===============
+
+.. automodule:: pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix
+   :members:
+   :show-inheritance:
+   :undoc-members:

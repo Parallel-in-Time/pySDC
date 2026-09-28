@@ -1,0 +1,7 @@
+buildWave1DMatrix
+=================
+
+.. automodule:: pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix
+   :members:
+   :show-inheritance:
+   :undoc-members:

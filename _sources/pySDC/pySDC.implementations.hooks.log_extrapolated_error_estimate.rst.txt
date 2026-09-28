@@ -1,0 +1,7 @@
+log\_extrapolated\_error\_estimate
+==================================
+
+.. automodule:: pySDC.implementations.hooks.log_extrapolated_error_estimate
+   :members:
+   :show-inheritance:
+   :undoc-members:

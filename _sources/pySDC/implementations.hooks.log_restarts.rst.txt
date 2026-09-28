@@ -1,7 +1,0 @@
-implementations.hooks.log\_restarts module
-==========================================
-
-.. automodule:: implementations.hooks.log_restarts
-   :members:
-   :show-inheritance:
-   :undoc-members:

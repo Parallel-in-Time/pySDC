@@ -1,0 +1,7 @@
+HeatFiredrake
+=============
+
+.. automodule:: pySDC.implementations.problem_classes.HeatFiredrake
+   :members:
+   :show-inheritance:
+   :undoc-members:

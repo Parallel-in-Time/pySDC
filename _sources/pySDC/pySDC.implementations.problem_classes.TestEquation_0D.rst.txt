@@ -1,0 +1,7 @@
+TestEquation\_0D
+================
+
+.. automodule:: pySDC.implementations.problem_classes.TestEquation_0D
+   :members:
+   :show-inheritance:
+   :undoc-members:

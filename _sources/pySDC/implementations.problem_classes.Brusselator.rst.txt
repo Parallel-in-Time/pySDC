@@ -1,7 +1,0 @@
-implementations.problem\_classes.Brusselator module
-===================================================
-
-.. automodule:: implementations.problem_classes.Brusselator
-   :members:
-   :show-inheritance:
-   :undoc-members:

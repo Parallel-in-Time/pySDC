@@ -1,0 +1,7 @@
+Quench
+======
+
+.. automodule:: pySDC.implementations.problem_classes.Quench
+   :members:
+   :show-inheritance:
+   :undoc-members:

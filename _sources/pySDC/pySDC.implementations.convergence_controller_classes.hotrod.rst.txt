@@ -1,0 +1,7 @@
+hotrod
+======
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.hotrod
+   :members:
+   :show-inheritance:
+   :undoc-members:

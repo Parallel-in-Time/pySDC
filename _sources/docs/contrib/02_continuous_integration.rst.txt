@@ -1,6 +1,7 @@
 
 :orphan:
 
+
 .. |m2r-link-fd88a5a3e72d| replace:: \ ``python-coverage-comment-action-data``
 .. _m2r-link-fd88a5a3e72d: https://github.com/Parallel-in-Time/pySDC/tree/python-coverage-comment-action-data
 
@@ -10,9 +11,9 @@
 Continuous Integration in pySDC
 ===============================
 
-Any commit in ``pySDC`` are tested by GitHub continuous integration (CI). You can see in in the `action panel <https://github.com/Parallel-in-Time/pySDC/actions>`_ the tests for each branches.
-Those tests are currently divided in three main categories : `code linting <#code-linting>`_\ , `code testing <#code-testing>`_ and `code coverage <#code-coverage>`_.
-Finally, the CI also build artifacts that are used to generate the documentation website (see http://parallel-in-time.org/pySDC/), more details given in the `documentation generation <#documentation-generation>`_ section.
+Every commit in ``pySDC`` is tested by GitHub continuous integration (CI). You can see the tests for each branch in the `action panel <https://github.com/Parallel-in-Time/pySDC/actions>`_.
+Those tests are currently divided in three main categories : :ref:`code linting <docs/contrib/02_continuous_integration/code-linting>`\ , :ref:`code testing <docs/contrib/02_continuous_integration/code-testing>` and :ref:`code coverage <docs/contrib/02_continuous_integration/code-coverage>`.
+Finally, the CI also build artifacts that are used to generate the documentation website (see http://parallel-in-time.org/pySDC/), more details given in the :ref:`documentation generation <docs/contrib/02_continuous_integration/documentation-generation>` section.
 
 .. _docs/contrib/02_continuous_integration/ci-workflow-triggers:
 
@@ -31,7 +32,7 @@ This configuration ensures that when you push commits to a pull request branch, 
 
    |:bell:| **A branch with no open pull request gets no CI.** This is deliberate: a bare ``push`` trigger fires
    alongside ``pull_request`` for the same commit and doubles the ~42-job matrix. Run the tests
-   `locally <#code-testing>`_ while you work, and open a pull request (a draft one is enough) as soon as you want
+   :ref:`locally <docs/contrib/02_continuous_integration/code-testing>` while you work, and open a pull request (a draft one is enough) as soon as you want
    the full matrix to run.
 
 
@@ -349,7 +350,7 @@ During developments, you can also run the coverage tests locally, using :
 
 ..
 
-   |:bell:| Note that this will run all ``pySDC`` tests while analyzing coverage, hence requires all packages installed for the `code testing stage <#code-testing>`_.
+   |:bell:| Note that this will run all ``pySDC`` tests while analyzing coverage, hence requires all packages installed for the :ref:`code testing stage <docs/contrib/02_continuous_integration/code-testing>`.
 
 
 Once the test are finished, you can collect and post-process coverage result :
@@ -426,6 +427,16 @@ Then you can open ``docs/build/html/index.html`` using you favorite browser and 
    But you can still generate the website without it: just all images for the tutorials, projects and playgrounds will be missing.
    This approach can be considered for local testing of your contribution when it does not concern parts containing images (\ *i.e* project or code documentation).
 
+
+Tutorial pages listed in ``BROWSER_PAGES`` in ``docs/source/conf.py`` have a "Run in browser" button, which runs their code in `Pyodide <https://pyodide.org>`_.
+CI presses it on every such page after building the site, and fails if a page does not finish or a cell raises.
+To do the same locally:
+
+.. code-block:: bash
+
+   python -m pip install playwright
+   python -m playwright install chromium
+   python docs/check_run_in_browser.py docs/build/html
 
 |:arrow_left:| :doc:`Back to Pull Request Recommendation <./01_pull_requests>` ---
 |:arrow_up:| :doc:`Contributing Summary <./../../CONTRIBUTING>` ---

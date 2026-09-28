@@ -1,0 +1,7 @@
+generic\_spectral
+=================
+
+.. automodule:: pySDC.implementations.problem_classes.generic_spectral
+   :members:
+   :show-inheritance:
+   :undoc-members:

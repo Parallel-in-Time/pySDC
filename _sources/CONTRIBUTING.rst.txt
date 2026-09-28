@@ -1,11 +1,15 @@
 
 :orphan:
+
 .. role:: raw-html-m2r(raw)
    :format: html
 
 
 .. |m2r-link-6d17989f7dfb| replace:: \ ``qmat`` companion package
 .. _m2r-link-6d17989f7dfb: https://github.com/Parallel-in-Time/qmat
+
+.. |m2r-link-d3e2db30b591| replace:: \ ``aidecl.yaml``
+.. _m2r-link-d3e2db30b591: https://github.com/Parallel-in-Time/pySDC/blob/master/aidecl.yaml
 
 
 .. _CONTRIBUTING/how-to-contribute-to-pysdc:
@@ -37,7 +41,7 @@ for more details. Additional guideline are also given on how to
 
 ..
 
-   📣 Some core components (collocation matrix, $Q-\\Delta$ coefficients, Lagrange barycentric interpolation)\ :raw-html-m2r:`<br>`
+   📣 Some core components (collocation matrix, :math:`Q-\Delta` coefficients, Lagrange barycentric interpolation)\ :raw-html-m2r:`<br>`
    are implemented and developed in the |m2r-link-6d17989f7dfb|_.
    Checkout its own `contributing guide <https://qmat.readthedocs.io/en/latest/contributing.html>`_
    to add any new coefficient / feature on this part.
@@ -46,12 +50,13 @@ for more details. Additional guideline are also given on how to
 ..
 
    🤖 ``pySDC`` declares how much of its code was written with AI help in
-   :doc:`aidecl.yaml <./aidecl>`\ , checked on every CI run. Two things help keep that honest:
+   |m2r-link-d3e2db30b591|_\ , checked on every CI run. Two things help keep that honest:
    please keep the ``Co-authored-by:`` trailer that agents add to their commits (this mostly
    means not stripping it when squashing), and, if you contribute regularly, consider
    installing `Git AI <https://github.com/git-ai-project/git-ai>`_. It records which lines an
    agent wrote, needs no workflow changes, and is strongly recommended but entirely optional
-   — without it your commits simply count as human-written.
+   — without it your commits simply count as human-written. See :doc:`using AI tools <./docs/contrib/08_ai_usage>`
+   for the rules on AI-assisted contributions.
 
 
 #. `GitHub Forks and Pull Requests <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models>`_
@@ -61,5 +66,7 @@ for more details. Additional guideline are also given on how to
 #. :doc:`Custom Implementations <./docs/contrib/04_custom_implementations>`
 #. :doc:`Documenting Code <./docs/contrib/05_documenting_code>`
 #. :doc:`Adding a project <./docs/contrib/06_new_project>`
+#. :doc:`Publishing a new release <./docs/contrib/07_release_guide>`
+#. :doc:`Using AI tools <./docs/contrib/08_ai_usage>`
 
 |:arrow_left:| :doc:`Back to main page <./index>`

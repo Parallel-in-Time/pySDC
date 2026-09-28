@@ -1,0 +1,7 @@
+generic\_implicit
+=================
+
+.. automodule:: pySDC.implementations.sweeper_classes.generic_implicit
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+ParaDiagSweepers
+================
+
+.. automodule:: pySDC.implementations.sweeper_classes.ParaDiagSweepers
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+imex\_1st\_order\_MPI
+=====================
+
+.. automodule:: pySDC.implementations.sweeper_classes.imex_1st_order_MPI
+   :members:
+   :show-inheritance:
+   :undoc-members:

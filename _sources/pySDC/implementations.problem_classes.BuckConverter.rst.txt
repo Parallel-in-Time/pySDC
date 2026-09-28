@@ -1,7 +1,0 @@
-implementations.problem\_classes.BuckConverter module
-=====================================================
-
-.. automodule:: implementations.problem_classes.BuckConverter
-   :members:
-   :show-inheritance:
-   :undoc-members:

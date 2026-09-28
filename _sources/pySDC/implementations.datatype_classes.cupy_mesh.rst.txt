@@ -1,7 +1,0 @@
-implementations.datatype\_classes.cupy\_mesh module
-===================================================
-
-.. automodule:: implementations.datatype_classes.cupy_mesh
-   :members:
-   :show-inheritance:
-   :undoc-members:

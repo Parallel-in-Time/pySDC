@@ -1,7 +1,0 @@
-implementations.problem\_classes.RayleighBenard module
-======================================================
-
-.. automodule:: implementations.problem_classes.RayleighBenard
-   :members:
-   :show-inheritance:
-   :undoc-members:

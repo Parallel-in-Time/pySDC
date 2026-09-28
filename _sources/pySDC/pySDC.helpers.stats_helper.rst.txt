@@ -1,0 +1,7 @@
+stats\_helper
+=============
+
+.. automodule:: pySDC.helpers.stats_helper
+   :members:
+   :show-inheritance:
+   :undoc-members:

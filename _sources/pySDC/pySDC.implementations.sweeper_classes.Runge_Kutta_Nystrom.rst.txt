@@ -1,0 +1,7 @@
+Runge\_Kutta\_Nystrom
+=====================
+
+.. automodule:: pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom
+   :members:
+   :show-inheritance:
+   :undoc-members:

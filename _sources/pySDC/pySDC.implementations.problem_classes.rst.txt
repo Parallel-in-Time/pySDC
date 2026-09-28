@@ -1,0 +1,76 @@
+problem\_classes
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.problem_classes.acoustic_helpers
+   pySDC.implementations.problem_classes.boussinesq_helpers
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex
+   pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT
+   pySDC.implementations.problem_classes.AdvectionEquation_ND_FD
+   pySDC.implementations.problem_classes.AllenCahn_1D_FD
+   pySDC.implementations.problem_classes.AllenCahn_2D_FD
+   pySDC.implementations.problem_classes.AllenCahn_2D_FFT
+   pySDC.implementations.problem_classes.AllenCahn_MPIFFT
+   pySDC.implementations.problem_classes.AllenCahn_Temp_MPIFFT
+   pySDC.implementations.problem_classes.Auzinger_implicit
+   pySDC.implementations.problem_classes.Battery
+   pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex
+   pySDC.implementations.problem_classes.Brusselator
+   pySDC.implementations.problem_classes.BuckConverter
+   pySDC.implementations.problem_classes.Burgers
+   pySDC.implementations.problem_classes.DiscontinuousTestODE
+   pySDC.implementations.problem_classes.FastWaveSlowWave_0D
+   pySDC.implementations.problem_classes.FermiPastaUlamTsingou
+   pySDC.implementations.problem_classes.FullSolarSystem
+   pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit
+   pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc
+   pySDC.implementations.problem_classes.GenericGusto
+   pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit
+   pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic
+   pySDC.implementations.problem_classes.GrayScott_MPIFFT
+   pySDC.implementations.problem_classes.HarmonicOscillator
+   pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced
+   pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced
+   pySDC.implementations.problem_classes.HeatEquation_Chebychev
+   pySDC.implementations.problem_classes.HeatEquation_ND_FD
+   pySDC.implementations.problem_classes.HeatFiredrake
+   pySDC.implementations.problem_classes.HenonHeiles
+   pySDC.implementations.problem_classes.LogisticEquation
+   pySDC.implementations.problem_classes.Lorenz
+   pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT
+   pySDC.implementations.problem_classes.OuterSolarSystem
+   pySDC.implementations.problem_classes.PenningTrap_3D
+   pySDC.implementations.problem_classes.Piline
+   pySDC.implementations.problem_classes.Quench
+   pySDC.implementations.problem_classes.RayleighBenard
+   pySDC.implementations.problem_classes.RayleighBenard3D
+   pySDC.implementations.problem_classes.TestEquation_0D
+   pySDC.implementations.problem_classes.Van_der_Pol_implicit
+   pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
+   pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian
+   pySDC.implementations.problem_classes.generic_ND_FD
+   pySDC.implementations.problem_classes.generic_spectral
+   pySDC.implementations.problem_classes.nonlinear_ODE_1
+   pySDC.implementations.problem_classes.odeScalar
+   pySDC.implementations.problem_classes.odeSystem
+   pySDC.implementations.problem_classes.polynomial_test_problem
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations.problem_classes
+   :members:
+   :show-inheritance:
+   :undoc-members:

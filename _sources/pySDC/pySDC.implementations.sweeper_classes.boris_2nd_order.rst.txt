@@ -1,0 +1,7 @@
+boris\_2nd\_order
+=================
+
+.. automodule:: pySDC.implementations.sweeper_classes.boris_2nd_order
+   :members:
+   :show-inheritance:
+   :undoc-members:

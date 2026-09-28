@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- pySDC's logo, drawn heavier to read at 16 px -->
+  <style>
+    .ink { stroke: #1d2327; } .inkfill { fill: #1d2327; } .p { stroke: #0f7b83; } .pfill { fill: #0f7b83; } .afill { fill: #e0692a; }
+    @media (prefers-color-scheme: dark) {
+      .ink { stroke: #e7ecef; } .inkfill { fill: #e7ecef; } .p { stroke: #5cc4ca; } .pfill { fill: #5cc4ca; } .afill { fill: #f28c52; }
+    }
+  </style>
+  <path class="ink" d="M15 6 H6 V58 H15" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path class="ink" d="M49 6 H58 V58 H49" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path class="p" d="M19 20 L25.5 44 M32 20 L25.5 44 M32 20 L38.5 44 M45 20 L38.5 44" stroke-opacity="0.6" stroke-width="3.5" stroke-linecap="round"/>
+  <circle class="pfill" cx="19" cy="20" r="6.5"/>
+  <circle class="pfill" cx="32" cy="20" r="6.5"/>
+  <circle class="afill" cx="45" cy="20" r="6.5"/>
+  <circle class="inkfill" cx="25.5" cy="44" r="5.5"/>
+  <circle class="inkfill" cx="38.5" cy="44" r="5.5"/>
+</svg>

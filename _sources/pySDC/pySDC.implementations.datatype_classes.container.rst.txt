@@ -1,0 +1,7 @@
+container
+=========
+
+.. automodule:: pySDC.implementations.datatype_classes.container
+   :members:
+   :show-inheritance:
+   :undoc-members:

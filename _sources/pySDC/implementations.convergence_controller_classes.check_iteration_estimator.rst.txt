@@ -1,7 +1,0 @@
-implementations.convergence\_controller\_classes.check\_iteration\_estimator module
-===================================================================================
-
-.. automodule:: implementations.convergence_controller_classes.check_iteration_estimator
-   :members:
-   :show-inheritance:
-   :undoc-members:

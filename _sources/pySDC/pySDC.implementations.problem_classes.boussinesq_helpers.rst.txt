@@ -1,0 +1,23 @@
+boussinesq\_helpers
+===================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix
+   pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix
+   pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix
+   pySDC.implementations.problem_classes.boussinesq_helpers.helper_classes
+   pySDC.implementations.problem_classes.boussinesq_helpers.standard_integrators
+   pySDC.implementations.problem_classes.boussinesq_helpers.unflatten
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations.problem_classes.boussinesq_helpers
+   :members:
+   :show-inheritance:
+   :undoc-members:

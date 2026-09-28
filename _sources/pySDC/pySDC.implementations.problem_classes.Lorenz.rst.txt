@@ -1,0 +1,7 @@
+Lorenz
+======
+
+.. automodule:: pySDC.implementations.problem_classes.Lorenz
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+controller\_MPI
+===============
+
+.. automodule:: pySDC.implementations.controller_classes.controller_MPI
+   :members:
+   :show-inheritance:
+   :undoc-members:

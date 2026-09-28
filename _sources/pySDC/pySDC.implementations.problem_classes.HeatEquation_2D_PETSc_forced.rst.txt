@@ -1,0 +1,7 @@
+HeatEquation\_2D\_PETSc\_forced
+===============================
+
+.. automodule:: pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced
+   :members:
+   :show-inheritance:
+   :undoc-members:

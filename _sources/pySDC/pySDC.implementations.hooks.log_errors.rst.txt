@@ -1,0 +1,7 @@
+log\_errors
+===========
+
+.. automodule:: pySDC.implementations.hooks.log_errors
+   :members:
+   :show-inheritance:
+   :undoc-members:

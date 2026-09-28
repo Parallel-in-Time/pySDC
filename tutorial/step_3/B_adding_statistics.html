@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Part B: Adding statistics &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/step_3/B_adding_statistics';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Part C: Studying collocation node types" href="C_study_collocations.html" />
+    <link rel="prev" title="Part A: Getting statistics" href="A_getting_statistics.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  <link rel="icon" href="../../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1"><a href="../index.html">Tutorials</a></p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_1.html">Step-1: A first spatial problem</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/A_spatial_problem_setup.html">Part A: Spatial problem setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/B_spatial_accuracy_check.html">Part B: Spatial accuracy check</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/C_collocation_problem_setup.html">Part C: Collocation problem setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/D_collocation_accuracy_check.html">Part D: Collocation accuracy check</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_2.html">Step-2: Data structures and my first sweeper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/A_step_data_structure.html">Part A: Step data structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/B_my_first_sweeper.html">Part B: My first sweeper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/C_using_pySDCs_frontend.html">Part C: Using pySDC’s frontend</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../step_3.html">Step-3: Statistics and a new sweeper</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="A_getting_statistics.html">Part A: Getting statistics</a></li>
+<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">Part B: Adding statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="C_study_collocations.html">Part C: Studying collocation node types</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_4.html">Step-4: Multilevel SDC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/A_spatial_transfer_operators.html">Part A: Spatial transfer operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/B_multilevel_hierarchy.html">Part B: Multilevel hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/C_SDC_vs_MLSDC.html">Part C: SDC vs. MLSDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/D_MLSDC_with_particles.html">Part D: MLSDC with particles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_5.html">Step-5: PFASST</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/A_multistep_multilevel_hierarchy.html">Part A: Multistep multilevel hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/B_my_first_PFASST_run.html">Part B: My first PFASST run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/C_advection_and_PFASST.html">Part C: Advection and PFASST</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_6.html">Step-6: Advanced PFASST controllers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/A_run_non_MPI_controller.html">Part A: The non-MPI controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/B_odd_temporal_distribution.html">Part B: Odd temporal distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/C_MPI_parallelization.html">Part C: MPI parallelization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_7.html">Step-7: pySDC with external libraries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_FEniCS.html">Part A: pySDC and FEniCS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_mpi4pyfft.html">Part B: mpi4py-fft for parallel Fourier transforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PETSc.html">Part C: Time-parallel pySDC with space-parallel PETSc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_PyTorch.html">Part D: pySDC and PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Firedrake.html">Part E: pySDC and Firedrake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_with_Gusto.html">Part F: pySDC and Gusto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_on_GPU.html">Part G: pySDC on GPUs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_8.html">Step-8: Advanced topics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_8/A_adaptive_time_stepping.html">Part A: Adaptive time-stepping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_8/B_multistep_SDC.html">Part B: Multi-step SDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_8/C_iteration_estimator.html">Part C: Iteration estimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_9.html">Step-9: ParaDiag</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/A_paradiag_for_linear_problems.html">Part A: ParaDiag for linear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/B_paradiag_for_nonlinear_problems.html">Part B: ParaDiag for nonlinear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/C_paradiag_in_pySDC.html">Part C: ParaDiag in pySDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/D_adaptive_alpha.html">Part D: Adaptive alpha</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/E_paradiag_MPI.html">Part E: MPI-parallel ParaDiag</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../step_3.html" class="nav-link">Step-3: Statistics and a new sweeper</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Part B: Adding statistics</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="notebook-links">
+  <button class="btn btn-sm run-in-browser" data-wheels="dill-0.4.1-py3-none-any.whl pysdc-5.8-py2.py3-none-any.whl qmat-0.1.21-py3-none-any.whl" data-wheels-url="../../_static/wheels/"><i class="fa-solid fa-play"></i> Run in browser</button>
+  <a class="btn btn-sm" href="B_adding_statistics.ipynb" download><i class="fa-solid fa-download"></i> Notebook</a>
+  <a class="btn btn-sm" href="https://colab.research.google.com/github/Parallel-in-Time/pySDC/blob/gh-pages/tutorial/step_3/B_adding_statistics.ipynb" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Open in Colab</a><p class="rib-status" aria-live="polite"></p>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="part-b-adding-statistics">
+<h1>Part B: Adding statistics<a class="headerlink" href="#part-b-adding-statistics" title="Link to this heading">#</a></h1>
+<p>Now we extend the statistics with entries of our own. To make things more interesting (and complicated), this
+part also brings a new problem, a new sweeper and new data types:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PenningTrap_3D</span></code>: particles in a Penning trap, held in place by an electric and a magnetic field,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boris_2nd_order</span></code>: SDC for second-order problems with the Boris method, see
+<a class="reference external" href="http://dx.doi.org/10.1016/j.jcp.2015.04.022">this paper</a>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">particles</span></code> for positions, velocities, charges and masses, and <code class="docutils literal notranslate"><span class="pre">fields</span></code> for the electric and magnetic field.</p></li>
+</ul>
+<p>An important measure for this kind of problem is the total energy of the system, which we would like to compute
+after each time step. That is a job for a new <strong>hook</strong>.</p>
+<section id="a-hook-of-our-own">
+<h2>A hook of our own<a class="headerlink" href="#a-hook-of-our-own" title="Link to this heading">#</a></h2>
+<p>Hooks are called by the controller at fixed points of a run: before it, before and after each step, iteration
+or sweep, and after it. <code class="docutils literal notranslate"><span class="pre">particle_hook</span></code>, in <code class="docutils literal notranslate"><span class="pre">HookClass_Particles.py</span></code> next to this tutorial, computes the total
+energy before the run and after each step and adds it to the statistics with <code class="docutils literal notranslate"><span class="pre">add_to_stats</span></code>, as type <code class="docutils literal notranslate"><span class="pre">'etot'</span></code>.
+This is what it does after a step:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Overwrite default routine called after each step</span>
+<span class="sd">        Args:</span>
+<span class="sd">            step: the current step</span>
+<span class="sd">            level_number: the current level number</span>
+<span class="sd">        """</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">particle_hook</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">post_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
+
+        <span class="c1"># some abbreviations</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+        <span class="n">part</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">uend</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">nparts</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="c1"># compute (slowly..) the potential at uend</span>
+        <span class="n">fpot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="c1"># inner loop, omit ith particle</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+                <span class="n">dist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">pos</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">part</span><span class="o">.</span><span class="n">pos</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">sig</span><span class="o">**</span><span class="mi">2</span>
+                <span class="n">fpot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">part</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dist2</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+                <span class="n">dist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">pos</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">part</span><span class="o">.</span><span class="n">pos</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">sig</span><span class="o">**</span><span class="mi">2</span>
+                <span class="n">fpot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">part</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dist2</span><span class="p">)</span>
+            <span class="n">fpot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">omega_E</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">part</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">part</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">part</span><span class="o">.</span><span class="n">pos</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">part</span><span class="o">.</span><span class="n">pos</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+
+        <span class="c1"># add up kinetic and potntial contributions to total energy</span>
+        <span class="n">epot</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ekin</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">epot</span> <span class="o">+=</span> <span class="n">part</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="n">fpot</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+            <span class="n">ekin</span> <span class="o">+=</span> <span class="n">part</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">vel</span><span class="p">[:,</span> <span class="n">n</span><span class="p">],</span> <span class="n">part</span><span class="o">.</span><span class="n">vel</span><span class="p">[:,</span> <span class="n">n</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
+            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
+            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">'etot'</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">epot</span> <span class="o">+</span> <span class="n">ekin</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p>Our hook does not replace pySDC’s default statistics: those come from <code class="docutils literal notranslate"><span class="pre">DefaultHooks</span></code>, which the controller always
+adds next to ours. The call to <code class="docutils literal notranslate"><span class="pre">super()</span></code> first still matters: the base class keeps track of restarted steps, and
+<code class="docutils literal notranslate"><span class="pre">add_to_stats</span></code> writes that into the key of each entry.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_list_of_types</span><span class="p">,</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span><span class="w"> </span><span class="kn">import</span> <span class="n">penningtrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">boris_2nd_order</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">particle_hook</span>
+
+<span class="c1"># initialize level parameters</span>
+<span class="n">level_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'restol'</span><span class="p">:</span> <span class="mf">1e-08</span><span class="p">,</span> <span class="s1">'dt'</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">16</span><span class="p">}</span>
+
+<span class="c1"># initialize sweeper parameters</span>
+<span class="n">sweeper_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'quad_type'</span><span class="p">:</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">,</span> <span class="s1">'num_nodes'</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+
+<span class="c1"># initialize problem parameters for the Penning trap</span>
+<span class="n">problem_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'omega_E'</span><span class="p">:</span> <span class="mf">4.9</span><span class="p">,</span>  <span class="c1"># E-field frequency</span>
+    <span class="s1">'omega_B'</span><span class="p">:</span> <span class="mf">25.0</span><span class="p">,</span>  <span class="c1"># B-field frequency</span>
+    <span class="s1">'u0'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">),</span>  <span class="c1"># initial position, velocity, charge, mass</span>
+    <span class="s1">'nparts'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  <span class="c1"># number of particles in the trap</span>
+    <span class="s1">'sig'</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># smoothing parameter for the forces</span>
+<span class="p">}</span>
+
+<span class="c1"># initialize step parameters</span>
+<span class="n">step_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'maxiter'</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+
+<span class="c1"># initialize controller parameters</span>
+<span class="n">controller_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'hook_class'</span><span class="p">:</span> <span class="n">particle_hook</span><span class="p">,</span>  <span class="c1"># specialized hook class for more statistics and output</span>
+    <span class="s1">'log_to_file'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">'fname'</span><span class="p">:</span> <span class="s1">'data/step_3_B_out.txt'</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+<span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'problem_class'</span><span class="p">:</span> <span class="n">penningtrap</span><span class="p">,</span>
+    <span class="s1">'problem_params'</span><span class="p">:</span> <span class="n">problem_params</span><span class="p">,</span>
+    <span class="s1">'sweeper_class'</span><span class="p">:</span> <span class="n">boris_2nd_order</span><span class="p">,</span>
+    <span class="s1">'sweeper_params'</span><span class="p">:</span> <span class="n">sweeper_params</span><span class="p">,</span>
+    <span class="s1">'level_params'</span><span class="p">:</span> <span class="n">level_params</span><span class="p">,</span>
+    <span class="s1">'step_params'</span><span class="p">:</span> <span class="n">step_params</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">Path</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The hook goes into the controller parameters. As in <a class="reference internal" href="../step_2/C_using_pySDCs_frontend.html"><span class="doc std std-doc">Step 2</span></a>, the controller
+prints its setup when we create it, and the log of the run:</p>
+<div class="cell tag_scroll-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># instantiate the controller</span>
+<span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+<span class="c1"># set time parameters: a single step</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">Tend</span> <span class="o">=</span> <span class="n">level_params</span><span class="p">[</span><span class="s1">'dt'</span><span class="p">]</span>
+
+<span class="c1"># get initial values on finest level</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+<span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_init</span><span class="p">()</span>
+
+<span class="c1"># call main function to get things done...</span>
+<span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>controller - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
+                                 _____ _____   _____ 
+                                / ____|  __ \ / ____|
+                    _ __  _   _| (___ | |  | | |     
+                   | '_ \| | | |\___ \| |  | | |     
+                   | |_) | |_| |____) | |__| | |____ 
+                   | .__/ \__, |_____/|_____/ \_____|
+                   | |     __/ |                     
+                   |_|    |___/                      
+                                                     
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>controller - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- BEGIN
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>controller - INFO: ----------------------------------------------------------------------------------------------------
+
+Controller: &lt;class 'pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI'&gt;
+    all_to_done = False
+    dump_setup = True
+--&gt; fname = data/step_3_B_out.txt
+--&gt; hook_class = [&lt;class 'pySDC.core.default_hook.DefaultHooks'&gt;, &lt;class 'pySDC.core.timings.CPUTimings'&gt;, &lt;class 'pySDC.tutorial.step_3.HookClass_Particles.particle_hook'&gt;]
+--&gt; log_to_file = True
+    logger_level = 20
+    mssdc_jac = True
+    predict_type = None
+    use_iteration_estimator = False
+
+Step: &lt;class 'pySDC.core.step.Step'&gt;
+--&gt; maxiter = 20
+    Number of steps: None
+    Level: &lt;class 'pySDC.core.level.Level'&gt;
+        Level  0
+--&gt;         dt = 0.0625
+            dt_initial = 0.0625
+            nsweeps = 1
+            residual_type = full_abs
+--&gt;         restol = 1e-08
+--&gt;         Problem: &lt;class 'pySDC.implementations.problem_classes.PenningTrap_3D.penningtrap'&gt;
+--&gt;             nparts = 1
+--&gt;             omega_B = 25.0
+--&gt;             omega_E = 4.9
+--&gt;             sig = 0.1
+--&gt;             u0 = [list([10, 0, 0]) list([100, 0, 100]) list([1]) list([1])]
+ -&gt;             Data type u: &lt;class 'pySDC.implementations.datatype_classes.particles.particles'&gt;
+ -&gt;             Data type f: &lt;class 'pySDC.implementations.datatype_classes.particles.fields'&gt;
+--&gt;             Sweeper: &lt;class 'pySDC.implementations.sweeper_classes.boris_2nd_order.boris_2nd_order'&gt;
+                    QE = EE
+                    QI = IE
+                    do_coll_update = False
+                    initial_guess = spread
+--&gt;                 num_nodes = 3
+--&gt;                 quad_type = RADAU-RIGHT
+                    skip_residual_computation = ()
+ -&gt;                 Collocation: &lt;class 'pySDC.core.collocation.CollBase'&gt;
+
+Active convergence controllers:
+    |  # | order | convergence controller
+----+----+-------+---------------------------------------------------------------------------------------
+    |  0 |    95 | BasicRestartingNonMPI
+ -&gt; |  1 |   100 | SpreadStepSizesBlockwiseNonMPI
+    |  2 |   200 | CheckConvergence
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>controller - INFO: ----------------------------------------------------------------------------------------------------
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>controller - INFO: Setup overview (--&gt; user-defined, -&gt; dependency) -- END
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534542e-06
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66967993e-07
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09408029e-08
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Finished run after 1.77e+00s
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="particles">
+<h2>Particles<a class="headerlink" href="#particles" title="Link to this heading">#</a></h2>
+<p>The solution is a <code class="docutils literal notranslate"><span class="pre">particles</span></code> data type. Its parts are separate arrays, one column per particle:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'position:'</span><span class="p">,</span> <span class="n">uend</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">velocity:'</span><span class="p">,</span> <span class="n">uend</span><span class="o">.</span><span class="n">vel</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">charge:'</span><span class="p">,</span> <span class="n">uend</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="s1">' mass:'</span><span class="p">,</span> <span class="n">uend</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>position: [[14.44301633 -4.24938502  6.05642416]] 
+velocity: [[  12.81766217 -113.34810048   90.76670718]] 
+charge: [1.]  mass: [1.]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="our-statistics">
+<h2>Our statistics<a class="headerlink" href="#our-statistics" title="Link to this heading">#</a></h2>
+<p>Our type <code class="docutils literal notranslate"><span class="pre">'etot'</span></code> now shows up among the others, and <code class="docutils literal notranslate"><span class="pre">get_sorted</span></code> treats it like any other:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'etot is registered:'</span><span class="p">,</span> <span class="s1">'etot'</span> <span class="ow">in</span> <span class="n">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">))</span>
+
+<span class="c1"># filter statistics type (etot)</span>
+<span class="n">energy</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'etot'</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'iter'</span><span class="p">)</span>
+
+<span class="c1"># get base energy and show difference</span>
+<span class="n">base_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energy</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s1">'Total energy and deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">'</span>
+        <span class="o">%</span> <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>etot is registered: True
+Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
+Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
+</pre></div>
+</div>
+</div>
+</div>
+<p>Iteration 0 is the energy the hook computed before the run, the other one after the step, at the iteration it
+converged in. For this single particle the exact solution is known, so we can also check the position:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute error compared to know exact solution for one particle</span>
+<span class="n">uex</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span>
+<span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">uex</span><span class="o">.</span><span class="n">pos</span> <span class="o">-</span> <span class="n">uend</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">uex</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'relative error of the position: </span><span class="si">{</span><span class="n">err</span><span class="si">:</span><span class="s1">.3e</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>relative error of the position: 4.290e-04
+</pre></div>
+</div>
+</div>
+</div>
+<p>The position is accurate, but the energy has changed by about 14.5 out of 8800 in a single step. We look into
+that in <a class="reference internal" href="C_study_collocations.html"><span class="doc std std-doc">Part C</span></a>.</p>
+<div class="admonition-important-things-to-note admonition">
+<p class="admonition-title">Important things to note</p>
+<ul class="simple">
+<li><p>A custom hook calls <code class="docutils literal notranslate"><span class="pre">super()</span></code> in every method it overrides, so that its entries are labelled correctly when a
+step is restarted, e.g. by adaptivity.</p></li>
+<li><p>User-defined statistics can also come from the problem class: give it an attribute (e.g. the number of GMRES
+iterations of its spatial solver) and read it in the hook through the level, as <code class="docutils literal notranslate"><span class="pre">L.prob</span></code>.</p></li>
+</ul>
+</div>
+<p>The checks the tests run:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'ERROR: energy deviated too much, got </span><span class="si">{</span><span class="n">base_energy</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
+<span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">5e-04</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"ERROR: solution is not as exact as expected, got </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">"</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="A_getting_statistics.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Part A: Getting statistics</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="C_study_collocations.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Part C: Studying collocation node types</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-hook-of-our-own">A hook of our own</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particles">Particles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#our-statistics">Our statistics</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Parallel-in-Time/pySDC/edit/master/pySDC/tutorial/step_3/B_adding_statistics.py">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tutorial/step_3/B_adding_statistics.py.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

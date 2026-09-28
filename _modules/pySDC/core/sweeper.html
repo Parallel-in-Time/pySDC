@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pySDC.core.sweeper &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pySDC/core/sweeper';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../../../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
+  <link rel="icon" href="../../../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../../../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../../../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pySDC.core.sweeper</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pySDC.core.sweeper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qmat.qdelta</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDeltaGenerator</span><span class="p">,</span> <span class="n">QDELTA_GENERATORS</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.collocation</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.pysdc_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrozenClass</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
+
+<span class="c1"># Organize QDeltaGenerator class in dict[type(QDeltaGenerator),set(str)] to retrieve aliases</span>
+<span class="n">QDELTA_GENERATORS_ALIASES</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">QDELTA_GENERATORS</span><span class="o">.</span><span class="n">values</span><span class="p">())}</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">QDELTA_GENERATORS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">QDELTA_GENERATORS_ALIASES</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+
+<span class="c1"># short helper class to add params as attributes</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pars</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_guess</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'spread'</span>  <span class="c1"># default value (see also below)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_residual_computation</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">()</span>  <span class="c1"># gain performance at the cost of correct residual output</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">'collocation_class'</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Sweeper">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Sweeper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Base abstract sweeper class, provides two base methods to generate QDelta matrices:</span>
+
+<span class="sd">    - get_Qdelta_implicit(qd_type):</span>
+<span class="sd">        Returns a (pySDC-type) QDelta matrix of **implicit type**,</span>
+<span class="sd">        *i.e* lower triangular with zeros on the first collumn.</span>
+<span class="sd">    - get_Qdelta_explicit(qd_type):</span>
+<span class="sd">        Returns a (pySDC-type) QDelta matrix of **explicit type**,</span>
+<span class="sd">        *i.e* strictly lower triangular with first node distance to zero on the first collumn.</span>
+
+
+<span class="sd">    All possible QDelta matrix coefficients are generated with</span>
+<span class="sd">    `qmat &lt;https://qmat.readthedocs.io/en/latest/api/qmat/qdelta/index.html&gt;`_,</span>
+<span class="sd">    check it out to see all available coefficient types.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        logger: custom logger for sweeper-related logging</span>
+<span class="sd">        params (__Pars): parameter object containing the custom parameters passed by the user</span>
+<span class="sd">        coll (pySDC.Collocation.CollBase): collocation object</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">level</span><span class="p">:</span> <span class="s1">'Level'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialization routine for the base sweeper</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            params (dict): parameter object</span>
+<span class="sd">            level (pySDC.Level.level): the level that uses this sweeper</span>
+<span class="sd">        """</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'sweeper'</span><span class="p">)</span>
+
+        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'num_nodes'</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">essential_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">'need </span><span class="si">%s</span><span class="s1"> to instantiate step, only got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">'collocation_class'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">'collocation_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollBase</span>
+
+        <span class="c1"># prepare random generator for initial guess</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'initial_guess'</span><span class="p">,</span> <span class="s1">'spread'</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'random'</span><span class="p">:</span>  <span class="c1"># default value (see also above)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">'random_seed'</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'random_seed'</span><span class="p">,</span> <span class="mi">1984</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">'random_seed'</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">_Pars</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">:</span> <span class="n">CollBase</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">'collocation_class'</span><span class="p">](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">right_is_node</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">'we need to do a collocation update here, since the right end point is not a node. Changing this!'</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Qdelta_diagonal</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"genQI"</span><span class="p">,</span> <span class="s2">"genQE"</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Sweeper.buildGenerator">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.buildGenerator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">buildGenerator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qdType</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QDeltaGenerator</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Build the qmat generator of QDelta coefficients for the collocation nodes of this sweeper.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            qdType (str): Name or alias of the QDelta type, a key of `qmat.qdelta.QDELTA_GENERATORS`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            qmat.qdelta.QDeltaGenerator: Generator for these nodes and left interval boundary</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">QDELTA_GENERATORS</span><span class="p">[</span><span class="n">qdType</span><span class="p">](</span><span class="n">qGen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">generator</span><span class="p">,</span> <span class="n">tLeft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">tleft</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sweeper.get_Qdelta_implicit">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.get_Qdelta_implicit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Qdelta_implicit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get a QDelta matrix of implicit type, i.e. lower triangular with zeros in the first row and column.</span>
+
+<span class="sd">        The generator is cached as `self.genQI` and only rebuilt if `qd_type` is not an alias of the cached one. Sets</span>
+<span class="sd">        `self.parallelizable`, see `_update_parallelizable`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            qd_type (str): Name or alias of the QDelta type</span>
+<span class="sd">            k (int, optional): Sweep index, for QDelta types whose coefficients change with the sweep</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: QDelta matrix of shape (num_nodes + 1, num_nodes + 1)</span>
+<span class="sd">        """</span>
+        <span class="n">QDmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"genQI"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">qd_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">QDELTA_GENERATORS_ALIASES</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="p">)]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="p">:</span> <span class="n">QDeltaGenerator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildGenerator</span><span class="p">(</span><span class="n">qd_type</span><span class="p">)</span>
+        <span class="n">QDmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">'Lower triangular matrix expected!'</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">QDmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">QDmat</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">err_msg</span><span class="o">=</span><span class="n">err_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_parallelizable</span><span class="p">((</span><span class="s1">'implicit'</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="p">)),</span> <span class="n">QDmat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">QDmat</span></div>
+
+
+<div class="viewcode-block" id="Sweeper.get_Qdelta_explicit">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.get_Qdelta_explicit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Qdelta_explicit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qd_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get a QDelta matrix of explicit type, i.e. strictly lower triangular, with the distances of the nodes to the</span>
+<span class="sd">        left</span>
+<span class="sd">        interval boundary in the first column and zeros in the first row.</span>
+
+<span class="sd">        The generator is cached as `self.genQE` and only rebuilt if `qd_type` is not an alias of the cached one. Sets</span>
+<span class="sd">        `self.parallelizable`, see `_update_parallelizable`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            qd_type (str): Name or alias of the QDelta type</span>
+<span class="sd">            k (int, optional): Sweep index, for QDelta types whose coefficients change with the sweep</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: QDelta matrix of shape (num_nodes + 1, num_nodes + 1)</span>
+<span class="sd">        """</span>
+        <span class="n">coll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span>
+        <span class="n">QDmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"genQE"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">qd_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">QDELTA_GENERATORS_ALIASES</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="p">)]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="p">:</span> <span class="n">QDeltaGenerator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildGenerator</span><span class="p">(</span><span class="n">qd_type</span><span class="p">)</span>
+        <span class="n">QDmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">QDmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="o">.</span><span class="n">genCoeffs</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">dTau</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">'Strictly lower triangular matrix expected!'</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">QDmat</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">QDmat</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">err_msg</span><span class="o">=</span><span class="n">err_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_parallelizable</span><span class="p">((</span><span class="s1">'explicit'</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="p">)),</span> <span class="n">QDmat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">QDmat</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_parallelizable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">QDmat</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The sweeper is parallelizable if every QDelta matrix it has built is diagonal, which for explicit ones means</span>
+<span class="sd">        zero (PIC). Matrices are remembered by kind and generator, so rebuilding one, for instance with a new sweep</span>
+<span class="sd">        index, replaces its entry, and a sweeper with QI='MIN-SR-S' and QE='EE' is not parallelizable.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Qdelta_diagonal</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">QDmat</span><span class="p">)),</span> <span class="n">QDmat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallelizable</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Qdelta_diagonal</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+<div class="viewcode-block" id="Sweeper.predict">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.predict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Predictor to fill values at nodes before first sweep</span>
+
+<span class="sd">        Default prediction for the sweepers, only copies the values to all collocation nodes</span>
+<span class="sd">        and evaluates the RHS of the ODE there</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># get current level and problem description</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="c1"># evaluate RHS at left point</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># copy u[0] to all collocation nodes, evaluate RHS</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">initial_guess</span> <span class="o">==</span> <span class="s1">'spread'</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="c1"># copy u[0] and RHS evaluation to all collocation nodes</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">initial_guess</span> <span class="o">==</span> <span class="s1">'copy'</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="c1"># start with zero everywhere</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">initial_guess</span> <span class="o">==</span> <span class="s1">'zero'</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="c1"># start with random initial guess</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">initial_guess</span> <span class="o">==</span> <span class="s1">'random'</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'initial_guess option </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">initial_guess</span><span class="si">}</span><span class="s1"> not implemented'</span><span class="p">)</span>
+
+        <span class="c1"># indicate that this level is now ready for sweeps</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">unlocked</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Sweeper.compute_residual">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.compute_residual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">''</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Computation of the residual using the collocation matrix Q</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stage (str): The current stage of the step the level belongs to</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># get current level and problem description</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+
+        <span class="c1"># Check if we want to skip the residual computation to gain performance</span>
+        <span class="c1"># Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!</span>
+        <span class="k">if</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">skip_residual_computation</span><span class="p">:</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># check if there are new values (e.g. from a sweep)</span>
+        <span class="c1"># assert L.status.updated</span>
+
+        <span class="c1"># compute the residual for each node</span>
+
+        <span class="c1"># build QF(u)</span>
+        <span class="n">res_norm</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">residual</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># add tau if associated</span>
+            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">residual</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="c1"># use abs function from data type here</span>
+            <span class="n">res_norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">residual</span><span class="p">[</span><span class="n">m</span><span class="p">]))</span>
+
+        <span class="c1"># find maximal residual over the nodes</span>
+        <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'full_abs'</span><span class="p">:</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res_norm</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'last_abs'</span><span class="p">:</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="n">res_norm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'full_rel'</span><span class="p">:</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res_norm</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'last_rel'</span><span class="p">:</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="n">res_norm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">'residual_type = </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="si">}</span><span class="s1"> not implemented, choose '</span>
+                <span class="sa">f</span><span class="s1">'full_abs, last_abs, full_rel or last_rel instead'</span>
+            <span class="p">)</span>
+
+        <span class="c1"># indicate that the residual has seen the new values</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Sweeper.compute_end_point">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.compute_end_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_end_point</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Abstract interface to end-node computation</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ERROR: sweeper has to implement compute_end_point(self)'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sweeper.integrate">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.integrate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Abstract interface to right-hand side integration</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ERROR: sweeper has to implement integrate(self)'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sweeper.update_nodes">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.update_nodes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Abstract interface to node update</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'ERROR: sweeper has to implement update_nodes(self)'</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Level'</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Returns the current level</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pySDC.Level.level: the current level</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__level</span>
+
+<div class="viewcode-block" id="Sweeper.level">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.level">[docs]</a>
+    <span class="nd">@level</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="s1">'Level'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Sets a reference to the current level (done in the initialization of the level)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            L (pySDC.Level.level): current level</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">Level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__level</span> <span class="o">=</span> <span class="n">L</span></div>
+
+
+<div class="viewcode-block" id="Sweeper.rank">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.rank">[docs]</a>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Rank of this sweeper in the communicator across nodes: always 0 here, overridden by the MPI sweepers."""</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="Sweeper.updateVariableCoeffs">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.sweeper.html#pySDC.core.sweeper.Sweeper.updateVariableCoeffs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateVariableCoeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Potentially update QDelta implicit coefficients if variable ...</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        k : int</span>
+<span class="sd">            Index of the sweep (0 for initial sweep, 1 for the first one, ...).</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"genQI"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="o">.</span><span class="n">isKDependent</span><span class="p">():</span>
+            <span class="n">qdType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQI</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="n">qdType</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"genQE"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="o">.</span><span class="n">isKDependent</span><span class="p">():</span>
+            <span class="n">qdType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genQE</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_explicit</span><span class="p">(</span><span class="n">qdType</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

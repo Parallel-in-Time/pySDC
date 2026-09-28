@@ -1,0 +1,7 @@
+estimate\_embedded\_error
+=========================
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.estimate_embedded_error
+   :members:
+   :show-inheritance:
+   :undoc-members:

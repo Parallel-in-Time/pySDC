@@ -1,0 +1,7 @@
+particles
+=========
+
+.. automodule:: pySDC.implementations.datatype_classes.particles
+   :members:
+   :show-inheritance:
+   :undoc-members:

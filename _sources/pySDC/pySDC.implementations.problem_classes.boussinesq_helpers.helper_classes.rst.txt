@@ -1,0 +1,7 @@
+helper\_classes
+===============
+
+.. automodule:: pySDC.implementations.problem_classes.boussinesq_helpers.helper_classes
+   :members:
+   :show-inheritance:
+   :undoc-members:

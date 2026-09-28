@@ -1,7 +1,0 @@
-implementations.problem\_classes.OuterSolarSystem module
-========================================================
-
-.. automodule:: implementations.problem_classes.OuterSolarSystem
-   :members:
-   :show-inheritance:
-   :undoc-members:

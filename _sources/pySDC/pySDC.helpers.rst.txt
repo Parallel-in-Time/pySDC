@@ -1,0 +1,34 @@
+pySDC.helpers
+=============
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.helpers.NCCL_communicator
+   pySDC.helpers.ParaDiagHelper
+   pySDC.helpers.blocks
+   pySDC.helpers.fft_helper
+   pySDC.helpers.fieldsIO
+   pySDC.helpers.firedrake_ensemble_communicator
+   pySDC.helpers.plot_helper
+   pySDC.helpers.problem_helper
+   pySDC.helpers.pySDC_as_gusto_time_discretization
+   pySDC.helpers.pysdc_helper
+   pySDC.helpers.setup_helper
+   pySDC.helpers.spectral_helper
+   pySDC.helpers.stats_helper
+   pySDC.helpers.testing
+   pySDC.helpers.transfer_helper
+   pySDC.helpers.visualization_tools
+   pySDC.helpers.vtkIO
+
+Module contents
+---------------
+
+.. automodule:: pySDC.helpers
+   :members:
+   :show-inheritance:
+   :undoc-members:

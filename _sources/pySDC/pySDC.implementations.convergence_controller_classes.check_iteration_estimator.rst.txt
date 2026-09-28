@@ -1,0 +1,7 @@
+check\_iteration\_estimator
+===========================
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.check_iteration_estimator
+   :members:
+   :show-inheritance:
+   :undoc-members:

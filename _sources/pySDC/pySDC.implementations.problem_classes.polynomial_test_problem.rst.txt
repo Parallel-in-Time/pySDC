@@ -1,0 +1,7 @@
+polynomial\_test\_problem
+=========================
+
+.. automodule:: pySDC.implementations.problem_classes.polynomial_test_problem
+   :members:
+   :show-inheritance:
+   :undoc-members:

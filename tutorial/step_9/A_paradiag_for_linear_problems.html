@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Part A: ParaDiag for linear problems &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/step_9/A_paradiag_for_linear_problems';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Part B: ParaDiag for nonlinear problems" href="B_paradiag_for_nonlinear_problems.html" />
+    <link rel="prev" title="Step-9: ParaDiag" href="../step_9.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  <link rel="icon" href="../../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1"><a href="../index.html">Tutorials</a></p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_1.html">Step-1: A first spatial problem</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/A_spatial_problem_setup.html">Part A: Spatial problem setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/B_spatial_accuracy_check.html">Part B: Spatial accuracy check</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/C_collocation_problem_setup.html">Part C: Collocation problem setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/D_collocation_accuracy_check.html">Part D: Collocation accuracy check</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_2.html">Step-2: Data structures and my first sweeper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/A_step_data_structure.html">Part A: Step data structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/B_my_first_sweeper.html">Part B: My first sweeper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/C_using_pySDCs_frontend.html">Part C: Using pySDC’s frontend</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_3.html">Step-3: Statistics and a new sweeper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_3/A_getting_statistics.html">Part A: Getting statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_3/B_adding_statistics.html">Part B: Adding statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_3/C_study_collocations.html">Part C: Studying collocation node types</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_4.html">Step-4: Multilevel SDC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/A_spatial_transfer_operators.html">Part A: Spatial transfer operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/B_multilevel_hierarchy.html">Part B: Multilevel hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/C_SDC_vs_MLSDC.html">Part C: SDC vs. MLSDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/D_MLSDC_with_particles.html">Part D: MLSDC with particles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_5.html">Step-5: PFASST</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/A_multistep_multilevel_hierarchy.html">Part A: Multistep multilevel hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/B_my_first_PFASST_run.html">Part B: My first PFASST run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/C_advection_and_PFASST.html">Part C: Advection and PFASST</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_6.html">Step-6: Advanced PFASST controllers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/A_run_non_MPI_controller.html">Part A: The non-MPI controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/B_odd_temporal_distribution.html">Part B: Odd temporal distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/C_MPI_parallelization.html">Part C: MPI parallelization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_7.html">Step-7: pySDC with external libraries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_FEniCS.html">Part A: pySDC and FEniCS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_mpi4pyfft.html">Part B: mpi4py-fft for parallel Fourier transforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PETSc.html">Part C: Time-parallel pySDC with space-parallel PETSc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_PyTorch.html">Part D: pySDC and PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Firedrake.html">Part E: pySDC and Firedrake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_with_Gusto.html">Part F: pySDC and Gusto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_on_GPU.html">Part G: pySDC on GPUs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_8.html">Step-8: Advanced topics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_8/A_adaptive_time_stepping.html">Part A: Adaptive time-stepping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_8/B_multistep_SDC.html">Part B: Multi-step SDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_8/C_iteration_estimator.html">Part C: Iteration estimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../step_9.html">Step-9: ParaDiag</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">Part A: ParaDiag for linear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="B_paradiag_for_nonlinear_problems.html">Part B: ParaDiag for nonlinear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="C_paradiag_in_pySDC.html">Part C: ParaDiag in pySDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="D_adaptive_alpha.html">Part D: Adaptive alpha</a></li>
+<li class="toctree-l2"><a class="reference internal" href="E_paradiag_MPI.html">Part E: MPI-parallel ParaDiag</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../step_9.html" class="nav-link">Step-9: ParaDiag</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Part A: ParaDiag for linear problems</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="notebook-links">
+  <button class="btn btn-sm run-in-browser" data-wheels="dill-0.4.1-py3-none-any.whl pysdc-5.8-py2.py3-none-any.whl qmat-0.1.21-py3-none-any.whl" data-wheels-url="../../_static/wheels/"><i class="fa-solid fa-play"></i> Run in browser</button>
+  <a class="btn btn-sm" href="A_paradiag_for_linear_problems.ipynb" download><i class="fa-solid fa-download"></i> Notebook</a>
+  <a class="btn btn-sm" href="https://colab.research.google.com/github/Parallel-in-Time/pySDC/blob/gh-pages/tutorial/step_9/A_paradiag_for_linear_problems.ipynb" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Open in Colab</a><p class="rib-status" aria-live="polite"></p>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="part-a-paradiag-for-linear-problems">
+<h1>Part A: ParaDiag for linear problems<a class="headerlink" href="#part-a-paradiag-for-linear-problems" title="Link to this heading">#</a></h1>
+<p>We start with the linear case, where the composite collocation problem really can be written as a matrix and the
+whole method is a few lines of linear algebra. It is recommended to view this code side by side with
+<a class="reference external" href="https://arxiv.org/abs/2103.12571">Gaya’s paper on ParaDiag with collocation methods</a>, as the code follows the
+equations there closely without repeating their explanation.</p>
+<p>The test problem is the Dahlquist equation, on <span class="math notranslate nohighlight">\(N = 2\)</span> unknowns, over <span class="math notranslate nohighlight">\(L = 4\)</span> time steps with <span class="math notranslate nohighlight">\(M = 3\)</span> collocation
+nodes each.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.TestEquation_0D</span><span class="w"> </span><span class="kn">import</span> <span class="n">testequation0d</span> <span class="k">as</span> <span class="n">problem_class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.ParaDiagSweepers</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDiagonalization</span>
+
+<span class="c1"># setup parameters</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># Number of parallel time steps</span>
+<span class="n">M</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Number of collocation nodes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Number of spatial degrees of freedom</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1e-4</span>  <span class="c1"># Circular perturbation parameter</span>
+<span class="n">restol</span> <span class="o">=</span> <span class="mf">1e-10</span>  <span class="c1"># Residual tolerance for the composite collocation problem</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># step size</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Running ParaDiag test script with </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1"> time steps, </span><span class="si">{</span><span class="n">M</span><span class="si">}</span><span class="s1"> collocation nodes and </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s1"> spatial degrees of freedom'</span><span class="p">)</span>
+
+<span class="c1"># setup pySDC infrastructure for Dahlquist problem and quadrature</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">problem_class</span><span class="p">(</span><span class="n">lambdas</span><span class="o">=-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span> <span class="n">u0</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">sweeper_params</span> <span class="o">=</span> <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'num_nodes'</span><span class="p">:</span> <span class="n">M</span><span class="p">,</span> <span class="s1">'quad_type'</span><span class="p">:</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">}</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">generic_implicit</span><span class="p">(</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Setup a global NumPy array and insert initial conditions in the first step</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running ParaDiag test script with 4 time steps, 3 collocation nodes and 2 spatial degrees of freedom
+</pre></div>
+</div>
+</div>
+</div>
+<section id="the-composite-collocation-problem">
+<h2>The composite collocation problem<a class="headerlink" href="#the-composite-collocation-problem" title="Link to this heading">#</a></h2>
+<p>We set up the matrices of the composite collocation problem, and note their sizes in the comments. The matrix <span class="math notranslate nohighlight">\(E\)</span>
+propagates the solution of each step to be the initial condition of the next.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start with identity matrices (I) of various sizes</span>
+<span class="n">I_L</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>  <span class="c1"># LxL</span>
+<span class="n">I_MN</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">((</span><span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+<span class="n">I_N</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>  <span class="c1"># NxN</span>
+<span class="n">I_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>  <span class="c1"># MxM</span>
+
+<span class="c1"># E matrix propagates the solution of the steps to be the initial condition for the next step</span>
+<span class="n">E</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>  <span class="c1"># LxL</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(H\)</span> matrix computes the solution at the end of an individual step from the solutions at the collocation nodes.
+For the RADAU-RIGHT rule we use here, the right node coincides with the end of the interval, so this is simple. We
+start with the <span class="math notranslate nohighlight">\(M \times M\)</span> matrix <span class="math notranslate nohighlight">\(H_M\)</span> on the node level, and extend it to the spatial dimension with a Kronecker
+product.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">H_M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span> <span class="o">*</span> <span class="mi">0</span>  <span class="c1"># MxM</span>
+<span class="n">H_M</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">H_M</span><span class="p">,</span> <span class="n">I_N</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now the collocation problem. Note that the Kronecker product of <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(A\)</span> is only possible when there is an <span class="math notranslate nohighlight">\(A\)</span>,
+i.e. when the problem is linear; nonlinear problems follow in <a class="reference internal" href="B_paradiag_for_nonlinear_problems.html"><span class="doc std std-doc">Part B</span></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Q</span> <span class="o">=</span> <span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># MxM</span>
+<span class="n">C_coll</span> <span class="o">=</span> <span class="n">I_MN</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># MNxMN</span>
+
+<span class="c1"># Set up the composite collocation / all-at-once problem</span>
+<span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">I_L</span><span class="p">,</span> <span class="n">C_coll</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">H</span><span class="p">))</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>  <span class="c1"># LMNxLMN</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>With the full composite collocation problem as one large matrix, we can solve it directly for a reference solution.
+Of course, this is prohibitively expensive for any actual application, and we would never do this in practice.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sol_direct</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The normal time-stepping approach solves the composite collocation problem by forward substitution, one step after
+the other. This only solves <span class="math notranslate nohighlight">\(MN \times MN\)</span> systems rather than <span class="math notranslate nohighlight">\(LMN \times LMN\)</span> ones, but that is still really
+expensive in practice, which is why there is SDC, for example.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sol_stepping</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+    <span class="c1"># solve the current step (sol_stepping[l] currently contains the initial conditions at step l)</span>
+    <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">C_coll</span><span class="p">,</span> <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># place the solution to the current step as the initial conditions to the next step</span>
+    <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sol_stepping</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_stepping</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="paradiag">
+<h2>ParaDiag<a class="headerlink" href="#paradiag" title="Link to this heading">#</a></h2>
+<p>So far, so serial and boring. We now parallelize this with ParaDiag. We solve the composite collocation problem
+with preconditioned Picard iterations,</p>
+<div class="math notranslate nohighlight">
+\[
+C_\alpha \delta = u_0 - C u^k, \qquad u^{k+1} = u^k + \delta ,
+\]</div>
+<p>where the right-hand side is the residual of the composite collocation problem. The trick behind ParaDiag is to
+choose the preconditioner <span class="math notranslate nohighlight">\(C_\alpha\)</span> as a time-periodic approximation to <span class="math notranslate nohighlight">\(C\)</span> that can be diagonalized, and
+therefore inverted in parallel. What changes in <span class="math notranslate nohighlight">\(C_\alpha\)</span> compared to <span class="math notranslate nohighlight">\(C\)</span> is the matrix <span class="math notranslate nohighlight">\(E\)</span>, which now also feeds
+the solution of the last step back into the first one, scaled by <span class="math notranslate nohighlight">\(\alpha\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">E_alpha</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">tolil</span><span class="p">()</span>  <span class="c1"># LxL</span>
+<span class="n">E_alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha</span>  <span class="c1"># make the problem time-periodic</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To diagonalize <span class="math notranslate nohighlight">\(C_\alpha\)</span> on the step level, we need to diagonalize <span class="math notranslate nohighlight">\(I_L\)</span> and <span class="math notranslate nohighlight">\(E_\alpha\)</span> simultaneously. Both are
+<span class="math notranslate nohighlight">\(\alpha\)</span>-circulant matrices, which can be diagonalized simultaneously by a weighted Fourier transform. We set up
+the weighting matrices of the Fourier transforms, and compute the diagonal entries of the diagonal version
+<span class="math notranslate nohighlight">\(D_\alpha\)</span> of <span class="math notranslate nohighlight">\(E_\alpha\)</span>. We do not set up the preconditioner itself, because we will not use the expanded version.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gamma</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>  <span class="c1"># LxL</span>
+<span class="n">J_inv</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">)</span>  <span class="c1"># LxL</span>
+
+<span class="c1"># compute diagonal entries via Fourier transform</span>
+<span class="n">D_alpha_diag_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">E_alpha</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'backward'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Two convenience functions, for matrix-vector products on the steps and for the residual of the composite
+collocation problem:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">mat_vec</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Matrix vector product</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mat (np.ndarray or scipy.sparse) : Matrix</span>
+<span class="sd">        vec (np.ndarray) : vector</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: mat @ vec</span>
+<span class="sd">    """</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">+=</span> <span class="n">mat</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">vec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">residual</span><span class="p">(</span><span class="n">_u</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compute the residual of the composite collocation problem</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        _u (np.ndarray): Current iterate</span>
+<span class="sd">        u0 (np.ndarray): Initial conditions</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: LMN size array with the residual</span>
+<span class="sd">    """</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">_u</span> <span class="o">*</span> <span class="mi">0</span><span class="n">j</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="c1"># build step local residual</span>
+
+        <span class="c1"># communicate initial conditions for each step</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">_u</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+
+        <span class="c1"># evaluate and subtract integral over right hand side functions</span>
+        <span class="n">f_evals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">_u</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)])</span>
+        <span class="n">Qf</span> <span class="o">=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">f_evals</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">-=</span> <span class="p">(</span><span class="n">_u</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">Qf</span><span class="p">)[</span><span class="n">m</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="parallel-across-the-steps">
+<h3>Parallel across the steps<a class="headerlink" href="#parallel-across-the-steps" title="Link to this heading">#</a></h3>
+<p>First, we parallelize across the <span class="math notranslate nohighlight">\(L\)</span> steps, but solve the collocation problems directly and in serial: a weighted
+FFT in time, <span class="math notranslate nohighlight">\(L\)</span> independent solves, the inverse transform.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sol_ParaDiag_L</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">u0</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">niter_ParaDiag_L</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">restol</span><span class="p">:</span>
+    <span class="c1"># compute weighted FFT in time to go to diagonal base of C_alpha</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span>
+        <span class="n">mat_vec</span><span class="p">(</span><span class="n">J_inv</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">res</span><span class="p">),</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">norm</span><span class="o">=</span><span class="s1">'ortho'</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># solve the collocation problems in parallel on the steps</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="c1"># construct local matrix of "collocation problem"</span>
+        <span class="n">local_matrix</span> <span class="o">=</span> <span class="p">(</span><span class="n">D_alpha_diag_vals</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span> <span class="o">+</span> <span class="n">C_coll</span><span class="p">)</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+
+        <span class="c1"># solve local "collocation problem" directly</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">local_matrix</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># compute inverse weighted FFT in time to go back from diagonal base of C_alpha</span>
+    <span class="n">sol_ParaDiag_L</span> <span class="o">+=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'ortho'</span><span class="p">))</span>
+
+    <span class="c1"># update residual</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">niter_ParaDiag_L</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'Needed </span><span class="si">{</span><span class="n">niter_ParaDiag_L</span><span class="si">}</span><span class="s1"> iterations in parallel across the steps ParaDiag. Stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_ParaDiag_L</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Needed 3 iterations in parallel across the steps ParaDiag. Stopped at residual 7.38e-13
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="parallel-across-the-steps-and-the-nodes">
+<h3>Parallel across the steps and the nodes<a class="headerlink" href="#parallel-across-the-steps-and-the-nodes" title="Link to this heading">#</a></h3>
+<p>The work is distributed across <span class="math notranslate nohighlight">\(L\)</span> tasks now, but each of them still solves a perturbed collocation problem
+directly, which is very expensive. So we additionally diagonalize the quadrature matrix <span class="math notranslate nohighlight">\(Q\)</span>, to distribute the work
+on <span class="math notranslate nohighlight">\(LM\)</span> tasks that solve <span class="math notranslate nohighlight">\(N \times N\)</span> systems each. We rearrange the contribution of <span class="math notranslate nohighlight">\(E_\alpha\)</span> to arrive at a
+problem <span class="math notranslate nohighlight">\((I - \Delta t\, Q G^{-1} A) u = u_0\)</span>. After diagonalizing <span class="math notranslate nohighlight">\(Q G^{-1}\)</span>, we can simply use the implicit Euler
+solves that pySDC problems implement, keeping in mind that they need complex “step sizes”.</p>
+<p>We set up <span class="math notranslate nohighlight">\(G\)</span> and <span class="math notranslate nohighlight">\(G^{-1}\)</span>, and pySDC sweepers that diagonalize <span class="math notranslate nohighlight">\(Q G^{-1}\)</span>. We do not use the sweepers themselves
+here, only the diagonalization they compute, to make clearer what is going on.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="p">[(</span><span class="n">D_alpha_diag_vals</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*</span> <span class="n">H_M</span> <span class="o">+</span> <span class="n">I_M</span><span class="p">)</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">)]</span>  <span class="c1"># MxM</span>
+<span class="n">G_inv</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">_G</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="k">for</span> <span class="n">_G</span> <span class="ow">in</span> <span class="n">G</span><span class="p">]</span>  <span class="c1"># MxM</span>
+<span class="n">sweepers</span> <span class="o">=</span> <span class="p">[</span><span class="n">QDiagonalization</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">sweeper_params</span><span class="p">,</span> <span class="s1">'G_inv'</span><span class="p">:</span> <span class="n">_G_inv</span><span class="p">},</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">_G_inv</span> <span class="ow">in</span> <span class="n">G_inv</span><span class="p">]</span>
+
+
+<span class="n">sol_ParaDiag</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">complex</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">restol</span><span class="p">:</span>
+
+    <span class="c1"># weighted FFT in time</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span>
+        <span class="n">mat_vec</span><span class="p">(</span><span class="n">J_inv</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">res</span><span class="p">),</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">norm</span><span class="o">=</span><span class="s1">'ortho'</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># perform local solves of "collocation problems" on the steps in parallel</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+
+        <span class="c1"># diagonalize QG^-1 matrix</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">S_inv</span> <span class="o">=</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="n">sweepers</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">S_inv</span>
+
+        <span class="c1"># perform local solves on the collocation nodes in parallel</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">S_inv</span> <span class="o">@</span> <span class="n">x</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="n">x2</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="o">=</span><span class="n">x1</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">factor</span><span class="o">=</span><span class="n">w</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">u0</span><span class="o">=</span><span class="n">x1</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">S</span> <span class="o">@</span> <span class="n">x2</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">G_inv</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">@</span> <span class="n">z</span>
+
+    <span class="c1"># inverse weighted FFT in time</span>
+    <span class="n">sol_ParaDiag</span> <span class="o">+=</span> <span class="n">mat_vec</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">tolil</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'ortho'</span><span class="p">))</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">niter</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'Needed </span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s1"> iterations in parallel and local paradiag with increment formulation, stopped at residual </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Needed 3 iterations in parallel and local paradiag with increment formulation, stopped at residual 7.38e-13
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition-important-things-to-note admonition">
+<p class="admonition-title">Important things to note</p>
+<ul class="simple">
+<li><p>The diagonalization happens across the time steps, not across the collocation nodes; the second variant adds a
+diagonalization across the nodes on top.</p></li>
+<li><p>The <span class="math notranslate nohighlight">\(\alpha\)</span>-circulant approximation is what makes the diagonalization possible in the first place.</p></li>
+</ul>
+</div>
+<p>The checks the tests run: both variants arrive at the direct solution, in the same number of iterations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sol_ParaDiag</span><span class="p">,</span> <span class="n">sol_direct</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">niter_ParaDiag_L</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../step_9.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Step-9: ParaDiag</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="B_paradiag_for_nonlinear_problems.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Part B: ParaDiag for nonlinear problems</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-composite-collocation-problem">The composite collocation problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paradiag">ParaDiag</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-across-the-steps">Parallel across the steps</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-across-the-steps-and-the-nodes">Parallel across the steps and the nodes</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Parallel-in-Time/pySDC/edit/master/pySDC/tutorial/step_9/A_paradiag_for_linear_problems.py">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tutorial/step_9/A_paradiag_for_linear_problems.py.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

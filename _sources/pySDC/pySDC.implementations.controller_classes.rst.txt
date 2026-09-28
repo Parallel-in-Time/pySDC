@@ -1,0 +1,22 @@
+controller\_classes
+===================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.controller_classes.ParaDiag
+   pySDC.implementations.controller_classes.controller_MPI
+   pySDC.implementations.controller_classes.controller_ParaDiag_MPI
+   pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI
+   pySDC.implementations.controller_classes.controller_nonMPI
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations.controller_classes
+   :members:
+   :show-inheritance:
+   :undoc-members:

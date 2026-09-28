@@ -1,0 +1,27 @@
+hooks
+=====
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.hooks.AllenCahn_monitor
+   pySDC.implementations.hooks.log_GPU_timings
+   pySDC.implementations.hooks.log_embedded_error_estimate
+   pySDC.implementations.hooks.log_errors
+   pySDC.implementations.hooks.log_extrapolated_error_estimate
+   pySDC.implementations.hooks.log_restarts
+   pySDC.implementations.hooks.log_solution
+   pySDC.implementations.hooks.log_step_size
+   pySDC.implementations.hooks.log_work
+   pySDC.implementations.hooks.plotting
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations.hooks
+   :members:
+   :show-inheritance:
+   :undoc-members:

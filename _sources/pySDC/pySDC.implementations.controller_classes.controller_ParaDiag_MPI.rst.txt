@@ -1,0 +1,7 @@
+controller\_ParaDiag\_MPI
+=========================
+
+.. automodule:: pySDC.implementations.controller_classes.controller_ParaDiag_MPI
+   :members:
+   :show-inheritance:
+   :undoc-members:

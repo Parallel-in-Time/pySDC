@@ -1,0 +1,7 @@
+cupy\_mesh
+==========
+
+.. automodule:: pySDC.implementations.datatype_classes.cupy_mesh
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+plotting
+========
+
+.. automodule:: pySDC.implementations.hooks.plotting
+   :members:
+   :show-inheritance:
+   :undoc-members:

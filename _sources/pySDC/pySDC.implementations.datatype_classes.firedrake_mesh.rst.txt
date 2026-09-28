@@ -1,0 +1,7 @@
+firedrake\_mesh
+===============
+
+.. automodule:: pySDC.implementations.datatype_classes.firedrake_mesh
+   :members:
+   :show-inheritance:
+   :undoc-members:

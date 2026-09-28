@@ -1,0 +1,7 @@
+ParaDiagHelper
+==============
+
+.. automodule:: pySDC.helpers.ParaDiagHelper
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+imex\_1st\_order\_mass
+======================
+
+.. automodule:: pySDC.implementations.sweeper_classes.imex_1st_order_mass
+   :members:
+   :show-inheritance:
+   :undoc-members:

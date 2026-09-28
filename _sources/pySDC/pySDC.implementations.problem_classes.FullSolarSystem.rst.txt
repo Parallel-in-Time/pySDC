@@ -1,0 +1,7 @@
+FullSolarSystem
+===============
+
+.. automodule:: pySDC.implementations.problem_classes.FullSolarSystem
+   :members:
+   :show-inheritance:
+   :undoc-members:

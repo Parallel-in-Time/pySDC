@@ -1,0 +1,7 @@
+RayleighBenard3D
+================
+
+.. automodule:: pySDC.implementations.problem_classes.RayleighBenard3D
+   :members:
+   :show-inheritance:
+   :undoc-members:

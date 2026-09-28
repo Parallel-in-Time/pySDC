@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>BaseTransferMPI &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'pySDC/pySDC.implementations.transfer_classes.BaseTransferMPI';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="BaseTransfer_mass" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html" />
+    <link rel="prev" title="BaseTransferDeltaMPI" href="pySDC.implementations.transfer_classes.BaseTransferDeltaMPI.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  <link rel="icon" href="../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1"><a href="../api.html">API reference</a></p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="pySDC.core.html">pySDC.core</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.base_transfer.html">base_transfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.check_convergence.html">check_convergence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.collocation.html">collocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.common.html">common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.controller.html">controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.convergence_controller.html">convergence_controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.default_hook.html">default_hook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.errors.html">errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.hooks.html">hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.level.html">level</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.problem.html">problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.space_transfer.html">space_transfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.step.html">step</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.sweeper.html">sweeper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.core.timings.html">timings</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="pySDC.implementations.html">pySDC.implementations</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.controller_classes.html">controller_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.ParaDiag.html">ParaDiag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.controller_MPI.html">controller_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.controller_ParaDiag_MPI.html">controller_ParaDiag_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI.html">controller_ParaDiag_nonMPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.controller_classes.controller_nonMPI.html">controller_nonMPI</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.html">convergence_controller_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.adaptive_alpha.html">adaptive_alpha</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.adaptive_collocation.html">adaptive_collocation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.adaptivity.html">adaptivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.basic_restarting.html">basic_restarting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.check_iteration_estimator.html">check_iteration_estimator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.crash.html">crash</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.estimate_contraction_factor.html">estimate_contraction_factor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.estimate_embedded_error.html">estimate_embedded_error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html">estimate_extrapolation_error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.estimate_polynomial_error.html">estimate_polynomial_error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.hotrod.html">hotrod</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.inexactness.html">inexactness</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.interpolate_between_restarts.html">interpolate_between_restarts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spread_step_sizes.html">spread_step_sizes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.step_size_limiter.html">step_size_limiter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.store_uold.html">store_uold</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.datatype_classes.html">datatype_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.container.html">container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.cupy_mesh.html">cupy_mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.fenics_mesh.html">fenics_mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.firedrake_mesh.html">firedrake_mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.mesh.html">mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.particles.html">particles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.petsc_vec.html">petsc_vec</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.hooks.html">hooks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.AllenCahn_monitor.html">AllenCahn_monitor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_GPU_timings.html">log_GPU_timings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_embedded_error_estimate.html">log_embedded_error_estimate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_errors.html">log_errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_extrapolated_error_estimate.html">log_extrapolated_error_estimate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_restarts.html">log_restarts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_solution.html">log_solution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_step_size.html">log_step_size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_work.html">log_work</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.plotting.html">plotting</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.problem_classes.html">problem_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.acoustic_helpers.html">acoustic_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.boussinesq_helpers.html">boussinesq_helpers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex.html">AcousticAdvection_1D_FD_imex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.html">AdvectionDiffusionEquation_1D_FFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AdvectionEquation_ND_FD.html">AdvectionEquation_ND_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_1D_FD.html">AllenCahn_1D_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_2D_FD.html">AllenCahn_2D_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_2D_FFT.html">AllenCahn_2D_FFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_MPIFFT.html">AllenCahn_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.AllenCahn_Temp_MPIFFT.html">AllenCahn_Temp_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Auzinger_implicit.html">Auzinger_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Battery.html">Battery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex.html">Boussinesq_2D_FD_imex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Brusselator.html">Brusselator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.BuckConverter.html">BuckConverter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Burgers.html">Burgers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.DiscontinuousTestODE.html">DiscontinuousTestODE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FastWaveSlowWave_0D.html">FastWaveSlowWave_0D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FermiPastaUlamTsingou.html">FermiPastaUlamTsingou</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FullSolarSystem.html">FullSolarSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html">GeneralizedFisher_1D_FD_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc.html">GeneralizedFisher_1D_PETSc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GenericGusto.html">GenericGusto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html">GrayScott_1D_FEniCS_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html">GrayScott_2D_PETSc_periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_MPIFFT.html">GrayScott_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HarmonicOscillator.html">HarmonicOscillator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html">HeatEquation_1D_FEniCS_matrix_forced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced.html">HeatEquation_2D_PETSc_forced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_Chebychev.html">HeatEquation_Chebychev</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_ND_FD.html">HeatEquation_ND_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatFiredrake.html">HeatFiredrake</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HenonHeiles.html">HenonHeiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.LogisticEquation.html">LogisticEquation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Lorenz.html">Lorenz</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT.html">NonlinearSchroedinger_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.OuterSolarSystem.html">OuterSolarSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.PenningTrap_3D.html">PenningTrap_3D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Piline.html">Piline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Quench.html">Quench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.RayleighBenard.html">RayleighBenard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.RayleighBenard3D.html">RayleighBenard3D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.TestEquation_0D.html">TestEquation_0D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Van_der_Pol_implicit.html">Van_der_Pol_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html">VorticityVelocity_2D_FEniCS_periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian.html">generic_MPIFFT_Laplacian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_ND_FD.html">generic_ND_FD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_spectral.html">generic_spectral</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.nonlinear_ODE_1.html">nonlinear_ODE_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.odeScalar.html">odeScalar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.odeSystem.html">odeSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.polynomial_test_problem.html">polynomial_test_problem</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.sweeper_classes.html">sweeper_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.Multistep.html">Multistep</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.ParaDiagSweepers.html">ParaDiagSweepers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.Runge_Kutta.html">Runge_Kutta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.Runge_Kutta_Nystrom.html">Runge_Kutta_Nystrom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.boris_2nd_order.html">boris_2nd_order</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.delta_form.html">delta_form</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.delta_form_MPI.html">delta_form_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.explicit.html">explicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit.html">generic_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit_MPI.html">generic_implicit_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order.html">imex_1st_order</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html">imex_1st_order_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html">imex_1st_order_mass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.multi_implicit.html">multi_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.verlet.html">verlet</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="pySDC.implementations.transfer_classes.html">transfer_classes</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferDelta.html">BaseTransferDelta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferDeltaMPI.html">BaseTransferDeltaMPI</a></li>
+<li class="toctree-l3 current active"><a aria-current="page" class="current reference internal" href="#">BaseTransferMPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html">BaseTransfer_mass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFenicsMesh.html">TransferFenicsMesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html">TransferFiredrakeMesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh.html">TransferMesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_FFT.html">TransferMesh_FFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_FFT2D.html">TransferMesh_FFT2D</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_MPIFFT.html">TransferMesh_MPIFFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_NoCoarse.html">TransferMesh_NoCoarse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferPETScDMDA.html">TransferPETScDMDA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferParticles_NoCoarse.html">TransferParticles_NoCoarse</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pySDC.helpers.html">pySDC.helpers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.NCCL_communicator.html">NCCL_communicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.ParaDiagHelper.html">ParaDiagHelper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.blocks.html">blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.fft_helper.html">fft_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.fieldsIO.html">fieldsIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.firedrake_ensemble_communicator.html">firedrake_ensemble_communicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.plot_helper.html">plot_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.problem_helper.html">problem_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.pySDC_as_gusto_time_discretization.html">pySDC_as_gusto_time_discretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.pysdc_helper.html">pysdc_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.setup_helper.html">setup_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.spectral_helper.html">spectral_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.stats_helper.html">stats_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.testing.html">testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.transfer_helper.html">transfer_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.visualization_tools.html">visualization_tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.vtkIO.html">vtkIO</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="pySDC.implementations.html" class="nav-link">pySDC.implementations</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="pySDC.implementations.transfer_classes.html" class="nav-link">transfer_classes</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">BaseTransferMPI</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pySDC.implementations.transfer_classes.BaseTransferMPI">
+<span id="basetransfermpi"></span><h1>BaseTransferMPI<a class="headerlink" href="#module-pySDC.implementations.transfer_classes.BaseTransferMPI" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">base_transfer_MPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/BaseTransferMPI.html#base_transfer_MPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pySDC.core.base_transfer.html#pySDC.core.base_transfer.BaseTransfer" title="pySDC.core.base_transfer.BaseTransfer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code></a></p>
+<p>Node-parallel space-time transfer for sweepers where each MPI rank holds one collocation node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> – custom logger for sweeper-related logging</p></li>
+<li><p><strong>params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">__Pars</span></code>) – parameter object containing the custom parameters passed by the user</p></li>
+<li><p><strong>fine</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.Level.level</span></code>) – reference to the fine level</p></li>
+<li><p><strong>coarse</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.Level.level</span></code>) – reference to the coarse level</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong">
+<span class="sig-name descname"><span class="pre">prolong</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/BaseTransferMPI.html#base_transfer_MPI.prolong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong" title="Link to this definition">#</a></dt>
+<dd><p>Space-time prolongation routine</p>
+<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong_f">
+<span class="sig-name descname"><span class="pre">prolong_f</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/BaseTransferMPI.html#base_transfer_MPI.prolong_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong_f" title="Link to this definition">#</a></dt>
+<dd><p>Space-time prolongation routine w.r.t. the rhs f</p>
+<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.restrict">
+<span class="sig-name descname"><span class="pre">restrict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/BaseTransferMPI.html#base_transfer_MPI.restrict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.restrict" title="Link to this definition">#</a></dt>
+<dd><p>Space-time restriction routine</p>
+<p>The routine applies the spatial restriction operator to the fine values on the fine nodes, then reevaluates f
+on the coarse level. This is used for the first part of the FAS correction tau via integration. The second part
+is the integral over the fine values, restricted to the coarse level. Finally, possible tau corrections on the
+fine level are restricted as well.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pySDC.implementations.transfer_classes.BaseTransferDeltaMPI.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">BaseTransferDeltaMPI</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">BaseTransfer_mass</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI"><code class="docutils literal notranslate"><span class="pre">base_transfer_MPI</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.prolong_f"><code class="docutils literal notranslate"><span class="pre">prolong_f()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.BaseTransferMPI.base_transfer_MPI.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Parallel-in-Time/pySDC/edit/master/docs/source//pySDC/pySDC.implementations.transfer_classes.BaseTransferMPI.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/pySDC/pySDC.implementations.transfer_classes.BaseTransferMPI.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

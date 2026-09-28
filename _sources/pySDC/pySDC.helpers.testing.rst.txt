@@ -1,0 +1,7 @@
+testing
+=======
+
+.. automodule:: pySDC.helpers.testing
+   :members:
+   :show-inheritance:
+   :undoc-members:

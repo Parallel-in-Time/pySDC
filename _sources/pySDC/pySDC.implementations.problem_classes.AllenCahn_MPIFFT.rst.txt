@@ -1,0 +1,7 @@
+AllenCahn\_MPIFFT
+=================
+
+.. automodule:: pySDC.implementations.problem_classes.AllenCahn_MPIFFT
+   :members:
+   :show-inheritance:
+   :undoc-members:

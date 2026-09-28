@@ -1,0 +1,7 @@
+odeScalar
+=========
+
+.. automodule:: pySDC.implementations.problem_classes.odeScalar
+   :members:
+   :show-inheritance:
+   :undoc-members:

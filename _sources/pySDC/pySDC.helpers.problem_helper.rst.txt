@@ -1,0 +1,7 @@
+problem\_helper
+===============
+
+.. automodule:: pySDC.helpers.problem_helper
+   :members:
+   :show-inheritance:
+   :undoc-members:

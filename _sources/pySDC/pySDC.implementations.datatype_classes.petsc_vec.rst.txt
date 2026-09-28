@@ -1,0 +1,7 @@
+petsc\_vec
+==========
+
+.. automodule:: pySDC.implementations.datatype_classes.petsc_vec
+   :members:
+   :show-inheritance:
+   :undoc-members:

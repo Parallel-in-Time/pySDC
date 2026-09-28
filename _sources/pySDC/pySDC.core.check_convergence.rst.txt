@@ -1,0 +1,7 @@
+check\_convergence
+==================
+
+.. automodule:: pySDC.core.check_convergence
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,6 +1,11 @@
 
 :orphan:
 
+
+.. |m2r-link-c7f553f49ade| replace:: \ ``pySDC/projects/gallery.yml``
+.. _m2r-link-c7f553f49ade: https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/gallery.yml
+
+
 .. _docs/contrib/06_new_project/adding-a-project-to-pysdc-(and-automatic-testing):
 
 Adding a project to pySDC (and automatic testing)
@@ -64,6 +69,27 @@ To run the tests of all projects in parallel, the projects are explicitly mentio
 In order to run the tests of your project, please add the name of your project **as your directory is named**
 in the `CI-File <https://github.com/Parallel-in-Time/pySDC/blob/master/.github/workflows/ci_pipeline.yml>`_
 in the job ``project_cpu_tests_linux`` in the list ``strategy/matrix/env``.
+
+.. _docs/contrib/06_new_project/add-the-project-to-the-website:
+
+Add the project to the website
+------------------------------
+
+The `project gallery <https://parallel-in-time.org/pySDC/projects/index.html>`_ shows one card per project.
+To add yours:
+
+#. Describe the project in a ``README.rst`` in its directory.
+#. Add a page ``docs/source/projects/<your_project>.rst`` that includes it, like the other pages there do:
+   ``.. include:: /../../pySDC/projects/<your_project>/README.rst``.
+#. Add an entry to |m2r-link-c7f553f49ade|_\ , with a title,
+   a one-line summary and the name of that page. For the card's image, name a plot your tests write into ``data/``.
+   The CI builds the website after the tests, so the card always shows what the current code produces,
+   and it fails if the plot is missing. If your tests make no plot, give an ``excerpt`` instead: a text file they write
+   (with ``lines``\ ), or a representative passage of your code, between a ``start-at`` and an ``end-at`` or ``end-before``
+   text; the website build stops if those texts are no longer in the file. See the entries in ``gallery.yml``.
+#. Once your project is published, add the DOIs of the papers to the entry's ``papers``\ , and run
+   ``docs/update_publications.py``\ , which fetches their metadata into ``docs/source/project_papers.json``. The project's
+   page then lists them, each with its BibTeX, the same way for every project.
 
 .. _docs/contrib/06_new_project/getting-a-doi-of-pysdc-for-publication:
 

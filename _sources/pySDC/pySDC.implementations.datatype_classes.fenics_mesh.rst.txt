@@ -1,0 +1,7 @@
+fenics\_mesh
+============
+
+.. automodule:: pySDC.implementations.datatype_classes.fenics_mesh
+   :members:
+   :show-inheritance:
+   :undoc-members:

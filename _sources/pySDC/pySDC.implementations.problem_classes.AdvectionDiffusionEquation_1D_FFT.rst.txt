@@ -1,0 +1,7 @@
+AdvectionDiffusionEquation\_1D\_FFT
+===================================
+
+.. automodule:: pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT
+   :members:
+   :show-inheritance:
+   :undoc-members:

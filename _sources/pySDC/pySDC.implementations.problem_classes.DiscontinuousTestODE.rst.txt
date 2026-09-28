@@ -1,0 +1,7 @@
+DiscontinuousTestODE
+====================
+
+.. automodule:: pySDC.implementations.problem_classes.DiscontinuousTestODE
+   :members:
+   :show-inheritance:
+   :undoc-members:

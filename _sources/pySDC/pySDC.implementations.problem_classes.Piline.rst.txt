@@ -1,0 +1,7 @@
+Piline
+======
+
+.. automodule:: pySDC.implementations.problem_classes.Piline
+   :members:
+   :show-inheritance:
+   :undoc-members:

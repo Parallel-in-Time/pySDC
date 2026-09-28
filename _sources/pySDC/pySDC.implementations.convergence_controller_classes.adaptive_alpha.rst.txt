@@ -1,0 +1,7 @@
+adaptive\_alpha
+===============
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.adaptive_alpha
+   :members:
+   :show-inheritance:
+   :undoc-members:

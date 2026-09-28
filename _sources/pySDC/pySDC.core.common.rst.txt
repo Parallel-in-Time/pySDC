@@ -1,0 +1,7 @@
+common
+======
+
+.. automodule:: pySDC.core.common
+   :members:
+   :show-inheritance:
+   :undoc-members:

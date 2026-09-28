@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Part A: Adaptive time-stepping &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial/step_8/A_adaptive_time_stepping';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Part B: Multi-step SDC" href="B_multistep_SDC.html" />
+    <link rel="prev" title="Step-8: Advanced topics" href="../step_8.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  <link rel="icon" href="../../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1"><a href="../index.html">Tutorials</a></p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_1.html">Step-1: A first spatial problem</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/A_spatial_problem_setup.html">Part A: Spatial problem setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/B_spatial_accuracy_check.html">Part B: Spatial accuracy check</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/C_collocation_problem_setup.html">Part C: Collocation problem setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_1/D_collocation_accuracy_check.html">Part D: Collocation accuracy check</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_2.html">Step-2: Data structures and my first sweeper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/A_step_data_structure.html">Part A: Step data structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/B_my_first_sweeper.html">Part B: My first sweeper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_2/C_using_pySDCs_frontend.html">Part C: Using pySDC’s frontend</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_3.html">Step-3: Statistics and a new sweeper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_3/A_getting_statistics.html">Part A: Getting statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_3/B_adding_statistics.html">Part B: Adding statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_3/C_study_collocations.html">Part C: Studying collocation node types</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_4.html">Step-4: Multilevel SDC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/A_spatial_transfer_operators.html">Part A: Spatial transfer operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/B_multilevel_hierarchy.html">Part B: Multilevel hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/C_SDC_vs_MLSDC.html">Part C: SDC vs. MLSDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_4/D_MLSDC_with_particles.html">Part D: MLSDC with particles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_5.html">Step-5: PFASST</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/A_multistep_multilevel_hierarchy.html">Part A: Multistep multilevel hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/B_my_first_PFASST_run.html">Part B: My first PFASST run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_5/C_advection_and_PFASST.html">Part C: Advection and PFASST</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_6.html">Step-6: Advanced PFASST controllers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/A_run_non_MPI_controller.html">Part A: The non-MPI controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/B_odd_temporal_distribution.html">Part B: Odd temporal distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_6/C_MPI_parallelization.html">Part C: MPI parallelization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_7.html">Step-7: pySDC with external libraries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_FEniCS.html">Part A: pySDC and FEniCS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_mpi4pyfft.html">Part B: mpi4py-fft for parallel Fourier transforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PETSc.html">Part C: Time-parallel pySDC with space-parallel PETSc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_PyTorch.html">Part D: pySDC and PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Firedrake.html">Part E: pySDC and Firedrake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_with_Gusto.html">Part F: pySDC and Gusto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_on_GPU.html">Part G: pySDC on GPUs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../step_8.html">Step-8: Advanced topics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">Part A: Adaptive time-stepping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="B_multistep_SDC.html">Part B: Multi-step SDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="C_iteration_estimator.html">Part C: Iteration estimator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../step_9.html">Step-9: ParaDiag</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/A_paradiag_for_linear_problems.html">Part A: ParaDiag for linear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/B_paradiag_for_nonlinear_problems.html">Part B: ParaDiag for nonlinear problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/C_paradiag_in_pySDC.html">Part C: ParaDiag in pySDC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/D_adaptive_alpha.html">Part D: Adaptive alpha</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_9/E_paradiag_MPI.html">Part E: MPI-parallel ParaDiag</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../step_8.html" class="nav-link">Step-8: Advanced topics</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Part A: Adaptive time-stepping</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="notebook-links">
+  <button class="btn btn-sm run-in-browser" data-wheels="dill-0.4.1-py3-none-any.whl pysdc-5.8-py2.py3-none-any.whl qmat-0.1.21-py3-none-any.whl" data-wheels-url="../../_static/wheels/"><i class="fa-solid fa-play"></i> Run in browser</button>
+  <a class="btn btn-sm" href="A_adaptive_time_stepping.ipynb" download><i class="fa-solid fa-download"></i> Notebook</a>
+  <a class="btn btn-sm" href="https://colab.research.google.com/github/Parallel-in-Time/pySDC/blob/gh-pages/tutorial/step_8/A_adaptive_time_stepping.ipynb" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Open in Colab</a><p class="rib-status" aria-live="polite"></p>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="part-a-adaptive-time-stepping">
+<h1>Part A: Adaptive time-stepping<a class="headerlink" href="#part-a-adaptive-time-stepping" title="Link to this heading">#</a></h1>
+<p>So far, all our steps had the same size. For many problems this is wasteful: the solution changes quickly at some
+times and slowly at others, and a fixed step size has to be small enough for the fastest phase. pySDC can choose
+the step size on the fly with the <code class="docutils literal notranslate"><span class="pre">Adaptivity</span></code> convergence controller. We try it on the van der Pol oscillator</p>
+<div class="math notranslate nohighlight">
+\[
+u'' - \mu (1 - u^2) u' + u = 0
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mu = 5\)</span>, written as a system for <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(u'\)</span> in <code class="docutils literal notranslate"><span class="pre">vanderpol</span></code>. In <span class="math notranslate nohighlight">\([0, 10]\)</span>, its solution creeps along, jumps
+once, and creeps along again. We solve it with implicit SDC and exactly 4 iterations per step. The function below
+does one run, with the fixed step size <code class="docutils literal notranslate"><span class="pre">dt</span></code> or, if a tolerance <code class="docutils literal notranslate"><span class="pre">e_tol</span></code> is given, adaptively, starting with <code class="docutils literal notranslate"><span class="pre">dt</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.stats_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sorted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span><span class="w"> </span><span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.adaptivity</span><span class="w"> </span><span class="kn">import</span> <span class="n">Adaptivity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_solution</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogSolution</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_work</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogWork</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">vanderpol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit</span>
+
+<span class="n">mu</span> <span class="o">=</span> <span class="mf">5.0</span>
+<span class="n">Tend</span> <span class="o">=</span> <span class="mf">10.0</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_vdp</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">e_tol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'problem_class'</span><span class="p">:</span> <span class="n">vanderpol</span><span class="p">,</span>
+        <span class="s1">'problem_params'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'mu'</span><span class="p">:</span> <span class="n">mu</span><span class="p">,</span> <span class="s1">'newton_tol'</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="s1">'relative_tolerance'</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="s1">'sweeper_class'</span><span class="p">:</span> <span class="n">generic_implicit</span><span class="p">,</span>
+        <span class="s1">'sweeper_params'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'quad_type'</span><span class="p">:</span> <span class="s1">'RADAU-RIGHT'</span><span class="p">,</span> <span class="s1">'num_nodes'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">'QI'</span><span class="p">:</span> <span class="s1">'LU'</span><span class="p">},</span>
+        <span class="s1">'level_params'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'dt'</span><span class="p">:</span> <span class="n">dt</span><span class="p">},</span>  <span class="c1"># no restol: every step does maxiter iterations</span>
+        <span class="s1">'step_params'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'maxiter'</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">e_tol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">'convergence_controllers'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">Adaptivity</span><span class="p">:</span> <span class="p">{</span><span class="s1">'e_tol'</span><span class="p">:</span> <span class="n">e_tol</span><span class="p">}}</span>
+
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'logger_level'</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="s1">'mssdc_jac'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># Adaptivity refuses the (default) Jacobi mode of multi-step SDC</span>
+        <span class="s1">'hook_class'</span><span class="p">:</span> <span class="p">[</span><span class="n">LogSolution</span><span class="p">,</span> <span class="n">LogWork</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="k">return</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+
+<span class="c1"># reference solution at Tend, computed once with scipy's solve_ivp at a tight tolerance</span>
+<span class="n">u_ref</span> <span class="o">=</span> <span class="n">vanderpol</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">)</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="n">uend</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Accepted steps, restarts, the work of all steps, restarted ones included, and the error at the end."""</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">'t_end'</span><span class="p">:</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'u'</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+        <span class="s1">'steps'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
+        <span class="s1">'restarts'</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'restart'</span><span class="p">)),</span>
+        <span class="s1">'iterations'</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'niter'</span><span class="p">)),</span>
+        <span class="s1">'rhs'</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'work_rhs'</span><span class="p">)),</span>
+        <span class="s1">'newton'</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'work_newton'</span><span class="p">)),</span>
+        <span class="s1">'error'</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend</span> <span class="o">-</span> <span class="n">u_ref</span><span class="p">),</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">me</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">me</span><span class="p">[</span><span class="s1">'steps'</span><span class="p">]</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> steps, </span><span class="si">{</span><span class="n">me</span><span class="p">[</span><span class="s1">'restarts'</span><span class="p">]</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="s2"> restarts, </span><span class="si">{</span><span class="n">me</span><span class="p">[</span><span class="s1">'iterations'</span><span class="p">]</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> iterations, "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">me</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]</span><span class="si">:</span><span class="s2">6d</span><span class="si">}</span><span class="s2"> right-hand sides, </span><span class="si">{</span><span class="n">me</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> Newton iterations, error </span><span class="si">{</span><span class="n">me</span><span class="p">[</span><span class="s1">'error'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">LogSolution</span></code> records the solution after each step and <code class="docutils literal notranslate"><span class="pre">LogWork</span></code> the increments of the problem’s work counters,
+here of right-hand side evaluations and Newton iterations. The error is measured against a reference solution
+from scipy.</p>
+<section id="an-adaptive-run">
+<h2>An adaptive run<a class="headerlink" href="#an-adaptive-run" title="Link to this heading">#</a></h2>
+<p>All it takes is the <code class="docutils literal notranslate"><span class="pre">Adaptivity</span></code> convergence controller with a tolerance <code class="docutils literal notranslate"><span class="pre">e_tol</span></code> for the local error. We start with
+a small step and let it grow:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e_tol</span> <span class="o">=</span> <span class="mf">2e-5</span>
+<span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">run_vdp</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">e_tol</span><span class="o">=</span><span class="n">e_tol</span><span class="p">)</span>
+<span class="n">adaptive</span> <span class="o">=</span> <span class="n">summary</span><span class="p">(</span><span class="n">uend</span><span class="p">,</span> <span class="n">stats</span><span class="p">)</span>
+<span class="n">show</span><span class="p">(</span><span class="s1">'adaptive'</span><span class="p">,</span> <span class="n">adaptive</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    adaptive:   77 steps,  27 restarts,   416 iterations,   1664 right-hand sides,  2072 Newton iterations, error 7.23e-06
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Adaptivity</span></code> adds the hooks it needs itself: <code class="docutils literal notranslate"><span class="pre">LogStepSize</span></code> records the step size as <code class="docutils literal notranslate"><span class="pre">dt</span></code>, and the error estimate
+it relies on comes with <code class="docutils literal notranslate"><span class="pre">LogEmbeddedErrorEstimate</span></code>. The restarts are recorded by <code class="docutils literal notranslate"><span class="pre">LogRestarts</span></code>, which comes with
+the restarting that <code class="docutils literal notranslate"><span class="pre">controller_nonMPI</span></code> always has. When a step is restarted, its values stay in the statistics;
+<code class="docutils literal notranslate"><span class="pre">recomputed=False</span></code> in <code class="docutils literal notranslate"><span class="pre">get_sorted</span></code> leaves them out and keeps only the accepted steps.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'u'</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'dt'</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">e_em</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'error_embedded_estimate'</span><span class="p">,</span> <span class="n">recomputed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">restart_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">restarted</span> <span class="ow">in</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'restart'</span><span class="p">)</span> <span class="k">if</span> <span class="n">restarted</span><span class="p">]</span>
+
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">e</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">e_em</span><span class="p">])</span> <span class="o">/</span> <span class="n">e_tol</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'estimate / e_tol of the accepted steps: median </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">ratio</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, max </span><span class="si">{</span><span class="n">ratio</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate / e_tol of the accepted steps: median 0.48, max 0.96
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">u</span><span class="p">],</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"$u$"</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">u</span><span class="p">],</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"$u'$"</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'solution'</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">semilogy</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dt</span><span class="p">],</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dt</span><span class="p">],</span> <span class="s1">'.-'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">restart_times</span><span class="p">:</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'grey'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">':'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\Delta t$ (dotted: restarts)'</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">semilogy</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">e_em</span><span class="p">],</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">e_em</span><span class="p">],</span> <span class="s1">'.'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'magenta'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'embedded estimate'</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">e_tol</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'e_tol'</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'local error'</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'time'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axs</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../../_images/ace8ef4ae1c1da540b4d4c7000d95f2e546e5c55e032ecfd89515c164d63dd47.png" src="../../_images/ace8ef4ae1c1da540b4d4c7000d95f2e546e5c55e032ecfd89515c164d63dd47.png" />
+</div>
+</div>
+<p>The step size follows the solution: it grows from the initial <span class="math notranslate nohighlight">\(0.01\)</span> to about <span class="math notranslate nohighlight">\(1\)</span> within the first time unit,
+shrinks as the jump approaches, is smallest (<span class="math notranslate nohighlight">\(0.015\)</span>) at <span class="math notranslate nohighlight">\(t \approx 5.3\)</span>, where <span class="math notranslate nohighlight">\(u\)</span> changes fastest (<span class="math notranslate nohighlight">\(u'\)</span> reaches
+<span class="math notranslate nohighlight">\(-7.6\)</span>), and grows again to its largest value (<span class="math notranslate nohighlight">\(1.28\)</span>) after the jump. The estimates of the accepted steps stay below
+<code class="docutils literal notranslate"><span class="pre">e_tol</span></code>, and all but 5 of the 77 above a tenth of it: their median is <span class="math notranslate nohighlight">\(0.48\)</span> <code class="docutils literal notranslate"><span class="pre">e_tol</span></code>.</p>
+</section>
+<section id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Error estimate.</strong> Each iteration raises the order of SDC by one, so the solution of the next-to-last iteration
+is a lower order approximation than that of the last one. <code class="docutils literal notranslate"><span class="pre">EstimateEmbeddedError</span></code> takes the difference of the two
+at the end of the step as an estimate of the local error of the lower order one: the embedded error estimate.</p></li>
+<li><p><strong>New step size.</strong> After the last iteration, the next step size is
+<span class="math notranslate nohighlight">\(\Delta t_\mathrm{new} = \beta \, \Delta t \, (\epsilon_\mathrm{tol} / \epsilon)^{1/k}\)</span>, with the estimate
+<span class="math notranslate nohighlight">\(\epsilon\)</span>, the tolerance <span class="math notranslate nohighlight">\(\epsilon_\mathrm{tol}\)</span> (<code class="docutils literal notranslate"><span class="pre">e_tol</span></code>), the safety factor <span class="math notranslate nohighlight">\(\beta\)</span> (<code class="docutils literal notranslate"><span class="pre">beta</span></code>, 0.9 by default),
+and <span class="math notranslate nohighlight">\(k\)</span> the number of iterations, which the code uses as the order of the estimate. Hence, all steps must do the
+same number of iterations: <code class="docutils literal notranslate"><span class="pre">Adaptivity</span></code> refuses a residual tolerance <code class="docutils literal notranslate"><span class="pre">restol</span></code> of zero or more.</p></li>
+<li><p><strong>Restarts.</strong> If <span class="math notranslate nohighlight">\(\epsilon\)</span> is not below <span class="math notranslate nohighlight">\(\epsilon_\mathrm{tol}\)</span>, the step is not accepted but restarted with
+<span class="math notranslate nohighlight">\(\Delta t_\mathrm{new}\)</span>, which is then smaller than <span class="math notranslate nohighlight">\(\Delta t\)</span>. A step that still fails after 10 restarts in a
+row stops the run with a <code class="docutils literal notranslate"><span class="pre">ConvergenceError</span></code> (parameters <code class="docutils literal notranslate"><span class="pre">max_restarts</span></code> and <code class="docutils literal notranslate"><span class="pre">crash_after_max_restarts</span></code> of
+<code class="docutils literal notranslate"><span class="pre">BasicRestarting</span></code>).</p></li>
+</ul>
+<p>The rule proposes the next step as if the error behaves there as in the current one. Where the error grows from step
+to step, as on the way to the jump, the proposal is too large and the step is restarted. That is where most of the
+restarts are: each of them redid one step, and none had to redo a step twice.</p>
+</section>
+<section id="a-comparison-with-fixed-steps">
+<h2>A comparison with fixed steps<a class="headerlink" href="#a-comparison-with-fixed-steps" title="Link to this heading">#</a></h2>
+<p>The same SDC with fixed step sizes, halving them until the error matches that of the adaptive run:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dts_fixed</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">32</span><span class="p">]</span>
+<span class="n">fixed</span> <span class="o">=</span> <span class="p">[</span><span class="n">summary</span><span class="p">(</span><span class="o">*</span><span class="n">run_vdp</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">me</span><span class="p">))</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">dts_fixed</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">dt_fixed</span><span class="p">,</span> <span class="n">me</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dts_fixed</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">show</span><span class="p">(</span><span class="sa">f</span><span class="s1">'dt = 1/</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">dt_fixed</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span>
+<span class="n">show</span><span class="p">(</span><span class="s1">'adaptive'</span><span class="p">,</span> <span class="n">adaptive</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    dt = 1/8:   80 steps,   0 restarts,   320 iterations,   1280 right-hand sides,  1438 Newton iterations, error 6.84e-04
+   dt = 1/16:  160 steps,   0 restarts,   640 iterations,   2560 right-hand sides,  2617 Newton iterations, error 9.33e-05
+   dt = 1/32:  320 steps,   0 restarts,  1280 iterations,   5120 right-hand sides,  4768 Newton iterations, error 7.31e-06
+    adaptive:   77 steps,  27 restarts,   416 iterations,   1664 right-hand sides,  2072 Newton iterations, error 7.23e-06
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="admonition hide above-input">
+<summary aria-label="Toggle hidden content">
+<p class="collapsed admonition-title">Show code cell source</p>
+<p class="expanded admonition-title">Hide code cell source</p>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">([</span><span class="n">me</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">fixed</span><span class="p">],</span> <span class="p">[</span><span class="n">me</span><span class="p">[</span><span class="s1">'error'</span><span class="p">]</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">fixed</span><span class="p">],</span> <span class="s1">'o-'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'fixed step size'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">dt_fixed</span><span class="p">,</span> <span class="n">me</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dts_fixed</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">f</span><span class="s1">' 1/</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">dt_fixed</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">],</span> <span class="n">me</span><span class="p">[</span><span class="s1">'error'</span><span class="p">]))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">adaptive</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">],</span> <span class="n">adaptive</span><span class="p">[</span><span class="s1">'error'</span><span class="p">],</span> <span class="s1">'*'</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'adaptive'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Newton iterations'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'error at the end'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../../_images/2a239e35ca70bd0840d8dfbbe113d788657c8b75e24a033efd8613a457087572.png" src="../../_images/2a239e35ca70bd0840d8dfbbe113d788657c8b75e24a033efd8613a457087572.png" />
+</div>
+</div>
+<p>With <span class="math notranslate nohighlight">\(\Delta t = 1/32\)</span>, the error is the same as with adaptivity, <span class="math notranslate nohighlight">\(7.3 \cdot 10^{-6}\)</span> against
+<span class="math notranslate nohighlight">\(7.2 \cdot 10^{-6}\)</span>. For that, the fixed steps need 320 steps, 1280 iterations, 5120 right-hand side evaluations
+and 4768 Newton iterations. The adaptive run gets there with 77 steps plus 27 restarts, 416 iterations, 1664
+right-hand side evaluations and 2072 Newton iterations: about a third of the iterations, although a quarter of them
+went into restarted steps, and less than half the Newton iterations.</p>
+<div class="admonition-important-things-to-note admonition">
+<p class="admonition-title">Important things to note</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">e_tol</span></code> bounds the estimated local error of each step, not the error at the end. Here, a local tolerance of
+<span class="math notranslate nohighlight">\(2 \cdot 10^{-5}\)</span> gave an error of <span class="math notranslate nohighlight">\(7.2 \cdot 10^{-6}\)</span> at the end, but the relation depends on the problem.</p></li>
+<li><p>The step size can be limited with the parameters <code class="docutils literal notranslate"><span class="pre">dt_min</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_max</span></code> of <code class="docutils literal notranslate"><span class="pre">Adaptivity</span></code>, which pass them on to
+the <code class="docutils literal notranslate"><span class="pre">StepSizeLimiter</span></code> convergence controller.</p></li>
+<li><p>With <code class="docutils literal notranslate"><span class="pre">avoid_restarts</span></code>, <code class="docutils literal notranslate"><span class="pre">Adaptivity</span></code> estimates from the contraction of the iteration how many more iterations
+would reach the tolerance, and continues iterating instead of restarting if they are few enough.</p></li>
+</ul>
+</div>
+<p>The checks the tests run:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">me</span><span class="p">[</span><span class="s1">'t_end'</span><span class="p">]</span> <span class="o">==</span> <span class="n">Tend</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="p">[</span><span class="n">adaptive</span><span class="p">]</span> <span class="o">+</span> <span class="n">fixed</span><span class="p">),</span> <span class="s1">'ERROR: not all runs reached Tend'</span>
+<span class="k">assert</span> <span class="n">ratio</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'ERROR: an accepted step has an estimate above the tolerance: </span><span class="si">{</span><span class="n">ratio</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s1">'</span>
+<span class="k">assert</span> <span class="n">adaptive</span><span class="p">[</span><span class="s1">'restarts'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'ERROR: expected restarts in the adaptive run'</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="n">adaptive</span><span class="p">[</span><span class="s1">'error'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="n">fixed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">'error'</span><span class="p">]</span>
+<span class="p">),</span> <span class="sa">f</span><span class="s2">"ERROR: adaptive run is less accurate than dt=1/32: </span><span class="si">{</span><span class="n">adaptive</span><span class="p">[</span><span class="s1">'error'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> vs. </span><span class="si">{</span><span class="n">fixed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">'error'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="n">adaptive</span><span class="p">[</span><span class="s1">'iterations'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">fixed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">'iterations'</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="p">),</span> <span class="sa">f</span><span class="s2">"ERROR: adaptive run needs too many iterations: </span><span class="si">{</span><span class="n">adaptive</span><span class="p">[</span><span class="s1">'iterations'</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs. </span><span class="si">{</span><span class="n">fixed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">'iterations'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">assert</span> <span class="p">(</span>
+    <span class="n">adaptive</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">fixed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">'newton'</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="p">),</span> <span class="sa">f</span><span class="s2">"ERROR: adaptive run needs too many Newton iterations: </span><span class="si">{</span><span class="n">adaptive</span><span class="p">[</span><span class="s1">'newton'</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs. </span><span class="si">{</span><span class="n">fixed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">'newton'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../step_8.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Step-8: Advanced topics</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="B_multistep_SDC.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Part B: Multi-step SDC</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-adaptive-run">An adaptive run</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">How it works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-comparison-with-fixed-steps">A comparison with fixed steps</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Parallel-in-Time/pySDC/edit/master/pySDC/tutorial/step_8/A_adaptive_time_stepping.py">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tutorial/step_8/A_adaptive_time_stepping.py.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

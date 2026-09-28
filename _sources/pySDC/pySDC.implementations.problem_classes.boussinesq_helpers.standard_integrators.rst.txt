@@ -1,0 +1,7 @@
+standard\_integrators
+=====================
+
+.. automodule:: pySDC.implementations.problem_classes.boussinesq_helpers.standard_integrators
+   :members:
+   :show-inheritance:
+   :undoc-members:

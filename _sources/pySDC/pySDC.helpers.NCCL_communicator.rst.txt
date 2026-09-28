@@ -1,0 +1,7 @@
+NCCL\_communicator
+==================
+
+.. automodule:: pySDC.helpers.NCCL_communicator
+   :members:
+   :show-inheritance:
+   :undoc-members:

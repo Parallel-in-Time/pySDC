@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../../../../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pySDC/implementations/convergence_controller_classes/estimate_extrapolation_error';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../../../../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  <link rel="icon" href="../../../../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../../../../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../../../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../../../../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">factorial</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.hooks.log_extrapolated_error_estimate</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogExtrapolationErrorEstimate</span>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EstimateExtrapolationErrorBase</span><span class="p">(</span><span class="n">ConvergenceController</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Abstract base class for error estimates by Taylor extrapolation of solutions and right-hand sides from other times.</span>
+
+<span class="sd">    This error estimate extrapolates a solution based on Taylor expansions using solutions at other times. Child</span>
+<span class="sd">    classes decide where these come from: EstimateExtrapolationErrorNonMPI uses previous time steps, and</span>
+<span class="sd">    EstimateExtrapolationErrorWithinQ the collocation nodes of the current step. There is no MPI version.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialization routine</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s2">"t"</span><span class="p">,</span> <span class="s2">"u"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"dt"</span><span class="p">])</span>  <span class="c1"># store solutions etc. of previous steps here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s2">"u"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"prefactor"</span><span class="p">])</span>  <span class="c1"># store coefficients for extrapolation here</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+        <span class="n">controller</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">LogExtrapolationErrorEstimate</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving</span>
+<span class="sd">        a linear system of equations to compute the Taylor expansion finite difference style. Here, all variables are</span>
+<span class="sd">        initialized which are needed for this process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Updated parameters with default values</span>
+<span class="sd">        """</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.hotrod</span><span class="w"> </span><span class="kn">import</span> <span class="n">HotRod</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.adaptivity</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">Adaptivity</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">default_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"control_order"</span><span class="p">:</span> <span class="o">-</span><span class="mi">75</span><span class="p">,</span>
+            <span class="s2">"use_adaptivity"</span><span class="p">:</span> <span class="kc">True</span> <span class="ow">in</span> <span class="p">[</span><span class="n">me</span> <span class="o">==</span> <span class="n">Adaptivity</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"convergence_controllers"</span><span class="p">,</span> <span class="p">{})],</span>
+            <span class="s2">"use_HotRod"</span><span class="p">:</span> <span class="kc">True</span> <span class="ow">in</span> <span class="p">[</span><span class="n">me</span> <span class="o">==</span> <span class="n">HotRod</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"convergence_controllers"</span><span class="p">,</span> <span class="p">{})],</span>
+            <span class="s2">"order_time_marching"</span><span class="p">:</span> <span class="n">description</span><span class="p">[</span><span class="s2">"step_params"</span><span class="p">][</span><span class="s2">"maxiter"</span><span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="n">new_params</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">default_params</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span>
+
+        <span class="c1"># Do a sufficiently high order Taylor expansion</span>
+        <span class="n">new_params</span><span class="p">[</span><span class="s2">"Taylor_order"</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s2">"order_time_marching"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span>
+
+        <span class="c1"># Estimate and store values from this iteration</span>
+        <span class="n">new_params</span><span class="p">[</span><span class="s2">"estimate_iter"</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s2">"order_time_marching"</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">new_params</span><span class="p">[</span><span class="s2">"use_HotRod"</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Store n values. Since we store u and f, we need only half of each (the +1 is for rounding)</span>
+        <span class="n">new_params</span><span class="p">[</span><span class="s2">"n"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_params</span><span class="p">[</span><span class="s2">"Taylor_order"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">new_params</span><span class="p">[</span><span class="s2">"n_per_proc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="s2">"n"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">new_params</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.setup_status_variables">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.setup_status_variables">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialize coefficient variables and add variable to the levels for extrapolated error</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.controller): The controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_level</span><span class="p">(</span><span class="s1">'error_extrapolation_estimate'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.check_parameters">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.check_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Whether the parameters are compatible</span>
+<span class="sd">            str: Error message</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">"step_params"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"restol"</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"Extrapolation error needs constant order in time and hence restol in the step parameters </span><span class="se">\</span>
+<span class="s2">has to be smaller than 0!"</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">mssdc_jac</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">"Extrapolation error estimator needs the same order on all steps, please activate Gauss-Seid</span><span class="se">\</span>
+<span class="s2">el multistep mode!"</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">""</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.store_values">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.store_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">store_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Store the required attributes of the step to do the extrapolation. We only care about the last collocation</span>
+<span class="sd">        node on the finest level at the moment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="c1"># figure out which values are to be replaced by the new ones</span>
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">:</span>
+            <span class="n">oldest_val</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span> <span class="o">==</span> <span class="p">[</span><span class="kc">None</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">oldest_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">)</span>
+
+        <span class="c1"># figure out how to store the right hand side</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">imex_mesh</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">oldest_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">mesh</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">oldest_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unable to store f from datatype </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s2">, extrapolation based error estimate only</span><span class="se">\</span>
+<span class="s2"> works with types imex_mesh and mesh"</span><span class="p">)</span>
+
+        <span class="c1"># store the rest of the values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">oldest_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">oldest_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">S</span><span class="o">.</span><span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">dt</span><span class="p">[</span><span class="n">oldest_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">dt</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorBase.get_extrapolation_coefficients">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase.get_extrapolation_coefficients">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_extrapolation_coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">t_eval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        This function solves a linear system where in the matrix A, the row index reflects the order of the derivative</span>
+<span class="sd">        in the Taylor expansion and the column index reflects the particular step and whether its u or f from that</span>
+<span class="sd">        step. The vector b on the other hand, contains a 1 in the first entry and zeros elsewhere, since we want to</span>
+<span class="sd">        compute the value itself and all the derivatives should vanish after combining the Taylor expansions. This</span>
+<span class="sd">        works to the order of the number of rows and since we want a square matrix for solving, we need the same amount</span>
+<span class="sd">        of columns, which determines the memory overhead, since it is equal to the solutions / rhs that we need in</span>
+<span class="sd">        memory at the time of evaluation.</span>
+
+<span class="sd">        This is enough to get the extrapolated solution, but if we want to compute the local error, we have to compute</span>
+<span class="sd">        a prefactor. This is based on error accumulation between steps (first step's solution is exact plus 1 LTE,</span>
+<span class="sd">        second solution is exact plus 2 LTE and so on), which can be computed for adaptive step sizes as well. However,</span>
+<span class="sd">        this is only true for linear problems, which means we expect the error estimate to work less well for non-linear</span>
+<span class="sd">        problems.</span>
+
+<span class="sd">        Since only time differences are important for computing the coefficients, we need to compute this only once when</span>
+<span class="sd">        using constant step sizes. When we allow the step size to change, however, we need to recompute this in every</span>
+<span class="sd">        step, which is activated by the `use_adaptivity` parameter.</span>
+
+<span class="sd">        Solving for the coefficients requires solving a dense linear system of equations. The number of unknowns is</span>
+<span class="sd">        equal to the order of the Taylor expansion, so this step should be cheap compared to the solves in each SDC</span>
+<span class="sd">        iteration.</span>
+
+<span class="sd">        The function stores the computed coefficients in the `self.coeff` variables.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (list): The list of times at which we have solutions available</span>
+<span class="sd">            dt (list): The step sizes used for computing these solutions (needed for the prefactor)</span>
+<span class="sd">            t_eval (float): The time we want to extrapolate to</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># prepare A matrix</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span><span class="p">))</span>
+        <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span><span class="p">)</span>
+        <span class="n">inv_facs</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+
+        <span class="c1"># get the steps backwards from the point of evaluation</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">steps_from_now</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">t_eval</span>
+
+        <span class="c1"># fill A matrix</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span><span class="p">):</span>
+            <span class="c1"># Taylor expansions of the solutions</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">steps_from_now</span> <span class="o">**</span> <span class="n">j</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">inv_facs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="c1"># Taylor expansions of the first derivatives a.k.a. right hand side evaluations</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">steps_from_now</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span> <span class="p">:]</span> <span class="o">**</span> <span class="p">(</span><span class="n">j</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">inv_facs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="c1"># prepare rhs</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span><span class="p">)</span>
+        <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="c1"># solve linear system for the coefficients</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span><span class="p">]</span>
+
+        <span class="c1"># determine prefactor</span>
+        <span class="n">step_size_ratios</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span><span class="p">)</span> <span class="p">:]</span> <span class="o">/</span> <span class="n">dt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">inv_prefactor</span> <span class="o">=</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">step_size_ratios</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="mf">1.0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span><span class="p">)):</span>
+            <span class="n">inv_prefactor</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">step_size_ratios</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">prefactor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">inv_prefactor</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EstimateExtrapolationErrorNonMPI</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Implementation of the extrapolation error estimate for the non-MPI controller.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.setup">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add a no parameter 'no_storage' which decides whether the standard or the no-memory-overhead version is run,</span>
+<span class="sd">        where only values are used for extrapolation which are in memory of other processes</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Updated parameters with default values</span>
+<span class="sd">        """</span>
+        <span class="n">default_params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+
+        <span class="n">non_mpi_defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"no_storage"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">non_mpi_defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">default_params</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.setup_status_variables">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.setup_status_variables">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialize storage variables.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.controller): The controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.post_iteration_processing">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        We perform three key operations here in the last iteration:</span>
+<span class="sd">         - Compute the error estimate</span>
+<span class="sd">         - Compute the coefficients if needed</span>
+<span class="sd">         - Store the values of the step if we pretend not to for the no-memory overhead version</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">estimate_iter</span><span class="p">:</span>
+            <span class="n">t_eval</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">S</span><span class="o">.</span><span class="n">dt</span>
+
+            <span class="c1"># compute the extrapolation coefficients if needed</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="kc">None</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span>
+                    <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_adaptivity</span>
+                    <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">no_storage</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="ow">and</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span>
+                <span class="ow">and</span> <span class="n">t_eval</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_extrapolation_coefficients</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">t_eval</span><span class="p">)</span>
+
+            <span class="c1"># compute the error if we can</span>
+            <span class="k">if</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span> <span class="ow">and</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_extrapolated_error</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+            <span class="c1"># store the solution and pretend we didn't because in the non MPI version we take a few shortcuts</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">no_storage</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store_values</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.prepare_next_block">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.prepare_next_block">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        If the no-memory-overhead version is used, we need to delete stuff that shouldn't be available. Otherwise, we</span>
+<span class="sd">        need to store all the stuff that we can.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.step): The current step</span>
+<span class="sd">            size (int): Number of ranks</span>
+<span class="sd">            time (float): The current time</span>
+<span class="sd">            Tend (float): The final time</span>
+<span class="sd">            MS (list): Active steps</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># delete values that should not be available in the next step</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">no_storage</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># decide where we need to restart to store everything up to that point</span>
+            <span class="n">restarts</span> <span class="o">=</span> <span class="p">[</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">]</span>
+            <span class="n">restart_at</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">restarts</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">restarts</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">)</span>
+
+            <span class="c1"># store values in the current block that don't need restarting</span>
+            <span class="k">if</span> <span class="n">restart_at</span> <span class="o">&gt;</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store_values</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.get_extrapolated_solution">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_extrapolated_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Combine values from previous steps to extrapolate.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: The extrapolated solution</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Extrapolated estimate only works on the finest level for now"</span><span class="p">)</span>
+
+        <span class="c1"># prepare variables</span>
+        <span class="n">u_ex</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.0</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">)</span>
+
+        <span class="c1"># see if we have a solution for the current step already stored</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">S</span><span class="o">.</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">idx_step</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">t</span> <span class="o">-</span> <span class="n">S</span><span class="o">.</span><span class="n">time</span> <span class="o">-</span> <span class="n">S</span><span class="o">.</span><span class="n">dt</span><span class="p">))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">idx_step</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># make a mask of all the steps we want to include in the extrapolation</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="n">idx_step</span><span class="p">,</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">idx_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="c1"># do the extrapolation by summing everything up</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">u_ex</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="n">mask</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">idx</span><span class="p">[</span><span class="n">mask</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="n">u_ex</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorNonMPI.get_extrapolated_error">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_extrapolated_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the</span>
+<span class="sd">        solution obtained by the time marching scheme.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+        <span class="n">u_ex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_extrapolated_solution</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">u_ex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">difference</span> <span class="o">=</span> <span class="n">u_ex</span> <span class="o">-</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># algebraic components of a DAE have no time derivative to extrapolate</span>
+            <span class="n">diff_mask</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="s1">'diff_mask'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">diff_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">diff_mask</span><span class="p">):</span>
+                <span class="n">difference</span> <span class="o">=</span> <span class="n">difference</span><span class="p">[</span><span class="n">diff_mask</span><span class="p">]</span>
+
+            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">prefactor</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span> <span class="o">=</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorWithinQ">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EstimateExtrapolationErrorWithinQ</span><span class="p">(</span><span class="n">EstimateExtrapolationErrorBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Estimate the local error by comparing the converged SDC solution to an extrapolation from other quadrature nodes.</span>
+<span class="sd">    Collocation methods compute a high order solution from a linear combination</span>
+<span class="sd">    of solutions at intermediate time points. While the intermediate solutions (a.k.a. stages) don't share the order of</span>
+<span class="sd">    accuracy with the solution at the end of the interval, for SDC we know that the order is equal to the number of</span>
+<span class="sd">    nodes + 1 (locally). This is because the solution to the collocation problem is a polynomial approximation of order</span>
+<span class="sd">    of the number of nodes.</span>
+<span class="sd">    That means we can do a Taylor expansion around the end point of the interval to higher order and after cancelling</span>
+<span class="sd">    terms just like we are used to with the extrapolation based error estimate across multiple steps, we get an error</span>
+<span class="sd">    estimate that is of the order of accuracy of the stages.</span>
+<span class="sd">    This can be used for adaptivity, for instance, with the nice property that it doesn't matter how we arrived at the</span>
+<span class="sd">    converged collocation solution, as long as we did. We don't rely on knowing the order of accuracy after every sweep,</span>
+<span class="sd">    only after convergence of the collocation problem has been achieved, which we can check from the residual.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorWithinQ.setup">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        We need this convergence controller to become active after the check for convergence, because we need the step</span>
+<span class="sd">        to be converged.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            params (dict): The params passed for this specific convergence controller</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Updated parameters with default values</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.check_convergence</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckConvergence</span>
+
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="s1">'num_nodes'</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'comm'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">sum</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span> <span class="o">=</span> <span class="n">CheckConvergence</span><span class="o">.</span><span class="n">check_convergence</span>
+
+        <span class="n">default_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">'Taylor_order'</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">num_nodes</span><span class="p">,</span>
+            <span class="s1">'n'</span><span class="p">:</span> <span class="n">num_nodes</span><span class="p">,</span>
+            <span class="s1">'recompute_coefficients'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">params</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="o">**</span><span class="n">default_params</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="EstimateExtrapolationErrorWithinQ.post_iteration_processing">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.html#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorWithinQ.post_iteration_processing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Compute the extrapolated error estimate here if the step is converged.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">            S (pySDC.Step): The current step</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">lvl</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">nodes_</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span> <span class="o">*</span> <span class="n">S</span><span class="o">.</span><span class="n">dt</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nodes_</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">t_eval</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">nodes_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">dts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nodes_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nodes_</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">nodes_</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Taylor_order</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+
+        <span class="c1"># compute the extrapolation coefficients</span>
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">recompute_coefficients</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_extrapolation_coefficients</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="n">t_eval</span><span class="p">)</span>
+
+        <span class="c1"># compute the extrapolated solution</span>
+        <span class="k">if</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lvl</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="n">imex_mesh</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">expl</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">else</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="n">mesh</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">else</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unable to store f from datatype </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">, extrapolation based error estimate only</span><span class="se">\</span>
+<span class="s2"> works with types imex_mesh and mesh"</span><span class="p">)</span>
+
+        <span class="c1"># compute the error with the weighted sum</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span>
+            <span class="n">sendbuf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">f</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">u_ex</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Reduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">u_ex</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_ex</span> <span class="o">=</span> <span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">u_ex</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># store the error</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">abs</span><span class="p">(</span><span class="n">u_ex</span> <span class="o">-</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">prefactor</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">)</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u_ex</span> <span class="o">-</span> <span class="n">lvl</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">prefactor</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

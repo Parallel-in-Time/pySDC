@@ -1,0 +1,33 @@
+convergence\_controller\_classes
+================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pySDC.implementations.convergence_controller_classes.adaptive_alpha
+   pySDC.implementations.convergence_controller_classes.adaptive_collocation
+   pySDC.implementations.convergence_controller_classes.adaptivity
+   pySDC.implementations.convergence_controller_classes.basic_restarting
+   pySDC.implementations.convergence_controller_classes.check_iteration_estimator
+   pySDC.implementations.convergence_controller_classes.crash
+   pySDC.implementations.convergence_controller_classes.estimate_contraction_factor
+   pySDC.implementations.convergence_controller_classes.estimate_embedded_error
+   pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error
+   pySDC.implementations.convergence_controller_classes.estimate_polynomial_error
+   pySDC.implementations.convergence_controller_classes.hotrod
+   pySDC.implementations.convergence_controller_classes.inexactness
+   pySDC.implementations.convergence_controller_classes.interpolate_between_restarts
+   pySDC.implementations.convergence_controller_classes.spread_step_sizes
+   pySDC.implementations.convergence_controller_classes.step_size_limiter
+   pySDC.implementations.convergence_controller_classes.store_uold
+
+Module contents
+---------------
+
+.. automodule:: pySDC.implementations.convergence_controller_classes
+   :members:
+   :show-inheritance:
+   :undoc-members:

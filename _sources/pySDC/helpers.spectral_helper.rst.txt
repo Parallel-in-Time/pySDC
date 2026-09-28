@@ -1,7 +1,0 @@
-helpers.spectral\_helper module
-===============================
-
-.. automodule:: helpers.spectral_helper
-   :members:
-   :show-inheritance:
-   :undoc-members:

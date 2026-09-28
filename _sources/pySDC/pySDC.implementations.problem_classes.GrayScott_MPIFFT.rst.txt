@@ -1,0 +1,7 @@
+GrayScott\_MPIFFT
+=================
+
+.. automodule:: pySDC.implementations.problem_classes.GrayScott_MPIFFT
+   :members:
+   :show-inheritance:
+   :undoc-members:

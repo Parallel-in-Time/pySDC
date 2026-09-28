@@ -1,0 +1,7 @@
+errors
+======
+
+.. automodule:: pySDC.core.errors
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Projects &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../_static/documentation_options.js?v=cd132f8b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'projects/index';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples of the pySDC paper in ACM TOMS" href="TOMS.html" />
+    <link rel="prev" title="Part E: MPI-parallel ParaDiag" href="../tutorial/step_9/E_paradiag_MPI.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.8" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  <link rel="icon" href="../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1"><a href="#">Projects</a></p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="TOMS.html">Examples of the pySDC paper in ACM TOMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallelSDC.html">Attempts to parallelize SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallelSDC_reloaded.html">Numerical experiment scripts for the parallel SDC paper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fwsw.html">Fast-Wave-Slow-Wave SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RDC.html">RDC: Rational Deferred Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asymp_conv.html">Asymptotic convergence of PFASST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrixPFASST.html">Matrix-based versions of PFASST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="second_order.html">Spectral Deferred Correction Methods for Second-Order Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Hamiltonian.html">Second-order Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SDC_showdown.html">What is the fastest SDC variant?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DAE.html">Solving differential algebraic equations with SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AllenCahn_Bayreuth.html">Allen-Cahn problems from Bayreuth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PinTSimE.html">Parallel-in-time simulation for multi-modal energy systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monodomain.html">Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayleighBenard.html">SDC for Rayleigh-Benard convection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StroemungsRaum.html">StroemungsRaum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Performance analysis of pySDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Resilience.html">Resilience in SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soft_failure.html">Soft faults in SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compression.html">Compression in pySDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GPU.html">pySDC using GPUs</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Projects</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="projects">
+<h1>Projects<a class="headerlink" href="#projects" title="Link to this heading">#</a></h1>
+<p>Projects are research done with pySDC: the code behind papers, theses and studies, kept in this repository so that
+the results stay reproducible. Each project has its own folder in <code class="docutils literal notranslate"><span class="pre">pySDC/projects</span></code>, with a README that explains
+what it does and how to run it, and usually an environment file with what it needs.</p>
+<p>All projects except <em>Performance</em>, which holds trace files, and those in <code class="docutils literal notranslate"><span class="pre">deprecated</span></code> are tested with every change to pySDC, so their code keeps
+working with the current version. Where the tests make plots, the pages show them as the latest run made them.</p>
+<p>To add your own, see <a class="reference external" href="https://parallel-in-time.org/pySDC/docs/contrib/06_new_project.html">Adding a project</a>.</p>
+<section id="methods-and-analysis">
+<h2>Methods and analysis<a class="headerlink" href="#methods-and-analysis" title="Link to this heading">#</a></h2>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 project-gallery docutils">
+<div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-3 sd-g-3 sd-g-xs-3 sd-g-sm-3 sd-g-md-3 sd-g-lg-3 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="The pySDC paper" class="sd-card-img-top" src="../_images/runtimes_matrix_heat.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+The pySDC paper</div>
+<p class="sd-card-text">SDC variants for the Allen-Cahn equation, and space-time parallel heat equation runs with PETSc, from ACM TOMS.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="TOMS.html"><span class="doc">Examples of the pySDC paper in ACM TOMS</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Parallel SDC" class="sd-card-img-top" src="../_images/parallelSDC_preconditioner_heat.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Parallel SDC</div>
+<p class="sd-card-text">Strategies to parallelize SDC across the collocation nodes, within each iteration.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="parallelSDC.html"><span class="doc">Attempts to parallelize SDC</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover excerpt-card docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Parallel SDC across the method, reloaded</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">getCost</span><span class="p">(</span><span class="n">counters</span><span class="p">):</span>
+    <span class="n">nNewton</span><span class="p">,</span> <span class="n">nRHS</span><span class="p">,</span> <span class="n">tComp</span> <span class="o">=</span> <span class="n">counters</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nNewton</span> <span class="o">+</span> <span class="n">nRHS</span>
+
+
+<span class="n">minPrec</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"MIN-SR-NS"</span><span class="p">,</span> <span class="s2">"MIN-SR-S"</span><span class="p">,</span> <span class="s2">"MIN-SR-FLEX"</span><span class="p">]</span>
+
+<span class="n">symList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'^'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="s1">'&lt;'</span><span class="p">,</span> <span class="s1">'o'</span><span class="p">,</span> <span class="s1">'s'</span><span class="p">,</span> <span class="s1">'*'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">]</span>
+<span class="n">config</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="o">*</span><span class="n">minPrec</span><span class="p">,</span> <span class="s2">"VDHS"</span><span class="p">,</span> <span class="s2">"ESDIRK43"</span><span class="p">,</span> <span class="s2">"LU"</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+</pre></div>
+</div>
+<p class="sd-card-text">The numerical experiments of the paper on parallel SDC by Čaklović, Lunet, Götschel and Ruprecht.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="parallelSDC_reloaded.html"><span class="doc">Numerical experiment scripts for the parallel SDC paper</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Fast-wave slow-wave SDC" class="sd-card-img-top" src="../_images/boussinesq.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Fast-wave slow-wave SDC</div>
+<p class="sd-card-text">Semi-implicit SDC for fast waves, compared with RK-IMEX and DIRK schemes, and its stability.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="fwsw.html"><span class="doc">Fast-Wave-Slow-Wave SDC</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover excerpt-card docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Rational deferred corrections</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">ji</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="n">d</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">jf</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">sumcoeff</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ji</span><span class="p">,</span> <span class="n">jf</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">prodterm</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">k</span><span class="p">:</span>
+                <span class="n">prodterm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prodterm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">product</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">prodterm</span><span class="p">)</span>
+        <span class="n">sumcoeff</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">product</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sumcoeff</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">abs</span><span class="p">)</span>
+    <span class="n">w</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sd-card-text">The RDC method of Güttel and Klein, with equidistant nodes and a blended barycentric interpolant.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="RDC.html"><span class="doc">RDC: Rational Deferred Corrections</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Asymptotic convergence of PFASST" class="sd-card-img-top" src="../_images/conv_test_niter_NS3.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Asymptotic convergence of PFASST</div>
+<p class="sd-card-text">How PFASST converges for linear problems, in the stiff and in the non-stiff limit.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="asymp_conv.html"><span class="doc">Asymptotic convergence of PFASST</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover excerpt-card docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Matrix-based PFASST</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Working with diffusion setup and parameter 1.0e-02..
+  Iteration counts for matrix-based version: [(0.0, 3), (0.25, 3), (0.5, 3), (0.75, 3)]
+  Error (mat/prop) vs. exact solution: 3.2542e-06 -- 3.2542e-06
+</pre></div>
+</div>
+<p class="sd-card-text">PFASST for linear problems, written as a two-grid method and as a propagation matrix.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="matrixPFASST.html"><span class="doc">Matrix-based versions of PFASST</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover excerpt-card docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+SDC for second-order problems</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define Collocation matrix to find for the stability function</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
+<span class="n">QQ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span>
+<span class="n">Q_coll</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="n">QQ</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">])],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">]),</span> <span class="n">Q</span><span class="p">]])</span>
+<span class="n">qQ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span>
+<span class="c1"># Matrix with all entries 1</span>
+<span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)]])</span>
+<span class="c1"># Combine all of the weights into a single matrix</span>
+<span class="n">q_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="n">dt</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">qQ</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">)],</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">),</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">weights</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p class="sd-card-text">The figures of the paper by Akramov, Götschel, Minion, Ruprecht and Speck.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="second_order.html"><span class="doc">Spectral Deferred Correction Methods for Second-Order Problems</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Hamiltonian systems with Verlet-SDC" class="sd-card-img-top" src="../_images/fput_positions.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Hamiltonian systems with Verlet-SDC</div>
+<p class="sd-card-text">The harmonic oscillator, Hénon-Heiles, Fermi-Pasta-Ulam-Tsingou and the solar system.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="Hamiltonian.html"><span class="doc">Second-order Problems</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="What is the fastest SDC variant?" class="sd-card-img-top" src="../_images/timings_SDC_variants_GrayScott.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+What is the fastest SDC variant?</div>
+<p class="sd-card-text">Fully, semi- and multi-implicit SDC with PETSc, for the Fisher and the Gray-Scott equations.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="SDC_showdown.html"><span class="doc">What is the fastest SDC variant?</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover excerpt-card docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Differential-algebraic equations</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># do the sweep</span>
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">M</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># add the known components from current sweep del_t*Q_del*U_k+1</span>
+    <span class="n">u_approx</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">integral</span><span class="p">[</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="n">u_approx</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+    <span class="c1"># update gradient (recall L.f is being used to store the gradient)</span>
+    <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">,</span> <span class="n">u_approx</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">QI</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="n">m</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">L</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>
+
+<span class="c1"># Update solution approximation</span>
+<span class="n">integral</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">integral</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+</pre></div>
+</div>
+<p class="sd-card-text">Sweepers, problems and scripts for solving differential-algebraic equations with SDC.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="DAE.html"><span class="doc">Solving differential algebraic equations with SDC</span></a></div>
+</div>
+</div>
+</div>
+</section>
+<section id="applications">
+<h2>Applications<a class="headerlink" href="#applications" title="Link to this heading">#</a></h2>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 project-gallery docutils">
+<div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-3 sd-g-3 sd-g-xs-3 sd-g-sm-3 sd-g-md-3 sd-g-lg-3 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Allen-Cahn problems from Bayreuth" class="sd-card-img-top" src="../_images/AC-test-noforce_radii.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Allen-Cahn problems from Bayreuth</div>
+<p class="sd-card-text">Allen-Cahn-type problems from materials science, for correctness, parallelization and benchmarks.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="AllenCahn_Bayreuth.html"><span class="doc">Allen-Cahn problems from Bayreuth</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Energy systems with discrete events" class="sd-card-img-top" src="../_images/detection_and_adaptivity_battery_dt%3D0.01_M%3D4.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Energy systems with discrete events</div>
+<p class="sd-card-text">Components of DC microgrids and a battery, with switches, and an estimator that restarts SDC at the events.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="PinTSimE.html"><span class="doc">Parallel-in-time simulation for multi-modal energy systems</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Exponential SDC for the heart" class="sd-card-img-top" src="../_images/stability_domain_IMEXEXP_EXPRK.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Exponential SDC for the heart</div>
+<p class="sd-card-text">Exponential SDC for the monodomain equation of cardiac electrophysiology.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="monodomain.html"><span class="doc">Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover excerpt-card docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Rayleigh-Bénard convection</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">desc</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="s1">'quad_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'RADAU-RIGHT'</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="s1">'num_nodes'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="s1">'QI'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'MIN-SR-S'</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="s1">'QE'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'PIC'</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="mi">64</span> <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="n">res</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'Rayleigh'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e8</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'nx'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res_ratio</span> <span class="o">*</span> <span class="n">res</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'ny'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res_ratio</span> <span class="o">*</span> <span class="n">res</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'nz'</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'Lx'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'Ly'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'Lz'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'heterogeneous'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">desc</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">][</span><span class="s1">'dealiasing'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dealiasing</span>
+</pre></div>
+</div>
+<p class="sd-card-text">3D convection with spectral methods, SDC and Runge-Kutta, from CPUs to large GPU runs.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="RayleighBenard.html"><span class="doc">SDC for Rayleigh-Benard convection</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover excerpt-card docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+StrömungsRaum</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+<span class="n">F</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">u</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+<span class="n">F</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">))</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+<span class="n">F</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">))</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+<span class="n">F</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+<span class="n">F</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+
+<span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="n">NewtonStep</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">))</span>
+</pre></div>
+</div>
+<p class="sd-card-text">SDC with FEniCS for heat, convection-diffusion and incompressible Navier-Stokes flows.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="StroemungsRaum.html"><span class="doc">StroemungsRaum</span></a></div>
+</div>
+</div>
+</div>
+</section>
+<section id="high-performance-computing">
+<h2>High-performance computing<a class="headerlink" href="#high-performance-computing" title="Link to this heading">#</a></h2>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 project-gallery docutils">
+<div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-3 sd-g-3 sd-g-xs-3 sd-g-sm-3 sd-g-md-3 sd-g-lg-3 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Performance analysis" class="sd-card-img-top" src="../_images/vampir_traces_pySDC_AC_4x2_intel_v2.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Performance analysis</div>
+<p class="sd-card-text">Space-time parallel runs traced with Score-P and Vampir, to understand their parallel performance.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="performance.html"><span class="doc">Performance analysis of pySDC</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Resilience" class="sd-card-img-top" src="../_images/piline_hotrod_adaptive_1procs.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Resilience</div>
+<p class="sd-card-text">Adaptivity and Hot Rod against bit flips, e.g. from radiation, and fault statistics.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="Resilience.html"><span class="doc">Resilience in SDC</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Soft faults" class="sd-card-img-top" src="../_images/vanderpol_500_runs_min_max_residuals.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Soft faults</div>
+<p class="sd-card-text">Bit flips injected into SDC sweeps, a detector for them, and its statistics over 500 runs.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="soft_failure.html"><span class="doc">Soft faults in SDC</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<img alt="Lossy compression" class="sd-card-img-top" src="../_images/compression_order_time_advection_d%3D1.00e-06_n%3D1_MPI%3DFalse.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Lossy compression</div>
+<p class="sd-card-text">Compressing the data SDC keeps at the collocation nodes, and what it costs in accuracy.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="compression.html"><span class="doc">Compression in pySDC</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover excerpt-card docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+pySDC on GPUs</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># change description dictionary for GPU problem</span>
+<span class="n">description</span><span class="p">[</span><span class="s1">'problem_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_forced</span>
+<span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">description</span><span class="p">[</span><span class="s1">'problem_params'</span><span class="p">],</span> <span class="n">useGPU</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># instantiate controller gpu</span>
+<span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+<span class="c1"># get initial values on finest level gpu</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+<span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+<span class="c1"># call main function to get things done on gpu...</span>
+<span class="n">uend_gpu</span><span class="p">,</span> <span class="n">stats_gpu</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+<span class="n">timing_gpu</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats_gpu</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'timing_run'</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">'time'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Runtime GPU:'</span><span class="p">,</span> <span class="n">timing_gpu</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend_gpu</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">-</span> <span class="n">uend_cpu</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-13</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend_gpu</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">-</span> <span class="n">uend_cpu</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sd-card-text">Running pySDC on GPUs with CuPy, up to large problems, and the plots of Thomas Baumann’s thesis.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="GPU.html"><span class="doc">pySDC using GPUs</span></a></div>
+</div>
+</div>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="playgrounds">
+<h2>Playgrounds<a class="headerlink" href="#playgrounds" title="Link to this heading">#</a></h2>
+<p>This folder gathers various small to medium experiments done with pySDC. They are for example grouped by application (e.g. <code class="docutils literal notranslate"><span class="pre">Boris</span></code>) or by problem type (e.g. <code class="docutils literal notranslate"><span class="pre">ODEs</span></code>).
+Also, the <code class="docutils literal notranslate"><span class="pre">deprecated</span></code> folder lists a few old applications which have not been ported to the current version of <cite>pySDC</cite>.
+Experiments which become more complex or which eventually evolve into a publication of any form should go to the <code class="docutils literal notranslate"><span class="pre">projects</span></code> folder and should receive proper documentation and description.
+The playground codes are supposed to be cleaned up, but there is no detailed documentation available.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tutorial/step_9/E_paradiag_MPI.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Part E: MPI-parallel ParaDiag</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="TOMS.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Examples of the pySDC paper in ACM TOMS</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

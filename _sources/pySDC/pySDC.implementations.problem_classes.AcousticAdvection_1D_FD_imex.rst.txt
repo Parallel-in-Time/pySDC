@@ -1,0 +1,7 @@
+AcousticAdvection\_1D\_FD\_imex
+===============================
+
+.. automodule:: pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+default\_hook
+=============
+
+.. automodule:: pySDC.core.default_hook
+   :members:
+   :show-inheritance:
+   :undoc-members:
