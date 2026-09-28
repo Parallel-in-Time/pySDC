@@ -83,7 +83,7 @@ jobs:
         run: |
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html
+          sphinx-build -j auto -b html docs/source docs/build/html
           mkdir -p docs/build/html/coverage
           mv htmlcov/* docs/build/html/coverage/.
       - name: Store docs
