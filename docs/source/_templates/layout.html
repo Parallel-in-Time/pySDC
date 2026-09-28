@@ -1,0 +1,9 @@
+{% extends "!layout.html" %}
+{#- The favicon in every format a browser may want: the SVG where it is supported, favicon.ico (16, 32, 48 px)
+    where it is not, e.g. Safari, which otherwise draws a letter from the title, and the icon iOS puts on home screens #}
+{% block extrahead %}
+  {{ super() }}
+  <link rel="icon" href="{{ pathto('_static/favicon.ico', 1) }}" sizes="any">
+  <link rel="icon" href="{{ pathto('_static/pysdc-favicon.svg', 1) }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ pathto('_static/apple-touch-icon.png', 1) }}">
+{% endblock %}

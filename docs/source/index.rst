@@ -97,9 +97,8 @@ Where to go
 .. toctree::
    :hidden:
 
-   Overview <README>
+   About <about>
    tutorial/index
    projects/index
    api
-   publications
    development

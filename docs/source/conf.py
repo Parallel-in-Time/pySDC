@@ -76,7 +76,7 @@ viewcode_follow_imported_members = False
 
 html_theme = 'pydata_sphinx_theme'
 html_title = 'pySDC'
-html_favicon = '_static/pysdc-favicon.svg'
+# the favicons: _templates/layout.html
 html_static_path = ['_static', '../img']  # ../img: the logos in README.md
 pygments_dark_style = 'github-dark'  # the theme's default dark style is loud
 html_css_files = ['custom.css']
@@ -119,8 +119,6 @@ html_theme_options = {
     'footer_start': ['copyright'],
     'footer_end': ['theme-version'],
 }
-# pages without subpages have nothing to show in the primary sidebar
-html_sidebars = {'publications': [], 'README': []}
 html_context = {
     'default_mode': 'auto',  # the theme's default is empty, which it reports as an error in every page's console
     'github_user': 'Parallel-in-Time',
