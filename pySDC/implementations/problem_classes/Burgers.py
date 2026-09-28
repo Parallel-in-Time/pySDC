@@ -373,7 +373,7 @@ class Burgers2D(GenericSpectralLinear):
         u_hat = self.transform(u)
         iu, iv = self.index(['u', 'v'])
 
-        me[iu] = (self.Dx @ u_hat[iv].flatten() + self.Dz @ u_hat[iu].flatten()).reshape(u[iu].shape)
+        me[iu] = (self.Dx @ u_hat[iv].flatten() - self.Dz @ u_hat[iu].flatten()).reshape(u[iu].shape)
         return self.itransform(me)[iu].real
 
     def get_fig(self):  # pragma: no cover

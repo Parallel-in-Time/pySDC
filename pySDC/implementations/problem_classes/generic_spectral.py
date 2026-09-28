@@ -304,8 +304,8 @@ class GenericSpectralLinear(Problem):
         # apply inverse right preconditioner to initial guess
         if u0_hat is not None and 'direct' not in self.solver_type:
             if not hasattr(self, '_Pr_inv'):
-                self._PR_inv = self.linalg.splu(self.Pr.astype(complex)).solve
-            u0_hat[...] = self._PR_inv(u0_hat)
+                self._Pr_inv = self.linalg.splu(self.Pr.astype(complex)).solve
+            u0_hat[...] = self._Pr_inv(u0_hat)
 
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
