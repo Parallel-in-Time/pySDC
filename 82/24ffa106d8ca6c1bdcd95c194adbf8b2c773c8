@@ -1,0 +1,27 @@
+docs/source/index.rst
+  s_619b2228c15391::t_5cb454ebc4d564 100
+docs/source/_templates/layout.html
+  s_619b2228c15391::t_582b6379fed230 1-9
+docs/source/.gitignore
+  s_619b2228c15391::t_5cb454ebc4d564 8
+docs/source/conf.py
+  s_619b2228c15391::t_582b6379fed230 79
+docs/source/about.rst
+  s_619b2228c15391::t_5cb454ebc4d564 1-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8224ffa106d8ca6c1bdcd95c194adbf8b2c773c8",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
