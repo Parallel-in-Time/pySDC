@@ -1,0 +1,293 @@
+.github/workflows/ci_pipeline.yml
+  s_619b2228c15391::t_34a30c55af06f9 237,404-407,441-454
+CHANGELOG.md
+  s_619b2228c15391::t_8130ef03ea7aba 5-335
+CITATION.cff
+  s_619b2228c15391::t_a710a9a25091e7 58-72
+CONTRIBUTING.md
+  s_619b2228c15391::t_86a69fdcd352e0 36-37,46-47
+README.md
+  s_619b2228c15391::t_ec95a53cbd56eb 9,61-62,95,102-104,120
+docs/check_run_in_browser.py
+  s_619b2228c15391::t_40cbda6296c186 1-145
+docs/contrib/02_continuous_integration.md
+  s_619b2228c15391::t_1cad82746d3985 3,348-357
+docs/contrib/06_new_project.md
+  s_619b2228c15391::t_c0b88de4e53307 50-67
+docs/contrib/07_release_guide.md
+  s_619b2228c15391::t_55179ed825ca81 18,38
+docs/contrib/08_ai_usage.md
+  s_619b2228c15391::t_bbc0bfe80e8e13 1-37
+docs/convert_markdown.py
+  s_619b2228c15391::t_43175f16de04c3 8,10,67-77,79,82-84,91-114,117-118,122,126,128-129
+docs/source/.gitignore
+  s_619b2228c15391::t_43103f9954e6da 5-9
+docs/source/_static/custom.css
+  s_619b2228c15391::t_4fc1d009252e4d 1-20,22-37,39-82
+docs/source/_static/landing-demo.js
+  s_619b2228c15391::t_13243bb1b5016d 1-67
+docs/source/_static/landing_demo.py
+  s_619b2228c15391::t_69549d856a59a4 1-7,11-64
+docs/source/_static/pysdc-favicon.svg
+  s_619b2228c15391::t_b02b295affda14 1-17
+docs/source/_static/pysdc-logo-dark.svg
+  s_619b2228c15391::t_fab4159da5b005 1-15
+docs/source/_static/pysdc-logo.svg
+  s_619b2228c15391::t_d94f526f1af1b0 1-15
+docs/source/_static/run-in-browser-worker.js
+  s_619b2228c15391::t_f360c864f1ed0c 1-75
+docs/source/_static/run-in-browser.js
+  s_619b2228c15391::t_bb91db5901ad16 1-123
+docs/source/_templates/layout.html
+  s_619b2228c15391::t_449227dd14cd21 1-14
+docs/source/_templates/notebook-links.html
+  s_619b2228c15391::t_8172da6c39008a 1-16
+docs/source/_templates/sidebar-nav-bs.html
+  s_619b2228c15391::t_42b527d87bd31a 1-20
+docs/source/about.rst
+  s_619b2228c15391::t_24f5c586e80492 1-2,4-5,7-8,10-12,14,16-18,20,22-24,26-33
+docs/source/api.rst
+  s_619b2228c15391::t_17aac0f1f3400c 1-21
+docs/source/conf.py
+  s_619b2228c15391::t_593f0dadc44178 1,3-4,6,8-9,11-14,16-23,31-33,38-49,51-58,62-132,135-268,272-581
+docs/source/development.rst
+  s_619b2228c15391::t_bc02ace341a739 1-21
+docs/source/index.rst
+  s_619b2228c15391::t_df106699f3f5cb 1,3-4,6,8,10,12-14,16-20,22,25-26,28-30,32,34-60,62,64-65,67-106,108-112
+docs/source/project_papers.json
+  s_619b2228c15391::t_d5d706a9e332da 1-187
+docs/source/projects/RayleighBenard.rst
+  s_619b2228c15391::t_54f8d07f2d53f1 1
+docs/source/projects/StroemungsRaum.rst
+  s_619b2228c15391::t_75c5dbfa932723 1
+docs/source/projects/TOMS.rst
+  s_619b2228c15391::t_253d066a3592c1 1
+docs/source/projects/index.rst
+  s_619b2228c15391::t_384ab6b748a5d9 1,3-4,6,8,10,12-15
+docs/source/projects/soft_failure.rst
+  s_619b2228c15391::t_32f2dab5137c51 1
+docs/source/publications.json
+  s_619b2228c15391::t_9e7da5f43ed036 1-130
+docs/source/publications.rst
+  s_619b2228c15391::t_54402c4a8e198b 1-7
+docs/source/tutorial/index.rst
+  s_619b2228c15391::t_18365ec4d26dd3 1-2,4,6-7,9-17
+docs/source/tutorial/step_1
+  s_619b2228c15391::t_698558db258e9a 1
+docs/source/tutorial/step_1.rst
+  s_619b2228c15391::t_ed8fcb148f6e1f 1-9
+docs/source/tutorial/step_2
+  s_619b2228c15391::t_1c8a42dd470aca 1
+docs/source/tutorial/step_2.rst
+  s_619b2228c15391::t_ec490d2e8ca1e3 1-8
+docs/source/tutorial/step_3
+  s_619b2228c15391::t_67d00fa2cae407 1
+docs/source/tutorial/step_3.rst
+  s_619b2228c15391::t_79b27694b82127 1-8
+docs/source/tutorial/step_4
+  s_619b2228c15391::t_eba4884517a5cd 1
+docs/source/tutorial/step_4.rst
+  s_619b2228c15391::t_87de6431c2e74f 1-9
+docs/source/tutorial/step_5
+  s_619b2228c15391::t_d76d30cfed0f06 1
+docs/source/tutorial/step_5.rst
+  s_619b2228c15391::t_37c824db38dc1d 1-8
+docs/source/tutorial/step_6
+  s_619b2228c15391::t_df1965ca6aa7c0 1
+docs/source/tutorial/step_6.rst
+  s_619b2228c15391::t_a20044f84affa1 1-8
+docs/source/tutorial/step_7
+  s_619b2228c15391::t_a505d7352344f9 1
+docs/source/tutorial/step_7.rst
+  s_619b2228c15391::t_123b041749a88e 1-12
+docs/source/tutorial/step_8
+  s_619b2228c15391::t_82bb8de921817f 1
+docs/source/tutorial/step_8.rst
+  s_619b2228c15391::t_2bc884a73246af 1-8
+docs/source/tutorial/step_9
+  s_619b2228c15391::t_9572facc29c879 1
+docs/source/tutorial/step_9.rst
+  s_619b2228c15391::t_0ad5e87a4f3ee9 1-10
+docs/update_apidocs.sh
+  s_619b2228c15391::t_d47ad57db7fa87 18,22-37,40-48
+docs/update_publications.py
+  s_619b2228c15391::t_d7a701334e5132 1-190
+etc/environment-postprocess.yml
+  s_619b2228c15391::t_03b014fa11f6b9 9-14
+etc/modal_gpu_tests.py
+  s_619b2228c15391::t_da0b9ba55161be 30-33,188-189,212-216
+pySDC/core/collocation.py
+  s_619b2228c15391::t_93dd13d9879436 33
+pySDC/core/sweeper.py
+  s_619b2228c15391::t_3fd0d92f302a36 46
+pySDC/helpers/visualization_tools.py
+  s_619b2228c15391::t_6d4398589cf9e3 1,4,15-17,43-47,49-50,52-53,55-58,60-61
+pySDC/projects/AllenCahn_Bayreuth/README.rst
+  s_619b2228c15391::t_1ff68a12b9e6e5 5,28
+pySDC/projects/FastWaveSlowWave/plotgmrescounter_boussinesq.py
+  s_619b2228c15391::t_174ac1083b70c3 46
+pySDC/projects/GPU/README.rst
+  s_619b2228c15391::t_6632a150c8c6be 30,36,43-44,48-49,51-52,54
+pySDC/projects/GPU/heat.py
+  s_619b2228c15391::t_5546791522da65 82,85,89
+pySDC/projects/Monodomain/README.rst
+  s_619b2228c15391::t_c69fc07cb92ce5 14
+pySDC/projects/RDC/README.rst
+  s_619b2228c15391::t_bd3164b84e6781 4
+pySDC/projects/README.rst
+  s_619b2228c15391::t_d499a9019b93d2 1-3,5-6,8
+pySDC/projects/Resilience/README.rst
+  s_619b2228c15391::t_8f0c805c1e00d9 25,27,29,31,37,39,41,99
+pySDC/projects/Second_orderSDC/README.rst
+  s_619b2228c15391::t_acc0f5b34d0492 4-6,9
+pySDC/projects/TOMS/README.rst
+  s_619b2228c15391::t_6f74655f284f3e 1-56
+pySDC/projects/compression/README.rst
+  s_619b2228c15391::t_c9368a5c6c7790 2,49
+pySDC/projects/gallery.yml
+  s_619b2228c15391::t_ff626f8dd0cdce 1-153
+pySDC/projects/parallelSDC_reloaded/README.rst
+  s_619b2228c15391::t_eac1f205d905e6 4-6
+pySDC/projects/soft_failure/README.rst
+  s_619b2228c15391::t_e873dcd16f185e 1-45
+pySDC/tests/README.rst
+  s_619b2228c15391::t_02b32d7a385d00 10-11
+pySDC/tests/test_benchmarks/test_PFASST_NumPy.py
+  s_619b2228c15391::t_5ce0748c49ede4 1-2,8,10-12
+pySDC/tests/test_citation.py
+  s_619b2228c15391::t_f6c7e659ca1bd2 1-16
+pySDC/tests/test_tutorials/test_step_1.py
+  s_619b2228c15391::t_1ce81290481463 1,3,6-7,9-24
+pySDC/tests/test_tutorials/test_step_2.py
+  s_619b2228c15391::t_36d90cab951511 1,3,6,8-15
+pySDC/tests/test_tutorials/test_step_3.py
+  s_619b2228c15391::t_81a0847d2cc51b 1,3,6,8-15
+pySDC/tests/test_tutorials/test_step_4.py
+  s_619b2228c15391::t_60b4f5b675c922 1,3,6,8-18
+pySDC/tests/test_tutorials/test_step_5.py
+  s_619b2228c15391::t_88693e747101c8 1,3,6,8-17
+pySDC/tests/test_tutorials/test_step_6.py
+  s_619b2228c15391::t_28ae53c2b45420 4-16,19,24,42-45
+pySDC/tests/test_tutorials/test_step_7.py
+  s_619b2228c15391::t_cebcd8a6e5615c 97-107,136-145
+pySDC/tests/test_tutorials/test_step_8.py
+  s_619b2228c15391::t_272f5127f54cae 1,3,6,8-15
+pySDC/tests/test_tutorials/test_step_9.py
+  s_619b2228c15391::t_1ccf72595206fb 35-37,39,41-44,48-52,58,60,79-80,82,92
+pySDC/tutorial/README.rst
+  s_619b2228c15391::t_bdb954eb3015d3 5-7
+pySDC/tutorial/step_1/A_spatial_problem_setup.py
+  s_619b2228c15391::t_b2c0750b69555c 1-23,25,29-65,94-132
+pySDC/tutorial/step_1/B_spatial_accuracy_check.py
+  s_619b2228c15391::t_0160ddcf73604b 1-20,22-23,28-32,34-36,38-43,45-47,92-104,134-178
+pySDC/tutorial/step_1/C_collocation_problem_setup.py
+  s_619b2228c15391::t_3e335f2c7d45b5 1-25,32-74,110-146
+pySDC/tutorial/step_1/D_collocation_accuracy_check.py
+  s_619b2228c15391::t_2f67dd11c0a7c0 1-21,23-24,31-37,39-40,42-43,45-46,48-50,125-178
+pySDC/tutorial/step_1/README.rst
+  s_619b2228c15391::t_a5d06796c75305 7-10,12-13
+pySDC/tutorial/step_2/A_step_data_structure.py
+  s_619b2228c15391::t_c8626e5b346d19 1-53,58-151
+pySDC/tutorial/step_2/B_my_first_sweeper.py
+  s_619b2228c15391::t_ae96df7f8b3d49 1-24,30-103,105-170
+pySDC/tutorial/step_2/C_using_pySDCs_frontend.py
+  s_619b2228c15391::t_b309fa5f784eb9 1-21,24-25,31-131
+pySDC/tutorial/step_2/README.rst
+  s_619b2228c15391::t_fe642fa3befb8f 4,6-8,10-11
+pySDC/tutorial/step_3/A_getting_statistics.py
+  s_619b2228c15391::t_9badeaeb9bc3a8 1-19,26-142,144-162
+pySDC/tutorial/step_3/B_adding_statistics.py
+  s_619b2228c15391::t_2ab7b96e0373bc 1-39,43,49-129,131-157
+pySDC/tutorial/step_3/C_study_collocations.py
+  s_619b2228c15391::t_982c131ffd12ac 1-18,27-146
+pySDC/tutorial/step_3/HookClass_Particles.py
+  s_619b2228c15391::t_e7c64eb222eadd 59
+pySDC/tutorial/step_3/README.rst
+  s_619b2228c15391::t_e45923b724fb0a 4-15
+pySDC/tutorial/step_4/A_spatial_transfer_operators.py
+  s_619b2228c15391::t_173a4d89e2291b 1-23,26,31-80,85-86,88-89,91-93,95-97,99-100,102-105,107-110,112-113,115-117,119-123,125-128,133-158
+pySDC/tutorial/step_4/B_multilevel_hierarchy.py
+  s_619b2228c15391::t_d740e055d5d3e6 1-8,10-21,23-24,29-30,32-37,39-45,47-48,50-51,53-63,65-66,68-69,71-74,76-88,90-98
+pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py
+  s_619b2228c15391::t_b51aaf0018bc33 1-17,25-178
+pySDC/tutorial/step_4/D_MLSDC_with_particles.py
+  s_619b2228c15391::t_16ab9965613040 1-24,27,41-42,45,48,51-57,60,63-66,68,71-83,99-146,148-194
+pySDC/tutorial/step_4/PenningTrap_3D_coarse.py
+  s_619b2228c15391::t_05abc5466efc64 24
+pySDC/tutorial/step_4/README.rst
+  s_619b2228c15391::t_d6091d8bffd2ee 4,6-9,11-13
+pySDC/tutorial/step_5/A_multistep_multilevel_hierarchy.py
+  s_619b2228c15391::t_c1b39dcafc5474 1-8,10-20,27-106,108-109
+pySDC/tutorial/step_5/B_my_first_PFASST_run.py
+  s_619b2228c15391::t_3246225a64de3f 1-19,28-151
+pySDC/tutorial/step_5/C_advection_and_PFASST.py
+  s_619b2228c15391::t_54698bbd202195 1-21,30-118,122-170
+pySDC/tutorial/step_5/README.rst
+  s_619b2228c15391::t_c5ece0d08c7187 6-8,10-11
+pySDC/tutorial/step_6/A_run_non_MPI_controller.py
+  s_619b2228c15391::t_89c1262c7588fc 1-68
+pySDC/tutorial/step_6/B_odd_temporal_distribution.py
+  s_619b2228c15391::t_01fd8eee8e2b17 1-8,10-16,18-19,21,23-44
+pySDC/tutorial/step_6/C_MPI_parallelization.py
+  s_619b2228c15391::t_d5d528b67ee7eb 1-30,37,39-40,42-43,45-46,48-50,52-53,55-57,59-61,63-64,66-67,69-74,76-78,80-82,84-86,88-90,94-125
+pySDC/tutorial/step_6/README.rst
+  s_619b2228c15391::t_c22beb3146bd69 6-13
+pySDC/tutorial/step_6/pfasst_setup.py
+  s_619b2228c15391::t_e50df12c85504c 1-196
+pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py
+  s_619b2228c15391::t_c2a705b0d86cce 1-26,109-122,211-219,232-249
+pySDC/tutorial/step_7/B_pySDC_with_mpi4pyfft.py
+  s_619b2228c15391::t_8a244b74ba0763 1-27,166-175,192-206
+pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
+  s_619b2228c15391::t_28e4976e1e4067 1-28,195-204,212-244
+pySDC/tutorial/step_7/D_pySDC_with_PyTorch.py
+  s_619b2228c15391::t_dacaeb9f8dd9ac 1-29,36-54,123,137-146
+pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py
+  s_619b2228c15391::t_fd0930e8c4b583 1-30,89-95,149-156,199-209,219-231,256-264
+pySDC/tutorial/step_7/F_pySDC_with_Gusto.py
+  s_619b2228c15391::t_a5d307c00e8954 1-39,84-89,91,372-380,383-387,441-450
+pySDC/tutorial/step_7/G_pySDC_on_GPU.py
+  s_619b2228c15391::t_fe17a9a7886599 1-29,89-95,119,132-138,172-190
+pySDC/tutorial/step_7/README.rst
+  s_619b2228c15391::t_1515b19a6d86b2 7-21
+pySDC/tutorial/step_8/A_adaptive_time_stepping.py
+  s_619b2228c15391::t_0415335c88e2c2 1-213
+pySDC/tutorial/step_8/B_multistep_SDC.py
+  s_619b2228c15391::t_9c8a8a972351ca 1-23,27,36-149,152-190
+pySDC/tutorial/step_8/C_iteration_estimator.py
+  s_619b2228c15391::t_99a7b5298f58bf 1-54,59,62,64,72,75-79,82-89,96,99,102,105,108-116,126,129,132-140,147,150,153,156,159-167,177,180,183,186,189,192,195-203,210-217,220,250,272,279,287,290-331
+pySDC/tutorial/step_8/HookClass_error_output.py
+  s_619b2228c15391::t_e8c80983a113b7 28-30,32-34
+pySDC/tutorial/step_8/README.rst
+  s_619b2228c15391::t_69dfea09bdb66a 4-6,8-10,12-14
+pySDC/tutorial/step_9/A_paradiag_for_linear_problems.py
+  s_619b2228c15391::t_eddb305d4b4c0c 1-21,37,48-52,54,70-76,81-85,92-96,99-104,107,116-131,141-147,155-157,160,209-215,244,249-261,299,302-312
+pySDC/tutorial/step_9/B_paradiag_for_nonlinear_problems.py
+  s_619b2228c15391::t_b5d009d31cf6ef 1-34,64,66-71,73,114-115,118,166-172,206-216
+pySDC/tutorial/step_9/C_paradiag_in_pySDC.py
+  s_619b2228c15391::t_ce98a670613bce 1-32,35,140-150,152,167,174,181-182,184-218
+pySDC/tutorial/step_9/D_adaptive_alpha.py
+  s_619b2228c15391::t_d914991e645f0d 1-47,50-116
+pySDC/tutorial/step_9/E_paradiag_MPI.py
+  s_619b2228c15391::t_0a85b8ecf27b1c 1-34,39-88
+pySDC/tutorial/step_9/README.rst
+  s_619b2228c15391::t_dd7a88cbedd062 11-19
+pySDC/tutorial/step_9/paradiag_setup.py
+  s_619b2228c15391::t_5f170982abe7b9 1-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "80a41e9574cb0ebccf60cb4a57c2e4a1bd871f0a",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
