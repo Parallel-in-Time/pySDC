@@ -27,6 +27,10 @@ COVERAGE_OUT = 'coverage_GPU_hardware.dat'
 #: The whole `cupy`-marked selection, which is what CI runs.
 DEFAULT_TREES = ['pySDC/tests', 'pySDC/projects/GPU/tests']
 
+#: Results the tests write for the website: tutorial step 7 G, which only a GPU can run. Carried back like the
+#: coverage data, the docs job includes them.
+RESULTS = ['data/step_7_G_out.txt']
+
 #: Four of them. The space-time tests ask for four ranks and NCCL wants a GPU per rank, and the
 #: serial pass -- most of the job -- is spread over the same four rather than leaving three idle.
 #: That costs about what two did, because the split more than pays for the extra devices: 101
@@ -181,7 +185,8 @@ def run_cupy_tests(trees, selection):
     # finds nothing: the test failures are the interesting output in that case, not this.
     subprocess.run(['python', '-m', 'coverage', 'combine'], cwd=REMOTE)
     measured = pathlib.Path(REMOTE, '.coverage')
-    return returncode, measured.read_bytes() if measured.exists() else b''
+    results = {name: pathlib.Path(REMOTE, name).read_text() for name in RESULTS if pathlib.Path(REMOTE, name).exists()}
+    return returncode, measured.read_bytes() if measured.exists() else b'', results
 
 
 @app.function(image=image, gpu=GPUS, timeout=900)
@@ -204,7 +209,11 @@ def main(tests: str = ' '.join(DEFAULT_TREES), k: str = '', script: str = ''):
         raise SystemExit(run_script.remote(script))
 
     trees = tests.split()
-    returncode, measured = run_cupy_tests.remote(trees, k)
+    returncode, measured, results = run_cupy_tests.remote(trees, k)
+    for name, text in results.items():
+        pathlib.Path(name).parent.mkdir(parents=True, exist_ok=True)
+        pathlib.Path(name).write_text(text)
+        print(f'wrote {name}')
 
     # A narrowed run measures a fraction of the code, so its data would understate coverage rather
     # than add to it. Only a full run is worth keeping.

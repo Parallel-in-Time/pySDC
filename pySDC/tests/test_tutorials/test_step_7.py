@@ -94,6 +94,17 @@ def test_F(monkeypatch):
         error < 1e-8
     ), f'Unexpectedly large difference of {error} between pySDC and Gusto SDC implementations in Williamson 5 test case'
 
+    # for the website: what this compared
+    from pathlib import Path
+
+    Path('data').mkdir(parents=True, exist_ok=True)
+    with open('data/step_7_F_out.txt', 'a') as file:
+        file.write(
+            f"Williamson 5, {params['tmax'] // params['dt']} steps of {params['dt']} s, M={params['M']}, "
+            f"{params['kmax']} iterations, QI={params['QI']}:\n"
+            f'  largest relative difference in u and D between pySDC and Gusto\'s own SDC: {error:.2e}\n\n'
+        )
+
 
 @pytest.mark.firedrake
 def test_F_ML(monkeypatch):
@@ -121,6 +132,16 @@ def test_F_ML(monkeypatch):
     assert all(
         res_SL > res_ML for res_SL, res_ML in zip(residual_SL, residual_fine, strict=True)
     ), 'Single level SDC converged faster than multi-level!'
+
+    # for the website: the residuals this compared
+    from pathlib import Path
+
+    Path('data').mkdir(parents=True, exist_ok=True)
+    with open('data/step_7_F_out.txt', 'a') as file:
+        file.write(f"Williamson 5, one step of {params['dt']} s, residual on the finest level after each iteration:\n")
+        file.write('  iteration   one level   two levels\n')
+        for (iteration, res_SL), (_, res_ML) in zip(residual_SL, residual_fine, strict=True):
+            file.write(f'  {iteration:9d}   {res_SL:9.2e}   {res_ML:10.2e}\n')
 
 
 @pytest.mark.cupy

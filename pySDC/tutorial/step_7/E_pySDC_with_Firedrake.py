@@ -27,6 +27,8 @@
 # [Firedrake documentation on parallelism](https://www.firedrakeproject.org/firedrake/parallelism.html).
 
 # %%
+from pathlib import Path
+
 import numpy as np
 from mpi4py import MPI
 
@@ -194,6 +196,17 @@ def runHeatFiredrake(useMPIsweeper=False, ML=False):
         f'Finished with error {error[0][1]:.2e}. Used {tot_iter} SDC iterations, with {tot_solver_setup} solver setups, {tot_solves} solves and {tot_rhs} right hand side evaluations on the finest level of time task {time_rank}.'
     )
 
+    # the results the website shows, from the first rank
+    if MPI.COMM_WORLD.rank == 0:
+        timing = get_sorted(stats, type='timing_run')[0][1]
+        variant = 'three-level SDC' if ML else ('SDC parallel across the nodes' if useMPIsweeper else 'serial SDC')
+        Path('data').mkdir(parents=True, exist_ok=True)
+        with open('data/step_7_E_out.txt', 'a') as file:
+            file.write(
+                f'{variant:30s} error {error[0][1]:.2e}, {tot_iter:2d} iterations, {tot_solves:3d} solves on the '
+                f'finest level, time to solution {timing:.2f} s\n'
+            )
+
     # do tests that we got the same as last time
     n_nodes = 1 if useMPIsweeper else description['sweeper_params']['num_nodes']
     assert error[0][1] < 2e-7
@@ -210,10 +223,10 @@ def runHeatFiredrake(useMPIsweeper=False, ML=False):
 # - `mpiexec -np 3 python E_pySDC_with_Firedrake.py --useMPIsweeper` for single-level SDC, parallel across the nodes,
 # - `python E_pySDC_with_Firedrake.py --ML` for three-level serial SDC.
 #
-# You should notice that the speedup of the MPI parallelisation is quite good, and that multilevel SDC reduces the
-# number of SDC iterations quite a bit, but not the time to solution. This is partly due to more solvers being
-# constructed on the coarse levels. We do not claim to have found the best parameters, though: this is just an example
-# of how to use it.
+# Multilevel SDC reduces the number of SDC iterations quite a bit, but not necessarily the time to solution, partly
+# because more solvers are constructed on the coarse levels, and the parallel variant does the work of one node per
+# rank. The results below show both; mind that they come from a CI machine, not from a dedicated one. We do not claim
+# to have found the best parameters: this is just an example of how to use it.
 
 # %%
 if __name__ == "__main__":
@@ -243,4 +256,9 @@ if __name__ == "__main__":
 
 # %% [markdown]
 # Firedrake does not run in the browser, nor in the environment this website is built in. Our CI runs all three
-# variants in a Firedrake container, and checks their errors and work counts.
+# variants in a Firedrake container, and checks their errors and work counts. These are its results, in the run that
+# built this page:
+#
+# :::{literalinclude} /../../data_firedrake/step_7_E_out.txt
+# :language: text
+# :::

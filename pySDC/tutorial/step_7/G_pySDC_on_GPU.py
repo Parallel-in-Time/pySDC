@@ -172,7 +172,12 @@ if __name__ == '__main__':
 
 # %% [markdown]
 # CuPy and GPUs are not available in the browser, nor in the environment this website is built in. Our CI runs this
-# part on GPUs, and checks that all three runs are accurate and that PFASST and MLSDC agree.
+# part on rented GPUs (NVIDIA T4, on [Modal](https://modal.com)), and checks that all three runs are accurate and
+# that PFASST and MLSDC agree. These are the results of the run that built this page:
+#
+# :::{literalinclude} /../../data/step_7_G_out.txt
+# :language: text
+# :::
 #
 # :::{admonition} Important things to note
 # - Space coarsening works on GPU arrays: `mesh_to_mesh` assembles its interpolation and restriction matrices with

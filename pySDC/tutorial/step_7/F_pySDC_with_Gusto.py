@@ -442,4 +442,9 @@ if __name__ == "__main__":
 # %% [markdown]
 # Firedrake and Gusto do not run in the browser, nor in the environment this website is built in. Our CI runs this part
 # in a Firedrake container with Gusto: it checks that the pySDC coupling gives the same result as Gusto's own SDC
-# after a few time steps, and that the multilevel version converges faster than the single-level one.
+# after a few time steps, and that the multilevel version converges faster than the single-level one. These are the
+# results of the run that built this page, for a few time steps only, to keep the CI fast:
+#
+# :::{literalinclude} /../../data_firedrake/step_7_F_out.txt
+# :language: text
+# :::
