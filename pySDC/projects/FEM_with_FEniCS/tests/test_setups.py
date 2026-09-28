@@ -1,3 +1,5 @@
+from itertools import pairwise
+
 import pytest
 
 from pySDC.projects.FEM_with_FEniCS.setups import (
@@ -54,12 +56,12 @@ def test_only_the_chosen_direction_coarsens(example, family, nlevels):
     p_params = get_description(example, nlevels=nlevels, family=family, coarsening='p')[0]['problem_params']
 
     refinements, order = h_params['refinements'], h_params['order']
-    assert len(refinements) == nlevels and all(b < a for a, b in zip(refinements, refinements[1:]))
+    assert len(refinements) == nlevels and all(b < a for a, b in pairwise(refinements))
     assert isinstance(order, int)
 
     refinements, order = p_params['refinements'], p_params['order']
     assert isinstance(refinements, int) and refinements == h_params['refinements'][0]
-    assert len(order) == nlevels and all(b < a for a, b in zip(order, order[1:]))
+    assert len(order) == nlevels and all(b < a for a, b in pairwise(order))
 
     if nlevels == 1:
         assert h_params['refinements'][0] == p_params['refinements']
@@ -119,7 +121,7 @@ def test_pfasst_procs_lookup():
 
     for example in EXAMPLES:
         procs = get_pfasst_procs(example)
-        assert procs[0] == 1 and all(b > a for a, b in zip(procs, procs[1:]))
+        assert procs[0] == 1 and all(b > a for a, b in pairwise(procs))
 
 
 @pytest.mark.fenics
