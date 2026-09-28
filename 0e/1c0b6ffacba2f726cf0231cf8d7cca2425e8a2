@@ -1,0 +1,22 @@
+pySDC/projects/FastWaveSlowWave/plot_dispersion.py
+  s_e2fbdaacf0b58c::t_693c0f1e5478fb 62
+  s_e2fbdaacf0b58c::t_1e1a0f99143a37 37-61,63-66,123
+pySDC/projects/FastWaveSlowWave/tests/test_fwsw.py
+  s_e2fbdaacf0b58c::t_501e9b5407f968 58-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0e1c0b6ffacba2f726cf0231cf8d7cca2425e8a2",
+  "prompts": {},
+  "sessions": {
+    "s_e2fbdaacf0b58c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "683376fc-4fd4-46bc-8097-ca162e49419e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
