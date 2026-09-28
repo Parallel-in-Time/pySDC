@@ -69,7 +69,7 @@ class base_transfer_mass(BaseTransfer):
         # restrict fine level tau correction part in space
         tmp_tau = []
         for m in range(SF.coll.num_nodes):
-            tmp_tau.append(self.space_transfer.restrict(tauF[m]))
+            tmp_tau.append(self.space_transfer.restrict_dual(tauF[m]))
 
         # restrict fine level tau correction part in collocation
         tauFG = []
@@ -86,7 +86,7 @@ class base_transfer_mass(BaseTransfer):
             # restrict possible tau correction from fine in space
             tmp_tau = []
             for m in range(SF.coll.num_nodes):
-                tmp_tau.append(self.space_transfer.restrict(F.tau[m]))
+                tmp_tau.append(self.space_transfer.restrict_dual(F.tau[m]))
 
             # restrict possible tau correction from fine in collocation
             for n in range(SG.coll.num_nodes):
@@ -100,9 +100,14 @@ class base_transfer_mass(BaseTransfer):
             G.uold[m] = PG.dtype_u(G.u[m])
             G.fold[m] = PG.dtype_f(G.f[m])
 
-        # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
+        # u0 lives in the DUAL space on every coarse level: the finest level supplies it as M u0,
+        # and each further level restricts that dual vector with P^T. Without the else branch,
+        # level 1 -> 2 kept the primal `project` result from above and L2-projected an already-dual
+        # vector, which is why 2 levels worked and 3 did not.
         if F.level_index == 0:
-            G.u[0] = self.space_transfer.restrict(PF.apply_mass_matrix(F.u[0]))
+            G.u[0] = self.space_transfer.restrict_dual(PF.apply_mass_matrix(F.u[0]))
+        else:
+            G.u[0] = self.space_transfer.restrict_dual(F.u[0])
 
         # works as a predictor
         G.status.unlocked = True
@@ -154,34 +159,17 @@ class base_transfer_mass(BaseTransfer):
         """
         Space-time prolongation routine w.r.t. the rhs f
 
-        This routine applies the spatial prolongation routine to the difference between the computed and the restricted
-        values on the coarse level and then adds this difference to the fine values as coarse correction.
+        Not available for the mass formulation, so this falls back to prolong().
+
+        Under the mass formulation eval_f returns a load vector (f.impl = K u, f.expl = M g), which
+        cannot be interpolated -- doing so reads it as a nodal function and makes the coarse
+        correction actively wrong. The dimensionally correct dual transfer M_f P M_c^-1 restores the
+        right answer but needs a coarse mass solve per node and still costs about seven times the
+        iterations of simply re-evaluating f (measured on step_7's heat problem: 14.40 against 2.00
+        at restol 5e-10). Re-evaluating is cheaper and more accurate here, so finter is ignored.
         """
+        if not getattr(self, '_finter_warned', False):
+            self.logger.warning('finter is not supported for the mass formulation, re-evaluating f instead')
+            self._finter_warned = True
 
-        # get data for easier access
-        F = self.fine
-        G = self.coarse
-
-        SF = F.sweep
-        SG = G.sweep
-
-        # only of the level is unlocked at least by prediction or restriction
-        if not G.status.unlocked:
-            raise UnlockError('coarse level is still locked, cannot use data from there')
-
-        # build coarse correction
-
-        # interpolate values in space first
-        tmp_u = []
-        tmp_f = []
-        for m in range(1, SG.coll.num_nodes + 1):
-            tmp_u.append(self.space_transfer.prolong(G.u[m] - G.uold[m]))
-            tmp_f.append(self.space_transfer.prolong(G.f[m] - G.fold[m]))
-
-        # interpolate values in collocation
-        for n in range(1, SF.coll.num_nodes + 1):
-            for m in range(SG.coll.num_nodes):
-                F.u[n] += self.Pcoll[n - 1, m] * tmp_u[m]
-                F.f[n] += self.Pcoll[n - 1, m] * tmp_f[m]
-
-        return None
+        return self.prolong()

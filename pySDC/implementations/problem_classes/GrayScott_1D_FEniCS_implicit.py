@@ -4,7 +4,6 @@ import random
 import dolfin as df
 import numpy as np
 
-from pySDC.core.errors import ParameterError
 from pySDC.core.problem import Problem
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
 
@@ -49,9 +48,10 @@ class fenics_grayscott(Problem):
         of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [3]_.
     order : int, optional
         Defines the order of the elements in the function space.
-    refinements : list or tuple, optional
-        Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.
-        ``refinements=[2, 2]`` or ``refinements=(2, 2)``.
+    refinements : int, optional
+        How many times the mesh of ``c_nvars`` cells is refined uniformly, halving the cell size each time:
+        ``refinements=2`` gives ``4 * c_nvars`` cells. For a multilevel hierarchy, pass one value per level in the
+        description, e.g. ``[1, 0]``, which the controller splits across the levels. The default is ``0``.
     Du : float, optional
         Diffusion rate for :math:`u`.
     Dv: float, optional
@@ -107,7 +107,7 @@ class fenics_grayscott(Problem):
         t0=0.0,
         family='CG',
         order=4,
-        refinements=None,
+        refinements=0,
         Du=1.0,
         Dv=0.01,
         A=0.09,
@@ -118,15 +118,12 @@ class fenics_grayscott(Problem):
     ):
         """Initialization routine"""
 
-        if refinements is None:
-            refinements = [1, 0]
-
-        # define the Dirichlet boundary
-        def Boundary(x, on_boundary):
-            return on_boundary
-
         # set logger level for FFC and dolfin
-        df.set_log_level(df.LogLevel.WARNING)
+        warning_level = getattr(df, 'WARNING', None)
+        if warning_level is None and hasattr(df, 'LogLevel'):
+            warning_level = df.LogLevel.WARNING
+        if warning_level is not None:
+            df.set_log_level(warning_level)
         logging.getLogger('FFC').setLevel(logging.WARNING)
 
         # set solver and form parameters
@@ -143,10 +140,7 @@ class fenics_grayscott(Problem):
         element = df.FiniteElement(family, mesh.ufl_cell(), order)
         self.V = df.FunctionSpace(mesh, df.MixedElement([element, element]))
 
-        # invoke super init, passing number of dofs. Note this used to be
-        # `super(fenics_grayscott).__init__(V)`, which builds an unbound super object and therefore
-        # never ran Problem.__init__ at all.
-        super(fenics_grayscott, self).__init__(self.V)
+        super().__init__(self.V)
         self._makeAttributeAndRegister(
             'c_nvars', 't0', 'family', 'order', 'refinements', 'Du', 'Dv', 'A', 'B', localVars=locals(), readOnly=True
         )
@@ -178,6 +172,28 @@ class fenics_grayscott(Problem):
         a_M = u2 * q2 * df.dx
         M2 = df.assemble(a_M)
         self.M = M1 + M2
+
+    def apply_mass_matrix(self, u):
+        r"""
+        Apply the mass matrix, :math:`M \vec{u}`.
+
+        Required by the mass-matrix sweepers and transfers; ``Problem`` has no default.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+
+        Returns
+        -------
+        me : dtype_u
+            The product :math:`M \vec{u}`.
+        """
+
+        me = self.dtype_u(self.V)
+        self.M.mult(u.values.vector(), me.values.vector())
+
+        return me
 
     def __invert_mass_matrix(self, u):
         r"""
@@ -316,3 +332,88 @@ class fenics_grayscott(Problem):
         me.values = df.interpolate(uinit, self.V)
 
         return me
+
+
+class fenics_grayscott_mass(fenics_grayscott):
+    r"""
+    Gray-Scott in mass-matrix form, :math:`M \vec{u}' = F(\vec{u})`, with no mass inversion.
+
+    ``eval_f`` returns the assembled weak-form residual (a load vector) rather than
+    :math:`M^{-1} F`, and ``solve_system`` takes an rhs that is already in the dual space. Use
+    with :class:`generic_implicit_mass` and, for MLSDC, :class:`base_transfer_mass`.
+
+    The Newton loop is written out rather than handed to ``NonlinearVariationalSolver`` because
+    the rhs is a vector, not a form, so it cannot be folded into the variational problem.
+    """
+
+    def eval_f(self, u, t):
+        r"""
+        Evaluate the right-hand side in weak (dual) form, without inverting the mass matrix.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        f : dtype_f
+            The assembled load vector :math:`F(\vec{u})`.
+        """
+
+        f = self.dtype_f(self.V)
+        self.w.assign(u.values)
+        f.values = df.Function(self.V, df.assemble(self.F))
+
+        return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        r"""
+        Solve :math:`M \vec{u} - factor \cdot F(\vec{u}) = \vec{rhs}` by Newton, rhs already dual.
+
+        Parameters
+        ----------
+        rhs : dtype_f
+            Right-hand side, in the dual space.
+        factor : float
+            Node-to-node stepsize.
+        u0 : dtype_u
+            Initial guess (unused; the loop starts from zero, matching the mass-inverse variant so
+            that the two are directly comparable).
+        t : float
+            Current time.
+
+        Returns
+        -------
+        sol : dtype_u
+            Solution.
+        """
+
+        sol = self.dtype_u(self.V)
+        self.w.assign(sol.values)
+
+        du = df.TrialFunction(self.V)
+        Jform = df.derivative(self.F, self.w, du)
+
+        res = df.Function(self.V)
+        delta = df.Function(self.V)
+        res0 = None
+
+        for _ in range(self.newton_maxiter):
+            self.M.mult(self.w.vector(), res.vector())
+            res.vector().axpy(-factor, df.assemble(self.F))
+            res.vector().axpy(-1.0, rhs.values.vector())
+
+            norm = res.vector().norm('l2')
+            res0 = norm if res0 is None else res0
+            if norm < self.newton_tol or norm < self.newton_rtol * res0:
+                break
+
+            df.solve(self.M - factor * df.assemble(Jform), delta.vector(), res.vector())
+            self.w.vector().axpy(-1.0, delta.vector())
+
+        sol.values.assign(self.w)
+
+        return sol

@@ -5,10 +5,8 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS import (
     fenics_NSE_2D_TaylorGreen,
 )
-from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass import (
-    generic_implicit_mass,
-    generic_implicit_mass_diffbc,
-)
+from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass_diffbc import generic_implicit_mass_diffbc
 
 
 def setup(

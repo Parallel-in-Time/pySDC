@@ -86,6 +86,10 @@
         start-at: '# do the sweep'
         end-at: 'L.u[m + 1] = L.u[0] + integral[m]'
       summary: Sweepers, problems and scripts for solving differential-algebraic equations with SDC.
+    - title: Finite elements, the mass-matrix route
+      page: FEM_with_FEniCS
+      image: data/fem_with_fenics_orders.png
+      summary: SDC, MLSDC and PFASST with FEniCS, never inverting the mass matrix, and why high-order elements make MLSDC pay.
 
 - section: Applications
   projects:

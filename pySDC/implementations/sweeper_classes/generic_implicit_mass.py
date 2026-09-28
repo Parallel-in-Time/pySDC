@@ -2,13 +2,14 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 
 
 class generic_implicit_mass(generic_implicit):
+    """Fully implicit SDC sweeper for the mass-matrix formulation (no M^-1 anywhere)."""
 
     def update_nodes(self):
         """
-        This sweeper extends the generic_implicit sweeper from the implementations
-        package for a monolithic discretization of the incompressible Navier-Stokes
-        equations with a mass matrix. It updates the solution and right-hand side
-        values at all collocation nodes during a single sweep.
+        Fully implicit sweep for problems posed in mass-matrix form, M u' = f(u), where eval_f
+        returns the load vector f and solve_system solves (M - factor J) u = rhs with rhs already
+        in the dual space. u0 carries the mass matrix on the finest level only; coarse levels
+        receive it already applied from the space-time transfer.
 
         Returns:
             None
@@ -88,6 +89,12 @@ class generic_implicit_mass(generic_implicit):
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
+            # On coarse levels u[0] is carried in the dual space: the transfer hands down P^T M u0 and
+            # the sweep consumes it as-is. PFASST copies uend straight into the next step's u[0]
+            # (controller.recv_full), so what we hand over has to be dual as well -- otherwise the step
+            # boundary feeds a primal value into a slot that is read as M u0.
+            if L.level_index > 0:
+                L.uend = P.apply_mass_matrix(L.uend)
         else:
             raise NotImplementedError('Mass matrix sweeper expect u_M = u_end')
 
@@ -132,7 +139,7 @@ class generic_implicit_mass(generic_implicit):
                 res[m] += L.tau[m]
 
             # Due to different boundary conditions we might have to fix the residual
-            if L.prob.fix_bc_for_residual:
+            if getattr(L.prob, 'fix_bc_for_residual', False):
                 L.prob.fix_residual(res[m])
             # use abs function from data type here
             res_norm.append(abs(res[m]))
@@ -144,33 +151,3 @@ class generic_implicit_mass(generic_implicit):
         L.status.updated = False
 
         return None
-
-
-class generic_implicit_mass_diffbc(generic_implicit_mass):
-    """
-    Variant of ``generic_implicit_mass`` for problems that impose their boundary conditions in
-    differentiated form.
-
-    Such a problem needs the collocation data of the current step to build the boundary values
-    of its stages by quadrature, and a problem class cannot see that data on its own: it only
-    ever learns the time of the node it is asked to solve at. This sweeper hands it over once
-    per step, before sweeping.
-
-    The problem class must provide ``prepare_step(t0, dt, coll)``.
-    """
-
-    def predict(self):
-        """
-        Supply the collocation data of this step to the problem, then predict as usual.
-
-        ``predict`` rather than ``update_nodes`` because the controller calls it exactly once
-        per step, while ``update_nodes`` runs once per sweep and would rebuild the same
-        boundary conditions on every iteration.
-
-        Returns:
-            None
-        """
-        L = self.level
-        L.prob.prepare_step(L.time, L.dt, self.coll)
-
-        return super().predict()
