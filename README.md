@@ -87,7 +87,7 @@
 | pySDC/implementations/problem\_classes/Boussinesq\_2D\_FD\_imex.py                                  |       67 |        1 |     99% |       108 |
 | pySDC/implementations/problem\_classes/Brusselator.py                                               |       44 |        6 |     86% |57-58, 145-149 |
 | pySDC/implementations/problem\_classes/BuckConverter.py                                             |       47 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/Burgers.py                                                   |       96 |        5 |     95% |   371-377 |
+| pySDC/implementations/problem\_classes/Burgers.py                                                   |       96 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/DiscontinuousTestODE.py                                      |       87 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/FastWaveSlowWave\_0D.py                                      |       40 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/FermiPastaUlamTsingou.py                                     |       40 |        1 |     98% |        61 |
@@ -112,8 +112,8 @@
 | pySDC/implementations/problem\_classes/PenningTrap\_3D.py                                           |      124 |       13 |     90% |5-8, 124-138, 183 |
 | pySDC/implementations/problem\_classes/Piline.py                                                    |       44 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Quench.py                                                    |      151 |       34 |     77% |205-206, 267-269, 340, 411-461 |
-| pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |107, 356, 455, 514 |
-| pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      255 |       15 |     94% |99, 325, 345, 492, 548, 568, 734-749 |
+| pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |107, 357, 456, 515 |
+| pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      257 |       14 |     95% |99, 325, 345, 492, 570, 736-751 |
 | pySDC/implementations/problem\_classes/TestEquation\_0D.py                                          |      101 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        1 |     98% |       182 |
 | pySDC/implementations/problem\_classes/VorticityVelocity\_2D\_FEniCS\_periodic.py                   |      108 |       51 |     53% |164-169, 188-197, 216-221, 240-243, 260-263, 280-282, 298-324, 407-412, 431-441, 460-464, 486-489 |
@@ -398,7 +398,7 @@
 | pySDC/tutorial/step\_9/C\_paradiag\_in\_pySDC.py                                                    |       88 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       77 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       16 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32540** | **4221** | **87%** |           |
+| **TOTAL**                                                                                           | **32542** | **4215** | **87%** |           |
 
 42 empty files skipped.
 

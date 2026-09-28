@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_nonlinear_ODE_1_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-27 15:30 +0000
+            created at 2026-09-28 05:20 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -386,8 +386,8 @@
     <p class="pln"><span class="n"><a id="t304" href="#t304">304</a></span><span class="t">        <span class="com"># apply inverse right preconditioner to initial guess</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t305" href="#t305">305</a></span><span class="t">        <span class="key">if</span> <span class="nam">u0_hat</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span> <span class="key">and</span> <span class="str">&#x27;direct&#x27;</span> <span class="key">not</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">solver_type</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t306" href="#t306">306</a></span><span class="t">            <span class="key">if</span> <span class="key">not</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="str">&#x27;_Pr_inv&#x27;</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t307" href="#t307">307</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">_PR_inv</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">linalg</span><span class="op">.</span><span class="nam">splu</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">Pr</span><span class="op">.</span><span class="nam">astype</span><span class="op">(</span><span class="nam">complex</span><span class="op">)</span><span class="op">)</span><span class="op">.</span><span class="nam">solve</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t308" href="#t308">308</a></span><span class="t">            <span class="nam">u0_hat</span><span class="op">[</span><span class="op">...</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_PR_inv</span><span class="op">(</span><span class="nam">u0_hat</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t307" href="#t307">307</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">_Pr_inv</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">linalg</span><span class="op">.</span><span class="nam">splu</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">Pr</span><span class="op">.</span><span class="nam">astype</span><span class="op">(</span><span class="nam">complex</span><span class="op">)</span><span class="op">)</span><span class="op">.</span><span class="nam">solve</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t308" href="#t308">308</a></span><span class="t">            <span class="nam">u0_hat</span><span class="op">[</span><span class="op">...</span><span class="op">]</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_Pr_inv</span><span class="op">(</span><span class="nam">u0_hat</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t309" href="#t309">309</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t310" href="#t310">310</a></span><span class="t">        <span class="nam">rhs_hat</span> <span class="op">=</span> <span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">M</span> <span class="op">@</span> <span class="nam">rhs_hat</span><span class="op">.</span><span class="nam">flatten</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">.</span><span class="nam">reshape</span><span class="op">(</span><span class="nam">rhs_hat</span><span class="op">.</span><span class="nam">shape</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t311" href="#t311">311</a></span><span class="t">        <span class="nam">rhs_hat</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">spectral</span><span class="op">.</span><span class="nam">put_BCs_in_rhs_hat</span><span class="op">(</span><span class="nam">rhs_hat</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -672,7 +672,7 @@
             <a class="nav" href="z_91faa57f8583c837_nonlinear_ODE_1_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-09-27 15:30 +0000
+            created at 2026-09-28 05:20 +0000
         </p>
     </div>
 </footer>
