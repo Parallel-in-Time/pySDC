@@ -1,0 +1,7 @@
+generic\_implicit\_mass
+=======================
+
+.. automodule:: pySDC.implementations.sweeper_classes.generic_implicit_mass
+   :members:
+   :show-inheritance:
+   :undoc-members:

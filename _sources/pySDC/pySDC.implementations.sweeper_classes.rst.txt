@@ -17,6 +17,7 @@ Submodules
    pySDC.implementations.sweeper_classes.explicit
    pySDC.implementations.sweeper_classes.generic_implicit
    pySDC.implementations.sweeper_classes.generic_implicit_MPI
+   pySDC.implementations.sweeper_classes.generic_implicit_mass
    pySDC.implementations.sweeper_classes.imex_1st_order
    pySDC.implementations.sweeper_classes.imex_1st_order_MPI
    pySDC.implementations.sweeper_classes.imex_1st_order_mass

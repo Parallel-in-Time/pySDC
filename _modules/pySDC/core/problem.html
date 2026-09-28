@@ -647,9 +647,21 @@
 
 <div class="viewcode-block" id="Problem.apply_mass_matrix">
 <a class="viewcode-back" href="../../../pySDC/pySDC.core.problem.html#pySDC.core.problem.Problem.apply_mass_matrix">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-<span class="w">        </span><span class="sd">"""Default mass matrix : identity"""</span>
-        <span class="k">return</span> <span class="n">u</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Apply the problem's mass matrix, :math:`M \vec{u}`.</span>
+
+<span class="sd">        There is deliberately no default implementation. The mass-matrix sweepers and transfers</span>
+<span class="sd">        (``generic_implicit_mass``, ``imex_1st_order_mass``, ``base_transfer_mass``) build ``u0``,</span>
+<span class="sd">        the FAS ``tau`` and the residual out of this, so a problem that does not implement it would</span>
+<span class="sd">        silently compute the wrong thing instead of failing. The identity default that used to sit</span>
+<span class="sd">        here did exactly that: it produced ``nan`` several sweeps later, with nothing pointing back</span>
+<span class="sd">        to the missing method.</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> is being used in a mass-matrix formulation but does not '</span>
+            <span class="s1">'implement apply_mass_matrix'</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Problem.generate_scipy_reference_solution">

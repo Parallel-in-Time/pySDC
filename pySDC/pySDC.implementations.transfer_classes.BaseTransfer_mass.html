@@ -529,6 +529,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.explicit.html">explicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit.html">generic_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit_MPI.html">generic_implicit_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit_mass.html">generic_implicit_mass</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order.html">imex_1st_order</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html">imex_1st_order_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html">imex_1st_order_mass</a></li>
@@ -669,8 +670,13 @@ values on the coarse level and then adds this difference to the fine values as c
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.prolong_f">
 <span class="sig-name descname"><span class="pre">prolong_f</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/BaseTransfer_mass.html#base_transfer_mass.prolong_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.prolong_f" title="Link to this definition">#</a></dt>
 <dd><p>Space-time prolongation routine w.r.t. the rhs f</p>
-<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
-values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+<p>Not available for the mass formulation, so this falls back to prolong().</p>
+<p>Under the mass formulation eval_f returns a load vector (f.impl = K u, f.expl = M g), which
+cannot be interpolated – doing so reads it as a nodal function and makes the coarse
+correction actively wrong. The dimensionally correct dual transfer M_f P M_c^-1 restores the
+right answer but needs a coarse mass solve per node and still costs about seven times the
+iterations of simply re-evaluating f (measured on step_7’s heat problem: 14.40 against 2.00
+at restol 5e-10). Re-evaluating is cheaper and more accurate here, so finter is ignored.</p>
 </dd></dl>
 
 <dl class="py method">

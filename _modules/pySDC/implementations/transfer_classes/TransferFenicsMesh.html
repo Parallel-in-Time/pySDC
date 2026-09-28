@@ -432,6 +432,9 @@
                   
   <h1>Source code for pySDC.implementations.transfer_classes.TransferFenicsMesh</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dolfin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">df</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spla</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransferError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.space_transfer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaceTransfer</span>
@@ -445,25 +448,143 @@
 <span class="sd">    This implementation can restrict and prolong between fenics meshes</span>
 <span class="sd">    """</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fine_prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Pmat</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_l2</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="mesh_to_mesh_fenics.Pmat">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFenicsMesh.html#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.Pmat">[docs]</a>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Pmat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Prolongation matrix P (coarse -&gt; fine), assembled once on first use.</span>
+
+<span class="sd">        P is the inclusion of the coarse space in the fine one: column j holds the coarse basis</span>
+<span class="sd">        function phi_j expanded in the fine basis. It is built cell by cell -- for every fine cell</span>
+<span class="sd">        the enclosing coarse cell is found from the fine cell's midpoint, which is never on a coarse</span>
+<span class="sd">        facet, and the coarse basis is evaluated in *that* cell.</span>
+
+<span class="sd">        Not df.interpolate: across meshes that is point evaluation, and a fine dof on a coarse facet</span>
+<span class="sd">        has two coarse values there, so a discontinuous coarse function comes back continuised. For</span>
+<span class="sd">        continuous spaces the two agree to machine precision.</span>
+
+<span class="sd">        Costs one basis evaluation per fine dof; dolfin 2019.1.0's</span>
+<span class="sd">        PETScDMCollection.create_transfer_matrix segfaults.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Pmat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Vc</span><span class="p">,</span> <span class="n">Vf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">Vc</span><span class="o">.</span><span class="n">mesh</span><span class="p">()</span><span class="o">.</span><span class="n">bounding_box_tree</span><span class="p">()</span>
+            <span class="n">element</span><span class="p">,</span> <span class="n">dofmap_c</span> <span class="o">=</span> <span class="n">Vc</span><span class="o">.</span><span class="n">element</span><span class="p">(),</span> <span class="n">Vc</span><span class="o">.</span><span class="n">dofmap</span><span class="p">()</span>
+            <span class="n">element_f</span> <span class="o">=</span> <span class="n">Vf</span><span class="o">.</span><span class="n">element</span><span class="p">()</span>
+
+            <span class="c1"># which component of a mixed space each fine dof belongs to; scalar spaces are all zero</span>
+            <span class="n">ncomp</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">Vf</span><span class="o">.</span><span class="n">num_sub_spaces</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Vf</span><span class="o">.</span><span class="n">dim</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Vf</span><span class="o">.</span><span class="n">num_sub_spaces</span><span class="p">()):</span>
+                <span class="n">component</span><span class="p">[</span><span class="n">Vf</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">dofmap</span><span class="p">()</span><span class="o">.</span><span class="n">dofs</span><span class="p">()]</span> <span class="o">=</span> <span class="n">k</span>
+
+            <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">cell_f</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">cells</span><span class="p">(</span><span class="n">Vf</span><span class="o">.</span><span class="n">mesh</span><span class="p">()):</span>
+                <span class="n">cell_c</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Cell</span><span class="p">(</span><span class="n">Vc</span><span class="o">.</span><span class="n">mesh</span><span class="p">(),</span> <span class="n">tree</span><span class="o">.</span><span class="n">compute_first_entity_collision</span><span class="p">(</span><span class="n">cell_f</span><span class="o">.</span><span class="n">midpoint</span><span class="p">()))</span>
+                <span class="n">coords</span><span class="p">,</span> <span class="n">orientation</span> <span class="o">=</span> <span class="n">cell_c</span><span class="o">.</span><span class="n">get_vertex_coordinates</span><span class="p">(),</span> <span class="n">cell_c</span><span class="o">.</span><span class="n">orientation</span><span class="p">()</span>
+                <span class="n">dofs_c</span> <span class="o">=</span> <span class="n">dofmap_c</span><span class="o">.</span><span class="n">cell_dofs</span><span class="p">(</span><span class="n">cell_c</span><span class="o">.</span><span class="n">index</span><span class="p">())</span>
+                <span class="c1"># per cell, not from tabulate_dof_coordinates: that reports one point per master</span>
+                <span class="c1"># dof, which on a periodic space is the wrong side of the domain for half the cells</span>
+                <span class="c1"># and evaluates the coarse basis outside the cell</span>
+                <span class="n">x_local</span> <span class="o">=</span> <span class="n">element_f</span><span class="o">.</span><span class="n">tabulate_dof_coordinates</span><span class="p">(</span><span class="n">cell_f</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">dof_f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Vf</span><span class="o">.</span><span class="n">dofmap</span><span class="p">()</span><span class="o">.</span><span class="n">cell_dofs</span><span class="p">(</span><span class="n">cell_f</span><span class="o">.</span><span class="n">index</span><span class="p">())):</span>
+                    <span class="c1"># a continuous space shares dofs between cells; the second visit is redundant</span>
+                    <span class="k">if</span> <span class="n">dof_f</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dof_f</span><span class="p">)</span>
+                    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">evaluate_basis_all</span><span class="p">(</span><span class="n">x_local</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">coords</span><span class="p">,</span> <span class="n">orientation</span><span class="p">))</span>
+                    <span class="n">col</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncomp</span><span class="p">)[:,</span> <span class="n">component</span><span class="p">[</span><span class="n">dof_f</span><span class="p">]]</span>
+                    <span class="n">nz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-13</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">rows</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">dof_f</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">nz</span><span class="p">))</span>
+                    <span class="n">cols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dofs_c</span><span class="p">[</span><span class="n">nz</span><span class="p">])</span>
+                    <span class="n">vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="n">nz</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Pmat</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">Vf</span><span class="o">.</span><span class="n">dim</span><span class="p">(),</span> <span class="n">Vc</span><span class="o">.</span><span class="n">dim</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Pmat</span></div>
+
+
+<div class="viewcode-block" id="mesh_to_mesh_fenics.restrict_dual">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFenicsMesh.html#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict_dual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restrict_dual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Variational restriction P^T, for quantities living in the dual space.</span>
+
+<span class="sd">        The FAS tau of the mass formulation is a load vector, not a nodal function, so it has to</span>
+<span class="sd">        be restricted with P^T rather than by interpolation. For nested Lagrange spaces</span>
+<span class="sd">        phi_i^coarse = sum_j P_ji phi_j^fine, which makes P^T exact: it reproduces the coarse</span>
+<span class="sd">        load vector of the same functional. Interpolating instead reads the load vector as if it</span>
+<span class="sd">        were a function and is wrong by roughly 2^dim.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            F: the fine level data</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">fenics_mesh</span><span class="p">):</span>
+            <span class="c1"># tau and u0 are the only dual quantities, and both are meshes</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Unknown type of fine data, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
+
+        <span class="n">u_coarse</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">u_coarse</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pmat</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:])</span>
+        <span class="k">return</span> <span class="n">u_coarse</span></div>
+
+
+<div class="viewcode-block" id="mesh_to_mesh_fenics.l2_pieces">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFenicsMesh.html#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.l2_pieces">[docs]</a>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">l2_pieces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Prefactorised coarse mass matrix, :math:`P^T`, and the fine mass matrix, assembled once.</span>
+
+<span class="sd">        Factorised up front: it is solved against once per node per sweep.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_l2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="nf">mass</span><span class="p">(</span><span class="n">V</span><span class="p">):</span>
+                <span class="c1"># straight out of PETSc's CSR; `.array()` would densify, and these are ~0.5% dense</span>
+                <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="n">V</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+                <span class="n">mat</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">as_backend_type</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">))</span><span class="o">.</span><span class="n">mat</span><span class="p">()</span>
+                <span class="n">indptr</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">getValuesCSR</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">indptr</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="n">mat</span><span class="o">.</span><span class="n">getSize</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_l2</span> <span class="o">=</span> <span class="p">(</span><span class="n">spla</span><span class="o">.</span><span class="n">factorized</span><span class="p">(</span><span class="n">mass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pmat</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">mass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_l2</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_project_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""L2-project one fine ``dolfin.Function`` onto the coarse space."""</span>
+        <span class="n">solve_coarse</span><span class="p">,</span> <span class="n">P_transpose</span><span class="p">,</span> <span class="n">mass_fine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">l2_pieces</span>
+        <span class="n">coarse</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">coarse</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">solve_coarse</span><span class="p">(</span><span class="n">P_transpose</span> <span class="o">@</span> <span class="p">(</span><span class="n">mass_fine</span> <span class="o">@</span> <span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]))</span>
+        <span class="k">return</span> <span class="n">coarse</span>
+
 <div class="viewcode-block" id="mesh_to_mesh_fenics.project">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFenicsMesh.html#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Restriction implementation via projection</span>
+<span class="sd">        Restriction of a SOLUTION, by L2 projection: :math:`M_c^{-1} P^T M_f`.</span>
+
+<span class="sd">        Not point sampling, which is cheaper to reach for but is not well defined on a DG space and</span>
+<span class="sd">        costs PFASST iterations even on a CG one -- :math:`R_u` cancels out of the linear FAS</span>
+<span class="sd">        iteration but not across step boundaries. See ``projects/FEM_with_FEniCS`` for the numbers.</span>
+
+<span class="sd">        Dual quantities go through :meth:`restrict_dual` instead.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            F: the fine level data</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">fenics_mesh</span><span class="p">):</span>
-            <span class="n">u_coarse</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_project_one</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">rhs_fenics_mesh</span><span class="p">):</span>
             <span class="n">u_coarse</span> <span class="o">=</span> <span class="n">rhs_fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-            <span class="n">u_coarse</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-            <span class="n">u_coarse</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Unknown type of fine data, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">u_coarse</span></div>
+            <span class="n">u_coarse</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_project_one</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">u_coarse</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_project_one</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">u_coarse</span>
+        <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Unknown type of fine data, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="mesh_to_mesh_fenics.restrict">
@@ -491,17 +612,22 @@
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFenicsMesh.html#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.prolong">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Prolongation implementation</span>
+<span class="sd">        Prolongation implementation, the exact inclusion via P.</span>
+
+<span class="sd">        Not df.interpolate: see the Pmat docstring for why that silently continuises a</span>
+<span class="sd">        discontinuous coarse function.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            G: the coarse level data</span>
 <span class="sd">        """</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pmat</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">fenics_mesh</span><span class="p">):</span>
-            <span class="n">u_fine</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">))</span>
+            <span class="n">u_fine</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+            <span class="n">u_fine</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:])</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">rhs_fenics_mesh</span><span class="p">):</span>
             <span class="n">u_fine</span> <span class="o">=</span> <span class="n">rhs_fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-            <span class="n">u_fine</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-            <span class="n">u_fine</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+            <span class="n">u_fine</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:])</span>
+            <span class="n">u_fine</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Unknown type of coarse data, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
 

@@ -48,6 +48,8 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'pySDC/pySDC.implementations.transfer_classes.TransferFenicsMesh';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <script type="module" src="../_static/run-in-browser.js?v=11117657"></script>
@@ -529,6 +531,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.explicit.html">explicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit.html">generic_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit_MPI.html">generic_implicit_MPI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.generic_implicit_mass.html">generic_implicit_mass</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order.html">imex_1st_order</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html">imex_1st_order_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html">imex_1st_order_mass</a></li>
@@ -644,13 +647,39 @@
 <span id="transferfenicsmesh"></span><h1>TransferFenicsMesh<a class="headerlink" href="#module-pySDC.implementations.transfer_classes.TransferFenicsMesh" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">mesh_to_mesh_fenics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">mesh_to_mesh_fenics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pySDC.core.space_transfer.html#pySDC.core.space_transfer.SpaceTransfer" title="pySDC.core.space_transfer.SpaceTransfer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTransfer</span></code></a></p>
 <p>This implementation can restrict and prolong between fenics meshes</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.Pmat">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Pmat</span></span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.Pmat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.Pmat" title="Link to this definition">#</a></dt>
+<dd><p>Prolongation matrix P (coarse -&gt; fine), assembled once on first use.</p>
+<p>P is the inclusion of the coarse space in the fine one: column j holds the coarse basis
+function phi_j expanded in the fine basis. It is built cell by cell – for every fine cell
+the enclosing coarse cell is found from the fine cell’s midpoint, which is never on a coarse
+facet, and the coarse basis is evaluated in <em>that</em> cell.</p>
+<p>Not df.interpolate: across meshes that is point evaluation, and a fine dof on a coarse facet
+has two coarse values there, so a discontinuous coarse function comes back continuised. For
+continuous spaces the two agree to machine precision.</p>
+<p>Costs one basis evaluation per fine dof; dolfin 2019.1.0’s
+PETScDMCollection.create_transfer_matrix segfaults.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.l2_pieces">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">l2_pieces</span></span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.l2_pieces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.l2_pieces" title="Link to this definition">#</a></dt>
+<dd><p>Prefactorised coarse mass matrix, <span class="math notranslate nohighlight">\(P^T\)</span>, and the fine mass matrix, assembled once.</p>
+<p>Factorised up front: it is solved against once per node per sweep.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project">
 <span class="sig-name descname"><span class="pre">project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project" title="Link to this definition">#</a></dt>
-<dd><p>Restriction implementation via projection</p>
+<dd><p>Restriction of a SOLUTION, by L2 projection: <span class="math notranslate nohighlight">\(M_c^{-1} P^T M_f\)</span>.</p>
+<p>Not point sampling, which is cheaper to reach for but is not well defined on a DG space and
+costs PFASST iterations even on a CG one – <span class="math notranslate nohighlight">\(R_u\)</span> cancels out of the linear FAS
+iteration but not across step boundaries. See <code class="docutils literal notranslate"><span class="pre">projects/FEM_with_FEniCS</span></code> for the numbers.</p>
+<p>Dual quantities go through <a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict_dual" title="pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict_dual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">restrict_dual()</span></code></a> instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>F</strong> – the fine level data</p>
@@ -661,7 +690,9 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.prolong">
 <span class="sig-name descname"><span class="pre">prolong</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.prolong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.prolong" title="Link to this definition">#</a></dt>
-<dd><p>Prolongation implementation</p>
+<dd><p>Prolongation implementation, the exact inclusion via P.</p>
+<p>Not df.interpolate: see the Pmat docstring for why that silently continuises a
+discontinuous coarse function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>G</strong> – the coarse level data</p>
@@ -673,6 +704,22 @@
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict">
 <span class="sig-name descname"><span class="pre">restrict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.restrict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict" title="Link to this definition">#</a></dt>
 <dd><p>Restriction implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>F</strong> – the fine level data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict_dual">
+<span class="sig-name descname"><span class="pre">restrict_dual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.restrict_dual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict_dual" title="Link to this definition">#</a></dt>
+<dd><p>Variational restriction P^T, for quantities living in the dual space.</p>
+<p>The FAS tau of the mass formulation is a load vector, not a nodal function, so it has to
+be restricted with P^T rather than by interpolation. For nested Lagrange spaces
+phi_i^coarse = sum_j P_ji phi_j^fine, which makes P^T exact: it reproduces the coarse
+load vector of the same functional. Interpolating instead reads the load vector as if it
+were a function and is wrong by roughly 2^dim.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>F</strong> – the fine level data</p>
@@ -732,9 +779,12 @@
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics"><code class="docutils literal notranslate"><span class="pre">mesh_to_mesh_fenics</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.Pmat"><code class="docutils literal notranslate"><span class="pre">Pmat</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.l2_pieces"><code class="docutils literal notranslate"><span class="pre">l2_pieces</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project"><code class="docutils literal notranslate"><span class="pre">project()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict_dual"><code class="docutils literal notranslate"><span class="pre">restrict_dual()</span></code></a></li>
 </ul>
 </li>
 </ul>

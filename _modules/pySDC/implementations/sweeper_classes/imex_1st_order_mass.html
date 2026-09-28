@@ -529,6 +529,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">right_is_node</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">:</span>
             <span class="c1"># a copy is sufficient</span>
             <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="c1"># On coarse levels u[0] is carried in the dual space: the transfer hands down P^T M u0 and</span>
+            <span class="c1"># the sweep consumes it as-is. PFASST copies uend straight into the next step's u[0]</span>
+            <span class="c1"># (controller.recv_full), so what we hand over has to be dual as well -- otherwise the step</span>
+            <span class="c1"># boundary feeds a primal value into a slot that is read as M u0.</span>
+            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">level_index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Mass matrix sweeper expect u_M = u_end'</span><span class="p">)</span>
 

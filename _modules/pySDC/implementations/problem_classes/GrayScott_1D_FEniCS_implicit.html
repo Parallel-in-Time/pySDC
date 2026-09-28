@@ -437,7 +437,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">dolfin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">df</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.fenics_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">fenics_mesh</span>
 
@@ -484,9 +483,10 @@
 <span class="sd">        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [3]_.</span>
 <span class="sd">    order : int, optional</span>
 <span class="sd">        Defines the order of the elements in the function space.</span>
-<span class="sd">    refinements : list or tuple, optional</span>
-<span class="sd">        Defines the refinement for the spatial grid. Needs to be a list or tuple, e.g.</span>
-<span class="sd">        ``refinements=[2, 2]`` or ``refinements=(2, 2)``.</span>
+<span class="sd">    refinements : int, optional</span>
+<span class="sd">        How many times the mesh of ``c_nvars`` cells is refined uniformly, halving the cell size each time:</span>
+<span class="sd">        ``refinements=2`` gives ``4 * c_nvars`` cells. For a multilevel hierarchy, pass one value per level in the</span>
+<span class="sd">        description, e.g. ``[1, 0]``, which the controller splits across the levels. The default is ``0``.</span>
 <span class="sd">    Du : float, optional</span>
 <span class="sd">        Diffusion rate for :math:`u`.</span>
 <span class="sd">    Dv: float, optional</span>
@@ -542,7 +542,7 @@
         <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">family</span><span class="o">=</span><span class="s1">'CG'</span><span class="p">,</span>
         <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-        <span class="n">refinements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">refinements</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">Du</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">Dv</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
         <span class="n">A</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span>
@@ -553,15 +553,12 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Initialization routine"""</span>
 
-        <span class="k">if</span> <span class="n">refinements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">refinements</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-
-        <span class="c1"># define the Dirichlet boundary</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">Boundary</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">on_boundary</span>
-
         <span class="c1"># set logger level for FFC and dolfin</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+        <span class="n">warning_level</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">'WARNING'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">warning_level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">'LogLevel'</span><span class="p">):</span>
+            <span class="n">warning_level</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">WARNING</span>
+        <span class="k">if</span> <span class="n">warning_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">set_log_level</span><span class="p">(</span><span class="n">warning_level</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'FFC'</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
 
         <span class="c1"># set solver and form parameters</span>
@@ -578,10 +575,7 @@
         <span class="n">element</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">FiniteElement</span><span class="p">(</span><span class="n">family</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">ufl_cell</span><span class="p">(),</span> <span class="n">order</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">MixedElement</span><span class="p">([</span><span class="n">element</span><span class="p">,</span> <span class="n">element</span><span class="p">]))</span>
 
-        <span class="c1"># invoke super init, passing number of dofs. Note this used to be</span>
-        <span class="c1"># `super(fenics_grayscott).__init__(V)`, which builds an unbound super object and therefore</span>
-        <span class="c1"># never ran Problem.__init__ at all.</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">fenics_grayscott</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
             <span class="s1">'c_nvars'</span><span class="p">,</span> <span class="s1">'t0'</span><span class="p">,</span> <span class="s1">'family'</span><span class="p">,</span> <span class="s1">'order'</span><span class="p">,</span> <span class="s1">'refinements'</span><span class="p">,</span> <span class="s1">'Du'</span><span class="p">,</span> <span class="s1">'Dv'</span><span class="p">,</span> <span class="s1">'A'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
@@ -613,6 +607,31 @@
         <span class="n">a_M</span> <span class="o">=</span> <span class="n">u2</span> <span class="o">*</span> <span class="n">q2</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
         <span class="n">M2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">a_M</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">M1</span> <span class="o">+</span> <span class="n">M2</span>
+
+<div class="viewcode-block" id="fenics_grayscott.apply_mass_matrix">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.apply_mass_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Apply the mass matrix, :math:`M \vec{u}`.</span>
+
+<span class="sd">        Required by the mass-matrix sweepers and transfers; ``Problem`` has no default.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        me : dtype_u</span>
+<span class="sd">            The product :math:`M \vec{u}`.</span>
+<span class="sd">        """</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__invert_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
@@ -759,6 +778,100 @@
         <span class="n">me</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">uinit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="fenics_grayscott_mass">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott_mass">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">fenics_grayscott_mass</span><span class="p">(</span><span class="n">fenics_grayscott</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Gray-Scott in mass-matrix form, :math:`M \vec{u}' = F(\vec{u})`, with no mass inversion.</span>
+
+<span class="sd">    ``eval_f`` returns the assembled weak-form residual (a load vector) rather than</span>
+<span class="sd">    :math:`M^{-1} F`, and ``solve_system`` takes an rhs that is already in the dual space. Use</span>
+<span class="sd">    with :class:`generic_implicit_mass` and, for MLSDC, :class:`base_transfer_mass`.</span>
+
+<span class="sd">    The Newton loop is written out rather than handed to ``NonlinearVariationalSolver`` because</span>
+<span class="sd">    the rhs is a vector, not a form, so it cannot be folded into the variational problem.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="fenics_grayscott_mass.eval_f">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott_mass.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right-hand side in weak (dual) form, without inverting the mass matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        u : dtype_u</span>
+<span class="sd">            Current values of the numerical solution.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : dtype_f</span>
+<span class="sd">            The assembled load vector :math:`F(\vec{u})`.</span>
+<span class="sd">        """</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="fenics_grayscott_mass.solve_system">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html#pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott_mass.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Solve :math:`M \vec{u} - factor \cdot F(\vec{u}) = \vec{rhs}` by Newton, rhs already dual.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rhs : dtype_f</span>
+<span class="sd">            Right-hand side, in the dual space.</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Node-to-node stepsize.</span>
+<span class="sd">        u0 : dtype_u</span>
+<span class="sd">            Initial guess (unused; the loop starts from zero, matching the mass-inverse variant so</span>
+<span class="sd">            that the two are directly comparable).</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Current time.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sol : dtype_u</span>
+<span class="sd">            Solution.</span>
+<span class="sd">        """</span>
+
+        <span class="n">sol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">sol</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="n">du</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">Jform</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">du</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">res0</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">res</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span><span class="o">.</span><span class="n">axpy</span><span class="p">(</span><span class="o">-</span><span class="n">factor</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="p">))</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span><span class="o">.</span><span class="n">axpy</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="s1">'l2'</span><span class="p">)</span>
+            <span class="n">res0</span> <span class="o">=</span> <span class="n">norm</span> <span class="k">if</span> <span class="n">res0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">res0</span>
+            <span class="k">if</span> <span class="n">norm</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_tol</span> <span class="ow">or</span> <span class="n">norm</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newton_rtol</span> <span class="o">*</span> <span class="n">res0</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">Jform</span><span class="p">),</span> <span class="n">delta</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">res</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span><span class="o">.</span><span class="n">axpy</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">delta</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+        <span class="n">sol</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sol</span></div>
 </div>
 
 </pre></div>
