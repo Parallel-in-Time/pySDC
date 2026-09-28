@@ -1,0 +1,19 @@
+pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py
+  s_f7ba080f6ae9bc::t_c19a729af67e28 260-261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fcb598d315f8c5faa0bbee8e6ec4fe182cd1b6ad",
+  "prompts": {},
+  "sessions": {
+    "s_f7ba080f6ae9bc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "613cd850-a16c-4a71-8fea-0a5703957a96",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
