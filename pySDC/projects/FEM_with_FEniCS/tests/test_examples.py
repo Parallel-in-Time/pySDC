@@ -163,6 +163,37 @@ def test_run_reports_dofs_and_work():
 
 
 @pytest.mark.fenics
+def test_high_order_elements_pay():
+    """The headline: at equal dofs per level, the speed-up of MLSDC grows with the element order.
+
+    At CG4 every savings example pays on two and on three levels, and more than at CG1, where the
+    coarse level buys next to nothing. Runs the study at the committed settings, the numbers the
+    README quotes, and plots it for the project's card on the website.
+    """
+    from pathlib import Path
+
+    from pySDC.projects.FEM_with_FEniCS.run_examples import compare_orders, plot_orders
+    from pySDC.projects.FEM_with_FEniCS.setups import get_order_study
+
+    speedups = {
+        e: compare_orders(e, orders=get_order_study(e), out=lambda *a: None) for e in EXAMPLES if get_order_study(e)
+    }
+    assert speedups, 'no example declares an order study'
+
+    for example, study in speedups.items():
+        low, high = min(get_order_study(example)), max(get_order_study(example))
+        for nlevels in (2, 3):
+            assert study[(high, nlevels)] > 1, f'{example}: {nlevels} levels at CG{high} do not pay'
+            assert (
+                study[(high, nlevels)] > study[(low, nlevels)]
+            ), f'{example}: {nlevels} levels gain less at CG{high} than at CG{low}'
+
+    Path('data').mkdir(parents=True, exist_ok=True)
+    plot_orders(speedups, fname='data/fem_with_fenics_orders.png')
+    assert Path('data/fem_with_fenics_orders.png').stat().st_size > 0
+
+
+@pytest.mark.fenics
 def test_main_writes_a_report(tmp_path, monkeypatch):
     """Cover main() end to end, shrunk to the cheapest example."""
     import pySDC.projects.FEM_with_FEniCS.run_examples as run_examples

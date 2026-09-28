@@ -88,11 +88,8 @@
       summary: Sweepers, problems and scripts for solving differential-algebraic equations with SDC.
     - title: Finite elements, the mass-matrix route
       page: FEM_with_FEniCS
-      excerpt:
-        file: pySDC/projects/FEM_with_FEniCS/setups.py
-        start-at: 'if nlevels > 1:'
-        end-at: 'description[''base_transfer_params''] = {''finter'': False}'
-      summary: SDC, MLSDC and PFASST with FEniCS without inverting the mass matrix, and which coarsening pays.
+      image: data/fem_with_fenics_orders.png
+      summary: SDC, MLSDC and PFASST with FEniCS, never inverting the mass matrix, and why high-order elements make MLSDC pay.
 
 - section: Applications
   projects:

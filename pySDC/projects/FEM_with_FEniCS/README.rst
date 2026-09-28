@@ -45,6 +45,9 @@ How to run it
     micromamba env create -f pySDC/projects/FEM_with_FEniCS/environment.yml
     python pySDC/projects/FEM_with_FEniCS/run_examples.py
 
+It writes every table below to ``data/fem_with_fenics_out.txt``, and the element-order study as a plot to
+``data/fem_with_fenics_orders.png``.
+
 To build your own setup, copy one from ``setups.py``. The three pieces that matter are:
 
 .. code-block:: python
@@ -75,6 +78,9 @@ example        CG1            CG2            CG4
 =============  =============  =============  =============
 
 (speed-up at 2 / 3 levels; below 1.00x means MLSDC costs more than SDC)
+
+``tests/test_examples.py::test_high_order_elements_pay`` runs this study at these settings in CI and
+plots the three-level column, which is the picture on this project's card in the gallery.
 
 At CG1 nothing pays: every example loses on two levels, and only ``heat`` scrapes past 1.00x on
 three. The coarse level exists to approximate the smooth part of the error, and for smooth solutions

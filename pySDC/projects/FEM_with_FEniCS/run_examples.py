@@ -1,6 +1,7 @@
 """
 Run every declared combination and write the tables the README quotes to
-``data/fem_with_fenics_out.txt``.
+``data/fem_with_fenics_out.txt``, and the element-order study as a plot to
+``data/fem_with_fenics_orders.png``.
 """
 
 from pathlib import Path
@@ -116,6 +117,53 @@ def compare_orders(example, orders, family='CG', out=print, **kwargs):
     return speedups
 
 
+def plot_orders(speedups, fname='data/fem_with_fenics_orders.png', nlevels=3):
+    """
+    Plot the MLSDC speed-up against the element order, one line per example.
+
+    Parameters
+    ----------
+    speedups : dict
+        The results of :func:`compare_orders`, keyed by example.
+    fname : str
+        Where to save the figure.
+    nlevels : int
+        Which hierarchy to show, 2 or 3 levels.
+    """
+    import matplotlib.pyplot as plt
+
+    colors = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100']
+    markers = ['o', 's', 'D', '^']
+
+    fig, ax = plt.subplots(figsize=(4.8, 2.6), constrained_layout=True)
+    ax.axhline(1.0, color='#8a8a85', lw=1, ls='--', zorder=1)
+    ax.text(0.01, 0.985, 'as fast as SDC', color='#5f5e5a', fontsize=9, va='top', transform=ax.get_yaxis_transform())
+    for i, (example, study) in enumerate(speedups.items()):
+        orders = sorted({order for order, _ in study})
+        ax.plot(
+            range(len(orders)),
+            [study[(order, nlevels)] for order in orders],
+            color=colors[i],
+            marker=markers[i],
+            ms=8,
+            lw=2.5,
+            mec='white',
+            mew=1.5,
+            label=example,
+            zorder=2,
+        )
+    ax.set_xticks(range(len(orders)), [f'CG{order}' for order in orders])
+    ax.set_xlabel('element order, at equal dofs per level')
+    ax.set_ylabel(f'speed-up over SDC,\n{nlevels}-level MLSDC')
+    ax.grid(axis='y', color='#e6e5df', lw=0.8)
+    ax.set_axisbelow(True)
+    for side in ('top', 'right'):
+        ax.spines[side].set_visible(False)
+    ax.legend(frameon=False, loc='upper left')
+    fig.savefig(fname, dpi=150)
+    plt.close(fig)
+
+
 def main():
     Path('data').mkdir(parents=True, exist_ok=True)
     with open('data/fem_with_fenics_out.txt', 'w') as f:
@@ -130,13 +178,16 @@ def main():
             'i.e. fine-level sweep equivalents including the solution restrictions.'
         )
         out('[family, coarsening]: CG/DG elements, h = coarser mesh, p = lower element order.')
+        speedups = {}
         for example in EXAMPLES:
             for family in get_families(example):
                 for coarsening in get_coarsenings(example):
                     compare_mlsdc(example, family=family, coarsening=coarsening, out=out)
                     check_pfasst(example, family=family, coarsening=coarsening, out=out)
             if get_order_study(example):
-                compare_orders(example, orders=get_order_study(example), out=out)
+                speedups[example] = compare_orders(example, orders=get_order_study(example), out=out)
+    if speedups:
+        plot_orders(speedups)
 
 
 if __name__ == '__main__':
