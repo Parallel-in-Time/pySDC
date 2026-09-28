@@ -1,0 +1,36 @@
+pySDC/tests/test_problems/test_generic_spectral.py
+  s_6435d1fae13e27::t_7a08d828b48c5e 56-77
+pySDC/implementations/problem_classes/RayleighBenard.py
+  s_6435d1fae13e27::t_883f8046e8e4bd 118,269,299,634,646-647
+  s_6435d1fae13e27::t_410da63de88d71 549-550
+  s_6435d1fae13e27::t_fe86804f2d40e0 426,688-689
+pySDC/implementations/problem_classes/generic_spectral.py
+  s_6435d1fae13e27::t_32f9a32d74143f 307-308
+pySDC/tests/test_problems/test_RayleighBenard.py
+  s_6435d1fae13e27::t_fabc67527fbcfa 353-354
+  s_6435d1fae13e27::t_883f8046e8e4bd 334-335,339-344
+  s_6435d1fae13e27::t_7a08d828b48c5e 95,99,143-144,148,159,294-323,326-333,337-338
+  s_6435d1fae13e27::t_33cce8dc3c3bbe 324,336,345-352
+  s_6435d1fae13e27::t_410da63de88d71 156-157,160,325
+pySDC/tests/test_problems/test_Burgers.py
+  s_6435d1fae13e27::t_7a08d828b48c5e 125-137
+  s_6435d1fae13e27::t_adab96c21361bc 124
+pySDC/implementations/problem_classes/Burgers.py
+  s_6435d1fae13e27::t_32f9a32d74143f 376
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6bb509a29b6b46430424ba881a2ec4087f900d68",
+  "prompts": {},
+  "sessions": {
+    "s_6435d1fae13e27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79d56209-5811-4846-8ee3-ed8d7bdb952b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
