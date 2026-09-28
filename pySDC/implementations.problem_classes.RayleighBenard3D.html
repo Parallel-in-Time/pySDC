@@ -198,7 +198,8 @@ physical space in z and broadcast from rank 0, which holds the mean mode.</p>
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard3D.html#RayleighBenard3D.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard3D.RayleighBenard3D.u_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Initial conditions, which are only available at t=0 and for Lz=1. Velocities and temperature are linear in z
 between their boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly
-distributed noise, multiplied by <cite>noise_level</cite> and (z - 1) (z + 1).</p>
+distributed noise, multiplied by <cite>noise_level</cite> and z (z - Lz), which vanishes at both plates. The vertical
+velocity w has to have equal boundary values, since a linear w is not divergence free.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

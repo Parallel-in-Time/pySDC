@@ -58,7 +58,7 @@
 <dd><p>Compute the largest step size allowed by the CFL condition with CFL number 1: the minimum over the grid of the
 grid spacing divided by the absolute velocity, in x and in z, reduced over the space communicator of the
 problem. The vertical grid spacing is the distance between the midpoints of neighbouring Chebychev nodes, with
-the domain [0, Lz].</p>
+the domain [z0, z0 + Lz].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -439,7 +439,7 @@ as the last variable.</p>
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/RayleighBenard.html#RayleighBenard.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.RayleighBenard.RayleighBenard.u_exact" title="Link to this definition">¶</a></dt>
 <dd><p>Initial conditions, which are only available at t=0. Velocities and temperature are linear in z between their
 boundary values, the pressure is zero, and the temperature is perturbed with seeded uniformly distributed noise,
-multiplied by <cite>noise_level</cite> and (z - z0) (z - z0 + Lz).</p>
+multiplied by <cite>noise_level</cite> and (z - z0) (z - z0 - Lz), which vanishes at both plates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
