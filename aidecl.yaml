@@ -73,30 +73,42 @@ ai_usage:
       notes: >-
         Replaced one mpirun per test case with mpi-pytest, moving the rank counts onto the tests
         themselves. Tutorial step 6 part C and step 9 parts D and E were rewritten along with it.
-    - name: Delta-form SDC and MLSDC
+    - name: Delta-form sweepers and their transfer classes
       description: >-
-        The deferred-correction sweepers and their multilevel hierarchy, sweeper_classes/delta_form*.py and
-        transfer_classes/BaseTransferDelta*.py, and low-precision levels (~1000 lines)
+        sweeper_classes/delta_form*.py, which sweep for the correction instead of the solution, and
+        transfer_classes/BaseTransferDelta*.py, which carry that form through the levels of MLSDC; the Problem hooks
+        and Level.u0_reference they need, and the dtype option of the finite-difference problems for levels in
+        reduced precision (~1100 lines)
       ai_involvement: significant
       tools_used:
         - Claude
-    - name: GPU support
+      notes: A variant on top of SDC and MLSDC, whose sweepers and transfer classes are human-written.
+    - name: GPU ports and the GPU CI job
       description: >-
-        The finite-difference problems and mesh_to_mesh on GPUs, the time-parallel controller with NCCL, and the
-        GPU CI on real hardware
+        useGPU for the finite-difference problems (replacing HeatEquation_ND_FD_CuPy) and the Allen-Cahn Newton
+        solves, mesh_to_mesh on GPUs, sharing one NCCL communicator per MPI communicator, tutorial step 7 G, and
+        the CI job on real GPUs (etc/modal_gpu_tests.py, etc/gpu_bind.py)
       ai_involvement: significant
       tools_used:
         - Claude
-    - name: Website and tutorials
+      notes: >-
+        Extends the GPU support that is human-written: cupy_mesh, the NCCL communicator, the GPU problems and the
+        GPU project.
+    - name: Website, and the tutorials rewritten as notebooks
       description: >-
         The website (docs/: its Sphinx configuration, the in-browser runtime, the landing demo, the project gallery
-        and publication pages and the scripts that feed them) and the nine tutorials, rewritten as notebook-style
+        and publication pages and the scripts that feed them), and the nine tutorials rewritten as notebook-style
         scripts. The audit counts only the Python and configuration files of it, not the JavaScript, CSS or pages.
       ai_involvement: significant
       tools_used:
         - Claude
-    - name: Test suite review
-      description: Tests that could not fail, loose tolerances, and tests depending on each other or on stale files
+      notes: >-
+        The tutorials' examples and their results are the human-written ones; Claude restructured them and rewrote
+        their text. Step 8 A (adaptive time-stepping) is new, built on the human-written adaptivity.
+    - name: Repairs to existing tests
+      description: >-
+        Tests that could not fail, loose tolerances, and tests depending on each other or on stale files, across
+        pySDC/tests and the projects
       ai_involvement: significant
       tools_used:
         - Claude
