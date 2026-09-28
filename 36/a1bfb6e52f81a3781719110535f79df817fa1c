@@ -1,0 +1,21 @@
+CHANGELOG.md
+  s_619b2228c15391::t_64d1e851c2d73b 7-13
+aidecl.yaml
+  s_619b2228c15391::t_5c5c259e28f002 54-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "36a1bfb6e52f81a3781719110535f79df817fa1c",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
