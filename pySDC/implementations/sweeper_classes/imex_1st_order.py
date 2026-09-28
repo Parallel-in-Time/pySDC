@@ -5,7 +5,7 @@ from pySDC.core.sweeper import Sweeper
 
 class imex_1st_order(Sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
+    SDC sweeper for right hand sides split into an implicitly and an explicitly treated part (IMEX-SDC).
 
     First-order IMEX sweeper using implicit/explicit Euler as base integrator
 

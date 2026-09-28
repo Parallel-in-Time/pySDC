@@ -117,6 +117,19 @@ def get_H_matrix(N, sweeper_params):
 
 
 def get_G_inv_matrix(l, L, alpha, sweeper_params):
+    """
+    Get the inverse of the preconditioner of the collocation problem of step `l` after diagonalization in time.
+
+    Args:
+        l (int): Index of the step in the block
+        L (int): Number of steps in the block
+        alpha (float): alpha parameter in ParaDiag
+        sweeper_params (dict): Parameters for the sweeper, needs `num_nodes` and `quad_type='RADAU-RIGHT'`
+
+    Returns:
+        numpy.ndarray: Dense matrix (I + d_l H)^-1 of shape (num_nodes, num_nodes), with d_l the `l`-th eigenvalue of
+        the alpha-circulant `E` from `get_E_matrix` and H from `get_H_matrix`
+    """
     M = sweeper_params['num_nodes']
     I_M = sp.eye(M)
     E_alpha = get_E_matrix(L, alpha)

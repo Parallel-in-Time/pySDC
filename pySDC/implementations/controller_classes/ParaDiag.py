@@ -37,6 +37,12 @@ class ParaDiag:
         """
         from pySDC.implementations.sweeper_classes.ParaDiagSweepers import QDiagonalization
 
+        # A list with more than one entry makes `Step` build more than one level. This has to be
+        # checked here: the controllers build G^-1 from the sweeper parameters before the steps exist.
+        for key in ['problem_params', 'level_params', 'sweeper_params']:
+            if any(type(value) is list and len(value) > 1 for value in description.get(key, {}).values()):
+                raise NotImplementedError('ParaDiag does not support multiple levels')
+
         if QDiagonalization in description['sweeper_class'].__mro__:
             description['sweeper_params']['ignore_ic'] = True
             description['sweeper_params']['update_f_evals'] = False

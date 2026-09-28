@@ -9,6 +9,17 @@ class NCCLComm(object):
     Wraps an MPI communicator and performs some calls to NCCL functions instead.
     """
 
+    #: One NCCL communicator per MPI communicator, keyed by the MPI handle.
+    #:
+    #: Creating one costs about 17 MB of device memory that is never released: NCCL has no
+    #: reference counting, and destroying a communicator is itself collective, so a `__del__`
+    #: would have ranks tearing them down whenever their garbage collectors happened to run --
+    #: in different orders, which deadlocks. Making them once and sharing them avoids both.
+    #:
+    #: The MPI communicator is kept alongside so it cannot be freed and have its handle reused
+    #: for a different one, which would hand out the wrong NCCL communicator.
+    _communicators = {}
+
     def __init__(self, comm):
         """
         Args:
@@ -16,8 +27,15 @@ class NCCLComm(object):
         """
         self.commMPI = comm
 
-        uid = comm.bcast(nccl.get_unique_id(), root=0)
-        self.commNCCL = nccl.NcclCommunicator(comm.size, uid, comm.rank)
+        # `py2f` rather than the communicator itself: mpi4py defines `__eq__` without `__hash__`,
+        # so a communicator cannot be a dictionary key, and the handle is the same for any two
+        # Python wrappers around one communicator.
+        key = comm.py2f()
+        if key not in NCCLComm._communicators:
+            uid = comm.bcast(nccl.get_unique_id(), root=0)
+            NCCLComm._communicators[key] = (comm, nccl.NcclCommunicator(comm.size, uid, comm.rank))
+
+        self.commNCCL = NCCLComm._communicators[key][1]
 
     def __getattr__(self, name):
         """
@@ -25,7 +43,7 @@ class NCCLComm(object):
         When performing any operations that depend on data, we have to synchronize host and device beforehand.
 
         Args:
-            Name (str): Name of the requested attribute
+            name (str): Name of the requested attribute
         """
         if name not in ['size', 'rank', 'Get_rank', 'Get_size', 'Split', 'Create_cart', 'Is_inter', 'Get_topology']:
             cp.cuda.get_current_stream().synchronize()
@@ -59,7 +77,23 @@ class NCCLComm(object):
         else:
             return data.size
 
-    def get_op(self, MPI_op):
+    def get_op(self, MPI_op, data=None):
+        """
+        Translate an MPI reduction operation to the NCCL one.
+
+        Complex data is reduced as twice as many reals, which is only right for sums: the product of two complex
+        numbers is not the pairwise product of their parts, and they have no order for `MAX` and `MIN`.
+
+        Args:
+            MPI_op (mpi4py.MPI.Op): One of `MPI.SUM`, `MPI.PROD`, `MPI.MAX` and `MPI.MIN`
+            data (cupy.ndarray, optional): The data to be reduced, to check that the operation works for its dtype
+
+        Returns:
+            NCCL reduction operation
+        """
+        if data is not None and cp.iscomplexobj(data) and MPI_op != MPI.SUM:
+            raise NotImplementedError('NCCL can only sum complex data, since it reduces it as pairs of reals!')
+
         if MPI_op == MPI.SUM:
             return nccl.NCCL_SUM
         elif MPI_op == MPI.PROD:
@@ -72,6 +106,7 @@ class NCCLComm(object):
             raise NotImplementedError('Don\'t know what NCCL operation to use to replace this MPI operation!')
 
     def reduce(self, sendobj, op=MPI.SUM, root=0):
+        """Wrap mpi4py's pickle-based `reduce`, synchronizing the device first if `sendobj` holds CuPy data."""
         sync = False
         if hasattr(sendobj, 'data'):
             if hasattr(sendobj.data, 'ptr'):
@@ -82,6 +117,7 @@ class NCCLComm(object):
         return self.commMPI.reduce(sendobj, op=op, root=root)
 
     def allreduce(self, sendobj, op=MPI.SUM):
+        """Wrap mpi4py's pickle-based `allreduce`, synchronizing the device first if `sendobj` holds CuPy data."""
         sync = False
         if hasattr(sendobj, 'data'):
             if hasattr(sendobj.data, 'ptr'):
@@ -92,12 +128,19 @@ class NCCLComm(object):
         return self.commMPI.allreduce(sendobj, op=op)
 
     def Reduce(self, sendbuf, recvbuf, op=MPI.SUM, root=0):
+        """
+        Wrap mpi4py's `Reduce`, going through NCCL if `sendbuf` is a CuPy array and through MPI otherwise.
+
+        The NCCL reduction is enqueued on the current CuPy stream without synchronizing. It reduces complex data as
+        pairs of
+        reals, so `MPI.PROD` is not the complex product. `recvbuf` may be None on ranks other than `root`.
+        """
         if not hasattr(sendbuf.data, 'ptr'):
             return self.commMPI.Reduce(sendbuf=sendbuf, recvbuf=recvbuf, op=op, root=root)
 
         dtype = self.get_dtype(sendbuf)
         count = self.get_count(sendbuf)
-        op = self.get_op(op)
+        op = self.get_op(op, sendbuf)
         recvbuf = cp.empty(1) if recvbuf is None else recvbuf
         stream = cp.cuda.get_current_stream()
 
@@ -112,12 +155,19 @@ class NCCLComm(object):
         )
 
     def Allreduce(self, sendbuf, recvbuf, op=MPI.SUM):
+        """
+        Wrap mpi4py's `Allreduce`, going through NCCL if `sendbuf` is a CuPy array and through MPI otherwise.
+
+        The NCCL reduction is enqueued on the current CuPy stream without synchronizing. It reduces complex data as
+        pairs of
+        reals, so `MPI.PROD` is not the complex product.
+        """
         if not hasattr(sendbuf.data, 'ptr'):
             return self.commMPI.Allreduce(sendbuf=sendbuf, recvbuf=recvbuf, op=op)
 
         dtype = self.get_dtype(sendbuf)
         count = self.get_count(sendbuf)
-        op = self.get_op(op)
+        op = self.get_op(op, sendbuf)
         stream = cp.cuda.get_current_stream()
 
         self.commNCCL.allReduce(
@@ -125,6 +175,10 @@ class NCCLComm(object):
         )
 
     def Bcast(self, buf, root=0):
+        """
+        Wrap mpi4py's `Bcast`, going through NCCL on the current CuPy stream, without synchronizing, if `buf` is a CuPy
+        array and through MPI otherwise.
+        """
         if not hasattr(buf.data, 'ptr'):
             return self.commMPI.Bcast(buf=buf, root=root)
 
@@ -134,6 +188,34 @@ class NCCLComm(object):
 
         self.commNCCL.bcast(buff=buf.data.ptr, count=count, datatype=dtype, root=root, stream=stream.ptr)
 
+    def Send(self, buf, dest, tag=0):
+        """
+        Send a buffer to another rank through NCCL.
+
+        NCCL has no tags: a send is matched to whichever receive the destination posts next for
+        this pair of ranks. That is fine when one message is in flight at a time, and wrong when
+        several are, which is why the non-blocking `Issend`/`Irecv` that pySDC's time-parallel
+        controller uses are left to fall through to MPI, where tags mean what they say.
+        """
+        if not hasattr(buf.data, 'ptr'):
+            return self.commMPI.Send(buf, dest=dest, tag=tag)
+
+        stream = cp.cuda.get_current_stream()
+        self.commNCCL.send(buf.data.ptr, self.get_count(buf), self.get_dtype(buf), dest, stream.ptr)
+        stream.synchronize()
+
+    def Recv(self, buf, source, tag=0):
+        """
+        Receive a buffer from another rank through NCCL. See `Send` on the absence of tags.
+        """
+        if not hasattr(buf.data, 'ptr'):
+            return self.commMPI.Recv(buf, source=source, tag=tag)
+
+        stream = cp.cuda.get_current_stream()
+        self.commNCCL.recv(buf.data.ptr, self.get_count(buf), self.get_dtype(buf), source, stream.ptr)
+        stream.synchronize()
+
     def Barrier(self):
+        """Synchronize the current CuPy stream, then wrap mpi4py's `Barrier`."""
         cp.cuda.get_current_stream().synchronize()
         self.commMPI.Barrier()

@@ -1,0 +1,130 @@
+[
+ {
+  "title": "Resilience Against Soft Faults Through Adaptivity in Spectral Deferred Correction",
+  "authors": "Thomas Saupe, Sebastian Götschel, Thibaut Lunet, Daniel Ruprecht, Robert Speck",
+  "year": 2026,
+  "venue": "",
+  "doi": "10.1007/978-3-032-17810-7_2",
+  "url": "https://doi.org/10.1007/978-3-032-17810-7_2"
+ },
+ {
+  "title": "asQ: parallel-in-time finite element simulations using ParaDiag for geoscientific models and beyond",
+  "authors": "Joshua Hope-Collins, Abdalaziz Hamdan, Werner Bauer, Lawrence Mitchell, Colin Cotter",
+  "year": 2025,
+  "venue": "Geoscientific Model Development",
+  "doi": "10.5194/gmd-18-4535-2025",
+  "url": "https://doi.org/10.5194%2Fgmd-18-4535-2025"
+ },
+ {
+  "title": "Performance Analysis of Inline Compression in pySDC",
+  "authors": "Emily Lattanzio, Sansriti Ranjan, Robert Underwood, Thomas Saupe, Robert Speck, Jon C. Calhoun",
+  "year": 2025,
+  "venue": "2025 IEEE High Performance Extreme Computing Conference (HPEC)",
+  "doi": "10.1109/hpec67600.2025.11196695",
+  "url": "https://doi.org/10.1109%2Fhpec67600.2025.11196695"
+ },
+ {
+  "title": "Adaptive time step selection for spectral deferred correction",
+  "authors": "Thomas Saupe, Sebastian Götschel, Thibaut Lunet, Daniel Ruprecht, Robert Speck",
+  "year": 2024,
+  "venue": "Numerical Algorithms",
+  "doi": "10.1007/s11075-024-01964-z",
+  "url": "https://doi.org/10.1007%2Fs11075-024-01964-z"
+ },
+ {
+  "title": "Parallel-in-time integration of the Landau–Lifshitz–Gilbert equation with the parallel full approximation scheme in space and time",
+  "authors": "Robert Kraft, Sabri Koraltan, Markus Gattringer, Florian Bruckner, Dieter Suess, Claas Abert",
+  "year": 2024,
+  "venue": "Journal of Magnetism and Magnetic Materials",
+  "doi": "10.1016/j.jmmm.2024.171998",
+  "url": "https://doi.org/10.1016%2Fj.jmmm.2024.171998"
+ },
+ {
+  "title": "Spectral Deferred Correction Methods for Second-Order Problems",
+  "authors": "Ikrom Akramov, Sebastian Götschel, Michael Minion, Daniel Ruprecht, Robert Speck",
+  "year": 2024,
+  "venue": "SIAM Journal on Scientific Computing",
+  "doi": "10.1137/23m1592596",
+  "url": "https://doi.org/10.1137%2F23m1592596"
+ },
+ {
+  "title": "A parallel-in-time collocation method using diagonalization: theory and implementation for linear problems",
+  "authors": "Gayatri Čaklović, Robert Speck, Martin Frank",
+  "year": 2023,
+  "venue": "Communications in Applied Mathematics and Computational Science",
+  "doi": "10.2140/camcos.2023.18.55",
+  "url": "https://doi.org/10.2140%2Fcamcos.2023.18.55"
+ },
+ {
+  "title": "Task graph-based performance analysis of parallel-in-time methods",
+  "authors": "Matthias Bolten, Stephanie Friedhoff, Jens Hahne",
+  "year": 2023,
+  "venue": "Parallel Computing",
+  "doi": "10.1016/j.parco.2023.103050",
+  "url": "https://doi.org/10.1016%2Fj.parco.2023.103050"
+ },
+ {
+  "title": "Algorithm 1016: PyMGRIT: A Python Package for the Parallel-in-time Method MGRIT",
+  "authors": "Jens Hahne, Stephanie Friedhoff, Matthias Bolten",
+  "year": 2021,
+  "venue": "ACM Transactions on Mathematical Software",
+  "doi": "10.1145/3446979",
+  "url": "https://doi.org/10.1145%2F3446979"
+ },
+ {
+  "title": "Convergence of multilevel spectral deferred corrections",
+  "authors": "Gitte Kremling, Robert Speck",
+  "year": 2021,
+  "venue": "Communications in Applied Mathematics and Computational Science",
+  "doi": "10.2140/camcos.2021.16.227",
+  "url": "https://doi.org/10.2140/camcos.2021.16.227"
+ },
+ {
+  "title": "Using Performance Analysis Tools for a Parallel-in-Time Integrator: Does My Time-Parallel Code Do What I Think It Does?",
+  "authors": "Robert Speck, Michael Knobloch, Sebastian Lührs, Andreas Gocht",
+  "year": 2021,
+  "venue": "Springer Proceedings in Mathematics & Statistics, Parallel-in-Time Integration Methods",
+  "doi": "10.1007/978-3-030-75933-9_3",
+  "url": "https://doi.org/10.1007%2F978-3-030-75933-9_3"
+ },
+ {
+  "title": "Deferred Correction Methods for Ordinary Differential Equations",
+  "authors": "Benjamin W. Ong, Raymond J. Spiteri",
+  "year": 2020,
+  "venue": "Journal of Scientific Computing",
+  "doi": "10.1007/s10915-020-01235-8",
+  "url": "https://doi.org/10.1007%2Fs10915-020-01235-8"
+ },
+ {
+  "title": "PFASST-ER: combining the parallel full approximation scheme in space and time with parallelization across the method",
+  "authors": "Ruth Schöbel, Robert Speck",
+  "year": 2020,
+  "venue": "Computing and Visualization in Science",
+  "doi": "10.1007/s00791-020-00330-5",
+  "url": "https://doi.org/10.1007%2Fs00791-020-00330-5"
+ },
+ {
+  "title": "Asymptotic convergence of the parallel full approximation scheme in space and time for linear problems",
+  "authors": "Matthias Bolten, Dieter Moser, Robert Speck",
+  "year": 2018,
+  "venue": "Numerical Linear Algebra with Applications",
+  "doi": "10.1002/nla.2208",
+  "url": "https://doi.org/10.1002%2Fnla.2208"
+ },
+ {
+  "title": "Parallelizing spectral deferred corrections across the method",
+  "authors": "Robert Speck",
+  "year": 2018,
+  "venue": "Computing and Visualization in Science",
+  "doi": "10.1007/s00791-018-0298-x",
+  "url": "https://doi.org/10.1007%2Fs00791-018-0298-x"
+ },
+ {
+  "title": "Spectral Deferred Corrections with Fast-wave Slow-wave Splitting",
+  "authors": "Daniel Ruprecht, Robert Speck",
+  "year": 2016,
+  "venue": "SIAM Journal on Scientific Computing",
+  "doi": "10.1137/16m1060078",
+  "url": "https://doi.org/10.1137%2F16m1060078"
+ }
+]

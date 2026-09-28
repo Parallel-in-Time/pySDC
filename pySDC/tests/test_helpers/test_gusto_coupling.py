@@ -1,12 +1,17 @@
+import sys
+
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def _gusto_running_tests(monkeypatch):
+    # gusto reads this flag from the command line; set it for these tests only, and before the
+    # `setup` fixture creates its IO, instead of appending it to `sys.argv` for the whole session
+    monkeypatch.setattr(sys, 'argv', [*sys.argv, '--running-tests'])
 
 
 def get_gusto_stepper(eqns, method, spatial_methods, dirname='./tmp'):
     from gusto import IO, OutputParameters, PrescribedTransport
-    import sys
-
-    if '--running-tests' not in sys.argv:
-        sys.argv.append('--running-tests')
 
     output = OutputParameters(dirname=dirname, dumpfreq=15)
     io = IO(method.domain, output)
@@ -177,6 +182,32 @@ def test_generic_gusto_problem(setup):
     assert (
         error < np.finfo(float).eps * 1e2
     ), f'Backward Euler does not match reference implementation! Got relative difference of {error}'
+
+
+@pytest.mark.firedrake
+def test_generic_gusto_imex_work(setup):
+    from pySDC.implementations.problem_classes.GenericGusto import GenericGustoImex
+
+    eqns, domain, spatial_methods, setup = get_gusto_advection_setup(False, True, setup)
+    problem = GenericGustoImex(eqns)
+
+    u = problem.u_init
+    u.interpolate(setup.f_init)
+
+    problem.eval_f(u)
+    for factor in [0.1, 0.2]:
+        problem.solve_system(u, factor, u)
+
+    # one solver for each of the two labels and one for each factor
+    assert problem.work_counters['solver_setup'].niter == 4
+
+    # a cached solver solves once per call
+    calls = []
+    solver = problem.solvers[0.1]
+    solve = solver.solve
+    solver.solve = lambda: calls.append(solve())
+    problem.solve_system(u, 0.1, u)
+    assert len(calls) == 1
 
 
 class Method(object):

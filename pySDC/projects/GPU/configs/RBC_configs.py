@@ -49,10 +49,13 @@ class RayleighBenardRegular(Config):
 
         desc = super().get_description(*args, MPIsweeper=MPIsweeper, **kwargs)
 
-        if MPIsweeper:
-            desc['sweeper_class'].compute_residual = compute_residual_DAE_MPI
-        else:
-            desc['sweeper_class'].compute_residual = compute_residual_DAE
+        # subclass rather than patch: the sweeper class is shared with every other problem in the process
+        sweeper_class = desc['sweeper_class']
+        desc['sweeper_class'] = type(
+            sweeper_class.__name__,
+            (sweeper_class,),
+            {'compute_residual': compute_residual_DAE_MPI if MPIsweeper else compute_residual_DAE},
+        )
 
         desc['level_params']['dt'] = 0.1
         desc['level_params']['restol'] = 1e-7

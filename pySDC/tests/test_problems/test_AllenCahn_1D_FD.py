@@ -149,10 +149,8 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
     from pySDC.core.errors import ProblemError
     from pySDC.implementations.problem_classes.AllenCahn_1D_FD import (
         allencahn_front_fullyimplicit,
-        allencahn_front_semiimplicit,
         allencahn_front_finel,
         allencahn_periodic_fullyimplicit,
-        allencahn_periodic_semiimplicit,
         allencahn_periodic_multiimplicit,
     )
 
@@ -164,11 +162,9 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
     }
 
     full_front = allencahn_front_fullyimplicit(**problem_params)
-    imex_front = allencahn_front_semiimplicit(**problem_params)
     finel_front = allencahn_front_finel(**problem_params)
 
     full_periodic = allencahn_periodic_fullyimplicit(**problem_params)
-    imex_periodic = allencahn_periodic_semiimplicit(**problem_params)
     multi_periodic = allencahn_periodic_multiimplicit(**problem_params)
 
     t0 = 0.0
@@ -191,16 +187,15 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
     }
 
     if stop_at_nan:
-        # test if ProblemError is raised
-        with pytest.raises(ProblemError):
-            full_front.solve_system(**args_front)
-            imex_front.solve_system(**args_front)
-            finel_front.solve_system(**args_front)
-
-        with pytest.raises(ProblemError):
-            full_periodic.solve_system(**args_periodic)
-            imex_periodic.solve_system(**args_periodic)
-            multi_periodic.solve_system_2(**args_periodic)
+        # the Newton solvers have to raise; the semi-implicit problems solve a linear system directly
+        for solve, args in [
+            (full_front.solve_system, args_front),
+            (finel_front.solve_system, args_front),
+            (full_periodic.solve_system, args_periodic),
+            (multi_periodic.solve_system_2, args_periodic),
+        ]:
+            with pytest.raises(ProblemError):
+                solve(**args)
 
     else:
         # test if warnings are raised when nan values arise

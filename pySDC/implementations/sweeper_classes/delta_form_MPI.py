@@ -24,7 +24,10 @@ from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_i
 
 
 class delta_implicit_MPI(DeltaFormMixin, generic_implicit_MPI):
-    """Delta-form counterpart of :class:`generic_implicit_MPI`. One collocation node per rank."""
+    """
+    Delta-form counterpart of :class:`~pySDC.implementations.sweeper_classes.generic_implicit_MPI.generic_implicit_MPI`.
+    One collocation node per rank.
+    """
 
     def _set_work_scale(self, values):
         """

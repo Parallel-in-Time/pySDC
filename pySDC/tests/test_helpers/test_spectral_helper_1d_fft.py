@@ -56,6 +56,31 @@ def test_transform(useFFTW, N=8):
     assert np.allclose(u, helper.itransform(u_hat))
 
 
+@pytest.mark.mpi4py
+def test_FFTW_is_set_per_instance(N=8):
+    from pySDC.helpers.spectral_helper import FFTHelper
+
+    with_FFTW = FFTHelper(N=N, useFFTW=True)
+    without_FFTW = FFTHelper(N=N, useFFTW=False)
+
+    assert with_FFTW.fft_backend == 'fftw', 'Setting up a helper without FFTW switched off FFTW in another helper'
+    assert without_FFTW.fft_backend == 'scipy'
+
+
+@pytest.mark.mpi4py
+def test_FFTW_plans_are_not_shared_between_precisions(N=8):
+    import numpy as np
+    from pySDC.helpers.spectral_helper import FFTHelper
+
+    u = np.random.random(N) + 1j * np.random.random(N)
+    helper = FFTHelper(N=N, useFFTW=True)
+    helper.transform(u.astype(np.complex64))
+
+    u_hat = helper.transform(u)
+    assert u_hat.dtype == np.complex128
+    assert np.allclose(u_hat, np.fft.fft(u), atol=1e-14), 'Transform used the single precision plan'
+
+
 @pytest.mark.cupy
 @pytest.mark.parametrize('d', [1, 2, 3])
 def test_transform_cupy(d, N=8):

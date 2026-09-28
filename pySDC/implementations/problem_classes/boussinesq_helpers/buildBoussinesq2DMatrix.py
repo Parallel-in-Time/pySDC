@@ -3,7 +3,6 @@ import scipy.sparse as sp
 
 from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import (
     get2DMatrix,
-    getBCHorizontal,
     get2DUpwindMatrix,
 )
 
@@ -47,18 +46,3 @@ def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver, c_s, Nfreq, order):
     Id = sp.eye(4 * N[0] * N[1])
 
     return sp.csc_matrix(Id), sp.csc_matrix(M)
-
-
-def getBoussinesqBCHorizontal(value, N, dx, bc_hor):
-    bu_left, bu_right = getBCHorizontal(value[0], N, dx, bc_hor[0])
-    bw_left, bw_right = getBCHorizontal(value[1], N, dx, bc_hor[1])
-    # bb_left, bb_right = getBCHorizontal(value[2], N, dx, bc_hor[2])
-    bp_left, bp_right = getBCHorizontal(value[3], N, dx, bc_hor[3])
-
-    b_left = np.concatenate((bp_left, bp_left, bu_left + bw_left))
-    b_right = np.concatenate((bp_right, bp_right, bu_right + bw_right))
-    return b_left, b_right
-
-
-def getBoussinesqBCVertical():
-    return 0.0

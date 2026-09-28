@@ -16,9 +16,12 @@ dependencies:
   - scipy>=0.17.1
   - matplotlib>=3.0
   - dill>=0.2.6
-  - cupy
+  - cupy>=14  # 14 renamed the iterative solvers' `tol` argument to `rtol`
+  - nccl  # `cupy.cuda.nccl` is an empty shim without it, and conda-forge's cupy does not pull it
   # the GPU project's configs go through `spectral_helper`, and its runs are MPI-decomposed
   - openmpi
+  # not enough on its own for the GPU spectral code, which needs the fork installed over it;
+  # see docs/contrib/02_continuous_integration.md
   - mpi4py-fft>=2.0.2
   - mpi4py>=3.0.0
   - tqdm
@@ -26,4 +29,3 @@ dependencies:
   - pip
   - pip:
     - qmat>=0.1.8
-    - pyvkfft

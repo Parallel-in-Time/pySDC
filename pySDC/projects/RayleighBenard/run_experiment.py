@@ -42,6 +42,7 @@ def run_experiment(args, config, **kwargs):
     import pickle
     import os
 
+    from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.helpers.stats_helper import filter_stats
 
@@ -64,11 +65,15 @@ def run_experiment(args, config, **kwargs):
 
         controller_params['hook_class'].append(GPUTimings)
 
-    assert (
-        config.comms[0].size == 1
-    ), 'Have not figured out how to do MPI controller with GPUs yet because I need NCCL for that!'
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-    prob = controller.MS[0].levels[0].prob
+    # Time-parallel runs need CUDA-aware MPI, which conda-forge's OpenMPI is built with and ships
+    # switched off: export `OMPI_MCA_opal_cuda_support=true` before launching. Without it the
+    # point-to-point calls in `controller_MPI` hand MPI a device pointer it will not read.
+    if config.comms[0].size > 1:
+        controller = controller_MPI(controller_params, description, config.comms[0])
+        prob = controller.S.levels[0].prob
+    else:
+        controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+        prob = controller.MS[0].levels[0].prob
 
     u0, t0 = config.get_initial_condition(prob, restart_idx=args['restart_idx'])
 

@@ -20,15 +20,18 @@ def test_main():
     for qd_type in run_params['qd_list']:
         for num_nodes in run_params['num_nodes_list']:
             for i, max_iter in enumerate(run_params['max_iter_list']):
-                assert np.isclose(
-                    conv_data[qd_type][num_nodes]['error'][i], test_dict[qd_type][num_nodes][max_iter], atol=1e-5
-                ), f"ERROR: error bound not fulfilled.\n Got {conv_data[qd_type][num_nodes]['error'][i]}\n Expecting less than {test_dict[qd_type][num_nodes][max_iter]}"
+                err = conv_data[qd_type][num_nodes]['error'][i]
+                ref, kind = test_dict[qd_type][num_nodes][max_iter]
+                if kind == 'value':
+                    assert np.isclose(err, ref, rtol=0.1, atol=0), f"Got error {err}, expected {ref}"
+                else:
+                    assert err < ref, f"Got error {err}, expected less than {ref}"
 
 
-# Dictionary of test values for use with:
-#   max_iter_low = 4
-#   max_iter_high = 6
-#   qd_list = ['IE', 'LU']
-#   num_nodes_list = [3]
-
-test_dict = {'IE': {3: {4: 1.6e-7, 5: 6e-8}}, 'LU': {3: {4: 4.1e-10, 5: 3.8e-13}}}
+# Errors of the differential variable at tend, measured with the current code. IE after 4/5 iterations
+# (1.617e-9, 5.982e-10) is iteration error, deterministic, so it is compared to 10%. LU (4.33e-13,
+# 4.06e-14) is close to round-off, so it is only bounded from above, with ~10x headroom.
+test_dict = {
+    'IE': {3: {4: (1.617e-9, 'value'), 5: (5.982e-10, 'value')}},
+    'LU': {3: {4: (5e-12, 'bound'), 5: (5e-13, 'bound')}},
+}

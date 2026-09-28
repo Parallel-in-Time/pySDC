@@ -10,9 +10,9 @@ class SweeperMPI(Sweeper):
     MPI based sweeper where each rank administers one collocation node. Adapt sweepers to MPI by use of multiple inheritance.
     See for example the `generic_implicit_MPI` sweeper, which has a class definition:
 
-    ```
-    class generic_implicit_MPI(SweeperMPI, generic_implicit):
-    ```
+    .. code-block:: python
+
+        class generic_implicit_MPI(SweeperMPI, generic_implicit):
 
     this means in inherits both from `SweeperMPI` and `generic_implicit`. The hierarchy works such that functions are first
     called from `SweeperMPI` and then from `generic_implicit`. For instance, in the `__init__` function, the `SweeperMPI`
@@ -44,10 +44,22 @@ class SweeperMPI(Sweeper):
 
     @property
     def comm(self):
+        """
+        The communicator across the collocation nodes, taken from the parameters.
+
+        Returns:
+            mpi4py.MPI.Intracomm: the communicator
+        """
         return self.params.comm
 
     @property
     def rank(self):
+        """
+        The rank in the node communicator, which is also the index of the collocation node this rank administers.
+
+        Returns:
+            int: the rank
+        """
         return self.comm.rank
 
     def compute_end_point(self):
@@ -157,6 +169,12 @@ class SweeperMPI(Sweeper):
         L.status.updated = True
 
     def communicate_tau_correction_for_full_interval(self):
+        """
+        Broadcast the tau correction of the full interval, stored in ``L.tau[-1]`` on the last rank, to all ranks.
+
+        Returns:
+            None
+        """
         L = self.level
         P = L.prob
         if self.rank < self.comm.size - 1:

@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse
 from scipy.special import factorial
 
 
@@ -10,7 +11,6 @@ def get_steps(derivative, order, stencil_type):
         derivative (int): Order of the derivative
         order (int): Order of accuracy
         stencil_type (str): Type of the stencil
-        steps (list): Provide specific steps, overrides `stencil_type`
 
     Returns:
         int: The number of elements in the stencil
@@ -106,6 +106,8 @@ def get_finite_difference_matrix(
         dim (int): Number of dimensions
         bc (str): Boundary conditions for both sides
         cupy (bool): Construct a GPU ready matrix if yes
+        bc_params (dict or list of dicts): Parameters `val`, `neumann_bc_order` and `reduce` of Dirichlet and Neumann
+            BCs, for both sides or one dict per side
 
     Returns:
         Sparse matrix: Finite difference matrix
@@ -140,7 +142,9 @@ def get_finite_difference_matrix(
             if steps[i] < 0:
                 A_1d += coeff[i] * sp.eye(size, k=size + steps[i])
     else:
-        A_1d = sp.diags(coeff, steps, shape=(size, size), format='lil')
+        # Built on the host whatever the target: the boundary rows are edited in place below, which
+        # needs `lil`, and CuPy has no `lil`. The matrix moves to the device once it is finished.
+        A_1d = scipy.sparse.diags(coeff, steps, shape=(size, size), format='lil')
 
         # Default parameters for Dirichlet and Neumann BCs
         bc_params_defaults = {
@@ -222,7 +226,7 @@ def get_finite_difference_matrix(
                     b[iLine] = val * b_coeff[iCoeff] / n_coeff[iCoeff] * dx
 
     # TODO: extend the BCs to higher dimensions
-    A_1d = A_1d.tocsc()
+    A_1d = sp.csc_matrix(A_1d)
     if dim == 1:
         A = A_1d
     elif dim == 2:

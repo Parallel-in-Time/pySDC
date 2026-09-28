@@ -247,9 +247,9 @@ class rk_imex:
             self.problem.Id - alpha * self.problem.M,
             rhs,
             x0=u0,
-            rtol=self.problem.params.gmres_tol_limit,
-            restart=self.problem.params.gmres_restart,
-            maxiter=self.problem.params.gmres_maxiter,
+            rtol=self.problem.gmres_tol_limit,
+            restart=self.problem.gmres_restart,
+            maxiter=self.problem.gmres_maxiter,
             atol=0,
             callback=cb,
         )
@@ -290,9 +290,9 @@ class trapezoidal:
             self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M),
             b,
             x0=u0,
-            rtol=self.problem.params.gmres_tol_limit,
-            restart=self.problem.params.gmres_restart,
-            maxiter=self.problem.params.gmres_maxiter,
+            rtol=self.problem.gmres_tol_limit,
+            restart=self.problem.gmres_restart,
+            maxiter=self.problem.gmres_maxiter,
             atol=0,
             callback=cb,
         )
@@ -334,9 +334,9 @@ class bdf2:
             self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M),
             b,
             x0=u0,
-            rtol=self.problem.params.gmres_tol_limit,
-            restart=self.problem.params.gmres_restart,
-            maxiter=self.problem.params.gmres_maxiter,
+            rtol=self.problem.gmres_tol_limit,
+            restart=self.problem.gmres_restart,
+            maxiter=self.problem.gmres_maxiter,
             atol=0,
             callback=cb,
         )
@@ -424,7 +424,7 @@ class SplitExplicit:
     def NumSmallTimeSteps(self, dx, dz, dt):
         cs = self.pparams['c_s']
         ns = dt / (0.9 / np.sqrt(1 / (dx * dx) + 1 / (dz * dz)) / cs)
-        ns = max(np.int(np.ceil(ns)), self.nsMin)
+        ns = max(int(np.ceil(ns)), self.nsMin)
         return ns
 
     def timestep(self, u0, dt):
@@ -440,7 +440,7 @@ class SplitExplicit:
             self.U[:, i + 1] = 0
             for j in range(0, i + 1):
                 self.U[:, i + 1] += self.dRunge[i, j] * self.U[:, j]
-            nsLoc = np.int(np.ceil(self.ns * self.dtRunge[i]))
+            nsLoc = int(np.ceil(self.ns * self.dtRunge[i]))
             self.logger.nsmall += nsLoc
             dtLoc = dt * self.dtRunge[i]
             dTau = dtLoc / nsLoc
@@ -616,9 +616,9 @@ class dirk:
             self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M),
             b,
             x0=u0,
-            rtol=self.problem.params.gmres_tol_limit,
-            restart=self.problem.params.gmres_restart,
-            maxiter=self.problem.params.gmres_maxiter,
+            rtol=self.problem.gmres_tol_limit,
+            restart=self.problem.gmres_restart,
+            maxiter=self.problem.gmres_maxiter,
             atol=0,
             callback=cb,
         )

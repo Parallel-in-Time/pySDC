@@ -191,12 +191,8 @@ def test_ParaDiag_order(L, M, N, alpha):
     from pySDC.helpers.stats_helper import get_sorted
 
     errors = []
-    if M == 3:
-        dts = [2 ** (-x) for x in range(9, 11)]
-    elif M == 2:
-        dts = [2 ** (-x) for x in range(5, 9)]
-    else:
-        raise NotImplementedError
+    # step sizes where the errors are well above round-off for every M tested
+    dts = [2 ** (-x) for x in range(1, 4)]
     Tend = max(dts) * L * 2
 
     for dt in dts:
@@ -216,12 +212,11 @@ def test_ParaDiag_order(L, M, N, alpha):
 
     errors = np.array(errors)
     dts = np.array(dts)
-    order = np.log(abs(errors[1:] - errors[:-1])) / np.log(abs(dts[1:] - dts[:-1]))
-    num_order = np.median(order)
+    order = np.log(errors[1:] / errors[:-1]) / np.log(dts[1:] / dts[:-1])
 
-    assert (
-        expected_order + 1 > num_order > expected_order
-    ), f'Got unexpected numerical order {num_order:2f} instead of {expected_order} in ParaDiag {order} {errors}'
+    assert np.allclose(
+        order, expected_order, atol=0.3
+    ), f'Got unexpected numerical order {order} instead of {expected_order} in ParaDiag {errors}'
 
 
 @pytest.mark.base
@@ -272,8 +267,8 @@ def test_fft(L, M, N):
     dt = 1e-2
     controller, prob = get_composite_collocation_problem(L, M, N, alpha=1e-1, dt=dt, problem='Dahlquist')
     # generate random data
-    data = np.random.random((L, M, N))
-    data = np.ones((L, M, N))
+    rng = np.random.default_rng(seed=99)
+    data = rng.random((L, M, N)) + 1j * rng.random((L, M, N))
 
     for l in range(L):
         for m in range(M):

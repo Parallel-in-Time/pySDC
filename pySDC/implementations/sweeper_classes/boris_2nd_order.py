@@ -5,7 +5,7 @@ from pySDC.core.sweeper import Sweeper
 
 class boris_2nd_order(Sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
+    SDC sweeper for charged particles in electromagnetic fields, with velocity-Verlet and a Boris push as base.
 
     Second-order sweeper using velocity-Verlet with Boris scheme as base integrator
 

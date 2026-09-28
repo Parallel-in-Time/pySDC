@@ -12,6 +12,8 @@ from pySDC.implementations.convergence_controller_classes.basic_restarting impor
 class controller_nonMPI(Controller):
     """
 
+    Controller running SDC, MLSDC and PFASST with the time steps of a block emulated serially in one process.
+
     PFASST controller, running serialized version of PFASST in blocks (MG-style)
 
     """

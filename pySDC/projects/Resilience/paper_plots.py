@@ -588,9 +588,9 @@ def plot_RBC_solution(setup='resilience'):  # pragma: no cover
         divider = make_axes_locatable(ax)
         caxs += [divider.append_axes('right', size='3%', pad=0.03)]
 
-    from pySDC.projects.Resilience.RBC import RayleighBenard, PROBLEM_PARAMS
+    from pySDC.projects.Resilience.RBC import RayleighBenardReference, PROBLEM_PARAMS
 
-    prob = RayleighBenard(**PROBLEM_PARAMS)
+    prob = RayleighBenardReference(**PROBLEM_PARAMS)
 
     def _plot(t, ax, cax):
         u_hat = prob.u_exact(t)

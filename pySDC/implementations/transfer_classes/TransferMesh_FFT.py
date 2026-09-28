@@ -6,13 +6,12 @@ from pySDC.core.space_transfer import SpaceTransfer
 
 class mesh_to_mesh_fft(SpaceTransfer):
     """
-    Custom base_transfer class, implements Transfer.py
+    Space transfer between periodic 1d meshes: injection to restrict, Fourier interpolation to prolong.
 
     This implementation can restrict and prolong between 1d meshes with FFT for periodic boundaries
 
     Attributes:
-        irfft_object_fine: planned FFT for backward transformation, real-valued output
-        rfft_object_coarse: planned real-valued FFT for forward transformation
+        ratio (int): ratio of the fine to the coarse resolution
     """
 
     def __init__(self, fine_prob, coarse_prob, params):

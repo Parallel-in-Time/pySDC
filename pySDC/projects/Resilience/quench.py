@@ -263,7 +263,7 @@ def get_crossing_time(stats, controller, num_points=5, inter_points=50, temperat
 
     temperature_error = abs(u_inter[crossing_inter] - u_thresh)
 
-    assert temperature_error < temp[crossing_index], "Temperature error is rising due to interpolation!"
+    assert temperature_error < abs(temp[crossing_index] - u_thresh), "Temperature error is rising due to interpolation!"
 
     if temperature_error > temperature_error_thresh and inter_points < 300:
         return get_crossing_time(stats, controller, num_points + 4, inter_points + 15, temperature_error_thresh)

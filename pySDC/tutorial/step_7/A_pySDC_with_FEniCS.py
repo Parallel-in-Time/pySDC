@@ -1,3 +1,31 @@
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+#   language_info:
+#     name: python
+# ---
+
+# %% [markdown]
+# # Part A: pySDC and FEniCS
+#
+# In this example, pySDC is coupled with the [FEniCS framework](https://fenicsproject.org/) for finite elements in
+# space. This implies significant changes to the algorithm, depending on whether or not the mass matrix should be
+# inverted. SDC, MLSDC and PFASST can be used without changes when the right-hand side of the ODE is defined with the
+# inverse of the mass matrix. Otherwise, the mass matrix has to be used, e.g. in the tau-correction. This example tests
+# different variants of this methodology for SDC, MLSDC and PFASST.
+#
+# ## The setup
+#
+# The forced heat equation in 1D, with continuous Lagrange elements of order 4, and for MLSDC a second level on a
+# mesh half as fine, with the same element order and the same collocation nodes: coarsening in the mesh is where the
+# multilevel gain is, while coarsening in the nodes or in the element order throws it away. The problem and sweeper
+# classes are set per variant below.
+
+# %%
 from pathlib import Path
 import numpy as np
 
@@ -82,6 +110,22 @@ def setup(t0=None, ml=None):
     return description, controller_params
 
 
+# %% [markdown]
+# ## The variants
+#
+# - `'mass_inv'`: the right-hand side includes the inverse of the mass matrix, with the problem class `fenics_heat`,
+#   so that the standard IMEX sweeper works unchanged.
+# - `'mass'`: the mass matrix stays on the left, with `fenics_heat_mass` and the sweeper `imex_1st_order_mass`, which
+#   applies it to the initial value and in the residual. Between the levels, `base_transfer_mass` restricts the
+#   quantities that carry the mass matrix, the tau-correction and the initial value, as load vectors. The right-hand
+#   side is one as well, so it is re-evaluated on the fine level instead of being interpolated (`finter=False`).
+# - `'mass_timebc'`: as `'mass'`, but with time-dependent boundary conditions, `fenics_heat_mass_timebc`.
+#
+# Each run prints the error, statistics of the iterations and the time to solution, and appends them to
+# `data/step_7_A_out.txt`.
+
+
+# %%
 def run_variants(variant=None, ml=None, num_procs=None):
     """
     Main routine to run the different implementations of the heat equation with FEniCS
@@ -180,6 +224,11 @@ def run_variants(variant=None, ml=None, num_procs=None):
     f.close()
 
 
+# %% [markdown]
+# SDC, MLSDC and PFASST with 5 steps in parallel, emulated in one process, each with all three variants.
+
+
+# %%
 def main():
     run_variants(variant='mass_inv', ml=False, num_procs=1)
     run_variants(variant='mass', ml=False, num_procs=1)
@@ -194,3 +243,20 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# %% [markdown]
+# ## Results
+#
+# FEniCS does not run in the browser, nor in the environment this website is built in. These are the results of our
+# CI, which runs this part in an environment with FEniCS, in the run that built this page:
+#
+# :::{literalinclude} /../../data/step_7_A_out.txt
+# :language: text
+# :::
+#
+# :::{admonition} Important things to note
+# - Even core routines can be replaced where a method needs it: for the mass-matrix formulation, pySDC also has
+#   `base_transfer_mass`, which the mass variants here use for MLSDC and PFASST.
+# - It is also valuable to check out the data type and transfer classes required to work with FEniCS. Both can be
+#   found in the `implementations` folder.
+# :::

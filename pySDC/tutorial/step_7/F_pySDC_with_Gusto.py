@@ -1,29 +1,42 @@
-"""
-Example for running pySDC together with Gusto. This test runs a shallow water equation and may take a considerable
-amount of time. After you have run it, move on to step F_2, which includes a plotting script.
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+#   language_info:
+#     name: python
+# ---
 
-This is Test Case 5 (flow over a mountain) of Williamson et al, 1992:
-``A standard test set for numerical approximations to the shallow water
-equations in spherical geometry'', JCP.
+# %% [markdown]
+# # Part F: pySDC and Gusto
+#
+# [Gusto](https://github.com/firedrakeproject/gusto) is a toolkit for geophysical simulations that uses
+# [Firedrake](https://github.com/firedrakeproject/firedrake) for the spatial discretization. This example is an
+# adaptation of the Williamson 5 test case as implemented in
+# [Gusto](https://github.com/firedrakeproject/gusto/blob/main/examples/shallow_water/williamson_5.py): the shallow
+# water equations, with flow over a mountain (Test Case 5 of Williamson et al., 1992, *A standard test set for
+# numerical approximations to the shallow water equations in spherical geometry*, JCP). It may take a considerable
+# amount of time.
+#
+# This coupling works slightly differently from the other examples of this step, as time stepping is part of Gusto.
+# The aim of the coupling is not a spatial discretization, but to use the equations that are implemented in Gusto. A
+# Gusto equation includes the basic form of the equation set, but a crucial part is to modify terms in the discretized
+# equations with spatial methods, such as upwinding schemes.
+#
+# We get the finished equation set into pySDC by setting up pySDC as a time discretization for Gusto: a pySDC
+# description and controller parameters as usual, passed to the pySDC time discretization, which then goes into a
+# Gusto time stepper. During this instantiation, the equation, and the residual used for solving systems, is modified
+# with all the spatial methods. Afterwards, there are two choices:
+#
+# - use the Gusto time stepper for running, or
+# - take its `.scheme.controller`, which is the pySDC controller, and run with pySDC.
+#
+# That is why a Gusto time stepper is needed even to run with pySDC: the spatial methods modify the residual of the
+# equations when it is created. Once they have, we can continue in Gusto or in pySDC.
 
-This script is adapted from the Gusto example: https://github.com/firedrakeproject/gusto/blob/main/examples/shallow_water/williamson_5.py
-
-The pySDC coupling works by setting up pySDC as a time integrator within Gusto.
-To this end, you need to construct a pySDC description and controller parameters as usual and pass them when
-constructing the pySDC time discretization.
-
-After passing this to a Gusto timestepper, you have two choices:
-    - Access the `.scheme.controller` variable of the timestepper, which is the pySDC controller and use pySDC for
-      running
-    - Use the Gusto timestepper for running
-You may wonder why it is necessary to construct a Gusto timestepper if you don't want to use it. The reason is the
-setup of spatial methods, such as upwinding. These are passed to the Gusto timestepper and modify the residual of the
-equations during its instantiation. Once the residual is modified, we can choose whether to continue in Gusto or pySDC.
-
-This script supports space-time parallelism, as well as running the Gusto SDC implementation or the pySDC-Gusto coupling.
-Please run with `--help` to learn how to configure this script.
-"""
-
+# %%
 import firedrake as fd
 from pySDC.helpers.pySDC_as_gusto_time_discretization import pySDC_integrator
 from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
@@ -68,7 +81,14 @@ williamson_5_defaults = {
     'logger_level': 15,  # pySDC logger level
 }
 
+# %% [markdown]
+# ## Williamson 5
+#
+# The whole test case, with the Gusto SDC implementation or the pySDC-Gusto coupling, optionally with adaptivity,
+# several levels in space, or space-time parallelism.
 
+
+# %%
 def williamson_5(
     ncells_per_edge=williamson_5_defaults['ncells_per_edge'],
     dt=williamson_5_defaults['dt'],
@@ -349,9 +369,22 @@ def williamson_5(
 # ---------------------------------------------------------------------------- #
 
 
+# %% [markdown]
+# ## Running it
+#
+# The script supports space-time parallelism, as well as running the Gusto SDC implementation or the pySDC-Gusto
+# coupling. Run it with `--help` to learn how to configure it. Afterwards,
+# [`F_2_plot_pySDC_with_Gusto_result.py`](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/F_2_plot_pySDC_with_Gusto_result.py),
+# next to this tutorial, plots the results.
+
+# %%
 if __name__ == "__main__":
 
-    parser = ArgumentParser(description=__doc__, formatter_class=ArgumentDefaultsHelpFormatter)
+    parser = ArgumentParser(
+        description='Williamson 5 (flow over a mountain) with pySDC as the time discretization of Gusto, or with '
+        "Gusto's own SDC implementation for comparison.",
+        formatter_class=ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument(
         '--ncells_per_edge',
         help="The number of cells per edge of icosahedron",
@@ -405,3 +438,13 @@ if __name__ == "__main__":
         options[key] = options[key] not in ['False', 0, False, 'false']
 
     williamson_5(**options)
+
+# %% [markdown]
+# Firedrake and Gusto do not run in the browser, nor in the environment this website is built in. Our CI runs this part
+# in a Firedrake container with Gusto: it checks that the pySDC coupling gives the same result as Gusto's own SDC
+# after a few time steps, and that the multilevel version converges faster than the single-level one. These are the
+# results of the run that built this page, for a few time steps only, to keep the CI fast:
+#
+# :::{literalinclude} /../../data_firedrake/step_7_F_out.txt
+# :language: text
+# :::

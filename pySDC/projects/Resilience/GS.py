@@ -54,9 +54,11 @@ def u_exact(self, t, u_init=None, t_init=None, recompute=False, _t0=None):
     return data
 
 
-if not hasattr(grayscott_imex_diffusion, '_u_exact'):
-    grayscott_imex_diffusion._u_exact = grayscott_imex_diffusion.u_exact
-    grayscott_imex_diffusion.u_exact = u_exact
+class grayscott_imex_diffusion_reference(grayscott_imex_diffusion):
+    """Gray-Scott whose solution at t > 0 is a reference solution computed with `run_GS` and cached on disk"""
+
+    _u_exact = grayscott_imex_diffusion.u_exact
+    u_exact = u_exact
 
 
 def run_GS(
@@ -128,7 +130,7 @@ def run_GS(
         controller_params = {**controller_params, **custom_controller_params}
 
     description = {}
-    description['problem_class'] = grayscott_imex_diffusion
+    description['problem_class'] = grayscott_imex_diffusion_reference
     description['problem_params'] = problem_params
     description['sweeper_class'] = imex_1st_order_efficient
     description['sweeper_params'] = sweeper_params

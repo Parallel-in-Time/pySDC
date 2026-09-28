@@ -1,11 +1,57 @@
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+#   language_info:
+#     name: python
+# ---
+
+# %% [markdown]
+# # Part D: pySDC and PyTorch
+#
+# PyTorch is a library for machine learning. Its data structure is called a tensor, which runs on CPUs as well as
+# GPUs, with access to all of PyTorch's machine learning methods. Since the potential for use in pySDC is very large,
+# we have started on a data type that uses PyTorch tensors throughout pySDC.
+#
+# This example trains a network to predict the results of implicit Euler solves for the heat equation. It is too
+# simple to do anything useful, but demonstrates how to use tensors in pySDC and then apply the enormous PyTorch
+# infrastructure. This is work in progress in very early stages! The tensor data type is the simplest possible
+# implementation, rather than an efficient one. If you want to work on this, your input is appreciated!
+#
+# The tensor data type, the problem class `Heat1DFDTensor` using it and the network `HeatEquationModel` live in the
+# helper module `torch_heat.py` next to this tutorial.
+
+# %%
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from pySDC.playgrounds.ML_initial_guess.ml_heat import HeatEquationModel, Train_pySDC
-from pySDC.playgrounds.ML_initial_guess.heat import Heat1DFDTensor
+from pySDC.tutorial.step_7.torch_heat import Heat1DFDTensor, HeatEquationModel
+
+# %% [markdown]
+# ## Training at the collocation nodes
+#
+# For a first proof of concept, we train the model specifically for the collocation nodes we use in SDC. If
+# successful, the initial guess would already be the exact solution, and we would need no SDC iterations.
+#
+# What we find is that we can train the network to predict the solution to one very specific problem rather well.
+# However, if we train for something else, here solving for a different step size, the model only predicts what it
+# was trained for last, and loses the ability to solve for what it learned before. This is solely because we chose
+# an overly simple model that is unsuitable to the task at hand, which is likely easily solved with a bit of
+# patience. So take this as a demonstration of the interface between pySDC and PyTorch, and if you want to do a
+# project with it, as a starting point for things that actually do something!
+#
+# The output shows the training loss during training and, after each of three training sessions, the error of the
+# prediction with the current state of the network. To demonstrate the forgetfulness, we finally print the error of
+# all learned predictions after training is complete.
 
 
+# %%
 def train_at_collocation_nodes():
     """
     For the first proof of concept, we want to train the model specifically to the collocation nodes we use in SDC.
@@ -74,6 +120,7 @@ def train_at_collocation_nodes():
         out += f'Error of prediction at {dt:.2e} after training: {abs(target_condition-model_prediction):.2e}\n'
 
     print(out)
+    Path('data').mkdir(parents=True, exist_ok=True)
     with open('data/step_7_D_out.txt', 'w') as file:
         file.write(out)
 
@@ -87,3 +134,13 @@ def train_at_collocation_nodes():
 
 if __name__ == '__main__':
     train_at_collocation_nodes()
+
+# %% [markdown]
+# ## Results
+#
+# PyTorch does not run in the browser, nor in the environment this website is built in. These are the results of our
+# CI, which runs this part in an environment with PyTorch, in the run that built this page:
+#
+# :::{literalinclude} /../../data/step_7_D_out.txt
+# :language: text
+# :::

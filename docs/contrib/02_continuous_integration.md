@@ -1,6 +1,6 @@
 # Continuous Integration in pySDC
 
-Any commit in `pySDC` are tested by GitHub continuous integration (CI). You can see in in the [action panel](https://github.com/Parallel-in-Time/pySDC/actions) the tests for each branches.
+Every commit in `pySDC` is tested by GitHub continuous integration (CI). You can see the tests for each branch in the [action panel](https://github.com/Parallel-in-Time/pySDC/actions).
 Those tests are currently divided in three main categories : [code linting](#code-linting), [code testing](#code-testing) and [code coverage](#code-coverage).
 Finally, the CI also build artifacts that are used to generate the documentation website (see http://parallel-in-time.org/pySDC/), more details given in the [documentation generation](#documentation-generation) section.
 
@@ -146,6 +146,11 @@ pytest -v pySDC/tests
 > pytest -v pySDC/tests/test_nodes.py::test_nodesGeneration[LEGENDRE]   # only test_nodesGeneration with LEGENDRE nodes
 > ```
 
+> :warning: CI runs `pySDC/tests` once per environment with `-m <marker>`, so every test there needs one of the
+> markers `base`, `fenics`, `mpi4py`, `petsc`, `pytorch`, `firedrake` or `cupy` (or `benchmark`, which CI
+> deliberately does not run). A test without one would never run anywhere, so collection stops with an error
+> that names it; see `pySDC/tests/conftest.py`.
+
 ## Running CI on HPC from pull requests
 
 > :warning: **Note:** The GitLab mirror integration is currently disabled due to technical issues. This section describes functionality that is temporarily unavailable.
@@ -173,25 +178,59 @@ Regardless of why the Gitlab pipeline was triggered, the following holds true:
 
 In order to run tests on GPUs, please use the pytest marker `cupy`.
 
-#### Running the GPU tests without a GPU
+#### Running the GPU tests
 
-The `cupy`-marked tests can also be run on any machine, against a NumPy-backed stand-in for CuPy:
+The `gpu_hardware_tests` job rents two NVIDIA T4s per run from [Modal](https://modal.com) and runs
+the same `cupy`-marked selection on them, through `etc/run_mpi_tests.sh` as every other leg does.
+Unlike the stub, **this one counts towards the coverage report**, because it really executes the
+lines it reports.
+
+Four GPUs, because the space-time tests ask for four ranks and NCCL wants a GPU per rank. The
+serial pass -- most of the job -- is spread over the same four with `pytest-xdist` rather than
+leaving three idle, which brings it from 101 seconds to 39 and costs about what two devices did.
+
+Nothing in pySDC selects a device: on a batch system the scheduler gives each task its own, so
+every process taking device 0 is correct. Inside one container it is not, so `etc/gpu_bind.py`
+assigns one, reading whichever of `OMPI_COMM_WORLD_LOCAL_RANK` or `PYTEST_XDIST_WORKER` the
+launcher set.
+
+`coverage` does not follow xdist workers, which are `execnet` subprocesses rather than the
+`multiprocessing` children `pyproject.toml` declares. Left alone the split reported 3836 covered
+lines against 5332 unsplit, with every test passing either way, so the image installs coverage's
+`.pth` hook and the job sets `COVERAGE_PROCESS_START`.
+
+You can run it yourself against your own Modal account, which is the fastest way to iterate:
 
 ```bash
-PYSDC_FAKE_GPU=1 pytest pySDC/tests -m cupy
+modal token new                      # once
+modal run etc/modal_gpu_tests.py     # from the repository root, the whole selection
+
+# narrow it while developing -- the full run is around three minutes
+modal run etc/modal_gpu_tests.py --tests pySDC/tests/test_sweepers/test_MPI_sweeper.py
+modal run etc/modal_gpu_tests.py --k NCCL
 ```
 
-This installs fake `cupy`, `cupyx` and `cupy_backends` modules that forward to NumPy and SciPy (see
-`pySDC/tests/fake_cupy.py`), so the `useGPU=True` branches really do get executed. Because nearly
-every `*_GPU` test is its CPU counterpart called with `useGPU=True`, this catches the usual
-regressions: a `setup_GPU` that forgets an attribute, a GPU class whose signature has drifted, an
-`xp` that should have been `sparse_lib`, an import that no longer resolves.
+In CI it runs on **every push**, like the rest of the pipeline, with one exception: a pull request
+from a fork gets no secrets, so the job is skipped there.
 
-> :warning: It is a smoke test, not a substitute for real hardware. Nothing CUDA-specific is
-> exercised: no kernels, no NCCL, no `DistArrayCuPy`, none of the `CuSparseError` fallbacks, and no
-> place where CuPy's behaviour genuinely differs from NumPy's. **A green stub run does not mean the
-> GPU code works.** It runs in the `mpi4py` leg of `user_cpu_tests_linux`, and is deliberately kept
-> out of the coverage report so that GPU-only lines are never reported as covered.
+It used to be opt-in through a `gpu` label. That was a mistake worth recording, because a label is
+a *gate* and not a *trigger*: adding one to an open pull request starts nothing, so the job
+skipped and the pull request went green having never touched a GPU. A skip that reads as a pass is
+the worst thing a check can do, and it happened four times before the label went away.
+
+Coverage is the other reason to run it unconditionally. `NCCL_communicator.py`, `cupy_mesh.py` and
+`log_GPU_timings.py` are executed nowhere else, so master's coverage includes them and a pull
+request that skipped the job reports a drop that is not real. Fork pull requests still show that
+drop, which cannot be helped without `pull_request_target`.
+
+It needs `MODAL_TOKEN_ID` and `MODAL_TOKEN_SECRET` as repository secrets. A run costs a few cents
+and takes about three minutes; the free tier covers several hundred a month.
+
+> :warning: The GPU spectral code needs an mpi4py-fft that no release provides -- the `cupy` and
+> `cupyx-scipy` FFT backends, `DistArrayCuPy` and the NCCL `comm_backend` only exist on the
+> `cupy_implementation` branch of https://github.com/brownbaerchen/mpi4py-fft, which
+> `etc/modal_gpu_tests.py` installs at a pinned commit. `etc/environment-cupy.yml` on its own is
+> not enough to run that code.
 
 If you want to create a new HPC test environment, the following steps need to be completed:
 
@@ -218,20 +257,21 @@ There are multiple ways to view test coverage for pySDC:
    - Shows line-by-line coverage with color coding
    - Updated automatically with each push to master
 
-2. **Codecov Dashboard** (for trends and PR analysis)
+2. **Codecov Dashboard** (for trends)
    - [Compare results with previous builds](https://app.codecov.io/gh/Parallel-in-Time/pySDC)
    - View coverage trends over time
-   - See coverage impact of specific commits
-   - Codecov automatically comments on pull requests with coverage changes
+   - See coverage impact of specific commits on master (only master's coverage is uploaded)
 
 3. **Coverage Badge** (quick status check)
    - Displayed in the [README](../../README.md)
    - Shows current coverage percentage for master branch
 
 4. **PR Coverage Comments** (for contributors)
-   - Codecov comments on each pull request
-   - Shows coverage changes introduced by the PR
+   - [python-coverage-comment-action](https://github.com/py-cov-action/python-coverage-comment-action) comments on each pull request
+   - Shows coverage changes introduced by the PR, compared to the latest master run
    - Highlights uncovered lines in modified files
+   - The master baseline, with a badge and a browsable report, lives on the
+     [`python-coverage-comment-action-data`](https://github.com/Parallel-in-Time/pySDC/tree/python-coverage-comment-action-data) branch
 
 During developments, you can also run the coverage tests locally, using :
 
@@ -304,6 +344,16 @@ Then you can open `docs/build/html/index.html` using you favorite browser and ch
 > :bell: **Important** : running all the tests is necessary to generate graphs and images used by the website.
 > But you can still generate the website without it: just all images for the tutorials, projects and playgrounds will be missing.
 > This approach can be considered for local testing of your contribution when it does not concern parts containing images (_i.e_ project or code documentation).
+
+Tutorial pages listed in `BROWSER_PAGES` in `docs/source/conf.py` have a "Run in browser" button, which runs their code in [Pyodide](https://pyodide.org).
+CI presses it on every such page after building the site, and fails if a page does not finish or a cell raises.
+To do the same locally:
+
+```bash
+python -m pip install playwright
+python -m playwright install chromium
+python docs/check_run_in_browser.py docs/build/html
+```
 
 :arrow_left: [Back to Pull Request Recommendation](./01_pull_requests.md) ---
 :arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---

@@ -116,7 +116,7 @@ def test_coarse_residual_is_the_restricted_fine_residual():
             # what the coarse level would have computed the stock way, from its own O(1) state
             rebuilt = delta_implicit._residual_nodes(self.coarse.sweep)
             inherited = self.coarse.sweep.eps_in
-            deviations.append(max(nrm(a - b) for a, b in zip(rebuilt, inherited)))
+            deviations.append(max(nrm(a - b) for a, b in zip(rebuilt, inherited, strict=True)))
 
     run([127, 63], delta_implicit, checking_transfer)
 
@@ -141,7 +141,7 @@ def test_accumulated_correction_is_the_coarse_grid_correction():
         def prolong(self):
             accumulated = self.coarse.sweep.delta_acc
             differenced = [self.coarse.u[m + 1] - self.coarse.uold[m + 1] for m in range(len(accumulated))]
-            deviations.append(max(nrm(a - b) for a, b in zip(accumulated, differenced)))
+            deviations.append(max(nrm(a - b) for a, b in zip(accumulated, differenced, strict=True)))
             super().prolong()
 
     run([127, 63], delta_implicit, checking_transfer)
@@ -168,7 +168,7 @@ def test_residual_recursion_tracks_the_real_residual():
             super().update_nodes()
             if self.eps_in is not None:
                 rebuilt = delta_implicit._residual_nodes(self)
-                deviations.append(max(nrm(a - b) for a, b in zip(rebuilt, self.eps_in)))
+                deviations.append(max(nrm(a - b) for a, b in zip(rebuilt, self.eps_in, strict=True)))
 
     # three levels, so a middle level is swept, restricted from, prolonged onto and swept again
     run([127, 63, 31], checking_sweeper, tau_building(delta_transfer))
@@ -251,7 +251,7 @@ def test_coarse_level_reports_the_residual_it_tracks():
 
     assert len(seen['stock']) > 2, 'the coarse level never reported a residual'
     assert len(seen['stock']) == len(seen['delta'])
-    for a, b in zip(seen['stock'], seen['delta']):
+    for a, b in zip(seen['stock'], seen['delta'], strict=True):
         # The two routes differ by round-off, which stays around 1e-14 absolute while the residual
         # falls, so the bar has to be absolute as well as relative. It still discriminates: a
         # residual rebuilt without tau differs by O(tau), i.e. by the coarsening defect.

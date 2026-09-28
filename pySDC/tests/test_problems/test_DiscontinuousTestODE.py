@@ -75,8 +75,21 @@ def test_capture_errors_and_warnings(caplog):
     assert 'Newton did not converge after 100 iterations, error is nan' in caplog.text
 
     # test if warning is raised when local error is tried to computed
-    u1 = DODE.u_exact(t0 + dt, u_init=u0, t_init=t0)
+    DODE.u_exact(t0 + dt, u_init=u0, t_init=t0)
     assert (
         'DiscontinuousTestODE uses an analytic exact solution from t=0. If you try to compute the local error, you will get the global error instead!'
         in caplog.text
     )
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('t', [1.0, 1.5, 1.7, 2.5])
+def test_exact_rhs_is_derivative_of_exact_solution(t):
+    """``ExactDiscontinuousTestODE`` has to evaluate the derivative of its exact solution, on both sides of the event."""
+    import numpy as np
+    from pySDC.implementations.problem_classes.DiscontinuousTestODE import ExactDiscontinuousTestODE
+
+    prob = ExactDiscontinuousTestODE()
+    eps = 1e-6
+    derivative = (prob.u_exact(t + eps) - prob.u_exact(t - eps)) / (2 * eps)
+    assert np.allclose(prob.eval_f(prob.u_exact(t), t), derivative, rtol=1e-8)

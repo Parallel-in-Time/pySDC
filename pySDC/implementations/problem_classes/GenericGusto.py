@@ -12,7 +12,9 @@ import numpy as np
 
 class GenericGusto(Problem):
     """
-    Set up solvers based on the equation. Keep in mind that you probably want to use the pySDC-Gusto coupling via
+    Problem class wrapping a Gusto (Firedrake) equation, with all terms of its residual treated implicitly.
+
+    Keep in mind that you probably want to use the pySDC-Gusto coupling via
     the `pySDC_integrator` class in the helpers in order to get spatial methods rather than interfacing with this
     class directly.
 
@@ -42,7 +44,8 @@ class GenericGusto(Problem):
             equation (:class:`PrognosticEquation`): the model's equation.
             apply_bcs (bool, optional): whether to apply the equation's boundary
                 conditions. Defaults to True.
-            solver_params (dict, optional): Solver parameters for the nonlinear variational problems
+            solver_parameters (dict, optional): Solver parameters for the nonlinear variational problems.
+                Defaults to GMRES with a block Jacobi preconditioner with ILU on the blocks.
             stop_at_divergence (bool, optional): Whether to raise an error when the variational problems do not converge. Defaults to False
             LHS_cache_size (int, optional): Size of the cache for solvers. Defaults to 12.
             residual (Firedrake.form, optional): Overwrite the residual of the equation, e.g. after adding spatial methods. Defaults to None.
@@ -78,38 +81,30 @@ class GenericGusto(Problem):
 
     @property
     def bcs(self):
+        """
+        Boundary conditions of the prognostic field of the equation.
+
+        Returns:
+            list of :class:`DirichletBC`: The boundary conditions, or None if `apply_bcs` is False
+        """
         if not self.apply_bcs:
             return None
         else:
             return self.equation.bcs[self.equation.field_name]
 
-    def invert_mass_matrix(self, rhs):
-        self._u.assign(rhs.functionspace)
-
-        if 'mass_matrix' not in self.solvers.keys():
-            mass_form = self.residual.label_map(
-                lambda t: t.has_label(time_derivative),
-                map_if_true=replace_subject(self.x_out, old_idx=self.idx),
-                map_if_false=drop,
-            )
-            rhs_form = self.residual.label_map(
-                lambda t: t.has_label(time_derivative),
-                map_if_true=replace_subject(self._u, old_idx=self.idx),
-                map_if_false=drop,
-            )
-
-            problem = fd.NonlinearVariationalProblem((mass_form - rhs_form).form, self.x_out, bcs=self.bcs)
-            solver_name = self.field_name + self.__class__.__name__
-            self.solvers['mass_matrix'] = fd.NonlinearVariationalSolver(
-                problem, solver_parameters=self.solver_parameters, options_prefix=solver_name
-            )
-            self.work_counters['solver_setup']()
-
-        self.solvers['mass_matrix'].solve()
-
-        return self.dtype_u(self.x_out)
-
     def eval_f(self, u, *args):
+        """
+        Evaluate the right hand side f(u) by solving M f = -R(u), where M is the mass form (the time derivative terms of
+        the residual) and R(u) are all other terms of the residual evaluated at `u`. The solver is set up once and
+        cached.
+
+        Args:
+            u (dtype_u): Solution at which to evaluate
+            *args: Not used, the time is not passed on to Gusto
+
+        Returns:
+            dtype_f: The right hand side
+        """
         self._u.assign(u.functionspace)
 
         if 'eval_rhs' not in self.solvers.keys():
@@ -137,6 +132,22 @@ class GenericGusto(Problem):
         return self.dtype_f(self.x_out)
 
     def solve_system(self, rhs, factor, u0, *args):
+        """
+        Solve the nonlinear system (M - factor f)(u) = M rhs, i.e. M u + factor R(u) = M rhs with R the terms of the
+        residual other than the time derivative, with a Firedrake nonlinear variational solver starting from `u0`.
+
+        The solvers are cached per `factor`. When the cache is full, the oldest one for a factor is evicted. If the
+        solver does not converge, the error is raised if `stop_at_divergence` is set and only logged otherwise.
+
+        Args:
+            rhs (dtype_u): Right hand side
+            factor (float): Prefactor of the right hand side f, e.g. the node-to-node step size
+            u0 (dtype_u): Initial guess
+            *args: Not used, typically the time
+
+        Returns:
+            dtype_u: The solution
+        """
         self.x_out.assign(u0.functionspace)  # set initial guess
         self._u.assign(rhs.functionspace)
 
@@ -180,10 +191,26 @@ class GenericGusto(Problem):
 
 
 class GenericGustoImex(GenericGusto):
+    """
+    Problem class wrapping a Gusto (Firedrake) equation, IMEX with the terms labeled implicit and explicit split.
+    """
+
     dtype_f = IMEX_firedrake_mesh
     rhs_n_labels = 2
 
     def evaluate_labeled_term(self, u, label):
+        """
+        Evaluate the part of the right hand side made of the terms carrying `label`, by solving M x = -R_label(u), where
+        M is the mass form and R_label are the terms of the residual with `label` and without the time derivative label.
+        One solver per label is set up and cached.
+
+        Args:
+            u (dtype_u): Solution at which to evaluate
+            label (:class:`Label`): Gusto label, e.g. `implicit` or `explicit`
+
+        Returns:
+            firedrake.Function: The result, in the output buffer `self.x_out` that is overwritten by the next solve
+        """
         self._u.assign(u.functionspace)
 
         if label not in self.solvers.keys():
@@ -203,12 +230,23 @@ class GenericGustoImex(GenericGusto):
             self.solvers[label] = fd.NonlinearVariationalSolver(
                 problem, solver_parameters=self.solver_parameters, options_prefix=solver_name
             )
-            self.work_counters['solver_setup'] = WorkCounter()
+            self.work_counters['solver_setup']()
 
         self.solvers[label].solve()
         return self.x_out
 
     def eval_f(self, u, *args):
+        """
+        Evaluate the right hand side with the terms labeled `implicit` in the implicit part and the terms labeled
+        `explicit` in the explicit part. Terms carrying neither label are left out.
+
+        Args:
+            u (dtype_u): Solution at which to evaluate
+            *args: Not used, the time is not passed on to Gusto
+
+        Returns:
+            dtype_f: The right hand side, with `impl` and `expl` parts
+        """
         me = self.dtype_f(self.init)
         me.impl.assign(self.evaluate_labeled_term(u, implicit))
         me.expl.assign(self.evaluate_labeled_term(u, explicit))
@@ -216,6 +254,20 @@ class GenericGustoImex(GenericGusto):
         return me
 
     def solve_system(self, rhs, factor, u0, *args):
+        """
+        Solve the nonlinear system (M - factor f_I)(u) = M rhs, i.e. M u + factor R_I(u) = M rhs with R_I the terms of
+        the residual labeled `implicit`, with a Firedrake nonlinear variational solver starting from `u0`. The explicit
+        terms are left out. Caching and convergence failures are handled as in `GenericGusto.solve_system`.
+
+        Args:
+            rhs (dtype_u): Right hand side
+            factor (float): Prefactor of the implicit part f_I, e.g. the node-to-node step size
+            u0 (dtype_u): Initial guess
+            *args: Not used, typically the time
+
+        Returns:
+            dtype_u: The solution
+        """
         self.x_out.assign(u0.functionspace)  # set initial guess
         self._u.assign(rhs.functionspace)
 
@@ -248,9 +300,8 @@ class GenericGustoImex(GenericGusto):
             self.solvers[factor] = fd.NonlinearVariationalSolver(
                 problem, solver_parameters=self.solver_parameters, options_prefix=solver_name
             )
-            self.work_counters['solver_setup'] = WorkCounter()
+            self.work_counters['solver_setup']()
 
-        self.solvers[factor].solve()
         try:
             self.solvers[factor].solve()
         except fd.exceptions.ConvergenceError as error:

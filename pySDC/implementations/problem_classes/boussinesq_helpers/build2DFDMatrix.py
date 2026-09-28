@@ -4,8 +4,6 @@ import scipy.sparse as sp
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix import (
     getMatrix,
     getUpwindMatrix,
-    getBCLeft,
-    getBCRight,
 )
 
 
@@ -71,46 +69,3 @@ def get2DMatrix(N, h, bc_hor, bc_ver, order):
     Dz = sp.kron(sp.eye(N[0]), Az, format="csr")
 
     return Dx, Dz
-
-
-#
-# NOTE: So far only constant dirichlet values can be prescribed, i.e. one fixed value for a whole segment
-#
-
-
-def getBCHorizontal(value, N, dx, bc_hor):
-    assert (
-        np.size(value) == 2
-    ), 'Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary'
-    assert np.size(N) == 2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
-    assert np.size(dx) == 1, 'dx must be a scalar'
-    assert (
-        np.size(bc_hor) == 2
-    ), 'bc_hor must have two entries, bc_hor[0] specifying the BC at the left, bc_hor[1] at the right boundary'
-
-    bl = getBCLeft(value[0], N[0], dx, bc_hor[0])
-    bl = np.kron(bl, np.ones(N[1]))
-
-    br = getBCRight(value[1], N[0], dx, bc_hor[1])
-    br = np.kron(br, np.ones(N[1]))
-
-    return bl, br
-
-
-def getBCVertical(value, N, dz, bc_ver):
-    assert (
-        np.size(value) == 2
-    ), 'Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary'
-    assert np.size(N) == 2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
-    assert np.size(dz) == 1, 'dx must be a scalar'
-    assert (
-        np.size(bc_ver) == 2
-    ), 'bc_hor must have two entries, bc_hor[0] specifying the BC at the left, bc_hor[1] at the right boundary'
-
-    bd = getBCLeft(value[0], N[1], dz, bc_ver[0])
-    bd = np.kron(np.ones(N[0]), bd)
-
-    bu = getBCRight(value[1], N[1], dz, bc_ver[1])
-    bu = np.kron(np.ones(N[0]), bu)
-
-    return bd, bu

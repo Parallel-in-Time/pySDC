@@ -27,14 +27,14 @@ def _unit_grid(nvars, periodic):
 
 class mesh_to_mesh(SpaceTransfer):
     """
-    Custom base_transfer class, implements Transfer.py
+    Space transfer between nd meshes by sparse interpolation matrices of even order, restricting by their transpose.
 
     This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries
     via matrix-vector products.
 
     Attributes:
-        Rspace: spatial restriction matrix, dim. Nf x Nc
-        Pspace: spatial prolongation matrix, dim. Nc x Nf
+        Rspace: spatial restriction matrix, dim. Nc x Nf
+        Pspace: spatial prolongation matrix, dim. Nf x Nc
     """
 
     def __init__(self, fine_prob, coarse_prob, params):
@@ -111,7 +111,7 @@ class mesh_to_mesh(SpaceTransfer):
             Pspace = []
             for i in range(len(self.fine_prob.nvars)):
                 # if number of variables is the same on both levels, Rspace and Pspace are identity
-                if self.coarse_prob.nvars == self.fine_prob.nvars:
+                if self.coarse_prob.nvars[i] == self.fine_prob.nvars[i]:
                     Rspace.append(sp.eye(self.coarse_prob.nvars[i]))
                     Pspace.append(sp.eye(self.fine_prob.nvars[i]))
                 # assemble restriction as transpose of interpolation
@@ -163,6 +163,16 @@ class mesh_to_mesh(SpaceTransfer):
         self.Rspace = self.Rspace.astype(np.promote_types(self.coarse_prob.init[-1], np.float32))
         self.Pspace = self.Pspace.astype(np.promote_types(self.fine_prob.init[-1], np.float32))
 
+        # Which side of the PCI bus this runs on is a property of the problem, not something the
+        # transfer is told -- the same way `TransferMesh_MPIFFT` decides it. The operators are
+        # assembled with SciPy either way, since that work is small, one-off and full of host-side
+        # index arithmetic; only the finished matrices move.
+        if 'cupy' in self.fine_prob.dtype_u.__name__.lower():
+            import cupyx.scipy.sparse as csp
+
+            self.Rspace = csp.csr_matrix(self.Rspace)
+            self.Pspace = csp.csr_matrix(self.Pspace)
+
     def restrict(self, F):
         """
         Restriction implementation
@@ -191,8 +201,8 @@ class mesh_to_mesh(SpaceTransfer):
 
         if hasattr(type(F), 'components'):
             for comp in F.components:
-                _restrict(F.__getattr__(comp), G.__getattr__(comp))
-        elif type(F).__name__ == 'mesh':
+                _restrict(getattr(F, comp), getattr(G, comp))
+        elif type(F).__name__ in ['mesh', 'cupy_mesh']:
             _restrict(F, G)
         else:
             raise TransferError('Wrong data type for restriction, got %s' % type(F))
@@ -227,8 +237,8 @@ class mesh_to_mesh(SpaceTransfer):
 
         if hasattr(type(F), 'components'):
             for comp in G.components:
-                _prolong(G.__getattr__(comp), F.__getattr__(comp))
-        elif type(G).__name__ == 'mesh':
+                _prolong(getattr(G, comp), getattr(F, comp))
+        elif type(G).__name__ in ['mesh', 'cupy_mesh']:
             F[:] = _prolong(G, F)
         else:
             raise TransferError('Wrong data type for prolongation, got %s' % type(G))

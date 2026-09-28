@@ -7,6 +7,19 @@ class LogEmbeddedErrorEstimate(Hooks):
     """
 
     def log_error(self, step, level_number, appendix=''):
+        """
+        Add the embedded error estimate as ``error_embedded_estimate<appendix>`` and, if the level carries one, the
+        estimate of the collocation error as ``error_embedded_estimate_collocation<appendix>`` to the stats. The latter
+        is recorded with the iteration number stored alongside it in the level status.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+            appendix (str): suffix appended to the type of the recorded statistics
+
+        Returns:
+            None
+        """
         L = step.levels[level_number]
 
         for flavour in ['', '_collocation']:
@@ -34,6 +47,7 @@ class LogEmbeddedErrorEstimate(Hooks):
         Args:
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
+            appendix (str): suffix appended to the type of the recorded statistics
 
         Returns:
             None
@@ -65,4 +79,14 @@ class LogEmbeddedErrorEstimatePostIter(LogEmbeddedErrorEstimate):
         self.log_error(step, level_number, '_post_iteration')
 
     def post_step(self, step, level_number):
+        """
+        Record the embedded error estimate of the final iteration as ``error_embedded_estimate_post_iteration``.
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+
+        Returns:
+            None
+        """
         super().post_step(step, level_number, appendix='_post_iteration')

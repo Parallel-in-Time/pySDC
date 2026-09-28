@@ -32,14 +32,9 @@ class RayleighBenard3DRegular(Config):
     def get_LogToFile(self, *args, **kwargs):
         if self.comms[1].rank > 0:
             return None
-        import numpy as np
         from pySDC.implementations.hooks.log_solution import LogToFile
 
-        LogToFile.filename = self.get_file_name()
-        LogToFile.time_increment = 5e-1
-        # LogToFile.allow_overwriting = True
-
-        return LogToFile
+        return self.get_hook(LogToFile, filename=self.get_file_name(), time_increment=5e-1)
 
     def get_controller_params(self, *args, **kwargs):
         from pySDC.implementations.hooks.log_step_size import LogStepSize
@@ -61,10 +56,13 @@ class RayleighBenard3DRegular(Config):
 
         desc = super().get_description(*args, MPIsweeper=MPIsweeper, **kwargs)
 
-        if MPIsweeper:
-            desc['sweeper_class'].compute_residual = compute_residual_DAE_MPI
-        else:
-            desc['sweeper_class'].compute_residual = compute_residual_DAE
+        # subclass rather than patch: the sweeper class is shared with every other problem in the process
+        sweeper_class = desc['sweeper_class']
+        desc['sweeper_class'] = type(
+            sweeper_class.__name__,
+            (sweeper_class,),
+            {'compute_residual': compute_residual_DAE_MPI if MPIsweeper else compute_residual_DAE},
+        )
 
         desc['level_params']['dt'] = 0.01
         desc['level_params']['restol'] = 1e-7

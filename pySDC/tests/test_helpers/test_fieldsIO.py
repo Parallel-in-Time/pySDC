@@ -8,7 +8,12 @@ import numpy as np
 
 from pySDC.helpers.fieldsIO import DTYPES, FieldsIO
 
-FieldsIO.ALLOW_OVERWRITE = True
+
+@pytest.fixture(autouse=True)
+def _allow_overwrite(monkeypatch):
+    # testRectilinear rewrites one file per grid size; scoped to this module, so the overwrite
+    # protection stays on for every other test in the session
+    monkeypatch.setattr(FieldsIO, 'ALLOW_OVERWRITE', True)
 
 
 @pytest.mark.base
@@ -20,7 +25,7 @@ def testHeader(tmpdir, dim, dtypeIdx):
     fileName = f"{tmpdir}/testHeader.pysdc"
     dtype = DTYPES[dtypeIdx]
 
-    coords = [np.linspace(0, 1, num=256, endpoint=False) for n in [256, 64, 32]]
+    coords = [np.linspace(0, 1, num=n, endpoint=False) for n in [256, 64, 32]]
 
     if dim == 0:
         Class = Scalar
@@ -60,7 +65,10 @@ def testHeader(tmpdir, dim, dtypeIdx):
 
     for key, val in f1.header.items():
         assert key in f2.header, f"could not read {key} key in written {f2}"
-        assert np.allclose(val, f2.header[key]), f"header's discrepancy for {key} in written {f2}"
+        # `coords` holds one array per axis, of different lengths, so compare it axis by axis
+        vals, vals2 = (val, f2.header[key]) if key == "coords" else ([val], [f2.header[key]])
+        for v, v2 in zip(vals, vals2, strict=True):
+            assert np.allclose(v, v2), f"header's discrepancy for {key} in written {f2}"
 
 
 @pytest.mark.base
@@ -186,7 +194,7 @@ def testToVTR(tmpdir, nVar, nX, nY, nZ, nSteps):
         uVTR, coords, _ = readFromVTR(vFile)
         _, uFile = file.readField(i)
         assert np.allclose(uFile, uVTR), "mismatch between data"
-    for i, (xVTR, xFile) in enumerate(zip(coords, file.header["coords"])):
+    for i, (xVTR, xFile) in enumerate(zip(coords, file.header["coords"], strict=True)):
         assert np.allclose(xVTR, xFile), f"coordinate mismatch in dir. {i}"
 
 
@@ -211,7 +219,7 @@ def testRectilinear_MPI(tmpdir, dim, dtypeIdx, algo, nSteps, nVar):
     fileNames = [f"{tmpdir}/testRectilinear{dim}D_MPI_{i}.pysdc" for i in range(len(allGridSizes))]
 
     try:
-        for fileName, gridSizes in zip(fileNames, allGridSizes):
+        for fileName, gridSizes in zip(fileNames, allGridSizes, strict=True):
             u0 = writeFields_MPI(
                 fileName=fileName,
                 dtypeIdx=dtypeIdx,
@@ -231,7 +239,7 @@ def testRectilinear_MPI(tmpdir, dim, dtypeIdx, algo, nSteps, nVar):
 
     comm.Barrier()
 
-    for fileName, gridSizes in zip(fileNames, allGridSizes):
+    for fileName, gridSizes in zip(fileNames, allGridSizes, strict=True):
 
         f2: Rectilinear = FieldsIO.fromFile(fileName)
 
@@ -241,7 +249,7 @@ def testRectilinear_MPI(tmpdir, dim, dtypeIdx, algo, nSteps, nVar):
         assert f2.gridSizes == list(gridSizes), f"incorrect gridSizes in MPI written fields {f2}"
 
         coords, u0 = initGrid(nVar, gridSizes)
-        for i, (cFile, cRef) in enumerate(zip(f2.header['coords'], coords)):
+        for i, (cFile, cRef) in enumerate(zip(f2.header['coords'], coords, strict=True)):
             assert np.allclose(cFile, cRef), f"incorrect coords[{i}] in MPI written fields {f2}"
 
         times = np.arange(nSteps) / nSteps

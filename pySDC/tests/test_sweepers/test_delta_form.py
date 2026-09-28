@@ -111,8 +111,9 @@ def test_correction_precision_storage(precision):
         2,
         6,
     )
-    tolerance = 1e-10 if precision == 'float32' else 1e-3
-    assert abs(u64 - u_red) < tolerance
+    # measured 5.9e-14 (float32) and 5.4e-10 (float16); without the correction scaling float16 gives 4.1e-8
+    tolerance = 1e-12 if precision == 'float32' else 1e-8
+    assert abs(u64 - u_red) < tolerance, f'{precision} storage moved the answer by {abs(u64 - u_red):.2e}'
 
 
 @pytest.mark.base
@@ -122,9 +123,20 @@ def test_linear_implicit_reuses_stock_solve_system():
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
     from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
 
-    args = (heatNd_unforced, HEAT_PARAMS, 1e-2, 2, 6)
-    u_std, _, _ = run(args[0], args[1], generic_implicit, sweeper_params(), *args[2:])
-    u_delta, _, _ = run(args[0], args[1], delta_implicit, sweeper_params(linear_implicit=True), *args[2:])
+    initial_guesses = []
+
+    class heat_spy(heatNd_unforced):
+        def solve_system(self, rhs, factor, u0, t):
+            initial_guesses.append(np.asarray(u0).copy())
+            return super().solve_system(rhs, factor, u0, t)
+
+    args = (HEAT_PARAMS, 1e-2, 2, 6)
+    u_std, _, _ = run(heatNd_unforced, args[0], generic_implicit, sweeper_params(), *args[1:])
+    u_delta, _, _ = run(heat_spy, args[0], delta_implicit, sweeper_params(linear_implicit=True), *args[1:])
+
+    # the fallback gives the same answer, but it hands solve_system the current iterate, not a zero
+    assert initial_guesses, 'solve_system was never called'
+    assert all(not u0.any() for u0 in initial_guesses), 'solve_system was not solving for the correction'
     assert abs(u_std - u_delta) < 1e-12
 
 
@@ -512,7 +524,9 @@ def test_a_handed_down_residual_is_used_and_advanced():
                 self.eps_in = self._residual_nodes()
             super().update_nodes()
             rebuilt = delta_implicit._residual_nodes(self)
-            drift.append(max(float(np.max(np.abs(np.asarray(a - b)))) for a, b in zip(rebuilt, self.eps_in)))
+            drift.append(
+                max(float(np.max(np.abs(np.asarray(a - b)))) for a, b in zip(rebuilt, self.eps_in, strict=True))
+            )
             banked.append(self.delta_acc is not None)
 
     args = (heatNd_unforced, HEAT_PARAMS, sweeper_params(linear_implicit=True), 1e-2, 1, 6)

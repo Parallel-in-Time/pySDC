@@ -7,9 +7,10 @@ from pySDC.helpers.fft_helper import PFFT
 
 class fft_to_fft(SpaceTransfer):
     """
-    Custom base_transfer class, implements Transfer.py
+    Space transfer between distributed periodic mpi4py-fft meshes: injection to restrict, spectral padding to prolong.
 
-    This implementation can restrict and prolong between PMESH datatypes meshes with FFT for periodic boundaries
+    This implementation can restrict and prolong between ``mesh`` or ``cupy_mesh`` datatypes, or datatypes made of
+    several such components, with FFT for periodic boundaries
 
     """
 
@@ -90,7 +91,7 @@ class fft_to_fft(SpaceTransfer):
 
         if hasattr(type(F), 'components'):
             for comp in F.components:
-                _restrict(F.__getattr__(comp), G.__getattr__(comp))
+                _restrict(getattr(F, comp), getattr(G, comp))
         elif type(F).__name__ in ['mesh', 'cupy_mesh']:
             _restrict(F, G)
         else:
@@ -140,7 +141,7 @@ class fft_to_fft(SpaceTransfer):
 
         if hasattr(type(F), 'components'):
             for comp in F.components:
-                _prolong(G.__getattr__(comp), F.__getattr__(comp))
+                _prolong(getattr(G, comp), getattr(F, comp))
         elif type(G).__name__ in ['mesh', 'cupy_mesh']:
             _prolong(G, F)
 

@@ -48,7 +48,10 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          # The repository secret is called `CODECOV`. Naming a secret that does not exist gives an
+          # empty token, which Codecov rejects for the protected master branch, and with
+          # `fail_ci_if_error: false` that only shows up in this step's log.
+          token: ${{ secrets.CODECOV }}
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
@@ -80,7 +83,7 @@ jobs:
         run: |
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html
+          sphinx-build -j auto -b html docs/source docs/build/html
           mkdir -p docs/build/html/coverage
           mv htmlcov/* docs/build/html/coverage/.
       - name: Store docs

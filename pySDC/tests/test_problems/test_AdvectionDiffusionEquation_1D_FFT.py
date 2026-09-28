@@ -106,5 +106,18 @@ def test_imex_vs_implicit(freq, nu):
         # check if ProblemError is raised correctly in case if nvars % 2 != 0
         problem_params.update({'nvars': 31})
         with pytest.raises(ProblemError):
-            imex_test = advectiondiffusion1d_imex(**problem_params)
-            fully_impl_test = advectiondiffusion1d_implicit(**problem_params)
+            advectiondiffusion1d_imex(**problem_params)
+        with pytest.raises(ProblemError):
+            advectiondiffusion1d_implicit(**problem_params)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('name', ['advectiondiffusion1d_imex', 'advectiondiffusion1d_implicit'])
+def test_rhs_evaluations_are_counted(name):
+    import pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT as problems
+
+    prob = getattr(problems, name)(nvars=32)
+    u = prob.u_exact(0.0)
+    for _ in range(3):
+        prob.eval_f(u, 0.0)
+    assert prob.work_counters['rhs'].niter == 3

@@ -43,7 +43,7 @@ class Sweeper(object):
 
 
     All possible QDelta matrix coefficients are generated with
-    `qmat <https://qmat.readthedocs.io/en/latest/autoapi/qmat/qdelta/index.html>`_,
+    `qmat <https://qmat.readthedocs.io/en/latest/api/qmat/qdelta/index.html>`_,
     check it out to see all available coefficient types.
 
     Attributes:
@@ -90,14 +90,37 @@ class Sweeper(object):
 
         self.__level = level
         self.parallelizable = False
+        self._Qdelta_diagonal = {}
         for name in ["genQI", "genQE"]:
             if hasattr(self, name):
                 delattr(self, name)
 
     def buildGenerator(self, qdType: str) -> QDeltaGenerator:
+        """
+        Build the qmat generator of QDelta coefficients for the collocation nodes of this sweeper.
+
+        Args:
+            qdType (str): Name or alias of the QDelta type, a key of `qmat.qdelta.QDELTA_GENERATORS`
+
+        Returns:
+            qmat.qdelta.QDeltaGenerator: Generator for these nodes and left interval boundary
+        """
         return QDELTA_GENERATORS[qdType](qGen=self.coll.generator, tLeft=self.coll.tleft)
 
     def get_Qdelta_implicit(self, qd_type: str, k: Optional[int] = None) -> np.ndarray:
+        """
+        Get a QDelta matrix of implicit type, i.e. lower triangular with zeros in the first row and column.
+
+        The generator is cached as `self.genQI` and only rebuilt if `qd_type` is not an alias of the cached one. Sets
+        `self.parallelizable`, see `_update_parallelizable`.
+
+        Args:
+            qd_type (str): Name or alias of the QDelta type
+            k (int, optional): Sweep index, for QDelta types whose coefficients change with the sweep
+
+        Returns:
+            numpy.ndarray: QDelta matrix of shape (num_nodes + 1, num_nodes + 1)
+        """
         QDmat = np.zeros_like(self.coll.Qmat)
         if not hasattr(self, "genQI") or qd_type not in QDELTA_GENERATORS_ALIASES[type(self.genQI)]:
             self.genQI: QDeltaGenerator = self.buildGenerator(qd_type)
@@ -105,11 +128,25 @@ class Sweeper(object):
 
         err_msg = 'Lower triangular matrix expected!'
         np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape), err_msg=err_msg)
-        if np.allclose(np.diag(np.diag(QDmat)), QDmat):
-            self.parallelizable = True
+        self._update_parallelizable(('implicit', type(self.genQI)), QDmat)
         return QDmat
 
     def get_Qdelta_explicit(self, qd_type: str, k: Optional[int] = None) -> np.ndarray:
+        """
+        Get a QDelta matrix of explicit type, i.e. strictly lower triangular, with the distances of the nodes to the
+        left
+        interval boundary in the first column and zeros in the first row.
+
+        The generator is cached as `self.genQE` and only rebuilt if `qd_type` is not an alias of the cached one. Sets
+        `self.parallelizable`, see `_update_parallelizable`.
+
+        Args:
+            qd_type (str): Name or alias of the QDelta type
+            k (int, optional): Sweep index, for QDelta types whose coefficients change with the sweep
+
+        Returns:
+            numpy.ndarray: QDelta matrix of shape (num_nodes + 1, num_nodes + 1)
+        """
         coll = self.coll
         QDmat = np.zeros(coll.Qmat.shape, dtype=float)
         if not hasattr(self, "genQE") or qd_type not in QDELTA_GENERATORS_ALIASES[type(self.genQE)]:
@@ -118,9 +155,17 @@ class Sweeper(object):
 
         err_msg = 'Strictly lower triangular matrix expected!'
         np.testing.assert_array_equal(np.triu(QDmat, k=0), np.zeros(QDmat.shape), err_msg=err_msg)
-        if np.allclose(np.diag(np.diag(QDmat)), QDmat):
-            self.parallelizable = True  # for PIC ;)
+        self._update_parallelizable(('explicit', type(self.genQE)), QDmat)
         return QDmat
+
+    def _update_parallelizable(self, key, QDmat):
+        """
+        The sweeper is parallelizable if every QDelta matrix it has built is diagonal, which for explicit ones means
+        zero (PIC). Matrices are remembered by kind and generator, so rebuilding one, for instance with a new sweep
+        index, replaces its entry, and a sweeper with QI='MIN-SR-S' and QE='EE' is not parallelizable.
+        """
+        self._Qdelta_diagonal[key] = np.allclose(np.diag(np.diag(QDmat)), QDmat)
+        self.parallelizable = all(self._Qdelta_diagonal.values())
 
     def predict(self) -> None:
         """
@@ -257,6 +302,7 @@ class Sweeper(object):
 
     @property
     def rank(self) -> int:
+        """Rank of this sweeper in the communicator across nodes: always 0 here, overridden by the MPI sweepers."""
         return 0
 
     def updateVariableCoeffs(self, k: int) -> None:

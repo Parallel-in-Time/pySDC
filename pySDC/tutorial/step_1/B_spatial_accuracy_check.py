@@ -1,54 +1,50 @@
-from pathlib import Path
-import matplotlib
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+# ---
 
-matplotlib.use('Agg')
+# %% [markdown]
+# # Part B: Spatial accuracy check
+#
+# One error value says little. A second-order discretisation should make the error four times smaller whenever
+# the mesh width halves, so we repeat the test of [Part A](A_spatial_problem_setup) on a sequence of meshes and
+# measure the order.
+#
+# Along the way, we set up the problem from a parameter dictionary instead of keyword arguments, which is how
+# pySDC is configured from now on.
 
+# %%
 from collections import namedtuple
-import matplotlib.pylab as plt
-import numpy as np
-import os.path
 
-from pySDC.implementations.datatype_classes.mesh import mesh
+import matplotlib.pyplot as plt
+import numpy as np
+
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
+problem_params = {
+    'nu': 0.1,  # diffusion coefficient
+    'freq': 4,  # frequency for the test value
+    'bc': 'dirichlet-zero',  # boundary conditions
+}
+
+# create list of nvars to do the accuracy test with
+nvars_list = [2**p - 1 for p in range(4, 15)]
+print(nvars_list)
+
+# %% [markdown]
+# ## Collecting results
+#
+# We store each error in a dictionary, keyed by an `ID` that says which run it belongs to, and keep the list of
+# `nvars` in the dictionary too. That makes the results self-describing: the functions that analyse them later
+# need nothing else. The pattern pays off once there are several parameters to vary.
+
+# %%
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')
-
-
-def main():
-    """
-    A simple test program to check order of accuracy in space for a simple test problem
-    """
-
-    # initialize problem parameters
-    problem_params = dict()
-    problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = 4  # frequency for the test value
-    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
-
-    # create list of nvars to do the accuracy test with
-    nvars_list = [2**p - 1 for p in range(4, 15)]
-
-    # run accuracy test for all nvars
-    results = run_accuracy_check(nvars_list=nvars_list, problem_params=problem_params)
-
-    # compute order of accuracy
-    order = get_accuracy_order(results)
-
-    Path("data").mkdir(parents=True, exist_ok=True)
-    f = open('data/step_1_B_out.txt', 'w')
-    for l in range(len(order)):
-        out = 'Expected order: %2i -- Computed order %4.3f' % (2, order[l])
-        f.write(out + '\n')
-        print(out)
-    f.close()
-
-    # visualize results
-    plot_accuracy(results)
-
-    assert os.path.isfile('data/step_1_accuracy_test_space.png'), 'ERROR: plotting did not create file'
-
-    assert all(np.isclose(order, 2, rtol=0.06)), "ERROR: spatial order of accuracy is not as expected, got %s" % order
 
 
 def run_accuracy_check(nvars_list, problem_params):
@@ -93,6 +89,19 @@ def run_accuracy_check(nvars_list, problem_params):
     return results
 
 
+results = run_accuracy_check(nvars_list=nvars_list, problem_params=problem_params)
+
+# %% [markdown]
+# ## Measuring the order
+#
+# For two consecutive meshes with $N_{i-1}$ and $N_i$ unknowns and errors $e_{i-1}$, $e_i$, the observed order is
+#
+# $$
+# p_i = \frac{\log(e_{i-1} / e_i)}{\log(N_i / N_{i-1})} .
+# $$
+
+
+# %%
 def get_accuracy_order(results):
     """
     Routine to compute the order of accuracy in space
@@ -122,68 +131,48 @@ def get_accuracy_order(results):
     return order
 
 
-def plot_accuracy(results):
-    """
-    Routine to visualize the errors as well as the expected errors
+order = get_accuracy_order(results)
+for nvars, p in zip(nvars_list[1:], order, strict=True):
+    print(f'nvars = {nvars:5d}: computed order {p:4.3f} (expected 2)')
 
-    Args:
-        results: the dictionary containing the errors
-    """
+# %% [markdown]
+# The numbers hover around 2. On a log-log plot, second order is a line with slope $-2$:
 
-    # retrieve the list of nvars from results
-    assert 'nvars_list' in results, 'ERROR: expecting the list of nvars in the results dictionary'
-    nvars_list = sorted(results['nvars_list'])
+# %% tags=["hide-input"]
+errors = [results[ID(nvars=n)] for n in nvars_list]
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.loglog(nvars_list, errors, 'o', label='experiment')
+ax.loglog(nvars_list, [errors[0] * (nvars_list[0] / n) ** 2 for n in nvars_list], 'k--', label='2nd order')
+ax.set_xlabel('nvars')
+ax.set_ylabel('abs. error')
+ax.grid(alpha=0.3)
+ax.legend(frameon=False)
+fig.tight_layout()
 
-    # Set up plotting parameters
-    params = {
-        'legend.fontsize': 20,
-        'figure.figsize': (12, 8),
-        'axes.labelsize': 20,
-        'axes.titlesize': 20,
-        'xtick.labelsize': 16,
-        'ytick.labelsize': 16,
-        'lines.linewidth': 3,
-    }
-    plt.rcParams.update(params)
+# %% [markdown]
+# :::{warning}
+# Test your operators with care: push `nvars` beyond $2^{15}$ and the error grows again. The truncation error is
+# then smaller than the round-off error of the stencil, which divides by $h^2$.
+# :::
+#
+# :::{admonition} Try it yourself
+# :class: tip
+# Replace the finite-difference stencil by a fourth-order one with `problem_params['order'] = 4`. Which order do
+# you measure now, and from which `nvars` on does round-off take over?
+# :::
+#
+# :::{dropdown} Answer
+# Fourth order (4.1 to 4.9 on the coarse meshes, then 3.99), but only up to 2047 unknowns, where the error bottoms
+# out near $10^{-9}$; from 4095 on it grows again. That is much earlier than with the second-order stencil, because
+# the error is so much smaller. The check in the last cell then fails, of course: it expects second order.
+# :::
+#
+# ## Summary
+#
+# - Collect results in a dictionary with IDs for the runs and a header with the metadata.
+# - Measure orders of accuracy, don't eyeball them.
+#
+# The check the tests run:
 
-    # create new figure
-    plt.figure()
-    # take x-axis limits from nvars_list + some spacing left and right
-    plt.xlim([min(nvars_list) / 2, max(nvars_list) * 2])
-    plt.xlabel('nvars')
-    plt.ylabel('abs. error')
-    plt.grid()
-
-    # get guide for the order of accuracy, i.e. the errors to expect
-    # get error for first entry in nvars_list
-    id = ID(nvars=nvars_list[0])
-    base_error = results[id]
-    # assemble optimal errors for 2nd order method and plot
-    order_guide_space = [base_error / (2 ** (2 * i)) for i in range(0, len(nvars_list))]
-    plt.loglog(nvars_list, order_guide_space, color='k', ls='--', label='2nd order')
-
-    min_err = 1e99
-    max_err = 0e00
-    err_list = []
-    # loop over nvars, get errors and find min/max error for y-axis limits
-    for nvars in nvars_list:
-        id = ID(nvars=nvars)
-        err = results[id]
-        min_err = min(err, min_err)
-        max_err = max(err, max_err)
-        err_list.append(err)
-    plt.loglog(nvars_list, err_list, ls=' ', marker='o', markersize=10, label='experiment')
-
-    # adjust y-axis limits, add legend
-    plt.ylim([min_err / 10, max_err * 10])
-    plt.legend(loc=1, ncol=1, numpoints=1)
-
-    # save plot as PDF, beautify
-    fname = 'data/step_1_accuracy_test_space.png'
-    plt.savefig(fname, bbox_inches='tight')
-
-    return None
-
-
-if __name__ == "__main__":
-    main()
+# %%
+assert all(np.isclose(order, 2, rtol=0.06)), f"ERROR: spatial order of accuracy is not as expected, got {order}"

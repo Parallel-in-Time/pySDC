@@ -27,6 +27,7 @@ class WorkCounter(object):
     """
 
     def __init__(self) -> None:
+        """Start counting at zero."""
         self.niter: int = 0
 
     def __call__(self, *args: Any, **kwargs: Any) -> None:
@@ -34,6 +35,7 @@ class WorkCounter(object):
         self.niter += 1
 
     def decrement(self) -> None:
+        """Decrease `niter` by one, e.g. to take back a count."""
         self.niter -= 1
 
     def __str__(self) -> str:
@@ -48,15 +50,15 @@ class Problem(RegisterParams):
     ----------
     init : list of args
         Argument(s) used to initialize data types.
-    dtype_u : type
-        Variable data type. Should generate a data variable using dtype_u(init).
-    dtype_f : type
-        RHS data type. Should generate a data variable using dtype_f(init).
 
     Attributes
     ----------
     logger: logging.Logger
         custom logger for problem-related logging.
+    dtype_u : type
+        Variable data type. Should generate a data variable using dtype_u(init).
+    dtype_f : type
+        RHS data type. Should generate a data variable using dtype_f(init).
 
     Notes
     -----
@@ -94,6 +96,7 @@ class Problem(RegisterParams):
     dtype_f: Optional[Type[Any]] = None
 
     def __init__(self, init: Any) -> None:
+        """Store `init`, see the class docstring, and start without work counters."""
         self.work_counters: Dict[str, WorkCounter] = {}  # Dictionary to store WorkCounter objects
         self.init: Any = init  # Initialization parameter to instantiate data types
 
@@ -109,6 +112,19 @@ class Problem(RegisterParams):
 
     @classmethod
     def get_default_sweeper_class(cls) -> Type[Any]:
+        """
+        Get the sweeper class to use with this problem if none is given, e.g. in `pySDC.helpers.setup_helper`.
+
+        Returns
+        -------
+        type
+            Sweeper class.
+
+        Raises
+        ------
+        NotImplementedError
+            If the problem class does not define a default.
+        """
         raise NotImplementedError(f'No default sweeper class implemented for {cls} problem!')
 
     def setUpFieldsIO(self) -> None:
@@ -118,9 +134,35 @@ class Problem(RegisterParams):
         pass
 
     def getOutputFile(self, fileName: str) -> Any:
+        """
+        Create the file the `LogToFile` hook writes the solution to. Implemented by problems that support file output.
+
+        Parameters
+        ----------
+        fileName : str
+            Name of the file.
+
+        Returns
+        -------
+        pySDC.helpers.fieldsIO.FieldsIO
+            File object with the header set and initialized.
+        """
         raise NotImplementedError(f'No output implemented file for {type(self).__name__}')
 
     def processSolutionForOutput(self, u: Any) -> Any:
+        """
+        Convert a solution to the data written to the file from `getOutputFile`.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Solution.
+
+        Returns
+        -------
+        np.ndarray
+            Data to write, `u` itself by default.
+        """
         return u
 
     def eval_f(self, u: Any, t: float) -> Any:

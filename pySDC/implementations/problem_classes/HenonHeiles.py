@@ -13,7 +13,7 @@ class henon_heiles(Problem):
         \frac{d^2 x}{dt^2} = - x - 2 x y,
 
     .. math::
-        \frac{d^2 y}{dt} = - y - x^2 + y^2
+        \frac{d^2 y}{dt^2} = - y - x^2 + y^2
 
     with Hamiltonian
 

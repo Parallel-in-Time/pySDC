@@ -16,7 +16,7 @@ class GenericSpectralLinear(Problem):
     `self.add_BC`.
 
     You can port problems derived from this more or less seamlessly to GPU by using the numerical libraries that are
-    class attributes of the spectral helper. This class will automatically switch the datatype using the `setup_GPU` class method.
+    class attributes of the spectral helper. This class will automatically switch the datatype using the `setup_GPU` method.
 
     Attributes:
         spectral (pySDC.helpers.spectral_helper.SpectralHelper): Spectral helper
@@ -78,6 +78,8 @@ class GenericSpectralLinear(Problem):
             left_preconditioner (bool): Reverse the Kronecker product if yes
             solver_type (str): Solver for linear systems
             solver_args (dict): Arguments for linear solver
+            preconditioner_args (dict): Arguments for the incomplete LU preconditioner of the `ilu` solver types,
+                passed to `spilu`. `drop_tol` (default 1e-3) is scaled by the step size, `fill_factor` defaults to 100
             useGPU (bool): Run on GPU or CPU
             max_cached_factorizations (int): Number of matrix decompositions to cache before starting eviction
             spectral_space (bool): If yes, the solution will not be transformed back after solving and evaluating the RHS, and is expected as input in spectral space to these functions
@@ -135,6 +137,14 @@ class GenericSpectralLinear(Problem):
         self.logger.debug('Finished GenericSpectralLinear __init__')
 
     def heterogeneous_setup(self):
+        """
+        Prepare the operators for heterogeneous runs, once and only if `heterogeneous` is set. On GPU, the BC matrices
+        `BC_line_zero_matrix` and `BCs` of the spectral helper are moved to the CPU, and CPU copies of `Pl`, `Pr`, `L`
+        and `M` are stored with the suffix `_CPU`. On CPU, the `_CPU` attributes refer to the operators themselves.
+
+        Returns:
+            None
+        """
         if self.heterogeneous and not self.__heterogeneous_setup:
 
             CPU_only = ['BC_line_zero_matrix', 'BCs']
@@ -190,12 +200,12 @@ class GenericSpectralLinear(Problem):
 
         The argument is meant to be a dictionary with the line you want to write the equation in as the key and the relationship between components as another dictionary. For instance, you can add an algebraic condition capturing a first derivative relationship between u and ux as follows:
 
-        ```
-        Dx = self.get_differentiation_matrix(axes=(0,))
-        I = self.get_Id()
-        LHS = {'ux': {'u': Dx, 'ux': -I}}
-        self.setup_L(LHS)
-        ```
+        .. code-block:: python
+
+            Dx = self.get_differentiation_matrix(axes=(0,))
+            I = self.get_Id()
+            LHS = {'ux': {'u': Dx, 'ux': -I}}
+            self.setup_L(LHS)
 
         If you put zero as right hand side for the solver in the line for ux, ux will contain the x-derivative of u afterwards.
 
@@ -294,8 +304,8 @@ class GenericSpectralLinear(Problem):
         # apply inverse right preconditioner to initial guess
         if u0_hat is not None and 'direct' not in self.solver_type:
             if not hasattr(self, '_Pr_inv'):
-                self._PR_inv = self.linalg.splu(self.Pr.astype(complex)).solve
-            u0_hat[...] = self._PR_inv(u0_hat)
+                self._Pr_inv = self.linalg.splu(self.Pr.astype(complex)).solve
+            u0_hat[...] = self._Pr_inv(u0_hat)
 
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
@@ -415,6 +425,12 @@ class GenericSpectralLinear(Problem):
             return sol
 
     def setUpFieldsIO(self):
+        """
+        Set up the MPI mode of `Rectilinear` output files with the local slice of this problem in physical space.
+
+        Returns:
+            None
+        """
         Rectilinear.setupMPI(
             comm=self.comm.commMPI if self.useGPU else self.comm,
             iLoc=[me.start for me in self.local_slice(False)],
@@ -422,6 +438,15 @@ class GenericSpectralLinear(Problem):
         )
 
     def getOutputFile(self, fileName):
+        """
+        Set up a `Rectilinear` output file on the grid of this problem, with one variable per component.
+
+        Args:
+            fileName (str): Name of the file
+
+        Returns:
+            pySDC.helpers.fieldsIO.Rectilinear: The initialized output file
+        """
         self.setUpFieldsIO()
 
         coords = [me.get_1dgrid() for me in self.spectral.axes]
@@ -436,6 +461,15 @@ class GenericSpectralLinear(Problem):
         return fOut
 
     def processSolutionForOutput(self, u):
+        """
+        Prepare a solution for output: its real part in physical space, moved to the CPU if running on GPU.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+
+        Returns:
+            numpy.ndarray: The solution as contiguous array
+        """
         if self.spectral_space:
             u = self.itransform(u).real
         else:
@@ -547,25 +581,3 @@ def compute_residual_DAE_MPI(self, stage=None):
     L.status.updated = False
 
     return None
-
-
-def get_extrapolated_error_DAE(self, S, **kwargs):
-    """
-    The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
-    solution obtained by the time marching scheme. This function can be used in `EstimateExtrapolationError`.
-
-    Args:
-        S (pySDC.Step): The current step
-
-    Returns:
-        None
-    """
-    u_ex = self.get_extrapolated_solution(S)
-    diff_mask = S.levels[0].prob.diff_mask
-    if u_ex is not None:
-        S.levels[0].status.error_extrapolation_estimate = (
-            abs((u_ex - S.levels[0].u[-1])[diff_mask]) * self.coeff.prefactor
-        )
-        # print([abs(me) for me in (u_ex - S.levels[0].u[-1]) * self.coeff.prefactor])
-    else:
-        S.levels[0].status.error_extrapolation_estimate = None

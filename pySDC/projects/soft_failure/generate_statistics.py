@@ -335,6 +335,8 @@ def process_statistics(type=None, cwd=''):
     nfm = 0
     # initialize sum of nfalse_positives_in_correction
     nfpc = 0
+    # initialize sum of nclean_steps
+    ntn = 0
     # calculate sum of nfaults_detected, sum of nfalse_positives, sum of nfaults_missed
     for stats in results:
         # Some black magic to extract fault stats out of monstrous stats object
@@ -343,6 +345,7 @@ def process_statistics(type=None, cwd=''):
         nfp += fault_stats.nfalse_positives
         nfm += fault_stats.nfaults_missed
         nfpc += fault_stats.nfalse_positives_in_correction
+        ntn += fault_stats.nclean_steps
 
     g = open(cwd + 'data/' + type + '_' + str(nruns) + '_' + 'runs' + '_' + 'Statistics.txt', 'w')
     out = 'Type: ' + type + ' ' + str(nruns) + ' runs'
@@ -360,17 +363,24 @@ def process_statistics(type=None, cwd=''):
     # nfalse_positives_in_correction
     out = 'false positives in correction: ' + str(nfpc)
     g.write(out + '\n')
+    # nclean_steps
+    out = 'true negatives: ' + str(ntn)
+    g.write(out + '\n')
     # F-Score
     f_score = 2 * nfd / (2 * nfd + nfp + nfm)
     out = 'F-Score: ' + str(f_score)
     g.write(out + '\n')
-    # false positive rate (FPR)
-    fpr = nfp / (nfd + nfp)
-    out = 'False positive rate: ' + str(fpr)
+    # precision, TP / (TP + FP)
+    precision = nfd / (nfd + nfp)
+    out = 'Precision: ' + str(precision)
     g.write(out + '\n')
-    # true positive rate (TPR)
-    tpr = nfd / (nfd + nfp)
+    # true positive rate (TPR, recall), TP / (TP + FN)
+    tpr = nfd / (nfd + nfm)
     out = 'True positive rate: ' + str(tpr)
+    g.write(out + '\n')
+    # false positive rate (FPR), FP / (FP + TN)
+    fpr = nfp / (nfp + ntn)
+    out = 'False positive rate: ' + str(fpr)
     g.write(out + '\n')
     g.close()
 

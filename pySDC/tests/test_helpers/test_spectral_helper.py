@@ -105,6 +105,12 @@ def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, useMPI=Fal
 
     assert np.allclose(D_u, expect, rtol=0, atol=1e-10)
 
+    if useMPI and comm.size > 1:
+        # a run that is distributed in name only proves nothing, so count the split axes in real
+        # space, where the global shape is known
+        split_axes = sum(local < size for local, size in zip(u.shape[1:], (nx, nz), strict=True))
+        assert split_axes >= 1, 'Not distributed'
+
 
 @pytest.mark.cupy
 @pytest.mark.parametrize('axes', [(-2,), (-1,), (-2, -1)])
@@ -112,6 +118,22 @@ def test_differentiation_matrix2D(nx, nz, axes, bx, bz, useGPU=False, useMPI=Fal
 @pytest.mark.parametrize('bz', ['cheby', 'fft'])
 def test_differentiation_matrix2D_GPU(bx, bz, axes):
     test_differentiation_matrix2D(32, 16, bx=bx, bz=bz, axes=axes, useGPU=True)
+
+
+@pytest.mark.cupy
+@pytest.mark.parallel(2)
+@pytest.mark.parametrize('axes', [(-1,), (-1, -2)])
+def test_differentiation_matrix2D_GPU_MPI(axes):
+    """A distributed transform on GPUs, which nothing else in the suite covers.
+
+    Every other GPU test runs on one rank, where mpi4py-fft never redistributes, and every
+    distributed transform test runs on CPUs. This is the crossing of the two: `DistArrayCuPy`,
+    which the fork exists for, and `NCCLTransfer`, which moves the pencils between ranks with
+    NCCL send/recv on device pointers. MPI carries only the NCCL unique id at setup, so this
+    path does not depend on MPI being CUDA-aware -- the time-parallel controller does, and
+    `test_controller_MPI_GPU.py` covers that.
+    """
+    test_differentiation_matrix2D(32, 16, bx='fft', bz='cheby', axes=axes, useGPU=True, useMPI=True)
 
 
 @pytest.mark.base
@@ -329,7 +351,7 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
     if nz > 0:
         helper.add_axis(base=bz, N=nz)
     elif -3 in axes:
-        return None
+        pytest.skip('Cannot transform along axis -3 in 2D')
 
     helper.setup_fft()
     u = helper.u_init
@@ -370,13 +392,6 @@ def test_transform(nx, ny, nz, bx, by, bz, axes, padding, useMPI=False, **kwargs
             *helper.local_slice(True),
         )
     ]
-    if expect_local.shape != trf.shape:
-        expect_local = expect_trf[
-            (
-                ...,
-                *helper.local_slice(True),
-            )
-        ]
 
     assert np.allclose(expect_local, trf), 'Forward transform is unexpected'
     assert np.allclose(
@@ -647,9 +662,7 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
 
     X, Y, Z = helper.get_grid()
 
-    if bz == 'cheby' and p > 1:
-        return None
-    elif bz == 'ultraspherical' and -1 in axes:
+    if bz == 'ultraspherical' and -1 in axes:
         conv = helper.get_basis_change_matrix(p_out=0, p_in=p)
     else:
         conv = helper.get_basis_change_matrix()
@@ -709,10 +722,12 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
     assert np.isclose(error, 0, atol=6e-8), f'Got {error=:.2e}'
 
     if useMPI:
+        # which axes are split depends on the bases, so count them, in real space where the global shape is known
+        split_axes = sum(local < size for local, size in zip(u.shape[1:], (nx, ny, nz), strict=True))
         if comm.size == 2:
-            assert u_hat.shape[1] < nx or u_hat.shape[2] < ny, 'Not distributed'
+            assert split_axes >= 1, 'Not distributed'
         elif comm.size > 2:
-            assert u_hat.shape[1] < nx and u_hat.shape[2] < ny, 'Not distributed in pencils'
+            assert split_axes >= 2, 'Not distributed in pencils'
 
 
 @pytest.mark.mpi4py
@@ -723,7 +738,7 @@ def test_differentiation_matrix3D(nx, ny, nz, bz, axes, p, useMPI=False, **kwarg
 @pytest.mark.parametrize('bz', ['fft', 'cheby', 'ultraspherical'])
 @pytest.mark.parametrize('axes', [(-1,), (-2,), (-3,), (-1, -2), (-2, -3), (-1, -3), (-1, -2, -3)])
 def test_differentiation_matrix3DMPI(nx, ny, nz, bz, axes, useMPI=True, **kwargs):
-    test_differentiation_matrix3D(nx, ny, nz, bz, axes, p=1, **kwargs)
+    test_differentiation_matrix3D(nx, ny, nz, bz, axes, p=1, useMPI=useMPI, **kwargs)
 
 
 @pytest.mark.base
@@ -821,3 +836,24 @@ def test_cache_memory_leaks():
         function()
 
     assert track[0] == 0, "possible memory leak with the @cache"
+
+
+@pytest.mark.base
+def test_padding_without_distributed_FFT_is_not_ignored():
+    import numpy as np
+    from pySDC.helpers.spectral_helper import SpectralHelper
+
+    helper = SpectralHelper(comm=None)
+    helper.add_axis(base='fft', N=8)
+    helper.add_axis(base='cheby', N=8)
+    helper.setup_fft()
+
+    u = helper.u_init
+    u[...] = np.random.random(u.shape)
+
+    # no padding is fine
+    assert np.allclose(helper.itransform(helper.transform(u, padding=(1, 1)), padding=(1, 1)), u)
+
+    for transform in [helper.transform, helper.itransform]:
+        with pytest.raises(NotImplementedError):
+            transform(u, padding=(1.5, 1.5))

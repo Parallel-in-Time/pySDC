@@ -69,7 +69,7 @@ def test_E_MPI():
 
 
 @pytest.mark.firedrake
-def test_F():
+def test_F(monkeypatch):
     """
     Test that the same result is obtained using the pySDC and Gusto coupling compared to only using Gusto after a few time steps.
     The test problem is Williamson 5, which involves huge numbers. Due to roundoff errors, we therefore cannot expect the solutions to match exactly.
@@ -78,8 +78,7 @@ def test_F():
     from firedrake import norm
     import sys
 
-    if '--running-tests' not in sys.argv:
-        sys.argv += ['--running-tests']
+    monkeypatch.setattr(sys, 'argv', [*sys.argv, '--running-tests'])
 
     params = {'dt': 900, 'tmax': 2700, 'use_adaptivity': False, 'M': 2, 'kmax': 3, 'QI': 'LU'}
     stepper_pySDC, mesh = williamson_5(use_pySDC=True, **params)
@@ -95,9 +94,20 @@ def test_F():
         error < 1e-8
     ), f'Unexpectedly large difference of {error} between pySDC and Gusto SDC implementations in Williamson 5 test case'
 
+    # for the website: what this compared
+    from pathlib import Path
+
+    Path('data').mkdir(parents=True, exist_ok=True)
+    with open('data/step_7_F_out.txt', 'a') as file:
+        file.write(
+            f"Williamson 5, {params['tmax'] // params['dt']} steps of {params['dt']} s, M={params['M']}, "
+            f"{params['kmax']} iterations, QI={params['QI']}:\n"
+            f'  largest relative difference in u and D between pySDC and Gusto\'s own SDC: {error:.2e}\n\n'
+        )
+
 
 @pytest.mark.firedrake
-def test_F_ML():
+def test_F_ML(monkeypatch):
     """
     Test that the Gusto coupling with multiple levels in space converges
     """
@@ -105,8 +115,7 @@ def test_F_ML():
     from pySDC.helpers.stats_helper import get_sorted, filter_stats
     import sys
 
-    if '--running-tests' not in sys.argv:
-        sys.argv += ['--running-tests']
+    monkeypatch.setattr(sys, 'argv', [*sys.argv, '--running-tests'])
 
     params = {'use_pySDC': True, 'dt': 1000, 'tmax': 1000, 'use_adaptivity': False, 'M': 2, 'kmax': 4, 'QI': 'LU'}
     stepper_ML, _ = williamson_5(Nlevels=2, **params)
@@ -121,5 +130,23 @@ def test_F_ML():
     stats_SL = stepper_SL.scheme.stats
     residual_SL = get_sorted(stats_SL, type='residual_post_sweep', sortby='iter')
     assert all(
-        res_SL > res_ML for res_SL, res_ML in zip(residual_SL, residual_fine)
+        res_SL > res_ML for res_SL, res_ML in zip(residual_SL, residual_fine, strict=True)
     ), 'Single level SDC converged faster than multi-level!'
+
+    # for the website: the residuals this compared
+    from pathlib import Path
+
+    Path('data').mkdir(parents=True, exist_ok=True)
+    with open('data/step_7_F_out.txt', 'a') as file:
+        file.write(f"Williamson 5, one step of {params['dt']} s, residual on the finest level after each iteration:\n")
+        file.write('  iteration   one level   two levels\n')
+        for (iteration, res_SL), (_, res_ML) in zip(residual_SL, residual_fine, strict=True):
+            file.write(f'  {iteration:9d}   {res_SL:9.2e}   {res_ML:10.2e}\n')
+
+
+@pytest.mark.cupy
+@pytest.mark.parallel(2)
+def test_G():
+    from pySDC.tutorial.step_7.G_pySDC_on_GPU import main as main_G
+
+    main_G()

@@ -46,8 +46,11 @@ def test_basic_operations():
     f = prob.eval_f(u, 0.0)
     assert abs(f) > 0.0
 
-    solution = prob.solve_system(u, 0.01, u, 0.0)
-    assert abs(solution) > 0.0
+    # the solve imposes M u - factor * F(u) = M rhs weakly, and eval_f returns M^{-1} F(u)
+    factor = 0.01
+    solution = prob.solve_system(u, factor, u, 0.0)
+    residual = abs(solution - factor * prob.eval_f(solution, 0.0) - u)
+    assert residual < 1e-8, f'implicit solve does not solve the implicit system, residual {residual:.2e}'
 
     with pytest.raises(AssertionError):
         prob.u_exact(1.0)

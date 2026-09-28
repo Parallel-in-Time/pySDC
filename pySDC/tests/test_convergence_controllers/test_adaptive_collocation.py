@@ -135,17 +135,18 @@ def test_adaptive_collocation_MPI():
     single_test(useMPI=True)
 
 
-def run_block(num_procs, num_nodes=[2, 3]):
+def run_block(num_procs, num_nodes=None):
     """
     Run one block of `num_procs` steps and report the collocation method each step ended on.
 
     Args:
         num_procs (int): number of steps in the block
-        num_nodes (list): the collocation methods to walk through
+        num_nodes (list): the collocation methods to walk through, [2, 3] if not given
 
     Returns:
         list: number of nodes each step finished with
     """
+    num_nodes = [2, 3] if num_nodes is None else num_nodes
     from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation

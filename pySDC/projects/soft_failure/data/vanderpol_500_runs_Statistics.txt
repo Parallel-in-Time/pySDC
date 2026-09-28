@@ -1,8 +1,10 @@
 Type: vanderpol 500 runs
-true positives: 302
-false positives: 520
-false negatives: 198
-false positives in correction: 261
-F-Score: 0.4568835098335855
-False positive rate: 0.6326034063260341
-True positive rate: 0.36739659367396593
+true positives: 316
+false positives: 811
+false negatives: 184
+false positives in correction: 407
+true negatives: 19245
+F-Score: 0.38844499078057776
+Precision: 0.2803904170363798
+True positive rate: 0.632
+False positive rate: 0.04043677702433187

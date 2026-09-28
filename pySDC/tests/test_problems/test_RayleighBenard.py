@@ -92,11 +92,11 @@ def test_vorticity(nx, nz, direction):
     elif direction == 'z':
         u[iv] = P.Z**2
         u[iu] = P.Z**3
-        expect = 3 * P.Z**2
+        expect = -3 * P.Z**2
     elif direction == 'mixed':
         u[iv] = np.sin(P.X * np.pi) * P.Z**2
         u[iu] = np.cos(P.X * np.pi) * P.Z**3
-        expect = np.cos(P.X * np.pi) * np.pi * P.Z**2 + np.cos(P.X * np.pi) * 3 * P.Z**2
+        expect = np.cos(P.X * np.pi) * np.pi * P.Z**2 - np.cos(P.X * np.pi) * 3 * P.Z**2
     else:
         raise NotImplementedError
 
@@ -122,28 +122,30 @@ def test_Nusselt_numbers(v, nx=1, nz=10):
     u = prob.u_init
     u[iT, ...] = prob.Z
     Nu = prob.compute_Nusselt_numbers(u)
-    for key, expect in zip(['t', 'b', 'V'], [-1, -1, -1]):
+    for key, expect in zip(['t', 'b', 'V'], [-1, -1, -1], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     u = prob.u_init
     u[iT, ...] = 3 * prob.Z**2 + 1
     Nu = prob.compute_Nusselt_numbers(u)
-    for key, expect in zip(['t', 'b', 'V'], [-6, 0, -3]):
+    for key, expect in zip(['t', 'b', 'V'], [-6, 0, -3], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     u = prob.u_init
     u[iT, ...] = 3 * prob.Z**2 + 1
     u[iv] = v * (1 + xp.sin(prob.X / prob.axes[0].L * 2 * xp.pi))
     Nu = prob.compute_Nusselt_numbers(u)
-    for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * v - 6, v, v * (1 + 1) - 3]):
+    for key, expect in zip(['t', 'b', 'V'], [prob.Lz * (3 + 1) * v - 6, v, v * (1 + 1) - 3], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
 
-def test_viscous_dissipation(nx=2**5 + 1, nz=2**3 + 1):
+@pytest.mark.mpi4py
+@pytest.mark.parametrize('spectral_space', [True, False])
+def test_viscous_dissipation(spectral_space, nx=2**5 + 1, nz=2**3 + 1):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
 
-    P = RayleighBenard(nx=nx, nz=nz, spectral_space=False)
+    P = RayleighBenard(nx=nx, nz=nz, spectral_space=spectral_space)
     iu, iv = P.index(['u', 'v'])
     X, Z = P.X, P.Z
 
@@ -151,14 +153,14 @@ def test_viscous_dissipation(nx=2**5 + 1, nz=2**3 + 1):
     u[iu] = np.sin(X * np.pi)
     u[iv] = Z**3
 
-    expect = P.u_init
-    expect[iu] = u[iu] * (-np.pi) ** 2 * u[iu]
-    expect[iv] = Z**3 * 6 * Z
+    # maximum of |u Lap(u) + v Lap(v)|
+    expect = np.max(np.abs(u[iu] * (-(np.pi**2)) * u[iu] + u[iv] * 6 * Z))
 
-    viscous_dissipation = P.compute_viscous_dissipation(u)
-    assert np.isclose(viscous_dissipation, abs(expect))
+    viscous_dissipation = P.compute_viscous_dissipation(P.transform(u) if spectral_space else u)
+    assert np.isclose(viscous_dissipation, expect)
 
 
+@pytest.mark.mpi4py
 def test_buoyancy_computation(nx=9, nz=6):
     import numpy as np
     from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
@@ -287,6 +289,67 @@ def test_CFL():
 
     dt2 = CFLLimit.compute_max_step_size(P, u2)
     assert np.allclose(dt2, 1 / u2[iv])
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parametrize('dt_new_from_elsewhere', [None, 1.0])
+def test_CFL_step_size_is_capped_by_dt_max(dt_new_from_elsewhere):
+    """dt_max caps the step size also when the current step is already larger, or when another controller asks for more."""
+    from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard, CFLLimit
+    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+    dt_max = 1e-3
+    description = {
+        'problem_class': RayleighBenard,
+        'problem_params': {'nx': 8, 'nz': 4, 'spectral_space': False},
+        'sweeper_class': imex_1st_order,
+        'sweeper_params': {'num_nodes': 1, 'quad_type': 'RADAU-RIGHT'},
+        'level_params': {'dt': 10 * dt_max},
+        'step_params': {'maxiter': 1},
+        'convergence_controllers': {CFLLimit: {'dt_max': dt_max}},
+    }
+    controller = controller_nonMPI(1, {'logger_level': 30}, description)
+    S = controller.MS[0]
+    L = S.levels[0]
+    iu, iv = L.prob.index(['u', 'v'])
+
+    # a slow flow, so the CFL limit is far above dt_max
+    L.status.time = 0
+    L.u[0] = L.prob.u_init
+    L.u[0][iu] = 1e-6
+    L.u[0][iv] = 1e-6
+    L.sweep.predict()
+    S.status.iter = S.params.maxiter
+    L.status.residual = 0.0
+    S.status.slot = 0
+    L.status.dt_new = dt_new_from_elsewhere
+
+    CFL = next(C for C in controller.convergence_controllers if type(C) is CFLLimit)
+    CFL.get_new_step_size(controller, S)
+    assert L.status.dt_new == dt_max
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parametrize('z0', [0, -0.5])
+def test_initial_conditions_satisfy_the_BCs(z0):
+    import numpy as np
+    from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
+
+    P = RayleighBenard(nx=5, nz=16, spectral_space=False, z0=z0, Lz=2)
+    assert np.isclose(P.Z.min(), z0, atol=1e-2) and np.isclose(P.Z.max(), z0 + 2, atol=1e-2), 'Wrong vertical domain'
+
+    # the linear profiles satisfy the BCs exactly
+    P.check_BCs(P.u_exact(noise_level=0))
+
+    iT = P.index('T')
+    noise = P.u_exact(noise_level=1) - P.u_exact(noise_level=0)
+    noise_hat = P.transform(noise, axes=(-1,))[iT]
+
+    # the random noise is only zero at the plates up to interpolation, so not exactly
+    for x in [-1, 1]:
+        at_plate = noise_hat @ P.axes[-1].get_BC(kind='Dirichlet', x=x)
+        assert np.max(np.abs(at_plate)) < 1e-1, f'Temperature noise is {at_plate} at z={x}'
 
 
 @pytest.mark.mpi4py

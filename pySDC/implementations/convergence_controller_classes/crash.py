@@ -6,10 +6,20 @@ import time
 
 class CrashBase(ConvergenceController):
     """
-    Crash the code across all ranks
+    Base class for convergence controllers that raise a `ConvergenceError` on all ranks as soon as one rank crashes.
     """
 
+    comm = None  #: communicator across the sweeper, which subclasses set up in `setup`
+
     def __init__(self, controller, params, description, **kwargs):
+        """
+        Initialization routine, which additionally prepares the logical or for communicating crashes with MPI
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+        """
         super().__init__(controller, params, description, **kwargs)
         if self.comm or self.params.useMPI:
             from mpi4py import MPI
@@ -22,6 +32,7 @@ class CrashBase(ConvergenceController):
 
         Args:
             crash (bool): If this rank wants to crash
+            msg (str): Message of the `ConvergenceError` raised on a crash
             comm (mpi4py.MPI.Intracomm or None): Communicator of the controller, if applicable:
         """
 
@@ -39,7 +50,7 @@ class CrashBase(ConvergenceController):
 
 class StopAtNan(CrashBase):
     """
-    Crash the code when the norm of the solution exceeds some limit or contains nan.
+    Crash all ranks when the solution contains nan or inf, or when its norm reaches the optional threshold `thresh`.
     This class is useful when running with MPI in the sweeper or controller.
     """
 
@@ -109,7 +120,7 @@ class StopAtMaxRuntime(CrashBase):
         Define parameters here.
 
         Default parameters are:
-         - max_runtime (float): Crash the code when the norm of the runtime exceeds this threshold
+         - max_runtime (float): Crash the code when the wall time since this setup exceeds this many seconds
 
         Args:
             controller (pySDC.Controller): The controller

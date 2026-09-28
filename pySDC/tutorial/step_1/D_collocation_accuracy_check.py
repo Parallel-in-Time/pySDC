@@ -1,64 +1,53 @@
-from pathlib import Path
-import matplotlib
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+# ---
 
-matplotlib.use('Agg')
+# %% [markdown]
+# # Part D: Collocation accuracy check
+#
+# As for space in [Part B](B_spatial_accuracy_check), we now measure the order of accuracy in time: solve the
+# collocation problem from [Part C](C_collocation_problem_setup) for a sequence of shrinking time steps and watch
+# the error.
+#
+# Collocation on $M$ Gauss-Radau nodes has order $2M - 1$. We solve a single step, so we see the *local* error,
+# which is one order higher: $2M = 6$ for three nodes. Beating sixth order in time with a second-order stencil in
+# space needs a fine mesh, otherwise the spatial error hides everything; hence the 16383 unknowns.
 
+# %%
 from collections import namedtuple
-import matplotlib.pylab as plt
+
+import matplotlib.pyplot as plt
 import numpy as np
-import os.path
 import scipy.sparse as sp
 
 from pySDC.core.collocation import CollBase
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
+problem_params = {
+    'nu': 0.1,  # diffusion coefficient
+    'freq': 4,  # frequency for the test value
+    'nvars': 16383,  # number of DOFs in space
+    'bc': 'dirichlet-zero',  # boundary conditions
+}
+prob = heatNd_unforced(**problem_params)
+
+# instantiate collocation class, relative to the time interval [0,1]
+coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')
+
+# assemble list of dt
+dt_list = [0.1 / 2**p for p in range(0, 5)]
+
+# %% [markdown]
+# The loop is the one from Part C, once per time step, with the results collected as in Part B.
+
+# %%
 # setup id for gathering the results (will sort by dt)
 ID = namedtuple('ID', 'dt')
-
-
-def main():
-    """
-    A simple test program to compute the order of accuracy in time
-    """
-
-    # initialize problem parameters
-    problem_params = {}
-    problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = 4  # frequency for the test value
-    problem_params['nvars'] = 16383  # number of DOFs in space
-    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
-
-    # instantiate problem
-    prob = heatNd_unforced(**problem_params)
-
-    # instantiate collocation class, relative to the time interval [0,1]
-    coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')
-
-    # assemble list of dt
-    dt_list = [0.1 / 2**p for p in range(0, 4)]
-
-    # run accuracy test for all dt
-    results = run_accuracy_check(prob=prob, coll=coll, dt_list=dt_list)
-
-    # get order of accuracy
-    order = get_accuracy_order(results)
-
-    Path("data").mkdir(parents=True, exist_ok=True)
-    f = open('data/step_1_D_out.txt', 'w')
-    for l in range(len(order)):
-        out = 'Expected order: %2i -- Computed order %4.3f' % (5, order[l])
-        f.write(out + '\n')
-        print(out)
-    f.close()
-
-    # visualize results
-    plot_accuracy(results)
-
-    assert os.path.isfile('data/step_1_accuracy_test_coll.png')
-
-    assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), (
-        "ERROR: did not get order of accuracy as expected, got %s" % order
-    )
 
 
 def run_accuracy_check(prob, coll, dt_list):
@@ -133,68 +122,57 @@ def get_accuracy_order(results):
     return order
 
 
-def plot_accuracy(results):
-    """
-    Routine to visualize the errors as well as the expected errors
+results = run_accuracy_check(prob=prob, coll=coll, dt_list=dt_list)
+order = get_accuracy_order(results)
 
-    Args:
-        results: the dictionary containing the errors
-    """
+# We solve a single step, so this is the local error, which for a collocation method of order 2M-1 is of order 2M.
+expected_order = 2 * coll.num_nodes
+for dt, p in zip(dt_list[1:], order, strict=True):
+    print(f'dt = {dt:.5f}: computed order {p:4.3f} (expected {expected_order})')
 
-    # retrieve the list of nvars from results
-    assert 'dt_list' in results, 'ERROR: expecting the list of dts in the results dictionary'
-    dt_list = sorted(results['dt_list'])
+# %% tags=["hide-input"]
+errors = [results[ID(dt=dt)] for dt in dt_list]
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.loglog(dt_list, errors, 'o', label='experiment')
+ax.loglog(
+    dt_list,
+    [errors[-1] * (dt / dt_list[-1]) ** expected_order for dt in dt_list],
+    'k--',
+    label=f'{expected_order}th order',
+)
+ax.set_xlabel(r'$\Delta t$')
+ax.set_ylabel('abs. error')
+ax.grid(alpha=0.3)
+ax.legend(frameon=False)
+fig.tight_layout()
 
-    # Set up plotting parameters
-    params = {
-        'legend.fontsize': 20,
-        'figure.figsize': (12, 8),
-        'axes.labelsize': 20,
-        'axes.titlesize': 20,
-        'xtick.labelsize': 16,
-        'ytick.labelsize': 16,
-        'lines.linewidth': 3,
-    }
-    plt.rcParams.update(params)
+# %% [markdown]
+# The orders approach 6 from below. The large time steps are not in the asymptotic regime yet: for the largest,
+# $|\lambda \Delta t| = \nu (4\pi)^2 \Delta t \approx 1.6$ for the sine we start from. This test is also less
+# clean than the spatial one because the error we are after is tiny: we are computing a solution that decays
+# towards zero, very, very thoroughly.
+#
+# :::{admonition} Try it yourself
+# :class: tip
+# Switch to `quad_type='LOBATTO'`. Both ends of the interval are nodes now, so the last node is still the end
+# point and nothing else has to change. Which order do you get?
+# :::
+#
+# :::{dropdown} Answer
+# About 4.9 for the smallest step, approaching 5: Gauss-Lobatto collocation with $M$ nodes has order $2M - 2$,
+# so the local error is of order $2M - 1 = 5$. The check in the last cell therefore fails: it only looks at the
+# last, asymptotic value and demands it to be close to 6, which is exactly what tells the two node types apart.
+# :::
+#
+# ## Summary
+#
+# - Collocation on $M$ Radau nodes is a method of order $2M - 1$; one step shows the local order $2M$.
+# - Measuring temporal orders needs a spatial error well below the temporal one.
+#
+# This concludes Step 1. In [Step 2](../step_2), we stop solving the collocation problem directly and let SDC do
+# it.
+#
+# The check the tests run:
 
-    # create new figure
-    plt.figure()
-    # take x-axis limits from nvars_list + some spacning left and right
-    plt.xlim([min(dt_list) / 2, max(dt_list) * 2])
-    plt.xlabel('dt')
-    plt.ylabel('abs. error')
-    plt.grid()
-
-    # get guide for the order of accuracy, i.e. the errors to expect
-    # get error for first entry in nvars_list
-    id = ID(dt=dt_list[0])
-    base_error = results[id]
-    # assemble optimal errors for 5th order method and plot
-    order_guide_space = [base_error * (2 ** (5 * i)) for i in range(0, len(dt_list))]
-    plt.loglog(dt_list, order_guide_space, color='k', ls='--', label='5th order')
-
-    min_err = 1e99
-    max_err = 0e00
-    err_list = []
-    # loop over nvars, get errors and find min/max error for y-axis limits
-    for dt in dt_list:
-        id = ID(dt=dt)
-        err = results[id]
-        min_err = min(err, min_err)
-        max_err = max(err, max_err)
-        err_list.append(err)
-    plt.loglog(dt_list, err_list, ls=' ', marker='o', markersize=10, label='experiment')
-
-    # adjust y-axis limits, add legend
-    plt.ylim([min_err / 10, max_err * 10])
-    plt.legend(loc=2, ncol=1, numpoints=1)
-
-    # save plot as PDF, beautify
-    fname = 'data/step_1_accuracy_test_coll.png'
-    plt.savefig(fname, bbox_inches='tight')
-
-    return None
-
-
-if __name__ == "__main__":
-    main()
+# %%
+assert np.isclose(order[-1], expected_order, atol=0.3), f"ERROR: did not get order of accuracy as expected, got {order}"

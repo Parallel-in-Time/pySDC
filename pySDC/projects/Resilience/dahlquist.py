@@ -230,7 +230,7 @@ def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, c
         kwargs['vmax'] = kwargs.get('vmax', lim)
         cs = ax.contourf(X, Y, rho_log, **kwargs)
     else:
-        cs = ax.contourf(X, Y, np.where(rho_log <= 0, rho_log, None), levels=500, **kwargs)
+        cs = ax.contourf(X, Y, np.where(rho_log <= 0, rho_log, np.nan), levels=500, **kwargs)
 
     # decorate
     ax.axhline(0, color='black')

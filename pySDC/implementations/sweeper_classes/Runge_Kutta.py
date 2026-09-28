@@ -3,7 +3,7 @@ import logging
 from qmat.qcoeff.butcher import RK_SCHEMES
 
 from pySDC.core.sweeper import Sweeper, _Pars
-from pySDC.core.errors import ParameterError
+from pySDC.core.errors import ParameterError, ProblemError
 from pySDC.core.level import Level
 
 
@@ -72,6 +72,13 @@ class ButcherTableau(object):
 
     @property
     def globally_stiffly_accurate(self):
+        """
+        Whether the last row of the Butcher matrix equals the weights, such that the last stage is the solution of the
+        step.
+
+        Returns:
+            bool: True if the method is stiffly accurate
+        """
         return np.allclose(self.Qmat[-1, 1:], self.weights)
 
 
@@ -90,17 +97,19 @@ class ButcherTableauEmbedded(ButcherTableau):
 
     @property
     def globally_stiffly_accurate(self):
+        """
+        Whether the last row of the Butcher matrix equals the weights of the primary (higher order) method, such that
+        the last stage is the solution of the step.
+
+        Returns:
+            bool: True if the method is stiffly accurate
+        """
         return np.allclose(self.Qmat[-1, 1:], self.weights[0])
 
 
 class RungeKutta(Sweeper):
-    nodes = None
-    weights = None
-    matrix = None
-    ButcherTableauClass = ButcherTableau
-
     """
-    Runge-Kutta scheme that fits the interface of a sweeper.
+    Base class for Runge-Kutta methods with lower triangular Butcher tableaux, wrapped in the sweeper interface.
     Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
     at the nodes are successively computed from earlier nodes. However, we only perform a single iteration of this.
 
@@ -125,6 +134,11 @@ class RungeKutta(Sweeper):
     The entries of the Butcher tableau are stored as class attributes.
     """
 
+    nodes = None
+    weights = None
+    matrix = None
+    ButcherTableauClass = ButcherTableau
+
     def __init__(self, params, level):
         """
         Initialization routine for the custom sweeper
@@ -144,7 +158,6 @@ class RungeKutta(Sweeper):
         # set parameters to their actual values
         self.coll = self.get_Butcher_tableau()
         params['initial_guess'] = 'zero'
-        params['collocation_class'] = type(self.ButcherTableauClass)
         params['num_nodes'] = self.coll.num_nodes
 
         # disable residual computation by default
@@ -166,10 +179,23 @@ class RungeKutta(Sweeper):
 
     @classmethod
     def get_Q_matrix(cls):
+        """
+        Get the quadrature matrix of the scheme, i.e. the Butcher matrix padded with a leading row and column of zeros
+        for the initial conditions.
+
+        Returns:
+            numpy.ndarray: the quadrature matrix
+        """
         return cls.get_Butcher_tableau().Qmat
 
     @classmethod
     def get_Butcher_tableau(cls):
+        """
+        Build the Butcher tableau from the class attributes ``weights``, ``nodes`` and ``matrix``.
+
+        Returns:
+            ButcherTableau: an instance of ``ButcherTableauClass``
+        """
         return cls.ButcherTableauClass(cls.weights, cls.nodes, cls.matrix)
 
     @classmethod
@@ -183,6 +209,13 @@ class RungeKutta(Sweeper):
 
     @classmethod
     def is_embedded(cls):
+        """
+        Whether the scheme is an embedded pair, i.e. uses ``ButcherTableauEmbedded`` and has a secondary solution for
+        error estimation.
+
+        Returns:
+            bool: True if the scheme is embedded
+        """
         return cls.ButcherTableauClass == ButcherTableauEmbedded
 
     def get_full_f(self, f):
@@ -246,6 +279,12 @@ class RungeKutta(Sweeper):
 
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
+
+        # `solve_system` of a split problem only inverts the implicit part, so an implicit stage would drop the rest
+        if self.coll.implicit and prob.dtype_f.__name__.lower().startswith('imex'):
+            raise ProblemError(
+                f'{type(self).__name__} has implicit stages, but {type(prob).__name__} splits its right hand side. Use an IMEX Runge-Kutta scheme, such as ARK548L2SA, instead.'
+            )
 
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
@@ -361,7 +400,6 @@ class RungeKuttaIMEX(RungeKutta):
             level (pySDC.Level.level): the level that uses this sweeper
         """
         super().__init__(params, level)
-        type(self).weights_explicit = self.weights if self.weights_explicit is None else self.weights_explicit
         self.coll_explicit = self.get_Butcher_tableau_explicit()
         self.QE = self.coll_explicit.Qmat
 
@@ -384,7 +422,15 @@ class RungeKuttaIMEX(RungeKutta):
 
     @classmethod
     def get_Butcher_tableau_explicit(cls):
-        return cls.ButcherTableauClass_explicit(cls.weights_explicit, cls.nodes, cls.matrix_explicit)
+        """
+        Build the Butcher tableau of the explicit part from ``weights_explicit``, ``nodes`` and ``matrix_explicit``.
+        Without ``weights_explicit``, the explicit part uses the implicit ``weights``.
+
+        Returns:
+            ButcherTableau: an instance of ``ButcherTableauClass_explicit``
+        """
+        weights = cls.weights if cls.weights_explicit is None else cls.weights_explicit
+        return cls.ButcherTableauClass_explicit(weights, cls.nodes, cls.matrix_explicit)
 
     def integrate(self):
         """
@@ -517,6 +563,15 @@ class BackwardEuler(RungeKutta):
 
 
 class IMEXEuler(RungeKuttaIMEX):
+    """
+    First-order IMEX Euler with one backward Euler stage, at which both parts of the right hand side are evaluated.
+
+    This is a Lie splitting of a backward Euler step for fI and a forward Euler step for fE from its result:
+    u1 = u0 + dt fI(u1), u = u1 + dt fE(u1, t + dt). The explicit tableau has node 1 and matrix entry 0, so fE is
+    evaluated at the new time and the implicit stage, not at the start of the step. For the variant with fE at the
+    start of the step, see IMEXEulerStifflyAccurate.
+    """
+
     nodes = BackwardEuler.nodes
     weights = BackwardEuler.weights
 
@@ -526,7 +581,8 @@ class IMEXEuler(RungeKuttaIMEX):
 
 class IMEXEulerStifflyAccurate(RungeKuttaIMEX):
     """
-    This implements u = fI^-1(u0 + fE(u0)) rather than u = fI^-1(u0) + fE(u0) + u0.
+    IMEX Euler with the explicit part evaluated at the start of the step, as a stiffly accurate two-stage method.
+    This implements u = fI^-1(u0 + fE(u0)) rather than IMEXEuler's u = fI^-1(u0) + fE(fI^-1(u0)).
     This implementation is slightly inefficient with two stages, but the last stage is the solution, making it stiffly
     accurate and suitable for some DAEs.
     """
@@ -590,6 +646,12 @@ class Heun_Euler(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of forward Euler.
+
+        Returns:
+            int: 2
+        """
         return 2
 
 
@@ -604,6 +666,12 @@ class Cash_Karp(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
@@ -620,6 +688,12 @@ class DIRK43(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -655,6 +729,12 @@ class ESDIRK53(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -670,6 +750,12 @@ class ESDIRK43(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the third order secondary method.
+
+        Returns:
+            int: 4
+        """
         return 4
 
 
@@ -684,12 +770,20 @@ class ARK548L2SAERK(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
 class ARK548L2SAESDIRK(ARK548L2SAERK):
     """
-    Implicit part of the ARK54 scheme. Be careful with the embedded scheme. It seems that both schemes are order 5 as opposed to 5 and 4 as claimed. This may cause issues when doing adaptive time-stepping.
+    Implicit part of the ARK54 scheme. As Kennedy and Carpenter state, the embedded method has order 4 and the main
+    method order 5. The fifth-order conditions of the embedded method are violated only by about 1e-4, however, so it
+    can look like order 5 in convergence tests at moderate step sizes.
     """
 
     generator_IMP = RK_SCHEMES["ARK548L2SAESDIRK"]()
@@ -698,7 +792,9 @@ class ARK548L2SAESDIRK(ARK548L2SAERK):
 
 class ARK54(RungeKuttaIMEX):
     """
-    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from [here](https://doi.org/10.1016/S0168-9274(02)00138-1).
+    IMEX Runge-Kutta method ARK5(4)8L[2]SA of Kennedy and Carpenter, combining ARK548L2SAERK and ARK548L2SAESDIRK.
+    Pair of pairs of ARK5(4)8L[2]SA-ERK and ARK5(4)8L[2]SA-ESDIRK from
+    [here](https://doi.org/10.1016/S0168-9274(02)00138-1).
     """
 
     ButcherTableauClass = ButcherTableauEmbedded
@@ -712,12 +808,20 @@ class ARK54(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
 class ARK548L2SAESDIRK2(RungeKutta):
     """
-    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
+    Implicit part of ARK548L2SA: an L-stable, stiffly accurate ESDIRK pair of orders 5 and 4.
+    Stiffly accurate singly diagonally L-stable implicit embedded Runge-Kutta pair of orders 5 and 4 with explicit
+    first stage from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
     This method is part of the IMEX method ARK548L2SA.
     """
 
@@ -727,12 +831,19 @@ class ARK548L2SAESDIRK2(RungeKutta):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
 class ARK548L2SAERK2(ARK548L2SAESDIRK2):
     """
-    Explicit embedded pair of Runge-Kutta methods of orders 5 and 4 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
+    Explicit part of ARK548L2SA: an explicit embedded Runge-Kutta pair of orders 5 and 4.
+    Taken from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
     This method is part of the IMEX method ARK548L2SA.
     """
 
@@ -742,7 +853,8 @@ class ARK548L2SAERK2(ARK548L2SAESDIRK2):
 
 class ARK548L2SA(RungeKuttaIMEX):
     """
-    IMEX Runge-Kutta method of order 5 based on the explicit method ARK548L2SAERK2 and the implicit method
+    Newer order-5 IMEX Runge-Kutta method ARK5(4)8L[2]SA of Kennedy and Carpenter, an alternative to ARK54.
+    It is based on the explicit method ARK548L2SAERK2 and the implicit method
     ARK548L2SAESDIRK2 from [here](https://doi.org/10.1016/j.apnum.2018.10.007).
 
     According to Kennedy and Carpenter (see reference), the two IMEX RK methods of order 5 are the only ones available
@@ -760,25 +872,49 @@ class ARK548L2SA(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the fourth order secondary method.
+
+        Returns:
+            int: 5
+        """
         return 5
 
 
 class ARK324L2SAERK(RungeKutta):
+    """
+    Explicit part of ARK32: an explicit embedded Runge-Kutta pair of orders 3 and 2.
+    """
+
     generator = RK_SCHEMES["ARK324L2SAERK"]()
     nodes, weights, matrix = generator.genCoeffs(embedded=True)
     ButcherTableauClass = ButcherTableauEmbedded
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the second order secondary method.
+
+        Returns:
+            int: 3
+        """
         return 3
 
 
 class ARK324L2SAESDIRK(ARK324L2SAERK):
+    """
+    Implicit part of ARK32: an L-stable, stiffly accurate ESDIRK pair of orders 3 and 2.
+    """
+
     generator = RK_SCHEMES["ARK324L2SAESDIRK"]()
     matrix = generator.Q
 
 
 class ARK32(RungeKuttaIMEX):
+    """
+    Embedded IMEX Runge-Kutta method ARK3(2)4L[2]SA of Kennedy and Carpenter, of orders 3 and 2.
+    """
+
     ButcherTableauClass = ButcherTableauEmbedded
     ButcherTableauClass_explicit = ButcherTableauEmbedded
 
@@ -790,6 +926,12 @@ class ARK32(RungeKuttaIMEX):
 
     @classmethod
     def get_update_order(cls):
+        """
+        Order in dt of the embedded error estimate, i.e. of the local error of the second order secondary method.
+
+        Returns:
+            int: 3
+        """
         return 3
 
 

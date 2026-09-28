@@ -3,7 +3,7 @@ from pySDC.core.sweeper import Sweeper
 
 class explicit(Sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
+    Fully explicit SDC sweeper, with explicit Euler as the default base integrator.
 
     Attributes:
         QE: explicit Euler integration matrix

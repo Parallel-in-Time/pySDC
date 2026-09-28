@@ -13,7 +13,9 @@ from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import u
 # noinspection PyUnusedLocal
 class boussinesq_2d_imex(Problem):
     r"""
-    This class implements the two-dimensional Boussinesq equations for different boundary conditions with
+    Linearized 2D Boussinesq equations with finite differences, IMEX with waves implicit (GMRES), advection explicit.
+
+    The equations, for different boundary conditions, are
 
     .. math::
         \frac{\partial u}{\partial t} + U \frac{\partial u}{\partial x} + \frac{\partial p}{\partial x} = 0,
@@ -43,7 +45,7 @@ class boussinesq_2d_imex(Problem):
         Domain in x-direction.
     z_bounds : list, optional
         Domain in z-direction.
-    order_upwind : int, optional
+    order_upw : int, optional
         Order of upwind scheme for discretization.
     order : int, optional
         Order for discretization.
@@ -103,13 +105,13 @@ class boussinesq_2d_imex(Problem):
         """Initialization routine"""
 
         if nvars is None:
-            nvars = [(4, 300, 30)]
+            nvars = (4, 300, 30)
 
         if x_bounds is None:
-            x_bounds = [(-150.0, 150.0)]
+            x_bounds = (-150.0, 150.0)
 
         if z_bounds is None:
-            z_bounds = [(0.0, 10.0)]
+            z_bounds = (0.0, 10.0)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -124,10 +126,11 @@ class boussinesq_2d_imex(Problem):
             'order',
             'gmres_maxiter',
             'gmres_restart',
-            'gmres_tol_limit',
             localVars=locals(),
             readOnly=True,
         )
+        # not read-only: rungmrescounter_boussinesq tightens it for its reference solution
+        self._makeAttributeAndRegister('gmres_tol_limit', localVars=locals())
 
         self.N = [self.nvars[1], self.nvars[2]]
 

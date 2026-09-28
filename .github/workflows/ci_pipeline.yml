@@ -107,15 +107,6 @@ jobs:
       - name: Install pySDC as a package in the current environment
         run: |
           pip install --no-deps -e .
-      # A smoke test only: `cupy` is swapped for `numpy`, so this checks that the `useGPU` code
-      # paths are wired up and import, NOT that they work on a GPU. See pySDC/tests/fake_cupy.py.
-      # Deliberately left out of the coverage report, so it cannot claim GPU code is covered.
-      - name: Run the GPU code paths against the CuPy stub
-        if: matrix.env == 'mpi4py'
-        env:
-          PYSDC_FAKE_GPU: '1'
-        run: |
-          pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
       - name: Run pytest for CPU stuff
         run: |
           echo "print('Loading sitecustomize.py...')
@@ -188,15 +179,6 @@ jobs:
           # `not cupy`: these runners have no GPU. The GPU project's cupy-marked tests are run
           # against the NumPy stub in the step below instead; no other project has such a test.
           bash etc/run_mpi_tests.sh pySDC/projects/${{ matrix.env }}/tests "not cupy"
-      - name: Run the GPU code paths against the CuPy stub
-        if: matrix.env == 'GPU'
-        env:
-          PYSDC_FAKE_GPU: '1'
-        # A smoke test only, exactly as for pySDC/tests: `cupy` is swapped for `numpy`, so this
-        # checks the `useGPU` paths are wired up and import, NOT that they work on a GPU.
-        # Deliberately outside the coverage run, so it cannot claim GPU code is covered.
-        run: |
-          pytest --continue-on-collection-errors -v --durations=0 pySDC/projects/GPU/tests -m cupy
       - name: Make coverage report
         run: |
           coverage combine
@@ -208,6 +190,52 @@ jobs:
           path: |
             data
             coverage_${{ matrix.env }}.dat
+
+  gpu_hardware_tests:
+    # The `cupy`-marked tests, on an actual GPU rented per job from Modal; see
+    # etc/modal_gpu_tests.py. This is the only job that runs them, so it is the only source of
+    # coverage for `NCCL_communicator.py`, `cupy_mesh.py` and `log_GPU_timings.py`.
+    #
+    # Skipped for a pull request from a fork, which gets no secrets and so cannot reach Modal.
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install the Modal client
+        run: |
+          pip install modal
+      # Pull requests from forks are skipped above, since they get no secrets. This catches the
+      # remaining case -- a repository without the Modal secrets, such as a fork's own pushes --
+      # which would otherwise fail several minutes in with an unhelpful traceback from `modal run`.
+      - name: Check that the Modal credentials are present
+        run: |
+          if [ -z "${{ secrets.MODAL_TOKEN_ID }}" ]; then
+            echo "::error::No Modal credentials. Add MODAL_TOKEN_ID and MODAL_TOKEN_SECRET as" \
+                 "repository secrets, or run 'modal run etc/modal_gpu_tests.py' locally."
+            exit 1
+          fi
+      # This step only rents the GPU: the container runs pytest under coverage and its output is
+      # streamed back here, so the log below is an ordinary pytest log.
+      - name: Run the cupy-marked tests on a T4
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: |
+          modal run etc/modal_gpu_tests.py
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-artifacts-gpu-hardware
+          path: |
+            coverage_GPU_hardware.dat
+            data/step_7_G_out.txt
 
   user_libpressio_tests:
     runs-on: ubuntu-latest
@@ -374,8 +402,10 @@ jobs:
     # It has to wait for the test jobs: several project READMEs embed plots
     # that the tests themselves write into `data/` (which is gitignored), so
     # the "image file not readable" check is meaningless on a bare checkout -
-    # every one of those images would be missing.
-    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    # every one of those images would be missing. The same goes for the tutorial
+    # results included from `data/`, among them step 7 G's from the GPU job, so a
+    # pull request from a fork, which cannot reach the GPUs, gets no docs build.
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux, gpu_hardware_tests]
     defaults:
       run:
         shell: bash -l {0}
@@ -399,7 +429,7 @@ jobs:
           set -o pipefail
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html 2>&1 | tee sphinx_build.log
+          sphinx-build -j auto -b html docs/source docs/build/html 2>&1 | tee sphinx_build.log
           # pySDC/tests/README.rst links the coverage badge, which genbadge
           # writes in the postprocess workflow just before it builds the site.
           # It is legitimately absent here, so it is not a broken link.
@@ -409,13 +439,33 @@ jobs:
             grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg"
             exit 1
           fi
+          # The same for the results the tutorial parts that need MPI, FEniCS, ... include from the test jobs.
+          includes_not_found=$(grep "WARNING: Include file" < sphinx_build.log | wc -l)
+          if [ $includes_not_found != "0" ] ; then
+            echo "Some included files were not found:"
+            grep "WARNING: Include file" < sphinx_build.log
+            exit 1
+          fi
+      - name: Run the tutorials in the browser
+        # Presses "Run in browser" on every page that has it, in headless Chromium, with Pyodide from
+        # jsDelivr and the wheels built above: what readers get once the site is online.
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps --only-shell chromium
+          python docs/check_run_in_browser.py docs/build/html
 
   coverage_comment_on_pr:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && !cancelled()
-    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux]
+    # On a pull request the action posts the comment. On master it commits the coverage to the
+    # `python-coverage-comment-action-data` branch instead, which is the baseline the comments
+    # compare against: without it, every comment reports no previous coverage and every file as new.
+    if: >-
+      (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
+      && !cancelled()
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux, gpu_hardware_tests]
     permissions:
-      contents: read
+      # write: push the data branch on master. GitHub downgrades it to read for pull requests from forks.
+      contents: write
       pull-requests: write
     defaults:
       run:

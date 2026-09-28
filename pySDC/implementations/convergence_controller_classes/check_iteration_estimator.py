@@ -4,6 +4,10 @@ from pySDC.implementations.convergence_controller_classes.store_uold import Stor
 
 
 class CheckIterationEstimatorNonMPI(ConvergenceController):
+    """
+    Stop iterating once the contraction of the increments predicts that `errtol` is reached, for the non-MPI controller.
+    """
+
     def __init__(self, controller, params, description, **kwargs):
         """
         Initialization routine
@@ -115,19 +119,26 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
             self.status.diff_old_loc[slot] = self.buffers.diff_new
             self.status.diff_first_loc[slot] = self.buffers.diff_new
         elif S.status.iter > 1:
-            # approximate contraction factor
-            self.buffers.Ltilde_loc = min(self.buffers.diff_new / self.status.diff_old_loc[slot], 0.9)
+            if 0.0 in (self.buffers.diff_new, self.status.diff_old_loc[slot], self.status.diff_first_loc[slot]):
+                # an update of exactly zero means the iteration has reached its fixed point: nothing is left to
+                # contract, so no more iterations are needed (this happens to steps that keep iterating when
+                # `all_to_done` is set)
+                self.buffers.Ltilde_loc = 0.0
+                self.buffers.Kest_loc = 0.0
+            else:
+                # approximate contraction factor
+                self.buffers.Ltilde_loc = min(self.buffers.diff_new / self.status.diff_old_loc[slot], 0.9)
+
+                # estimate how many more iterations we need for this step to converge to the desired tolerance
+                alpha = 1 / (1 - self.buffers.Ltilde_loc) * self.status.diff_first_loc[slot]
+                self.buffers.Kest_loc = np.log(self.params.errtol / alpha) / np.log(self.buffers.Ltilde_loc) * 1.05
+                self.logger.debug(
+                    f'LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(self.buffers.Kest_loc))}, '
+                    f'{self.buffers.Ltilde_loc:8.6e}, {self.buffers.Kest_loc:8.6e}, \
+{self.buffers.Ltilde_loc ** S.status.iter * alpha:8.6e}'
+                )
 
             self.status.diff_old_loc[slot] = self.buffers.diff_new
-
-            # estimate how many more iterations we need for this step to converge to the desired tolerance
-            alpha = 1 / (1 - self.buffers.Ltilde_loc) * self.status.diff_first_loc[slot]
-            self.buffers.Kest_loc = np.log(self.params.errtol / alpha) / np.log(self.buffers.Ltilde_loc) * 1.05
-            self.logger.debug(
-                f'LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(self.buffers.Kest_loc))}, '
-                f'{self.buffers.Ltilde_loc:8.6e}, {self.buffers.Kest_loc:8.6e}, \
-{self.buffers.Ltilde_loc ** S.status.iter * alpha:8.6e}'
-            )
 
             # set global Kest as last local one, force stop if done
             if S.status.last:

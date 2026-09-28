@@ -1,22 +1,15 @@
+import runpy
+
 import pytest
 
 
+# The parts are notebook-style scripts, so running one is the test. run_module executes them afresh every time.
 @pytest.mark.base
-def test_A():
-    from pySDC.tutorial.step_8.A_visualize_residuals import main as main_A
+@pytest.mark.parametrize('part', ['A_adaptive_time_stepping', 'B_multistep_SDC', 'C_iteration_estimator'])
+def test_part(part):
+    import matplotlib.pyplot as plt
 
-    main_A()
-
-
-@pytest.mark.base
-def test_B():
-    from pySDC.tutorial.step_8.B_multistep_SDC import main as main_B
-
-    main_B()
-
-
-@pytest.mark.base
-def test_C():
-    from pySDC.tutorial.step_8.C_iteration_estimator import main as main_C
-
-    main_C()
+    try:
+        runpy.run_module(f'pySDC.tutorial.step_8.{part}', run_name='__main__')
+    finally:
+        plt.close('all')  # the parts leave their figures open, as a notebook does

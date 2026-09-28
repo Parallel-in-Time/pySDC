@@ -8,7 +8,9 @@ from pySDC.helpers.fieldsIO import Scalar
 
 class testequation0d(Problem):
     r"""
-    This class implements the simple test equation of the form
+    Dahlquist test equation for many values of :math:`\lambda` at once, treated fully implicitly.
+
+    It is of the form
 
     .. math::
         \frac{d u(t)}{dt} = A u(t)
@@ -21,6 +23,8 @@ class testequation0d(Problem):
         List of lambda parameters.
     u0 : sequence of array_like, optional
         Initial condition.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
 
     Attributes
     ----------
@@ -33,8 +37,7 @@ class testequation0d(Problem):
     dtype_u = mesh
     dtype_f = mesh
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """
         Switch to GPU modules
         """
@@ -42,10 +45,10 @@ class testequation0d(Problem):
         import cupy as cp
         import cupyx.scipy.sparse as csp
 
-        cls.xp = cp
-        cls.xsp = csp
-        cls.dtype_u = cupy_mesh
-        cls.dtype_f = cupy_mesh
+        self.xp = cp
+        self.xsp = csp
+        self.dtype_u = cupy_mesh
+        self.dtype_f = cupy_mesh
 
     def __init__(self, lambdas=None, u0=0.0, useGPU=False):
         """Initialization routine"""
@@ -148,16 +151,68 @@ class testequation0d(Problem):
         return me
 
     def getOutputFile(self, fileName):
+        r"""
+        Set up a ``Scalar`` output file for complex values, with one variable per :math:`\lambda`.
+
+        Parameters
+        ----------
+        fileName : str
+            Name of the output file.
+
+        Returns
+        -------
+        fOut : pySDC.helpers.fieldsIO.Scalar
+            The initialized output file.
+        """
         fOut = Scalar(np.complex128, fileName=fileName)
         fOut.setHeader(self.lambdas.size)
         fOut.initialize()
         return fOut
 
     def processSolutionForOutput(self, u):
+        """
+        Flatten the solution for output.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Solution to be written.
+
+        Returns
+        -------
+        np.1darray
+            The flattened solution.
+        """
         return u.flatten()
 
 
 class test_equation_IMEX(Problem):
+    r"""
+    Test equation with the right-hand side split into an implicit and an explicit part
+
+    .. math::
+        \frac{d u(t)}{dt} = A_I u(t) + A_E u(t)
+
+    for :math:`A_I = diag(\lambda_{I,1}, .. ,\lambda_{I,n})` and :math:`A_E = diag(\lambda_{E,1}, .. ,\lambda_{E,n})`.
+    For IMEX time-stepping, :math:`A_I u` is treated implicitly and :math:`A_E u` explicitly.
+
+    Parameters
+    ----------
+    lambdas_implicit : sequence of array_like, optional
+        Flat list of the parameters :math:`\lambda_{I,k}` of the implicit part. ``None`` means 2500 complex values
+        :math:`a + b i` with integers :math:`a \in [-30, 19]` and :math:`b \in [-50, 49]`.
+    lambdas_explicit : sequence of array_like, optional
+        Flat list of the parameters :math:`\lambda_{E,k}` of the explicit part, of the same shape as
+        ``lambdas_implicit``. ``None`` means a copy of ``lambdas_implicit``.
+    u0 : sequence of array_like, optional
+        Initial condition at :math:`t = 0`, either a scalar or one value per equation.
+
+    Attributes
+    ----------
+    A : scipy.sparse.dia_matrix
+        Diagonal matrix containing the implicit parameters :math:`\lambda_{I,1},..,\lambda_{I,n}`.
+    """
+
     dtype_f = imex_mesh
     dtype_u = mesh
     xp = np

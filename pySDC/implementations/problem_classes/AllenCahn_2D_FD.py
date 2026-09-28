@@ -13,6 +13,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_m
 # noinspection PyUnusedLocal
 class allencahn_fullyimplicit(Problem):
     r"""
+    2D periodic Allen-Cahn equation with finite differences, fully implicit with Newton.
+
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -48,6 +50,8 @@ class allencahn_fullyimplicit(Problem):
         Tolerance for linear solver to terminate.
     lin_maxiter : int, optional
         Maximum number of iterations for the linear solver.
+    inexact_linear_ratio : float, optional
+        Ratio of tolerance of linear solver to the Newton residual, overrides ``lin_tol`` if set.
     radius : float, optional
         Radius of the circles.
     order : int, optional
@@ -77,8 +81,7 @@ class allencahn_fullyimplicit(Problem):
     xsp = sp
     linalg = spla
 
-    @classmethod
-    def setup_GPU(cls):
+    def setup_GPU(self):
         """
         Switch the array, sparse and solver modules and the datatypes over to CuPy.
 
@@ -90,13 +93,13 @@ class allencahn_fullyimplicit(Problem):
         import cupyx.scipy.sparse.linalg as cspla
         from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
 
-        cls.xp = cp
-        cls.xsp = csp
-        cls.linalg = cspla
-        cls.dtype_u = cupy_mesh
+        self.xp = cp
+        self.xsp = csp
+        self.linalg = cspla
+        self.dtype_u = cupy_mesh
         # .get, not [], because this runs once per instance and the class keeps what it is given
         GPU_versions = {mesh: cupy_mesh, imex_mesh: imex_cupy_mesh, comp2_mesh: comp2_cupy_mesh}
-        cls.dtype_f = GPU_versions.get(cls.dtype_f, cls.dtype_f)
+        self.dtype_f = GPU_versions.get(self.dtype_f, self.dtype_f)
 
     def __init__(
         self,
@@ -218,8 +221,10 @@ class allencahn_fullyimplicit(Problem):
             The solution as mesh.
         """
 
-        u = self.dtype_u(u0).flatten()
-        z = self.dtype_u(self.init, val=0.0).flatten()
+        # plain arrays, not the datatype: its `__abs__` is a norm, which CuPy's `linalg.norm` trips over
+        u = u0.view(self.xp.ndarray).flatten()
+        b = rhs.view(self.xp.ndarray).flatten()
+        z = self.xp.zeros_like(u)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
@@ -228,7 +233,7 @@ class allencahn_fullyimplicit(Problem):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + self.reaction(u)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction(u)) - b
 
             # if g is close to 0, then we are done
             res = self.xp.linalg.norm(g, self.xp.inf)
@@ -295,6 +300,10 @@ class allencahn_fullyimplicit(Problem):
         ----------
         t : float
             Time of the exact solution.
+        u_init : dtype_u, optional
+            Initial conditions for getting the exact solution.
+        t_init : float, optional
+            The starting time.
 
         Returns
         -------
@@ -320,6 +329,8 @@ class allencahn_fullyimplicit(Problem):
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
     r"""
+    2D periodic Allen-Cahn equation with finite differences, IMEX with Laplacian implicit, reaction explicit.
+
     This class implements the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -369,7 +380,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Simple linear solver for :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}`.
+        Pointwise solver for :math:`\vec{u} - factor \cdot \frac{1}{2\varepsilon^2}(2\vec{u} - 1) = \vec{rhs}`.
 
         Parameters
         ----------
@@ -414,6 +425,10 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         ----------
         t : float
             Time of the exact solution.
+        u_init : dtype_u, optional
+            Initial conditions for getting the exact solution.
+        t_init : float, optional
+            The starting time.
 
         Returns
         -------
@@ -436,6 +451,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     r"""
+    2D periodic Allen-Cahn equation with finite differences, IMEX with Laplacian and cubic term implicit.
+
     This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -505,8 +522,10 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        u = self.dtype_u(u0).flatten()
-        z = self.dtype_u(self.init, val=0.0).flatten()
+        # plain arrays, not the datatype: its `__abs__` is a norm, which CuPy's `linalg.norm` trips over
+        u = u0.view(self.xp.ndarray).flatten()
+        b = rhs.view(self.xp.ndarray).flatten()
+        z = self.xp.zeros_like(u)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
@@ -515,7 +534,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - b
 
             # if g is close to 0, then we are done
             res = self.xp.linalg.norm(g, self.xp.inf)
@@ -549,6 +568,8 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
     r"""
+    2D periodic Allen-Cahn equation with finite differences, multi-implicit: Laplacian (CG), reaction (Newton).
+
     Example implementing the two-dimensional Allen-Cahn equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -656,8 +677,10 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        u = self.dtype_u(u0).flatten()
-        z = self.dtype_u(self.init, val=0.0).flatten()
+        # plain arrays, not the datatype: its `__abs__` is a norm, which CuPy's `linalg.norm` trips over
+        u = u0.view(self.xp.ndarray).flatten()
+        b = rhs.view(self.xp.ndarray).flatten()
+        z = self.xp.zeros_like(u)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
@@ -666,7 +689,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * self.reaction(u) - rhs.flatten()
+            g = u - factor * self.reaction(u) - b
 
             # if g is close to 0, then we are done
             res = self.xp.linalg.norm(g, self.xp.inf)
@@ -700,6 +723,8 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     r"""
+    2D periodic Allen-Cahn with finite differences, multi-implicit: Laplacian plus cubic term, linear term.
+
     This class implements the two-dimensional Allen-Cahn (AC) equation with periodic boundary conditions, with the two
     phases at :math:`u = 0` and :math:`u = 1`
 
@@ -718,8 +743,9 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
     for :math:`i, j=0,..,N-1`, where :math:`N` is the number of spatial grid points. For time-stepping, a special AC-splitting
     is used here to get another kind of *semi-implicit* treatment of the problem: The term :math:`\Delta u - \frac{1}{2\varepsilon^2}(2u - 1)^3`
-    is handled implicitly and the nonlinear system including this part will be solved by Newton. :math:`\frac{1}{2\varepsilon^2}(2u - 1)`
-    is solved by a linear solver provided by a ``SciPy`` routine.
+    is handled implicitly and the nonlinear system including this part will be solved by Newton. The linear reaction
+    term :math:`\frac{1}{2\varepsilon^2}(2u - 1)` acts pointwise, so its implicit system is solved by a pointwise
+    division.
     """
 
     dtype_f = comp2_mesh
@@ -769,8 +795,10 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
             The solution as mesh.
         """
 
-        u = self.dtype_u(u0).flatten()
-        z = self.dtype_u(self.init, val=0.0).flatten()
+        # plain arrays, not the datatype: its `__abs__` is a norm, which CuPy's `linalg.norm` trips over
+        u = u0.view(self.xp.ndarray).flatten()
+        b = rhs.view(self.xp.ndarray).flatten()
+        z = self.xp.zeros_like(u)
 
         Id = self.xsp.eye(self.nvars[0] * self.nvars[1])
 
@@ -779,7 +807,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         res = 99
         while n < self.newton_maxiter:
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - rhs.flatten()
+            g = u - factor * (self.A.dot(u) + self.reaction_cubic(u)) - b
 
             # if g is close to 0, then we are done
             res = self.xp.linalg.norm(g, self.xp.inf)

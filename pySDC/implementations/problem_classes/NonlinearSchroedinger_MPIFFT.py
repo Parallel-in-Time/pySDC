@@ -10,14 +10,19 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
     r"""
+    Periodic nonlinear Schrödinger equation with mpi4py-fft, IMEX with the Laplacian implicit, nonlinearity explicit.
+
     Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::
-        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u
+        \frac{\partial u}{\partial t} = i \Delta u + 2 N c i |u|^2 u
 
-    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be solved using
-    ``mpi4py-fft`` [1]_. *Semi-explicit* time-stepping is used here to solve the problem in the temporal dimension, i.e., the
-    Laplacian will be handled implicitly.
+    for fixed parameter :math:`c \in \{0, 1\}` and :math:`N=2, 3`, on :math:`[0, 2\pi]^N`. The factor :math:`N` makes
+    the one-dimensional breather solution (39) of https://doi.org/10.1007/BF01017105, taken along
+    :math:`x_1 + \dots + x_N` and at time :math:`N t`, an exact solution. The period :math:`2\pi` is fixed and cannot
+    be passed as ``L``. The linear parts of the problem will be solved using ``mpi4py-fft`` [#]_. *Semi-explicit*
+    time-stepping is used here to solve the problem in the temporal dimension, i.e., the Laplacian will be handled
+    implicitly.
 
     Parameters
     ----------
@@ -25,10 +30,8 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
         Spatial resolution
     spectral : bool, optional
         If True, the solution is computed in spectral space.
-    L : float, optional
-        Denotes the period of the function to be approximated for the Fourier transform.
     c : float, optional
-        Nonlinearity parameter.
+        Nonlinearity parameter, either 0 or 1.
     comm : MPI.COMM_World
         Communicator for parallelisation.
 
@@ -43,7 +46,7 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
 
     References
     ----------
-    .. [1] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+    .. [#] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
         Journal of Parallel and Distributed Computing (2019).
     """
 
@@ -100,24 +103,45 @@ class nonlinearschroedinger_imex(IMEX_Laplacian_MPIFFT):
 
 class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     r"""
+    Periodic nonlinear Schrödinger equation with mpi4py-fft, fully implicit with SciPy's Newton-Krylov solver.
+
     Example implementing the :math:`N`-dimensional nonlinear Schrödinger equation with periodic boundary conditions
 
     .. math::
-        \frac{\partial u}{\partial t} = -i \Delta u + 2 c i |u|^2 u
+        \frac{\partial u}{\partial t} = i \Delta u + 2 N c i |u|^2 u
 
-    for fixed parameter :math:`c` and :math:`N=2, 3`. The linear parts of the problem will be discretized using
-    ``mpi4py-fft`` [1]_. For time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing
-    the full right-hand side is solved by GMRES method.
+    for fixed parameter :math:`c \in \{0, 1\}` and :math:`N=2, 3`, on :math:`[0, 2\pi]^N`. The factor :math:`N` makes
+    the one-dimensional breather solution (39) of https://doi.org/10.1007/BF01017105, taken along
+    :math:`x_1 + \dots + x_N` and at time :math:`N t`, an exact solution. The period :math:`2\pi` is fixed and cannot
+    be passed as ``L``. The linear parts of the problem will be discretized using ``mpi4py-fft`` [#]_. For
+    time-stepping, the problem will be solved *fully-implicitly*, i.e., the nonlinear system containing the full
+    right-hand side is solved by a Newton-Krylov method [#]_.
+
+    Parameters
+    ----------
+    lintol : float, optional
+        Absolute tolerance for the ``SciPy`` Newton-Krylov solver, passed as ``x_tol``, i.e., applied to the
+        maximum norm of the Newton step. ``SciPy`` additionally requires the maximum norm of the residual to be below
+        its default ``f_tol`` of about ``6e-6``.
+    liniter : int, optional
+        Maximum number of Newton iterations of the Newton-Krylov solver, passed as ``maxiter``. If the solver does not
+        converge, the last iterate is used without a warning.
+    **kwargs
+        Passed on to ``nonlinearschroedinger_imex``, see there: ``c``, ``nvars``, ``spectral`` and ``comm``.
+        ``useGPU`` has to be False.
 
     References
     ----------
-    .. [1] https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html
+    .. [#] Lisandro Dalcin, Mikael Mortensen, David E. Keyes. Fast parallel multidimensional FFT using advanced MPI.
+        Journal of Parallel and Distributed Computing (2019).
+    .. [#] https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html
     """
 
     dtype_u = mesh
     dtype_f = mesh
 
     def __init__(self, lintol=1e-9, liniter=99, **kwargs):
+        """Initialization routine"""
         assert kwargs.get('useGPU', False) is False
 
         super().__init__(**kwargs)
@@ -160,7 +184,8 @@ class nonlinearschroedinger_fully_implicit(nonlinearschroedinger_imex):
     def solve_system(self, rhs, factor, u0, t):
         r"""
         Solve the nonlinear system :math:`(1 - factor \cdot f)(\vec{u}) = \vec{rhs}` using a ``SciPy`` Newton-Krylov
-        solver. See page [1]_ for details on the solver.
+        solver, see `scipy.optimize.newton_krylov
+        <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.newton_krylov.html>`__.
 
         Parameters
         ----------

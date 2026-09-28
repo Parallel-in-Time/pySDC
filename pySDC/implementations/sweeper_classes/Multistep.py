@@ -53,6 +53,10 @@ class Cache(object):
 
 
 class MultiStep(Sweeper):
+    """
+    Base class for linear multistep methods, given by alpha and beta coefficients and a cache of previous steps.
+    """
+
     alpha = None
     beta = None
 
@@ -196,7 +200,7 @@ class MultiStep(Sweeper):
 
 class AdamsBashforthExplicit1Step(MultiStep):
     """
-    This is just forward Euler.
+    One-step Adams-Bashforth method, which is just forward Euler.
     """
 
     alpha = [-1.0]
@@ -205,6 +209,7 @@ class AdamsBashforthExplicit1Step(MultiStep):
 
 class BackwardEuler(MultiStep):
     """
+    Backward Euler written as a one-step implicit multistep method.
     Almost as old, impressive and beloved as Koelner Dom.
     """
 
@@ -223,7 +228,7 @@ class AdamsMoultonImplicit1Step(MultiStep):
 
 class AdamsMoultonImplicit2Step(MultiStep):
     """
-    Third order implicit scheme
+    Third-order implicit two-step Adams-Moulton method, started with a trapezoidal rule step.
     """
 
     alpha = [0.0, -1.0]

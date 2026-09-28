@@ -23,6 +23,9 @@ def test_show_results():
     import os
     from pySDC.projects.TOMS.AllenCahn_contracting_circle import show_results
 
+    if not results:
+        pytest.skip('No results: test_AllenCahn_contracting_circle did not run in this session')
+
     # dump result
     cwd = 'pySDC/projects/TOMS/'
     fname = 'data/results_SDC_variants_AllenCahn_1E-03'

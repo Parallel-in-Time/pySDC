@@ -1,29 +1,18 @@
+import runpy
+
 import pytest
 
 
+# The parts are notebook-style scripts, so running one is the test. run_module executes them afresh every time.
 @pytest.mark.base
-def test_A():
-    from pySDC.tutorial.step_4.A_spatial_transfer_operators import main as main_A
+@pytest.mark.parametrize(
+    'part',
+    ['A_spatial_transfer_operators', 'B_multilevel_hierarchy', 'C_SDC_vs_MLSDC', 'D_MLSDC_with_particles'],
+)
+def test_part(part):
+    import matplotlib.pyplot as plt
 
-    main_A()
-
-
-@pytest.mark.base
-def test_B():
-    from pySDC.tutorial.step_4.B_multilevel_hierarchy import main as main_B
-
-    main_B()
-
-
-@pytest.mark.base
-def test_C():
-    from pySDC.tutorial.step_4.C_SDC_vs_MLSDC import main as main_C
-
-    main_C()
-
-
-@pytest.mark.base
-def test_D():
-    from pySDC.tutorial.step_4.D_MLSDC_with_particles import main as main_D
-
-    main_D()
+    try:
+        runpy.run_module(f'pySDC.tutorial.step_4.{part}', run_name='__main__')
+    finally:
+        plt.close('all')  # the parts leave their figures open, as a notebook does

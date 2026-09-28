@@ -5,9 +5,6 @@ from numpy.polynomial.polynomial import polyval
 from pySDC.core.collocation import CollBase
 import pySDC.helpers.transfer_helper as th
 
-t_start = np.random.rand(1) * 0.2
-t_end = 0.8 + np.random.rand(1) * 0.2
-
 node_types = ['EQUID', 'LEGENDRE']
 quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
@@ -82,7 +79,7 @@ def test_Q_transfer_minimal(node_type, quad_type):
         Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=2, pad=0, equidist_nested=False)
         Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=2, pad=0)
 
-        for polyorder in range(1, 3):
+        for polyorder in range(1, 4):
             coeff = np.random.rand(polyorder)
             ufine = polyval(fine_grid, coeff)
             ucoarse = polyval(coarse_grid, coeff)

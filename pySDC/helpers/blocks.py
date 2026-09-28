@@ -17,6 +17,7 @@ class BlockDecomposition(object):
         - Hybrid : approach minimizing interface communication, inspired from
           the `[Hybrid CFD solver] <https://web.stanford.edu/group/ctr/ResBriefs07/5_larsson1_pp47_58.pdf>`_.
         - ChatGPT : quickly generated using `[ChatGPT] <https://chatgpt.com>`_.
+
         The default is "Hybrid".
     gRank : int, optional
         If provided, the global rank that will determine the local block distribution. Default is None.
@@ -25,6 +26,7 @@ class BlockDecomposition(object):
     """
 
     def __init__(self, nProcs, gridSizes, algo="Hybrid", gRank=None, order="C"):
+        """Compute the number of blocks in each dimension, see the class docstring."""
         dim = len(gridSizes)
         assert dim in [1, 2, 3], "block decomposition only works for 1D, 2D or 3D domains"
 
@@ -95,12 +97,30 @@ class BlockDecomposition(object):
 
     @property
     def ranks(self):
+        """
+        Coordinates of the block of `gRank` in the cartesian grid of blocks, which uses `order`.
+
+        Returns
+        -------
+        list[int]
+            Block index of `gRank` in each dimension.
+        """
         assert self.gRank is not None, "gRank attribute needs to be set"
         cart = np.arange(np.prod(self.nBlocks)).reshape(self.nBlocks, order=self.order)
         return list(np.argwhere(cart == self.gRank)[0])
 
     @property
     def localBounds(self):
+        """
+        Bounds of the block of `gRank`. The points left over by an even split go one each to the first blocks.
+
+        Returns
+        -------
+        iLocList : list[int]
+            Global index of the first local point in each dimension.
+        nLocList : list[int]
+            Number of local points in each dimension.
+        """
         iLocList, nLocList = [], []
         for rank, nPoints, nBlocks in zip(self.ranks, self.gridSizes, self.nBlocks, strict=True):
             n0 = nPoints // nBlocks

@@ -471,13 +471,27 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
     else:
         raise ParameterError(f"For {prob_cls_name} there is no test implemented here!")
 
+    # The runs are deterministic: the iteration and restart counts are reproduced exactly, and all other values
+    # were reproduced to <= 3e-15 relative (<= 6e-14 absolute), except for one final step size (1.3e-6 relative).
+    # - counts are integers and compared exactly
+    # - e_em and e_event are errors that can be at round-off level (down to 2e-16) -> relative 1e-3, but at
+    #   least 1e-14 absolute, which makes it an upper bound for the ones near round-off
+    # - dt is the last step size chosen by adaptivity -> relative 1e-4
+    # - everything else (solution values, event times, global errors) -> relative 1e-10, absolute 1e-12
     for key in expected.keys():
+        if key in ['sum_niters', 'sum_restarts']:
+            tols = {'rtol': 0, 'atol': 0}
+        elif key in ['e_em', 'e_event']:
+            tols = {'rtol': 1e-3, 'atol': 1e-14}
+        elif key == 'dt':
+            tols = {'rtol': 1e-4, 'atol': 0}
+        else:
+            tols = {'rtol': 1e-10, 'atol': 1e-12}
+
         if key == 't_switches' or key == 'e_event':
             err_msg = f'{msg} Expected {key}={expected[key]}, got {key}={got[key]}'
-            if len(expected[key]) == got[key]:
-                assert np.allclose(expected[key], got[key], atol=1e-4), err_msg
-            else:
-                assert np.isclose(expected[key][-1], got[key][-1], atol=1e-4), err_msg
+            assert len(expected[key]) == len(got[key]), err_msg
+            assert np.allclose(got[key], expected[key], **tols), err_msg
         else:
-            err_msg = f'{msg} Expected {key}={expected[key]:.4e}, got {key}={got[key]:.4e}'
-            assert np.isclose(expected[key], got[key], atol=1e-4), err_msg
+            err_msg = f'{msg} Expected {key}={expected[key]:.15e}, got {key}={got[key]:.15e}'
+            assert np.isclose(got[key], expected[key], **tols), err_msg

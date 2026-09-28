@@ -89,16 +89,40 @@ class Config(object):
         res = self.args['res']
         return f'{self.base_path}/data/{type(self).__name__}-res{res}.pySDC'
 
+    def get_hook(self, hook_class, key=None, **attributes):
+        """
+        Get a subclass of a hook configured through class attributes, the same one for every call with the same key.
+
+        Setting the attributes on `hook_class` itself would configure every other run in the process. The subclass is
+        kept because the restart counter set on it has to reach the hook that does the logging and `LogStats`.
+
+        Args:
+            hook_class (pySDC.Hook): The hook to configure
+            key: Distinguishes differently configured subclasses of the same hook
+            attributes: Class attributes to set on the subclass
+
+        Returns:
+            pySDC.Hook: The configured subclass
+        """
+        hooks = self.__dict__.setdefault('_hooks', {})
+        if (hook_class, key) not in hooks:
+            hooks[(hook_class, key)] = type(hook_class.__name__, (hook_class,), {})
+        hook = hooks[(hook_class, key)]
+        for name, value in attributes.items():
+            setattr(hook, name, value)
+        return hook
+
     def get_LogToFile(self, *args, **kwargs):
         if self.comms[1].rank > 0:
             return None
         from pySDC.implementations.hooks.log_solution import LogToFile
 
-        LogToFile.filename = self.get_file_name()
-        LogToFile.time_increment = self.logging_time_increment
-        LogToFile.allow_overwriting = True
-
-        return LogToFile
+        return self.get_hook(
+            LogToFile,
+            filename=self.get_file_name(),
+            time_increment=self.logging_time_increment,
+            allow_overwriting=True,
+        )
 
     def get_description(self, *args, MPIsweeper=False, useGPU=False, **kwargs):
         description = {}
@@ -110,9 +134,10 @@ class Config(object):
         description['step_params'] = {}
         description['convergence_controllers'] = {}
 
-        if self.get_LogToFile():
+        hook = self.get_LogToFile()
+        if hook:
             path = self.get_file_name()[:-6]
-            description['convergence_controllers'][LogStats] = {'path': path}
+            description['convergence_controllers'][LogStats] = {'path': path, 'hook': hook}
 
         if MPIsweeper:
             description['sweeper_params']['comm'] = self.comms[1]

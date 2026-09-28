@@ -4,7 +4,7 @@ from pySDC.core.errors import UnlockError
 
 class base_transfer_mass(BaseTransfer):
     """
-    Standard base_transfer class
+    Space-time transfer for problems with a mass matrix, which enters the FAS correction and the restricted u0.
 
     Attributes:
         logger: custom logger for sweeper-related logging

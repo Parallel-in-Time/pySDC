@@ -1275,7 +1275,7 @@ def get_configs(mode, problem):
 
         for parallel in [False, True]:
             desc = {'sweeper_class': parallel_sweeper} if parallel else {}
-            for num_nodes, ls in zip([3, 4, 2], ['-', '--', ':', '-.'], strict=True):
+            for num_nodes, ls in zip([3, 4, 2], ['-', '--', ':'], strict=True):
                 configurations[num_nodes + (99 if parallel else 0)] = {
                     'custom_description': {**desc, 'sweeper_params': {'num_nodes': num_nodes}},
                     'strategies': [
@@ -1602,13 +1602,13 @@ def get_configs(mode, problem):
         from pySDC.projects.Resilience.strategies import (
             AdaptivityStrategy,
             AdaptivityAvoidRestartsStrategy,
-            AdaptivityPolynomialStrategy,
+            AdaptivityPolynomialError,
         )
 
         desc = {'sweeper_params': {'QI': 'IE'}, 'step_params': {'maxiter': 3}}
         param_range = [1e-3, 1e-5]
         configurations[0] = {
-            'strategies': [AdaptivityPolynomialStrategy(useMPI=True)],
+            'strategies': [AdaptivityPolynomialError(useMPI=True)],
             'plotting_params': {'ls': '--'},
             'custom_description': desc,
             'param_range': param_range,

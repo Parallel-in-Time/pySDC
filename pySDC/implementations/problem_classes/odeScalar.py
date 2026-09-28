@@ -60,8 +60,8 @@ class ProtheroRobinson(Problem):
     stop_at_nan : bool, optional
         Wheter to stop or not solve_system when getting NAN. The default is True.
 
-    Reference
-    ---------
+    References
+    ----------
     A. Prothero and A. Robinson, On the stability and accuracy of one-step methods for solving
     stiff systems of ordinary differential equations, Mathematics of Computation, 28 (1974),
     pp. 145–162.
@@ -71,6 +71,7 @@ class ProtheroRobinson(Problem):
     dtype_f = mesh
 
     def __init__(self, epsilon=1e-3, nonLinear=False, newton_maxiter=200, newton_tol=5e-11, stop_at_nan=True):
+        """Initialization routine"""
         nvars = 1
         super().__init__((nvars, None, np.dtype('float64')))
 
@@ -86,30 +87,146 @@ class ProtheroRobinson(Problem):
     # g function (analytical solution), and its first derivative
     # -------------------------------------------------------------------------
     def g(self, t):
+        r"""
+        Function :math:`g(t) = \cos(t)`, which is the exact solution.
+
+        Parameters
+        ----------
+        t : float
+            Time.
+
+        Returns
+        -------
+        float
+            The value of :math:`g(t)`.
+        """
         return np.cos(t)
 
     def dg(self, t):
+        r"""
+        First derivative :math:`g'(t) = -\sin(t)` of :math:`g`.
+
+        Parameters
+        ----------
+        t : float
+            Time.
+
+        Returns
+        -------
+        float
+            The value of :math:`g'(t)`.
+        """
         return -np.sin(t)
 
     # -------------------------------------------------------------------------
     # f(u,t) and Jacobian functions
     # -------------------------------------------------------------------------
     def f(self, u, t):
+        """
+        Right-hand side, replaced in ``__init__`` by ``f_LIN`` or ``f_NONLIN``.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time.
+
+        Raises
+        ------
+        NotImplementedError
+            Always.
+        """
         raise NotImplementedError()
 
     def f_LIN(self, u, t):
+        r"""
+        Right-hand side :math:`-(u - g(t)) / \epsilon + g'(t)` of the linear form.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        dtype_u
+            The right-hand side.
+        """
         return -self.epsilon ** (-1) * (u - self.g(t)) + self.dg(t)
 
     def f_NONLIN(self, u, t):
+        r"""
+        Right-hand side :math:`-(u^3 - g(t)^3) / \epsilon + g'(t)` of the nonlinear form.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        dtype_u
+            The right-hand side.
+        """
         return -self.epsilon ** (-1) * (u**3 - self.g(t) ** 3) + self.dg(t)
 
     def jac(self, u, t):
+        """
+        Jacobian of the right-hand side, replaced in ``__init__`` by ``jac_LIN`` or ``jac_NONLIN``.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time.
+
+        Raises
+        ------
+        NotImplementedError
+            Always.
+        """
         raise NotImplementedError()
 
     def jac_LIN(self, u, t):
+        r"""
+        Jacobian :math:`-1/\epsilon` of the right-hand side of the linear form.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        float
+            The Jacobian.
+        """
         return -self.epsilon ** (-1)
 
     def jac_NONLIN(self, u, t):
+        r"""
+        Jacobian :math:`-3 u^2 / \epsilon` of the right-hand side of the nonlinear form.
+
+        Parameters
+        ----------
+        u : dtype_u
+            Current values of the numerical solution.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        dtype_u
+            The Jacobian.
+        """
         return -self.epsilon ** (-1) * 3 * u**2
 
     # -------------------------------------------------------------------------

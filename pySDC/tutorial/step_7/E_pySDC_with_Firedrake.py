@@ -1,20 +1,33 @@
-"""
-Simple example running a forced heat equation in Firedrake.
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+#   language_info:
+#     name: python
+# ---
 
-The function `setup` generates the description and controller_params dictionaries needed to run SDC with diagonal preconditioner.
-This proceeds very similar to earlier tutorials. The interesting part of this tutorial is rather in the problem class.
-See `pySDC/implementations/problem_classes/HeatFiredrake` for an easy example of how to use Firedrake within pySDC.
+# %% [markdown]
+# # Part E: pySDC and Firedrake
+#
+# [Firedrake](https://github.com/firedrakeproject/firedrake) is a finite element library with similar features as
+# FEniCS. This example runs the same forced heat equation as the [FEniCS example](A_pySDC_with_FEniCS), but
+# implemented in Firedrake. The setup proceeds very much as in earlier tutorials; the interesting part is rather the
+# problem class. See
+# [pySDC/implementations/problem_classes/HeatFiredrake.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/HeatFiredrake.py)
+# as a blueprint for how to implement problems with Firedrake in a way that pySDC understands.
+#
+# ## Single level, serial or parallel across the nodes
+#
+# SDC with the diagonal preconditioner `MIN-SR-S`, whose nodes can be solved in parallel. The space-time parallelism
+# comes from a Firedrake ensemble: with `--useMPIsweeper` and a multiple of 3 ranks, the ranks are split across the
+# 3 collocation nodes, and the ranks of each node share the spatial problem. See the
+# [Firedrake documentation on parallelism](https://www.firedrakeproject.org/firedrake/parallelism.html).
 
-The script allows to run in three different ways. Use
- - `python E_pySDC_with_Firedrake.py` for single-level serial SDC
- - `mpiexec -np 3 E_pySDC_with_Firedrake --useMPIsweeper` for single-level MPI-parallel diagonal SDC
- - `python E_pySDC_with_Firedrake --ML` for three-level serial SDC
-
-You should notice that speedup of MPI parallelisation is quite good and that, while multi-level SDC reduces the number
-of SDC iterations quite a bit, it does not reduce time to solution in this case. This is partly due to more solvers being
-constructed when using coarse levels. Also, we do not claim to have found the best parameters, though. This is just an
-example to demonstrate how to use it.
-"""
+# %%
+from pathlib import Path
 
 import numpy as np
 from mpi4py import MPI
@@ -73,6 +86,13 @@ def setup(useMPIsweeper):
     return description, controller_params
 
 
+# %% [markdown]
+# ## Three levels
+#
+# Multilevel SDC, serial, coarsened in space from 128 to 32 to 4 elements, with interpolation of the right-hand side.
+
+
+# %%
 def setup_ML():
     """
     Helper routine to set up parameters
@@ -126,6 +146,14 @@ def setup_ML():
     return description, controller_params
 
 
+# %% [markdown]
+# ## Running it
+#
+# The run prints the error and the work: SDC iterations, solver setups, solves and right-hand side evaluations on the
+# finest level, and checks them against what we got last time.
+
+
+# %%
 def runHeatFiredrake(useMPIsweeper=False, ML=False):
     """
     Run the example defined by the above parameters
@@ -168,15 +196,39 @@ def runHeatFiredrake(useMPIsweeper=False, ML=False):
         f'Finished with error {error[0][1]:.2e}. Used {tot_iter} SDC iterations, with {tot_solver_setup} solver setups, {tot_solves} solves and {tot_rhs} right hand side evaluations on the finest level of time task {time_rank}.'
     )
 
+    # the results the website shows, from the first rank
+    if MPI.COMM_WORLD.rank == 0:
+        timing = get_sorted(stats, type='timing_run')[0][1]
+        variant = 'three-level SDC' if ML else ('SDC parallel across the nodes' if useMPIsweeper else 'serial SDC')
+        Path('data').mkdir(parents=True, exist_ok=True)
+        with open('data/step_7_E_out.txt', 'a') as file:
+            file.write(
+                f'{variant:30s} error {error[0][1]:.2e}, {tot_iter:2d} iterations, {tot_solves:3d} solves on the '
+                f'finest level, time to solution {timing:.2f} s\n'
+            )
+
     # do tests that we got the same as last time
     n_nodes = 1 if useMPIsweeper else description['sweeper_params']['num_nodes']
     assert error[0][1] < 2e-7
-    assert tot_iter == 10 if ML else 29
+    assert tot_iter == (10 if ML else 29)
     assert tot_solver_setup == n_nodes
     assert tot_solves == n_nodes * tot_iter
     assert tot_rhs == n_nodes * tot_iter + (n_nodes + 1) * len(niter)
 
 
+# %% [markdown]
+# The script runs in three different ways:
+#
+# - `python E_pySDC_with_Firedrake.py` for single-level serial SDC,
+# - `mpiexec -np 3 python E_pySDC_with_Firedrake.py --useMPIsweeper` for single-level SDC, parallel across the nodes,
+# - `python E_pySDC_with_Firedrake.py --ML` for three-level serial SDC.
+#
+# Multilevel SDC reduces the number of SDC iterations quite a bit, but not necessarily the time to solution, partly
+# because more solvers are constructed on the coarse levels, and the parallel variant does the work of one node per
+# rank. The results below show both; mind that they come from a CI machine, not from a dedicated one. We do not claim
+# to have found the best parameters: this is just an example of how to use it.
+
+# %%
 if __name__ == "__main__":
     from argparse import ArgumentParser
 
@@ -201,3 +253,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     runHeatFiredrake(**vars(args))
+
+# %% [markdown]
+# Firedrake does not run in the browser, nor in the environment this website is built in. Our CI runs all three
+# variants in a Firedrake container, and checks their errors and work counts. These are its results, in the run that
+# built this page:
+#
+# :::{literalinclude} /../../data_firedrake/step_7_E_out.txt
+# :language: text
+# :::

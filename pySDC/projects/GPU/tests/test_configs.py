@@ -21,7 +21,7 @@ def create_directories():
     os.makedirs(path, exist_ok=True)
 
 
-def test_run(tmpdir):
+def test_run(tmpdir, monkeypatch):
     from pySDC.projects.GPU.configs.base_config import get_config
     from pySDC.projects.GPU.run_experiment import run_experiment
     from pySDC.helpers.stats_helper import get_sorted
@@ -41,20 +41,16 @@ def test_run(tmpdir):
         'dt': None,
     }
     config = get_config(args)
-    type(config).base_path = args['o']
+    monkeypatch.setattr(type(config), 'base_path', args['o'])
 
     def get_LogToFile(self, *args, **kwargs):
         if self.comms[1].rank > 0:
             return None
         from pySDC.implementations.hooks.log_solution import LogToFile
 
-        LogToFile.filename = self.get_file_name()
-        LogToFile.time_increment = 0
-        LogToFile.allow_overwriting = True
+        return self.get_hook(LogToFile, filename=self.get_file_name(), time_increment=0, allow_overwriting=True)
 
-        return LogToFile
-
-    type(config).get_LogToFile = get_LogToFile
+    monkeypatch.setattr(type(config), 'get_LogToFile', get_LogToFile)
     stats_path = f'{config.base_path}/data/{config.get_path()}-stats-whole-run.pickle'
     file_path = config.get_file_name()
 

@@ -1,8 +1,6 @@
 import pytest
 import sys
 
-from pySDC.tests import fake_cupy
-
 
 @pytest.mark.mpi4py
 @pytest.mark.parametrize('direction', ['x', 'y', 'z', 'mixed'])
@@ -230,9 +228,12 @@ def test_solver_convergence(solver_type, N, left_preconditioner, Dirichlet_recom
     assert error <= P.solver_args['atol'] * 1e3, error
 
     if 'ilu' in solver_type.lower():
-        size_LU = P_direct.cached_factorizations[dt].__sizeof__()
-        size_iLU = P.cached_factorizations[dt].__sizeof__()
-        assert size_iLU < size_LU, 'iLU does not require less memory than LU!'
+        # the cached solvers are Python wrappers of constant size, so compare the nonzeros of the factors
+        A = P.Pl @ P.spectral.put_BCs_in_matrix(P.M + dt * P.L) @ P.Pr
+        ilu_args = {**P.preconditioner_args, 'drop_tol': dt * P.preconditioner_args['drop_tol']}
+        nnz_LU = P.linalg.splu(A).nnz
+        nnz_iLU = P.linalg.spilu(A, **ilu_args).nnz
+        assert nnz_iLU < nnz_LU, f'iLU does not require less memory than LU! ({nnz_iLU=}, {nnz_LU=})'
 
 
 @pytest.mark.mpi4py
@@ -276,7 +277,6 @@ def test_banded_matrix(preconditioning):
 
 
 @pytest.mark.cupy
-@pytest.mark.skipif(fake_cupy.ACTIVE, reason='wraps the communicator in an NCCLComm, which the CPU stub cannot fake')
 def test_heterogeneous_implementation(N=8, useGPU=True):
     from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
 
@@ -310,7 +310,9 @@ def test_Nusselt_number_computation(c, N=6):
     u[iw] = c * (1 + xp.sin(prob.Y / prob.axes[1].L * 2 * xp.pi))
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key, expect in zip(['t', 'b', 'V', 'thermal'], [prob.Lz * (3 + 1) * c - 6, c, c * (1 + 1) - 3, 12]):
+    for key, expect in zip(
+        ['t', 'b', 'V', 'thermal'], [prob.Lz * (3 + 1) * c - 6, c, c * (1 + 1) - 3, 12], strict=True
+    ):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]}'
 
     # zero
@@ -326,7 +328,7 @@ def test_Nusselt_number_computation(c, N=6):
     u[iu] = c * xp.sqrt(5) / 3 * prob.Z**3 + c
     Nu = prob.compute_Nusselt_numbers(u)
 
-    for key, expect in zip(['t', 'b', 'V', 'thermal', 'kinetic'], [-prob.Lz * 2, 0, -1, 4 / 3, 1 + c**2]):
+    for key, expect in zip(['t', 'b', 'V', 'thermal', 'kinetic'], [-prob.Lz * 2, 0, -1, 4 / 3, 1 + c**2], strict=True):
         assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]} with T=z**2!'
 
     # gradient plus fluctuations
@@ -353,6 +355,15 @@ def test_Nusselt_number_computation(c, N=6):
     assert xp.isclose(
         Nu['thermal'], 0
     ), f'Expected Nu_thermal=0, but got {Nu["thermal"]} with constant T and perturbed w!'
+
+    # gradients in two directions at once: the dissipation is |grad T|^2, not (T_x + T_y + T_z)^2
+    kx, ky = 2 * xp.pi / prob.axes[0].L, 2 * xp.pi / prob.axes[1].L
+    u = prob.u_init
+    u[iT] = xp.sin(kx * prob.X + ky * prob.Y)
+    u[iu] = xp.sin(kx * prob.X + ky * prob.Y)
+    Nu = prob.compute_Nusselt_numbers(u)
+    for key, expect in zip(['thermal', 'kinetic'], [(kx**2 + ky**2) / 2, 1 + (kx**2 + ky**2) / 2], strict=True):
+        assert xp.isclose(Nu[key], expect), f'Expected Nu_{key}={expect}, but got {Nu[key]} with T=u=sin(kx x + ky y)!'
 
 
 @pytest.mark.mpi4py
@@ -418,6 +429,50 @@ def test_vertical_profiles():
 
     profile = prob.get_vertical_profiles(u, 'u')
     assert xp.allclose(expect, profile['u'])
+
+
+@pytest.mark.mpi4py
+def test_Nyquist_mode_elimination_in_y_with_different_resolutions():
+    import numpy as np
+    from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
+
+    P = RayleighBenard3D(nx=4, ny=8, nz=4)
+    u = P.solve_system(P.u_exact(noise_level=1e-3), dt=1e-3)
+
+    assert np.allclose(u[:, :, P.axes[1].get_Nyquist_mode_index(), :], 0), 'Nyquist mode in y is not zero'
+    assert not np.allclose(u[:, :, P.axes[0].get_Nyquist_mode_index(), :], 0), 'Removed a resolved mode in y'
+
+
+@pytest.mark.mpi4py
+def test_initial_temperature_noise_vanishes_at_both_plates():
+    import numpy as np
+    from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
+
+    P = RayleighBenard3D(nx=4, ny=4, nz=16, spectral_space=False)
+    iT = P.index('T')
+    noise = P.u_exact(noise_level=1) - P.u_exact(noise_level=0)
+    noise_hat = P.transform(noise, axes=(-1,))[iT]
+
+    # the random noise is only zero at the plates up to interpolation, so not exactly
+    for x in [-1, 1]:
+        at_plate = noise_hat @ P.axes[-1].get_BC(kind='Dirichlet', x=x)
+        assert np.max(np.abs(at_plate)) < 1e-1, f'Temperature noise reaches {np.max(np.abs(at_plate))} at z={x}'
+
+
+@pytest.mark.mpi4py
+def test_initial_conditions_need_zero_vertical_velocity_gradient():
+    import numpy as np
+    from pySDC.implementations.problem_classes.RayleighBenard3D import RayleighBenard3D
+
+    # a horizontal shear flow in y is fine
+    P = RayleighBenard3D(nx=4, ny=4, nz=4, spectral_space=False, BCs={'v_top': 1})
+    iv = P.index('v')
+    assert np.allclose(P.u_exact(noise_level=0)[iv], P.Z)
+
+    # w varying linearly in z is not divergence free
+    P = RayleighBenard3D(nx=4, ny=4, nz=4, BCs={'w_top': 1})
+    with pytest.raises(AssertionError):
+        P.u_exact()
 
 
 if __name__ == '__main__':

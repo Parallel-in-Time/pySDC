@@ -171,6 +171,7 @@ def test_problem_class():
     # Compute errors in drag and lift coefficients
     errors = [abs(dc - rdc), abs(lc - rlc)]
 
-    # Assert that the computed drag and lift coefficients are within the specified tolerances
-    assert errors[0] < 5e-2, f"Error in drag coefficient {errors[0]} exceeds tolerance"
-    assert errors[1] < 5e-2, f"Error in lift coefficient {errors[1]} exceeds tolerance"
+    # Assert that the computed drag and lift coefficients are within the specified tolerances. On this
+    # coarse mesh the measured errors are 1.17e-2 (drag) and 6.9e-5 (lift, which is itself only 2.3e-4)
+    assert errors[0] < 2e-2, f"Error in drag coefficient {errors[0]} exceeds tolerance"
+    assert errors[1] < 1e-4, f"Error in lift coefficient {errors[1]} exceeds tolerance"

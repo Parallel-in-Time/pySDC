@@ -14,7 +14,7 @@ class EstimatePolynomialError(ConvergenceController):
     instance.
     If the last node is not the end point, we can interpolate to that node, which is an order M approximation and compare
     to the order 2M approximation we get from the extrapolation step.
-    By default, we interpolate to the second to last node.
+    By default, we interpolate to the second to last node, or to the end point for Gauss nodes, where it is not a node.
     """
 
     def setup(self, controller, params, description, **kwargs):
@@ -93,6 +93,11 @@ class EstimatePolynomialError(ConvergenceController):
             buf = b[0] * 0.0
             for i in range(0, A.shape[0]):
                 index = self.comm.rank + (1 if self.comm.rank < self.params.estimate_on_node - 1 else 0)
+                # `zeros_like` gives a bare array on CuPy, where NumPy would keep the datatype:
+                # CuPy has no `subok`. That is fine here, since this is only a send buffer and
+                # needs a device pointer rather than a datatype. Do not "tidy" it into
+                # `res[0] * 0.0`, which would keep the type but propagate `NaN` -- and `res` is a
+                # residual, so it is `NaN` exactly when a solve has already gone wrong.
                 send_buf = (
                     (A[i, index] * b[index])
                     if self.comm.rank != self.params.estimate_on_node - 1
@@ -102,15 +107,21 @@ class EstimatePolynomialError(ConvergenceController):
                 res[i] += buf
             return res
         else:
-            return A @ xp.asarray(b)
+            # `asarray` stacks the vector into a single array, and CuPy builds that through
+            # `copy`, which asserts -- with no message -- when it is handed back an `ndarray`
+            # subclass instead of the base type. `cupy_mesh.copy` returns `type(self)` on
+            # purpose, so that a copied mesh stays a mesh, which makes every datatype here such a
+            # subclass. NumPy has no such restriction, but dropping the wrapper is right either
+            # way: what this wants is the numbers, not the datatype.
+            return A @ xp.asarray([entry.view(xp.ndarray) for entry in b])
 
     def get_interpolated_solution(self, L, xp):
         """
         Get the interpolated solution for numpy or cupy data types
 
         Args:
-            u_vec (array): Vector of solutions
-            prob (pySDC.problem): Problem
+            L (pySDC.level): The level holding the solutions at the collocation nodes
+            xp: The array module of the data, numpy or cupy
         """
         coll = L.sweep.coll
 
@@ -164,14 +175,18 @@ class EstimatePolynomialError(ConvergenceController):
                 rank = estimate_on_node - 1
                 L.status.order_embedded_estimate = coll.num_nodes * 1
 
-            rescale = float(abs(u_inter).max()) if self.params.rel_error else 1
+            if not self.comm or self.comm.rank == rank:
+                error = abs(u_inter - high_order_sol)
+                if self.params.rel_error:
+                    # the norm of the datatype, as for the error: `u_inter` may be a bare array
+                    error /= abs(high_order_sol)
 
             if self.comm:
-                buf = np.array(abs(u_inter - high_order_sol) / rescale if self.comm.rank == rank else 0.0)
+                buf = np.array(error if self.comm.rank == rank else 0.0)
                 self.comm.Bcast(buf, root=rank)
                 L.status.error_embedded_estimate = float(buf)
             else:
-                L.status.error_embedded_estimate = abs(u_inter - high_order_sol) / rescale
+                L.status.error_embedded_estimate = error
 
             self.debug(
                 f'Obtained error estimate: {L.status.error_embedded_estimate:.2e} of order {L.status.order_embedded_estimate}',
@@ -198,6 +213,10 @@ class EstimatePolynomialError(ConvergenceController):
 
 
 class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
+    """
+    Polynomial interpolation error estimate for Firedrake functions, combining the node solutions term by term.
+    """
+
     def matmul(self, A, b):
         """
         Matrix vector multiplication, possibly MPI parallel.
@@ -233,14 +252,14 @@ class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
 
             return res
 
-    def get_interpolated_solution(self, L):
+    def get_interpolated_solution(self, L, xp=None):
         """
-        Get the interpolated solution for Firedrake data types
-        We are not 100% sure that you don't need to invert the mass matrix here, but should be fine.
+        Get the interpolated solution for Firedrake data types. The nodes hold solutions, not mass matrix applied to
+        them, so interpolating them needs no mass matrix.
 
         Args:
-            u_vec (array): Vector of solutions
-            prob (pySDC.problem): Problem
+            L (pySDC.level): The level holding the solutions at the collocation nodes
+            xp: Not used, Firedrake data is not an array; accepted because the base class passes it
         """
         coll = L.sweep.coll
 
@@ -250,4 +269,3 @@ class EstimatePolynomialErrorFiredrake(EstimatePolynomialError):
             if i != self.params.estimate_on_node
         ]
         return L.prob.dtype_u(self.matmul(self.interpolation_matrix, u)[0])
-        # return L.prob.invert_mass_matrix(self.matmul(self.interpolation_matrix, u)[0])
