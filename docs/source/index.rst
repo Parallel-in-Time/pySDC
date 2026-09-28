@@ -13,25 +13,6 @@ pySDC
    :bdg-secondary:`NumPy` :bdg-secondary:`CuPy` :bdg-secondary:`FEniCS` :bdg-secondary:`Firedrake`
    :bdg-secondary:`PETSc` :bdg-secondary:`MPI`
 
-.. code-block:: python
-
-   from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
-   from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-   from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
-   description = {
-       'problem_class': heatNd_forced,
-       'problem_params': {'nvars': 128, 'nu': 0.1},
-       'sweeper_class': imex_1st_order,
-       'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT'},
-       'level_params': {'dt': 0.1, 'restol': 1e-10},
-       'step_params': {'maxiter': 20},
-   }
-   # four time steps, iterated simultaneously (multi-step SDC); add levels to get PFASST
-   controller = controller_nonMPI(num_procs=4, controller_params={}, description=description)
-   u0 = controller.MS[0].levels[0].prob.u_exact(0)
-   uend, stats = controller.run(u0=u0, t0=0, Tend=0.4)
-
 Try it
 ------
 
@@ -44,8 +25,30 @@ One time step of the Allen-Cahn equation
 on 128 periodic grid points, with the collocation problem solved by SDC, or by two-level MLSDC with 64 points on the
 coarse level. The equation is nonlinear and, for a thin interface ε, stiff; the implicit preconditioners solve each node with Newton's method.
 The plot shows the residual of the collocation problem after each iteration. It runs in your browser, with
-`Pyodide <https://pyodide.org>`__; nothing is installed. The code is
-`landing_demo.py <https://github.com/Parallel-in-Time/pySDC/blob/master/docs/source/_static/landing_demo.py>`__.
+`Pyodide <https://pyodide.org>`__; nothing is installed. Its default setup, written out in pySDC, is below; the form
+changes the time step, the preconditioner, the nodes, the levels and the interface width (the whole demo is
+`landing_demo.py <https://github.com/Parallel-in-Time/pySDC/blob/master/docs/source/_static/landing_demo.py>`__):
+
+.. code-block:: python
+
+   from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_periodic_fullyimplicit
+   from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+   from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+   from pySDC.helpers.stats_helper import get_sorted
+
+   description = {
+       'problem_class': allencahn_periodic_fullyimplicit,
+       'problem_params': {'nvars': 128, 'eps': 0.04, 'dw': 0.0, 'newton_tol': 1e-12},
+       'sweeper_class': generic_implicit,
+       'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT', 'QI': 'LU', 'initial_guess': 'spread'},
+       'level_params': {'dt': 0.1, 'restol': 1e-10},
+       'step_params': {'maxiter': 30},
+   }
+   # one time step, the collocation problem solved by SDC
+   controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 40}, description=description)
+   u0 = controller.MS[0].levels[0].prob.u_exact(0.0)
+   uend, stats = controller.run(u0=u0, t0=0.0, Tend=0.1)
+   residuals = [r for _, r in get_sorted(stats, type='residual_post_iteration', sortby='iter')]
 
 .. landing-demo
 

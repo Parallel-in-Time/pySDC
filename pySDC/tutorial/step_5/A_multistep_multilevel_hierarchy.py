@@ -12,7 +12,9 @@
 #
 # For SDC and MLSDC, one `step` was all we needed. PFASST works on several time steps at once, and a controller
 # represents them simply as a list of steps, its attribute `MS`. The nice thing about going from MLSDC to PFASST is
-# that only one number changes: `num_procs`, the number of time steps the controller computes in parallel.
+# that only one number changes: `num_procs`, the number of time steps the controller works on at once. This
+# controller only emulates working on them in parallel, see the box below; running them really in parallel takes the
+# MPI controller as well, with one process per step.
 
 # %%
 import matplotlib.pyplot as plt
@@ -97,8 +99,8 @@ print('Step 0 and step 1 share their problem:', controller.MS[0].levels[0].prob 
 #   serially: the controller moves all of them through the algorithm together, one stage at a time, and within
 #   each stage it handles one step after another. The `MPI` controllers run them really in parallel and should give
 #   the same results, see [Step 6](../step_6).
-# - In principle, every step could have a different number of levels, and pySDC's data structures allow for that.
-#   The controllers, and the way they create their steps, assume the same number of levels everywhere.
+# - All steps of a controller are created from the same description, so they all have the same levels, as the
+#   check below confirms.
 # :::
 #
 # The check the tests run:

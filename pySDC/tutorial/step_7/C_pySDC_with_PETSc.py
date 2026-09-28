@@ -234,6 +234,10 @@ if __name__ == "__main__":
 # :language: text
 # :::
 #
+# The iterations and the error agree in all three: distributing the spatial problem over processes changes how it is
+# solved, not what, and running the steps in parallel does not change what PFASST computes. Only the time to solution
+# differs, and each time rank prints its own steps.
+#
 # :::{admonition} Important things to note
 # - We need processors in space and time, which can be achieved by `comm.Split` and coloring. The space communicator
 #   is then passed to the problem class.

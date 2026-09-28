@@ -100,6 +100,8 @@ NOT_IN_BROWSER = {
     'tutorial/step_9/E_*': 'it runs on several processes with MPI (mpi4py).',
 }
 nb_execution_excludepatterns = [f'{page}.py' for page in NOT_IN_BROWSER]
+# of those, the parts Colab can run as they are (PyTorch is preinstalled there): they keep their Colab button
+COLAB_TOO = ['tutorial/step_7/D_*']
 BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
     'logo': {'image_light': '_static/pysdc-logo.svg', 'image_dark': '_static/pysdc-logo-dark.svg', 'alt_text': 'pySDC'},
@@ -157,6 +159,7 @@ def write_notebooks(app, exception):
 def add_run_in_browser(app, pagename, templatename, context, doctree):
     reasons = [reason for page, reason in NOT_IN_BROWSER.items() if fnmatch(pagename, page)]
     context['run_unavailable'] = reasons[0] if reasons else None
+    context['colab'] = not reasons or any(fnmatch(pagename, page) for page in COLAB_TOO)
     context['run_in_browser'] = (
         bool(BROWSER_WHEELS) and not reasons and any(fnmatch(pagename, page) for page in BROWSER_PAGES)
     )

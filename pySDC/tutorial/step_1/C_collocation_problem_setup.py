@@ -18,7 +18,8 @@
 #
 # with $A$ the finite-difference Laplacian (times $\nu$). **Collocation** replaces the integral by a quadrature
 # rule on $M$ nodes $t_0 + \tau_m \Delta t$ inside one time step, and demands that the equation holds exactly at
-# these nodes. This is the problem that everything in pySDC ultimately solves.
+# these nodes. Whatever the equation, this collocation problem of one time step is what the methods in pySDC solve;
+# the heat equation is just the example here.
 
 # %%
 import matplotlib.pyplot as plt

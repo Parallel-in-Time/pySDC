@@ -19,6 +19,32 @@
 # in [Part C](C_using_pySDCs_frontend) does it for them.
 # :::
 #
+# ## What SDC iterates
+#
+# [Step 1](../step_1) ended with the collocation problem of one time step, solved directly. For a general
+# right-hand side $f$, it reads
+#
+# $$
+# \vec u = \vec u_0 + \Delta t\, Q\, \vec f(\vec u) ,
+# $$
+#
+# with $\vec u$ the values at the $M$ nodes. SDC solves it iteratively: it replaces the full matrix $Q$, which
+# couples all nodes, by a lower-triangular approximation $Q_\Delta$, and corrects for the difference with the last
+# iterate,
+#
+# $$
+# \vec u^{k+1} - \Delta t\, Q_\Delta\, \vec f(\vec u^{k+1}) = \vec u_0 + \Delta t\, (Q - Q_\Delta)\, \vec f(\vec u^{k}) .
+# $$
+#
+# Because $Q_\Delta$ is lower triangular, this is solved node by node, from the first to the last: one **sweep**, in
+# which each node needs one implicit solve the size of the spatial problem, like a step of implicit Euler. Once the
+# iteration has converged, $\vec u^{k+1} = \vec u^k$, the $Q_\Delta$ terms cancel, and the result solves the
+# collocation problem, whatever $Q_\Delta$ is. $Q_\Delta$ is the **preconditioner** of the iteration: it decides how
+# fast SDC converges, not what it converges to. The sweeper parameter `QI` chooses it: `'IE'` is implicit Euler
+# from node to node, `'LU'`, used below, takes it from the LU decomposition of $Q^T$ (the "LU trick"). How far an
+# iterate is from the solution is measured by the **residual**
+# $\|\vec u_0 + \Delta t\, Q\, \vec f(\vec u^{k}) - \vec u^{k}\|$. [Part B](B_my_first_sweeper) runs this iteration by hand.
+#
 # ## The description
 #
 # A step is created from a single dictionary, the **description**. It names the classes to use and gives each of
