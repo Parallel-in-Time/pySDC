@@ -1,0 +1,32 @@
+docs/source/_templates/notebook-links.html
+  s_619b2228c15391::t_f752df1f7dfebe 10
+docs/source/index.rst
+  s_619b2228c15391::t_ea2e9014833141 30-51
+  s_619b2228c15391::t_fea11be79f43ce 28-29
+pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
+  s_619b2228c15391::t_444c8d1dd61562 237-240
+pySDC/tutorial/step_5/A_multistep_multilevel_hierarchy.py
+  s_619b2228c15391::t_b63b1cb24c6436 15-17,102-103
+pySDC/tutorial/step_2/A_step_data_structure.py
+  s_619b2228c15391::t_b63b1cb24c6436 22-47
+pySDC/tutorial/step_1/C_collocation_problem_setup.py
+  s_619b2228c15391::t_b63b1cb24c6436 21-22
+docs/source/conf.py
+  s_619b2228c15391::t_f752df1f7dfebe 103-104,162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b8e4c95849079f5d9ebcee80867cb69b87c1bfb0",
+  "prompts": {},
+  "sessions": {
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
