@@ -55,3 +55,42 @@ def test_dispersion():
 
     compute_and_plot_dispersion(Nsamples=3, K=4)
     compute_and_plot_dispersion(Nsamples=3, K=5)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('K', [2, 3, 5])
+@pytest.mark.parametrize('num_nodes', [2, 3])
+def test_system_stability_matches_scalar(K, num_nodes):
+    """
+    The acoustic-advection stability matrix used for the dispersion plots has to be the scalar IMEX-SDC
+    stability function of imex_1st_order, applied mode by mode: Uadv is a multiple of the identity, so it
+    commutes with Cs and both diagonalize in the eigenvectors of Cs. The scalar K-sweep matrix is itself
+    checked against actual sweeps in pySDC/tests/test_sweepers/test_imexsweeper.py.
+    """
+    from pySDC.core.step import Step
+    from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
+    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+    from pySDC.projects.FastWaveSlowWave.plot_dispersion import sdc_system_stability
+
+    description = {
+        'problem_class': swfw_scalar,
+        'problem_params': {'lambda_s': np.array([0.0]), 'lambda_f': np.array([0.0]), 'u0': 1.0},
+        'sweeper_class': imex_1st_order,
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'do_coll_update': True, 'num_nodes': num_nodes},
+        'level_params': {'dt': 1.0},
+        'step_params': {},
+    }
+    L = Step(description=description).levels[0]
+    weights, ones = L.sweep.coll.weights, np.ones(num_nodes)
+
+    for k in np.linspace(0, np.pi, 6)[1:]:
+        Cs = -1j * k * np.array([[0.0, 1.0], [1.0, 0.0]])
+        lam_slow = -1j * k * 0.05
+        stab = sdc_system_stability(L, Cs, lam_slow * np.eye(2), K)
+
+        lam_fast, V = np.linalg.eig(Cs)
+        R = [
+            1 + (lf + lam_slow) * weights @ L.sweep.get_scalar_problems_manysweep_mat(K, [lf, lam_slow]) @ ones
+            for lf in lam_fast
+        ]
+        assert np.allclose(stab, V @ np.diag(R) @ np.linalg.inv(V), atol=1e-13, rtol=0)
