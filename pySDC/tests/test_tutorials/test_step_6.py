@@ -1,19 +1,27 @@
 import pytest
 
 
+def _run(part):
+    """The parts are notebook-style scripts, so running one is the test: afresh every time, and closing its figures"""
+    import runpy
+
+    import matplotlib.pyplot as plt
+
+    try:
+        runpy.run_module(f'pySDC.tutorial.step_6.{part}', run_name='__main__')
+    finally:
+        plt.close('all')
+
+
+# Parts A and B write the results Part C's comparison below reads, so they run in the same (mpi4py) job
 @pytest.mark.mpi4py
 def test_A():
-    from pySDC.tutorial.step_6.A_run_non_MPI_controller import main as main_A
-
-    main_A(num_proc_list=[1], fname='step_6_A_sl_out.txt', multi_level=False)
-    main_A(num_proc_list=[1, 2, 4, 8], fname='step_6_A_ml_out.txt', multi_level=True)
+    _run('A_run_non_MPI_controller')
 
 
 @pytest.mark.mpi4py
 def test_B():
-    from pySDC.tutorial.step_6.B_odd_temporal_distribution import main as main_B
-
-    main_B()
+    _run('B_odd_temporal_distribution')
 
 
 # Part C writes two output files: one with the rank counts Part A's multi-level run used, one with
@@ -31,18 +39,10 @@ def test_C_run():
     One file per rank count, so the passes do not have to agree on who truncates what; `test_C`
     below stitches them into the two files the tutorial shows.
     """
-    from pathlib import Path
-    from mpi4py import MPI
-    from pySDC.tutorial.step_6.C_MPI_parallelization import main
+    import runpy
 
-    comm = MPI.COMM_WORLD
-    fname = f'step_6_C_np{comm.size}.txt'
-    if comm.rank == 0:
-        Path('data').mkdir(parents=True, exist_ok=True)
-        open('data/' + fname, 'w').close()
-    comm.Barrier()
-
-    main(fname)
+    # it writes data/step_6_C_np<ranks>.txt itself
+    runpy.run_module('pySDC.tutorial.step_6.C_MPI_parallelization', run_name='__main__')
 
 
 def _results(fname):

@@ -1,7 +1,7 @@
 RDC: Rational Deferred Corrections
 ==================================
 
-In this project, we integrate the rational deferred correction (RDC) method by Guettel & Klein from `this paper <http://etna.mcs.kent.edu/volumes/2011-2020/vol41/abstract.php?vol=41&pages=443-464>`_.
+In this project, we integrate the rational deferred correction (RDC) method by Guettel & Klein from `this paper <https://etna.ricam.oeaw.ac.at/volumes/2011-2020/vol41/abstract.php?vol=41&pages=443-464>`_.
 This is done by deriving from the equidistant collocation class, but replacing Scipy's standard BarycentricInterpolator with a custom ``MyBarycentricInterpolator``, where the blended nodes are used.
 The rest is standard pySDC and all features are available.
 

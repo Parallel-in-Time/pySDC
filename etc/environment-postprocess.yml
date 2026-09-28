@@ -6,6 +6,12 @@ channels:
 dependencies:
   - coverage[toml]
   - sphinx
+  - pydata-sphinx-theme
+  - sphinx-design
+  - sphinx-copybutton
+  - myst-nb
+  - jupytext
+  - ipykernel
   - numpy
   - scipy
   - matplotlib

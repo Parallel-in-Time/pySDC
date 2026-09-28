@@ -1,21 +1,12 @@
 Spectral Deferred Correction Methods for Second-Order Problems
 ==============================================================
 
-Python code for implementing the paper's plots on Second-order SDC methods.
+Python code for the plots of the paper
+`Spectral Deferred Correction Methods for Second-Order Problems <https://doi.org/10.1137/23M1592596>`_
+by Akramov, Götschel, Minion, Ruprecht and Speck (SIAM Journal on Scientific Computing, 2024).
 
 You are welcome to use and adapt this code under the terms of the BSD license.
-If you utilize it, either in whole or in part, for a publication, please provide proper citation:
-
-.. code-block:: tex
-
-    @misc{akramov2023spectral,
-        title={Spectral deferred correction methods for second-order problems},
-       author={Ikrom Akramov and Sebastian Götschel and Michael Minion and Daniel Ruprecht and Robert Speck},
-       year={2023},
-       eprint={2310.08352},
-       archivePrefix={arXiv},
-       primaryClass={math.NA}}
-
+If you use it, in whole or in part, for a publication, please cite the paper.
 
 Reproducing Figures from the Publication
 ----------------------------------------

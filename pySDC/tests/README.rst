@@ -7,5 +7,5 @@ Code coverage: |badge-cc|
 
 .. |badge-ga| image:: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg
     :target: https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml
-.. |badge-cc| image:: ../../htmlcov/coverage-badge.svg
-    :target: ./coverage/index.html
+.. |badge-cc| image:: https://parallel-in-time.org/pySDC/coverage/coverage-badge.svg
+    :target: https://parallel-in-time.org/pySDC/coverage/index.html

@@ -1,29 +1,24 @@
+import runpy
+
 import pytest
 
 
+# The parts are notebook-style scripts, so running one is the test. run_module executes them afresh every time,
+# also when another tutorial has imported them already.
 @pytest.mark.base
-def test_A():
-    from pySDC.tutorial.step_1.A_spatial_problem_setup import main as main_A
+@pytest.mark.parametrize(
+    'part',
+    [
+        'A_spatial_problem_setup',
+        'B_spatial_accuracy_check',
+        'C_collocation_problem_setup',
+        'D_collocation_accuracy_check',
+    ],
+)
+def test_part(part):
+    import matplotlib.pyplot as plt
 
-    main_A()
-
-
-@pytest.mark.base
-def test_B():
-    from pySDC.tutorial.step_1.B_spatial_accuracy_check import main as main_B
-
-    main_B()
-
-
-@pytest.mark.base
-def test_C():
-    from pySDC.tutorial.step_1.C_collocation_problem_setup import main as main_C
-
-    main_C()
-
-
-@pytest.mark.base
-def test_D():
-    from pySDC.tutorial.step_1.D_collocation_accuracy_check import main as main_D
-
-    main_D()
+    try:
+        runpy.run_module(f'pySDC.tutorial.step_1.{part}', run_name='__main__')
+    finally:
+        plt.close('all')  # the parts leave their figures open, as a notebook does

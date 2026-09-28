@@ -21,6 +21,7 @@ class penningtrap_coarse(penningtrap):
 
         N = self.nparts
 
+        self.work_counters['rhs']()  # count the evaluations, as the fine problem does
         Emat = np.diag([1, 1, -2])
         f = self.dtype_f(self.init, val=0.0)
 

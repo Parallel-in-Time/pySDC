@@ -1,0 +1,153 @@
+# The project gallery on the website, rendered by docs/source/conf.py.
+#
+# One entry per project: the title and the one-line summary on its card, and the page it links to (in
+# docs/source/projects/). The optional image is a path from the repository root, usually a plot the project's
+# tests write into data/ in CI, so that the card shows what the current code produces. Without one, the optional
+# excerpt shows a text file the tests write (with lines) or a passage of the code (between start-at and end-at or
+# end-before, texts that have to be in the file). The optional papers are the DOIs of the publications done with the
+# project, which its page lists; docs/update_publications.py fetches their metadata into
+# docs/source/project_papers.json. A paper without a DOI is given in full, with title, authors, venue, year, type
+# (the BibTeX entry type) and url. See
+# docs/contrib/06_new_project.md for adding a project.
+
+- section: Methods and analysis
+  projects:
+    - title: The pySDC paper
+      page: TOMS
+      papers:
+        - 10.1145/3310410
+      image: data/runtimes_matrix_heat.png
+      summary: SDC variants for the Allen-Cahn equation, and space-time parallel heat equation runs with PETSc, from ACM TOMS.
+    - title: Parallel SDC
+      page: parallelSDC
+      papers:
+        - 10.1007/s00791-018-0298-x
+      image: data/parallelSDC_preconditioner_heat.png
+      summary: Strategies to parallelize SDC across the collocation nodes, within each iteration.
+    - title: Parallel SDC across the method, reloaded
+      page: parallelSDC_reloaded
+      papers:
+        - 10.1137/24M1649800
+      excerpt:
+        file: pySDC/projects/parallelSDC_reloaded/scripts/fig05_allenCahn.py
+        start-at: 'def getCost(counters):'
+        end-before: '# The reference solution depends only'
+      summary: The numerical experiments of the paper on parallel SDC by Čaklović, Lunet, Götschel and Ruprecht.
+    - title: Fast-wave slow-wave SDC
+      page: fwsw
+      papers:
+        - 10.1137/16M1060078
+      image: data/boussinesq.png
+      summary: Semi-implicit SDC for fast waves, compared with RK-IMEX and DIRK schemes, and its stability.
+    - title: Rational deferred corrections
+      page: RDC
+      excerpt:
+        file: pySDC/projects/RDC/equidistant_RDC.py
+        start-at: 'for k in range(0, n + 1):'
+        end-at: 'w[k] = np.sum(y)'
+      summary: The RDC method of Güttel and Klein, with equidistant nodes and a blended barycentric interpolant.
+    - title: Asymptotic convergence of PFASST
+      page: asymp_conv
+      papers:
+        - 10.1002/nla.2208
+      image: data/conv_test_niter_NS3.png
+      summary: How PFASST converges for linear problems, in the stiff and in the non-stiff limit.
+    - title: Matrix-based PFASST
+      page: matrixPFASST
+      excerpt:
+        file: data/comparison_matrix_vs_propagator_detail.txt
+        lines: 1-4
+        language: text
+      summary: PFASST for linear problems, written as a two-grid method and as a propagation matrix.
+    - title: SDC for second-order problems
+      page: second_order
+      papers:
+        - 10.1137/23M1592596
+      excerpt:
+        file: pySDC/projects/Second_orderSDC/stability_simulation.py
+        start-at: '# Define Collocation matrix to find for the stability function'
+        end-before: '# Zeros matrices to store'
+      summary: The figures of the paper by Akramov, Götschel, Minion, Ruprecht and Speck.
+    - title: Hamiltonian systems with Verlet-SDC
+      page: Hamiltonian
+      image: data/fput_positions.png
+      summary: The harmonic oscillator, Hénon-Heiles, Fermi-Pasta-Ulam-Tsingou and the solar system.
+    - title: What is the fastest SDC variant?
+      page: SDC_showdown
+      image: data/timings_SDC_variants_GrayScott.png
+      summary: Fully, semi- and multi-implicit SDC with PETSc, for the Fisher and the Gray-Scott equations.
+    - title: Differential-algebraic equations
+      page: DAE
+      papers:
+        - 10.1007/s10915-026-03385-7
+        - 10.48550/arXiv.2606.25908
+      excerpt:
+        file: pySDC/projects/DAE/sweepers/fullyImplicitDAE.py
+        start-at: '# do the sweep'
+        end-at: 'L.u[m + 1] = L.u[0] + integral[m]'
+      summary: Sweepers, problems and scripts for solving differential-algebraic equations with SDC.
+
+- section: Applications
+  projects:
+    - title: Allen-Cahn problems from Bayreuth
+      page: AllenCahn_Bayreuth
+      image: data/AC-test-noforce_radii.png
+      summary: Allen-Cahn-type problems from materials science, for correctness, parallelization and benchmarks.
+    - title: Energy systems with discrete events
+      page: PinTSimE
+      image: data/detection_and_adaptivity_battery_dt=0.01_M=4.png
+      summary: Components of DC microgrids and a battery, with switches, and an estimator that restarts SDC at the events.
+    - title: Exponential SDC for the heart
+      page: monodomain
+      papers:
+        - 10.48550/arXiv.2405.19994
+      image: data_monodomain/stability_domain_IMEXEXP_EXPRK.png
+      summary: Exponential SDC for the monodomain equation of cardiac electrophysiology.
+    - title: Rayleigh-Bénard convection
+      page: RayleighBenard
+      excerpt:
+        file: pySDC/projects/RayleighBenard/RBC3D_configs.py
+        start-at: 'desc[''sweeper_params''][''quad_type''] = ''RADAU-RIGHT'''
+        end-at: 'desc[''problem_params''][''dealiasing''] = self.dealiasing'
+      summary: 3D convection with spectral methods, SDC and Runge-Kutta, from CPUs to large GPU runs.
+    - title: StrömungsRaum
+      page: StroemungsRaum
+      excerpt:
+        file: pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_FEniCS.py
+        start-at: 'F = df.dot(u, self.v) * df.dx'
+        end-at: 'self.step = NewtonStep(F, df.derivative(F, self.w))'
+      summary: SDC with FEniCS for heat, convection-diffusion and incompressible Navier-Stokes flows.
+
+- section: High-performance computing
+  projects:
+    - title: Performance analysis
+      page: performance
+      papers:
+        - 10.1007/978-3-030-75933-9_3
+      image: pySDC/projects/Performance/vampir_traces_pySDC_AC_4x2_intel_v2.png
+      summary: Space-time parallel runs traced with Score-P and Vampir, to understand their parallel performance.
+    - title: Resilience
+      page: Resilience
+      papers:
+        - 10.1007/s11075-024-01964-z
+        - 10.1007/978-3-032-17810-7_2
+        - 10.34734/fzj-2026-03360
+      image: data/piline_hotrod_adaptive_1procs.png
+      summary: Adaptivity and Hot Rod against bit flips, e.g. from radiation, and fault statistics.
+    - title: Soft faults
+      page: soft_failure
+      image: data/vanderpol_500_runs_min_max_residuals.png
+      summary: Bit flips injected into SDC sweeps, a detector for them, and its statistics over 500 runs.
+    - title: Lossy compression
+      page: compression
+      image: data_libpressio/compression_order_time_advection_d=1.00e-06_n=1_MPI=False.png
+      summary: Compressing the data SDC keeps at the collocation nodes, and what it costs in accuracy.
+    - title: pySDC on GPUs
+      page: GPU
+      papers:
+        - 10.34734/fzj-2026-03360
+      excerpt:
+        file: pySDC/projects/GPU/heat.py
+        start-at: '# change description dictionary for GPU problem'
+        end-at: 'assert abs(uend_gpu.get() - uend_cpu)'
+      summary: Running pySDC on GPUs with CuPy, up to large problems, and the plots of Thomas Baumann's thesis.
