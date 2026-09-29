@@ -70,7 +70,7 @@
 | pySDC/implementations/hooks/log\_errors.py                                                          |       50 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_extrapolated\_error\_estimate.py                                   |        6 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_restarts.py                                                        |        6 |        0 |    100% |           |
-| pySDC/implementations/hooks/log\_solution.py                                                        |      144 |        6 |     96% |173, 286-287, 348, 388, 417 |
+| pySDC/implementations/hooks/log\_solution.py                                                        |      144 |        4 |     97% |173, 349, 389, 419 |
 | pySDC/implementations/hooks/log\_step\_size.py                                                      |        6 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_work.py                                                            |       18 |        0 |    100% |           |
 | pySDC/implementations/hooks/plotting.py                                                             |        2 |        0 |    100% |           |
@@ -127,7 +127,7 @@
 | pySDC/implementations/problem\_classes/boussinesq\_helpers/unflatten.py                             |        7 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/generic\_MPIFFT\_Laplacian.py                                |       89 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/generic\_ND\_FD.py                                           |       96 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/generic\_spectral.py                                         |      244 |       42 |     83% |117, 271-273, 340-342, 357-358, 395, 411, 454, 476, 479, 514, 521-526, 546-583 |
+| pySDC/implementations/problem\_classes/generic\_spectral.py                                         |      244 |       41 |     83% |117, 271-273, 340-342, 357-358, 395, 411, 454, 479, 514, 521-526, 546-583 |
 | pySDC/implementations/problem\_classes/nonlinear\_ODE\_1.py                                         |       41 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/odeScalar.py                                                 |       53 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/odeSystem.py                                                 |      187 |        6 |     97% |602-615, 951-964 |
@@ -374,6 +374,7 @@
 | pySDC/tutorial/step\_3/A\_getting\_statistics.py                                                    |       42 |        0 |    100% |           |
 | pySDC/tutorial/step\_3/B\_adding\_statistics.py                                                     |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_3/C\_study\_collocations.py                                                    |       42 |        0 |    100% |           |
+| pySDC/tutorial/step\_3/D\_writing\_solutions\_to\_file.py                                           |       50 |        0 |    100% |           |
 | pySDC/tutorial/step\_3/HookClass\_Particles.py                                                      |       49 |        0 |    100% |           |
 | pySDC/tutorial/step\_4/A\_spatial\_transfer\_operators.py                                           |       51 |        0 |    100% |           |
 | pySDC/tutorial/step\_4/B\_multilevel\_hierarchy.py                                                  |       18 |        0 |    100% |           |
@@ -405,7 +406,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32606** | **4048** | **88%** |           |
+| **TOTAL**                                                                                           | **32656** | **4045** | **88%** |           |
 
 44 empty files skipped.
 
