@@ -1,7 +1,7 @@
 import pytest
 
 
-def run(hook, Tend=0, ODE=True, t0=0):
+def run(hook, Tend=0, ODE=True, t0=0, dt=1.0e-2):
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.helpers.fieldsIO import FieldsIO
 
@@ -16,7 +16,7 @@ def run(hook, Tend=0, ODE=True, t0=0):
 
         problem_params = {'nx': 16, 'nz': 8, 'spectral_space': False}
 
-    level_params = {'dt': 1.0e-2}
+    level_params = {'dt': dt}
 
     sweeper_params = {
         'num_nodes': 1,
@@ -149,6 +149,21 @@ def test_errors_FieldsIO(tmpdir):
     hook.allow_overwriting = False
     with pytest.raises(DataError):
         run(**run_kwargs, t0=0.1)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('hook_name', ['LogToPickleFileAfterXS', 'LogToFile'])
+def test_logging_times(tmpdir, hook_name):
+    """Steps finer than the time increment log at its multiples, although the accumulated times round away from them."""
+    import pySDC.implementations.hooks.log_solution as log_solution
+    import numpy as np
+
+    attrs = {'path': str(tmpdir), 'filename': f'{tmpdir}/times.pySDC', 'time_increment': 0.1, 'counter': 0}
+    hook = type(hook_name, (getattr(log_solution, hook_name),), attrs)
+    run(hook, Tend=0.5, dt=0.05)
+
+    times = [hook.load(i)['t'] for i in range(hook.counter)]
+    assert np.allclose(times, np.arange(6) * 0.1), times
 
 
 @pytest.mark.base

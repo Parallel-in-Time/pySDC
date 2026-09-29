@@ -282,7 +282,8 @@ class LogToPickleFileAfterXS(LogToPickleFile):
         if self.t_next_log == 0:
             self.t_next_log = self.time_increment
 
-        if L.time + L.dt >= self.t_next_log and not step.status.restart:
+        # rounding in the accumulated step times must not skip a logging time
+        if L.time + L.dt >= self.t_next_log - np.finfo(float).eps * 1000 and not step.status.restart:
             super().post_step(step, level_number)
             self.t_next_log = max([L.time + L.dt, self.t_next_log]) + self.time_increment
         else:
@@ -392,7 +393,8 @@ class LogToFile(Hooks):
         if self.t_next_log == 0:
             self.t_next_log = L.time + self.time_increment
 
-        if L.time + L.dt >= self.t_next_log and not step.status.restart:
+        # rounding in the accumulated step times must not skip a logging time
+        if L.time + L.dt >= self.t_next_log - np.finfo(float).eps * 1000 and not step.status.restart:
             value_exists = True in [abs(me - (L.time + L.dt)) < np.finfo(float).eps * 1000 for me in self.outfile.times]
             if value_exists and not self.allow_overwriting:
                 raise DataError(f'Already have recorded data for time {L.time + L.dt} in this file!')
