@@ -76,12 +76,12 @@
 | pySDC/implementations/hooks/plotting.py                                                             |        2 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/AcousticAdvection\_1D\_FD\_imex.py                           |       52 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/AdvectionDiffusionEquation\_1D\_FFT.py                       |       63 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/AdvectionEquation\_ND\_FD.py                                 |       23 |        8 |     65% |   115-125 |
+| pySDC/implementations/problem\_classes/AdvectionEquation\_ND\_FD.py                                 |       23 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/AllenCahn\_1D\_FD.py                                         |      225 |       10 |     96% |   474-485 |
 | pySDC/implementations/problem\_classes/AllenCahn\_2D\_FD.py                                         |      212 |        8 |     96% |243, 316-319, 441-445 |
 | pySDC/implementations/problem\_classes/AllenCahn\_2D\_FFT.py                                        |       85 |       10 |     88% |106, 232-245 |
 | pySDC/implementations/problem\_classes/AllenCahn\_MPIFFT.py                                         |       92 |        8 |     91% |167, 229, 236, 243, 249, 264, 271, 277 |
-| pySDC/implementations/problem\_classes/AllenCahn\_Temp\_MPIFFT.py                                   |      126 |       22 |     83% |279-303, 319-321 |
+| pySDC/implementations/problem\_classes/AllenCahn\_Temp\_MPIFFT.py                                   |      126 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Auzinger\_implicit.py                                        |       38 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Battery.py                                                   |      165 |        2 |     99% |     82-83 |
 | pySDC/implementations/problem\_classes/Boussinesq\_2D\_FD\_imex.py                                  |       67 |        1 |     99% |       108 |
@@ -98,11 +98,11 @@
 | pySDC/implementations/problem\_classes/GrayScott\_1D\_FEniCS\_implicit.py                           |      116 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/GrayScott\_2D\_PETSc\_periodic.py                            |      305 |        2 |     99% |  175, 281 |
 | pySDC/implementations/problem\_classes/GrayScott\_MPIFFT.py                                         |      297 |        6 |     98% |266-277, 290-291 |
-| pySDC/implementations/problem\_classes/HarmonicOscillator.py                                        |       54 |       17 |     69% |71-78, 102-111, 114-121 |
+| pySDC/implementations/problem\_classes/HarmonicOscillator.py                                        |       53 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/HeatEquation\_1D\_FEniCS\_matrix\_forced.py                  |      123 |        9 |     93% |191-193, 228-233 |
 | pySDC/implementations/problem\_classes/HeatEquation\_2D\_PETSc\_forced.py                           |       90 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/HeatEquation\_Chebychev.py                                   |      220 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/HeatEquation\_ND\_FD.py                                      |       66 |        8 |     88% |88, 107, 118-119, 237-238, 273-274 |
+| pySDC/implementations/problem\_classes/HeatEquation\_ND\_FD.py                                      |       68 |        2 |     97% |   88, 107 |
 | pySDC/implementations/problem\_classes/HeatFiredrake.py                                             |       63 |        1 |     98% |       169 |
 | pySDC/implementations/problem\_classes/HenonHeiles.py                                               |       31 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/LogisticEquation.py                                          |       40 |       20 |     50% |   119-155 |
@@ -126,7 +126,7 @@
 | pySDC/implementations/problem\_classes/boussinesq\_helpers/standard\_integrators.py                 |      394 |      112 |     72% |21-25, 28-32, 36-50, 266-271, 274-276, 282, 288-301, 309-313, 316, 319-320, 326, 332-345, 372-378, 459-466, 472, 492-496, 499-511, 514-526, 551-580 |
 | pySDC/implementations/problem\_classes/boussinesq\_helpers/unflatten.py                             |        7 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/generic\_MPIFFT\_Laplacian.py                                |       89 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/generic\_ND\_FD.py                                           |       96 |        2 |     98% |   156-157 |
+| pySDC/implementations/problem\_classes/generic\_ND\_FD.py                                           |       96 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/generic\_spectral.py                                         |      244 |       42 |     83% |117, 271-273, 340-342, 357-358, 395, 411, 454, 476, 479, 514, 521-526, 546-583 |
 | pySDC/implementations/problem\_classes/nonlinear\_ODE\_1.py                                         |       41 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/odeScalar.py                                                 |       53 |        0 |    100% |           |
@@ -201,7 +201,7 @@
 | pySDC/projects/FEM\_with\_FEniCS/setups.py                                                          |       69 |        0 |    100% |           |
 | pySDC/projects/FastWaveSlowWave/AcousticAdvection\_1D\_FD\_imex\_multiscale.py                      |       13 |        0 |    100% |           |
 | pySDC/projects/FastWaveSlowWave/HookClass\_acoustic.py                                              |       12 |        0 |    100% |           |
-| pySDC/projects/FastWaveSlowWave/plot\_dispersion.py                                                 |      115 |        3 |     97% | 28, 32-33 |
+| pySDC/projects/FastWaveSlowWave/plot\_dispersion.py                                                 |      111 |        3 |     97% | 28, 32-33 |
 | pySDC/projects/FastWaveSlowWave/plot\_stab\_vs\_k.py                                                |       62 |        3 |     95% |     83-85 |
 | pySDC/projects/FastWaveSlowWave/plot\_stability.py                                                  |       75 |        4 |     95% | 87, 91-93 |
 | pySDC/projects/FastWaveSlowWave/plot\_stifflimit\_specrad.py                                        |       82 |        4 |     95% |     85-89 |
@@ -405,7 +405,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32607** | **4103** | **87%** |           |
+| **TOTAL**                                                                                           | **32604** | **4048** | **88%** |           |
 
 44 empty files skipped.
 
