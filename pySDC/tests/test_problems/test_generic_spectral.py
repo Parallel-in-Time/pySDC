@@ -54,6 +54,17 @@ def test_initial_guess(
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('problem', ['Heat1DChebychev', 'Heat1DUltraspherical'])
+@pytest.mark.parametrize('spectral_space', [True, False])
+def test_u_exact_is_dtype_u(problem, spectral_space):
+    """The controller cannot take a bare array as initial conditions, so `u_exact` must return `dtype_u`."""
+    import pySDC.implementations.problem_classes.HeatEquation_Chebychev as module
+
+    P = getattr(module, problem)(nvars=2**4, spectral_space=spectral_space)
+    assert type(P.u_exact(0)) is P.dtype_u
+
+
+@pytest.mark.base
 def test_right_preconditioner_is_factorized_once(monkeypatch):
     """Iterative solves apply Pr^-1 to the initial guess, whose factorization should be reused, not redone each time."""
     import scipy.sparse.linalg
