@@ -248,7 +248,9 @@ class Heat1DUltraspherical(GenericSpectralLinear):
         self.check_BCs(u)
 
         if self.spectral_space:
-            return self.transform(u)
+            u_hat = self.u_init
+            u_hat[...] = self.transform(u)
+            return u_hat
         else:
             return u
 
