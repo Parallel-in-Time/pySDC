@@ -421,7 +421,7 @@ def add_publications(app, docname, source):
         "If you use pySDC for your work, please cite the paper, and the version of the software you used.",
         '',
     ]
-    lines += ['.. grid:: 1 1 2 2', '   :gutter: 3', '']
+    lines += ['.. grid:: 1 1 1 1', '   :gutter: 3', '']
     lines += ['   .. grid-item-card:: The paper', '']
     lines += [
         f"      {names(paper['authors'])}, **{paper['title']}**, *{paper['journal']}* {paper['volume']}({paper['issue']}),"
