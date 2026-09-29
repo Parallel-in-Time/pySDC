@@ -1,0 +1,30 @@
+pySDC/playgrounds/time_dep_BCs/heat_time_dep_BCs.py
+  s_f5d0618f463037::t_19e9b3efcf7701 90-91
+  s_f5d0618f463037::t_5c6f493daf1671 1-12,15-28,31-32,34,36-89,92-101
+  s_f5d0618f463037::t_e45cad315a5a06 13-14
+  s_f5d0618f463037::t_252aabca001ec4 29-30,33,35
+pySDC/playgrounds/time_dep_BCs/run_time_dep_BCs.py
+  s_f5d0618f463037::t_a2d74c3a1b53a6 20,33
+  s_f5d0618f463037::t_9bb494bcdeb315 1-19,21-32,34-68
+pySDC/playgrounds/time_dep_BCs/test_time_dep_BCs.py
+  s_f5d0618f463037::t_a3146ff757d4d3 1-9,12-34
+  s_f5d0618f463037::t_a2d74c3a1b53a6 10-11
+pySDC/playgrounds/time_dep_BCs/README.rst
+  s_f5d0618f463037::t_5c5f8d081ef5b6 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5425eb5682c491e44231853d3f66d581d3a5bd84",
+  "prompts": {},
+  "sessions": {
+    "s_f5d0618f463037": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8a8807b1-a7d0-4475-b122-01e961450309",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
