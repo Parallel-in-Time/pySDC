@@ -483,7 +483,7 @@ class Rectilinear(Scalar):
         -------
         >>> # Suppose the FieldsIO object is already written into outputs.pysdc
         >>> import os
-        >>> from pySDC.utils.fieldsIO import Rectilinear
+        >>> from pySDC.helpers.fieldsIO import Rectilinear
         >>> os.makedirs("vtrFiles")  # to store all VTR files into a subfolder
         >>> Rectilinear.fromFile("outputs.pysdc").toVTR(
         >>>    baseName="vtrFiles/field", varNames=["u", "v", "w", "T", "p"])
