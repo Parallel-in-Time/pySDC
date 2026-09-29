@@ -697,7 +697,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">check_BCs</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral_space</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+            <span class="n">u_hat</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">u_hat</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">u</span></div>
 </div>
