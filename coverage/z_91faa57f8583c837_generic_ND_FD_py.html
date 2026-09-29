@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/implementations/problem_classes/generic_ND_FD.py: 98%</title>
+    <title>Coverage for pySDC/implementations/problem_classes/generic_ND_FD.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_15cffcd0.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>implementations<span class="sep">/</span>problem_classes<span class="sep">/</span>generic_ND_FD.py</b>:
-            <span class="pc_cov">98%</span>
+            <span class="pc_cov">100%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">96 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">94<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">2<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">96<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">0<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">10<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_generic_spectral_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.2">coverage.py v7.16.2</a>,
-            created at 2026-09-28 13:30 +0000
+            created at 2026-09-29 04:28 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -235,8 +235,8 @@
     <p class="run"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t">        <span class="key">for</span> <span class="nam">f</span> <span class="key">in</span> <span class="nam">freq</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t">            <span class="key">if</span> <span class="nam">ndim</span> <span class="op">==</span> <span class="num">1</span> <span class="key">and</span> <span class="nam">f</span> <span class="op">==</span> <span class="op">-</span><span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t">                <span class="com"># use Gaussian initial solution in 1D</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">                <span class="nam">bc</span> <span class="op">=</span> <span class="str">&#x27;periodic&#x27;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">                <span class="key">break</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">                <span class="nam">bc</span> <span class="op">=</span> <span class="str">&#x27;periodic&#x27;</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">                <span class="key">break</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">            <span class="key">if</span> <span class="nam">f</span> <span class="op">%</span> <span class="num">2</span> <span class="op">!=</span> <span class="num">0</span> <span class="key">and</span> <span class="nam">bc</span> <span class="op">==</span> <span class="str">&#x27;periodic&#x27;</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">                <span class="key">raise</span> <span class="nam">ProblemError</span><span class="op">(</span><span class="str">&#x27;need even number of frequencies due to periodic BCs&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">        <span class="key">for</span> <span class="nam">nvar</span> <span class="key">in</span> <span class="nam">nvars</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -440,7 +440,7 @@
             <a class="nav" href="z_91faa57f8583c837_generic_spectral_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.2">coverage.py v7.16.2</a>,
-            created at 2026-09-28 13:30 +0000
+            created at 2026-09-29 04:28 +0000
         </p>
     </div>
 </footer>
