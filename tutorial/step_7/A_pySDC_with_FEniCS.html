@@ -411,6 +411,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../step_3/A_getting_statistics.html">Part A: Getting statistics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../step_3/B_adding_statistics.html">Part B: Adding statistics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../step_3/C_study_collocations.html">Part C: Studying collocation node types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_3/D_writing_solutions_to_file.html">Part D: Writing solutions to file</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../step_4.html">Step-4: Multilevel SDC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -772,68 +773,68 @@ side is one as well, so it is re-evaluated on the fine level instead of being in
 <h2>Results<a class="headerlink" href="#results" title="Link to this heading">#</a></h2>
 <p>FEniCS does not run in the browser, nor in the environment this website is built in. These are the results of our
 CI, which runs this part in an environment with FEniCS, in the run that built this page:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Variant mass_inv with ml=False and num_procs=1 -- error at time 1.0: 1.1449635077912191e-08
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Variant mass_inv with ml=False and num_procs=1 -- error at time 1.0: 1.1377657836034685e-08
    Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 0.9486 sec.
+Time to solution: 1.4408 sec.
 
-Variant mass with ml=False and num_procs=1 -- error at time 1.0: 1.1449619766957102e-08
+Variant mass with ml=False and num_procs=1 -- error at time 1.0: 1.1377861148441931e-08
    Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 0.9969 sec.
+Time to solution: 1.5202 sec.
 
-Variant mass_timebc with ml=False and num_procs=1 -- error at time 1.0: 3.247378543794095e-07
+Variant mass_timebc with ml=False and num_procs=1 -- error at time 1.0: 3.247349374610132e-07
    Mean number of iterations: 6.00
    Range of values for number of iterations:  3 
    Position of max/min number of iterations:  3 --  0
    Std and var for number of iterations: 1.10 -- 1.20
-Time to solution: 1.0135 sec.
+Time to solution: 1.5127 sec.
 
-Variant mass_inv with ml=True and num_procs=1 -- error at time 1.0: 1.1448670572655503e-08
+Variant mass_inv with ml=True and num_procs=1 -- error at time 1.0: 1.1377662797310038e-08
    Mean number of iterations: 3.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 1.3067 sec.
+Time to solution: 1.9616 sec.
 
-Variant mass with ml=True and num_procs=1 -- error at time 1.0: 1.145028468271638e-08
+Variant mass with ml=True and num_procs=1 -- error at time 1.0: 1.1377697402643071e-08
    Mean number of iterations: 3.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
-Time to solution: 1.1923 sec.
+Time to solution: 1.8383 sec.
 
-Variant mass_timebc with ml=True and num_procs=1 -- error at time 1.0: 2.844393240632413e-07
+Variant mass_timebc with ml=True and num_procs=1 -- error at time 1.0: 2.844354168118505e-07
    Mean number of iterations: 3.20
    Range of values for number of iterations:  2 
    Position of max/min number of iterations:  3 --  0
    Std and var for number of iterations: 0.75 -- 0.56
-Time to solution: 1.2306 sec.
+Time to solution: 1.9456 sec.
 
-Variant mass_inv with ml=True and num_procs=5 -- error at time 1.0: 1.1296719996296408e-08
+Variant mass_inv with ml=True and num_procs=5 -- error at time 1.0: 1.1229233182211586e-08
    Mean number of iterations: 3.80
    Range of values for number of iterations:  1 
    Position of max/min number of iterations:  1 --  0
    Std and var for number of iterations: 0.40 -- 0.16
-Time to solution: 1.7499 sec.
+Time to solution: 2.6009 sec.
 
-Variant mass with ml=True and num_procs=5 -- error at time 1.0: 1.1306211435698218e-08
+Variant mass with ml=True and num_procs=5 -- error at time 1.0: 1.1235003391776316e-08
    Mean number of iterations: 3.80
    Range of values for number of iterations:  1 
    Position of max/min number of iterations:  1 --  0
    Std and var for number of iterations: 0.40 -- 0.16
-Time to solution: 1.5520 sec.
+Time to solution: 2.4133 sec.
 
-Variant mass_timebc with ml=True and num_procs=5 -- error at time 1.0: 1.271987325464836e-06
+Variant mass_timebc with ml=True and num_procs=5 -- error at time 1.0: 1.2719783013018495e-06
    Mean number of iterations: 2.80
    Range of values for number of iterations:  1 
    Position of max/min number of iterations:  1 --  0
    Std and var for number of iterations: 0.40 -- 0.16
-Time to solution: 1.2092 sec.
+Time to solution: 1.8282 sec.
 </pre></div>
 </div>
 <div class="admonition-important-things-to-note admonition">

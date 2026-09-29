@@ -1016,7 +1016,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        &gt;&gt;&gt; # Suppose the FieldsIO object is already written into outputs.pysdc</span>
 <span class="sd">        &gt;&gt;&gt; import os</span>
-<span class="sd">        &gt;&gt;&gt; from pySDC.utils.fieldsIO import Rectilinear</span>
+<span class="sd">        &gt;&gt;&gt; from pySDC.helpers.fieldsIO import Rectilinear</span>
 <span class="sd">        &gt;&gt;&gt; os.makedirs("vtrFiles")  # to store all VTR files into a subfolder</span>
 <span class="sd">        &gt;&gt;&gt; Rectilinear.fromFile("outputs.pysdc").toVTR(</span>
 <span class="sd">        &gt;&gt;&gt;    baseName="vtrFiles/field", varNames=["u", "v", "w", "T", "p"])</span>

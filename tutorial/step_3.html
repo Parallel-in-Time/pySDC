@@ -411,6 +411,7 @@
 <li class="toctree-l2"><a class="reference internal" href="step_3/A_getting_statistics.html">Part A: Getting statistics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="step_3/B_adding_statistics.html">Part B: Adding statistics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="step_3/C_study_collocations.html">Part C: Studying collocation node types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="step_3/D_writing_solutions_to_file.html">Part D: Writing solutions to file</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="step_4.html">Step-4: Multilevel SDC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -518,14 +519,16 @@
                   
   <section id="step-3-statistics-and-a-new-sweeper">
 <h1>Step-3: Statistics and a new sweeper<a class="headerlink" href="#step-3-statistics-and-a-new-sweeper" title="Link to this heading">#</a></h1>
-<p>In this step, we will show how to work with the statistics pySDC generates. We will also introduce a new problem
-as well as a new sweeper.</p>
+<p>In this step, we will show how to work with the statistics pySDC generates and how to write solutions to file. We
+will also introduce a new problem as well as a new sweeper.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="step_3/A_getting_statistics.html"><span class="doc">Part A: Getting statistics</span></a>. What the <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary holds, and how to filter and sort it.</p></li>
 <li><p><a class="reference internal" href="step_3/B_adding_statistics.html"><span class="doc">Part B: Adding statistics</span></a>. A hook of our own records the energy of particles in a Penning trap, solved with
 the Boris-SDC sweeper.</p></li>
 <li><p><a class="reference internal" href="step_3/C_study_collocations.html"><span class="doc">Part C: Studying collocation node types</span></a>. A parameter study over the collocation nodes, and why symmetric
 nodes conserve the energy.</p></li>
+<li><p><a class="reference internal" href="step_3/D_writing_solutions_to_file.html"><span class="doc">Part D: Writing solutions to file</span></a>. The <code class="docutils literal notranslate"><span class="pre">LogToFile</span></code> hook writes the solution of a 2D heat equation to disk,
+we read it back and restart the run from it.</p></li>
 </ul>
 <p>Each part is a Python script in <a class="reference external" href="https://jupytext.readthedocs.io">jupytext</a> “percent” format: run it with
 <code class="docutils literal notranslate"><span class="pre">python</span></code>, open it as a notebook in Jupyter, or read it on the website, where it is executed with every build.
