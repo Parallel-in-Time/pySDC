@@ -1,0 +1,21 @@
+pySDC/implementations/problem_classes/HeatEquation_Chebychev.py
+  s_f5d0618f463037::t_e843e0a59c7471 251-253
+pySDC/tests/test_problems/test_generic_spectral.py
+  s_f5d0618f463037::t_9a82fe62c22ad8 56-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "023adffbebc08540e6425dc31c5a87a9ab1db9f7",
+  "prompts": {},
+  "sessions": {
+    "s_f5d0618f463037": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8a8807b1-a7d0-4475-b122-01e961450309",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
