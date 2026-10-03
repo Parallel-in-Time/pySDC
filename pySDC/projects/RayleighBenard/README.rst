@@ -17,7 +17,7 @@ use
    python run_experiment.py --help
 
 to get more information about the different parameters. The config names always start with ``RBC3DG4R4``, which means Rayleigh-Benard convection in 3D with aspect ratio four and four times as many degrees of freedom in horizontal directions as in the vertical.
-Next comes the time-stepping scheme. Choices are ``SDC44``, ``SDC23``, ``RK`` for RK443 and ``Euler`` for RK111. Finally, the Rayleigh number is specified using ``Ra1e5``, ``Ra1e6``, ``Ra1e7``, or ``Ra1e7``.
+Next comes the time-stepping scheme. Choices are ``SDC44``, ``SDC23``, ``RK`` for RK443 and ``Euler`` for RK111. Finally, the Rayleigh number is specified using ``Ra1e5``, ``Ra1e6``, ``Ra1e7``, or ``Ra1e8``.
 Note that you need to run the simulations in order of ascending Rayleigh number since larger Rayleigh number simulations take solutions from lower Rayleigh number experiments as initial conditions. Only ``Ra=1e5`` is started from random perturbations.
 
 To analyse, stay in the directory you ran the simulation in and use commands like
