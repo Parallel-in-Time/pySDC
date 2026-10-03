@@ -8,7 +8,7 @@ import numpy as np
 from scipy import integrate
 import matplotlib.pyplot as plt
 
-ints = {'1e5': 1e5, '1e6': 1e6, '1e7': 1e7}
+ints = {'1e5': 1e5, '1e6': 1e6, '1e7': 1e7, '1e8': 1e8}
 
 
 def get_Nek5000_Data(Ra, base_path='data/Nek5000'):  # pragma: no cover
@@ -90,26 +90,26 @@ def get_Nek5000_Data(Ra, base_path='data/Nek5000'):  # pragma: no cover
 def get_pySDC_data(Ra):
     from pySDC.projects.RayleighBenard.analysis_scripts.process_RBC3D_data import get_pySDC_data as _get_data
 
-    dts = {'1e5': 0.06, '1e6': 0.01, '1e7': 0.005}
-    res = {'1e5': 32, '1e6': 64, '1e7': 128}
+    dts = {'1e5': 0.06, '1e6': 0.01, '1e7': 0.005, '1e8': 0.0005}
+    res = {'1e5': 32, '1e6': 64, '1e7': 128, '1e8': 256}
     return _get_data(config_name=f'RBC3DG4R4SDC23Ra{Ra}', dt=dts[Ra], res=res[Ra])
 
 
 def plot_Nu_scaling(ax):  # pragma: no cover
 
     # reference values
-    for Ra in ['1e5', '1e6', '1e7']:
+    for Ra in ['1e5', '1e6', '1e7', '1e8']:
         dat = get_Nek5000_Data(Ra)
         ax.errorbar(ints[Ra], dat['Nu'], yerr=dat['std_Nu'], fmt='o', color='black')
 
     # pySDC values
-    for Ra in ['1e5', '1e6', '1e7']:
+    for Ra in ['1e5', '1e6', '1e7', '1e8']:
         dat = get_pySDC_data(Ra)
         ax.errorbar(ints[Ra], dat['avg_Nu']['V'], yerr=dat['std_Nu']['V'], fmt='.', color='tab:blue')
 
-    ax.errorbar(None, None, fmt='o', color='black', label='Nek5000')
+    ax.errorbar(None, None, fmt='o', color='black', label='NekRS')
     ax.errorbar(None, None, fmt='.', color='tab:blue', label='pySDC')
-    ax.legend(frameon=False, loc='lower right')
+    ax.legend(frameon=True, loc='lower right')
 
     ax.set_xscale('log')
     ax.set_xlabel('$Ra$')
@@ -117,16 +117,16 @@ def plot_Nu_scaling(ax):  # pragma: no cover
 
 
 def plot_T_profile(ax):  # pragma: no cover
-    colors = {'1e5': 'tab:blue', '1e6': 'tab:orange', '1e7': 'tab:green'}
-    markevery = {'1e7': 3}
+    colors = {'1e5': 'tab:blue', '1e6': 'tab:orange', '1e7': 'tab:green', '1e8': 'tab:red'}
+    markevery = {'1e7': 3, '1e8': 6}
 
     # reference values
-    for Ra in ['1e5', '1e6', '1e7']:
+    for Ra in ['1e5', '1e6', '1e7', '1e8']:
         dat = get_Nek5000_Data(Ra)
-        ax.plot(dat['profile_T'].mean(axis=0), dat['z'], color=colors[Ra], label=f'Nek5000 Ra={Ra}')
+        ax.plot(dat['profile_T'].mean(axis=0), dat['z'], color=colors[Ra], label=f'NekRS Ra={Ra}')
 
     # pySDC values
-    for Ra in ['1e5', '1e6', '1e7']:
+    for Ra in ['1e5', '1e6', '1e7', '1e8']:
         dat = get_pySDC_data(Ra)
         s = slice(None, None, markevery.get(Ra, 1))
         ax.scatter(dat['profile_T'][s], dat['z'][s], color=colors[Ra], label=f'pySDC Ra={Ra}')
@@ -135,19 +135,19 @@ def plot_T_profile(ax):  # pragma: no cover
     ax.set_xlabel('$T$')
     ax.set_xlim((0.47, 1.03))
     ax.set_ylim((-0.01, 0.33))
-    ax.legend(frameon=False)
+    ax.legend(frameon=True)
 
 
 def plot_T_rms_profile(ax):  # pragma: no cover
-    colors = {'1e5': 'tab:blue', '1e6': 'tab:orange', '1e7': 'tab:green'}
+    colors = {'1e5': 'tab:blue', '1e6': 'tab:orange', '1e7': 'tab:green', '1e8': 'tab:red'}
 
     # reference values
-    for Ra in ['1e5', '1e6', '1e7']:
+    for Ra in ['1e5', '1e6', '1e7', '1e8']:
         dat = get_Nek5000_Data(Ra)
         ax.plot(dat['rms_profile_T'], dat['z'], color=colors[Ra], label=f'Nek5000 Ra={Ra}')
 
     # pySDC values
-    for Ra in ['1e5', '1e6', '1e7']:
+    for Ra in ['1e5', '1e6', '1e7', '1e8']:
         dat = get_pySDC_data(Ra)
         ax.scatter(dat['rms_profile_T'], dat['z'], color=colors[Ra], label=f'pySDC Ra={Ra}')
 
