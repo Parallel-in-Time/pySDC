@@ -212,7 +212,7 @@
 | pySDC/projects/FastWaveSlowWave/runmultiscale\_acoustic.py                                          |       97 |        1 |     99% |       143 |
 | pySDC/projects/GPU/ac\_fft.py                                                                       |       48 |        0 |    100% |           |
 | pySDC/projects/GPU/configs/RBC\_configs.py                                                          |      229 |      157 |     31% |8-23, 97-134, 139-150, 153-161, 166-186, 189-197, 202-213, 220-233, 236-238, 244-256, 259-267, 274-286, 293-311, 314-318, 326-353, 356-362, 365-371 |
-| pySDC/projects/GPU/configs/base\_config.py                                                          |      177 |       29 |     84% |9, 11, 34-46, 75, 85, 116-120, 143, 162, 165-168, 195, 211, 243-244, 257-259, 274, 276 |
+| pySDC/projects/GPU/configs/base\_config.py                                                          |      177 |       27 |     85% |9, 11, 34-46, 75, 85, 116-120, 143, 162, 165-168, 195, 211, 243-244, 274, 276 |
 | pySDC/projects/GPU/heat.py                                                                          |        5 |        0 |    100% |           |
 | pySDC/projects/GPU/paper\_plots.py                                                                  |        2 |        2 |      0% |       3-4 |
 | pySDC/projects/GPU/run\_experiment.py                                                               |       48 |       23 |     52% |2-38, 58-60, 66-67 |
@@ -253,11 +253,11 @@
 | pySDC/projects/RDC/vanderpol\_MLSDC\_PFASST\_test.py                                                |       63 |        0 |    100% |           |
 | pySDC/projects/RDC/vanderpol\_error\_test.py                                                        |       82 |       82 |      0% |     1-153 |
 | pySDC/projects/RDC/vanderpol\_reference.py                                                          |       35 |       35 |      0% |      1-62 |
-| pySDC/projects/RayleighBenard/RBC3D\_configs.py                                                     |      295 |       68 |     77% |7, 23, 29-30, 103-121, 136-158, 161-182, 277, 292-295, 310-313, 319-329, 335-339 |
+| pySDC/projects/RayleighBenard/RBC3D\_configs.py                                                     |      331 |       65 |     80% |7, 23, 29-30, 109-131, 148-170, 173-194, 292, 307-310, 325-328, 334-344, 350-354 |
 | pySDC/projects/RayleighBenard/analysis\_scripts/RBC3D\_order.py                                     |       58 |        0 |    100% |           |
 | pySDC/projects/RayleighBenard/analysis\_scripts/plot\_Nu.py                                         |       13 |        0 |    100% |           |
 | pySDC/projects/RayleighBenard/analysis\_scripts/plotting\_utils.py                                  |        8 |        0 |    100% |           |
-| pySDC/projects/RayleighBenard/analysis\_scripts/process\_RBC3D\_data.py                             |      134 |        7 |     95% |80, 108-109, 115, 206-208 |
+| pySDC/projects/RayleighBenard/analysis\_scripts/process\_RBC3D\_data.py                             |      148 |       16 |     89% |64, 80, 85, 89, 100-101, 110-111, 120-121, 127-128, 134, 225-227 |
 | pySDC/projects/RayleighBenard/run\_experiment.py                                                    |       54 |       26 |     52% |2-38, 53, 61, 64-66, 72-73, 81 |
 | pySDC/projects/RayleighBenard/sweepers.py                                                           |       39 |        2 |     95% |    36, 90 |
 | pySDC/projects/Resilience/AC.py                                                                     |       98 |       25 |     74% |39, 87-88, 90-91, 97-105, 127, 160-165, 173-175, 180-183 |
@@ -406,7 +406,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32656** | **4045** | **88%** |           |
+| **TOTAL**                                                                                           | **32706** | **4049** | **88%** |           |
 
 44 empty files skipped.
 
