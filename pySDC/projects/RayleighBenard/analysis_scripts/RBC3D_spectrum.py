@@ -12,11 +12,12 @@ def plot_spectrum(res, dt, config_name, ax, **plotting_params):  # pragma: no co
 
     spectrum = data['avg_spectrum']
     k = data['k']
+    markevery = res // 6
     ax.loglog(
         k[spectrum > 1e-16],
         spectrum[spectrum > 1e-16],
         **{**get_plotting_style(config_name), **plotting_params},
-        markevery=5,
+        markevery=markevery,
     )
     ax.set_xlabel('$k$')
     ax.set_ylabel(r'$\|\hat{u}_x\|$')
@@ -56,15 +57,16 @@ def plot_all_spectra(ax=None):  # pragma: no cover
     else:
         fig = None
 
-    Ras = ['1e5', '1e6', '1e7']
-    dts = [0.06, 0.01, 0.005]
-    res = [32, 64, 128]
+    Ras = ['1e5', '1e6', '1e7', '1e8']
+    dts = [0.06, 0.01, 0.005, 0.0005]
+    res = [32, 64, 128, 256]
     colors = [
         'tab:blue',
         'tab:orange',
         'tab:green',
+        'tab:red',
     ]
-    markers = ['x', 'o', '.']
+    markers = ['x', 'o', '<', '.']
 
     for Ra, dt, _res, color, marker in zip(Ras, dts, res, colors, markers, strict=True):
         config = f'RBC3DG4R4SDC23Ra{Ra}'

@@ -27,7 +27,6 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     )
     P.setUpFieldsIO()
     zInt = P.axes[-1].get_integration_weights()
-    xp = P.xp
 
     # prepare paths
     os.makedirs(base_path, exist_ok=True)
@@ -61,7 +60,10 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
                 print(f'Read data from file {path!r}')
         for key in profiles.keys():
             if f'profile_{key}' in avg_data.keys():
-                u_mean_profile[P.index(key)] = avg_data[f'profile_{key}'][P.local_slice(False)[-1]]
+                if P.useGPU:
+                    u_mean_profile[P.index(key)] = P.xp.array(avg_data[f'profile_{key}'][P.local_slice(False)[-1]])
+                else:
+                    u_mean_profile[P.index(key)] = avg_data[f'profile_{key}'][P.local_slice(False)[-1]]
     elif comm.rank == 0:
         print('No mean profiles available yet. Please rerun script after completion to get correct RMS profiles')
 
@@ -74,13 +76,19 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     for i in indeces:
         _t, u = data.readField(i)
 
+        if P.useGPU:
+            u = P.xp.array(u)
+
         # Nusselt numbers
         _Nu = P.compute_Nusselt_numbers(u)
         if any(me > 1e3 for me in _Nu.values()):
             continue
 
         for key in Nu.keys():
-            Nu[key].append(_Nu[key])
+            if P.useGPU:
+                Nu[key].append(_Nu[key].get())
+            else:
+                Nu[key].append(_Nu[key])
 
         t.append(_t)
 
@@ -88,25 +96,36 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
         _profiles = P.get_vertical_profiles(u, list(profiles.keys()))
         _rms_profiles = P.get_vertical_profiles((u - u_mean_profile) ** 2, list(profiles.keys()))
         for key in profiles.keys():
-            profiles[key].append(_profiles[key])
-            rms_profiles[key].append(_rms_profiles[key])
+            if P.useGPU:
+                profiles[key].append(_profiles[key].get())
+                rms_profiles[key].append(_rms_profiles[key].get())
+            else:
+                profiles[key].append(_profiles[key])
+                rms_profiles[key].append(_rms_profiles[key])
 
         # spectrum
         k, s = P.get_frequency_spectrum(u)
         s_mean = zInt @ P.axes[-1].transform(s[0], axes=(0,))
-        spectrum.append(s_mean)
-        spectrum_all.append(s)
+        if P.useGPU:
+            spectrum.append(s_mean.get())
+            spectrum_all.append(s.get())
+        else:
+            spectrum.append(s_mean)
+            spectrum_all.append(s)
 
     # make a plot of the results
-    t = xp.array(t)
+    t = np.array(t)
     z = P.axes[-1].get_1dgrid()
+    if P.useGPU:
+        z = z.get()
+        k = k.get()
 
     converged = config.converged
     if config.converged == 0:
         print('Warning: no convergence has been set for this configuration!')
-    if xp.max(t) < converged:
+    if np.max(t) < converged:
         converged = 0
-        print(f'Warning: Convergence time {config.converged} has not been reached! Simulation only goes to {xp.max(t)}')
+        print(f'Warning: Convergence time {config.converged} has not been reached! Simulation only goes to {np.max(t)}')
 
     fig, axs = plt.subplots(1, 4, figsize=(18, 4))
     for key in Nu.keys():
@@ -122,8 +141,8 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     std_Nu = {}
     for key in Nu.keys():
         _Nu = [Nu[key][i] for i in range(len(Nu[key])) if t[i] > converged]
-        avg_Nu[key] = xp.mean(_Nu)
-        std_Nu[key] = xp.std(_Nu)
+        avg_Nu[key] = np.mean(_Nu)
+        std_Nu[key] = np.std(_Nu)
 
     rel_error = {
         key: abs(avg_Nu[key] - avg_Nu['V']) / avg_Nu['V']
@@ -144,12 +163,12 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     for key, values in profiles.items():
         values_from_convergence = [values[i] for i in range(len(values)) if t[i] >= converged]
 
-        avg_profiles[key] = xp.mean(values_from_convergence, axis=0)
+        avg_profiles[key] = np.mean(values_from_convergence, axis=0)
 
     avg_rms_profiles = {}
     for key, values in rms_profiles.items():
         values_from_convergence = [values[i] for i in range(len(values)) if t[i] >= converged]
-        avg_rms_profiles[key] = xp.sqrt(xp.mean(values_from_convergence, axis=0))
+        avg_rms_profiles[key] = np.sqrt(np.mean(values_from_convergence, axis=0))
 
     # average T
     avg_T = avg_profiles['T']
@@ -160,7 +179,7 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
 
     # rms profiles
     avg_T = avg_rms_profiles['T']
-    max_idx = xp.argmax(avg_T)
+    max_idx = np.argmax(avg_T)
     res_in_boundary_layer = max_idx if max_idx < len(z) / 2 else len(z) - max_idx
     boundary_layer = z[max_idx] if max_idx > len(z) / 2 else P.axes[-1].L - z[max_idx]
     if comm.rank == 0:
@@ -174,8 +193,8 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
     axs[2].set_ylabel('$z$')
 
     # spectrum
-    _s = xp.array(spectrum)
-    avg_spectrum = xp.mean(_s[t >= converged], axis=0)
+    _s = np.array(spectrum)
+    avg_spectrum = np.mean(_s[t >= converged], axis=0)
     axs[3].loglog(k[avg_spectrum > 1e-15], avg_spectrum[avg_spectrum > 1e-15])
     axs[3].set_xlabel('$k$')
     axs[3].set_ylabel(r'$\|\hat{u}_x\|$')
@@ -186,12 +205,12 @@ def process_RBC3D_data(base_path='./data/processed', plot=True, args=None, confi
             'Nu': Nu,
             'avg_Nu': avg_Nu,
             'std_Nu': std_Nu,
-            'z': P.axes[-1].get_1dgrid(),
+            'z': z,
             'k': k,
             'spectrum': spectrum_all,
             'avg_spectrum': avg_spectrum,
-            'boundary_layer_thickness': boundary_layer,
-            'res_in_boundary_layer': res_in_boundary_layer,
+            'boundary_layer_thickness': int(boundary_layer),
+            'res_in_boundary_layer': int(res_in_boundary_layer),
         }
         for key, values in avg_profiles.items():
             write_data[f'profile_{key}'] = values
