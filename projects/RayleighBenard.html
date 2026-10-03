@@ -490,7 +490,7 @@ mpirun<span class="w"> </span>-np<span class="w"> </span><span class="m">64</spa
 </pre></div>
 </div>
 <p>to get more information about the different parameters. The config names always start with <code class="docutils literal notranslate"><span class="pre">RBC3DG4R4</span></code>, which means Rayleigh-Benard convection in 3D with aspect ratio four and four times as many degrees of freedom in horizontal directions as in the vertical.
-Next comes the time-stepping scheme. Choices are <code class="docutils literal notranslate"><span class="pre">SDC44</span></code>, <code class="docutils literal notranslate"><span class="pre">SDC23</span></code>, <code class="docutils literal notranslate"><span class="pre">RK</span></code> for RK443 and <code class="docutils literal notranslate"><span class="pre">Euler</span></code> for RK111. Finally, the Rayleigh number is specified using <code class="docutils literal notranslate"><span class="pre">Ra1e5</span></code>, <code class="docutils literal notranslate"><span class="pre">Ra1e6</span></code>, or <code class="docutils literal notranslate"><span class="pre">Ra1e7</span></code>.
+Next comes the time-stepping scheme. Choices are <code class="docutils literal notranslate"><span class="pre">SDC44</span></code>, <code class="docutils literal notranslate"><span class="pre">SDC23</span></code>, <code class="docutils literal notranslate"><span class="pre">RK</span></code> for RK443 and <code class="docutils literal notranslate"><span class="pre">Euler</span></code> for RK111. Finally, the Rayleigh number is specified using <code class="docutils literal notranslate"><span class="pre">Ra1e5</span></code>, <code class="docutils literal notranslate"><span class="pre">Ra1e6</span></code>, <code class="docutils literal notranslate"><span class="pre">Ra1e7</span></code>, or <code class="docutils literal notranslate"><span class="pre">Ra1e8</span></code>.
 Note that you need to run the simulations in order of ascending Rayleigh number since larger Rayleigh number simulations take solutions from lower Rayleigh number experiments as initial conditions. Only <code class="docutils literal notranslate"><span class="pre">Ra=1e5</span></code> is started from random perturbations.</p>
 <p>To analyse, stay in the directory you ran the simulation in and use commands like</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>analysis_scripts/process_RBC3D_data.py<span class="w"> </span>--config<span class="o">=</span>RBC3DG4R4SDC23Ra1e5<span class="w"> </span>--dt<span class="o">=</span><span class="m">0</span>.06<span class="w"> </span>--res<span class="o">=</span><span class="m">32</span>
@@ -500,14 +500,15 @@ Note that you need to run the simulations in order of ascending Rayleigh number 
 <section id="benchmarks">
 <h2>Benchmarks<a class="headerlink" href="#benchmarks" title="Link to this heading">#</a></h2>
 <p>The benchmarks use JUBE.
-Please run them using commands like</p>
+On JUSUF and JUWELS booster, please run them using commands like</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>JUBE
 <span class="nb">cd</span><span class="w"> </span>pySDC/projects/RayleighBenard/benchmarks
 <span class="nv">OUT</span><span class="o">=</span>JUSUF_RBC3DG4R4SDC44Ra1e5<span class="w"> </span>jube<span class="w"> </span>run<span class="w"> </span>jube_script.yaml<span class="w"> </span>-t<span class="w"> </span>JUSUF<span class="w"> </span>SDC44<span class="w"> </span>Ra1e5
 jube<span class="w"> </span>result<span class="w"> </span>bench_run_JUSUF_RBC3DG4R4SDC44Ra1e5<span class="w"> </span>-a<span class="w"> </span>&gt;<span class="w"> </span>results/JUSUF_RBC3DG4R4SDC44Ra1e5.txt
 </pre></div>
 </div>
-<p>Use tags <code class="docutils literal notranslate"><span class="pre">JUSUF</span></code> of <code class="docutils literal notranslate"><span class="pre">BOOSTER</span></code> for running on JUSUF or JUWELS booster respectively. The tags for configurations are <code class="docutils literal notranslate"><span class="pre">RBC3DG4R4SDC44Ra1e5</span></code> and <code class="docutils literal notranslate"><span class="pre">RBC3DG4R4SDC44Ra1e6</span></code></p>
+<p>Use tags <code class="docutils literal notranslate"><span class="pre">JUSUF</span></code> of <code class="docutils literal notranslate"><span class="pre">BOOSTER</span></code> for running on JUSUF or JUWELS booster respectively. The tags for configurations are <code class="docutils literal notranslate"><span class="pre">Euler</span></code>, <code class="docutils literal notranslate"><span class="pre">RK</span></code>, <code class="docutils literal notranslate"><span class="pre">SDC23</span></code>, and <code class="docutils literal notranslate"><span class="pre">SDC44</span></code>.
+On JUPITER, use analogous commands with the script <code class="docutils literal notranslate"><span class="pre">jube_script_jupiter.yaml</span></code>. No need for a device tag here, just specify Rayleigh number and method.</p>
 <p>Once you have run all the benchmarks, plot them with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>pySDC/projects/RayleighBenard
 python<span class="w"> </span>analysis_scripts/plot_benchmarks.py
@@ -537,6 +538,7 @@ You need to run and analyse simulations with:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">--res=32</span> <span class="pre">--dt=0.06</span> <span class="pre">--config=RBC3DG4R4SDC23Ra1e5</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--res=64</span> <span class="pre">--dt=0.01</span> <span class="pre">--config=RBC3DG4R4SDC23Ra1e6</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--res=128</span> <span class="pre">--dt=0.005</span> <span class="pre">--config=RBC3DG4R4SDC23Ra1e7</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--res=256</span> <span class="pre">--dt=0.0005</span> <span class="pre">--config=RBC3DG4R4SDC23Ra1e8</span></code></p></li>
 </ul>
 <p>Then, just run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>analysis_scripts/RBC3D_spectrum.py
