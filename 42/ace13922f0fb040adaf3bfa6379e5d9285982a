@@ -1,0 +1,41 @@
+pySDC/projects/Multirate/boris_multirate.py
+  s_3c4f92a9a3448a::t_09ae814f504fa1 19-27,72,74,76-84,86,88,90-95,102-109,143-145,149,157-161,194-200,205-206,213-225,227-236,278-280
+  s_3c4f92a9a3448a::t_62eeb72a5b4588 58-60
+  s_3c4f92a9a3448a::t_4ed2f38f78af09 85
+  s_3c4f92a9a3448a::t_76d90faed03f93 64
+  s_3c4f92a9a3448a::t_074abfbb99ce93 226
+pySDC/projects/Multirate/results/boris_species.txt
+  s_3c4f92a9a3448a::t_68a8aabdf3f6f7 20-24
+  s_3c4f92a9a3448a::t_90c8caedcb3b59 1-17
+  s_3c4f92a9a3448a::t_42fd5717e70758 18-19
+pySDC/projects/Multirate/run_boris_species.py
+  s_3c4f92a9a3448a::t_90c8caedcb3b59 43-48,75-78
+  s_3c4f92a9a3448a::t_3fc8b238740ec6 1-42,49-74,79-94
+pySDC/projects/Multirate/tests/test_multirate.py
+  s_3c4f92a9a3448a::t_4ed2f38f78af09 128-152,154-166
+  s_3c4f92a9a3448a::t_76d90faed03f93 153
+pySDC/projects/Multirate/adaptivity_multirate.py
+  s_3c4f92a9a3448a::t_09ae814f504fa1 37-38
+pySDC/projects/Multirate/grids.py
+  s_3c4f92a9a3448a::t_821bd9b56b4dc9 72-81,106-108,110-111,113-114
+pySDC/projects/Multirate/penningtrap_multirate.py
+  s_3c4f92a9a3448a::t_074abfbb99ce93 34-50,59-65,70-83,86-88,91-93,105,112,116-117,119-124
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_a8ef4f67b2ef7f 23-25,27,340-381
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "42ace13922f0fb040adaf3bfa6379e5d9285982a",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
