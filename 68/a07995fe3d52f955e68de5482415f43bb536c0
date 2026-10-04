@@ -1,0 +1,19 @@
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_ce56d6fbce8d68 319-323,328-331
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "68a07995fe3d52f955e68de5482415f43bb536c0",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
