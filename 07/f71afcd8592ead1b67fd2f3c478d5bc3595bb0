@@ -1,0 +1,25 @@
+pySDC/projects/Multirate/run_boris_species.py
+  s_3c4f92a9a3448a::t_2de6cd737c2f4a 50-51,53-54,56-57,226-264,272-273
+pySDC/projects/Multirate/adaptivity_multirate.py
+  s_3c4f92a9a3448a::t_2de6cd737c2f4a 104,106-110,112
+pySDC/projects/Multirate/results/boris_species_growth.txt
+  s_3c4f92a9a3448a::t_69921c992a14f0 1-15
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_4ed8cbe67216bf 468-496
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "07f71afcd8592ead1b67fd2f3c478d5bc3595bb0",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
