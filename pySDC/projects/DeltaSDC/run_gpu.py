@@ -3,7 +3,7 @@ Time to solution of the precision ladder on real hardware: 2D heat, CG solves, C
 
 Every other script in this project measures *whether* a reduced precision costs accuracy or
 iterations. This one measures what it buys, so nothing here is emulated: a reduced-precision solve
-really reads fp32 arrays (:class:`.problems.heat_solve_dtype`) and a reduced coarse level really
+really reads fp32 arrays (:class:`.problems.heat_delta`) and a reduced coarse level really
 holds them (``dtype``). Every row runs to the same residual tolerance, and reports the answer's
 distance from the fp64 SDC one next to its wall time.
 
@@ -23,7 +23,7 @@ from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.BaseTransferDelta import delta_transfer
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.projects.DeltaSDC.problems import heat_solve_dtype
+from pySDC.projects.DeltaSDC.problems import heat_delta
 
 SWEEPER_PARAMS = {
     'quad_type': 'RADAU-RIGHT',
@@ -51,13 +51,13 @@ def configurations():
         ('SDC, CG 1e-12', generic_implicit, {'lintol': TIGHT}, {}, False),
         ('CONTROL SDC, CG 1e-5', generic_implicit, {'lintol': LOOSE}, {}, False),
         ('deltaSDC, CG 1e-5', delta_implicit, {'lintol': LOOSE}, delta, False),
-        ('deltaSDC, fp32 CG 1e-5', delta_implicit, {'lintol': LOOSE, 'solve_dtype': 'float32'}, delta, False),
+        ('deltaSDC, fp32 CG 1e-5', delta_implicit, {'lintol': LOOSE, 'solve_precision': 'float32'}, delta, False),
         ('MLSDC, CG 1e-12', generic_implicit, {'lintol': TIGHT}, {}, True),
         ('deltaMLSDC, CG 1e-5', delta_implicit, {'lintol': LOOSE}, delta, True),
         (
             'deltaMLSDC, fp32 fine CG + fp32 coarse',
             delta_implicit,
-            {'lintol': LOOSE, 'solve_dtype': ['float32', None], 'dtype': ['float64', 'float32']},
+            {'lintol': LOOSE, 'solve_precision': ['float32', None], 'dtype': ['float64', 'float32']},
             delta,
             True,
         ),
@@ -65,7 +65,7 @@ def configurations():
             # fp16 storage, fp32 arithmetic: neither SciPy nor CuPy has a half-precision sparse matrix
             'deltaMLSDC, fp32 fine CG + fp16 coarse',
             delta_implicit,
-            {'lintol': LOOSE, 'solve_dtype': ['float32', None], 'dtype': ['float64', 'float16']},
+            {'lintol': LOOSE, 'solve_precision': ['float32', None], 'dtype': ['float64', 'float16']},
             delta,
             True,
         ),
@@ -86,11 +86,11 @@ def fft_configurations():
     fft = {'solver_type': 'FFT'}
     return [
         ('SDC, FFT', generic_implicit, fft, {}, False),
-        ('deltaSDC, fp32 FFT', delta_implicit, {**fft, 'solve_dtype': 'float32'}, delta, False),
-        ('deltaSDC, fp16 FFT', delta_implicit, {**fft, 'solve_dtype': 'float16'}, delta, False),
+        ('deltaSDC, fp32 FFT', delta_implicit, {**fft, 'solve_precision': 'float32'}, delta, False),
+        ('deltaSDC, fp16 FFT', delta_implicit, {**fft, 'solve_precision': 'float16'}, delta, False),
         ('MLSDC, FFT', generic_implicit, fft, {}, True),
-        ('deltaMLSDC, fp16 coarse FFT', delta_implicit, {**fft, 'solve_dtype': [None, 'float16']}, delta, True),
-        ('deltaMLSDC, fp16 fine FFT', delta_implicit, {**fft, 'solve_dtype': ['float16', None]}, delta, True),
+        ('deltaMLSDC, fp16 coarse FFT', delta_implicit, {**fft, 'solve_precision': [None, 'float16']}, delta, True),
+        ('deltaMLSDC, fp16 fine FFT', delta_implicit, {**fft, 'solve_precision': ['float16', None]}, delta, True),
     ]
 
 
@@ -115,7 +115,7 @@ def run(n, sweeper_class, problem_params, sweeper_params, multilevel, use_gpu, d
         **problem_params,
     }
     description = {
-        'problem_class': heat_solve_dtype,
+        'problem_class': heat_delta,
         'problem_params': problem_params,
         'sweeper_class': sweeper_class,
         'sweeper_params': dict(SWEEPER_PARAMS, **sweeper_params),

@@ -347,9 +347,9 @@ def test_fft_solve_matches_the_direct_one(nvars, precision, low, high):
     import numpy as np
     from scipy.sparse.linalg import spsolve
 
-    from pySDC.projects.DeltaSDC.problems import heat_solve_dtype
+    from pySDC.projects.DeltaSDC.problems import heat_delta
 
-    prob = heat_solve_dtype(nvars=nvars, nu=0.1, bc='periodic', solver_type='FFT', solve_dtype=precision)
+    prob = heat_delta(nvars=nvars, nu=0.1, bc='periodic', solver_type='FFT', solve_precision=precision)
     rhs = prob.dtype_u(prob.init)
     rhs[:] = np.random.default_rng(0).standard_normal(rhs.shape) * 1e-9
     solution = prob.solve_system(rhs, 1e-3, None, 0.0)
@@ -362,10 +362,10 @@ def test_fft_solve_matches_the_direct_one(nvars, precision, low, high):
 
 @pytest.mark.base
 def test_fft_solve_needs_a_periodic_grid():
-    from pySDC.projects.DeltaSDC.problems import heat_solve_dtype
+    from pySDC.projects.DeltaSDC.problems import heat_delta
 
     with pytest.raises(ValueError, match='periodic'):
-        heat_solve_dtype(nvars=63, bc='dirichlet-zero', solver_type='FFT')
+        heat_delta(nvars=63, bc='dirichlet-zero', solver_type='FFT')
 
 
 @pytest.mark.base

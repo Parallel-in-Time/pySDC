@@ -204,7 +204,8 @@ class petsc_fisher_delta(petsc_fisher_fullyimplicit):
     def __init__(self, solve_precision=None, **kwargs):
         """Initialization routine"""
         super().__init__(**kwargs)
-        self.solve_precision = None if solve_precision is None else np.dtype(solve_precision)
+        solve_precision = None if solve_precision is None else np.dtype(solve_precision)
+        self._makeAttributeAndRegister('solve_precision', localVars=locals())
 
     def eval_f_increment(self, base, delta, t):
         r"""

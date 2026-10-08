@@ -33,7 +33,7 @@ class heat_inexact(heat_delta):
     def __init__(self, eta=None, seed=0, **kwargs):
         """Initialization routine"""
         super().__init__(**kwargs)
-        self.eta = eta
+        self._makeAttributeAndRegister('eta', 'seed', localVars=locals())
         self.rng = np.random.default_rng(seed)
 
     def solve_system(self, rhs, factor, u0, t):

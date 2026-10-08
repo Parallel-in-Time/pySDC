@@ -96,8 +96,8 @@ class fenics_grayscott_delta(fenics_grayscott):
         # in the parent, whose unknown is the full state and whose r_0 does not shrink.
         kwargs.setdefault('newton_tol', 1e-30)
         super().__init__(**kwargs)
-        self.solve_precision = None if solve_precision is None else np.dtype(solve_precision)
-        self.normalize = normalize
+        solve_precision = None if solve_precision is None else np.dtype(solve_precision)
+        self._makeAttributeAndRegister('solve_precision', 'normalize', localVars=locals())
 
         # base state of the correction, assigned per solve
         self.base = df.Function(self.V)

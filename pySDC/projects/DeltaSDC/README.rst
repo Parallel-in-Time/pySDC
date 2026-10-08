@@ -113,8 +113,8 @@ controls:
 ``mlsdc.py``                    reduced precision on a level, emulated
 ``cascade.py``                  storage precision raised as the iteration converges
 ``sweepers_MPI.py``             the same, for the node-parallel hierarchy
-``problems.py``                 ``allencahn_delta`` (nonlinear), ``heat_delta`` (linear), and
-                                ``heat_solve_dtype``, whose solve genuinely runs at a reduced precision
+``problems.py``                 ``allencahn_delta`` (nonlinear) and ``heat_delta`` (linear), whose solves
+                                run at ``solve_precision``, emulated or genuinely
 ``problems_petsc.py``           ``petsc_fisher_delta`` (reduced precision emulated)
 ``problems_fenics.py``          ``fenics_grayscott_delta`` (emulated), plus the controls
 ``run_demo.py``                 runnable demonstration, nonlinear and linear
@@ -493,7 +493,7 @@ On real hardware
 ``run_gpu.py`` times the ladder where nothing is emulated: 2D heat, periodic, CG solves, a Gaussian
 bump as initial value, :math:`\Delta t = 10^{-2}`, two steps, every row run to the same residual
 tolerance of 1e-10. The reduced-precision solve reads and writes genuine ``float32`` arrays
-(``problems.heat_solve_dtype``); a reduced coarse level genuinely holds them (``dtype``). Measured on
+(``problems.heat_delta``); a reduced coarse level genuinely holds them (``dtype``). Measured on
 Modal, 1024 x 1024 -- speedup against fp64 SDC, answer distance to it in the last column:
 
 ==========================================  ====  ======  ==========  ===========  ===========
@@ -538,7 +538,7 @@ Half-precision arithmetic: the specification, checked
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The delivered-accuracy table above was measured by spoiling exact solves. With
-``solver_type='FFT'``, ``heat_solve_dtype`` solves by diagonalising the periodic operator, and at
+``solver_type='FFT'``, ``heat_delta`` solves by diagonalising the periodic operator, and at
 ``float16`` on a GPU every value in that solve is stored, and every product rounded, in half
 precision -- cuFFT's complex32 transforms through ``cupy.cuda.cufft.XtPlanNd``. It delivers
 :math:`\eta \approx 2\cdot 10^{-3}` to :math:`4\cdot 10^{-3}`, growing with the grid as the

@@ -65,9 +65,9 @@ def test_reduced_precision_is_genuine():
     rhs[:] = cp.random.default_rng(0).standard_normal(prob.nvars)
     prob.lintol = 1e-12
     single = prob.solve_system(rhs, 0.01, None, 0.0)
-    prob.solve_dtype, keep = None, prob.solve_dtype
+    prob.solve_precision, keep = None, prob.solve_precision
     double = prob.solve_system(rhs, 0.01, prob.dtype_u(prob.init, val=0.0), 0.0)
-    prob.solve_dtype = keep
+    prob.solve_precision = keep
     assert single.dtype == cp.float64
     assert 1e-9 < float(abs(single - double) / abs(double)) < 1e-5
 
@@ -190,12 +190,12 @@ def test_half_precision_fft_solve_is_genuine():
     """cuFFT's complex32 transform: off by half precision's epsilon, not by single's, and not broken."""
     import cupy as cp
 
-    from pySDC.projects.DeltaSDC.problems import heat_solve_dtype
+    from pySDC.projects.DeltaSDC.problems import heat_delta
 
     solves = {}
     for precision in [None, 'float16']:
-        prob = heat_solve_dtype(
-            nvars=(256, 256), nu=0.1, bc='periodic', solver_type='FFT', solve_dtype=precision, useGPU=True
+        prob = heat_delta(
+            nvars=(256, 256), nu=0.1, bc='periodic', solver_type='FFT', solve_precision=precision, useGPU=True
         )
         rhs = prob.dtype_u(prob.init)
         rhs[:] = cp.random.default_rng(0).standard_normal(prob.nvars) * 1e-9

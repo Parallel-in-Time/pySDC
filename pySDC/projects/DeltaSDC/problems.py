@@ -93,8 +93,8 @@ class allencahn_delta(allencahn_fullyimplicit):
         if self.nu != 2:
             raise NotImplementedError('allencahn_delta derives its analytic increment for nu=2 only!')
 
-        self.solve_precision = None if solve_precision is None else np.dtype(solve_precision)
-        self.normalize = normalize
+        solve_precision = None if solve_precision is None else np.dtype(solve_precision)
+        self._makeAttributeAndRegister('solve_precision', 'normalize', localVars=locals())
         dtype = np.dtype('float64') if self.solve_precision is None else self.solve_precision
         # What the solve *stores* is ``solve_precision``; what it computes in is at least float32,
         # because SciPy holds no float16 sparse matrix and fp16 hardware accumulates in fp32 anyway.
@@ -290,33 +290,46 @@ class allencahn_delta(allencahn_fullyimplicit):
 
 class heat_delta(heatNd_unforced):
     r"""
-    Heat equation with an analytic increment and a reduced-precision node-local solve.
+    Heat equation whose node-local solve runs at ``solve_precision``.
 
     The implicit operator is linear, so no ``solve_system_delta`` is needed: the sweeper reaches the
-    correction equation with ``linear_implicit=True`` and the stock ``solve_system``. What this class
-    adds is the two things a *level* below backend precision needs.
+    correction equation with ``linear_implicit=True`` and the stock ``solve_system``, and
+    ``eval_f_increment`` is inherited from :class:`GenericNDimFinDiff`. What this class adds is the
+    solve at a reduced precision, which ``dtype`` cannot give, since that stores the level's state at
+    the same precision. Only meaningful under the delta form: the solve then returns a correction,
+    and its error is relative to that.
 
-    ``eval_f_increment`` is inherited: the operator is linear, so
-    :class:`GenericNDimFinDiff` supplies :math:`A\delta` for every problem built on it.
+    How the solve gets there follows ``solver_type``:
 
-    ``solve_precision``
-        Emulated, as on the PETSc and FEniCS backends: the operator, the right-hand side and the
-        result are rounded through the working precision while the arithmetic stays at the backend
-        type. SciPy carries no ``float16`` sparse matrix, so half precision can only be reached this
-        way.
-
-    ``normalize``
-        Scales the right-hand side to :math:`\mathcal{O}(1)` before the solve and scales the result
-        back, which is exact for a linear solve. Half precision needs it: the smallest ``float16``
-        subnormal is 6e-8, so a correction of 1e-10 -- exactly what the delta form is built to hand
-        the solver -- rounds to **zero** without it. The two are otherwise in direct tension.
+    ``'direct'``
+        **Emulated**, as on the PETSc and FEniCS backends: the operator, the right-hand side and the
+        result are rounded through ``solve_precision`` while the arithmetic stays at the backend type.
+        SciPy carries no ``float16`` sparse matrix, so on a sparse operator half precision can only be
+        reached this way.
+    ``'CG'``
+        **Genuine**: the operator is held a second time at ``solve_precision`` and the Krylov solve
+        reads and writes arrays of that type, from a zero initial guess, so on a GPU the bandwidth
+        the solve moves really shrinks. Up to ``float32``, where CuPy's and SciPy's sparse matrices
+        stop.
+    ``'FFT'``
+        Periodic grids only. The operator is circulant, so the solve is a forward FFT, a division and
+        an inverse FFT at ``solve_precision``. At ``float16`` on a GPU those are cuFFT's complex32
+        transforms (power-of-two grids), with every value stored and every product rounded in half
+        precision -- the one route to genuine half-precision *arithmetic*. A CPU has no
+        half-precision FFT, so there it is emulated, optimistically, by rounding through ``float16``
+        around a ``complex64`` transform. The transforms are unitary and the right-hand side is
+        normalised, which keeps every intermediate inside ``float16``'s range: an unnormalised
+        transform of a 1024 x 1024 grid reaches 1e6, and ``float16`` stops at 65504.
 
     Parameters
     ----------
     solve_precision : dtype-like or None, optional
-        Working precision to emulate for the node-local solve. ``None`` keeps backend precision.
+        Precision of the node-local solve. ``None`` keeps backend precision.
     normalize : bool, optional
-        Scale the right-hand side to :math:`\mathcal{O}(1)` around the solve.
+        For ``'direct'``: scale the right-hand side to :math:`\mathcal{O}(1)` before the solve and the
+        result back, exact for a linear solve. Half precision needs it: the smallest ``float16``
+        subnormal is 6e-8, so a correction of 1e-10 -- exactly what the delta form hands the solver --
+        rounds to **zero** without it. ``'FFT'`` always normalises.
     **kwargs
         Forwarded to :class:`heatNd_unforced`.
     """
@@ -324,115 +337,19 @@ class heat_delta(heatNd_unforced):
     def __init__(self, solve_precision=None, normalize=True, **kwargs):
         """Initialization routine"""
         super().__init__(**kwargs)
-        self.solve_precision = None if solve_precision is None else np.dtype(solve_precision)
-        self.normalize = normalize
-
-    def solve_system(self, rhs, factor, u0, t):
-        r"""
-        Solve :math:`(I - factor\,A)\,x = rhs`, at an emulated reduced precision if asked.
-
-        Parameters
-        ----------
-        rhs : dtype_f
-            Right-hand side.
-        factor : float
-            Implicit prefactor.
-        u0 : dtype_u
-            Initial guess, unused for this direct solve.
-        t : float
-            Current time.
-
-        Returns
-        -------
-        dtype_u
-            The solution.
-        """
-        if self.solve_precision is None:
-            return super().solve_system(rhs, factor, u0, t)
-
-        dtype = self.solve_precision
-        b = rhs.view(self.xp.ndarray).astype(np.float64).flatten()
-        scale = max(float(abs(b).max()), 1e-300) if self.normalize else 1.0
-        b = (b / scale).astype(dtype).astype(np.float64)
-        matrix = (self.Id - factor * self.A).toarray().astype(dtype).astype(np.float64)
-        solution = self.xp.linalg.solve(matrix, b)
-        me = self.dtype_u(self.init)
-        me[:] = (scale * solution.astype(dtype).astype(np.float64)).reshape(self.nvars)
-        return me
-
-
-class heat_no_increment(heat_delta):
-    r"""
-    Control: the heat equation with its analytic increment deliberately out of reach.
-
-    Every problem built on :class:`GenericNDimFinDiff` supplies ``eval_f_increment``, so a sweeper on
-    one never falls back to forming :math:`\Delta f` by subtracting two stored right-hand sides.
-    This class hides it again, which is what makes the claim that the increment matters falsifiable.
-
-    The attribute raises rather than being absent, because the sweeper dispatches on ``hasattr`` and
-    a raising property is the way to make that report ``False`` for an inherited method.
-    """
-
-    @property
-    def eval_f_increment(self):
-        """
-        Raises
-        ------
-        AttributeError
-            Always. That is the point of the class.
-        """
-        raise AttributeError('control: the analytic increment is deliberately unavailable here')
-
-
-class heat_solve_dtype(heatNd_unforced):
-    r"""
-    Heat equation whose node-local solve genuinely runs at ``solve_dtype``, on CPU or GPU.
-
-    Not emulated: the level's state stays at ``dtype``, but the operator is held a second time at
-    ``solve_dtype`` and the Krylov solve reads and writes arrays of that type, so on a GPU the
-    bandwidth the solve moves really halves. This is the configuration whose *speed* can be
-    measured, which the emulated :class:`heat_delta` cannot be.
-
-    Only meaningful under the delta form with ``linear_implicit=True``: the solve then returns a
-    correction, starts from zero and its relative tolerance is relative to the correction. Handed
-    the state instead, as by :class:`generic_implicit`, the result would be capped at
-    ``solve_dtype``'s precision -- which is the stall the delta form exists to remove.
-
-    ``solver_type='FFT'`` (periodic grids only) solves by diagonalising instead: the operator is
-    circulant, so the solve is a forward FFT, a division and an inverse FFT, all at ``solve_dtype``.
-    That is the one route to a genuinely **half-precision** solve, because neither SciPy's nor
-    CuPy's sparse matrices hold ``float16``: on a GPU the transforms are cuFFT's complex32 ones
-    (power-of-two grids), with every value stored and every product rounded in half precision. A
-    CPU has no half-precision FFT, so there the same flag rounds through ``float16`` around a
-    ``complex64`` transform -- an emulation, and an optimistic one, since the transform's own
-    arithmetic is then single. The right-hand side is normalised by its maximum and the transforms
-    are unitary, which keeps every intermediate inside ``float16``'s range: an unnormalised
-    transform of a 1024 x 1024 grid reaches 1e6, and ``float16`` stops at 65504.
-
-    Parameters
-    ----------
-    solve_dtype : dtype-like or None, optional
-        Precision of the solve. ``None`` defers to the stock solve at the level's own precision.
-        CuPy's sparse matrices, like SciPy's, stop at ``float32``; ``float16`` needs ``'FFT'``.
-    **kwargs
-        Forwarded to :class:`heatNd_unforced`.
-    """
-
-    def __init__(self, solve_dtype=None, **kwargs):
-        """Initialization routine"""
-        super().__init__(**kwargs)
-        self.solve_dtype = None if solve_dtype is None else np.dtype(solve_dtype)
+        solve_precision = None if solve_precision is None else np.dtype(solve_precision)
+        self._makeAttributeAndRegister('solve_precision', 'normalize', localVars=locals())
         if self.solver_type == 'FFT':
             if self.bc != 'periodic':
                 raise ValueError('the FFT solve diagonalises a circulant operator and needs a periodic grid')
-            if self.solve_dtype == np.float16 and self.xp is not np and any(n & (n - 1) for n in self._shape):
+            if solve_precision == np.float16 and self.xp is not np and any(n & (n - 1) for n in self._shape):
                 raise ValueError(f'cuFFT computes half precision on power-of-two grids only, got {self.nvars}')
             self._fft, eigenvalues = circulant_eigenvalues(self)
             self._eigenvalues = eigenvalues.real  # a symmetric stencil
             self._half_plan = None
-        elif self.solve_dtype is not None:
-            self.A_solve = self.A.astype(self.solve_dtype)
-            self.Id_solve = self.Id.astype(self.solve_dtype)
+        elif self.solver_type == 'CG' and solve_precision is not None:
+            self.A_solve = self.A.astype(solve_precision)
+            self.Id_solve = self.Id.astype(solve_precision)
 
     @property
     def _shape(self):
@@ -441,7 +358,7 @@ class heat_solve_dtype(heatNd_unforced):
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Solve :math:`(I - factor\,A)\,x = rhs` by CG at ``solve_dtype``, from a zero initial guess.
+        Solve :math:`(I - factor\,A)\,x = rhs` at ``solve_precision``, by the route ``solver_type`` names.
 
         Parameters
         ----------
@@ -461,25 +378,35 @@ class heat_solve_dtype(heatNd_unforced):
         """
         if self.solver_type == 'FFT':
             return self._solve_fft(rhs, factor)
-        if self.solve_dtype is None:
+        if self.solve_precision is None:
             return super().solve_system(rhs, factor, u0, t)
-        # float(): an np.float64 factor would drag the operator back to double under NEP 50
-        matrix = self.Id_solve - float(factor) * self.A_solve
-        solution, _ = self.linalg.cg(
-            matrix,
-            rhs.flatten().astype(self.solve_dtype),
-            rtol=self.lintol,
-            atol=0,
-            maxiter=self.liniter,
-            callback=self.work_counters['CG'],
-        )
+        if self.solver_type == 'CG':
+            # float(): an np.float64 factor would drag the operator back to double under NEP 50
+            solution, _ = self.linalg.cg(
+                self.Id_solve - float(factor) * self.A_solve,
+                rhs.flatten().astype(self.solve_precision),
+                rtol=self.lintol,
+                atol=0,
+                maxiter=self.liniter,
+                callback=self.work_counters['CG'],
+            )
+            me = self.dtype_u(self.init)
+            me[:] = solution.reshape(self.nvars)
+            return me
+
+        dtype = self.solve_precision
+        b = rhs.view(self.xp.ndarray).astype(np.float64).flatten()
+        scale = max(float(abs(b).max()), 1e-300) if self.normalize else 1.0
+        b = (b / scale).astype(dtype).astype(np.float64)
+        matrix = (self.Id - factor * self.A).toarray().astype(dtype).astype(np.float64)
+        solution = self.xp.linalg.solve(matrix, b)
         me = self.dtype_u(self.init)
-        me[:] = solution.reshape(self.nvars)
+        me[:] = (scale * solution.astype(dtype).astype(np.float64)).reshape(self.nvars)
         return me
 
     def _solve_fft(self, rhs, factor):
         r"""
-        Solve :math:`(I - factor\,A)\,x = rhs` by diagonalisation, at ``solve_dtype``.
+        Solve :math:`(I - factor\,A)\,x = rhs` by diagonalisation, at ``solve_precision``.
 
         Returns
         -------
@@ -492,7 +419,7 @@ class heat_solve_dtype(heatNd_unforced):
         if scale == 0.0:
             return me
         inverse = 1.0 / (1.0 - float(factor) * self._eigenvalues)
-        dtype = np.dtype(np.float64) if self.solve_dtype is None else self.solve_dtype
+        dtype = np.dtype(np.float64) if self.solve_precision is None else self.solve_precision
         if dtype == np.float16:
             x = self._solve_fft_half(b / scale, inverse)
         else:
@@ -541,3 +468,26 @@ class heat_solve_dtype(heatNd_unforced):
         spectrum[..., 1::2] *= inverse
         self._half_plan.fft(spectrum, data, cufft.CUFFT_INVERSE)
         return data[..., 0::2].astype(cp.float64) * unit
+
+
+class heat_no_increment(heat_delta):
+    r"""
+    Control: the heat equation with its analytic increment deliberately out of reach.
+
+    Every problem built on :class:`GenericNDimFinDiff` supplies ``eval_f_increment``, so a sweeper on
+    one never falls back to forming :math:`\Delta f` by subtracting two stored right-hand sides.
+    This class hides it again, which is what makes the claim that the increment matters falsifiable.
+
+    The attribute raises rather than being absent, because the sweeper dispatches on ``hasattr`` and
+    a raising property is the way to make that report ``False`` for an inherited method.
+    """
+
+    @property
+    def eval_f_increment(self):
+        """
+        Raises
+        ------
+        AttributeError
+            Always. That is the point of the class.
+        """
+        raise AttributeError('control: the analytic increment is deliberately unavailable here')

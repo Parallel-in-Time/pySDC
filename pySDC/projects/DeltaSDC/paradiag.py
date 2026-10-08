@@ -70,16 +70,15 @@ class heat_paradiag(heatNd_forced):
 
     def __init__(self, solve_precision=None, dtype=FULL, **kwargs):
         super().__init__(dtype=dtype, **kwargs)
+        solve_precision = FULL if solve_precision is None else np.dtype(solve_precision)
         self._makeAttributeAndRegister('solve_precision', localVars=locals())
-
-        self._solve_dtype = FULL if solve_precision is None else np.dtype(solve_precision)
-        self.work_counters['paradiag_solve'] = WorkCounter()
+        self.work_counters['jacobian_solves'] = WorkCounter()
 
         # With periodic boundaries the solve is a diagonalisation: two FFTs and a division, which is
         # also the one place where single precision is several times faster on a GPU.
         if self.bc == 'periodic':
             self._fft, eigenvalues = circulant_eigenvalues(self)
-            self._eigenvalues = eigenvalues.astype(self._solve_dtype)
+            self._eigenvalues = eigenvalues.astype(self.solve_precision)
 
     def solve_jacobian(self, rhs, factor, u=None, u0=None, t=0, **kwargs):
         r"""
@@ -104,7 +103,7 @@ class heat_paradiag(heatNd_forced):
         dtype_u
             The increment, cast back to working precision.
         """
-        dtype = self._solve_dtype
+        dtype = self.solve_precision
         rhs = rhs.view(self.xp.ndarray).astype(dtype)
         if self.bc == 'periodic':
             solution = self._fft.ifftn(self._fft.fftn(rhs) / (1 - dtype.type(factor) * self._eigenvalues))
@@ -112,7 +111,7 @@ class heat_paradiag(heatNd_forced):
             identity = self.xsp.eye(self.A.shape[0], dtype=dtype, format='csr')
             operator = (identity - dtype.type(factor) * self.A.astype(dtype)).tocsr()
             solution = self.linalg.spsolve(operator, rhs.flatten())
-        self.work_counters['paradiag_solve']()
+        self.work_counters['jacobian_solves']()
 
         me = self.dtype_u(self.init)
         me[:] = solution.astype(FULL).reshape(self.nvars)
