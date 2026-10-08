@@ -136,6 +136,7 @@ jobs:
           - AllenCahn_Bayreuth
           - AsympConv
           - DAE
+          - DeltaSDC
           - FastWaveSlowWave
           - GPU
           - Hamiltonian
