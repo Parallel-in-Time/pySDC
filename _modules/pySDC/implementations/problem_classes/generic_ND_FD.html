@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
@@ -36,10 +36,10 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ede09976" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
     <script src="../../../../_static/documentation_options.js?v=696bab92"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -55,6 +55,7 @@
     <link rel="search" title="Search" href="../../../../search.html" />
   
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="5.9" />
   
@@ -438,6 +439,7 @@
 <span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.fft</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spla</span>
 
@@ -487,7 +489,20 @@
 <span class="sd">        single anyway -- so ``float16`` here means genuinely half-precision *storage* with</span>
 <span class="sd">        single-precision arithmetic, which is the arrangement it has on real hardware too.</span>
 <span class="sd">    solver_type : str, optional</span>
-<span class="sd">        Type of solver. Can be ``'direct'``, ``'GMRES'`` or ``'CG'``.</span>
+<span class="sd">        Type of solver. Can be ``'direct'``, ``'GMRES'``, ``'CG'`` or, on periodic grids, ``'FFT'``:</span>
+<span class="sd">        the operator is then circulant, so the FFT diagonalises it and a solve is two transforms</span>
+<span class="sd">        and a division -- exact, and the cheapest solve there is on a GPU.</span>
+<span class="sd">    solve_precision : dtype-like or None, optional</span>
+<span class="sd">        Precision the implicit solve runs at, independently of the state's ``dtype``. ``None``</span>
+<span class="sd">        (default) solves at the operator's precision, exactly as without it. Otherwise the solve</span>
+<span class="sd">        genuinely works in that precision: the sparse solvers on a copy of the operator held at it,</span>
+<span class="sd">        ``'FFT'`` with transforms at it, and the result is widened back to ``dtype``. Sparse</span>
+<span class="sd">        matrices stop at single precision in SciPy and CuPy alike, so ``float16`` needs ``'FFT'``.</span>
+<span class="sd">        On a GPU those are cuFFT's half-precision transforms (power-of-two grids), with every value</span>
+<span class="sd">        stored and every product rounded in half precision. A CPU has no half-precision FFT, so</span>
+<span class="sd">        there ``float16`` is *emulated*, by rounding through it around a single-precision</span>
+<span class="sd">        transform -- which is optimistic, since the transform's own arithmetic is then single.</span>
+<span class="sd">        For a complex state the solve is complex at the same precision.</span>
 <span class="sd">    bc : str or tuple of 2 string, optional</span>
 <span class="sd">        Type of boundary conditions. Default is ``'periodic'``.</span>
 <span class="sd">        To define two different types of boundary condition for each side,</span>
@@ -561,6 +576,7 @@
         <span class="n">bcParams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64'</span><span class="p">,</span>
         <span class="n">useGPU</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">solve_precision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Initialization routine"""</span>
         <span class="k">if</span> <span class="n">useGPU</span><span class="p">:</span>
@@ -646,6 +662,36 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">!=</span> <span class="s1">'direct'</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+
+        <span class="n">solve_precision</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">solve_precision</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">solve_precision</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'solve_precision'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_solve</span><span class="p">(</span><span class="n">solver_type</span><span class="p">,</span> <span class="n">solve_precision</span><span class="p">,</span> <span class="n">bc</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solver_type</span><span class="p">,</span> <span class="n">solve_precision</span><span class="p">,</span> <span class="n">bc</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Prepare the reduced-precision operator, or the eigenvalues the FFT solve divides by."""</span>
+        <span class="c1"># half precision is the one format that is not a complex dtype for a complex state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_half</span> <span class="o">=</span> <span class="n">solve_precision</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float16</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator_dtype</span> <span class="k">if</span> <span class="n">solve_precision</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_half</span> <span class="k">else</span> <span class="n">solve_precision</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">'c'</span><span class="p">:</span>
+            <span class="n">precision</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">promote_types</span><span class="p">(</span><span class="n">precision</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_solve_dtype</span> <span class="o">=</span> <span class="n">precision</span>
+
+        <span class="k">if</span> <span class="n">solver_type</span> <span class="o">==</span> <span class="s1">'FFT'</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bc</span> <span class="o">!=</span> <span class="s1">'periodic'</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'the FFT solve diagonalises a circulant operator and needs periodic BCs, got </span><span class="si">{</span><span class="n">bc</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_half</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">np</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">n</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'cuFFT computes in half precision on power-of-two grids only, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fft</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">fft</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="ow">is</span> <span class="n">np</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">fft</span>
+            <span class="c1"># the first column of a circulant transforms to its eigenvalues</span>
+            <span class="n">first_column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator_dtype</span><span class="p">)</span>
+            <span class="n">first_column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eigenvalues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">first_column</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_half_plan</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">solve_precision</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_half</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">'sparse matrices stop at single precision; float16 needs solver_type="FFT"'</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_A_solve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Id_solve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Id</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GenericNDimFinDiff.ndim">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.generic_ND_FD.html#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim">[docs]</a>
@@ -770,6 +816,9 @@
 <span class="sd">        sol : dtype_u</span>
 <span class="sd">            The solution of the linear solver.</span>
 <span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">==</span> <span class="s1">'FFT'</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">solve_precision</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_at_precision</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+
         <span class="n">solver_type</span><span class="p">,</span> <span class="n">Id</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">lintol</span><span class="p">,</span> <span class="n">liniter</span><span class="p">,</span> <span class="n">sol</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Id</span><span class="p">,</span>
@@ -807,7 +856,115 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'solver type "</span><span class="si">{</span><span class="n">solver_type</span><span class="si">}</span><span class="s1">" not known in generic advection-diffusion implementation!'</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">sol</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_solve_at_precision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Solve :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}` at ``solve_precision``, or by FFT.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sol : dtype_u</span>
+<span class="sd">            The solution, widened to the state's precision.</span>
+<span class="sd">        """</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">==</span> <span class="s1">'FFT'</span><span class="p">:</span>
+            <span class="n">sol</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_fft</span><span class="p">(</span><span class="n">rhs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">),</span> <span class="n">factor</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'FFT'</span><span class="p">]()</span>
+            <span class="k">return</span> <span class="n">sol</span>
+
+        <span class="n">precision</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_dtype</span>
+        <span class="c1"># the factor at the solve's own precision: a float64 scalar would widen the operator back</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Id_solve</span> <span class="o">-</span> <span class="n">precision</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A_solve</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">rhs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">==</span> <span class="s1">'direct'</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'GMRES'</span><span class="p">,</span> <span class="s1">'CG'</span><span class="p">]:</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">u0</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'callback_type'</span><span class="p">:</span> <span class="s1">'legacy'</span><span class="p">}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">==</span> <span class="s1">'GMRES'</span> <span class="k">else</span> <span class="p">{}</span>
+            <span class="c1"># A Krylov solve cannot meet a tolerance below its own precision. Asked to, it iterates to</span>
+            <span class="c1"># `liniter` and, in CG, divides by a dot product that has rounded to zero: NaN. A hundred</span>
+            <span class="c1"># times the precision's epsilon is what single precision still reaches.</span>
+            <span class="n">rtol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lintol</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linalg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="o">.</span><span class="n">lower</span><span class="p">())(</span>
+                <span class="n">matrix</span><span class="p">,</span>
+                <span class="n">b</span><span class="p">,</span>
+                <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+                <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span>
+                <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">liniter</span><span class="p">,</span>
+                <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">],</span>
+                <span class="o">**</span><span class="n">options</span><span class="p">,</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">'solver type "</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="si">}</span><span class="s1">" not known in generic advection-diffusion implementation!'</span>
+            <span class="p">)</span>
+        <span class="n">sol</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sol</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_solve_fft</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ``ifft(fft(b) / (1 - factor * eigenvalues))`` at the solve precision, at the state's precision.</span>
+
+<span class="sd">        The right-hand side is scaled to a maximum of one first and the result scaled back, which is</span>
+<span class="sd">        exact for a linear solve and keeps a half-precision solve clear of underflow: a correction of</span>
+<span class="sd">        1e-10 is below ``float16``'s smallest subnormal.</span>
+<span class="sd">        """</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">inverse</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eigenvalues</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_half</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_fft_half</span><span class="p">(</span><span class="n">b</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">inverse</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">precision</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">promote_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_solve_dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">((</span><span class="n">b</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">precision</span><span class="p">))</span> <span class="o">*</span> <span class="n">inverse</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">precision</span><span class="p">))</span>
+        <span class="c1"># widen first, scale second: scaling at half precision would underflow on the way out</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">promote_types</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">'c'</span> <span class="k">else</span> <span class="n">x</span><span class="o">.</span><span class="n">real</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">scale</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_solve_fft_half</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ``ifft(fft(y) * inverse)`` in half precision for ``|y| &lt;= 1``, returned in single precision.</span>
+
+<span class="sd">        Both transforms are scaled by ``1 / sqrt(N)``, so the forward one is bounded by ``sqrt(N)``</span>
+<span class="sd">        and the inverse one by ``sqrt(N)`` times the solution: 1024 on a 1024 x 1024 grid, where an</span>
+<span class="sd">        unscaled transform would reach 1e6 and ``float16`` stops at 65504.</span>
+<span class="sd">        """</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xp</span> <span class="ow">is</span> <span class="n">np</span><span class="p">:</span>
+            <span class="c1"># an emulation: rounded through float16 at every stage, computed in single precision</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="nf">rounded</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">z</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">z</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+            <span class="n">spectrum</span> <span class="o">=</span> <span class="n">rounded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft</span><span class="o">.</span><span class="n">fftn</span><span class="p">(</span><span class="n">rounded</span><span class="p">((</span><span class="n">y</span> <span class="o">*</span> <span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">))))</span>
+            <span class="n">spectrum</span> <span class="o">=</span> <span class="n">rounded</span><span class="p">(</span><span class="n">spectrum</span> <span class="o">*</span> <span class="n">rounded</span><span class="p">(</span><span class="n">inverse</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="n">rounded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fft</span><span class="o">.</span><span class="n">ifftn</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">'forward'</span><span class="p">))</span> <span class="o">*</span> <span class="n">unit</span>
+
+        <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cupy.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">cufft</span>
+
+        <span class="n">shape</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvars</span><span class="p">),</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_half_plan</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># complex32 in and out, stored as float16 (re, im) pairs along the last axis</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_half_plan</span> <span class="o">=</span> <span class="n">cufft</span><span class="o">.</span><span class="n">XtPlanNd</span><span class="p">(</span>
+                <span class="n">shape</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="s1">'E'</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="s1">'E'</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'E'</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">'C'</span><span class="p">,</span> <span class="n">last_axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">last_size</span><span class="o">=</span><span class="kc">None</span>
+            <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">'c'</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">imag</span>
+        <span class="n">spectrum</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_half_plan</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">spectrum</span><span class="p">,</span> <span class="n">cufft</span><span class="o">.</span><span class="n">CUFFT_FORWARD</span><span class="p">)</span>
+        <span class="n">re</span><span class="p">,</span> <span class="n">im</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">spectrum</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">ir</span><span class="p">,</span> <span class="n">ii</span> <span class="o">=</span> <span class="n">inverse</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">float16</span><span class="p">),</span> <span class="n">inverse</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>
+        <span class="n">spectrum</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span> <span class="o">*</span> <span class="n">ir</span> <span class="o">-</span> <span class="n">im</span> <span class="o">*</span> <span class="n">ii</span>
+        <span class="n">spectrum</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span> <span class="o">*</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">im</span> <span class="o">*</span> <span class="n">ir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_half_plan</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">cufft</span><span class="o">.</span><span class="n">CUFFT_INVERSE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span> <span class="o">*</span> <span class="n">unit</span></div>
 
 </pre></div>
 
@@ -838,8 +995,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
-<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -865,7 +1022,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
 </p></div>
       
     </div>
