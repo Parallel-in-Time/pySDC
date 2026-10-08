@@ -8,10 +8,10 @@ A standard SDC sweep
                 + \Delta t \sum_j Q^\Delta_{mj}\,(f^{k+1}_j - f^k_j)
 
 is algebraically identical to, with :math:`\delta_m = u^{k+1}_m - u^k_m` and the collocation
-residual :math:`\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`,
+residual :math:`r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`,
 
 .. math::
-    \delta_m = \varepsilon_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,
+    \delta_m = r_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,
     \qquad \Delta f_j = f(u^k_j + \delta_j) - f(u^k_j).
 
 Written this way, every sweep is iterative refinement: a high-precision residual, a correction
@@ -21,7 +21,8 @@ survives unchanged.
 The point of the reformulation is that the quantity handed to the node-local solver is a
 *correction*. Its magnitude tends to zero as the sweeps converge, so a reduced-precision solve
 introduces an error proportional to :math:`|\delta|` rather than to :math:`|u|` and therefore does
-not cap the attainable accuracy.
+not cap the attainable accuracy. What the sweeper and the solver guarantee each other for that to
+hold is the correction-solve contract, documented on :class:`~pySDC.core.problem.Problem`.
 
 Three node-local strategies are supported, selected automatically:
 
@@ -35,6 +36,8 @@ Three node-local strategies are supported, selected automatically:
     For a linear or affine implicit operator, :math:`f(w+\delta) - f(w) = A\delta`, so the stock
     ``solve_system`` already solves the correction equation once the affine part
     :math:`\alpha f(0, t)` is removed from the right-hand side. No problem class needs changing.
+    The right-hand side is scaled to unit size around the call, so the solver may work in any
+    precision without the shrinking correction falling out of its format's range.
 
 fallback
     Otherwise the substitution :math:`y = u^k_m + \delta_m` reduces the correction equation to the
@@ -43,7 +46,7 @@ fallback
     :math:`\mathcal{O}(1)` unknown, so there is no precision benefit.
 
 ``correction_precision`` additionally stores the small quantities
-(:math:`\varepsilon`, :math:`\delta`, :math:`\Delta f`) in a reduced-precision datatype built from
+(:math:`r`, :math:`\delta`, :math:`\Delta f`) in a reduced-precision datatype built from
 the problem's own ``init`` tuple, scaled by the residual's magnitude so the format's mantissa is
 used however small the correction gets.
 
@@ -88,7 +91,7 @@ class DeltaFormMixin:
 
         PFASST receives the initial value from the predecessor *after* the restriction, directly
         into ``u[0]``. The residual depends on it additively, so following it is one addition:
-        :math:`\varepsilon_m \leftarrow \varepsilon_m + (u_0 - u_0^{\mathrm{ref}})`. Exactly zero
+        :math:`r_m \leftarrow r_m + (u_0 - u_0^{\mathrm{ref}})`. Exactly zero
         when nothing arrived, which is every serial run.
 
         This is the one place the hierarchy still differences two :math:`\mathcal{O}(1)` values, and
@@ -147,7 +150,7 @@ class DeltaFormMixin:
 
     def advance_residual(self, eps, deltas, dfs):
         r"""
-        Advance a residual by an update: :math:`\varepsilon \leftarrow \varepsilon - \delta
+        Advance a residual by an update: :math:`r \leftarrow r - \delta
         + \Delta t (Q \Delta f)`.
 
         Every term is small, so this never cancels. It is exact for any update to the nodal values,
@@ -231,7 +234,7 @@ class DeltaFormMixin:
         Choose the divisor for this sweep, from the residual the corrections will be built out of.
 
         This is what lets a correction be stored below ``float16``'s smallest normal, 6.1e-5. The
-        delta form drives :math:`\varepsilon` and :math:`\delta` towards zero on purpose, and half
+        delta form drives :math:`r` and :math:`\delta` towards zero on purpose, and half
         precision has almost no mantissa left down there -- 1.3e-2 relative at 1e-6, 1.9e-1 at 1e-7 --
         so an unscaled correction turns to noise exactly when it starts to matter. Dividing by the
         residual's own magnitude keeps the stored values at :math:`\mathcal{O}(1)`, which is block
@@ -306,7 +309,7 @@ class DeltaFormMixin:
 
     def _residual_nodes(self):
         r"""
-        Compute :math:`\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`.
+        Compute :math:`r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`.
 
         This is the high-precision residual of iterative refinement. It is a difference of
         :math:`\mathcal{O}(1)` quantities and is therefore always formed in backend precision --
@@ -405,10 +408,9 @@ class DeltaFormMixin:
         elif self._linear_implicit:
             # f(w+d) - f(w) = A d, so solve_system already solves the correction equation once the
             # affine part f(0, t) has been removed. f(0, t) vanishes for a homogeneous operator.
-            zero = prob.dtype_u(prob.init, val=0.0)
-            affine = prob.eval_f(zero, t_node)
-            rhs_phys -= alpha * (affine if implicit_part is None else affine.impl)
-            delta = prob.solve_system(rhs_phys, alpha, zero, t_node)
+            affine = prob.eval_f(prob.dtype_u(prob.init, val=0.0), t_node)
+            affine = affine if implicit_part is None else affine.impl
+            delta = self._solve_scaled(prob, rhs_phys, alpha, affine, t_node)
         else:
             # Fallback: substitute y = u_old + delta. Always correct, but the solver sees an O(1)
             # unknown, so there is no precision benefit.
@@ -419,6 +421,55 @@ class DeltaFormMixin:
             delta -= u_old
         # recorded so a transfer never has to recover the correction by subtraction
         self._deltas.append(delta)
+        return delta
+
+    @staticmethod
+    def _solve_scaled(prob, rhs, alpha, affine, t_node):
+        r"""
+        Hand a linear correction solve its right-hand side at unit size, and take back any precision.
+
+        This is the sweeper's side of the correction-solve contract documented on
+        :class:`~pySDC.core.problem.Problem`. The right-hand side shrinks with the iteration, which
+        is the point of the delta form and also what pushes it out of a reduced-precision format's
+        range: a correction of 1e-10 is below ``float16``'s smallest subnormal. Dividing by its
+        maximum before the solve and multiplying the result by it afterwards is exact for a linear
+        solve, and makes an absolute solver tolerance a relative one, which the contract asks for
+        anyway. The affine part :math:`\alpha f(0, t)` is removed *after* scaling: the stock solve
+        adds it back in unscaled, and the two only cancel at the same scale. The result may come back in any precision; it is widened before it is scaled back,
+        since scaling first would multiply at the solver's precision.
+
+        Parameters
+        ----------
+        prob : pySDC.core.problem.Problem
+            The level's problem.
+        rhs : dtype_u
+            Right-hand side of the correction equation, modified in place.
+        alpha : float
+            Implicit prefactor.
+        affine : dtype_u
+            The implicit right-hand side at zero, :math:`f(0, t)`, which a homogeneous operator
+            makes zero.
+        t_node : float
+            Physical time of the collocation node.
+
+        Returns
+        -------
+        dtype_u
+            The correction, at the level's precision.
+        """
+        zero = prob.dtype_u(prob.init, val=0.0)
+        scale = float(abs(rhs))
+        if scale == 0.0:
+            return zero
+        rhs /= scale
+        rhs -= alpha * affine
+        solution = prob.solve_system(rhs, alpha, zero, t_node)
+        if isinstance(prob.init, tuple) and getattr(solution, 'dtype', None) not in (None, np.dtype(prob.init[-1])):
+            delta = prob.dtype_u(prob.init)
+            delta[:] = solution
+        else:
+            delta = prob.dtype_u(solution)
+        delta *= scale
         return delta
 
 

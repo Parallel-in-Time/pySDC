@@ -6,10 +6,10 @@ Kept in its own module because importing it requires ``mpi4py``, which
 
 The MPI sweeper assigns one collocation node per rank and therefore uses only the **diagonal** of
 :math:`Q^\Delta`. The delta form collapses accordingly: with
-:math:`\varepsilon_r = u_0 + \tau_r + \Delta t (Q f^k)_r - u^k_r` for the rank's own node,
+:math:`r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m` for the rank's own node :math:`m`,
 
 .. math::
-    \delta_r = \varepsilon_r + \Delta t Q^\Delta_{rr}\,\big(f(u^k_r + \delta_r) - f(u^k_r)\big),
+    \delta_m = r_m + \Delta t Q^\Delta_{mm}\,\big(f(u^k_m + \delta_m) - f(u^k_m)\big),
 
 with no accumulation over other nodes. The node-local piece is identical to the serial case, so
 :meth:`DeltaFormMixin._solve_correction` is reused unchanged and all three strategies
@@ -49,7 +49,7 @@ class delta_implicit_MPI(DeltaFormMixin, generic_implicit_MPI):
 
     def _residual_nodes(self):
         r"""
-        Compute :math:`\varepsilon_r` at this rank's node, in backend precision.
+        Compute :math:`r_m` at this rank's node, in backend precision.
 
         Returned as a one-element list, so the multi-level machinery -- which is written for a list
         of nodes -- reads the same here as it does serially. A residual handed down by a transfer is
