@@ -37,7 +37,7 @@ def _run_mpi(extra_args):
 
         del mpi4py
     except ImportError:
-        raise ImportError('the node-parallel sweeper test needs mpi4py')
+        raise ImportError('the node-parallel sweeper test needs mpi4py') from None
 
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
