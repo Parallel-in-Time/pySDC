@@ -381,14 +381,6 @@ def heat_configurations():
             True,
             rounding_transfer,
         ),
-        (
-            'CONTROL fp16 solve, unnormalised',
-            {'solve_precision': f16, 'normalize': False},
-            delta_implicit,
-            {},
-            False,
-            None,
-        ),
         ('CONTROL fp32 fine level', {}, delta_implicit_rounded, {'level_precision': f32}, True, delta_transfer),
     ]
 

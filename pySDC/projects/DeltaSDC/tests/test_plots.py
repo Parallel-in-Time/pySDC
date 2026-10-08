@@ -11,13 +11,13 @@ import pytest
 
 @pytest.mark.base
 def test_mixed_precision_figures():
-    """A normalised half-precision solve keeps the fp64 floor; the naive one, its control, does not."""
+    """In each figure the half-precision run keeps the fp64 floor, and the control, drawn last, does not."""
     from pySDC.projects.DeltaSDC.plot_mixed_precision import main
 
     for name, curves in main().items():
-        floor = {label: min(history) for label, history in curves.items()}
-        assert floor['fp16 solve, normalized'] < 10 * floor['fp64 solve'], name
-        assert floor['fp16 solve, naive'] > 1e4 * floor['fp64 solve'], f'{name}: the control no longer fails'
+        reference, half, control = (min(history) for history in curves.values())
+        assert half < 10 * reference, name
+        assert control > 1e4 * reference, f'{name}: the control no longer fails'
         assert os.path.isfile(f'data/mixed_precision_{name}.png')
 
 

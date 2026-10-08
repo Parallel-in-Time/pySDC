@@ -114,15 +114,15 @@ controls:
 ``mlsdc.py``                    reduced precision on a level, emulated
 ``cascade.py``                  storage precision raised as the iteration converges
 ``sweepers_MPI.py``             the same, for the node-parallel hierarchy
-``problems.py``                 ``allencahn_delta`` (nonlinear) and ``heat_delta`` (linear), whose solves
-                                run at ``solve_precision``, emulated or genuinely
+``problems.py``                 ``allencahn_delta`` (nonlinear), and ``heat_delta`` (linear), which
+                                emulates half precision where no sparse solver has it
 ``problems_petsc.py``           ``petsc_fisher_delta`` (reduced precision emulated)
 ``problems_fenics.py``          ``fenics_grayscott_delta`` (emulated), plus the controls
 ``run_demo.py``                 runnable demonstration, nonlinear and linear
 ``run_petsc.py``                PETSc entry point, called by the ``petsc``-marked test
 ``run_fenics.py``               FEniCS entry point, called by the ``fenics``-marked test
 ``run_mpi.py``                  node-parallel driver, run on three ranks by the ``mpi4py`` test
-``paradiag.py``                 ParaDiag at reduced precision -- no reformulation needed
+``paradiag.py``                 ParaDiag's transform at reduced precision
 ``run_gpu.py``                  time to solution on CPU or GPU, and the half-precision FFT check
 ``plot_mixed_precision.py``     the figures in "Corrections below ``float16`` need scaling"
 ``plot_delivered_accuracy.py``  the figure in "The node-local solve"
@@ -274,12 +274,13 @@ coarse level and solve ``float16``    7           7.4e-14
 CONTROL stock hierarchy, fp32 coarse  never       **2.7e-10**
 CONTROL stock hierarchy, fp16 coarse  never       **2.3e-04**
 CONTROL fine *level* ``float32``      never       **2.2e-05**
-CONTROL fine solve fp16, unscaled     never       **5.7e-05**
 ====================================  ==========  ==============
 
-The four controls are what make the rest of the table mean anything. The first two say the delta
+The three controls are what make the rest of the table mean anything. The first two say the delta
 *hierarchy* is what makes a reduced-precision coarse level safe, not the node-local solve; the third
-says the fine level is where precision binds; the fourth is the scaling below.
+says the fine level is where precision binds. A fourth, a half-precision fine solve handed its
+right-hand side unscaled, used to stall at 5.7e-05; the sweeper now scales for it (below), so that
+control lives in pySDC's own tests, with the scaling switched off.
 
 The same holds for three and four levels, for PFASST, for the node-parallel sweeper, and on every
 backend. ``run_demo.py``, ``run_petsc.py``, ``run_fenics.py`` and ``run_mpi.py`` each print their own
@@ -292,7 +293,11 @@ The smallest ``float16`` subnormal is 6e-8. The delta form exists to make the so
 small, so the two are in direct tension: a correction of 1e-10 handed to a half-precision solver
 rounds to **zero**. Scaling the right-hand side to :math:`\mathcal{O}(1)` before the solve and
 scaling the result back -- exact for a linear solve, and free, since the right-hand side's
-magnitude is already known -- removes it.
+magnitude is already known -- removes it. On the linear route the delta-form sweeper does that for
+any solver; that is part of the correction-solve contract documented on
+:class:`~pySDC.core.problem.Problem`. On the nonlinear route the scaled unknown would enter
+:math:`f`, so there the solver does it itself, as ``allencahn_delta`` and ``fenics_grayscott_delta``
+do.
 
 ``correction_precision``, which stores :math:`r`, :math:`\delta` and :math:`\Delta f` in a
 reduced-precision datatype, gets the same treatment: the stored quantities are divided by the
@@ -313,18 +318,20 @@ corrections on the fine level stored at  iterations  residual floor
 5.9e-05 is ``float16``'s smallest *normal*, 6.1e-05. Below it half precision has almost no mantissa
 left -- 1.3e-2 relative at 1e-6, 1.9e-1 at 1e-7 -- so an unscaled correction turns to noise exactly
 when it starts to matter. The same holds for a half-precision node-local solve
-(``plot_mixed_precision.py``), on a linear and on a nonlinear problem:
+(``plot_mixed_precision.py``). On the linear heat equation the sweeper scales, so the control is
+stock SDC with the same solve, which hands it the state rather than a correction; on nonlinear
+Allen-Cahn the solver scales, so the control is the same solve with its scaling switched off:
 
 .. image:: ../../../data/mixed_precision_heat.png
-   :alt: Residual against SDC iteration for 1D heat: the fp64 and the normalised fp16 solve fall
-         together to about 1e-13, the naive fp16 solve stalls near 6e-5.
+   :alt: Residual against SDC iteration for 1D heat: the fp64 and the fp16 solve fall together to
+         about 1e-13, stock SDC with the same fp16 solve stalls near 0.3.
 
 .. image:: ../../../data/mixed_precision_allencahn.png
    :alt: Residual against SDC iteration for 2D Allen-Cahn: the fp64 and the normalised fp16 solve
          fall together to about 1e-12, the naive fp16 solve stalls near 2e-6.
 
-On the *fine* solve, unscaled half precision floors the iteration at 5.7e-05; scaled, it converges at
-three extra iterations. On a *coarse* solve the same underflow costs iterations only, 10 instead of
+Unscaled, half precision floors the iteration on the *fine* solve at 5.7e-05; scaled, it converges
+at three extra iterations. On a *coarse* solve the same underflow costs iterations only, 10 instead of
 7, with the floor unchanged. Losing the coarse correction degrades MLSDC towards SDC; losing the
 fine correction stalls it. That is the precise sense in which a coarse level tolerates less
 precision than a fine one -- it fails gracefully, which the fine level does not.
@@ -459,8 +466,10 @@ ParaDiag needs none of the above. It is already in the delta form, because the P
 
 The residual is formed in working precision, handed to the diagonalised alpha-circulant
 preconditioner, and the result added back -- so the quantity the node-local solver receives and
-returns is already an increment whose magnitude falls with the iteration. ``paradiag.py`` therefore
-contains no reformulation, only two precision knobs and the tests that say what they cost. Measured
+returns is already an increment whose magnitude falls with the iteration. So there is no
+reformulation: the node-local solve's precision is the library's ``solve_precision`` on the stock
+heat problem, and ``paradiag.py`` adds only the transform's, plus the tests that say what both cost.
+Measured
 on 8 steps of 1D heat, 3 nodes, :math:`\alpha = 10^{-4}`:
 
 ==================================  ==============  ===========
@@ -493,8 +502,8 @@ On real hardware
 
 ``run_gpu.py`` times the ladder where nothing is emulated: 2D heat, periodic, CG solves, a Gaussian
 bump as initial value, :math:`\Delta t = 10^{-2}`, two steps, every row run to the same residual
-tolerance of 1e-10. The reduced-precision solve reads and writes genuine ``float32`` arrays
-(``problems.heat_delta``); a reduced coarse level genuinely holds them (``dtype``). Measured on
+tolerance of 1e-10. The reduced-precision solve reads and writes genuine ``float32`` arrays (the
+library's ``solve_precision``); a reduced coarse level genuinely holds them (``dtype``). Measured on
 Modal, 1024 x 1024 -- speedup against fp64 SDC, answer distance to it in the last column:
 
 ==========================================  ====  ======  ==========  ===========  ===========
@@ -539,7 +548,8 @@ Half-precision arithmetic: the specification, checked
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The delivered-accuracy table above was measured by spoiling exact solves. With
-``solver_type='FFT'``, ``heat_delta`` solves by diagonalising the periodic operator, and at
+``solver_type='FFT'``, pySDC's finite-difference problems solve by diagonalising the periodic
+operator, and at
 ``float16`` on a GPU every value in that solve is stored, and every product rounded, in half
 precision -- cuFFT's complex32 transforms through ``cupy.cuda.cufft.XtPlanNd``. It delivers
 :math:`\eta \approx 2\cdot 10^{-3}` to :math:`4\cdot 10^{-3}`, growing with the grid as the

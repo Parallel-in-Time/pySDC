@@ -3,7 +3,7 @@ Time to solution of the precision ladder on real hardware: 2D heat, CG solves, C
 
 Every other script in this project measures *whether* a reduced precision costs accuracy or
 iterations. This one measures what it buys, so nothing here is emulated: a reduced-precision solve
-really reads fp32 arrays (:class:`.problems.heat_delta`) and a reduced coarse level really
+really reads fp32 arrays (the library's ``solve_precision``) and a reduced coarse level really
 holds them (``dtype``). Every row runs to the same residual tolerance, and reports the answer's
 distance from the fp64 SDC one next to its wall time.
 
@@ -23,7 +23,7 @@ from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.BaseTransferDelta import delta_transfer
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.projects.DeltaSDC.problems import heat_delta
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
 SWEEPER_PARAMS = {
     'quad_type': 'RADAU-RIGHT',
@@ -115,7 +115,7 @@ def run(n, sweeper_class, problem_params, sweeper_params, multilevel, use_gpu, d
         **problem_params,
     }
     description = {
-        'problem_class': heat_delta,
+        'problem_class': heatNd_unforced,
         'problem_params': problem_params,
         'sweeper_class': sweeper_class,
         'sweeper_params': dict(SWEEPER_PARAMS, **sweeper_params),
@@ -173,11 +173,14 @@ def run_paradiag(n, solve_precision, transform_precision, use_gpu, dt, nsteps, a
         End value, wall time in seconds, iterations, and the residual reached.
     """
     from pySDC.implementations.sweeper_classes.ParaDiagSweepers import QDiagonalizationIMEX
-    from pySDC.projects.DeltaSDC.paradiag import controller_ParaDiag_reduced_transform, heat_paradiag
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
+    from pySDC.projects.DeltaSDC.paradiag import controller_ParaDiag_reduced_transform
 
     description = {
-        'problem_class': heat_paradiag,
+        'problem_class': heatNd_forced,
         'problem_params': {
+            'dtype': 'complex128',
+            'solver_type': 'FFT',
             'nvars': (n, n),
             'nu': 0.1,
             'freq': (2, 2),

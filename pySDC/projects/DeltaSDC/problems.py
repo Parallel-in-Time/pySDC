@@ -26,7 +26,6 @@ costs no extra right-hand side evaluation.
 """
 
 import numpy as np
-import scipy.fft
 
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
@@ -36,20 +35,6 @@ TOLERANCE_SAFETY = 100.0
 
 CONDITIONING_SAFETY = 4.0
 """Multiplier applied to the conditioning estimate ``1 + alpha * ||J||``."""
-
-
-def circulant_eigenvalues(prob):
-    """
-    The FFT module for the problem's device, and the eigenvalues of its periodic operator ``A``.
-
-    A periodic finite-difference operator is circulant, so the FFT diagonalises it exactly and its
-    first column transforms to its eigenvalues; a solve is then two FFTs and a division. scipy.fft
-    rather than numpy.fft on the CPU: NumPy 1 computes a single-precision FFT in double.
-    """
-    fft = scipy.fft if prob.xp is np else prob.xp.fft
-    first_column = prob.xp.zeros(prob.A.shape[0], dtype=prob.A.dtype)
-    first_column[0] = 1.0
-    return fft, fft.fftn((prob.A @ first_column).reshape(prob.nvars))
 
 
 class allencahn_delta(allencahn_fullyimplicit):
@@ -290,75 +275,40 @@ class allencahn_delta(allencahn_fullyimplicit):
 
 class heat_delta(heatNd_unforced):
     r"""
-    Heat equation whose node-local solve runs at ``solve_precision``.
+    Heat equation whose solve may run in half precision on any solver, emulated where none can.
 
-    The implicit operator is linear, so no ``solve_system_delta`` is needed: the sweeper reaches the
-    correction equation with ``linear_implicit=True`` and the stock ``solve_system``, and
-    ``eval_f_increment`` is inherited from :class:`GenericNDimFinDiff`. What this class adds is the
-    solve at a reduced precision, which ``dtype`` cannot give, since that stores the level's state at
-    the same precision. Only meaningful under the delta form: the solve then returns a correction,
-    and its error is relative to that.
+    ``solve_precision`` is the library's (:class:`GenericNDimFinDiff`): the solve genuinely runs at
+    it on every route that has one -- the sparse solvers down to single precision, the FFT on a
+    periodic grid down to half. That leaves half precision on a sparse solver, which neither SciPy
+    nor CuPy provides. There this class **emulates** it: the operator, the right-hand side and the
+    result are rounded through ``float16`` around a dense solve at the backend precision. The 1D
+    Dirichlet demo, which has no FFT, needs that for its half-precision rows; results obtained this
+    way are labelled as emulated.
 
-    How the solve gets there follows ``solver_type``:
-
-    ``'direct'``
-        **Emulated**, as on the PETSc and FEniCS backends: the operator, the right-hand side and the
-        result are rounded through ``solve_precision`` while the arithmetic stays at the backend type.
-        SciPy carries no ``float16`` sparse matrix, so on a sparse operator half precision can only be
-        reached this way.
-    ``'CG'``
-        **Genuine**: the operator is held a second time at ``solve_precision`` and the Krylov solve
-        reads and writes arrays of that type, from a zero initial guess, so on a GPU the bandwidth
-        the solve moves really shrinks. Up to ``float32``, where CuPy's and SciPy's sparse matrices
-        stop.
-    ``'FFT'``
-        Periodic grids only. The operator is circulant, so the solve is a forward FFT, a division and
-        an inverse FFT at ``solve_precision``. At ``float16`` on a GPU those are cuFFT's complex32
-        transforms (power-of-two grids), with every value stored and every product rounded in half
-        precision -- the one route to genuine half-precision *arithmetic*. A CPU has no
-        half-precision FFT, so there it is emulated, optimistically, by rounding through ``float16``
-        around a ``complex64`` transform. The transforms are unitary and the right-hand side is
-        normalised, which keeps every intermediate inside ``float16``'s range: an unnormalised
-        transform of a 1024 x 1024 grid reaches 1e6, and ``float16`` stops at 65504.
+    The right-hand side needs no scaling here: on the linear route the delta-form sweeper hands it
+    over at unit size, as the correction-solve contract on :class:`~pySDC.core.problem.Problem`
+    says.
 
     Parameters
     ----------
     solve_precision : dtype-like or None, optional
-        Precision of the node-local solve. ``None`` keeps backend precision.
-    normalize : bool, optional
-        For ``'direct'``: scale the right-hand side to :math:`\mathcal{O}(1)` before the solve and the
-        result back, exact for a linear solve. Half precision needs it: the smallest ``float16``
-        subnormal is 6e-8, so a correction of 1e-10 -- exactly what the delta form hands the solver --
-        rounds to **zero** without it. ``'FFT'`` always normalises.
+        Precision of the node-local solve; ``float16`` on a sparse solver is emulated.
     **kwargs
         Forwarded to :class:`heatNd_unforced`.
     """
 
-    def __init__(self, solve_precision=None, normalize=True, **kwargs):
+    def __init__(self, solve_precision=None, **kwargs):
         """Initialization routine"""
-        super().__init__(**kwargs)
-        solve_precision = None if solve_precision is None else np.dtype(solve_precision)
-        self._makeAttributeAndRegister('solve_precision', 'normalize', localVars=locals())
-        if self.solver_type == 'FFT':
-            if self.bc != 'periodic':
-                raise ValueError('the FFT solve diagonalises a circulant operator and needs a periodic grid')
-            if solve_precision == np.float16 and self.xp is not np and any(n & (n - 1) for n in self._shape):
-                raise ValueError(f'cuFFT computes half precision on power-of-two grids only, got {self.nvars}')
-            self._fft, eigenvalues = circulant_eigenvalues(self)
-            self._eigenvalues = eigenvalues.real  # a symmetric stencil
-            self._half_plan = None
-        elif self.solver_type == 'CG' and solve_precision is not None:
-            self.A_solve = self.A.astype(solve_precision)
-            self.Id_solve = self.Id.astype(solve_precision)
-
-    @property
-    def _shape(self):
-        """The grid as a tuple, also in 1D."""
-        return tuple(int(n) for n in np.atleast_1d(self.nvars))
+        precision = None if solve_precision is None else np.dtype(solve_precision)
+        emulate = precision == np.float16 and kwargs.get('solver_type', 'direct') != 'FFT'
+        super().__init__(solve_precision=None if emulate else precision, **kwargs)
+        self._emulated = precision if emulate else None
+        solve_precision = precision
+        self._makeAttributeAndRegister('solve_precision', localVars=locals())
 
     def solve_system(self, rhs, factor, u0, t):
         r"""
-        Solve :math:`(I - factor\,A)\,x = rhs` at ``solve_precision``, by the route ``solver_type`` names.
+        Solve :math:`(I - factor\,A)\,x = rhs`, emulating half precision on a sparse solver.
 
         Parameters
         ----------
@@ -367,7 +317,7 @@ class heat_delta(heatNd_unforced):
         factor : float
             Implicit prefactor.
         u0 : dtype_u
-            Initial guess, ignored at reduced precision: the unknown is a correction, so zero is it.
+            Initial guess, unused by the emulated dense solve.
         t : float
             Current time.
 
@@ -376,98 +326,15 @@ class heat_delta(heatNd_unforced):
         dtype_u
             The solution, at the level's own precision.
         """
-        if self.solver_type == 'FFT':
-            return self._solve_fft(rhs, factor)
-        if self.solve_precision is None:
+        if self._emulated is None:
             return super().solve_system(rhs, factor, u0, t)
-        if self.solver_type == 'CG':
-            # float(): an np.float64 factor would drag the operator back to double under NEP 50
-            solution, _ = self.linalg.cg(
-                self.Id_solve - float(factor) * self.A_solve,
-                rhs.flatten().astype(self.solve_precision),
-                rtol=self.lintol,
-                atol=0,
-                maxiter=self.liniter,
-                callback=self.work_counters['CG'],
-            )
-            me = self.dtype_u(self.init)
-            me[:] = solution.reshape(self.nvars)
-            return me
-
-        dtype = self.solve_precision
-        b = rhs.view(self.xp.ndarray).astype(np.float64).flatten()
-        scale = max(float(abs(b).max()), 1e-300) if self.normalize else 1.0
-        b = (b / scale).astype(dtype).astype(np.float64)
+        dtype = self._emulated
+        b = rhs.view(self.xp.ndarray).astype(np.float64).flatten().astype(dtype).astype(np.float64)
         matrix = (self.Id - factor * self.A).toarray().astype(dtype).astype(np.float64)
         solution = self.xp.linalg.solve(matrix, b)
         me = self.dtype_u(self.init)
-        me[:] = (scale * solution.astype(dtype).astype(np.float64)).reshape(self.nvars)
+        me[:] = solution.astype(dtype).astype(np.float64).reshape(self.nvars)
         return me
-
-    def _solve_fft(self, rhs, factor):
-        r"""
-        Solve :math:`(I - factor\,A)\,x = rhs` by diagonalisation, at ``solve_precision``.
-
-        Returns
-        -------
-        dtype_u
-            The solution, at the level's own precision.
-        """
-        me = self.dtype_u(self.init, val=0.0)
-        b = rhs.view(self.xp.ndarray).reshape(self._shape)
-        scale = float(abs(b).max())
-        if scale == 0.0:
-            return me
-        inverse = 1.0 / (1.0 - float(factor) * self._eigenvalues)
-        dtype = np.dtype(np.float64) if self.solve_precision is None else self.solve_precision
-        if dtype == np.float16:
-            x = self._solve_fft_half(b / scale, inverse)
-        else:
-            spectrum = self._fft.fftn((b / scale).astype(np.result_type(dtype, np.complex64)))
-            x = self._fft.ifftn(spectrum * inverse.astype(dtype)).real
-        self.work_counters['FFT']()
-        # widen first, scale second, as for the stored corrections
-        me[:] = x.reshape(me.shape)
-        me *= scale
-        return me
-
-    def _solve_fft_half(self, y, inverse):
-        """
-        ``ifft(fft(y) * inverse)`` in half precision, for ``|y| <= 1``; returned in double.
-
-        Both transforms are scaled by ``1 / sqrt(N)``, so the forward one is bounded by ``sqrt(N)``
-        and the inverse one by ``sqrt(N)`` times the solution -- 1024 on a 1024 x 1024 grid.
-        """
-        unit = 1.0 / np.sqrt(y.size)
-        if self.xp is np:
-            f16 = np.float16
-
-            def rounded(z):
-                return z.real.astype(f16).astype(np.float32) + 1j * z.imag.astype(f16).astype(np.float32)
-
-            spectrum = rounded(self._fft.fftn((y * unit).astype(f16).astype(np.complex64)))
-            spectrum = rounded(spectrum * inverse.astype(f16).astype(np.float32))
-            solution = rounded(self._fft.ifftn(spectrum, norm='forward')).real
-            return solution.astype(np.float64) * unit
-
-        import cupy as cp
-        from cupy.cuda import cufft
-
-        shape, n = self._shape, y.size
-        if self._half_plan is None:
-            # complex32 in and out, stored as float16 (re, im) pairs along the last axis
-            self._half_plan = cufft.XtPlanNd(
-                shape, shape, 1, n, 'E', shape, 1, n, 'E', 1, 'E', order='C', last_axis=-1, last_size=None
-            )
-        data = cp.zeros(shape[:-1] + (2 * shape[-1],), dtype=cp.float16)
-        data[..., 0::2] = y * unit
-        spectrum = cp.empty_like(data)
-        self._half_plan.fft(data, spectrum, cufft.CUFFT_FORWARD)
-        inverse = inverse.astype(cp.float16)
-        spectrum[..., 0::2] *= inverse
-        spectrum[..., 1::2] *= inverse
-        self._half_plan.fft(spectrum, data, cufft.CUFFT_INVERSE)
-        return data[..., 0::2].astype(cp.float64) * unit
 
 
 class heat_no_increment(heat_delta):

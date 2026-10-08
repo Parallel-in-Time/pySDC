@@ -49,7 +49,7 @@ def test_control_stalls():
 
 @pytest.mark.cupy
 def test_reduced_precision_is_genuine():
-    """The coarse level really holds reduced device arrays, and the fp32 solve really is fp32."""
+    """The coarse level really holds reduced device arrays; the solve's own precision is the library's to test."""
     import cupy as cp
 
     for coarse_dtype in ['fp32', 'fp16']:
@@ -59,25 +59,13 @@ def test_reduced_precision_is_genuine():
         assert all(isinstance(u, cp.ndarray) and u.dtype == expected for u in coarse.u)
         assert all(u.dtype == cp.float64 for u in fine.u)
 
-    # fingerprint: same system, fp32 vs fp64 solve, must differ by about fp32's epsilon
-    prob = fine.prob
-    rhs = prob.dtype_u(prob.init)
-    rhs[:] = cp.random.default_rng(0).standard_normal(prob.nvars)
-    prob.lintol = 1e-12
-    single = prob.solve_system(rhs, 0.01, None, 0.0)
-    prob.solve_precision, keep = None, prob.solve_precision
-    double = prob.solve_system(rhs, 0.01, prob.dtype_u(prob.init, val=0.0), 0.0)
-    prob.solve_precision = keep
-    assert single.dtype == cp.float64
-    assert 1e-9 < float(abs(single - double) / abs(double)) < 1e-5
-
 
 @pytest.mark.cupy
 def test_paradiag_complex64_on_device():
     """The whole ParaDiag preconditioner at complex64 on the GPU: fp64's answer, genuinely single."""
     import cupy as cp
 
-    from pySDC.projects.DeltaSDC.paradiag import heat_paradiag
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
     from pySDC.projects.DeltaSDC.run_gpu import run_paradiag
 
     reference, _, niter_full, _ = run_paradiag(N, None, None, True, 1e-2, 8)
@@ -86,14 +74,22 @@ def test_paradiag_complex64_on_device():
     assert float(abs(uend - reference)) < 1e-12 and residual < 1e-10
     assert niter <= niter_full + 1
 
-    # fingerprint: the complex64 solve must differ from the complex128 one by about its epsilon
+    # fingerprint: the complex64 solve, with ParaDiag's complex factor, must differ from the
+    # complex128 one by about its epsilon -- the library tests complex solves on the CPU only
     solves = []
     for precision in [None, 'complex64']:
-        prob = heat_paradiag(nvars=(N, N), nu=0.1, freq=(2, 2), bc='periodic', solve_precision=precision, useGPU=True)
+        prob = heatNd_forced(
+            nvars=(N, N),
+            nu=0.1,
+            freq=(2, 2),
+            dtype='complex128',
+            solver_type='FFT',
+            solve_precision=precision,
+            useGPU=True,
+        )
         rhs = prob.dtype_u(prob.init)
         rhs[:] = cp.random.default_rng(0).standard_normal(prob.nvars)
         solves.append(prob.solve_jacobian(rhs, 0.3 - 0.2j))
-    assert prob._eigenvalues.dtype == cp.complex64
     assert 1e-9 < float(abs(solves[1] - solves[0]) / abs(solves[0])) < 1e-5
 
 
@@ -113,7 +109,6 @@ HEAT_TABLE = {
     'all three: fp32 solve, fp16 coarse, cascade': 8,
     'full ladder: fp32 fine, fp16 coarse': 10,
     'CONTROL fp16 coarse, stock ML': None,
-    'CONTROL fp16 solve, unnormalised': None,
     'CONTROL fp32 fine level': None,
 }
 
@@ -183,27 +178,6 @@ def test_readme_tables_are_complete():
 
     assert [config[0] for config in heat_configurations()] == list(HEAT_TABLE)
     assert [config[0] for config in configurations()] == list(ALLEN_CAHN_SWEEPS)
-
-
-@pytest.mark.cupy
-def test_half_precision_fft_solve_is_genuine():
-    """cuFFT's complex32 transform: off by half precision's epsilon, not by single's, and not broken."""
-    import cupy as cp
-
-    from pySDC.projects.DeltaSDC.problems import heat_delta
-
-    solves = {}
-    for precision in [None, 'float16']:
-        prob = heat_delta(
-            nvars=(256, 256), nu=0.1, bc='periodic', solver_type='FFT', solve_precision=precision, useGPU=True
-        )
-        rhs = prob.dtype_u(prob.init)
-        rhs[:] = cp.random.default_rng(0).standard_normal(prob.nvars) * 1e-9
-        solves[precision] = prob.solve_system(rhs, 1e-3, None, 0.0)
-    error = float(abs(solves['float16'] - solves[None]) / abs(solves[None]))
-    # single precision would be ~1e-7; a broken transform or a flushed rhs would be ~1
-    assert 1e-5 < error < 1e-2, f'half-precision solve off by {error:.1e}'
-    assert solves['float16'].dtype == cp.float64
 
 
 @pytest.mark.cupy

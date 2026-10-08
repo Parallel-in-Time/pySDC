@@ -22,11 +22,14 @@ FLOOR_FULL = 1e-13
 
 def _description(solve_precision=None):
     from pySDC.implementations.sweeper_classes.ParaDiagSweepers import QDiagonalizationIMEX
-    from pySDC.projects.DeltaSDC.paradiag import heat_paradiag
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 
+    # the stock problem: ParaDiag's state is complex, and the library's solve_precision runs the
+    # node-local solve below it
     return {
-        'problem_class': heat_paradiag,
+        'problem_class': heatNd_forced,
         'problem_params': {
+            'dtype': 'complex128',
             'nu': 0.1,
             'freq': (2,),
             'nvars': (31,),

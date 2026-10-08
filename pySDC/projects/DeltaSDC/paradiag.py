@@ -31,91 +31,23 @@ reduced precision. It is deliberately ill-conditioned: ``get_J_inv_matrix`` weig
 which is itself shrinking. See ``tests/test_paradiag.py``, which pins both halves of this and
 carries the control that shows the measurement can fail.
 
-Unlike the PETSc and FEniCS routes in this project, nothing here is emulated: the FFT (periodic),
-the sparse solver (otherwise) and the matmul all carry ``complex64`` through, on the CPU and on a
-GPU alike, so the reduced-precision runs really are single-precision arithmetic. ParaDiag diagonalises in time, so its working type is *complex*, and
-reduced precision therefore means ``complex64`` rather than ``float32``.
+The node-local solve needs nothing from this project: the stock heat problem with
+``dtype='complex128'`` and the library's ``solve_precision='complex64'`` solves at single precision
+while the state stays double, by a sparse solve or, on a periodic grid, by FFT. What is here is the
+transform at reduced precision, :class:`controller_ParaDiag_reduced_transform`.
+
+Unlike the PETSc and FEniCS routes in this project, nothing here is emulated: the solves and the
+matmul all carry ``complex64`` through, on the CPU and on a GPU alike, so the reduced-precision runs
+really are single-precision arithmetic. ParaDiag diagonalises in time, so its working type is
+*complex*, and reduced precision therefore means ``complex64`` rather than ``float32``.
 """
 
 import numpy as np
 
 from pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI import controller_ParaDiag_nonMPI
-from pySDC.core.problem import WorkCounter
-from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
-from pySDC.projects.DeltaSDC.problems import circulant_eigenvalues
 
 FULL = np.dtype('complex128')
 """Working precision. ParaDiag diagonalises in time, so it is complex even for a real problem."""
-
-
-class heat_paradiag(heatNd_forced):
-    """
-    ``heatNd_forced`` prepared for ParaDiag, with the node-local solve at a chosen precision.
-
-    The stock problem's ``dtype`` already makes the state and the operators complex, which
-    diagonalising across the steps requires, so it defaults to ``complex128`` here. What it cannot do
-    is hold the solve at a *different* precision from the state -- ``dtype='complex64'`` stores the
-    solution at single precision too, which is the control that stalls. So ``solve_jacobian`` solves
-    :math:`(I - \\text{factor}\\,A)\\,x = r` at ``solve_precision`` instead of inheriting the
-    double-precision solve. The factor is complex here -- it is an eigenvalue of the circulant
-    times :math:`\\Delta t` -- so a sparse operator has to be assembled per call. With periodic
-    boundaries none is: the FFT diagonalises :math:`A`, and the solve is a division in Fourier
-    space. That path is what runs on a GPU; ``spsolve`` there is too slow to be worth timing.
-
-    Parameters
-    ----------
-    solve_precision : dtype-like or None, optional
-        Working precision of the node-local solve. ``None`` keeps ``complex128``.
-    """
-
-    def __init__(self, solve_precision=None, dtype=FULL, **kwargs):
-        super().__init__(dtype=dtype, **kwargs)
-        solve_precision = FULL if solve_precision is None else np.dtype(solve_precision)
-        self._makeAttributeAndRegister('solve_precision', localVars=locals())
-        self.work_counters['jacobian_solves'] = WorkCounter()
-
-        # With periodic boundaries the solve is a diagonalisation: two FFTs and a division, which is
-        # also the one place where single precision is several times faster on a GPU.
-        if self.bc == 'periodic':
-            self._fft, eigenvalues = circulant_eigenvalues(self)
-            self._eigenvalues = eigenvalues.astype(self.solve_precision)
-
-    def solve_jacobian(self, rhs, factor, u=None, u0=None, t=0, **kwargs):
-        r"""
-        Solve :math:`(I - \text{factor}\,A)\,x = \text{rhs}` at the configured precision.
-
-        In ParaDiag ``rhs`` is a residual and ``x`` an increment, so an error of relative size
-        :math:`\varepsilon` here is an absolute error :math:`\varepsilon|\delta|`, which vanishes
-        with the iteration. That is what makes reducing this precision safe, and it is a property
-        of ParaDiag's formulation rather than of anything done here.
-
-        Parameters
-        ----------
-        rhs : dtype_u
-            Right-hand side, a residual in Fourier space across the steps.
-        factor : complex
-            Circulant eigenvalue times the step size.
-        u, u0, t
-            Accepted for interface compatibility; a linear problem needs none of them.
-
-        Returns
-        -------
-        dtype_u
-            The increment, cast back to working precision.
-        """
-        dtype = self.solve_precision
-        rhs = rhs.view(self.xp.ndarray).astype(dtype)
-        if self.bc == 'periodic':
-            solution = self._fft.ifftn(self._fft.fftn(rhs) / (1 - dtype.type(factor) * self._eigenvalues))
-        else:
-            identity = self.xsp.eye(self.A.shape[0], dtype=dtype, format='csr')
-            operator = (identity - dtype.type(factor) * self.A.astype(dtype)).tocsr()
-            solution = self.linalg.spsolve(operator, rhs.flatten())
-        self.work_counters['jacobian_solves']()
-
-        me = self.dtype_u(self.init)
-        me[:] = solution.astype(FULL).reshape(self.nvars)
-        return me
 
 
 class controller_ParaDiag_reduced_transform(controller_ParaDiag_nonMPI):
