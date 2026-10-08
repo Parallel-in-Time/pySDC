@@ -1,0 +1,20 @@
+.github/workflows/sbom.yml
+  s_410ce2888ad51b::t_0605bf8baf7adb 53,114
+  s_410ce2888ad51b::t_c01f7f465d2fd4 28-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bbd6ad2ac1dbdad91c882a5b3a81357e074a9d68",
+  "prompts": {},
+  "sessions": {
+    "s_410ce2888ad51b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aa3129b0-226b-485d-8376-47de5b709237",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
