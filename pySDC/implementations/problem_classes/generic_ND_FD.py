@@ -5,6 +5,7 @@ Created on Sat Feb 11 22:39:30 2023
 """
 
 import numpy as np
+import scipy.fft
 import scipy.sparse as sp
 import scipy.sparse.linalg as spla
 
@@ -52,7 +53,20 @@ class GenericNDimFinDiff(Problem):
         single anyway -- so ``float16`` here means genuinely half-precision *storage* with
         single-precision arithmetic, which is the arrangement it has on real hardware too.
     solver_type : str, optional
-        Type of solver. Can be ``'direct'``, ``'GMRES'`` or ``'CG'``.
+        Type of solver. Can be ``'direct'``, ``'GMRES'``, ``'CG'`` or, on periodic grids, ``'FFT'``:
+        the operator is then circulant, so the FFT diagonalises it and a solve is two transforms
+        and a division -- exact, and the cheapest solve there is on a GPU.
+    solve_precision : dtype-like or None, optional
+        Precision the implicit solve runs at, independently of the state's ``dtype``. ``None``
+        (default) solves at the operator's precision, exactly as without it. Otherwise the solve
+        genuinely works in that precision: the sparse solvers on a copy of the operator held at it,
+        ``'FFT'`` with transforms at it, and the result is widened back to ``dtype``. Sparse
+        matrices stop at single precision in SciPy and CuPy alike, so ``float16`` needs ``'FFT'``.
+        On a GPU those are cuFFT's half-precision transforms (power-of-two grids), with every value
+        stored and every product rounded in half precision. A CPU has no half-precision FFT, so
+        there ``float16`` is *emulated*, by rounding through it around a single-precision
+        transform -- which is optimistic, since the transform's own arithmetic is then single.
+        For a complex state the solve is complex at the same precision.
     bc : str or tuple of 2 string, optional
         Type of boundary conditions. Default is ``'periodic'``.
         To define two different types of boundary condition for each side,
@@ -123,6 +137,7 @@ class GenericNDimFinDiff(Problem):
         bcParams=None,
         dtype='float64',
         useGPU=False,
+        solve_precision=None,
     ):
         """Initialization routine"""
         if useGPU:
@@ -208,6 +223,36 @@ class GenericNDimFinDiff(Problem):
 
         if self.solver_type != 'direct':
             self.work_counters[self.solver_type] = WorkCounter()
+
+        solve_precision = None if solve_precision is None else np.dtype(solve_precision)
+        self._makeAttributeAndRegister('solve_precision', localVars=locals(), readOnly=True)
+        self._setup_solve(solver_type, solve_precision, bc)
+
+    def _setup_solve(self, solver_type, solve_precision, bc):
+        """Prepare the reduced-precision operator, or the eigenvalues the FFT solve divides by."""
+        # half precision is the one format that is not a complex dtype for a complex state
+        self._half = solve_precision == np.float16
+        precision = self.operator_dtype if solve_precision is None or self._half else solve_precision
+        if self.dtype.kind == 'c':
+            precision = np.promote_types(precision, np.complex64)
+        self._solve_dtype = precision
+
+        if solver_type == 'FFT':
+            if bc != 'periodic':
+                raise ProblemError(f'the FFT solve diagonalises a circulant operator and needs periodic BCs, got {bc}')
+            if self._half and self.xp is not np and any(n & (n - 1) for n in self.nvars):
+                raise ProblemError(f'cuFFT computes in half precision on power-of-two grids only, got {self.nvars}')
+            self._fft = scipy.fft if self.xp is np else self.xp.fft
+            # the first column of a circulant transforms to its eigenvalues
+            first_column = self.xp.zeros(self.A.shape[0], dtype=self.operator_dtype)
+            first_column[0] = 1.0
+            self._eigenvalues = self._fft.fftn((self.A @ first_column).reshape(self.nvars))
+            self._half_plan = None
+        elif solve_precision is not None:
+            if self._half:
+                raise ProblemError('sparse matrices stop at single precision; float16 needs solver_type="FFT"')
+            self._A_solve = self.A.astype(precision)
+            self._Id_solve = self.Id.astype(precision)
 
     @property
     def ndim(self):
@@ -312,6 +357,9 @@ class GenericNDimFinDiff(Problem):
         sol : dtype_u
             The solution of the linear solver.
         """
+        if self.solver_type == 'FFT' or self.solve_precision is not None:
+            return self._solve_at_precision(rhs, factor, u0)
+
         solver_type, Id, A, nvars, lintol, liniter, sol = (
             self.solver_type,
             self.Id,
@@ -349,3 +397,111 @@ class GenericNDimFinDiff(Problem):
             raise ValueError(f'solver type "{solver_type}" not known in generic advection-diffusion implementation!')
 
         return sol
+
+    def _solve_at_precision(self, rhs, factor, u0):
+        r"""
+        Solve :math:`(I-factor\cdot A)\vec{u}=\vec{rhs}` at ``solve_precision``, or by FFT.
+
+        Returns
+        -------
+        sol : dtype_u
+            The solution, widened to the state's precision.
+        """
+        sol = self.dtype_u(self.init)
+        if self.solver_type == 'FFT':
+            sol[:] = self._solve_fft(rhs.view(self.xp.ndarray).reshape(self.nvars), factor)
+            self.work_counters['FFT']()
+            return sol
+
+        precision = self._solve_dtype
+        # the factor at the solve's own precision: a float64 scalar would widen the operator back
+        matrix = self._Id_solve - precision.type(factor) * self._A_solve
+        b = rhs.view(self.xp.ndarray).flatten().astype(precision)
+        if self.solver_type == 'direct':
+            x = self.linalg.spsolve(matrix, b)
+        elif self.solver_type in ['GMRES', 'CG']:
+            x0 = u0.view(self.xp.ndarray).flatten().astype(precision)
+            options = {'callback_type': 'legacy'} if self.solver_type == 'GMRES' else {}
+            # A Krylov solve cannot meet a tolerance below its own precision. Asked to, it iterates to
+            # `liniter` and, in CG, divides by a dot product that has rounded to zero: NaN. A hundred
+            # times the precision's epsilon is what single precision still reaches.
+            rtol = max(self.lintol, 100 * float(np.finfo(precision).eps))
+            x = getattr(self.linalg, self.solver_type.lower())(
+                matrix,
+                b,
+                x0=x0,
+                rtol=rtol,
+                maxiter=self.liniter,
+                atol=0,
+                callback=self.work_counters[self.solver_type],
+                **options,
+            )[0]
+        else:
+            raise ValueError(
+                f'solver type "{self.solver_type}" not known in generic advection-diffusion implementation!'
+            )
+        sol[:] = x.reshape(self.nvars)
+        return sol
+
+    def _solve_fft(self, b, factor):
+        """
+        ``ifft(fft(b) / (1 - factor * eigenvalues))`` at the solve precision, at the state's precision.
+
+        The right-hand side is scaled to a maximum of one first and the result scaled back, which is
+        exact for a linear solve and keeps a half-precision solve clear of underflow: a correction of
+        1e-10 is below ``float16``'s smallest subnormal.
+        """
+        scale = float(abs(b).max())
+        if scale == 0.0:
+            return self.xp.zeros_like(b)
+        inverse = 1.0 / (1.0 - factor * self._eigenvalues)
+        if self._half:
+            x = self._solve_fft_half(b / scale, inverse)
+        else:
+            precision = np.promote_types(self._solve_dtype, np.complex64)
+            x = self._fft.ifftn(self._fft.fftn((b / scale).astype(precision)) * inverse.astype(precision))
+        # widen first, scale second: scaling at half precision would underflow on the way out
+        x = x.astype(np.promote_types(self.dtype, np.complex64))
+        x = x if self.dtype.kind == 'c' else x.real
+        return x * scale
+
+    def _solve_fft_half(self, y, inverse):
+        """
+        ``ifft(fft(y) * inverse)`` in half precision for ``|y| <= 1``, returned in single precision.
+
+        Both transforms are scaled by ``1 / sqrt(N)``, so the forward one is bounded by ``sqrt(N)``
+        and the inverse one by ``sqrt(N)`` times the solution: 1024 on a 1024 x 1024 grid, where an
+        unscaled transform would reach 1e6 and ``float16`` stops at 65504.
+        """
+        unit = 1.0 / np.sqrt(y.size)
+        if self.xp is np:
+            # an emulation: rounded through float16 at every stage, computed in single precision
+
+            def rounded(z):
+                return z.real.astype(np.float16).astype(np.float32) + 1j * z.imag.astype(np.float16).astype(np.float32)
+
+            spectrum = rounded(self._fft.fftn(rounded((y * unit).astype(np.complex64))))
+            spectrum = rounded(spectrum * rounded(inverse.astype(np.complex64)))
+            return rounded(self._fft.ifftn(spectrum, norm='forward')) * unit
+
+        import cupy as cp
+        from cupy.cuda import cufft
+
+        shape, n = tuple(self.nvars), y.size
+        if self._half_plan is None:
+            # complex32 in and out, stored as float16 (re, im) pairs along the last axis
+            self._half_plan = cufft.XtPlanNd(
+                shape, shape, 1, n, 'E', shape, 1, n, 'E', 1, 'E', order='C', last_axis=-1, last_size=None
+            )
+        data = cp.zeros(shape[:-1] + (2 * shape[-1],), dtype=cp.float16)
+        data[..., 0::2] = (y * unit).real
+        if y.dtype.kind == 'c':
+            data[..., 1::2] = (y * unit).imag
+        spectrum = cp.empty_like(data)
+        self._half_plan.fft(data, spectrum, cufft.CUFFT_FORWARD)
+        re, im = spectrum[..., 0::2].copy(), spectrum[..., 1::2].copy()
+        ir, ii = inverse.real.astype(cp.float16), inverse.imag.astype(cp.float16)
+        spectrum[..., 0::2] = re * ir - im * ii
+        spectrum[..., 1::2] = re * ii + im * ir
+        self._half_plan.fft(spectrum, data, cufft.CUFFT_INVERSE)
+        return (data[..., 0::2].astype(cp.float32) + 1j * data[..., 1::2].astype(cp.float32)) * unit

@@ -56,6 +56,8 @@ class heatNd_unforced(GenericNDimFinDiff):
         operators follow it.
     useGPU : bool, optional
         Run on the GPU with CuPy instead of on the CPU with NumPy.
+    solve_precision : dtype-like or None, optional
+        Precision the implicit solve runs at, independently of ``dtype``. See :class:`GenericNDimFinDiff`.
 
     Attributes
     ----------
@@ -79,10 +81,23 @@ class heatNd_unforced(GenericNDimFinDiff):
         sigma=6e-2,
         dtype='float64',
         useGPU=False,
+        solve_precision=None,
     ):
         """Initialization routine"""
         super().__init__(
-            nvars, nu, 2, freq, stencil_type, order, lintol, liniter, solver_type, bc, dtype=dtype, useGPU=useGPU
+            nvars,
+            nu,
+            2,
+            freq,
+            stencil_type,
+            order,
+            lintol,
+            liniter,
+            solver_type,
+            bc,
+            dtype=dtype,
+            useGPU=useGPU,
+            solve_precision=solve_precision,
         )
         if solver_type == 'GMRES':
             self.logger.warning('GMRES is not usually used for heat equation')
