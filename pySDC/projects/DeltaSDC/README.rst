@@ -29,10 +29,11 @@ A standard SDC sweep
                 + \Delta t \sum_j Q^\Delta_{mj}\,(f^{k+1}_j - f^k_j)
 
 is algebraically identical to, writing :math:`\delta_m = u^{k+1}_m - u^k_m` and
-:math:`\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m` for the collocation residual,
+:math:`r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m` for the collocation residual
+(:math:`\varepsilon` is kept for the precision of a format throughout),
 
 .. math::
-    \delta_m = \varepsilon_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,
+    \delta_m = r_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,
     \qquad \Delta f_j = f(u^k_j + \delta_j) - f(u^k_j),
     \qquad u^{k+1}_m = u^k_m + \delta_m.
 
@@ -213,13 +214,13 @@ A whole coarse level
 
 Stock MLSDC cannot run a coarse level below backend precision, because it forms two differences of
 :math:`\mathcal{O}(1)` quantities per V-cycle: the coarse residual, rebuilt from coarse data as
-:math:`\varepsilon_G = u_G[0] + \tau + \Delta t (Q f_G) - u_G[m]`, and the coarse-grid correction,
+:math:`r_G = u_G[0] + \tau + \Delta t (Q f_G) - u_G[m]`, and the coarse-grid correction,
 recovered in ``BaseTransfer.prolong`` as :math:`u_G - u_G^{\mathrm{old}}`. Each carries an absolute
 error :math:`\varepsilon|u|` that does not shrink as the iteration converges. Both have exact
 algebraic replacements:
 
 .. math::
-    \varepsilon_G = R\,\varepsilon_F,
+    r_G = R\,r_F,
     \qquad
     u_G - u_G^{\mathrm{old}} = \sum_{\text{sweeps}} \delta_G .
 
@@ -230,7 +231,7 @@ already computed by the sweep. The delta hierarchy uses both, and both are teste
 quantities they replace. The residual then travels with the level, advanced by a sweep as
 
 .. math::
-    \varepsilon \leftarrow \varepsilon - \delta + \Delta t\,(Q\,\Delta f),
+    r \leftarrow r - \delta + \Delta t\,(Q\,\Delta f),
 
 and by a prolongation with :math:`\delta` the interpolated coarse correction. Both combine only
 small quantities, which is what lets a middle level be swept again on the way up without rebuilding
@@ -290,10 +291,10 @@ Corrections below ``float16`` need scaling
 The smallest ``float16`` subnormal is 6e-8. The delta form exists to make the solver's argument
 small, so the two are in direct tension: a correction of 1e-10 handed to a half-precision solver
 rounds to **zero**. Scaling the right-hand side to :math:`\mathcal{O}(1)` before the solve and
-scaling the result back -- exact for a linear solve, and free, since :math:`|r|` is already known --
-removes it.
+scaling the result back -- exact for a linear solve, and free, since the right-hand side's
+magnitude is already known -- removes it.
 
-``correction_precision``, which stores :math:`\varepsilon`, :math:`\delta` and :math:`\Delta f` in a
+``correction_precision``, which stores :math:`r`, :math:`\delta` and :math:`\Delta f` in a
 reduced-precision datatype, gets the same treatment: the stored quantities are divided by the
 residual's own magnitude before they are written and multiplied back on the way out. That is block
 floating point, and what half-precision hardware does anyway. One divisor serves the whole sweep, so
@@ -582,7 +583,7 @@ whole preconditioner ``complex64``      4 it        5 it        4 it        4 it
 speedup of ``complex64``                **1.41x**   1.36x       1.26x       1.02x
 ======================================  ==========  ==========  ==========  ===============
 
-``adaptive`` is :class:`AdaptiveAlpha` with its accuracy floor :math:`\gamma = L(3\varepsilon + \tau)`
+``adaptive`` is :class:`AdaptiveAlpha` with its accuracy floor :math:`\gamma = L(3\varepsilon + \texttt{inner\_tol})`
 told the precision the preconditioner runs at, through ``inner_tol``; ``adaptive (fp64)`` is the stock
 floor, which assumes double throughout. **The floor has to know the precision.** The stock one drives
 :math:`\alpha` to 2e-9, where ``complex64``'s :math:`\varepsilon/\alpha` is of order ten, and the
@@ -722,7 +723,7 @@ which is affordable in fourteen sweeps and not in seven, so it costs MLSDC two i
 
 **PFASST still differences one pair of** :math:`\mathcal{O}(1)` **values.** The initial value arrives
 from the predecessor *after* the restriction, straight into ``u[0]``, and the inherited residual has
-to follow it: :math:`\varepsilon_m \leftarrow \varepsilon_m + (u_0 - u_0^{\mathrm{ref}})`. The
+to follow it: :math:`r_m \leftarrow r_m + (u_0 - u_0^{\mathrm{ref}})`. The
 difference is small and converges to zero, but it is *formed* by cancelling two values of size
 :math:`|u|`, so a reduced-precision coarse level buys less under PFASST than under MLSDC. Putting the
 step-to-step exchange itself in delta form would remove it; that is not done here.
