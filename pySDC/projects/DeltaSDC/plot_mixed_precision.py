@@ -1,5 +1,5 @@
 r"""
-Plots for a talk: SDC absorbs a half-precision node-local solve.
+Figures: SDC absorbs a half-precision node-local solve.
 
 One figure per problem -- the 1D heat equation (linear, direct solve) and 2D Allen-Cahn (nonlinear,
 Newton-CG) -- each showing the residual per iteration for three runs of the same delta-form sweeper.
@@ -17,8 +17,11 @@ Both runs go to a fixed iteration count rather than to a tolerance, so the tail 
 whatever stopped the run.
 
 Run as ``python -m pySDC.projects.DeltaSDC.plot_mixed_precision``; writes
-``mixed_precision_heat`` and ``mixed_precision_allencahn`` as PDF and PNG.
+``data/mixed_precision_heat`` and ``data/mixed_precision_allencahn`` as PDF and PNG. The project's
+tests run it, so the README and the website show what the current code produces.
 """
+
+from pathlib import Path
 
 import numpy as np
 
@@ -154,8 +157,9 @@ def figure(name, problem_class, base_params, sweeper_extra, dt, maxiter, title):
     ax.legend(frameon=False, loc='lower left')
     fig.tight_layout()
 
+    Path('data').mkdir(exist_ok=True)
     for suffix in ('pdf', 'png'):
-        fig.savefig(f'mixed_precision_{name}.{suffix}', dpi=200)
+        fig.savefig(f'data/mixed_precision_{name}.{suffix}', dpi=200)
     plt.close(fig)
     return curves
 

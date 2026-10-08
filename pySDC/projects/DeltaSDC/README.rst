@@ -109,19 +109,26 @@ slightly cheaper, because the FAS :math:`\tau` is then never built.
 What stays in this project is the mixed-precision study -- the emulation, the measurements and the
 controls:
 
-===========================  ====================================================================
-``mlsdc.py``                 reduced precision on a level, emulated
-``cascade.py``               storage precision raised as the iteration converges
-``sweepers_MPI.py``          the same, for the node-parallel hierarchy
-``problems.py``              ``allencahn_delta`` (nonlinear) and ``heat_delta`` (linear)
-``problems_petsc.py``        ``petsc_fisher_delta`` (reduced precision emulated)
-``problems_fenics.py``       ``fenics_grayscott_delta`` (emulated), plus the controls
-``run_demo.py``              runnable demonstration, nonlinear and linear
-``run_petsc.py``             PETSc entry point, called by the ``petsc``-marked test
-``run_fenics.py``            FEniCS entry point, called by the ``fenics``-marked test
-``run_mpi.py``               node-parallel driver, spawned by the ``mpi4py``-marked test
-``paradiag.py``              ParaDiag at reduced precision -- no reformulation needed
-===========================  ====================================================================
+==============================  ====================================================================
+``mlsdc.py``                    reduced precision on a level, emulated
+``cascade.py``                  storage precision raised as the iteration converges
+``sweepers_MPI.py``             the same, for the node-parallel hierarchy
+``problems.py``                 ``allencahn_delta`` (nonlinear), ``heat_delta`` (linear), and
+                                ``heat_solve_dtype``, whose solve genuinely runs at a reduced precision
+``problems_petsc.py``           ``petsc_fisher_delta`` (reduced precision emulated)
+``problems_fenics.py``          ``fenics_grayscott_delta`` (emulated), plus the controls
+``run_demo.py``                 runnable demonstration, nonlinear and linear
+``run_petsc.py``                PETSc entry point, called by the ``petsc``-marked test
+``run_fenics.py``               FEniCS entry point, called by the ``fenics``-marked test
+``run_mpi.py``                  node-parallel driver, spawned by the ``mpi4py``-marked test
+``paradiag.py``                 ParaDiag at reduced precision -- no reformulation needed
+``run_gpu.py``                  time to solution on CPU or GPU, and the half-precision FFT check
+``plot_mixed_precision.py``     the figures in "Corrections below ``float16`` need scaling"
+``plot_delivered_accuracy.py``  the figure in "The node-local solve"
+==============================  ====================================================================
+
+The two plot scripts are run by the project's tests, which write the figures into ``data/``, so the
+figures here are what the current code produces.
 
 The names from ``pySDC/implementations`` are re-exported here with the emulation layered on, so
 ``mlsdc.delta_transfer`` is the ported transfer plus rounding. The optional-backend modules are
@@ -167,6 +174,14 @@ Reading off the point where one iteration is lost:
 * **SDC, fine solve: about four digits**, so ``float16`` at one extra iteration;
 * **MLSDC, fine solve: about six digits**, so ``float32``, and that is the floor;
 * **MLSDC, coarse solve: about two digits**, so ``float16`` for free.
+
+.. image:: ../../../data/delivered_accuracy.png
+   :alt: Left: residual against SDC iteration for solves spoiled by eta from 1e-2 to exact, all
+         reaching the same floor. Right: iterations to 1e-11 against eta, flat at 14 down to about
+         1e-5 and rising to 18 at 1e-2, with the half-precision solve one iteration above flat.
+
+The same sweep for SDC on 1D heat as a figure (``plot_delivered_accuracy.py``): every curve on the
+left reaches the same floor, so the accuracy of the solve buys iterations and never accuracy.
 
 Four orders of magnitude between the fine and the coarse solve *in the same run*. And MLSDC's fine
 solve needs roughly a hundred times more accuracy than SDC's, because a method that contracts twice
@@ -294,7 +309,16 @@ corrections on the fine level stored at  iterations  residual floor
 
 5.9e-05 is ``float16``'s smallest *normal*, 6.1e-05. Below it half precision has almost no mantissa
 left -- 1.3e-2 relative at 1e-6, 1.9e-1 at 1e-7 -- so an unscaled correction turns to noise exactly
-when it starts to matter.
+when it starts to matter. The same holds for a half-precision node-local solve
+(``plot_mixed_precision.py``), on a linear and on a nonlinear problem:
+
+.. image:: ../../../data/mixed_precision_heat.png
+   :alt: Residual against SDC iteration for 1D heat: the fp64 and the normalised fp16 solve fall
+         together to about 1e-13, the naive fp16 solve stalls near 6e-5.
+
+.. image:: ../../../data/mixed_precision_allencahn.png
+   :alt: Residual against SDC iteration for 2D Allen-Cahn: the fp64 and the normalised fp16 solve
+         fall together to about 1e-12, the naive fp16 solve stalls near 2e-6.
 
 On the *fine* solve, unscaled half precision floors the iteration at 5.7e-05; scaled, it converges at
 three extra iterations. On a *coarse* solve the same underflow costs iterations only, 10 instead of
@@ -303,7 +327,7 @@ fine correction stalls it. That is the precise sense in which a coarse level tol
 precision than a fine one -- it fails gracefully, which the fine level does not.
 
 The fine level's state, as the iteration converges
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 "The fine level's state must be ``float64``" is a statement about the **end** of the run. Early on
 the residual is nowhere near :math:`\varepsilon|u|`, and the rounding a low format introduces is not

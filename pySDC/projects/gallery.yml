@@ -92,10 +92,7 @@
       summary: SDC, MLSDC and PFASST with FEniCS, never inverting the mass matrix, and why high-order elements make MLSDC pay.
     - title: Mixed precision in delta form
       page: DeltaSDC
-      excerpt:
-        file: pySDC/projects/DeltaSDC/run_gpu.py
-        start-at: "delta = {'linear_implicit': True}"
-        end-at: "('deltaMLSDC, CG 1e-5', delta_implicit, {'lintol': LOOSE}, delta, True),"
+      image: data/mixed_precision_heat.png
       summary: SDC and MLSDC solving for corrections, so solves and coarse levels can drop to single or half precision, timed on GPUs.
 
 - section: Applications

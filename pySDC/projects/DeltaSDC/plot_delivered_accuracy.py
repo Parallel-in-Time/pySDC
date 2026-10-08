@@ -1,5 +1,5 @@
 r"""
-Plot for a talk: what the SDC iteration actually asks of its node-local solver.
+Figure: what the SDC iteration actually asks of its node-local solver.
 
 The solver is a black box specified by a single number -- the relative accuracy :math:`\eta` of
 the *correction* it returns. How it got there (a low-precision factorisation with iterative
@@ -12,12 +12,16 @@ Left panel
     reaches the same floor; a less accurate solve only shifts the curve right.
 Right panel
     Iterations to a fixed tolerance against :math:`\eta`, with the unit roundoff of each IEEE
-    format marked. The star is a real ``float16`` node-local solve, which lands on the sweep at
-    its own unit roundoff -- the model and the emulation agree.
+    format marked. The star is a node-local solve rounded through ``float16`` (``heat_delta``'s
+    emulation, not half-precision arithmetic), which lands on the sweep at its own unit roundoff:
+    the model and the emulation agree. ``run_gpu.py --fft`` does the same with real arithmetic.
 
 Run as ``python -m pySDC.projects.DeltaSDC.plot_delivered_accuracy``; writes
-``delivered_accuracy`` as PDF and PNG.
+``data/delivered_accuracy`` as PDF and PNG. The project's tests run it, so the README and the
+website show what the current code produces.
 """
+
+from pathlib import Path
 
 import numpy as np
 
@@ -111,7 +115,7 @@ def main():
     Returns
     -------
     dict
-        ``etas``, the median iteration count per eta, and the real float16 run's count.
+        ``etas``, the median iteration count per eta, and the emulated float16 run's count.
     """
     plt.rcParams.update({'font.size': 14, 'axes.labelsize': 15, 'legend.fontsize': 12})
     fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.0))
@@ -171,7 +175,7 @@ def main():
         zorder=4,
     )
     right.annotate(
-        'real float16 solve',
+        'float16 solve, emulated',
         xy=(2.0**-11, genuine),
         xytext=(-12, -22),
         textcoords='offset points',
@@ -190,14 +194,15 @@ def main():
         for side in ('top', 'right'):
             axes.spines[side].set_visible(False)
     fig.tight_layout()
+    Path('data').mkdir(exist_ok=True)
     for suffix in ('pdf', 'png'):
-        fig.savefig(f'delivered_accuracy.{suffix}', dpi=200)
+        fig.savefig(f'data/delivered_accuracy.{suffix}', dpi=200)
     plt.close(fig)
     return {'etas': ETAS, 'iterations': counts, 'exact': exact, 'float16': genuine}
 
 
 if __name__ == '__main__':
     result = main()
-    print(f"exact solve: {result['exact']} iterations, real float16 solve: {result['float16']}")
+    print(f"exact solve: {result['exact']} iterations, emulated float16 solve: {result['float16']}")
     for eta, count in zip(result['etas'], result['iterations'], strict=True):
         print(f'  eta {eta:.1e}: {count}')
