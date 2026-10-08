@@ -38,11 +38,11 @@ reduced precision therefore means ``complex64`` rather than ``float32``.
 """
 
 import numpy as np
-import scipy.fft
 
 from pySDC.implementations.controller_classes.controller_ParaDiag_nonMPI import controller_ParaDiag_nonMPI
 from pySDC.core.problem import WorkCounter
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
+from pySDC.projects.DeltaSDC.problems import circulant_eigenvalues
 
 FULL = np.dtype('complex128')
 """Working precision. ParaDiag diagonalises in time, so it is complex even for a real problem."""
@@ -80,15 +80,10 @@ class heat_paradiag(heatNd_forced):
         # vector is converted on every product by CuPy, which would dominate the residual.
         self.A = self.A.astype(FULL)
 
-        # A periodic finite-difference operator is circulant, so the FFT diagonalises it exactly and
-        # its first column transforms to its eigenvalues. The solve is then two FFTs and a division,
-        # which is also the one place where single precision is several times faster on a GPU.
-        # scipy.fft rather than numpy.fft on the CPU: NumPy 1 computes a complex64 FFT in double.
-        self._fft = scipy.fft if self.xp is np else self.xp.fft
+        # With periodic boundaries the solve is a diagonalisation: two FFTs and a division, which is
+        # also the one place where single precision is several times faster on a GPU.
         if self.bc == 'periodic':
-            first_column = self.xp.zeros(self.A.shape[0], dtype=FULL)
-            first_column[0] = 1.0
-            eigenvalues = self._fft.fftn((self.A @ first_column).reshape(self.nvars))
+            self._fft, eigenvalues = circulant_eigenvalues(self)
             self._eigenvalues = eigenvalues.astype(self._solve_dtype)
 
     def solve_jacobian(self, rhs, factor, u=None, u0=None, t=0, **kwargs):

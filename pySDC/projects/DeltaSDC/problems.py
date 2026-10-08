@@ -38,6 +38,20 @@ CONDITIONING_SAFETY = 4.0
 """Multiplier applied to the conditioning estimate ``1 + alpha * ||J||``."""
 
 
+def circulant_eigenvalues(prob):
+    """
+    The FFT module for the problem's device, and the eigenvalues of its periodic operator ``A``.
+
+    A periodic finite-difference operator is circulant, so the FFT diagonalises it exactly and its
+    first column transforms to its eigenvalues; a solve is then two FFTs and a division. scipy.fft
+    rather than numpy.fft on the CPU: NumPy 1 computes a single-precision FFT in double.
+    """
+    fft = scipy.fft if prob.xp is np else prob.xp.fft
+    first_column = prob.xp.zeros(prob.A.shape[0], dtype=prob.A.dtype)
+    first_column[0] = 1.0
+    return fft, fft.fftn((prob.A @ first_column).reshape(prob.nvars))
+
+
 class allencahn_delta(allencahn_fullyimplicit):
     r"""
         Fully implicit Allen-Cahn with a node-local correction solve.
@@ -413,11 +427,8 @@ class heat_solve_dtype(heatNd_unforced):
                 raise ValueError('the FFT solve diagonalises a circulant operator and needs a periodic grid')
             if self.solve_dtype == np.float16 and self.xp is not np and any(n & (n - 1) for n in self._shape):
                 raise ValueError(f'cuFFT computes half precision on power-of-two grids only, got {self.nvars}')
-            self._fft = scipy.fft if self.xp is np else self.xp.fft
-            # the first column of a circulant transforms to its eigenvalues; real for a symmetric stencil
-            first_column = self.xp.zeros(self.A.shape[0])
-            first_column[0] = 1.0
-            self._eigenvalues = self._fft.fftn((self.A @ first_column).reshape(self._shape)).real
+            self._fft, eigenvalues = circulant_eigenvalues(self)
+            self._eigenvalues = eigenvalues.real  # a symmetric stencil
             self._half_plan = None
         elif self.solve_dtype is not None:
             self.A_solve = self.A.astype(self.solve_dtype)

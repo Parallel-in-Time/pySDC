@@ -11,40 +11,15 @@ from mpi4py import MPI
 from pySDC.implementations.sweeper_classes.delta_form_MPI import delta_implicit_MPI as _delta_implicit_MPI
 from pySDC.implementations.transfer_classes.BaseTransferDeltaMPI import delta_transfer_MPI as _delta_transfer_MPI
 from pySDC.projects.DeltaSDC.cascade import PrecisionCascade
-from pySDC.projects.DeltaSDC.mlsdc import RoundedLevelMixin, round_level
+from pySDC.projects.DeltaSDC.mlsdc import RoundedLevelMixin, RoundedTransferMixin
 
 
 class delta_implicit_MPI_rounded(RoundedLevelMixin, _delta_implicit_MPI):
     """Node-parallel sweeper whose level storage is rounded through ``level_precision``."""
 
 
-class delta_transfer_MPI(_delta_transfer_MPI):
+class delta_transfer_MPI(RoundedTransferMixin, _delta_transfer_MPI):
     """Node-parallel delta-form transfer that rounds each level's storage after touching it."""
-
-    def restrict(self):
-        """
-        Restrict, then round the coarse level.
-
-        Returns
-        -------
-        None
-        """
-        super().restrict()
-        round_level(self.coarse)
-        self.coarse.u0_reference = self.coarse.prob.dtype_u(self.coarse.u[0])
-        return None
-
-    def prolong(self):
-        """
-        Prolong, then round the fine level.
-
-        Returns
-        -------
-        None
-        """
-        super().prolong()
-        round_level(self.fine)
-        return None
 
 
 class delta_implicit_MPI_cascade(PrecisionCascade, delta_implicit_MPI_rounded):

@@ -34,9 +34,7 @@ from pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc import (
     Fisher_full,
     petsc_fisher_fullyimplicit,
 )
-
-TOLERANCE_SAFETY = 100.0
-"""Unconditional minimum multiple of the working-precision epsilon."""
+from pySDC.projects.DeltaSDC.problems import TOLERANCE_SAFETY
 
 
 def quantize(values, work_precision):

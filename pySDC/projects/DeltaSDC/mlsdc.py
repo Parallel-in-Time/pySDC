@@ -27,11 +27,7 @@ the operator norm and binds long before anything else does.
 import numpy as np
 
 from pySDC.core.base_transfer import BaseTransfer
-from pySDC.implementations.sweeper_classes.delta_form import (
-    delta_imex_1st_order,
-    delta_implicit,
-    total_increment,  # noqa: F401  -- re-exported for the node-parallel module
-)
+from pySDC.implementations.sweeper_classes.delta_form import delta_imex_1st_order, delta_implicit
 from pySDC.implementations.transfer_classes.BaseTransferDelta import delta_transfer as _delta_transfer
 
 LEVEL_FIELDS = ('u', 'f', 'uold', 'fold', 'tau')
@@ -127,8 +123,8 @@ class RoundedLevelMixin:
         return None
 
 
-class delta_transfer(_delta_transfer):
-    """Delta-form transfer that rounds each level's storage after touching it."""
+class RoundedTransferMixin:
+    """Rounds each level's storage after a delta-form transfer has touched it, serial or node-parallel."""
 
     def restrict(self):
         """
@@ -156,6 +152,10 @@ class delta_transfer(_delta_transfer):
         super().prolong()
         round_level(self.fine)
         return None
+
+
+class delta_transfer(RoundedTransferMixin, _delta_transfer):
+    """Delta-form transfer that rounds each level's storage after touching it."""
 
 
 class delta_implicit_rounded(RoundedLevelMixin, delta_implicit):
