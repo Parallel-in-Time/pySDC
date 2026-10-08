@@ -652,9 +652,9 @@
 \[u^{k+1}_m = u_0 + \tau_m + \Delta t (Q f^k)_m
             + \Delta t \sum_j Q^\Delta_{mj}\,(f^{k+1}_j - f^k_j)\]</div>
 <p>is algebraically identical to, with <span class="math notranslate nohighlight">\(\delta_m = u^{k+1}_m - u^k_m\)</span> and the collocation
-residual <span class="math notranslate nohighlight">\(\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m\)</span>,</p>
+residual <span class="math notranslate nohighlight">\(r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[\delta_m = \varepsilon_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,
+\[\delta_m = r_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,
 \qquad \Delta f_j = f(u^k_j + \delta_j) - f(u^k_j).\]</div>
 <p>Written this way, every sweep is iterative refinement: a high-precision residual, a correction
 solve, and a high-precision update <code class="docutils literal notranslate"><span class="pre">u</span> <span class="pre">&lt;-</span> <span class="pre">u</span> <span class="pre">+</span> <span class="pre">delta</span></code>. No Jacobian appears, so an IMEX splitting
@@ -662,7 +662,8 @@ survives unchanged.</p>
 <p>The point of the reformulation is that the quantity handed to the node-local solver is a
 <em>correction</em>. Its magnitude tends to zero as the sweeps converge, so a reduced-precision solve
 introduces an error proportional to <span class="math notranslate nohighlight">\(|\delta|\)</span> rather than to <span class="math notranslate nohighlight">\(|u|\)</span> and therefore does
-not cap the attainable accuracy.</p>
+not cap the attainable accuracy. What the sweeper and the solver guarantee each other for that to
+hold is the correction-solve contract, documented on <a class="reference internal" href="pySDC.core.problem.html#pySDC.core.problem.Problem" title="pySDC.core.problem.Problem"><code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></a>.</p>
 <p>Three node-local strategies are supported, selected automatically:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">solve_system_delta</span></code></dt><dd><p>Used when the problem provides it. Solves
@@ -672,7 +673,9 @@ solver a small unknown.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">linear_implicit=True</span></code></dt><dd><p>For a linear or affine implicit operator, <span class="math notranslate nohighlight">\(f(w+\delta) - f(w) = A\delta\)</span>, so the stock
 <code class="docutils literal notranslate"><span class="pre">solve_system</span></code> already solves the correction equation once the affine part
-<span class="math notranslate nohighlight">\(\alpha f(0, t)\)</span> is removed from the right-hand side. No problem class needs changing.</p>
+<span class="math notranslate nohighlight">\(\alpha f(0, t)\)</span> is removed from the right-hand side. No problem class needs changing.
+The right-hand side is scaled to unit size around the call, so the solver may work in any
+precision without the shrinking correction falling out of its format’s range.</p>
 </dd>
 <dt>fallback</dt><dd><p>Otherwise the substitution <span class="math notranslate nohighlight">\(y = u^k_m + \delta_m\)</span> reduces the correction equation to the
 ordinary implicit solve. Always correct and identical to
@@ -681,7 +684,7 @@ ordinary implicit solve. Always correct and identical to
 </dd>
 </dl>
 <p><code class="docutils literal notranslate"><span class="pre">correction_precision</span></code> additionally stores the small quantities
-(<span class="math notranslate nohighlight">\(\varepsilon\)</span>, <span class="math notranslate nohighlight">\(\delta\)</span>, <span class="math notranslate nohighlight">\(\Delta f\)</span>) in a reduced-precision datatype built from
+(<span class="math notranslate nohighlight">\(r\)</span>, <span class="math notranslate nohighlight">\(\delta\)</span>, <span class="math notranslate nohighlight">\(\Delta f\)</span>) in a reduced-precision datatype built from
 the problem’s own <code class="docutils literal notranslate"><span class="pre">init</span></code> tuple, scaled by the residual’s magnitude so the format’s mantissa is
 used however small the correction gets.</p>
 <p>The increment <span class="math notranslate nohighlight">\(\Delta f\)</span> is formed by subtracting two stored right-hand sides unless the
@@ -708,7 +711,7 @@ nothing down, so on a stock hierarchy this sweeper reproduces MLSDC and PFASST e
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.sweeper_classes.delta_form.DeltaFormMixin.advance_residual">
 <span class="sig-name descname"><span class="pre">advance_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/sweeper_classes/delta_form.html#DeltaFormMixin.advance_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.sweeper_classes.delta_form.DeltaFormMixin.advance_residual" title="Link to this definition">#</a></dt>
-<dd><p>Advance a residual by an update: <span class="math notranslate nohighlight">\(\varepsilon \leftarrow \varepsilon - \delta
+<dd><p>Advance a residual by an update: <span class="math notranslate nohighlight">\(r \leftarrow r - \delta
 + \Delta t (Q \Delta f)\)</span>.</p>
 <p>Every term is small, so this never cancels. It is exact for any update to the nodal values,
 which is why it serves both a sweep and a prolongation.</p>
@@ -762,7 +765,7 @@ accurate. It is also what makes the <span class="math notranslate nohighlight">\
 <dd><p>Follow a change of <span class="math notranslate nohighlight">\(u_0\)</span> made after the residual was handed down.</p>
 <p>PFASST receives the initial value from the predecessor <em>after</em> the restriction, directly
 into <code class="docutils literal notranslate"><span class="pre">u[0]</span></code>. The residual depends on it additively, so following it is one addition:
-<span class="math notranslate nohighlight">\(\varepsilon_m \leftarrow \varepsilon_m + (u_0 - u_0^{\mathrm{ref}})\)</span>. Exactly zero
+<span class="math notranslate nohighlight">\(r_m \leftarrow r_m + (u_0 - u_0^{\mathrm{ref}})\)</span>. Exactly zero
 when nothing arrived, which is every serial run.</p>
 <p>This is the one place the hierarchy still differences two <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> values, and
 it is the reason a reduced-precision coarse level buys less under PFASST than under MLSDC:

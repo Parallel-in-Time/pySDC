@@ -649,14 +649,14 @@
 <p>Space-time transfer for the delta-form hierarchy.</p>
 <p><a class="reference internal" href="pySDC.core.base_transfer.html#pySDC.core.base_transfer.BaseTransfer" title="pySDC.core.base_transfer.BaseTransfer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTransfer</span></code></a> makes a coarse level rebuild its own residual from
 <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> coarse data and recovers the coarse-grid correction as <span class="math notranslate nohighlight">\(u_G - u_G^{\mathrm{old}}\)</span>.
-Both have exact algebraic replacements – <span class="math notranslate nohighlight">\(\varepsilon_G = R\varepsilon_F\)</span>, which is what the FAS
+Both have exact algebraic replacements – <span class="math notranslate nohighlight">\(r_G = R\,r_F\)</span>, which is what the FAS
 <span class="math notranslate nohighlight">\(\tau\)</span> is <em>for</em>, and the correction is the sum of the sweep’s own increments – and this
 transfer uses those instead. It is what decides whether a level rebuilds its residual or is handed
 one: the delta-form sweepers do both, and this is what hands one down.</p>
 <p>The FAS <span class="math notranslate nohighlight">\(\tau\)</span> is <strong>substituted, not discarded</strong>. Writing
 <span class="math notranslate nohighlight">\(\tau = R(\Delta t\,Q_F f_F) - \Delta t\,Q_G f_G\)</span> and putting it into the coarse residual
 <span class="math notranslate nohighlight">\(\Delta t (Q_G f_G) + u_G[0] - u_G[m] + \tau\)</span> cancels the <span class="math notranslate nohighlight">\(\Delta t\,Q_G f_G\)</span> terms
-identically and leaves <span class="math notranslate nohighlight">\(R\varepsilon_F\)</span>. So a coarse level handed that residual is solving
+identically and leaves <span class="math notranslate nohighlight">\(R\,r_F\)</span>. So a coarse level handed that residual is solving
 precisely the FAS-corrected problem – and must <em>not</em> also add <span class="math notranslate nohighlight">\(\tau\)</span>, which would count it
 twice. What is skipped is materialising <span class="math notranslate nohighlight">\(\tau\)</span> as an array, since the quantity it exists to
 produce arrives directly.</p>

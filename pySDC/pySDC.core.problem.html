@@ -665,30 +665,59 @@
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Two <strong>optional</strong> methods are recognised by the deferred-correction (“delta-form”) sweepers in
-<a class="reference internal" href="pySDC.implementations.sweeper_classes.delta_form.html#module-pySDC.implementations.sweeper_classes.delta_form" title="pySDC.implementations.sweeper_classes.delta_form"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pySDC.implementations.sweeper_classes.delta_form</span></code></a>. Neither is required: a problem that
-defines neither still works, and the sweeper falls back to a route that is always correct. They
-exist because both fallbacks read quantities of size <span class="math notranslate nohighlight">\(|u|\)</span> or <span class="math notranslate nohighlight">\(|f|\)</span>, which is
-harmless at backend precision and is what binds first below it.</p>
-<dl>
-<dt><code class="docutils literal notranslate"><span class="pre">solve_system_delta(rhs,</span> <span class="pre">factor,</span> <span class="pre">base,</span> <span class="pre">f_base,</span> <span class="pre">t)</span></code></dt><dd><p>Solve <span class="math notranslate nohighlight">\(\delta - factor\,[f(base+\delta) - f(base)] = rhs\)</span> and return the correction
-<span class="math notranslate nohighlight">\(\delta\)</span>. Needed only for a <strong>nonlinear</strong> implicit operator; for a linear or affine one
-the sweeper reaches the same equation through the stock <a class="reference internal" href="#pySDC.core.problem.Problem.solve_system" title="pySDC.core.problem.Problem.solve_system"><code class="xref py py-meth docutils literal notranslate"><span class="pre">solve_system()</span></code></a>. The unknown
-must be the correction, and the increment must be expanded analytically rather than formed as
-a difference of two <span class="math notranslate nohighlight">\(\mathcal{O}(|f|)\)</span> quantities.</p>
-<p>Without it the sweeper substitutes <span class="math notranslate nohighlight">\(y = u^k_m + \delta_m\)</span> and uses
+<p><strong>The correction-solve contract.</strong> The deferred-correction (“delta-form”) sweepers in
+<a class="reference internal" href="pySDC.implementations.sweeper_classes.delta_form.html#module-pySDC.implementations.sweeper_classes.delta_form" title="pySDC.implementations.sweeper_classes.delta_form"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pySDC.implementations.sweeper_classes.delta_form</span></code></a> hand the implicit solve a <em>correction</em>
+equation instead of the state’s. That is what lets the solver – typically the expensive, often
+external part – work in, and return, a much lower precision while the iteration still
+converges to full precision. Both sides of that call are specified here; nothing in it is
+required, and a problem that ignores it keeps working.</p>
+<p>The call is made per collocation node and sweep, by one of two routes:</p>
+<ul class="simple">
+<li><p>linear or affine implicit operator: the stock <a class="reference internal" href="#pySDC.core.problem.Problem.solve_system" title="pySDC.core.problem.Problem.solve_system"><code class="xref py py-meth docutils literal notranslate"><span class="pre">solve_system()</span></code></a>, with the sweeper
+parameter <code class="docutils literal notranslate"><span class="pre">linear_implicit=True</span></code>;</p></li>
+<li><p>nonlinear implicit operator: <code class="docutils literal notranslate"><span class="pre">solve_system_delta(rhs,</span> <span class="pre">factor,</span> <span class="pre">base,</span> <span class="pre">f_base,</span> <span class="pre">t)</span></code>, which
+solves <span class="math notranslate nohighlight">\(\delta - factor\,[f(base+\delta) - f(base)] = rhs\)</span> and returns <span class="math notranslate nohighlight">\(\delta\)</span>.
+This is the contract for an external nonlinear solver.</p></li>
+</ul>
+<p>Without either, the sweeper substitutes <span class="math notranslate nohighlight">\(y = u^k_m + \delta_m\)</span> and calls
 <a class="reference internal" href="#pySDC.core.problem.Problem.solve_system" title="pySDC.core.problem.Problem.solve_system"><code class="xref py py-meth docutils literal notranslate"><span class="pre">solve_system()</span></code></a>. That is exact, but the solver then sees an <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span>
-unknown.</p>
-</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">eval_f_increment(base,</span> <span class="pre">delta,</span> <span class="pre">t)</span></code></dt><dd><p>Return <span class="math notranslate nohighlight">\(f(base+\delta) - f(base)\)</span> with the same splitting as <a class="reference internal" href="#pySDC.core.problem.Problem.eval_f" title="pySDC.core.problem.Problem.eval_f"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eval_f()</span></code></a>, expanded
-so that every term carries an explicit factor <span class="math notranslate nohighlight">\(\delta\)</span>.</p>
-<p>Without it the sweeper subtracts two stored right-hand sides. That cancellation carries the
-operator norm: on the FEniCS heat equation, where <span class="math notranslate nohighlight">\(|M^{-1}Ku|\)</span> is of order
-<span class="math notranslate nohighlight">\(10^5\)</span>, it is already 7.7e-11 off in double precision.</p>
-</dd>
-</dl>
-<p>Both fallbacks are correct and neither fails loudly, which is the reason to document them here
-rather than to leave them to be discovered.</p>
+unknown, and none of what follows holds.</p>
+<p><em>The sweeper guarantees the solver</em></p>
+<ol class="arabic simple">
+<li><p>the unknown is a correction, the right-hand side is that of the correction equation, and it
+shrinks with the iteration like the residual; the initial guess is zero;</p></li>
+<li><p>on the linear route, a right-hand side of unit size: it is divided by its maximum before
+the call and the result multiplied by it after, which is exact and keeps any format clear of
+underflow. On the nonlinear route the scaled unknown would enter <span class="math notranslate nohighlight">\(f\)</span>, so there the
+solver scales internally if its format needs it;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">base</span></code> and <code class="docutils literal notranslate"><span class="pre">f_base</span></code> at the level’s own precision, read only, and <code class="docutils literal notranslate"><span class="pre">factor</span></code> a plain
+scalar;</p></li>
+<li><p>that everything outside the solve – the residual, the update <span class="math notranslate nohighlight">\(u \leftarrow u +
+\delta\)</span>, and the increment <span class="math notranslate nohighlight">\(f(u+\delta) - f(u)\)</span> – stays at the level’s precision, so
+every sweep is a step of iterative refinement around the solve.</p></li>
+</ol>
+<p><em>The solver guarantees the sweeper</em></p>
+<ol class="arabic simple">
+<li><p>it returns the correction, not the state, in any precision: the sweeper widens it to the
+level’s before using it;</p></li>
+<li><p>a relative accuracy <span class="math notranslate nohighlight">\(\eta\)</span>, <span class="math notranslate nohighlight">\(\|\tilde\delta - \delta\| \le \eta\|\delta\|\)</span>, below
+what the method needs. How it gets there – its internal precision, iterative refinement, a
+Krylov tolerance, multigrid cycles – is its own business;</p></li>
+<li><p>relative tolerances only, and none below what its own precision can deliver: an absolute
+tolerance caps the attainable accuracy, and an unreachable one costs iterations or, in a
+Krylov method, breaks it down;</p></li>
+<li><p>no boundary data or affine terms re-imposed on the correction, whose boundary conditions are
+homogeneous.</p></li>
+</ol>
+<p>Then the iteration converges to the level’s precision, at an iteration cost set by
+<span class="math notranslate nohighlight">\(\eta\)</span> alone. Measured on the heat equation: SDC needs <span class="math notranslate nohighlight">\(\eta\)</span> of about 1e-4, an
+MLSDC fine level about 1e-6 and an MLSDC coarse level about 1e-2 to lose at most one iteration.</p>
+<p>One more optional method serves the contract. <code class="docutils literal notranslate"><span class="pre">eval_f_increment(base,</span> <span class="pre">delta,</span> <span class="pre">t)</span></code> returns
+<span class="math notranslate nohighlight">\(f(base+\delta) - f(base)\)</span> with the same splitting as <a class="reference internal" href="#pySDC.core.problem.Problem.eval_f" title="pySDC.core.problem.Problem.eval_f"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eval_f()</span></code></a>, expanded so that
+every term carries an explicit factor <span class="math notranslate nohighlight">\(\delta\)</span>. Without it the sweeper subtracts two
+stored right-hand sides, a cancellation that carries the operator norm: on the FEniCS heat
+equation, where <span class="math notranslate nohighlight">\(|M^{-1}Ku|\)</span> is of order <span class="math notranslate nohighlight">\(10^5\)</span>, it is already 7.7e-11 off in
+double precision, and below double precision it binds before the solver does.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.core.problem.Problem.apply_mass_matrix">
 <span class="sig-name descname"><span class="pre">apply_mass_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/pySDC/core/problem.html#Problem.apply_mass_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.problem.Problem.apply_mass_matrix" title="Link to this definition">#</a></dt>

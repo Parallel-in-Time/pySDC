@@ -440,10 +440,10 @@
 
 <span class="sd">The MPI sweeper assigns one collocation node per rank and therefore uses only the **diagonal** of</span>
 <span class="sd">:math:`Q^\Delta`. The delta form collapses accordingly: with</span>
-<span class="sd">:math:`\varepsilon_r = u_0 + \tau_r + \Delta t (Q f^k)_r - u^k_r` for the rank's own node,</span>
+<span class="sd">:math:`r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m` for the rank's own node :math:`m`,</span>
 
 <span class="sd">.. math::</span>
-<span class="sd">    \delta_r = \varepsilon_r + \Delta t Q^\Delta_{rr}\,\big(f(u^k_r + \delta_r) - f(u^k_r)\big),</span>
+<span class="sd">    \delta_m = r_m + \Delta t Q^\Delta_{mm}\,\big(f(u^k_m + \delta_m) - f(u^k_m)\big),</span>
 
 <span class="sd">with no accumulation over other nodes. The node-local piece is identical to the serial case, so</span>
 <span class="sd">:meth:`DeltaFormMixin._solve_correction` is reused unchanged and all three strategies</span>
@@ -485,7 +485,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_residual_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Compute :math:`\varepsilon_r` at this rank's node, in backend precision.</span>
+<span class="sd">        Compute :math:`r_m` at this rank's node, in backend precision.</span>
 
 <span class="sd">        Returned as a one-element list, so the multi-level machinery -- which is written for a list</span>
 <span class="sd">        of nodes -- reads the same here as it does serially. A residual handed down by a transfer is</span>

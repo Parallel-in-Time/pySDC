@@ -442,10 +442,10 @@
 <span class="sd">                + \Delta t \sum_j Q^\Delta_{mj}\,(f^{k+1}_j - f^k_j)</span>
 
 <span class="sd">is algebraically identical to, with :math:`\delta_m = u^{k+1}_m - u^k_m` and the collocation</span>
-<span class="sd">residual :math:`\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`,</span>
+<span class="sd">residual :math:`r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`,</span>
 
 <span class="sd">.. math::</span>
-<span class="sd">    \delta_m = \varepsilon_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,</span>
+<span class="sd">    \delta_m = r_m + \Delta t \sum_j Q^\Delta_{mj}\,\Delta f_j,</span>
 <span class="sd">    \qquad \Delta f_j = f(u^k_j + \delta_j) - f(u^k_j).</span>
 
 <span class="sd">Written this way, every sweep is iterative refinement: a high-precision residual, a correction</span>
@@ -455,7 +455,8 @@
 <span class="sd">The point of the reformulation is that the quantity handed to the node-local solver is a</span>
 <span class="sd">*correction*. Its magnitude tends to zero as the sweeps converge, so a reduced-precision solve</span>
 <span class="sd">introduces an error proportional to :math:`|\delta|` rather than to :math:`|u|` and therefore does</span>
-<span class="sd">not cap the attainable accuracy.</span>
+<span class="sd">not cap the attainable accuracy. What the sweeper and the solver guarantee each other for that to</span>
+<span class="sd">hold is the correction-solve contract, documented on :class:`~pySDC.core.problem.Problem`.</span>
 
 <span class="sd">Three node-local strategies are supported, selected automatically:</span>
 
@@ -469,6 +470,8 @@
 <span class="sd">    For a linear or affine implicit operator, :math:`f(w+\delta) - f(w) = A\delta`, so the stock</span>
 <span class="sd">    ``solve_system`` already solves the correction equation once the affine part</span>
 <span class="sd">    :math:`\alpha f(0, t)` is removed from the right-hand side. No problem class needs changing.</span>
+<span class="sd">    The right-hand side is scaled to unit size around the call, so the solver may work in any</span>
+<span class="sd">    precision without the shrinking correction falling out of its format's range.</span>
 
 <span class="sd">fallback</span>
 <span class="sd">    Otherwise the substitution :math:`y = u^k_m + \delta_m` reduces the correction equation to the</span>
@@ -477,7 +480,7 @@
 <span class="sd">    :math:`\mathcal{O}(1)` unknown, so there is no precision benefit.</span>
 
 <span class="sd">``correction_precision`` additionally stores the small quantities</span>
-<span class="sd">(:math:`\varepsilon`, :math:`\delta`, :math:`\Delta f`) in a reduced-precision datatype built from</span>
+<span class="sd">(:math:`r`, :math:`\delta`, :math:`\Delta f`) in a reduced-precision datatype built from</span>
 <span class="sd">the problem's own ``init`` tuple, scaled by the residual's magnitude so the format's mantissa is</span>
 <span class="sd">used however small the correction gets.</span>
 
@@ -526,7 +529,7 @@
 
 <span class="sd">        PFASST receives the initial value from the predecessor *after* the restriction, directly</span>
 <span class="sd">        into ``u[0]``. The residual depends on it additively, so following it is one addition:</span>
-<span class="sd">        :math:`\varepsilon_m \leftarrow \varepsilon_m + (u_0 - u_0^{\mathrm{ref}})`. Exactly zero</span>
+<span class="sd">        :math:`r_m \leftarrow r_m + (u_0 - u_0^{\mathrm{ref}})`. Exactly zero</span>
 <span class="sd">        when nothing arrived, which is every serial run.</span>
 
 <span class="sd">        This is the one place the hierarchy still differences two :math:`\mathcal{O}(1)` values, and</span>
@@ -591,7 +594,7 @@
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.sweeper_classes.delta_form.html#pySDC.implementations.sweeper_classes.delta_form.DeltaFormMixin.advance_residual">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">advance_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">deltas</span><span class="p">,</span> <span class="n">dfs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Advance a residual by an update: :math:`\varepsilon \leftarrow \varepsilon - \delta</span>
+<span class="sd">        Advance a residual by an update: :math:`r \leftarrow r - \delta</span>
 <span class="sd">        + \Delta t (Q \Delta f)`.</span>
 
 <span class="sd">        Every term is small, so this never cancels. It is exact for any update to the nodal values,</span>
@@ -682,7 +685,7 @@
 <span class="sd">        Choose the divisor for this sweep, from the residual the corrections will be built out of.</span>
 
 <span class="sd">        This is what lets a correction be stored below ``float16``'s smallest normal, 6.1e-5. The</span>
-<span class="sd">        delta form drives :math:`\varepsilon` and :math:`\delta` towards zero on purpose, and half</span>
+<span class="sd">        delta form drives :math:`r` and :math:`\delta` towards zero on purpose, and half</span>
 <span class="sd">        precision has almost no mantissa left down there -- 1.3e-2 relative at 1e-6, 1.9e-1 at 1e-7 --</span>
 <span class="sd">        so an unscaled correction turns to noise exactly when it starts to matter. Dividing by the</span>
 <span class="sd">        residual's own magnitude keeps the stored values at :math:`\mathcal{O}(1)`, which is block</span>
@@ -757,7 +760,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_residual_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Compute :math:`\varepsilon_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`.</span>
+<span class="sd">        Compute :math:`r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m`.</span>
 
 <span class="sd">        This is the high-precision residual of iterative refinement. It is a difference of</span>
 <span class="sd">        :math:`\mathcal{O}(1)` quantities and is therefore always formed in backend precision --</span>
@@ -856,10 +859,9 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linear_implicit</span><span class="p">:</span>
             <span class="c1"># f(w+d) - f(w) = A d, so solve_system already solves the correction equation once the</span>
             <span class="c1"># affine part f(0, t) has been removed. f(0, t) vanishes for a homogeneous operator.</span>
-            <span class="n">zero</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-            <span class="n">affine</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">zero</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
-            <span class="n">rhs_phys</span> <span class="o">-=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">affine</span> <span class="k">if</span> <span class="n">implicit_part</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">affine</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
-            <span class="n">delta</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs_phys</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+            <span class="n">affine</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">t_node</span><span class="p">)</span>
+            <span class="n">affine</span> <span class="o">=</span> <span class="n">affine</span> <span class="k">if</span> <span class="n">implicit_part</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">affine</span><span class="o">.</span><span class="n">impl</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_scaled</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">rhs_phys</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Fallback: substitute y = u_old + delta. Always correct, but the solver sees an O(1)</span>
             <span class="c1"># unknown, so there is no precision benefit.</span>
@@ -870,6 +872,55 @@
             <span class="n">delta</span> <span class="o">-=</span> <span class="n">u_old</span>
         <span class="c1"># recorded so a transfer never has to recover the correction by subtraction</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_deltas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">delta</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_solve_scaled</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">t_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Hand a linear correction solve its right-hand side at unit size, and take back any precision.</span>
+
+<span class="sd">        This is the sweeper's side of the correction-solve contract documented on</span>
+<span class="sd">        :class:`~pySDC.core.problem.Problem`. The right-hand side shrinks with the iteration, which</span>
+<span class="sd">        is the point of the delta form and also what pushes it out of a reduced-precision format's</span>
+<span class="sd">        range: a correction of 1e-10 is below ``float16``'s smallest subnormal. Dividing by its</span>
+<span class="sd">        maximum before the solve and multiplying the result by it afterwards is exact for a linear</span>
+<span class="sd">        solve, and makes an absolute solver tolerance a relative one, which the contract asks for</span>
+<span class="sd">        anyway. The affine part :math:`\alpha f(0, t)` is removed *after* scaling: the stock solve</span>
+<span class="sd">        adds it back in unscaled, and the two only cancel at the same scale. The result may come back in any precision; it is widened before it is scaled back,</span>
+<span class="sd">        since scaling first would multiply at the solver's precision.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prob : pySDC.core.problem.Problem</span>
+<span class="sd">            The level's problem.</span>
+<span class="sd">        rhs : dtype_u</span>
+<span class="sd">            Right-hand side of the correction equation, modified in place.</span>
+<span class="sd">        alpha : float</span>
+<span class="sd">            Implicit prefactor.</span>
+<span class="sd">        affine : dtype_u</span>
+<span class="sd">            The implicit right-hand side at zero, :math:`f(0, t)`, which a homogeneous operator</span>
+<span class="sd">            makes zero.</span>
+<span class="sd">        t_node : float</span>
+<span class="sd">            Physical time of the collocation node.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dtype_u</span>
+<span class="sd">            The correction, at the level's precision.</span>
+<span class="sd">        """</span>
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">rhs</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">zero</span>
+        <span class="n">rhs</span> <span class="o">/=</span> <span class="n">scale</span>
+        <span class="n">rhs</span> <span class="o">-=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">affine</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="n">t_node</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="s1">'dtype'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])):</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+            <span class="n">delta</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">solution</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">*=</span> <span class="n">scale</span>
         <span class="k">return</span> <span class="n">delta</span></div>
 
 

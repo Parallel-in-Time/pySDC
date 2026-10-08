@@ -437,7 +437,7 @@
 
 <span class="sd">:class:`~pySDC.core.base_transfer.BaseTransfer` makes a coarse level rebuild its own residual from</span>
 <span class="sd">:math:`\mathcal{O}(1)` coarse data and recovers the coarse-grid correction as :math:`u_G - u_G^{\mathrm{old}}`.</span>
-<span class="sd">Both have exact algebraic replacements -- :math:`\varepsilon_G = R\varepsilon_F`, which is what the FAS</span>
+<span class="sd">Both have exact algebraic replacements -- :math:`r_G = R\,r_F`, which is what the FAS</span>
 <span class="sd">:math:`\tau` is *for*, and the correction is the sum of the sweep's own increments -- and this</span>
 <span class="sd">transfer uses those instead. It is what decides whether a level rebuilds its residual or is handed</span>
 <span class="sd">one: the delta-form sweepers do both, and this is what hands one down.</span>
@@ -445,7 +445,7 @@
 <span class="sd">The FAS :math:`\tau` is **substituted, not discarded**. Writing</span>
 <span class="sd">:math:`\tau = R(\Delta t\,Q_F f_F) - \Delta t\,Q_G f_G` and putting it into the coarse residual</span>
 <span class="sd">:math:`\Delta t (Q_G f_G) + u_G[0] - u_G[m] + \tau` cancels the :math:`\Delta t\,Q_G f_G` terms</span>
-<span class="sd">identically and leaves :math:`R\varepsilon_F`. So a coarse level handed that residual is solving</span>
+<span class="sd">identically and leaves :math:`R\,r_F`. So a coarse level handed that residual is solving</span>
 <span class="sd">precisely the FAS-corrected problem -- and must *not* also add :math:`\tau`, which would count it</span>
 <span class="sd">twice. What is skipped is materialising :math:`\tau` as an array, since the quantity it exists to</span>
 <span class="sd">produce arrives directly.</span>

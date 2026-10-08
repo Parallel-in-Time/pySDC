@@ -651,9 +651,9 @@
 <a class="reference internal" href="pySDC.implementations.sweeper_classes.delta_form.html#module-pySDC.implementations.sweeper_classes.delta_form" title="pySDC.implementations.sweeper_classes.delta_form"><code class="xref py py-mod docutils literal notranslate"><span class="pre">delta_form</span></code></a> does not.</p>
 <p>The MPI sweeper assigns one collocation node per rank and therefore uses only the <strong>diagonal</strong> of
 <span class="math notranslate nohighlight">\(Q^\Delta\)</span>. The delta form collapses accordingly: with
-<span class="math notranslate nohighlight">\(\varepsilon_r = u_0 + \tau_r + \Delta t (Q f^k)_r - u^k_r\)</span> for the rank’s own node,</p>
+<span class="math notranslate nohighlight">\(r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m\)</span> for the rank’s own node <span class="math notranslate nohighlight">\(m\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[\delta_r = \varepsilon_r + \Delta t Q^\Delta_{rr}\,\big(f(u^k_r + \delta_r) - f(u^k_r)\big),\]</div>
+\[\delta_m = r_m + \Delta t Q^\Delta_{mm}\,\big(f(u^k_m + \delta_m) - f(u^k_m)\big),\]</div>
 <p>with no accumulation over other nodes. The node-local piece is identical to the serial case, so
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">DeltaFormMixin._solve_correction()</span></code> is reused unchanged and all three strategies
 (<code class="docutils literal notranslate"><span class="pre">solve_system_delta</span></code>, <code class="docutils literal notranslate"><span class="pre">linear_implicit</span></code>, substitution fallback) work here too.</p>
