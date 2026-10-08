@@ -78,12 +78,19 @@ def run(sweeper_class, params, problem_class=heatNd_unforced, multilevel=False, 
     return uend
 
 
-def main():
+def main(precision=None):
+    """
+    Compare the node-parallel runs with the serial ones; every rank asserts the verdict of rank 0.
+
+    Parameters
+    ----------
+    precision : numpy.dtype or None, optional
+        Store the corrections at this precision (``correction_precision``).
+    """
     comm = MPI.COMM_WORLD
     if comm.size != 3:
         raise RuntimeError(f'this driver needs one rank per collocation node, got {comm.size}')
 
-    precision = np.dtype('float32') if '--fp32' in sys.argv else None
     extra = {'correction_precision': precision} if precision is not None else {}
 
     # Comparing two runs at the SAME precision must be exact to round-off. Comparing against a
@@ -92,6 +99,7 @@ def main():
     cross_precision_tol = 1e-11 if precision is None else 1e-9
 
     parallel_delta = run(delta_implicit_MPI, sweeper_params(comm=comm, **extra))
+    mismatch = False
 
     if comm.rank == 0:
         serial_delta = run(delta_implicit, sweeper_params(**extra))
@@ -103,23 +111,18 @@ def main():
         }
         for label, (value, tol) in errors.items():
             print(f'{label}: {value:.3e} (tol {tol:.0e})', flush=True)
-        if any(value > tol for value, tol in errors.values()):
-            print('MISMATCH', flush=True)
-            comm.Abort(1)
+        mismatch = any(value > tol for value, tol in errors.values())
 
     # cross-check that the stock MPI sweeper agrees too, i.e. the comparison itself is sound
     parallel_stock = run(generic_implicit_MPI, sweeper_params(comm=comm))
     if comm.rank == 0:
         diff = abs(parallel_delta - parallel_stock)
         print(f'delta_MPI vs generic_implicit_MPI: {diff:.3e} (tol {cross_precision_tol:.0e})', flush=True)
-        if diff > cross_precision_tol:
-            print('MISMATCH', flush=True)
-            comm.Abort(1)
+        mismatch = mismatch or diff > cross_precision_tol
 
-    check_multilevel(comm, extra)
-
-    if comm.rank == 0:
-        print('OK', flush=True)
+    mismatch = check_multilevel(comm, extra) or mismatch
+    # rank 0 alone holds the serial references, so it decides, and every rank fails with it
+    assert not comm.bcast(mismatch, root=0), 'the node-parallel runs disagree with the serial ones'
 
 
 def check_multilevel(comm, extra):
@@ -139,7 +142,8 @@ def check_multilevel(comm, extra):
 
     Returns
     -------
-    None
+    bool
+        Whether anything disagrees, on rank 0; ``False`` on the other ranks.
     """
     # linear_implicit reaches the correction equation through the stock solve_system, which this
     # problem's homogeneous Dirichlet operator allows. A reduced-precision level *needs* a genuine
@@ -175,7 +179,7 @@ def check_multilevel(comm, extra):
     )
 
     if comm.rank != 0:
-        return
+        return False
 
     serial = run(
         delta_implicit_rounded,
@@ -192,10 +196,8 @@ def check_multilevel(comm, extra):
     }
     for label, (value, tol) in errors.items():
         print(f'{label}: {value:.3e} (tol {tol:.0e})', flush=True)
-    if any(value > tol for value, tol in errors.values()):
-        print('MISMATCH', flush=True)
-        comm.Abort(1)
+    return any(value > tol for value, tol in errors.values())
 
 
 if __name__ == '__main__':
-    main()
+    main(np.dtype('float32') if '--fp32' in sys.argv else None)

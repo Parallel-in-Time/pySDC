@@ -120,7 +120,7 @@ controls:
 ``run_demo.py``                 runnable demonstration, nonlinear and linear
 ``run_petsc.py``                PETSc entry point, called by the ``petsc``-marked test
 ``run_fenics.py``               FEniCS entry point, called by the ``fenics``-marked test
-``run_mpi.py``                  node-parallel driver, spawned by the ``mpi4py``-marked test
+``run_mpi.py``                  node-parallel driver, run on three ranks by the ``mpi4py`` test
 ``paradiag.py``                 ParaDiag at reduced precision -- no reformulation needed
 ``run_gpu.py``                  time to solution on CPU or GPU, and the half-precision FFT check
 ``plot_mixed_precision.py``     the figures in "Corrections below ``float16`` need scaling"

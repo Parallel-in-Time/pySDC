@@ -366,3 +366,15 @@ def test_fft_solve_needs_a_periodic_grid():
 
     with pytest.raises(ValueError, match='periodic'):
         heat_solve_dtype(nvars=63, bc='dirichlet-zero', solver_type='FFT')
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('table', [[], ['--fft'], ['--paradiag', '--alpha', '1e-4', 'adaptive']])
+def test_run_gpu_runs_on_the_cpu(table, monkeypatch):
+    """``run_gpu.py``'s tables, tiny and on the CPU: the GPU job times them, this keeps them runnable."""
+    import sys
+
+    from pySDC.projects.DeltaSDC.run_gpu import main
+
+    monkeypatch.setattr(sys, 'argv', ['run_gpu.py', '--n', '16', '--nsteps', '1', *table])
+    main()

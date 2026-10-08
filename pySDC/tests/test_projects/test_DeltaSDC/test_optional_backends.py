@@ -8,9 +8,6 @@ while the project job installs only the project's own environment. Same split as
 tests here just call them.
 """
 
-import os
-import subprocess
-
 import pytest
 
 
@@ -30,35 +27,13 @@ def test_petsc():
     main()
 
 
-def _run_mpi(extra_args):
-    """Spawn the node-parallel driver with one rank per collocation node."""
-    try:
-        import mpi4py
-
-        del mpi4py
-    except ImportError:
-        raise ImportError('the node-parallel sweeper test needs mpi4py') from None
-
-    my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../../..:.'
-
-    cmd = ('mpirun -np 3 python pySDC/projects/DeltaSDC/run_mpi.py ' + extra_args).split()
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd='.')
-    p.wait()
-    for line in p.stdout:
-        print(line)
-    for line in p.stderr:
-        print(line)
-    assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % p.returncode
-
-
 @pytest.mark.mpi4py
-def test_mpi_sweeper():
-    """One collocation node per rank must reproduce the serial delta form and generic_implicit."""
-    _run_mpi('')
+@pytest.mark.parallel(3)
+@pytest.mark.parametrize('precision', [None, 'float32'])
+def test_mpi_sweeper(precision):
+    """One collocation node per rank must reproduce the serial delta form, also with the corrections stored at fp32."""
+    import numpy as np
 
+    from pySDC.projects.DeltaSDC.run_mpi import main
 
-@pytest.mark.mpi4py
-def test_mpi_sweeper_reduced_precision():
-    """The same, with the small quantities stored at reduced precision."""
-    _run_mpi('--fp32')
+    main(None if precision is None else np.dtype(precision))
