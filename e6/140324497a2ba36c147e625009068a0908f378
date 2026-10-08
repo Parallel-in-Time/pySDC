@@ -1,0 +1,35 @@
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_b7dee3d2162d1e 116-117,496,541
+pySDC/projects/DeltaSDC/paradiag.py
+  s_3cfbaa2fb0772b::t_00764b535cd53d 73,75,81,106,114
+pySDC/projects/DeltaSDC/problems.py
+  s_3cfbaa2fb0772b::t_98ecaff51b3282 96-97,293,296-322,327,329-332,340-341,345,350-352,361,381,383-402,404,409,422,471-493
+pySDC/projects/DeltaSDC/problems_fenics.py
+  s_3cfbaa2fb0772b::t_378835b42827f3 99-100
+pySDC/projects/DeltaSDC/problems_petsc.py
+  s_3cfbaa2fb0772b::t_db229af67c365b 207-208
+pySDC/projects/DeltaSDC/run_gpu.py
+  s_3cfbaa2fb0772b::t_8f2b9631715397 6,26,54,60,68,89-90,92-93,118
+pySDC/projects/DeltaSDC/tests/inexact_problem.py
+  s_3cfbaa2fb0772b::t_dd629ab4ec4f81 36
+pySDC/projects/DeltaSDC/tests/test_problems.py
+  s_3cfbaa2fb0772b::t_2bef1f67710bfe 350,352,365,368
+pySDC/tests/test_projects/test_DeltaSDC/test_gpu.py
+  s_3cfbaa2fb0772b::t_c54eb74cb95383 68,70,193,197-198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e6140324497a2ba36c147e625009068a0908f378",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
