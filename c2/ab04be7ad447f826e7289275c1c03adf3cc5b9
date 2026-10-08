@@ -1,0 +1,19 @@
+pySDC/tests/test_problems/test_FD_solve_precision.py
+  s_3cfbaa2fb0772b::t_3d9ffcba5fb2da 73-76,80-82,93-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c2ab04be7ad447f826e7289275c1c03adf3cc5b9",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
