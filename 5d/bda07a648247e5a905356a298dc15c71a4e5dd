@@ -1,0 +1,25 @@
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_bc61400638a8c2 123
+pySDC/projects/DeltaSDC/run_mpi.py
+  s_3cfbaa2fb0772b::t_e4726999d92105 81-89,102,114,121,123-125,145-146,182,199,203
+pySDC/projects/DeltaSDC/tests/test_problems.py
+  s_3cfbaa2fb0772b::t_7dd6a4d9fa6579 369-380
+pySDC/tests/test_projects/test_DeltaSDC/test_optional_backends.py
+  s_3cfbaa2fb0772b::t_71021230d46018 31-35,37,39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5dbda07a648247e5a905356a298dc15c71a4e5dd",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
