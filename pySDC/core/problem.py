@@ -62,33 +62,62 @@ class Problem(RegisterParams):
 
     Notes
     -----
-    Two **optional** methods are recognised by the deferred-correction ("delta-form") sweepers in
-    :mod:`pySDC.implementations.sweeper_classes.delta_form`. Neither is required: a problem that
-    defines neither still works, and the sweeper falls back to a route that is always correct. They
-    exist because both fallbacks read quantities of size :math:`|u|` or :math:`|f|`, which is
-    harmless at backend precision and is what binds first below it.
+    **The correction-solve contract.** The deferred-correction ("delta-form") sweepers in
+    :mod:`pySDC.implementations.sweeper_classes.delta_form` hand the implicit solve a *correction*
+    equation instead of the state's. That is what lets the solver -- typically the expensive, often
+    external part -- work in, and return, a much lower precision while the iteration still
+    converges to full precision. Both sides of that call are specified here; nothing in it is
+    required, and a problem that ignores it keeps working.
 
-    ``solve_system_delta(rhs, factor, base, f_base, t)``
-        Solve :math:`\delta - factor\,[f(base+\delta) - f(base)] = rhs` and return the correction
-        :math:`\delta`. Needed only for a **nonlinear** implicit operator; for a linear or affine one
-        the sweeper reaches the same equation through the stock :meth:`solve_system`. The unknown
-        must be the correction, and the increment must be expanded analytically rather than formed as
-        a difference of two :math:`\mathcal{O}(|f|)` quantities.
+    The call is made per collocation node and sweep, by one of two routes:
 
-        Without it the sweeper substitutes :math:`y = u^k_m + \delta_m` and uses
-        :meth:`solve_system`. That is exact, but the solver then sees an :math:`\mathcal{O}(1)`
-        unknown.
+    - linear or affine implicit operator: the stock :meth:`solve_system`, with the sweeper
+      parameter ``linear_implicit=True``;
+    - nonlinear implicit operator: ``solve_system_delta(rhs, factor, base, f_base, t)``, which
+      solves :math:`\delta - factor\,[f(base+\delta) - f(base)] = rhs` and returns :math:`\delta`.
+      This is the contract for an external nonlinear solver.
 
-    ``eval_f_increment(base, delta, t)``
-        Return :math:`f(base+\delta) - f(base)` with the same splitting as :meth:`eval_f`, expanded
-        so that every term carries an explicit factor :math:`\delta`.
+    Without either, the sweeper substitutes :math:`y = u^k_m + \delta_m` and calls
+    :meth:`solve_system`. That is exact, but the solver then sees an :math:`\mathcal{O}(1)`
+    unknown, and none of what follows holds.
 
-        Without it the sweeper subtracts two stored right-hand sides. That cancellation carries the
-        operator norm: on the FEniCS heat equation, where :math:`|M^{-1}Ku|` is of order
-        :math:`10^5`, it is already 7.7e-11 off in double precision.
+    *The sweeper guarantees the solver*
 
-    Both fallbacks are correct and neither fails loudly, which is the reason to document them here
-    rather than to leave them to be discovered.
+    1. the unknown is a correction, the right-hand side is that of the correction equation, and it
+       shrinks with the iteration like the residual; the initial guess is zero;
+    2. on the linear route, a right-hand side of unit size: it is divided by its maximum before
+       the call and the result multiplied by it after, which is exact and keeps any format clear of
+       underflow. On the nonlinear route the scaled unknown would enter :math:`f`, so there the
+       solver scales internally if its format needs it;
+    3. ``base`` and ``f_base`` at the level's own precision, read only, and ``factor`` a plain
+       scalar;
+    4. that everything outside the solve -- the residual, the update :math:`u \leftarrow u +
+       \delta`, and the increment :math:`f(u+\delta) - f(u)` -- stays at the level's precision, so
+       every sweep is a step of iterative refinement around the solve.
+
+    *The solver guarantees the sweeper*
+
+    1. it returns the correction, not the state, in any precision: the sweeper widens it to the
+       level's before using it;
+    2. a relative accuracy :math:`\eta`, :math:`\|\tilde\delta - \delta\| \le \eta\|\delta\|`, below
+       what the method needs. How it gets there -- its internal precision, iterative refinement, a
+       Krylov tolerance, multigrid cycles -- is its own business;
+    3. relative tolerances only, and none below what its own precision can deliver: an absolute
+       tolerance caps the attainable accuracy, and an unreachable one costs iterations or, in a
+       Krylov method, breaks it down;
+    4. no boundary data or affine terms re-imposed on the correction, whose boundary conditions are
+       homogeneous.
+
+    Then the iteration converges to the level's precision, at an iteration cost set by
+    :math:`\eta` alone. Measured on the heat equation: SDC needs :math:`\eta` of about 1e-4, an
+    MLSDC fine level about 1e-6 and an MLSDC coarse level about 1e-2 to lose at most one iteration.
+
+    One more optional method serves the contract. ``eval_f_increment(base, delta, t)`` returns
+    :math:`f(base+\delta) - f(base)` with the same splitting as :meth:`eval_f`, expanded so that
+    every term carries an explicit factor :math:`\delta`. Without it the sweeper subtracts two
+    stored right-hand sides, a cancellation that carries the operator norm: on the FEniCS heat
+    equation, where :math:`|M^{-1}Ku|` is of order :math:`10^5`, it is already 7.7e-11 off in
+    double precision, and below double precision it binds before the solver does.
     """
 
     logger: logging.Logger = logging.getLogger('problem')

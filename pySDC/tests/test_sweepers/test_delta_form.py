@@ -537,3 +537,66 @@ def test_a_handed_down_residual_is_used_and_advanced():
     assert all(banked), 'the corrections were not banked for a transfer to take back'
     assert max(drift) < 1e-13, f'the tracked residual drifted from the real one by {max(drift):.3e}'
     assert abs(uend - reference) < 1e-13, f'carrying the residual moved the answer by {abs(uend - reference):.3e}'
+
+
+def half_precision_heat():
+    """
+    Heat with a solver that works in half precision and scales nothing: it rounds the right-hand side
+    to ``float16`` as it comes, solves in single precision and hands back a ``float16`` result -- the
+    solver the correction-solve contract on :class:`~pySDC.core.problem.Problem` is written for.
+    """
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
+
+    class heat_half_solver(heatNd_unforced):
+        def solve_system(self, rhs, factor, u0, t):
+            matrix = (self.Id - factor * self.A).toarray().astype(np.float32)
+            b = np.asarray(rhs).reshape(-1).astype(np.float16).astype(np.float32)
+            me = self.dtype_u((self.init[0], self.init[1], np.dtype('float16')))
+            me[:] = np.linalg.solve(matrix, b).reshape(self.nvars)
+            return me
+
+    return heat_half_solver
+
+
+@pytest.mark.base
+def test_half_precision_solver_reaches_full_precision():
+    """
+    The contract, end to end: handed a correction scaled to unit size, a half-precision solver costs
+    iterations and not accuracy, and its half-precision result reaches the level widened. Unscaled, the
+    same solver flushes a correction below 6e-8 to zero; stock SDC, handing it the state, stalls -- the
+    control.
+    """
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+    def floor(problem_class, sweeper_class, **extra):
+        _, stats, _ = run(problem_class, HEAT_PARAMS, sweeper_class, sweeper_params(**extra), 1e-1, 1, 25)
+        return min(value for _, value in get_sorted(stats, type='residual_post_iteration'))
+
+    half = half_precision_heat()
+    reference = floor(heatNd_unforced, generic_implicit)
+    assert floor(half, delta_implicit, linear_implicit=True) < 10 * reference
+    assert floor(half, generic_implicit) > 1e-6, 'the control: the state itself through float16'
+
+
+@pytest.mark.base
+def test_half_precision_result_is_widened():
+    """A correction handed back in half precision is stored at the level's precision, not left at the solver's."""
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+
+    description = {
+        'problem_class': half_precision_heat(),
+        'problem_params': HEAT_PARAMS,
+        'sweeper_class': delta_implicit,
+        'sweeper_params': sweeper_params(linear_implicit=True),
+        'level_params': {'restol': -1, 'dt': 1e-1},
+        'step_params': {'maxiter': 3},
+    }
+    controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+    prob = controller.MS[0].levels[0].prob
+    controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=1e-1)
+    deltas = controller.MS[0].levels[0].sweep._deltas
+    assert deltas and all(delta.dtype == np.float64 for delta in deltas)
