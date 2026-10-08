@@ -27,6 +27,12 @@ class IMEX_Laplacian_MPIFFT(Problem):
         Multiplicative factor before the Laplacian
     comm : MPI.COMM_World
         Communicator for parallelisation.
+    dtype : numpy.dtype or str, optional
+        Datatype of the solution in real space, e.g. ``'d'`` for real or ``'D'`` for complex problems.
+    useGPU : bool, optional
+        Run on the GPU with CuPy and NCCL instead of on the CPU with NumPy and MPI.
+    x0 : float, optional
+        Coordinate of the left boundary of the domain in each direction.
 
     Attributes
     ----------
@@ -66,6 +72,7 @@ class IMEX_Laplacian_MPIFFT(Problem):
     def __init__(
         self, nvars=None, spectral=False, L=2 * np.pi, alpha=1.0, comm=MPI.COMM_WORLD, dtype='d', useGPU=False, x0=0.0
     ):
+        """Initialization routine"""
         if useGPU:
             self.setup_GPU()
 
@@ -111,6 +118,14 @@ class IMEX_Laplacian_MPIFFT(Problem):
         self.work_counters['rhs'] = WorkCounter()
 
     def getLocalGrid(self):
+        """
+        Compute the coordinates of the local part of the grid in real space and store them in ``self.X``, one array per
+        dimension broadcast to the local shape, with the points :math:`x_0 + i L / N`.
+
+        Returns
+        -------
+        None
+        """
         X = list(self.xp.ogrid[self.fft.local_slice(False)])
         N = self.fft.global_shape()
         for i in range(len(N)):
@@ -118,6 +133,14 @@ class IMEX_Laplacian_MPIFFT(Problem):
         self.X = [self.xp.broadcast_to(x, self.fft.shape(False)) for x in X]
 
     def getLaplacian(self):
+        r"""
+        Compute the squared wave numbers :math:`|k|^2` of the local part of the spectral grid, with the wave numbers
+        scaled by :math:`2\pi / L`, and store them in ``self.K2``. The Laplacian in spectral space is :math:`-|k|^2`.
+
+        Returns
+        -------
+        None
+        """
         s = self.fft.local_slice()
         N = self.fft.global_shape()
         k = [self.xp.fft.fftfreq(n, 1.0 / n).astype(int) for n in N]

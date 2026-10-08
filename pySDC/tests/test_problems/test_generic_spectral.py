@@ -53,5 +53,38 @@ def test_initial_guess(
     assert np.allclose(u, u2)
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('problem', ['Heat1DChebychev', 'Heat1DUltraspherical'])
+@pytest.mark.parametrize('spectral_space', [True, False])
+def test_u_exact_is_dtype_u(problem, spectral_space):
+    """The controller cannot take a bare array as initial conditions, so `u_exact` must return `dtype_u`."""
+    import pySDC.implementations.problem_classes.HeatEquation_Chebychev as module
+
+    P = getattr(module, problem)(nvars=2**4, spectral_space=spectral_space)
+    assert type(P.u_exact(0)) is P.dtype_u
+
+
+@pytest.mark.base
+def test_right_preconditioner_is_factorized_once(monkeypatch):
+    """Iterative solves apply Pr^-1 to the initial guess, whose factorization should be reused, not redone each time."""
+    import scipy.sparse.linalg
+    from pySDC.implementations.problem_classes.HeatEquation_Chebychev import Heat1DUltraspherical
+
+    splu = scipy.sparse.linalg.splu
+    calls = []
+
+    def counting_splu(*args, **kwargs):
+        calls.append(1)
+        return splu(*args, **kwargs)
+
+    monkeypatch.setattr(scipy.sparse.linalg, 'splu', counting_splu)
+
+    P = Heat1DUltraspherical(nvars=2**4, solver_type='bicgstab', Dirichlet_recombination=True)
+    u0 = P.u_exact(0)
+    for _ in range(3):
+        P.solve_system(u0, u0=u0, dt=1e-1)
+    assert len(calls) == 1, f'Factorized the right preconditioner {len(calls)} times'
+
+
 if __name__ == '__main__':
     test_initial_guess(False, True, 'bicgstab', True, True, 2**4)

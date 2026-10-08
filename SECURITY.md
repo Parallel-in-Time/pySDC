@@ -47,6 +47,14 @@ Security updates will be released as soon as possible after a vulnerability is c
 
 pySDC uses several third-party dependencies. We monitor our dependencies for known security vulnerabilities and update them as needed. If you discover a security issue in one of our dependencies, please also report it to the respective maintainers of that dependency.
 
+Every [release](https://github.com/Parallel-in-Time/pySDC/releases) comes with software bills of materials (SBOMs) in CycloneDX format, generated from the installed environments with the exact versions resolved on the day of the release:
+
+- `sbom-pySDC.cdx.json`: the core install, i.e. `pip install pySDC`
+- `sbom-env-<name>.cdx.json`: the optional backends in `etc/environment-<name>.yml` (FEniCS, PETSc, MPI, CuPy, ...)
+- `sbom-project-<name>.cdx.json`: the environments of the projects in `pySDC/projects/<name>`
+
+The ones for the newest release are always at `https://github.com/Parallel-in-Time/pySDC/releases/latest/download/<file>`, e.g. [sbom-pySDC.cdx.json](https://github.com/Parallel-in-Time/pySDC/releases/latest/download/sbom-pySDC.cdx.json).
+
 ## Comments on This Policy
 
 If you have suggestions on how this process could be improved, please submit a pull request or open an issue to discuss.

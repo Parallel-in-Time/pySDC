@@ -23,6 +23,7 @@ parameterset:
       - {tag: 'JUSUF+Ra1e5', name: ntasks_space, type: int, '_': '1,2,4,8,16,32,64,128,256,512,1024,2048'}
       - {tag: 'JUSUF+Ra1e6', name: ntasks_space, type: int, '_': '1,2,4,8,16,32,64,128,256,512,1024,2048,4096'}
       - {tag: 'JUSUF+Ra1e7', name: ntasks_space, type: int, '_': '128,256,512,1024,2048,4096'}
+      - {tag: 'JUSUF+Ra1e8', name: ntasks_space, type: int, '_': '1024,2048,4096'}
       - {tag: 'BOOSTER+Ra1e5', name: ntasks_space, type: int, '_': '1,2,4,8'}
       - {tag: 'BOOSTER+Ra1e6', name: ntasks_space, type: int, '_': '1,2,4,8,16,32,64'}
       - {tag: 'BOOSTER+Ra1e7', name: ntasks_space, type: int, '_': '32,64,128,256,512'}

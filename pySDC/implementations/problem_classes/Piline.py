@@ -8,6 +8,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 # noinspection PyUnusedLocal
 class piline(Problem):
     r"""
+    Pi-line model of a transmission line as three linear ODEs, IMEX with the constant source term explicit.
+
     Example implementing the model of the piline. It serves as a transmission line in an energy grid. The problem of simulating the
     piline consists of three ordinary differential equations (ODEs) with nonhomogeneous part:
 
@@ -44,7 +46,8 @@ class piline(Problem):
     Rl : float, optional
         Resistance of the resistive load :math:`R_\ell`.
 
-    Attributes:
+    Attributes
+    ----------
     A : np.2darray
         Coefficient matrix of the linear ODE system.
     """

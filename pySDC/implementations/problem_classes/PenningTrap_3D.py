@@ -1,5 +1,12 @@
 import numpy as np
-from numba import jit
+
+try:
+    from numba import jit
+except ImportError:  # numba does not exist everywhere, e.g. not in the browser (Pyodide): run uncompiled there
+
+    def jit(*args, **kwargs):
+        return lambda function: function
+
 
 from pySDC.core.errors import ProblemError
 from pySDC.core.problem import Problem, WorkCounter
@@ -9,6 +16,8 @@ from pySDC.implementations.datatype_classes.particles import particles, fields, 
 # noinspection PyUnusedLocal
 class penningtrap(Problem):
     r"""
+    Charged particles in a 3D Penning trap with Coulomb interaction, a second-order problem for the Boris integrator.
+
     This class implements a standard Penning trap problem on the time interval :math:`[0, t_{end}]`
     fully investigated in [1]_. The equations are given by the following equation of motion
 
@@ -58,11 +67,8 @@ class penningtrap(Problem):
     omega_E : float
         Amplitude of electric field.
     u0 : np.1darray
-        Initial condition for position, and for velocity.
-    q : np.1darray
-        Particle's charge.
-    m : np.1darray
-        Mass.
+        Initial condition ``[pos, vel, [q], [m]]``: position and velocity (three components each) around which the
+        particles are placed, and the particles' charge and mass (so far only :math:`q = m = 1` is implemented).
     nparts : int
         The number of particles.
     sig : float
@@ -85,6 +91,7 @@ class penningtrap(Problem):
     dtype_f = fields
 
     def __init__(self, omega_B, omega_E, u0, nparts, sig):
+        """Initialization routine"""
         # invoke super init, passing nparts, dtype_u and dtype_f
         super().__init__(((3, nparts), None, np.dtype('float64')))
         self._makeAttributeAndRegister('nparts', localVars=locals(), readOnly=True)
@@ -192,6 +199,10 @@ class penningtrap(Problem):
         """
         Routine to compute the starting values for the particles.
 
+        The first particle starts at ``u0``. The others are shifted from it by random amounts in :math:`[-1, 0)` in
+        each position component and in :math:`[-5, -4)` in each velocity component, drawn after seeding
+        ``np.random`` with the number of particles.
+
         Returns
         -------
         u : dtype_u
@@ -225,13 +236,13 @@ class penningtrap(Problem):
         comz = u.pos[2, 0]
 
         for n in range(1, N):
-            # draw 3 random variables in [-1,1] to shift positions
+            # draw 3 random variables in [-1, 0) to shift positions
             r = np.random.random_sample(3) - 1
             u.pos[0, n] = r[0] + u0[0][0]
             u.pos[1, n] = r[1] + u0[0][1]
             u.pos[2, n] = r[2] + u0[0][2]
 
-            # draw 3 random variables in [-5,5] to shift velocities
+            # draw 3 random variables in [-5, -4) to shift velocities
             r = np.random.random_sample(3) - 5
             u.vel[0, n] = r[0] + u0[1][0]
             u.vel[1, n] = r[1] + u0[1][1]

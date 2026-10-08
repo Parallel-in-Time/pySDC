@@ -2,3 +2,8 @@
 !index.rst
 !projects/*.rst
 !tutorial/*.rst
+!api.rst
+!development.rst
+!publications.rst
+!about.rst
+_static/wheels/

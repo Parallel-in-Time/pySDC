@@ -10,6 +10,8 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_
 # noinspection PyUnusedLocal
 class fenics_vortex_2d(Problem):
     r"""
+    2D periodic vorticity-velocity problem with FEniCS, IMEX (diffusion implicit), with the mass matrix inverted.
+
     This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions
     in :math:`[0, 1]^2`
 
@@ -17,7 +19,7 @@ class fenics_vortex_2d(Problem):
         \frac{\partial w}{\partial t} = \nu \Delta w
 
     for some parameter :math:`\nu`. In this class the problem is implemented that the spatial part is solved
-    using ``FEniCS`` [1]_. Hence, the problem is reformulated to the *weak formulation*
+    using ``FEniCS`` [#]_. Hence, the problem is reformulated to the *weak formulation*
 
     .. math::
         \int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx
@@ -27,12 +29,12 @@ class fenics_vortex_2d(Problem):
 
     Parameters
     ----------
-    c_nvars : List of int tuple, optional
-        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. ``c_nvars=[(128, 128)]``.
+    c_nvars : tuple of int, optional
+        Number of cells of the coarse mesh in :math:`x` and :math:`y` direction, e.g. ``c_nvars=(128, 128)``.
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
-        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [#]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
@@ -40,9 +42,9 @@ class fenics_vortex_2d(Problem):
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
     rho : int, optional
-        Problem parameter.
+        Steepness of the shear layers in the initial condition.
     delta : float, optional
-        Problem parameter.
+        Amplitude of the perturbation in the initial condition.
 
     Attributes
     ----------
@@ -52,12 +54,16 @@ class fenics_vortex_2d(Problem):
         Mass matrix for FENiCS.
     K : scalar, vector, matrix or higher rank tensor
         Stiffness matrix including diffusion coefficient (and correct sign).
+    dtype_u : fenics_mesh
+        FEniCS mesh data type.
+    dtype_f : rhs_fenics_mesh
+        FEniCS mesh data type with implicit and explicit parts.
 
     References
     ----------
-    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+    .. [#] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
         C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
-    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+    .. [#] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
         Wells and others. Springer (2012).
     """
 
@@ -65,17 +71,10 @@ class fenics_vortex_2d(Problem):
     dtype_f = rhs_fenics_mesh
 
     def __init__(self, c_nvars=None, family='CG', order=4, refinements=None, nu=0.01, rho=50, delta=0.05):
-        """
-        Initialization routine
-
-        Args:
-            problem_params (dict): custom parameters for the example
-            dtype_u: FEniCS mesh data type (will be passed to parent class)
-            dtype_f: FEniCS mesh data data type with implicit and explicit parts (will be passed to parent class)
-        """
+        """Initialization routine"""
 
         if c_nvars is None:
-            c_nvars = [(32, 32)]
+            c_nvars = (32, 32)
 
         if refinements is None:
             refinements = 1
@@ -248,13 +247,14 @@ class fenics_vortex_2d(Problem):
         Routine to apply mass matrix.
 
         Parameters
+        ----------
         u : dtype_u
             Current values of the numerical solution.
 
         Returns
         -------
         me : dtype_u
-            The product :math:` M\vec{u}`.
+            The product :math:`M\vec{u}`.
         """
 
         me = self.dtype_u(self.V)
@@ -326,6 +326,8 @@ class fenics_vortex_2d(Problem):
 
 class fenics_vortex_2d_mass(fenics_vortex_2d):
     r"""
+    2D periodic vorticity-velocity problem with FEniCS, IMEX (diffusion implicit), with the mass matrix applied.
+
     This class implements the vorticity-velocity problem in two dimensions with periodic boundary conditions
     in :math:`[0, 1]^2`
 
@@ -333,7 +335,7 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
         \frac{\partial w}{\partial t} = \nu \Delta w
 
     for some parameter :math:`\nu`. In this class the problem is implemented that the spatial part is solved
-    using ``FEniCS`` [1]_. Hence, the problem is reformulated to the *weak formulation*
+    using ``FEniCS`` [#]_. Hence, the problem is reformulated to the *weak formulation*
 
     .. math::
         \int_\Omega w_t v\,dx = - \nu \int_\Omega \nabla w \nabla v\,dx
@@ -343,12 +345,12 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
 
     Parameters
     ----------
-    c_nvars : List of int tuple, optional
-        Spatial resolution, i.e., numbers of degrees of freedom in space, e.g. ``c_nvars=[(128, 128)]``.
+    c_nvars : tuple of int, optional
+        Number of cells of the coarse mesh in :math:`x` and :math:`y` direction, e.g. ``c_nvars=(128, 128)``.
     family : str, optional
         Indicates the family of elements used to create the function space
         for the trail and test functions. The default is ``'CG'``, which are the class
-        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [2]_.
+        of Continuous Galerkin, a *synonym* for the Lagrange family of elements, see [#]_.
     order : int, optional
         Defines the order of the elements in the function space.
     refinements : int, optional
@@ -356,9 +358,9 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
     rho : int, optional
-        Problem parameter.
+        Steepness of the shear layers in the initial condition.
     delta : float, optional
-        Problem parameter.
+        Amplitude of the perturbation in the initial condition.
 
     Attributes
     ----------
@@ -368,12 +370,16 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
         Mass matrix for FENiCS.
     K : scalar, vector, matrix or higher rank tensor
         Stiffness matrix including diffusion coefficient (and correct sign).
+    dtype_u : fenics_mesh
+        FEniCS mesh data type.
+    dtype_f : rhs_fenics_mesh
+        FEniCS mesh data type with implicit and explicit parts.
 
     References
     ----------
-    .. [1] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
+    .. [#] The FEniCS Project Version 1.5. M. S. Alnaes, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg,
         C. Richardson, J. Ring, M. E. Rognes, G. N. Wells. Archive of Numerical Software (2015).
-    .. [2] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
+    .. [#] Automated Solution of Differential Equations by the Finite Element Method. A. Logg, K.-A. Mardal, G. N.
         Wells and others. Springer (2012).
     """
 
@@ -426,11 +432,22 @@ class fenics_vortex_2d_mass(fenics_vortex_2d):
         psi = self.dtype_u(self.V)
         df.solve(self.K, psi.values.vector(), b.values.vector())
 
+        # Assemble the load vector of the advection term directly. The previous version projected the
+        # expression onto V and multiplied the result by M again, which is M M^-1 = identity: it paid
+        # for a mass solve per right-hand side evaluation and produced the same vector. It is also the
+        # form FFC miscompiles under PFASST, emitting a duplicate J_c1 declaration.
+        # u may have been handed over from another step, and fenics_mesh copies keep the function
+        # space they were created on. Under PFASST every step owns a separate (but identical) mesh, so
+        # a form built straight from u.values would mix two meshes and UFL refuses to order them.
+        # Copying the coefficients onto this problem's own space keeps the form single-domain.
+        w = df.Function(self.V)
+        w.vector()[:] = u.values.vector()[:]
+
+        v = df.TestFunction(self.V)
+        expr = df.Dx(psi.values, 1) * df.Dx(w, 0) - df.Dx(psi.values, 0) * df.Dx(w, 1)
+
         fexpl = self.dtype_u(self.V)
-        fexpl.values = df.project(
-            df.Dx(psi.values, 1) * df.Dx(u.values, 0) - df.Dx(psi.values, 0) * df.Dx(u.values, 1), self.V
-        )
-        fexpl = self.apply_mass_matrix(fexpl)
+        fexpl.values = df.Function(self.V, df.assemble(expr * v * df.dx))
 
         return fexpl
 

@@ -22,7 +22,8 @@ class QDiagonalization(generic_implicit):
 
     Similarly, in ParaDiag, the solution is in Fourier space right after the solve. It therefore makes little sense to
     evaluate the right hand side directly after. By default, this is not done! Set `update_f_evals=True` in the
-    parameters if you want to use this sweeper in SDC.
+    parameters if you want to use this sweeper in SDC. With `ignore_ic`, the solve gives only an increment, which is
+    added to the solution later, so there is nothing to evaluate the right hand side at and `update_f_evals` is ignored.
     """
 
     def __init__(self, params, level):
@@ -125,13 +126,19 @@ class QDiagonalization(generic_implicit):
                 L.increment[m] = y[m]
             else:
                 L.u[m + 1] = y[m]
-            if self.params.update_f_evals:
-                L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+                if self.params.update_f_evals:
+                    L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         L.status.updated = True
         return None
 
     def eval_f_at_all_nodes(self):
+        """
+        Evaluate the right hand side at all collocation nodes, since the solve does not do this by default.
+
+        Returns:
+            None
+        """
         L = self.level
         P = self.level.prob
         for m in range(self.coll.num_nodes):
@@ -158,13 +165,24 @@ class QDiagonalization(generic_implicit):
         return residual
 
     def compute_residual(self, *args, **kwargs):
+        """
+        Evaluate the right hand side at all nodes and then compute the residual as in the base class.
+
+        Args:
+            *args: passed on to the base class method, typically the stage (str)
+            **kwargs: passed on to the base class method
+
+        Returns:
+            None
+        """
         self.eval_f_at_all_nodes()
         return super().compute_residual(*args, **kwargs)
 
 
 class QDiagonalizationIMEX(QDiagonalization):
     """
-    Use as sweeper class for ParaDiag with IMEX splitting. Note that it will not work with SDC.
+    Variant of QDiagonalization for ParaDiag on problems whose right hand side has implicit and explicit parts.
+    Note that it will not work with SDC.
     """
 
     integrate = imex_1st_order.integrate

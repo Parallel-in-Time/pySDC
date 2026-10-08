@@ -216,5 +216,20 @@ def test_AdaptivityPolynomialError(num_nodes):
     assert not_passed == [], not_passed
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('e_tol_rel, expect', [(1e-8, 1e-7), (1e-4, 1e-4), (1e-1, 1e-3)])
+def test_relative_increment_tolerance_is_clamped_to_the_given_bounds(e_tol_rel, expect):
+    import numpy as np
+    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityPolynomialError
+
+    params = {'e_tol': 1.0, 'e_tol_rel': e_tol_rel, 'e_tol_min': 1e-7, 'e_tol_max': 1e-3}
+    description = {'level_params': {}, 'step_params': {'maxiter': 4}, 'sweeper_params': {'num_nodes': 3}}
+    controller = get_controller(
+        dt=1e-1, num_nodes=3, useMPI=False, adaptivity=AdaptivityPolynomialError, adaptivity_params={}
+    )
+    AdaptivityPolynomialError(controller, params, description)
+    assert np.isclose(description['level_params']['e_tol'], expect)
+
+
 if __name__ == '__main__':
     test_AdaptivityPolynomialError(4)

@@ -8,7 +8,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
     """
 
-    ParaDiag controller, running serialized version.
+    ParaDiag controller with the time steps of a block emulated serially in one process.
 
     This is `controller_nonMPI` with a different iteration: where PFASST sweeps and cascades through
     the levels, ParaDiag diagonalizes across the steps. Everything around the iteration -- blocks,
@@ -56,6 +56,7 @@ class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
 
         Args:
             mat: square LxL matrix with L number of steps
+            quantity (str): The quantity the matrix is applied to, `'residual'` or `'increment'`
         """
         L = len(self.MS)
         assert np.allclose(mat.shape, L)
@@ -150,6 +151,16 @@ class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
                 S.levels[0].u[m + 1] += S.levels[0].increment[m]
 
     def prepare_Jacobians(self, local_MS_running):
+        """
+        Average the solution over the steps of the block, node by node, for constructing average Jacobians.
+
+        Does nothing unless `average_jacobian` is set. Stores the list of averages as `u_avg` on the finest level of
+        every
+        running step, which all share the same list.
+
+        Args:
+            local_MS_running (list): list of currently running steps
+        """
         # get solutions for constructing average Jacobians
         if self.params.average_jacobian:
             level = local_MS_running[0].levels[0]

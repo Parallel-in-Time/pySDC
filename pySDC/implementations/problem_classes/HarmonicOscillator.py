@@ -8,7 +8,7 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 # noinspection PyUnusedLocal
 class harmonic_oscillator(Problem):
     r"""
-    Example implementing the harmonic oscillator with mass :math:`1`
+    Example implementing the harmonic oscillator [#]_ with mass :math:`1`
 
     .. math::
         \frac{d^2 x}{dt^2} = -kx - \mu \frac{d x}{dt},
@@ -28,7 +28,10 @@ class harmonic_oscillator(Problem):
         Phase of the oscillation.
     amp : float, optional
         Amplitude of the oscillation.
-    Source: https://beltoforion.de/en/harmonic_oscillator/
+
+    References
+    ----------
+    .. [#] https://beltoforion.de/en/harmonic_oscillator/
     """
 
     dtype_u = particles
@@ -94,7 +97,6 @@ class harmonic_oscillator(Problem):
 
         U_0 = self.u0
         alpha = np.sqrt(np.abs(delta**2 - omega**2))
-        print(self.mu)
         if delta > omega:
             """
             Overdamped case

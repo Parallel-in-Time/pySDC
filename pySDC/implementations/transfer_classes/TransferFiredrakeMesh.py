@@ -59,14 +59,15 @@ class MeshToMeshFiredrakeHierarchy(SpaceTransfer):
     This implementation can restrict and prolong between Firedrake meshes that are generated from a hierarchy.
     Example:
 
-    ```
-    from firedrake import *
+    .. code-block:: python
 
-    mesh = UnitSquareMesh(8, 8)
-    hierarchy = MeshHierarchy(mesh, 4)
+        from firedrake import *
 
-    mesh = hierarchy[-1]
-    ```
+        mesh = UnitSquareMesh(8, 8)
+        hierarchy = MeshHierarchy(mesh, 4)
+
+        mesh = hierarchy[-1]
+
     """
 
     @staticmethod

@@ -6,8 +6,19 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 class polynomial_testequation(Problem):
     """
+    Scalar ODE whose exact solution is a random polynomial in time, to test operations exact on polynomials.
+
     Dummy problem for tests only! In particular, the `solve_system` function just returns the exact solution instead of
     solving an appropriate system. This class is indented to be used for tests of operations that are exact on polynomials.
+
+    Parameters
+    ----------
+    degree : int, optional
+        Number of coefficients of the polynomial, i.e., the polynomial has degree ``degree - 1``.
+    seed : int, optional
+        Seed for ``np.random.RandomState``, which draws the coefficients uniformly from :math:`[0, 1)`.
+    useGPU : bool, optional
+        Use ``CuPy`` for the solution. This switches the data types of the class, not only of this instance.
     """
 
     dtype_u = mesh
@@ -19,11 +30,12 @@ class polynomial_testequation(Problem):
 
         if useGPU:
             import cupy as cp
-            from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+            from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
-            type(self).xp = cp
-            type(self).dtype_u = cupy_mesh
-            type(self).dtype_f = cupy_mesh
+            # on the instance, since setting them on the class would switch every later instance to the GPU
+            self.xp = cp
+            self.dtype_u = cupy_mesh
+            self.dtype_f = imex_cupy_mesh if self.dtype_f is imex_mesh else cupy_mesh
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(1, None, np.dtype('float64')))
@@ -84,10 +96,9 @@ class polynomial_testequation(Problem):
         ----------
         t : float
             Time of the exact solution.
-        u_init : pySDC.problem.testequation0d.dtype_u
-            Initial solution.
-        t_init : float
-            The initial time.
+        **kwargs
+            Takes ``u_init`` and ``t_init`` of the generic interface, which are ignored since the polynomial is known
+            everywhere.
 
         Returns
         -------

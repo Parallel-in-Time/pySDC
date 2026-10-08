@@ -34,6 +34,36 @@ def findomega(stab_fh):
     return sol
 
 
+def sdc_system_stability(L, Cs, Uadv, K):
+    """
+    Stability matrix of K IMEX-SDC sweeps plus the collocation update for u' = (Cs + Uadv) u, with Cs
+    treated implicitly and Uadv explicitly: the system version of the scalar K-sweep matrix of
+    imex_1st_order, starting from the initial value spread to all nodes.
+
+    Args:
+        L: level holding the imex_1st_order sweeper and the time step
+        Cs: fast (implicit) part of the system matrix
+        Uadv: slow (explicit) part of the system matrix
+        K: number of sweeps
+
+    Returns:
+        numpy.ndarray: matrix mapping u0 to the value at the end of the step
+    """
+    QE, QI, Q = L.sweep.QE[1:, 1:], L.sweep.QI[1:, 1:], L.sweep.coll.Qmat[1:, 1:]
+    nnodes, dt, n = L.sweep.coll.num_nodes, L.params.dt, Cs.shape[0]
+
+    LHS = np.eye(n * nnodes) - dt * (np.kron(QI, Cs) + np.kron(QE, Uadv))
+    RHS = dt * (np.kron(Q, Uadv + Cs) - np.kron(QI, Cs) - np.kron(QE, Uadv))
+    LHSinv = np.linalg.inv(LHS)
+    Mat_sweep = np.linalg.matrix_power(LHSinv.dot(RHS), K)
+    for k in range(0, K):
+        Mat_sweep = Mat_sweep + np.linalg.matrix_power(LHSinv.dot(RHS), k).dot(LHSinv)
+
+    update = dt * np.kron(L.sweep.coll.weights, Uadv + Cs)
+    spread = np.kron(np.ones((nnodes, 1)), np.eye(n))
+    return np.eye(n) + update.dot(Mat_sweep.dot(spread))
+
+
 def compute_and_plot_dispersion(Nsamples=15, K=3):
     """
     Function to compute and plot the dispersion relation
@@ -81,12 +111,6 @@ def compute_and_plot_dispersion(Nsamples=15, K=3):
 
     # u0 = S.levels[0].prob.u_exact(t0)
     # S.init_step(u0)
-    QE = L.sweep.QE[1:, 1:]
-    QI = L.sweep.QI[1:, 1:]
-    Q = L.sweep.coll.Qmat[1:, 1:]
-    nnodes = L.sweep.coll.num_nodes
-    dt = L.params.dt
-
     k_vec = np.linspace(0, np.pi, Nsamples + 1, endpoint=False)
     k_vec = k_vec[1:]
     phase = np.zeros((3, Nsamples))
@@ -96,24 +120,9 @@ def compute_and_plot_dispersion(Nsamples=15, K=3):
         Cs = -1j * k_vec[i] * np.array([[0.0, c_speed], [c_speed, 0.0]], dtype='complex')
         Uadv = -1j * k_vec[i] * np.array([[U_speed, 0.0], [0.0, U_speed]], dtype='complex')
 
-        LHS = np.eye(2 * nnodes) - dt * (np.kron(QI, Cs) + np.kron(QE, Uadv))
-        RHS = dt * (np.kron(Q, Uadv + Cs) - np.kron(QI, Cs) - np.kron(QE, Uadv))
-
-        LHSinv = np.linalg.inv(LHS)
-        Mat_sweep = np.linalg.matrix_power(LHSinv.dot(RHS), K)
-        for k in range(0, K):
-            Mat_sweep = Mat_sweep + np.linalg.matrix_power(LHSinv.dot(RHS), k).dot(LHSinv)
-        ##
-        # ---> The update formula for this case need verification!!
-        update = dt * np.kron(L.sweep.coll.weights, Uadv + Cs)
-
+        stab_sdc = sdc_system_stability(L, Cs, Uadv, K)
         y1 = np.array([1, 0], dtype='complex')
         y2 = np.array([0, 1], dtype='complex')
-        e1 = np.kron(np.ones(nnodes), y1)
-        stab_fh_1 = y1 + update.dot(Mat_sweep.dot(e1))
-        e2 = np.kron(np.ones(nnodes), y2)
-        stab_fh_2 = y2 + update.dot(Mat_sweep.dot(e2))
-        stab_sdc = np.column_stack((stab_fh_1, stab_fh_2))
 
         # Stability function of backward Euler is 1/(1-z); system is y' = (Cs+Uadv)*y
         # stab_ie = np.linalg.inv( np.eye(2) - step.status.dt*(Cs+Uadv) )

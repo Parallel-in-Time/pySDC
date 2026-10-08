@@ -56,6 +56,18 @@ class Heat1DChebychev(GenericSpectralLinear):
         self.setup_BCs()
 
     def eval_f(self, u, *args, **kwargs):
+        """
+        Evaluate the right hand side nu u_xx, computed as nu times the Chebychev derivative of the auxiliary component
+        `ux`. The algebraic `ux` equation gets zero.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+            *args: Not used, the right hand side does not depend on time
+            **kwargs: Not used, the right hand side does not depend on time
+
+        Returns:
+            Heat1DChebychev.dtype_f: The right hand side, in the same space as `u`
+        """
         f = self.f_init
         iu, iux = self.index(self.components)
 
@@ -170,6 +182,18 @@ class Heat1DUltraspherical(GenericSpectralLinear):
         self.setup_BCs()
 
     def eval_f(self, u, *args, **kwargs):
+        """
+        Evaluate the right hand side nu u_xx with the ultraspherical second derivative matrix, converted back to the
+        Chebychev basis.
+
+        Args:
+            u (dtype_u): Solution, in spectral space if `spectral_space` is set, else in physical space
+            *args: Not used, the right hand side does not depend on time
+            **kwargs: Not used, the right hand side does not depend on time
+
+        Returns:
+            Heat1DUltraspherical.dtype_f: The right hand side, in the same space as `u`
+        """
         f = self.f_init
         iu = self.index('u')
 
@@ -224,14 +248,18 @@ class Heat1DUltraspherical(GenericSpectralLinear):
         self.check_BCs(u)
 
         if self.spectral_space:
-            return self.transform(u)
+            u_hat = self.u_init
+            u_hat[...] = self.transform(u)
+            return u_hat
         else:
             return u
 
 
 class Heat2DChebychev(GenericSpectralLinear):
     """
-    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.
+    2D heat equation, periodic (FFT) or Dirichlet (Chebychev) in each direction, in first-order formulation.
+
+    Discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Chebychev.
     """
 
     dtype_u = mesh
@@ -303,6 +331,18 @@ class Heat2DChebychev(GenericSpectralLinear):
         self.setup_BCs()
 
     def eval_f(self, u, *args, **kwargs):
+        """
+        Evaluate the right hand side nu (u_xx + u_yy), computed by spectral differentiation of the auxiliary components
+        `ux` and `uy`. The algebraic `ux` and `uy` equations get zero.
+
+        Args:
+            u (dtype_u): Solution in physical space
+            *args: Not used, the right hand side does not depend on time
+            **kwargs: Not used, the right hand side does not depend on time
+
+        Returns:
+            Heat2DChebychev.dtype_f: The right hand side in physical space
+        """
         f = self.f_init
         iu, iux, iuy = self.index(self.components)
 
@@ -317,6 +357,17 @@ class Heat2DChebychev(GenericSpectralLinear):
         return f
 
     def u_exact(self, t):
+        """
+        Get the exact solution at time `t`: sin(fx x) sin(fy y) exp(-nu (fx^2 + fy^2) t) plus the linear function in x
+        and y that satisfies the boundary conditions, where the frequencies are multiplied by pi in Chebychev
+        directions. The components `ux` and `uy` are set to the derivatives.
+
+        Args:
+            t (float): When you want the exact solution
+
+        Returns:
+            Heat2DChebychev.dtype_u: Exact solution in physical space
+        """
         xp = self.xp
         iu, iux, iuy = self.index(self.components)
         u = self.u_init
@@ -339,7 +390,9 @@ class Heat2DChebychev(GenericSpectralLinear):
 
 class Heat2DUltraspherical(GenericSpectralLinear):
     """
-    2D Heat equation with Dirichlet Boundary conditions discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.
+    2D heat equation, periodic (FFT) or Dirichlet (ultraspherical) in each direction, in second-order formulation.
+
+    Discretized on (-1, 1)x(-1,1) using spectral methods based on FFT and Gegenbauer.
     """
 
     dtype_u = mesh
@@ -414,6 +467,18 @@ class Heat2DUltraspherical(GenericSpectralLinear):
         self.setup_BCs()
 
     def eval_f(self, u, *args, **kwargs):
+        """
+        Evaluate the right hand side nu (u_xx + u_yy) with the ultraspherical second derivative matrices, converted back
+        to the Chebychev basis.
+
+        Args:
+            u (dtype_u): Solution in physical space
+            *args: Not used, the right hand side does not depend on time
+            **kwargs: Not used, the right hand side does not depend on time
+
+        Returns:
+            Heat2DUltraspherical.dtype_f: The right hand side in physical space
+        """
         f = self.f_init
         iu = self.index('u')
 
@@ -426,6 +491,17 @@ class Heat2DUltraspherical(GenericSpectralLinear):
         return f
 
     def u_exact(self, t):
+        """
+        Get the exact solution at time `t`: sin(fx x) sin(fy y) exp(-nu (fx^2 + fy^2) t) plus the linear function in x
+        and y that satisfies the boundary conditions, where the frequencies are multiplied by pi in ultraspherical
+        directions.
+
+        Args:
+            t (float): When you want the exact solution
+
+        Returns:
+            Heat2DUltraspherical.dtype_u: Exact solution in physical space
+        """
         xp = self.xp
         iu = self.index('u')
         u = self.u_init

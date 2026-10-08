@@ -103,5 +103,27 @@ def test_direct_solve(M, N, ignore_ic):
         assert np.isclose(level.status.residual, 0), 'residual is non-zero'
 
 
+@pytest.mark.base
+def test_no_rhs_evaluations_at_stale_solutions_when_ignoring_ic(M=2, N=2):
+    """With `ignore_ic`, the solve gives only an increment, so evaluating f at `u` would use the old solution."""
+    controller, prob = get_composite_collocation_problem(1, M, N)
+
+    level = controller.MS[0].levels[0]
+    level.status.unlocked = True
+    level.status.time = 0
+    sweep = level.sweep
+    sweep.params.ignore_ic = True
+    sweep.params.update_f_evals = True
+
+    for m in range(M + 1):
+        level.u[m] = prob.u_exact(0)
+        level.f[m] = prob.eval_f(level.u[m], 0)
+    sweep.compute_residual()
+
+    f_before = [level.f[m + 1] for m in range(M)]
+    sweep.update_nodes()
+    assert all(level.f[m + 1] is f_before[m] for m in range(M)), 'Evaluated f at the solution before the increment'
+
+
 if __name__ == '__main__':
     test_direct_solve(2, 1, True)

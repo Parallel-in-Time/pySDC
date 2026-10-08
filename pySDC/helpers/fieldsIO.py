@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 Generic utility class to write and read cartesian grid field solutions into binary files.
-It implements the base file handler class :class:`FieldsIO`, that is specialized into :
+It implements the base file handler class :class:`~pySDC.helpers.fieldsIO.FieldsIO`, that is specialized into :
 
-- :class:`Scalar` : for 0D fields (scalar) with a given number of variables
-- :class:`Rectilinear` : for fields on N-dimensional rectilinear grids
+- :class:`~pySDC.helpers.fieldsIO.Scalar` : for 0D fields (scalar) with a given number of variables
+- :class:`~pySDC.helpers.fieldsIO.Rectilinear` : for fields on N-dimensional rectilinear grids
 
 While each file handler need to be setup with specific parameters (grid, ...),
 each written file can be read using the same interface implemented in the
@@ -39,7 +39,7 @@ Example
 
 Notes
 -----
-🚀 :class:`Rectilinear` is compatible with a MPI-based cartesian decomposition.
+🚀 :class:`~pySDC.helpers.fieldsIO.Rectilinear` is compatible with a MPI-based cartesian decomposition.
 See :class:`pySDC.helpers.fieldsIO.writeFields_MPI` for an illustrative example.
 
 Warning
@@ -152,7 +152,7 @@ class FieldsIO:
 
         Returns
         -------
-        fieldsIO : :class:`FieldsIO`
+        fieldsIO : :class:`~pySDC.helpers.fieldsIO.FieldsIO`
             The specialized `FieldsIO` adapted to the file.
         """
         if not os.path.isfile(fileName):
@@ -483,7 +483,7 @@ class Rectilinear(Scalar):
         -------
         >>> # Suppose the FieldsIO object is already written into outputs.pysdc
         >>> import os
-        >>> from pySDC.utils.fieldsIO import Rectilinear
+        >>> from pySDC.helpers.fieldsIO import Rectilinear
         >>> os.makedirs("vtrFiles")  # to store all VTR files into a subfolder
         >>> Rectilinear.fromFile("outputs.pysdc").toVTR(
         >>>    baseName="vtrFiles/field", varNames=["u", "v", "w", "T", "p"])
@@ -692,6 +692,23 @@ class Rectilinear(Scalar):
 # Utility functions used for testing
 # -----------------------------------------------------------------------------------------------
 def initGrid(nVar, gridSizes):
+    """
+    Build a test grid on [0, 1)^dim and fields that are products of the coordinates.
+
+    Parameters
+    ----------
+    nVar : int
+        Number of variables.
+    gridSizes : list[int]
+        Number of grid points in each dimension.
+
+    Returns
+    -------
+    coords : list[np.ndarray]
+        1D coordinates in each dimension, without the right boundary.
+    u0 : np.ndarray
+        Fields of shape ``(nVar, *gridSizes)``, variable `i` being `i + 1` times the product of the coordinates.
+    """
     dim = len(gridSizes)
     coords = [np.linspace(0, 1, num=n, endpoint=False) for n in gridSizes]
     s = [None] * dim
@@ -702,6 +719,32 @@ def initGrid(nVar, gridSizes):
 
 
 def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
+    """
+    Write test fields with MPI, decomposing the grid from :func:`initGrid` in blocks over `MPI.COMM_WORLD`.
+
+    Sets up the MPI mode of :class:`Rectilinear` for the local block and writes `nSteps` fields `u0 * t` for
+    `t = i / nSteps`.
+
+    Parameters
+    ----------
+    fileName : str
+        Name of the file.
+    dtypeIdx : int
+        Index of the data type in `DTYPES`.
+    algo : str
+        Algorithm for :class:`pySDC.helpers.blocks.BlockDecomposition`.
+    nSteps : int
+        Number of fields to write.
+    nVar : int
+        Number of variables.
+    gridSizes : list[int]
+        Number of grid points in each dimension.
+
+    Returns
+    -------
+    u0 : np.ndarray
+        Local block of the initial fields, in the data type of the file.
+    """
     coords, u0 = initGrid(nVar, gridSizes)
 
     from mpi4py import MPI
@@ -734,6 +777,20 @@ def writeFields_MPI(fileName, dtypeIdx, algo, nSteps, nVar, gridSizes):
 
 
 def compareFields_MPI(fileName, u0, nSteps):
+    """
+    Check that the fields in a file are `u0 * t` for `t = i / nSteps`, raising an AssertionError otherwise.
+
+    Reads the local fields only, so the MPI mode must be set up as in :func:`writeFields_MPI`.
+
+    Parameters
+    ----------
+    fileName : str
+        Name of the file.
+    u0 : np.ndarray
+        Local initial fields, as returned by :func:`writeFields_MPI`.
+    nSteps : int
+        Number of fields in the file.
+    """
     from pySDC.helpers.fieldsIO import FieldsIO
 
     comm = MPI.COMM_WORLD

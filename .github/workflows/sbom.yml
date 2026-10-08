@@ -1,0 +1,124 @@
+name: SBOMs
+
+# Software bills of materials (CycloneDX) for every release, attached to it as assets; see SECURITY.md.
+# One for the core install from pyproject.toml, and one per conda environment file, since those pull in
+# what pyproject.toml cannot express (MPI, PETSc, FEniCS, CUDA, ...). The environments are scanned as
+# installed, so the SBOMs carry the exact versions resolved on the day of the release. The file names
+# carry no version, so `releases/latest/download/<name>` always points at the newest one.
+on:
+  release:
+    types: [published]
+  # to backfill a release that predates this workflow, or to redo one
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to generate the SBOMs for'
+        required: true
+  # tests changes to this file: generates the SBOMs as artifacts, but attaches them to nothing
+  pull_request:
+    paths: ['.github/workflows/sbom.yml']
+
+permissions:
+  contents: write
+
+env:
+  TAG: ${{ github.event.release.tag_name || inputs.tag }}
+  # Otherwise syft lists every file of every conda package, which grows each SBOM to tens of MB.
+  SYFT_FILE_METADATA_SELECTION: none
+  # The scans below drop syft's Windows-binary cataloger: its only finds were the .exe launchers
+  # vendored in pip, six "Simple Launcher" entries in every SBOM.
+
+jobs:
+
+  core:
+    runs-on: ubuntu-latest
+    env:
+      SBOM: sbom-pySDC.cdx.json
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: anchore/sbom-action/download-syft@v0
+        id: syft
+      - name: Generate SBOM
+        # A bare venv, so that only pySDC's own dependencies end up in it.
+        run: |
+          python -m venv /tmp/pySDC
+          /tmp/pySDC/bin/pip install .
+          ${{ steps.syft.outputs.cmd }} scan dir:/tmp/pySDC --source-name pySDC --source-version "${TAG:-dev}" \
+            --select-catalogers=-pe-binary-package-cataloger -o cyclonedx-json=$SBOM
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.SBOM }}
+          path: ${{ env.SBOM }}
+      - name: Attach to the release
+        if: env.TAG != ''
+        run: gh release upload "$TAG" "$SBOM" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  list_environments:
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.ls.outputs.files }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - name: List environment files
+        id: ls
+        # The environments pySDC runs in; lint, tests and postprocess are tooling. Missing files are
+        # skipped, so this also works for tags that predate some of them.
+        run: |
+          echo "files=$(ls etc/environment-{base,cupy,fenics,mpi4py,petsc,pytorch}.yml \
+            pySDC/projects/*/environment.yml pySDC/projects/Monodomain/etc/environment-monodomain.yml \
+            2>/dev/null | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+  environments:
+    needs: list_environments
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        yml: ${{ fromJSON(needs.list_environments.outputs.files) }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: ${{ matrix.yml }}
+      - uses: anchore/sbom-action/download-syft@v0
+        id: syft
+      - name: Generate SBOM
+        # etc/environment-fenics.yml -> sbom-env-fenics, pySDC/projects/DAE/... -> sbom-project-DAE
+        run: |
+          case "${{ matrix.yml }}" in
+            etc/*) NAME=env-$(basename "${{ matrix.yml }}" .yml | sed 's/^environment-//') ;;
+            *) NAME=project-$(echo "${{ matrix.yml }}" | cut -d/ -f3) ;;
+          esac
+          echo "SBOM=sbom-$NAME.cdx.json" >> $GITHUB_ENV
+          ${{ steps.syft.outputs.cmd }} scan dir:$CONDA_PREFIX --source-name pySDC-$NAME --source-version "${TAG:-dev}" \
+            --select-catalogers=-pe-binary-package-cataloger -o cyclonedx-json=sbom-$NAME.cdx.json
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.SBOM }}
+          path: ${{ env.SBOM }}
+      - name: Attach to the release
+        if: env.TAG != ''
+        run: gh release upload "$TAG" "$SBOM" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -51,6 +51,12 @@ class heatNd_unforced(GenericNDimFinDiff):
                 \right)^2
                 }
 
+    dtype : dtype-like, optional
+        Precision the state is stored at, ``float64`` by default. See :class:`GenericNDimFinDiff` for how the
+        operators follow it.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
+
     Attributes
     ----------
     A : sparse matrix (CSC)
@@ -109,8 +115,11 @@ class heatNd_unforced(GenericNDimFinDiff):
             rho = (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[0] * dx)) / dx**2
             if freq[0] > 0:
                 sol[:] = self.xp.sin(self.xp.pi * freq[0] * x) * self.xp.exp(-t * nu * rho)
-            elif freq[0] == -1:  # Gaussian
-                sol[:] = self.xp.exp(-0.5 * ((x - 0.5) / sigma) ** 2) * self.xp.exp(-t * nu * rho)
+            elif freq[0] == -1:  # Gaussian, spreading with the heat kernel, plus the periodic images that
+                # are still above machine precision at the current width
+                s = (sigma**2 + 2 * nu * t) ** 0.5
+                K = int(9 * s) + 1
+                sol[:] = sum(sigma / s * self.xp.exp(-0.5 * ((x - 0.5 - k) / s) ** 2) for k in range(-K, K + 1))
         elif ndim == 2:
             rho = (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[0] * dx)) / dx**2 + (
                 2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[1] * dx)
@@ -124,7 +133,7 @@ class heatNd_unforced(GenericNDimFinDiff):
         elif ndim == 3:
             rho = (
                 (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[0] * dx)) / dx**2
-                + (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[1] * dx))
+                + (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[1] * dx)) / dx**2
                 + (2.0 - 2.0 * self.xp.cos(self.xp.pi * freq[2] * dx)) / dx**2
             )
             x, y, z = self.grids

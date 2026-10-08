@@ -6,16 +6,27 @@ from pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian import IMEX_
 
 class Brusselator(IMEX_Laplacian_MPIFFT):
     r"""
-    Two-dimensional Brusselator from [1]_.
-    This is a reaction-diffusion equation with non-autonomous source term:
+    2D periodic Brusselator reaction-diffusion system with mpi4py-fft, IMEX with diffusion implicit, reactions explicit.
+
+    This Brusselator from [1]_ is a reaction-diffusion equation with non-autonomous source term:
 
     .. math::
-        \frac{\partial u}{\partial t} = \varalpha \Delta u + 1 + u^2 v - 4.4u _ f(x,y,t),
-        \frac{\partial v}{\partial t} = \varalpha \Delta v + 3.4u - u^2 v
+        \frac{\partial u}{\partial t} = \alpha \Delta u + 1 + u^2 v - 4.4u + f(x,y,t),
+
+        \frac{\partial v}{\partial t} = \alpha \Delta v + 3.4u - u^2 v
 
     with the source term :math:`f(x,y,t) = 5` if :math:`(x-0.3)^2 + (y-0.6)^2 <= 0.1^2` and :math:`t >= 1.1` and 0 else.
     We discretize in a periodic domain of length 1 and solve with an IMEX scheme based on a spectral method for the
     Laplacian which we invert implicitly. We treat the reaction and source terms explicitly.
+
+    Parameters
+    ----------
+    alpha : float, optional
+        Diffusion coefficient in front of the Laplacian, the same for both components.
+    **kwargs
+        Passed on to ``IMEX_Laplacian_MPIFFT``: ``nvars`` (tuple of two int, spatial resolution), ``comm``
+        (communicator for ``mpi4py-fft``), ``useGPU`` and ``x0`` (left end of the domain :math:`[x_0, x_0 + 1]^2`).
+        ``spectral=False``, ``L=1.0`` and ``dtype='d'`` are fixed and cannot be passed.
 
     References
     ----------
@@ -150,8 +161,7 @@ class Brusselator(IMEX_Laplacian_MPIFFT):
         import matplotlib.pyplot as plt
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-        plt.rcParams['figure.constrained_layout.use'] = True
-        self.fig, axs = plt.subplots(1, 2, sharex=True, sharey=True, figsize=((8, 3)))
+        self.fig, axs = plt.subplots(1, 2, sharex=True, sharey=True, figsize=((8, 3)), constrained_layout=True)
         divider = make_axes_locatable(axs[1])
         self.cax = divider.append_axes('right', size='3%', pad=0.03)
         return self.fig

@@ -7,6 +7,8 @@ from mpi4py import MPI
 
 class Heat1DForcedFiredrake(Problem):
     r"""
+    Forced 1D heat equation with Dirichlet BCs and Firedrake finite elements, IMEX with diffusion implicit.
+
     Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
     .. math::
@@ -108,7 +110,7 @@ class Heat1DForcedFiredrake(Problem):
             The evaluated right hand side
         """
         # construct and cache a solver for the implicit part of the right hand side evaluation
-        if not hasattr(self, '__solv_eval_f_implicit'):
+        if not hasattr(self, '_solv_eval_f_implicit'):
             v = fd.TestFunction(self.V)
             u_trial = fd.TrialFunction(self.V)
 
@@ -118,13 +120,13 @@ class Heat1DForcedFiredrake(Problem):
             bcs = [fd.bcs.DirichletBC(self.V, fd.Constant(0), area) for area in [1, 2]]
 
             prob = fd.LinearVariationalProblem(a, L_impl, self.tmp_out, bcs=bcs)
-            self.__solv_eval_f_implicit = fd.LinearVariationalSolver(prob)
+            self._solv_eval_f_implicit = fd.LinearVariationalSolver(prob)
 
         # copy the solution we want to evaluate at into the input buffer
         self.tmp_in.assign(u.functionspace)
 
         # perform the solve using the cached solver
-        self.__solv_eval_f_implicit.solve()
+        self._solv_eval_f_implicit.solve()
 
         me = self.dtype_f(self.init)
 
@@ -150,10 +152,8 @@ class Heat1DForcedFiredrake(Problem):
             Right-hand side for the nonlinear system.
         factor : float
             Abbrev. for the node-to-node stepsize (or any other factor required).
-        u0 : dtype_u
-            Initial guess for the iterative solver (not used here so far).
-        t : float
-            Current time.
+        *args, **kwargs
+            Take the initial guess ``u0`` and the current time ``t`` of the generic interface, neither is used here.
 
         Returns
         -------
@@ -197,6 +197,14 @@ class Heat1DForcedFiredrake(Problem):
 
     @fd.utils.cached_property
     def x(self):
+        """
+        Spatial coordinate of the mesh, cached after the first access.
+
+        Returns
+        -------
+        x : ufl.SpatialCoordinate
+            Symbolic spatial coordinate, used to interpolate expressions on the mesh.
+        """
         return fd.SpatialCoordinate(self.mesh)
 
     def u_exact(self, t):

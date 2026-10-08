@@ -4,7 +4,7 @@ from pySDC.core.hooks import Hooks
 
 class Timings(Hooks):
     """
-    Abstract base class for recoding timings
+    Abstract base class for hooks timing the setup, run, predictor, steps, iterations, sweeps and communication.
 
     Attributes:
         __t0_setup (float): private variable to get starting time of setup
@@ -32,6 +32,7 @@ class Timings(Hooks):
         raise NotImplementedError
 
     def __init__(self):
+        """Start with all start and end times unset."""
         super().__init__()
         self.__t0_setup = None
         self.__t0_run = None

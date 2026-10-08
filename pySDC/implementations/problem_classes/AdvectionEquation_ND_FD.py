@@ -76,6 +76,7 @@ class advectionNd(GenericNDimFinDiff):
         bc='periodic',
         sigma=6e-2,
     ):
+        """Initialization routine"""
         super().__init__(nvars, -c, 1, freq, stencil_type, order, lintol, liniter, solver_type, bc)
 
         if solver_type == 'CG':  # pragma: no cover

@@ -12,11 +12,11 @@ class MultiComponentContainer(object):
     To make a specific multi-component datatype, derive from this class, list the components as strings in
     ``components``, and say what a single component is in ``component_type``. An example:
 
-    ```
-    class rhs_fenics_mesh(MultiComponentContainer):
-        components = ['impl', 'expl']
-        component_type = fenics_mesh
-    ```
+    .. code-block:: python
+
+        class rhs_fenics_mesh(MultiComponentContainer):
+            components = ['impl', 'expl']
+            component_type = fenics_mesh
 
     Instantiating such a datatype builds one component of ``component_type`` per name, either by copying the
     components of another instance or by passing ``init`` and ``val`` on to each of them. The arithmetic is

@@ -17,7 +17,7 @@ use
    python run_experiment.py --help
 
 to get more information about the different parameters. The config names always start with ``RBC3DG4R4``, which means Rayleigh-Benard convection in 3D with aspect ratio four and four times as many degrees of freedom in horizontal directions as in the vertical.
-Next comes the time-stepping scheme. Choices are ``SDC44``, ``SDC23``, ``RK`` for RK443 and ``Euler`` for RK111. Finally, the Rayleigh number is specified using ``Ra1e5``, ``Ra1e6``, or ``Ra1e7``.
+Next comes the time-stepping scheme. Choices are ``SDC44``, ``SDC23``, ``RK`` for RK443 and ``Euler`` for RK111. Finally, the Rayleigh number is specified using ``Ra1e5``, ``Ra1e6``, ``Ra1e7``, or ``Ra1e8``.
 Note that you need to run the simulations in order of ascending Rayleigh number since larger Rayleigh number simulations take solutions from lower Rayleigh number experiments as initial conditions. Only ``Ra=1e5`` is started from random perturbations.
 
 To analyse, stay in the directory you ran the simulation in and use commands like
@@ -30,7 +30,7 @@ To analyse, stay in the directory you ran the simulation in and use commands lik
 Benchmarks
 ----------
 The benchmarks use JUBE.
-Please run them using commands like
+On JUSUF and JUWELS booster, please run them using commands like
 
 .. code-block:: bash
 
@@ -39,7 +39,8 @@ Please run them using commands like
    OUT=JUSUF_RBC3DG4R4SDC44Ra1e5 jube run jube_script.yaml -t JUSUF SDC44 Ra1e5
    jube result bench_run_JUSUF_RBC3DG4R4SDC44Ra1e5 -a > results/JUSUF_RBC3DG4R4SDC44Ra1e5.txt
 
-Use tags ``JUSUF`` of ``BOOSTER`` for running on JUSUF or JUWELS booster respectively. The tags for configurations are ``RBC3DG4R4SDC44Ra1e5`` and ``RBC3DG4R4SDC44Ra1e6``
+Use tags ``JUSUF`` of ``BOOSTER`` for running on JUSUF or JUWELS booster respectively. The tags for configurations are ``Euler``, ``RK``, ``SDC23``, and ``SDC44``.
+On JUPITER, use analogous commands with the script ``jube_script_jupiter.yaml``. No need for a device tag here, just specify Rayleigh number and method.
 
 Once you have run all the benchmarks, plot them with
 
@@ -77,6 +78,7 @@ You need to run and analyse simulations with:
 - ``--res=32 --dt=0.06 --config=RBC3DG4R4SDC23Ra1e5``
 - ``--res=64 --dt=0.01 --config=RBC3DG4R4SDC23Ra1e6``
 - ``--res=128 --dt=0.005 --config=RBC3DG4R4SDC23Ra1e7``
+- ``--res=256 --dt=0.0005 --config=RBC3DG4R4SDC23Ra1e8``
 
 Then, just run
 

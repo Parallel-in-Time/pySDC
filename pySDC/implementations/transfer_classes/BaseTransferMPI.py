@@ -6,7 +6,7 @@ from pySDC.core.base_transfer import BaseTransfer
 
 class base_transfer_MPI(BaseTransfer):
     """
-    Standard base_transfer class
+    Node-parallel space-time transfer for sweepers where each MPI rank holds one collocation node.
 
     Attributes:
         logger: custom logger for sweeper-related logging
@@ -16,6 +16,16 @@ class base_transfer_MPI(BaseTransfer):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Set up the transfer as `BaseTransfer` does and take the node communicators from the sweepers of both levels.
+
+        Args:
+            *args: Passed on to `BaseTransfer`
+            **kwargs: Passed on to `BaseTransfer`
+
+        Raises:
+            NotImplementedError: If a communicator size differs from the number of collocation nodes of its level
+        """
         super().__init__(*args, **kwargs)
         self.comm_fine = self.fine.sweep.comm
         self.comm_coarse = self.coarse.sweep.comm

@@ -1,4 +1,4 @@
-from pySDC.projects.GPU.configs.base_config import Config
+from pySDC.projects.GPU.configs.base_config import Config, LogStats
 
 
 def get_config(args):
@@ -69,6 +69,11 @@ class RayleighBenard3DRegular(Config):
 
         desc['convergence_controllers'][StepSizeSlopeLimiter] = {'dt_rel_min_slope': 0.1}
         desc['convergence_controllers'][StopAtNan] = {}
+        try:
+            desc['convergence_controllers'].pop(LogStats)
+        except KeyError:
+            pass
+        desc['convergence_controllers'][ClearStats] = {}
 
         desc['sweeper_params']['quad_type'] = 'RADAU-RIGHT'
         desc['sweeper_params']['num_nodes'] = 2
@@ -95,6 +100,7 @@ class RayleighBenard3DRegular(Config):
     def get_initial_condition(self, P, *args, restart_idx=0, **kwargs):
 
         if restart_idx == 0:
+            P.logger.debug('Setting up random initial conditions')
             u0 = P.u_exact(t=0, seed=P.comm.rank, noise_level=1e-3)
             u0_with_pressure = P.solve_system(u0, 1e-9, u0)
             P.cached_factorizations.pop(1e-9)
@@ -102,8 +108,11 @@ class RayleighBenard3DRegular(Config):
         else:
             from pySDC.helpers.fieldsIO import FieldsIO
 
+            filename = self.get_file_name()
+            P.logger.debug(f'Loading snapshot {restart_idx} from file {filename}')
+
             P.setUpFieldsIO()
-            outfile = FieldsIO.fromFile(self.get_file_name())
+            outfile = FieldsIO.fromFile(filename)
 
             t0, solution = outfile.readField(restart_idx)
             solution = solution[: P.spectral.ncomponents, ...]
@@ -118,13 +127,16 @@ class RayleighBenard3DRegular(Config):
             else:
                 u0[...] = solution
 
+            P.logger.info(f'Loaded snapshot {restart_idx} at t={t0} from file {filename}')
             return u0, t0
 
     def prepare_caches(self, prob):
         """
         Cache the fft objects, which are expensive to create on GPU because graphs have to be initialized.
         """
+        prob.logger.debug('Preparing caches ...')
         prob.eval_f(prob.u_init)
+        prob.logger.debug('Prepared caches')
 
     def prepare_for_benchmark(self):
         def _pass(*args, **kwargs):
@@ -170,16 +182,16 @@ class RayleighBenard3DRegular(Config):
 
         description['problem_params']['max_cached_factorizations'] = 99
 
-        time_rank = 0
-        if 'comm' in description['sweeper_params'].keys():
-            time_rank = description['sweeper_params']['comm'].rank
-        for i in range(MPI.COMM_WORLD.size):
-            if MPI.COMM_WORLD.rank == i:
-                print(
-                    f'Global rank {MPI.COMM_WORLD.rank} is {time_rank} in time and {description["problem_params"]["comm"].rank} in space',
-                    flush=True,
-                )
-            MPI.COMM_WORLD.barrier()
+        # time_rank = 0
+        # if 'comm' in description['sweeper_params'].keys():
+        #     time_rank = description['sweeper_params']['comm'].rank
+        # for i in range(MPI.COMM_WORLD.size):
+        #     if MPI.COMM_WORLD.rank == i:
+        #         print(
+        #             f'Global rank {MPI.COMM_WORLD.rank} is {time_rank} in time and {description["problem_params"]["comm"].rank} in space',
+        #             flush=True,
+        #         )
+        MPI.COMM_WORLD.barrier()
 
 
 class RBC3Dverification(RayleighBenard3DRegular):
@@ -242,6 +254,9 @@ class RBC3Dverification(RayleighBenard3DRegular):
         ic_ny = desc['problem_params']['ny']
         ic_nz = desc['problem_params']['nz']
 
+        P.logger.debug(
+            f'Setting up auxiliary problem with resolution {ic_nx}x{ic_ny}x{ic_nz} for interpolating initial conditions'
+        )
         _P = type(P)(
             nx=ic_nx,
             ny=ic_ny,
@@ -337,6 +352,19 @@ class RBC3DverificationEuler(RBC3DverificationRK):
         desc = super().get_description(*args, res=res, dt=dt, **kwargs)
         desc['sweeper_class'] = IMEXEulerStifflyAccurate
         return desc
+
+
+class ClearStats(LogStats):
+
+    def post_step_processing(self, controller, S, **kwargs):
+        self.reset_stats(controller)
+
+    def post_run_processing(self, controller, S, **kwargs):
+
+        def return_stats():
+            return {}
+
+        controller.return_stats = return_stats
 
 
 # --- Ra 1e5 ---
@@ -446,3 +474,36 @@ class RBC3DG4R4RKRa1e7(RBC3DverificationRK):
     res = 128
     converged = 25
     ic_config = {'config': RBC3DG4R4SDC23Ra1e6, 'res': 64, 'dt': 0.01}
+
+
+# --- Ra 1e8 ---
+class RBC3DG4R4SDC23Ra1e8(RBC3DM2K3):
+    Tend = 70
+    dt = 7e-4
+    res = 256
+    converged = 16
+    ic_config = {'config': RBC3DG4R4SDC23Ra1e7, 'res': 128, 'dt': 0.005}
+
+
+class RBC3DG4R4SDC44Ra1e8(RBC3DM4K4):
+    Tend = 30
+    dt = 5e-3
+    res = 256
+    converged = 8
+    ic_config = {'config': RBC3DG4R4SDC23Ra1e7, 'res': 128, 'dt': 0.005}
+
+
+class RBC3DG4R4EulerRa1e8(RBC3DverificationEuler):
+    Tend = 30
+    dt = 1e-4
+    res = 256
+    converged = 8
+    ic_config = {'config': RBC3DG4R4SDC23Ra1e7, 'res': 128, 'dt': 0.005}
+
+
+class RBC3DG4R4RKRa1e8(RBC3DverificationRK):
+    Tend = 30
+    dt = 4e-3
+    res = 256
+    converged = 8
+    ic_config = {'config': RBC3DG4R4SDC23Ra1e7, 'res': 128, 'dt': 0.005}

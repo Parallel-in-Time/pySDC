@@ -9,11 +9,9 @@ Monodomain equation
 The monodomain equation models the electrical activity in the heart. It is a reaction-diffusion equation coupled with an ordinary differential equation for the ionic model and is given by
 
 .. math::
-    \begin{align}
     \chi (C_m\frac{\partial V}{\partial t}+I_{ion}(V,z_E,z_e, t)) &= \nabla \cdot (D \nabla V) & \quad \text{in } &\Omega \times (0,T), \\
     \frac{\partial z_E}{\partial t} &= g_E(V,z_E,z_e) & \quad \text{in } &\Omega \times (0,T), \\
-    \frac{\partial z_e}{\partial t} &= \Lambda_e(V)(z_e-z_{e,\infty}(V)) & \quad \text{in } &\Omega \times (0,T), \\
-    \end{align}
+    \frac{\partial z_e}{\partial t} &= \Lambda_e(V)(z_e-z_{e,\infty}(V)) & \quad \text{in } &\Omega \times (0,T),
     
 plus the boundary conditions, where :math:`V(t,x)\in\mathbb{R}` is the transmembrane potential and :math:`z_E(t,x)\in\mathbb{R}^n`, :math:`z_e(t,x)\in\mathbb{R}^m` are the ionic model state variables. 
 The ionic model right-hand side :math:`g_E` is a general nonlinear term, while :math:`\Lambda_e` is a diagonal matrix. The typical range for the number of unknowns :math:`N=1+n+m` is :math:`N\in [4,50]` and depends on the ionic model of choice. 

@@ -47,6 +47,46 @@ def get_sweeper(sweeper_name):
     return eval(f'RK.{sweeper_name}')
 
 
+def get_level(sweeper_class):
+    """
+    Build a single level of the Dahlquist problem with a Runge-Kutta sweeper.
+
+    Args:
+        sweeper_class (pySDC.Sweeper.RungeKutta): The sweeper class
+
+    Returns:
+        pySDC.Level.level: The level
+    """
+    from pySDC.core.level import Level
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+
+    return Level(
+        problem_class=testequation0d,
+        problem_params={},
+        sweeper_class=sweeper_class,
+        sweeper_params={},
+        level_params={'dt': 0.1},
+        level_index=0,
+    )
+
+
+@pytest.mark.base
+def test_explicit_weights_are_not_inherited_from_an_instantiated_parent():
+    """Instantiating an IMEX sweeper must not store its weights as the explicit weights of all its subclasses."""
+    import numpy as np
+    from pySDC.implementations.sweeper_classes.Runge_Kutta import IMEXEuler
+
+    class Parent(IMEXEuler):
+        weights_explicit = None
+
+    class Child(Parent):
+        weights = np.array([0.5])
+
+    get_level(Parent)
+    assert np.allclose(Child.get_Butcher_tableau_explicit().weights, Child.weights)
+    assert Parent.weights_explicit is None
+
+
 def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU=False):
     """
     Do a single run of the test equation.

@@ -56,6 +56,11 @@ def test_eval_f():
     error = abs(expect - get) / abs(expect)
     assert error < 1e-8, error
 
+    # the solver for the Laplacian is set up once and then reused
+    solver = P._solv_eval_f_implicit
+    P.eval_f(me, 0)
+    assert P._solv_eval_f_implicit is solver
+
 
 if __name__ == '__main__':
     test_solve_system(0)

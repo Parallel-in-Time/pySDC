@@ -4,7 +4,18 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
 class imex_1st_order_MPI(SweeperMPI, imex_1st_order):
+    """
+    Node-parallel IMEX-SDC sweeper, one collocation node per MPI rank, so far only with Picard for the explicit part.
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Initialization routine for the sweeper, which additionally checks that the explicit preconditioner is Picard
+
+        Args:
+            *args: passed on to the parent classes, i.e. the parameters for the sweeper and the level
+            **kwargs: passed on to the parent classes
+        """
         super().__init__(*args, **kwargs)
         assert (
             self.params.QE == 'PIC'

@@ -8,7 +8,9 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 # noinspection PyUnusedLocal
 class vanderpol(Problem):
     r"""
-    This class implements the stiff Van der Pol oscillator given by the equation
+    Stiff Van der Pol oscillator as a system of two first-order ODEs, fully implicit with Newton.
+
+    It is given by the equation
 
     .. math::
         \frac{d^2 u(t)}{d t^2} - \mu (1 - u(t)^2) \frac{d u(t)}{dt} + u(t) = 0.
@@ -188,6 +190,26 @@ class vanderpol(Problem):
         return u
 
     def solve_jacobian(self, rhs, dt, u, **kwargs):
+        r"""
+        Solve the linear system with the Jacobian of the Newton function :math:`g(u) = u - dt f(u) - rhs` of
+        ``solve_system``, by applying the analytically computed inverse of the :math:`2 \times 2` Jacobian at ``u``.
+
+        Parameters
+        ----------
+        rhs : np.1darray
+            Right-hand side of the linear system, i.e., the Newton residual.
+        dt : float
+            Abbrev. for the node-to-node stepsize (or any other factor required).
+        u : dtype_u
+            Current Newton iterate, at which the Jacobian is evaluated.
+        **kwargs
+            Not used.
+
+        Returns
+        -------
+        du : np.1darray
+            The Newton update.
+        """
         mu = self.mu
         u1 = u[0]
         u2 = u[1]

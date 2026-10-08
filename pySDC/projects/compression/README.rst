@@ -1,5 +1,5 @@
 Compression in pySDC
---------------------
+====================
 
 This project aims to implement compression in pySDC in whatever way proves to be useful.
 It is a collaboration between Clemson University, Argonne National Laboratory and Forschungszentrum Juelich under the umbrella of `JLESC <https://jlesc.github.io>`_.
@@ -46,7 +46,7 @@ See the `guide <https://github.com/Parallel-in-Time/pySDC/tree/master/pySDC/proj
 
 Proof of Concept
 ________________
-For a proof of concept, we take the solution and right hand sides and compress and immediately decompress them every time they get updated during the sweeps.
+For a proof of concept, we compress and immediately decompress the solution at every collocation node after each iteration, and evaluate the right hand sides again from the decompressed solution.
 While this provides no benefit, it should capture the downsides of compression.
 We measure the local order of accuracy in time and verify that it increases by one with each sweep for an advection problem.
 While the order is typically only maintained up to machine precision or the discretization error, we find now that accuracy now stalls at the error bound that we set for the compressor.

@@ -1,44 +1,42 @@
-"""
-This script introduces ParaDiag for nonlinear problems with the van der Pol oscillator as an example.
+# ---
+# jupyter:
+#   jupytext:
+#     formats: py:percent
+#   kernelspec:
+#     display_name: Python 3
+#     name: python3
+# ---
 
-ParaDiag works by diagonalizing the "top layer" of Kronecker products that make up the circularized composite
-collocation problem.
-However, in nonlinear problems, the problem cannot be written as a matrix and therefore we cannot write the composite
-collocation problem as a matrix.
-There are two approaches for dealing with this. We can do IMEX splitting, where we treat only the linear part implicitly.
-The ParaDiag preconditioner is then only made up of the linear implicit part and we can again write this as a matrix and
-do the diagonalization just like for linear problems. The non-linear part then comes in via the residual on the right
-hand side.
-The second approach is to average Jacobians. The non-linear problems are solved with a Newton scheme, where the Jacobian
-matrix is computed based on the current solution and then inverted in each Newton iteration. In order to write the
-ParaDiag preconditioner as a matrix with Kronecker products and then only diagonalize the outermost part, we need to
-have the same Jacobian on all steps.
-The ParaDiag iteration then proceeds as follows:
-    - (1) Compute residual of composite collocation problem
-    - (2) Average the solution across the steps and nodes as preparation for computing the average Jacobian
-    - (3) Weighted FFT in time to diagonalize E_alpha
-    - (4) Solve for the increment by inverting the averaged Jacobian from (2) on the subproblems on the different steps
-          and nodes.
-    - (5) Weighted iFFT in time
-    - (6) Increment solution
-As IMEX ParaDiag is a trivial extension of ParaDiag for linear problems, we focus on the second approach here.
-"""
+# %% [markdown]
+# # Part B: ParaDiag for nonlinear problems
+#
+# ParaDiag works by diagonalizing the "top layer" of Kronecker products that make up the circularized composite
+# collocation problem. For nonlinear problems, though, the composite collocation problem cannot be written as a
+# matrix, so the diagonalization needs a linear operator to work with. There are two ways out:
+#
+# - **IMEX splitting**, where only the linear part is treated implicitly. The ParaDiag preconditioner is then made up
+#   of the linear implicit part only, which can be diagonalized just like for linear problems, and the nonlinear part
+#   comes in through the residual on the right-hand side.
+# - **Averaging the Jacobian**. Nonlinear problems are solved with Newton, where the Jacobian is computed from the
+#   current solution and inverted in each Newton iteration. To write the ParaDiag preconditioner with Kronecker
+#   products and only diagonalize the outermost part, all steps need the same Jacobian: the average.
+#
+# As IMEX ParaDiag is a trivial extension of ParaDiag for linear problems, we focus on the second approach here, with
+# the van der Pol oscillator as an example. The ParaDiag iteration then proceeds as follows:
+#
+# 1. compute the residual of the composite collocation problem,
+# 2. average the solution across the steps and nodes, to compute the average Jacobian,
+# 3. weighted FFT in time to diagonalize $E_\alpha$,
+# 4. solve for the increment on the subproblems on the steps and nodes, inverting the averaged Jacobian from (2),
+# 5. weighted inverse FFT in time,
+# 6. increment the solution.
 
+# %%
 import numpy as np
 import scipy.sparse as sp
-import sys
 
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_class
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
-
-# setup output
-out_file = open('data/step_9_B_out.txt', 'w')
-
-
-def my_print(*args, **kwargs):
-    for output in [sys.stdout, out_file]:
-        print(*args, **kwargs, file=output)
-
 
 # setup parameters
 L = 4
@@ -63,15 +61,16 @@ sweep = sweeper_class({'num_nodes': M, 'quad_type': 'RADAU-RIGHT'}, None)
 # initial conditions
 u[0, :, :] = prob.u_exact(t=0)
 
-my_print(
-    f'Running ParaDiag test script for van der Pol with mu={prob.mu} and {L} time steps and {M} collocation nodes.'
-)
+print(f'Running ParaDiag test script for van der Pol with mu={prob.mu} and {L} time steps and {M} collocation nodes.')
 
+# %% [markdown]
+# ## The matrices
+#
+# Those that make up the composite collocation problem, as in [Part A](A_paradiag_for_linear_problems), although we
+# do not set up the full problem here. See [the paper](https://arxiv.org/abs/2103.12571) for their meaning. We
+# diagonalize $Q G^{-1}$ on every step right away.
 
-"""
-Setup matrices that make up the composite collocation problem. We do not set up the full composite collocation problem
-here, however. See https://arxiv.org/abs/2103.12571 for the meaning of the matrices.
-"""
+# %%
 I_M = sp.eye(M)
 
 H_M = sp.eye(M).tolil() * 0
@@ -112,12 +111,11 @@ for l in range(L):
     S.append(_S)
     S_inv.append(_S_inv)
 
-"""
-Setup functions for computing matrix-vector productions on the steps and for computing the residual of the composite
-collocation problem
-"""
+# %% [markdown]
+# The matrix-vector product on the steps and the residual of the composite collocation problem, as in Part A:
 
 
+# %%
 def mat_vec(mat, vec):
     """
     Matrix vector product
@@ -165,7 +163,13 @@ def residual(_u, u0):
     return res
 
 
-# do ParaDiag
+# %% [markdown]
+# ## The iteration
+#
+# The six steps from above. Each ParaDiag iteration does a single Newton iteration on every node, one call of
+# `solve_jacobian` per node, so the number of Newton iterations per node equals the number of ParaDiag iterations.
+
+# %%
 sol_paradiag = u.copy() * 0j
 u0 = u.copy()
 niter = 0
@@ -199,4 +203,14 @@ while np.max(np.abs(res)) > restol:
     res = residual(sol_paradiag, u0)
     niter += 1
     assert niter < 99, 'ParaDiag did not converge for nonlinear problem!'
-my_print(f'Needed {niter} ParaDiag iterations, stopped at residual {np.max(np.abs(res)):.2e}')
+print(f'Needed {niter} ParaDiag iterations, stopped at residual {np.max(np.abs(res)):.2e}')
+
+# %% [markdown]
+# :::{admonition} Important things to note
+# - Averaging the Jacobian requires communicating the average solution, which is why `average_jacobian` is off by
+#   default for linear problems.
+# - We do a single Newton iteration per ParaDiag iteration, so the number of Newton iterations per node equals the
+#   number of ParaDiag iterations.
+# :::
+#
+# The check the tests run is the one inside the loop: ParaDiag has to converge in fewer than 99 iterations.

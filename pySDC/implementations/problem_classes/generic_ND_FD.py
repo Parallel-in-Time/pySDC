@@ -73,6 +73,8 @@ class GenericNDimFinDiff(Problem):
         Default is None, which takes the default values for each parameters.
         You can also define a tuple to set different parameters for each
         side.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
 
     Attributes
     ----------
@@ -122,6 +124,7 @@ class GenericNDimFinDiff(Problem):
         dtype='float64',
         useGPU=False,
     ):
+        """Initialization routine"""
         if useGPU:
             self.setup_GPU()
 
@@ -229,6 +232,14 @@ class GenericNDimFinDiff(Problem):
 
     @classmethod
     def get_default_sweeper_class(cls):
+        """
+        Default sweeper for these problems, which are treated fully implicitly.
+
+        Returns
+        -------
+        type
+            The sweeper class ``generic_implicit``.
+        """
         from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
         return generic_implicit

@@ -1,39 +1,82 @@
-blockquote {
-    padding: 0 0 0 15px;
-    margin: 0 0 19px;
-    border-left: 5px solid #eeeeee;
+.hero-tagline { font-size: 1.3rem; line-height: 1.45; max-width: 42rem; }
+.hero .sd-badge { font-size: 0.8rem; margin: 0 0.15rem 0.3rem 0; }
+.sd-card { transition: transform .12s ease; }
+.sd-card:hover { transform: translateY(-2px); }
+.notebook-links { display: flex; gap: 0.4rem; }
+.notebook-links .btn { border: 1px solid var(--pst-color-border); border-radius: 999px; font-size: 0.8rem; }
+
+/* Run in browser, see run-in-browser.js */
+.notebook-links { flex-wrap: wrap; align-items: center; }
+.notebook-links .run-in-browser { background: var(--pst-color-primary); color: var(--pst-color-background); border-color: var(--pst-color-primary); }
+.notebook-links .run-in-browser:disabled { opacity: 0.6; cursor: wait; }
+.rib-status { flex-basis: 100%; margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--pst-color-text-muted); }
+.rib-status:empty { display: none; }
+.rib-live .cell_input { position: relative; }
+.rib-live .cell_input pre { outline: none; }
+.rib-live .cell_input:focus-within { box-shadow: 0 0 0 2px var(--pst-color-primary); border-radius: 4px; }
+.rib-cell-run {
+  position: absolute; right: 0.4rem; bottom: 0.4rem; z-index: 2; width: 1.7rem; height: 1.7rem; border-radius: 50%;
+  border: 1px solid var(--pst-color-border); background: var(--pst-color-background); color: var(--pst-color-primary);
+  font-size: 0.7rem; line-height: 1; cursor: pointer;
 }
-blockquote p {
-    margin-bottom: 0;
+.rib-running .cell_input { box-shadow: 0 0 0 2px var(--pst-color-warning); border-radius: 4px; }
+.rib-running .rib-cell-run { animation: rib-pulse 1s infinite; }
+@keyframes rib-pulse { 50% { opacity: 0.3; } }
+.cell_output pre.rib-stdout { margin: 0.3rem 0; padding: 0.6rem; background: var(--pst-color-surface); border: none; }
+.cell_output pre.rib-error { margin: 0.3rem 0; padding: 0.6rem; color: var(--pst-color-danger); background: var(--pst-color-surface); border-left: 3px solid var(--pst-color-danger); }
+.cell_output img { max-width: 100%; }
+.notebook-links .run-in-browser-unavailable { opacity: 0.45; cursor: not-allowed; }
+.rib-status.rib-unavailable { display: block; }
+
+/* Project gallery, see add_project_gallery in conf.py */
+.project-gallery .sd-card-img-top { height: 11rem; object-fit: contain; padding: 0.5rem; background: #fff; border-bottom: 1px solid var(--pst-color-border); }
+.project-gallery .sd-card-title { font-size: 1rem; }
+.project-gallery .sd-card-text { font-size: 0.9rem; color: var(--pst-color-text-muted); }
+.project-gallery .no-image::before {
+  content: ''; display: block; height: 11rem; border-bottom: 1px solid var(--pst-color-border);
+  background: linear-gradient(135deg, var(--pst-color-primary-bg), var(--pst-color-secondary-bg));
 }
-blockquote small {
-    display: block;
-    line-height: 19px;
-    color: #999999;
-}
-blockquote small:before {
-    content: '\2014 \00A0';
-}
-blockquote.pull-right {
-    float: right;
-    padding-right: 15px;
-    padding-left: 0;
-    border-right: 5px solid #eeeeee;
-    border-left: 0;
-}
-blockquote.pull-right p,
-blockquote.pull-right small {
-    text-align: right;
-}
-blockquote.pull-right small:before {
-    content: '';
-}
-blockquote.pull-right small:after {
-    content: '\00A0 \2014';
-}
-q:before,
-q:after,
-blockquote:before,
-blockquote:after {
-    content: "";
-}
+
+/* API overview, see add_api_overview in conf.py */
+table.api-overview { table-layout: fixed; }
+table.api-overview td:first-child code, table.api-overview td:first-child .pre { white-space: normal; overflow-wrap: anywhere; }
+table.api-overview td { font-size: 0.9rem; overflow-wrap: anywhere; }
+
+/* Gallery cards that show an excerpt of the code or its output instead of a plot: the excerpt takes the plot's place */
+.project-gallery .excerpt-card .sd-card-body { display: flex; flex-direction: column; }
+.project-gallery .excerpt-card .sd-card-body > div[class*="highlight"] { order: -1; margin: -1rem -1rem 0.75rem; }
+.project-gallery .excerpt-card pre { height: 11rem; overflow: hidden; margin: 0; font-size: 0.68rem; line-height: 1.35;
+  border: none; border-bottom: 1px solid var(--pst-color-border); border-radius: 0; }
+
+/* Landing page demo, see landing-demo.js */
+.landing-demo form { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: flex-end; margin: 0.5rem 0; }
+.landing-demo label { display: flex; flex-direction: column; font-size: 0.85rem; color: var(--pst-color-text-muted); }
+.landing-demo select { margin-top: 0.2rem; padding: 0.2rem 0.4rem; border: 1px solid var(--pst-color-border); border-radius: 4px;
+  background: var(--pst-color-background); color: var(--pst-color-text-base); }
+.landing-demo .demo-buttons { display: flex; gap: 0.4rem; }
+.landing-demo .btn { border: 1px solid var(--pst-color-border); border-radius: 999px; font-size: 0.85rem; }
+.landing-demo .demo-run { background: var(--pst-color-primary); color: var(--pst-color-background); border-color: var(--pst-color-primary); }
+.landing-demo .btn:disabled { opacity: 0.6; }
+.landing-demo .demo-status { font-size: 0.85rem; color: var(--pst-color-text-muted); min-height: 1.3em; }
+.landing-demo .demo-plot { max-width: 100%; background: #fff; border-radius: 4px; }
+
+/* Found by a visual review: buttons without their own colour turned dark on dark in dark mode, module pages' long
+   dotted titles and table-of-contents entries ran out of their column, and the per-cell ▶ covered code */
+.notebook-links .btn, .landing-demo .btn { color: var(--pst-color-text-base); }
+.notebook-links .run-in-browser, .landing-demo .demo-run { color: var(--pst-color-background); }
+.bd-article h1, .bd-toc-nav a, .bd-sidenav a { overflow-wrap: anywhere; }
+.rib-live .cell_input pre { padding-bottom: 2.2rem; }
+/* results the tests wrote, included on the pages that do not run on the website: wrap instead of scrolling */
+div.highlight-text pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* pages without a primary sidebar (the overview, publications) are centred like the others */
+.bd-container__inner:has(> .bd-sidebar-primary.hide-on-wide) > .bd-main { max-width: 72rem; margin: 0 auto; }
+/* a row of images from a README, e.g. of a project, keeps some distance from the text after it */
+.bd-article img[style*="width"] { margin-bottom: 0.75rem; }
+
+/* The logo, mark and wordmark in one image */
+.navbar-brand .logo__image { height: 2.6rem; }
+
+/* the sidebar's title is its section, linked to the section's start page */
+.bd-links__title { font-size: 1.1rem; }
+.bd-links__title a { color: var(--pst-color-text-base); text-decoration: none; }
+.bd-links__title a:hover { color: var(--pst-color-link-hover); text-decoration: underline; }

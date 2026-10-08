@@ -91,12 +91,8 @@ class battery_n_capacitors(Problem):
             msg1 = "ERROR for reference value V_ref: V_ref has to be an np.ndarray and/or length of array needs to be equal to number of capacitances"
             assert all(assertions_V_ref_1), msg1
 
-            assertions_V_ref_2 = [
-                (alpha > V_ref[k] for k in range(n)),
-                (V_ref[k] > 0 for k in range(n)),
-            ]
-            msg2 = "ERROR for V_ref: At least one of V_ref is less than zero and/or alpha!"
-            assert all(assertions_V_ref_2), msg2
+            msg2 = "ERROR for V_ref: every entry of V_ref has to be positive and smaller than alpha!"
+            assert np.all(V_ref > 0) and np.all(V_ref < alpha), msg2
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super().__init__(init=(nvars, None, np.dtype('float64')))
@@ -136,9 +132,11 @@ class battery_n_capacitors(Problem):
             v_1 \leq V_{ref,0}, v_2 \leq V_{ref,1}, v_3 \leq V_{ref,2}.
 
         :math:`max_{index}` is initialized to :math:`-1`. List "switch" contains a True if :math:`v_k \leq V_{ref,k-1}` is satisfied.
-            - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.
-            - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.
-              So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.
+
+        - Is no True there (i.e., :math:`max_{index}=-1`), we are in the first case.
+        - :math:`max_{index}=k\geq 0` means we are in the :math:`(k+1)`-th case.
+          So, the actual RHS has key :math:`max_{index}`-1 in the dictionary self.switch_f.
+
         In case of using the switch estimator, we count the number of switches which illustrates in which case of voltage source we are.
 
         Parameters
@@ -325,6 +323,28 @@ class battery(battery_n_capacitors):
 
     where :math:`i_L` denotes the function of the current over time :math:`t`.
 
+    Parameters
+    ----------
+    ncapacitors : int, optional
+        Number of capacitors in the circuit. Has to be one here, since the right-hand side and the solver are
+        implemented for a single capacitor only.
+    Vs : float, optional
+        Voltage at the voltage source :math:`V_s`.
+    Rs : float, optional
+        Resistance of the resistor :math:`R_s` at the voltage source.
+    C : np.1darray, optional
+        Capacitance of the capacitor as an array of length one. ``None`` means ``np.array([1.0])``.
+    R : float, optional
+        Resistance for the load :math:`R_\ell`.
+    L : float, optional
+        Inductance of inductor :math:`L`.
+    alpha : float, optional
+        Factor greater than zero to describe the storage of the capacitor. The initial voltage of the capacitor is
+        :math:`\alpha V_{ref, 0}`.
+    V_ref : np.1darray, optional
+        Reference value :math:`V_{ref, 0}` greater than zero for the battery to switch to the voltage source, as an
+        array of length one. ``None`` means ``np.array([1.0])``.
+
     Note
     ----
     This class has the same attributes as the class it inherits from.
@@ -426,7 +446,8 @@ class battery(battery_n_capacitors):
 
 class battery_implicit(battery):
     r"""
-    Example implementing the battery drain model as above. The method solve_system uses a fully-implicit computation.
+    Battery drain model with one capacitor, treated fully implicitly with Newton instead of the IMEX splitting.
+    The method solve_system uses a fully-implicit computation.
 
     Parameters
     ----------
@@ -450,6 +471,8 @@ class battery_implicit(battery):
         Number of maximum iterations for the Newton solver.
     newton_tol : float, optional
         Tolerance for determination of the Newton solver.
+    stop_at_nan : bool, optional
+        Raise a ``ProblemError`` if Newton's method produces ``nan``, instead of only logging a warning.
 
     Attributes
     ----------
@@ -471,9 +494,11 @@ class battery_implicit(battery):
         V_ref=None,
         newton_maxiter=100,
         newton_tol=1e-11,
+        stop_at_nan=True,
     ):
+        """Initialization routine"""
         super().__init__(ncapacitors, Vs, Rs, C, R, L, alpha, V_ref)
-        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister('newton_maxiter', 'newton_tol', 'stop_at_nan', localVars=locals(), readOnly=True)
 
         self.work_counters['newton'] = WorkCounter()
 
@@ -501,7 +526,7 @@ class battery_implicit(battery):
 
         if u[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
-            non_f[0] = self.Vs
+            non_f[0] = self.Vs / self.L
 
         else:
             self.A[1, 1] = -1 / (self.C[0] * self.R)
@@ -539,7 +564,7 @@ class battery_implicit(battery):
 
         if rhs[1] - self.V_ref[0] <= 0 or t >= t_switch:
             self.A[0, 0] = -(self.Rs + self.R) / self.L
-            non_f[0] = self.Vs
+            non_f[0] = self.Vs / self.L
 
         else:
             self.A[1, 1] = -1 / (self.C[0] * self.R)

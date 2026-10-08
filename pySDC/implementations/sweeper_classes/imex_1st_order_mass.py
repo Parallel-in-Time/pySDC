@@ -3,9 +3,12 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 class imex_1st_order_mass(imex_1st_order):
     """
-    Custom sweeper class, implements Sweeper.py
+    IMEX-SDC sweeper for problems M u' = f(u) with a mass matrix M, as they arise from finite elements.
 
     First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix
+
+    The end point is only available as a copy of the last node: ``compute_end_point`` raises unless the right end of
+    the interval is a node and ``do_coll_update`` is off.
     """
 
     def update_nodes(self):
@@ -71,7 +74,8 @@ class imex_1st_order_mass(imex_1st_order):
         """
         Compute u at the right point of the interval
 
-        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
+        This is a copy of the last node. The mass matrix sweeper does not support the collocation update, so this
+        raises unless the right end of the interval is a node and do_coll_update is False.
 
         Returns:
             None
@@ -85,6 +89,12 @@ class imex_1st_order_mass(imex_1st_order):
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
+            # On coarse levels u[0] is carried in the dual space: the transfer hands down P^T M u0 and
+            # the sweep consumes it as-is. PFASST copies uend straight into the next step's u[0]
+            # (controller.recv_full), so what we hand over has to be dual as well -- otherwise the step
+            # boundary feeds a primal value into a slot that is read as M u0.
+            if L.level_index > 0:
+                L.uend = P.apply_mass_matrix(L.uend)
         else:
             raise NotImplementedError('Mass matrix sweeper expect u_M = u_end')
 

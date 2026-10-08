@@ -217,3 +217,25 @@ if __name__ == '__main__':
     test_LU('EQUID', 'LOBATTO', 5)
 
     test_FLEX_preconditioner_in_sweepers(True, 4)
+
+
+@pytest.mark.base
+@pytest.mark.parametrize(
+    'QI, QE, parallelizable',
+    [('MIN-SR-S', 'PIC', True), ('MIN-SR-S', 'EE', False), ('LU', 'PIC', False), ('IE', 'EE', False)],
+)
+def test_parallelizable_needs_every_QDelta_diagonal(QI, QE, parallelizable):
+    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+
+    sweeper = imex_1st_order({'num_nodes': 3, 'quad_type': 'RADAU-RIGHT', 'QI': QI, 'QE': QE}, None)
+    assert sweeper.parallelizable == parallelizable
+
+
+@pytest.mark.base
+def test_parallelizable_after_rebuilding_a_variable_QDelta():
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+    sweeper = generic_implicit({'num_nodes': 3, 'quad_type': 'RADAU-RIGHT', 'QI': 'MIN-SR-FLEX'}, None)
+    for k in [1, 2, 3]:
+        sweeper.updateVariableCoeffs(k)
+        assert sweeper.parallelizable

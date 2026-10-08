@@ -1,0 +1,7 @@
+res,distribution,procs,ntasks_time,ntasks_space,binding,time,time_GPU
+256,block:cyclic:cyclic,128,1,128,time_first,,
+256,block:cyclic:cyclic,256,1,256,time_first,0.5932138858749995,0.5932670216015631
+256,block:cyclic:cyclic,512,1,512,time_first,0.38944519925390636,0.38950328276171836
+256,block:cyclic:cyclic,1024,1,1024,time_first,0.2824965814199216,0.2825528922617188
+256,block:cyclic:cyclic,2048,1,2048,time_first,0.25762467790722593,0.25768063598632696
+

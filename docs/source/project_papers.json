@@ -1,0 +1,187 @@
+{
+ "10.1002/nla.2208": {
+  "doi": "10.1002/nla.2208",
+  "title": "Asymptotic convergence of the parallel full approximation scheme in space and time for linear problems",
+  "authors": [
+   "Bolten, Matthias",
+   "Moser, Dieter",
+   "Speck, Robert"
+  ],
+  "venue": "Numerical Linear Algebra with Applications",
+  "volume": "25",
+  "issue": "6",
+  "pages": null,
+  "year": 2018,
+  "type": "article"
+ },
+ "10.1007/978-3-030-75933-9_3": {
+  "doi": "10.1007/978-3-030-75933-9_3",
+  "title": "Using Performance Analysis Tools for a Parallel-in-Time Integrator: Does My Time-Parallel Code Do What I Think It Does?",
+  "authors": [
+   "Speck, Robert",
+   "Knobloch, Michael",
+   "Lührs, Sebastian",
+   "Gocht, Andreas"
+  ],
+  "venue": "Springer Proceedings in Mathematics & Statistics",
+  "volume": null,
+  "issue": null,
+  "pages": "51-80",
+  "year": 2021,
+  "type": "incollection"
+ },
+ "10.1007/978-3-032-17810-7_2": {
+  "doi": "10.1007/978-3-032-17810-7_2",
+  "title": "Resilience Against Soft Faults Through Adaptivity in Spectral Deferred Correction",
+  "authors": [
+   "Saupe, Thomas",
+   "Götschel, Sebastian",
+   "Lunet, Thibaut",
+   "Ruprecht, Daniel",
+   "Speck, Robert"
+  ],
+  "venue": "Springer Proceedings in Mathematics & Statistics",
+  "volume": null,
+  "issue": null,
+  "pages": "31-51",
+  "year": 2026,
+  "type": "incollection"
+ },
+ "10.1007/s00791-018-0298-x": {
+  "doi": "10.1007/s00791-018-0298-x",
+  "title": "Parallelizing spectral deferred corrections across the method",
+  "authors": [
+   "Speck, Robert"
+  ],
+  "venue": "Computing and Visualization in Science",
+  "volume": "19",
+  "issue": "3-4",
+  "pages": "75-83",
+  "year": 2018,
+  "type": "article"
+ },
+ "10.1007/s10915-026-03385-7": {
+  "doi": "10.1007/s10915-026-03385-7",
+  "title": "On the Analysis of Spectral Deferred Corrections for Differential-Algebraic Equations of Index One",
+  "authors": [
+   "Bolten, Matthias",
+   "Wimmer, Lisa"
+  ],
+  "venue": "Journal of Scientific Computing",
+  "volume": "108",
+  "issue": "3",
+  "pages": null,
+  "year": 2026,
+  "type": "article"
+ },
+ "10.1007/s11075-024-01964-z": {
+  "doi": "10.1007/s11075-024-01964-z",
+  "title": "Adaptive time step selection for spectral deferred correction",
+  "authors": [
+   "Saupe, Thomas",
+   "Götschel, Sebastian",
+   "Lunet, Thibaut",
+   "Ruprecht, Daniel",
+   "Speck, Robert"
+  ],
+  "venue": "Numerical Algorithms",
+  "volume": "100",
+  "issue": "1",
+  "pages": "369-393",
+  "year": 2025,
+  "type": "article"
+ },
+ "10.1137/16M1060078": {
+  "doi": "10.1137/16M1060078",
+  "title": "Spectral Deferred Corrections with Fast-wave Slow-wave Splitting",
+  "authors": [
+   "Ruprecht, Daniel",
+   "Speck, Robert"
+  ],
+  "venue": "SIAM Journal on Scientific Computing",
+  "volume": "38",
+  "issue": "4",
+  "pages": "A2535-A2557",
+  "year": 2016,
+  "type": "article"
+ },
+ "10.1137/23M1592596": {
+  "doi": "10.1137/23M1592596",
+  "title": "Spectral Deferred Correction Methods for Second-Order Problems",
+  "authors": [
+   "Akramov, Ikrom",
+   "Götschel, Sebastian",
+   "Minion, Michael",
+   "Ruprecht, Daniel",
+   "Speck, Robert"
+  ],
+  "venue": "SIAM Journal on Scientific Computing",
+  "volume": "46",
+  "issue": "3",
+  "pages": "A1690-A1713",
+  "year": 2024,
+  "type": "article"
+ },
+ "10.1137/24M1649800": {
+  "doi": "10.1137/24M1649800",
+  "title": "Improving Efficiency of Parallel Across the Method Spectral Deferred Corrections",
+  "authors": [
+   "Čaklović, Gayatri",
+   "Lunet, Thibaut",
+   "Götschel, Sebastian",
+   "Ruprecht, Daniel"
+  ],
+  "venue": "SIAM Journal on Scientific Computing",
+  "volume": "47",
+  "issue": "1",
+  "pages": "A430-A453",
+  "year": 2025,
+  "type": "article"
+ },
+ "10.1145/3310410": {
+  "doi": "10.1145/3310410",
+  "title": "Algorithm 997: pySDC—Prototyping Spectral Deferred Corrections",
+  "authors": [
+   "Speck, Robert"
+  ],
+  "venue": "ACM Transactions on Mathematical Software",
+  "volume": "45",
+  "issue": "3",
+  "pages": "1-23",
+  "year": 2019,
+  "type": "article"
+ },
+ "10.34734/fzj-2026-03360": {
+  "doi": "10.34734/fzj-2026-03360",
+  "title": "Efficient Massively Space-Time-Parallel Simulations with Adaptive Spectral Deferred Correction",
+  "authors": [
+   "Baumann, Thomas"
+  ],
+  "venue": "Technische Universität Hamburg",
+  "year": 2026,
+  "type": "phdthesis"
+ },
+ "10.48550/arXiv.2405.19994": {
+  "doi": "10.48550/arXiv.2405.19994",
+  "title": "High-order parallel-in-time method for the monodomain equation in cardiac electrophysiology",
+  "authors": [
+   "de Souza, Giacomo Rosilho",
+   "Pezzuto, Simone",
+   "Krause, Rolf"
+  ],
+  "venue": "arXiv",
+  "year": 2024,
+  "type": "misc"
+ },
+ "10.48550/arXiv.2606.25908": {
+  "doi": "10.48550/arXiv.2606.25908",
+  "title": "Spectral deferred corrections parallelized across the method for differential-algebraic equations",
+  "authors": [
+   "Bolten, Matthias",
+   "Wimmer, Lisa"
+  ],
+  "venue": "arXiv",
+  "year": 2026,
+  "type": "misc"
+ }
+}

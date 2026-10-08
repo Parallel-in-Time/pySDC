@@ -21,12 +21,12 @@ class auzinger(Problem):
     .. math::
         (y_1(t), y_2(t))^T = (\cos(t), \sin(t))^T.
 
-    Attributes
+    Parameters
     ----------
     newton_maxiter : int, optional
         Maximum number of iterations for Newton's method.
     newton_tol : float, optional
-        Tolerance for Newton's method to terminate.
+        Absolute tolerance for Newton's method to terminate, applied to the maximum norm of the residual.
 
     References
     ----------
@@ -36,7 +36,7 @@ class auzinger(Problem):
     dtype_u = mesh
     dtype_f = mesh
 
-    def __init__(self, newton_maxiter=1e-12, newton_tol=100):
+    def __init__(self, newton_maxiter=100, newton_tol=1e-12):
         """Initialization routine"""
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2

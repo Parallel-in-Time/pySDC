@@ -27,6 +27,10 @@ COVERAGE_OUT = 'coverage_GPU_hardware.dat'
 #: The whole `cupy`-marked selection, which is what CI runs.
 DEFAULT_TREES = ['pySDC/tests', 'pySDC/projects/GPU/tests']
 
+#: Results the tests write for the website: tutorial step 7 G, which only a GPU can run. Carried back like the
+#: coverage data, the docs job includes them.
+RESULTS = ['data/step_7_G_out.txt']
+
 #: Four of them. The space-time tests ask for four ranks and NCCL wants a GPU per rank, and the
 #: serial pass -- most of the job -- is spread over the same four rather than leaving three idle.
 #: That costs about what two did, because the split more than pays for the extra devices: 101
@@ -128,6 +132,19 @@ def run_cupy_tests(trees, selection):
     """
     import subprocess
 
+    # Which host this landed on. The two-rank NCCL pass has failed on some hosts and passed on
+    # others with identical code -- NCCL_ERROR_UNHANDLED_CUDA_ERROR on the first allReduce, and
+    # CUDA_ERROR_ILLEGAL_ADDRESS in every test after it -- so a log has to say what it ran on.
+    subprocess.run(['nvidia-smi', '--query-gpu=index,name,driver_version', '--format=csv,noheader'])
+    subprocess.run(
+        [
+            'python',
+            '-c',
+            'import cupy; from cupy.cuda import nccl; r = cupy.cuda.runtime; '
+            'print(f"CUDA runtime {r.runtimeGetVersion()}, driver {r.driverGetVersion()}, NCCL {nccl.get_version()}")',
+        ]
+    )
+
     # `etc/run_mpi_tests.sh` is how every other leg runs its tests: it asks the tests themselves
     # what rank counts they declare and launches one pass per count, so `test_sweeper_NCCL` gets
     # the two ranks its `parallel(2)` marker asks for, and everything else runs serially. Each
@@ -145,6 +162,17 @@ def run_cupy_tests(trees, selection):
         'PYTHONPATH': f'{REMOTE}/etc:{REMOTE}',
         # arms the .pth installed in the image; without it that file does nothing
         'COVERAGE_PROCESS_START': f'{REMOTE}/pyproject.toml',
+        # NCCL only says why a call failed at WARN or above, and prints nothing there when all is
+        # well. Without it the failure above reads "unhandled cuda error (run with NCCL_DEBUG=INFO
+        # for details)", on a host that is gone by the time anyone reads the log.
+        'NCCL_DEBUG': 'WARN',
+        # NCCL's shared-memory transport allocates its host buffers as cuMem handles and passes
+        # them between ranks, and on some Modal hosts importing one fails
+        # (`ncclShmImportShareableBuffer`: CUDA 801, operation not supported), which poisons the
+        # context for every test after it. Plain /dev/shm works everywhere. Only the host side:
+        # `NCCL_CUMEM_ENABLE=0` fixes it too, but then every communicator callocs 512 MB up front
+        # and `test_heterogeneous_implementation`, which builds several, runs out of memory.
+        'NCCL_CUMEM_HOST_ENABLE': '0',
     }
     returncode = 0
     for tree in trees:
@@ -157,7 +185,8 @@ def run_cupy_tests(trees, selection):
     # finds nothing: the test failures are the interesting output in that case, not this.
     subprocess.run(['python', '-m', 'coverage', 'combine'], cwd=REMOTE)
     measured = pathlib.Path(REMOTE, '.coverage')
-    return returncode, measured.read_bytes() if measured.exists() else b''
+    results = {name: pathlib.Path(REMOTE, name).read_text() for name in RESULTS if pathlib.Path(REMOTE, name).exists()}
+    return returncode, measured.read_bytes() if measured.exists() else b'', results
 
 
 @app.function(image=image, gpu=GPUS, timeout=900)
@@ -180,7 +209,11 @@ def main(tests: str = ' '.join(DEFAULT_TREES), k: str = '', script: str = ''):
         raise SystemExit(run_script.remote(script))
 
     trees = tests.split()
-    returncode, measured = run_cupy_tests.remote(trees, k)
+    returncode, measured, results = run_cupy_tests.remote(trees, k)
+    for name, text in results.items():
+        pathlib.Path(name).parent.mkdir(parents=True, exist_ok=True)
+        pathlib.Path(name).write_text(text)
+        print(f'wrote {name}')
 
     # A narrowed run measures a fraction of the code, so its data would understate coverage rather
     # than add to it. Only a full run is worth keeping.
