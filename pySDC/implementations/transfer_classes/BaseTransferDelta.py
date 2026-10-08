@@ -3,7 +3,7 @@ Space-time transfer for the delta-form hierarchy.
 
 :class:`~pySDC.core.base_transfer.BaseTransfer` makes a coarse level rebuild its own residual from
 :math:`\mathcal{O}(1)` coarse data and recovers the coarse-grid correction as :math:`u_G - u_G^{\mathrm{old}}`.
-Both have exact algebraic replacements -- :math:`\varepsilon_G = R\varepsilon_F`, which is what the FAS
+Both have exact algebraic replacements -- :math:`r_G = R\,r_F`, which is what the FAS
 :math:`\tau` is *for*, and the correction is the sum of the sweep's own increments -- and this
 transfer uses those instead. It is what decides whether a level rebuilds its residual or is handed
 one: the delta-form sweepers do both, and this is what hands one down.
@@ -11,7 +11,7 @@ one: the delta-form sweepers do both, and this is what hands one down.
 The FAS :math:`\tau` is **substituted, not discarded**. Writing
 :math:`\tau = R(\Delta t\,Q_F f_F) - \Delta t\,Q_G f_G` and putting it into the coarse residual
 :math:`\Delta t (Q_G f_G) + u_G[0] - u_G[m] + \tau` cancels the :math:`\Delta t\,Q_G f_G` terms
-identically and leaves :math:`R\varepsilon_F`. So a coarse level handed that residual is solving
+identically and leaves :math:`R\,r_F`. So a coarse level handed that residual is solving
 precisely the FAS-corrected problem -- and must *not* also add :math:`\tau`, which would count it
 twice. What is skipped is materialising :math:`\tau` as an array, since the quantity it exists to
 produce arrives directly.
