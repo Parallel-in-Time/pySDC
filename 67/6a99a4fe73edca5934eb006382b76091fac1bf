@@ -1,0 +1,35 @@
+pySDC/core/problem.py
+  s_3cfbaa2fb0772b::t_8c3b9e080040f3 65-120
+pySDC/implementations/problem_classes/AdvectionEquation_ND_FD.py
+  s_3cfbaa2fb0772b::t_b9a22aa1ad73a9 42-47,84-86,89-103
+pySDC/implementations/problem_classes/HeatEquation_ND_FD.py
+  s_3cfbaa2fb0772b::t_0f6014aafc807a 59-60,84,88-100
+pySDC/implementations/problem_classes/generic_ND_FD.py
+  s_3cfbaa2fb0772b::t_df80923815c169 8,56-69,140,227-256,360-362,400-507
+pySDC/implementations/sweeper_classes/delta_form.py
+  s_3cfbaa2fb0772b::t_eb44c554d18180 11,14,24-25,39-40,49,94,153,237,312,411-413,426-474
+pySDC/implementations/sweeper_classes/delta_form_MPI.py
+  s_3cfbaa2fb0772b::t_2a2885a6d85a3e 9,12,52
+pySDC/implementations/transfer_classes/BaseTransferDelta.py
+  s_3cfbaa2fb0772b::t_9d2a0ad0075d71 6,14
+pySDC/tests/test_problems/test_FD_solve_precision.py
+  s_3cfbaa2fb0772b::t_01cdd0adb43ea2 1-132
+pySDC/tests/test_sweepers/test_delta_form.py
+  s_3cfbaa2fb0772b::t_ddc6182bef1b9e 540-602
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "676a99a4fe73edca5934eb006382b76091fac1bf",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
