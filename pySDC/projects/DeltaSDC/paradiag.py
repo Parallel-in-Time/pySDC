@@ -52,8 +52,10 @@ class heat_paradiag(heatNd_forced):
     """
     ``heatNd_forced`` prepared for ParaDiag, with the node-local solve at a chosen precision.
 
-    Two things separate this from the stock problem. The state is complex, because diagonalising
-    across the steps makes it so, and ``solve_jacobian`` solves
+    The stock problem's ``dtype`` already makes the state and the operators complex, which
+    diagonalising across the steps requires, so it defaults to ``complex128`` here. What it cannot do
+    is hold the solve at a *different* precision from the state -- ``dtype='complex64'`` stores the
+    solution at single precision too, which is the control that stalls. So ``solve_jacobian`` solves
     :math:`(I - \\text{factor}\\,A)\\,x = r` at ``solve_precision`` instead of inheriting the
     double-precision solve. The factor is complex here -- it is an eigenvalue of the circulant
     times :math:`\\Delta t` -- so a sparse operator has to be assembled per call. With periodic
@@ -66,19 +68,12 @@ class heat_paradiag(heatNd_forced):
         Working precision of the node-local solve. ``None`` keeps ``complex128``.
     """
 
-    def __init__(self, solve_precision=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, solve_precision=None, dtype=FULL, **kwargs):
+        super().__init__(dtype=dtype, **kwargs)
         self._makeAttributeAndRegister('solve_precision', localVars=locals())
-
-        # ParaDiag diagonalises across the steps, so the state is complex whatever the problem is
-        self.init = tuple([*self.init[:2]] + [FULL])
 
         self._solve_dtype = FULL if solve_precision is None else np.dtype(solve_precision)
         self.work_counters['paradiag_solve'] = WorkCounter()
-
-        # Complex once, here: the state is complex, and a real sparse matrix applied to a complex
-        # vector is converted on every product by CuPy, which would dominate the residual.
-        self.A = self.A.astype(FULL)
 
         # With periodic boundaries the solve is a diagonalisation: two FFTs and a division, which is
         # also the one place where single precision is several times faster on a GPU.
