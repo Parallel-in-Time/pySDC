@@ -25,6 +25,8 @@ env:
   TAG: ${{ github.event.release.tag_name || inputs.tag }}
   # Otherwise syft lists every file of every conda package, which grows each SBOM to tens of MB.
   SYFT_FILE_METADATA_SELECTION: none
+  # The scans below drop syft's Windows-binary cataloger: its only finds were the .exe launchers
+  # vendored in pip, six "Simple Launcher" entries in every SBOM.
 
 jobs:
 
@@ -48,7 +50,7 @@ jobs:
           python -m venv /tmp/pySDC
           /tmp/pySDC/bin/pip install .
           ${{ steps.syft.outputs.cmd }} scan dir:/tmp/pySDC --source-name pySDC --source-version "${TAG:-dev}" \
-            -o cyclonedx-json=$SBOM
+            --select-catalogers=-pe-binary-package-cataloger -o cyclonedx-json=$SBOM
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
@@ -109,7 +111,7 @@ jobs:
           esac
           echo "SBOM=sbom-$NAME.cdx.json" >> $GITHUB_ENV
           ${{ steps.syft.outputs.cmd }} scan dir:$CONDA_PREFIX --source-name pySDC-$NAME --source-version "${TAG:-dev}" \
-            -o cyclonedx-json=sbom-$NAME.cdx.json
+            --select-catalogers=-pe-binary-package-cataloger -o cyclonedx-json=sbom-$NAME.cdx.json
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
