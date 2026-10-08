@@ -173,7 +173,9 @@ Reading off the point where one iteration is lost:
 
 * **SDC, fine solve: about four digits**, so ``float16`` at one extra iteration;
 * **MLSDC, fine solve: about six digits**, so ``float32``, and that is the floor;
-* **MLSDC, coarse solve: about two digits**, so ``float16`` for free.
+* **MLSDC, coarse solve: about two digits**, so ``float16`` at most one extra iteration: its
+  :math:`\eta` sits between the 1e-4 and 1e-3 columns, and which side it lands on depends on the
+  platform's BLAS for an emulated solve, and on the grid for a real one.
 
 .. image:: ../../../data/delivered_accuracy.png
    :alt: Left: residual against SDC iteration for solves spoiled by eta from 1e-2 to exact, all
