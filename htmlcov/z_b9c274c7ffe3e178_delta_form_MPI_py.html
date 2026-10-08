@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_b9c274c7ffe3e178_explicit_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-10-08 21:17 +0000
+            created at 2026-10-08 22:28 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -88,10 +88,10 @@
     <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="str">The MPI sweeper assigns one collocation node per rank and therefore uses only the **diagonal** of</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="str">:math:`Q^\Delta`. The delta form collapses accordingly: with</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="str">:math:`\varepsilon_r = u_0 + \tau_r + \Delta t (Q f^k)_r - u^k_r` for the rank&#x27;s own node,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="str">:math:`r_m = u_0 + \tau_m + \Delta t (Q f^k)_m - u^k_m` for the rank&#x27;s own node :math:`m`,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="str">.. math::</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">    \delta_r = \varepsilon_r + \Delta t Q^\Delta_{rr}\,\big(f(u^k_r + \delta_r) - f(u^k_r)\big),</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">    \delta_m = r_m + \Delta t Q^\Delta_{mm}\,\big(f(u^k_m + \delta_m) - f(u^k_m)\big),</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">with no accumulation over other nodes. The node-local piece is identical to the serial case, so</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="str">:meth:`DeltaFormMixin._solve_correction` is reused unchanged and all three strategies</span>&nbsp;</span><span class="r"></span></p>
@@ -131,7 +131,7 @@
     <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">    <span class="key">def</span> <span class="nam">_residual_nodes</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">        <span class="str">r&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t"><span class="str">        Compute :math:`\varepsilon_r` at this rank&#x27;s node, in backend precision.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t"><span class="str">        Compute :math:`r_m` at this rank&#x27;s node, in backend precision.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t"><span class="str">        Returned as a one-element list, so the multi-level machinery -- which is written for a list</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t"><span class="str">        of nodes -- reads the same here as it does serially. A residual handed down by a transfer is</span>&nbsp;</span><span class="r"></span></p>
@@ -263,7 +263,7 @@
             <a class="nav" href="z_b9c274c7ffe3e178_explicit_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.16.1">coverage.py v7.16.1</a>,
-            created at 2026-10-08 21:17 +0000
+            created at 2026-10-08 22:28 +0000
         </p>
     </div>
 </footer>
