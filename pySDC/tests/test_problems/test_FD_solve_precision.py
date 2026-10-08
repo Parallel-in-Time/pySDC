@@ -70,11 +70,16 @@ def test_misconfigurations_raise():
         _problem('heat', nvars=63, bc='dirichlet-zero', solver_type='FFT')
 
 
-@pytest.mark.base
-def test_half_precision_solve_reaches_double_precision_in_delta_form():
+@pytest.mark.parametrize(
+    'useGPU', [pytest.param(False, marks=pytest.mark.base), pytest.param(True, marks=pytest.mark.cupy)]
+)
+def test_half_precision_solve_reaches_double_precision_in_delta_form(useGPU):
     """
     What the option is for: the delta form solves for a correction, so a half-precision solve costs
     iterations, not accuracy. Stock SDC hands the same solve the state, and stalls -- the control.
+
+    On a CPU the half-precision solve is an emulation; on a GPU it is cuFFT's half-precision
+    arithmetic, which is the case the correction-solve contract on ``Problem`` is written for.
     """
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -85,7 +90,13 @@ def test_half_precision_solve_reaches_double_precision_in_delta_form():
     def floor(sweeper_class, precision, **sweeper_extra):
         description = {
             'problem_class': heatNd_unforced,
-            'problem_params': {'nvars': (32, 32), 'nu': 0.1, 'solver_type': 'FFT', 'solve_precision': precision},
+            'problem_params': {
+                'nvars': (32, 32),
+                'nu': 0.1,
+                'solver_type': 'FFT',
+                'solve_precision': precision,
+                'useGPU': useGPU,
+            },
             'sweeper_class': sweeper_class,
             'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU', **sweeper_extra},
             'level_params': {'restol': -1, 'dt': 1e-2},
