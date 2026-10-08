@@ -39,6 +39,12 @@ class advectionNd(GenericNDimFinDiff):
         Solve the linear system directly or using GMRES or CG
     bc : str, optional
         Boundary conditions, either ``'periodic'`` or ``'dirichlet'``.
+    dtype : dtype-like, optional
+        Precision the state is stored at, ``float64`` by default. See :class:`GenericNDimFinDiff`.
+    useGPU : bool, optional
+        Run on the GPU with CuPy instead of on the CPU with NumPy.
+    solve_precision : dtype-like or None, optional
+        Precision the implicit solve runs at, independently of ``dtype``. See :class:`GenericNDimFinDiff`.
     sigma : float, optional
         If ``freq=-1`` and ``ndim=1``, uses a Gaussian initial solution of the form
 
@@ -75,9 +81,26 @@ class advectionNd(GenericNDimFinDiff):
         solver_type='direct',
         bc='periodic',
         sigma=6e-2,
+        dtype='float64',
+        useGPU=False,
+        solve_precision=None,
     ):
         """Initialization routine"""
-        super().__init__(nvars, -c, 1, freq, stencil_type, order, lintol, liniter, solver_type, bc)
+        super().__init__(
+            nvars,
+            -c,
+            1,
+            freq,
+            stencil_type,
+            order,
+            lintol,
+            liniter,
+            solver_type,
+            bc,
+            dtype=dtype,
+            useGPU=useGPU,
+            solve_precision=solve_precision,
+        )
 
         if solver_type == 'CG':  # pragma: no cover
             self.logger.warning('CG is not usually used for advection equation')
