@@ -1,0 +1,21 @@
+SECURITY.md
+  s_410ce2888ad51b::t_782724a05e1b6f 50-57
+.github/workflows/sbom.yml
+  s_410ce2888ad51b::t_3b7c94154b3773 1-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dd98e660d0adf489755d462a541152779c8b790a",
+  "prompts": {},
+  "sessions": {
+    "s_410ce2888ad51b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aa3129b0-226b-485d-8376-47de5b709237",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
