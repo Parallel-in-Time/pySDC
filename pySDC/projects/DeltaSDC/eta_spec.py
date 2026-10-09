@@ -12,10 +12,20 @@ counted against :math:`\eta`. Two numbers come out:
     the largest :math:`\eta` at which the run, and every run with a more accurate solve, costs at
     most one iteration more than the exact one.
 
-If the solve's error enters the iteration as a perturbation of size :math:`c\,\eta` on top of its
-contraction, :math:`\eta^*` should scale with :math:`\rho`: an iteration that contracts fast has
-little room for solver error. Plotting one against the other, one point per configuration, is the
-test of that.
+``eta* predicted``
+    from linear error propagation, without running anything inexact. A sweep maps the collocation
+    error by :math:`K = I - L^{-1}R`, with :math:`L = I - \Delta t\,Q_\Delta \otimes A` and
+    :math:`R = I - \Delta t\,Q \otimes A`. A solve error :math:`\varepsilon` made in sweep :math:`j`
+    enters through the same lower-triangular sweep, as :math:`L^{-1} D \varepsilon` with :math:`D`
+    each node's own system matrix, is then contracted by every later sweep, and shows in the
+    residual through :math:`R`. Per mode :math:`\lambda` of :math:`A` that is an :math:`M \times M`
+    computation. With white noise of relative size :math:`\eta` on every solve -- what the spoiling
+    does, and what rounding does -- the expected maximum of the residual it leaves at iteration
+    :math:`K + 1` follows from the corrections' sizes in the exact run, and :math:`\eta^*` is where
+    that reaches the tolerance. A nonlinear problem uses its Jacobian at the initial value.
+
+The measured contraction rate does not predict :math:`\eta^*`: the solve's error excites every mode,
+while the solution converges in its own. The propagation does, because it follows every mode.
 
 Run as ``python -m pySDC.projects.DeltaSDC.eta_spec``; prints the table and writes ``data/eta_spec``
 as PDF and PNG.
@@ -30,6 +40,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+from pySDC.core.hooks import Hooks
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
@@ -86,10 +97,7 @@ def cases():
             for dt in [1e-3, 1e-2, 1e-1, 1.0]
         ],
         *[case('heat', f'heat M={M}', heat_delta, HEAT, 1e-1, 1e-11, M=M, sweeper=LINEAR) for M in [2, 5]],
-        *[
-            case('heat', f'heat {QI}', heat_delta, HEAT, 1e-1, 1e-11, QI=QI, sweeper=LINEAR)
-            for QI in ['IE', 'MIN-SR-S']
-        ],
+        *[case('heat', f'heat {QI}', heat_delta, HEAT, 1e-1, 1e-11, QI=QI, sweeper=LINEAR) for QI in ['MIN-SR-S']],
         *[
             case('heat MLSDC', f'MLSDC {level} solve', heat_delta, HEAT, 1e-1, 1e-11, sweeper=LINEAR, eta_level=level)
             for level in ['fine', 'coarse']
@@ -98,14 +106,26 @@ def cases():
             case('advection', f'advection CFL={cfl:g}', advectionNd, ADVECTION, cfl * dx, 1e-11, sweeper=LINEAR)
             for cfl in [0.5, 2.0, 8.0]
         ],
+        case(
+            'advection',
+            'advection CFL=2 MIN-SR-S',
+            advectionNd,
+            ADVECTION,
+            2 * dx,
+            1e-11,
+            QI='MIN-SR-S',
+            sweeper=LINEAR,
+        ),
         *[
             case('Allen-Cahn', f'Allen-Cahn dt={dt:g}', allencahn_delta, ALLEN_CAHN, dt, 1e-10)
             for dt in [1e-3, 4e-3, 1.6e-2]
         ],
+        case('Allen-Cahn', 'Allen-Cahn dt=0.004 MIN-SR-S', allencahn_delta, ALLEN_CAHN, 4e-3, 1e-10, QI='MIN-SR-S'),
         *[
             case('Van der Pol', f'Van der Pol mu={mu:g}', vanderpol_delta, {'mu': mu}, 0.05, 1e-11)
             for mu in [1.0, 10.0, 100.0]
         ],
+        case('Van der Pol', 'Van der Pol mu=1 MIN-SR-NS', vanderpol_delta, {'mu': 1.0}, 0.05, 1e-11, QI='MIN-SR-NS'),
     ]
 
 
@@ -150,6 +170,85 @@ def contraction(history, tol):
     return (above[-1] / above[0]) ** (1 / (len(above) - 1)) if len(above) > 1 else np.nan
 
 
+def exact_run(spec, maxiter=60):
+    """
+    One exact run of an SDC configuration, recording what the prediction needs.
+
+    Returns
+    -------
+    tuple
+        The residual history, the maximum of every node's correction per sweep (sweeps x nodes), the
+        preconditioner each sweep used (``MIN-SR-FLEX`` changes it), the sweeper and the problem.
+    """
+    deltas, preconditioners = [], []
+
+    class record(Hooks):
+        def post_sweep(self, step, level_number):
+            super().post_sweep(step, level_number)
+            sweep = step.levels[0].sweep
+            deltas.append([float(np.max(np.abs(np.asarray(delta)))) for delta in sweep._deltas])
+            preconditioners.append(np.array(sweep.QI[1:, 1:]))
+
+    description = {
+        'problem_class': spec['problem_class'],
+        'problem_params': spec['problem_params'],
+        'sweeper_class': delta_implicit,
+        'sweeper_params': spec['sweeper_params'],
+        'level_params': {'restol': -1, 'dt': spec['dt']},
+        'step_params': {'maxiter': maxiter},
+    }
+    controller = controller_nonMPI(1, {'logger_level': 40, 'hook_class': record}, description)
+    level = controller.MS[0].levels[0]
+    _, stats = controller.run(u0=level.prob.u_exact(0.0), t0=0.0, Tend=spec['dt'])
+    history = [value for _, value in get_sorted(stats, type='residual_post_iteration', sortby='iter')]
+    return history, np.array(deltas), preconditioners, level.sweep, level.prob
+
+
+def jacobian(prob):
+    """The implicit operator, or for a nonlinear problem its Jacobian at the initial value, as a dense matrix."""
+    if isinstance(prob, allencahn_delta):
+        u = np.asarray(prob.u_exact(0.0)).reshape(-1)
+        return prob.A.toarray() + np.diag(prob.reaction_prime(u))
+    if isinstance(prob, vanderpol_delta):
+        x, y = prob.u0
+        return np.array([[0.0, 1.0], [-2 * prob.mu * x * y - 1, prob.mu * (1 - x**2)]])
+    return prob.A.toarray()
+
+
+def predict(spec):
+    """
+    eta* from linear error propagation: where white solve noise leaves the tolerance at iteration K + 1.
+
+    Returns
+    -------
+    float
+        The predicted eta*.
+    """
+    history, deltas, preconditioners, sweep, prob = exact_run(spec)
+    end = iterations(history, spec['tol']) + 1
+    A = jacobian(prob)
+    modes = np.linalg.eigvalsh(A) if np.allclose(A, A.T) else np.linalg.eigvals(A)
+    Q = sweep.coll.Qmat[1:, 1:]
+    nodes = len(Q)
+    eye = np.eye(nodes)
+    variance = np.zeros(nodes)
+    for mode in modes:
+        z = spec['dt'] * mode
+        R = eye - z * Q
+        steps = [eye - z * QD for QD in preconditioners[:end]]
+        # the noise of sweep j, read after sweep `end`: R K_end ... K_(j+1) L_j^(-1) D_j
+        carry = R
+        for j in range(end - 1, -1, -1):
+            L = steps[j]
+            gain = carry @ np.linalg.solve(L, np.diag(np.diag(L)))
+            # uniform noise of amplitude eta * |delta| per node: variance (eta |delta|)^2 / 3, spread over the modes
+            variance += np.abs(gain) ** 2 @ (deltas[j] ** 2 / 3) / len(modes)
+            carry = carry @ (eye - np.linalg.solve(L, R))
+    # the expected maximum over all nodes and points of the residual the noise leaves, at eta = 1
+    noise = np.sqrt(2 * np.log(len(modes) * nodes)) * np.sqrt(variance.max())
+    return spec['tol'] / noise
+
+
 def measure(spec, etas=ETAS, seeds=SEEDS):
     """
     The exact run's iterations and contraction rate, the iterations per eta, and eta*.
@@ -169,7 +268,13 @@ def measure(spec, etas=ETAS, seeds=SEEDS):
         if count > exact + 1:
             break
         eta_star = eta
-    return {'exact': exact, 'rho': contraction(exact_history, spec['tol']), 'counts': counts, 'eta_star': eta_star}
+    return {
+        'exact': exact,
+        'rho': contraction(exact_history, spec['tol']),
+        'counts': counts,
+        'eta_star': eta_star,
+        'predicted': None if spec['eta_level'] else predict(spec),
+    }
 
 
 # one hue per family, from the project's palette
@@ -197,16 +302,17 @@ def figure(results, etas=ETAS):
     left.set_title('every configuration: flat, then a knee')
 
     for family, color in COLORS.items():
-        points = [(r['rho'], r['eta_star']) for s, r in results if s['family'] == family and r['eta_star']]
+        points = [(r['predicted'], r['eta_star']) for s, r in results if s['family'] == family and r['predicted']]
         if points:
-            rho, eta_star = zip(*points, strict=True)
-            right.loglog(rho, eta_star, 'o', color=color, markersize=8, label=family)
-    lim = [1e-4, 1]
-    right.loglog(lim, lim, color='#9a9a9a', linewidth=1, linestyle=':', label=r'$\eta^* = \rho$')
-    right.set_xlabel(r'contraction rate $\rho$ with an exact solve')
-    right.set_ylabel(r'$\eta^*$: largest $\eta$ at $\leq 1$ extra iteration')
+            predicted, measured = zip(*points, strict=True)
+            right.loglog(predicted, measured, 'o', color=color, markersize=8, label=family)
+    line = np.array([1e-9, 1e1])
+    right.loglog(line, line, color='#9a9a9a', linewidth=1, linestyle=':')
+    right.fill_between(line, line / 3, line * 3, color='#9a9a9a', alpha=0.15, linewidth=0, label='within a factor 3')
+    right.set_xlabel(r'$\eta^*$ predicted from linear error propagation')
+    right.set_ylabel(r'$\eta^*$ measured: largest $\eta$ at $\leq 1$ extra iteration')
     right.legend(frameon=False, loc='lower right')
-    right.set_title(r'the accuracy a solve needs, against $\rho$')
+    right.set_title(r'the accuracy a solve needs, predicted')
 
     for axes in (left, right):
         axes.grid(True, linewidth=0.6, alpha=0.4)
@@ -230,11 +336,12 @@ def main(specs=None, etas=ETAS, seeds=SEEDS):
         ``(spec, result)`` per configuration.
     """
     results = [(spec, measure(spec, etas, seeds)) for spec in (specs or cases())]
-    print(f"{'configuration':>26} | {'iter':>4} {'rho':>8} | {'eta*':>8}")
-    print('-' * 56)
+    print(f"{'configuration':>30} | {'iter':>4} {'rho':>8} | {'eta*':>8} {'predicted':>10}")
+    print('-' * 72)
     for spec, result in results:
         eta_star = '-' if result['eta_star'] is None else f"{result['eta_star']:.0e}"
-        print(f"{spec['label']:>26} | {result['exact']:>4} {result['rho']:>8.1e} | {eta_star:>8}")
+        predicted = '-' if result['predicted'] is None else f"{result['predicted']:.1e}"
+        print(f"{spec['label']:>30} | {result['exact']:>4} {result['rho']:>8.1e} | {eta_star:>8} {predicted:>10}")
     figure(results, etas)
     return results
 
