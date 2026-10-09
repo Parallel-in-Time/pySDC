@@ -1,0 +1,21 @@
+pySDC/projects/DeltaSDC/eta_spec.py
+  s_3cfbaa2fb0772b::t_fa224ad4919dce 15-28,43,100,109-118,123,128,173-251,271-277,305,307-313,315,339-340,343-344
+pySDC/projects/DeltaSDC/tests/test_eta_spec.py
+  s_3cfbaa2fb0772b::t_a4e863e33dba78 53,62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ff90cdd83758a436cfa63cc3743f155c4b437226",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
