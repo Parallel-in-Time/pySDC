@@ -1,0 +1,23 @@
+pySDC/projects/DeltaSDC/inexact.py
+  s_3cfbaa2fb0772b::t_a6c47ec1e55fc4 15-17,22-40,54-58,62,64,71-72,75-77,80
+pySDC/projects/DeltaSDC/precision_theory.py
+  s_3cfbaa2fb0772b::t_645ea03bea1411 6-9,12-13,17-23,27-28,35,90,92-98,103-104,108,110-113,117,119,124-125,129,131-132,135-137,139,148-150,152,160-171,174,176,181,183-185,187-212
+pySDC/projects/DeltaSDC/tests/test_eta_spec.py
+  s_3cfbaa2fb0772b::t_c64ebbbd4814b0 64-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "596904bca81bf314771bc82734cb6ec0cf1de01c",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
