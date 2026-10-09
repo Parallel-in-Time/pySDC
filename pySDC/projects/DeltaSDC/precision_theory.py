@@ -1,34 +1,30 @@
 r"""
-When does a low-precision node-local solve cost nothing? Theorem B of the note, in closed form.
+How accurate does a node-local solve have to be? Theorem 2 of the note, in closed form.
 
-Delta-form SDC is preconditioned Richardson iteration on the collocation system :math:`Cu = b`,
-:math:`C = I - \Delta t\,Q \otimes A`, with the sweep :math:`P = I - \Delta t\,Q_\Delta \otimes A` as
-preconditioner. An error :math:`\varepsilon` in the node-local solves enters the residual as
-
-.. math::
-    r^{k+1} = E\,r^k - F\,\varepsilon^k, \qquad E = I - C P^{-1}, \qquad F = C P^{-1} D,
-
-with :math:`D` the block diagonal of :math:`P`. If the errors are independent, mean-zero and bounded by
-:math:`\eta` times the node's correction, Hoeffding's inequality and a union bound give, with
-probability at least :math:`1 - p`, an extra residual after iteration :math:`K + 1` of at most
-:math:`\eta\,\lambda_p\,\Psi`, :math:`\lambda_p = \sqrt{2 \log(2MN/p)}`, where
+Notation as in Kremling and Speck (2021). For :math:`u' = Au` the collocation problem is
+:math:`CU = U_0` with :math:`C = I - \Delta t\,(Q \otimes A)`, SDC is preconditioned with
+:math:`P = I - \Delta t\,(Q_\Delta \otimes A)`, and :math:`K = I - P^{-1}C` is its iteration matrix. A
+node-local solve that returns its correction with an error :math:`\varepsilon^{(k)}` changes the residual
+:math:`r^{(k)} = U_0 - CU^{(k)}` after iteration :math:`K + 1` by
 
 .. math::
-    \Psi^2 = \max_i \sum_{j=0}^{K} \sum_l \big|(E^{K-j} F)_{il}\big|^2\,\|\delta_{j,l}\|_\infty^2 .
+    \sum_{k=0}^{K} C K^{K-k} P^{-1} D\,\varepsilon^{(k)}, \qquad D = I - \Delta t\,(\mathrm{diag}(Q_\Delta) \otimes A).
 
-For a normal operator with delocalised eigenvectors the sum over unknowns is an integral over the
-spectral measure :math:`\mu` of :math:`\Delta t\,A`, of :math:`M \times M` functions of the scalar
-:math:`z` -- the test-equation matrices :math:`E(z)`, :math:`F(z)`:
+If the errors are independent, mean-zero and bounded by :math:`\eta` times the node's correction
+:math:`\delta^{(k)}_j`, Hoeffding's inequality and a union bound bound this, with probability at least
+:math:`1 - p`, by :math:`\eta\,c_p\,\Psi`, :math:`c_p = \sqrt{2 \log(2MN/p)}`, with
 
 .. math::
-    \Psi^2 \le c_V \max_m \sum_{j=0}^{K} \sum_n \|\delta_{j,n}\|_\infty^2
-    \int \big|[E(z)^{K-j} F(z)]_{mn}\big|^2\,d\mu(z),
+    \Psi^2 \le c_V \max_m \sum_{k=0}^{K} \sum_{j=1}^{M} \|\delta^{(k)}_j\|_\infty^2\,
+    \frac{1}{N} \sum_{\ell} \big|[C K^{K-k} P^{-1} D]_{mj}(\Delta t \lambda_\ell)\big|^2
 
-:math:`c_V = N \max |V_{x\lambda}|^2`, 1 for a Fourier and 2 for a sine basis. :math:`\mu` is known in
-closed form for the finite-difference operators, so nothing is decomposed. The run costs at most one
-iteration more as long as :math:`\eta \le \eta^*_B = (\mathrm{tol} - \|r^{K+1}\|)/(\lambda_p \Psi)`.
-That is first order; the feedback of the error into later corrections adds the rate condition
-:math:`\eta \le \rho\,(\rho^{-1/(K+1)} - 1)`, which binds only for non-stiff problems.
+for a normal :math:`A` with eigenvalues :math:`\lambda_\ell`: the matrices are those of SDC for the
+Dahlquist test equation, and :math:`c_V = 1` for a Fourier, :math:`2N/(N + 1)` for a sine basis. The
+eigenvalues of the finite-difference operators are known in closed form, so nothing is diagonalised.
+The run costs at most one iteration more as long as
+:math:`\eta \le \eta^* = (\mathrm{restol} - \|r^{(K+1)}\|_\infty)/(c_p \Psi)`. The feedback of the errors
+into later corrections adds the rate condition :math:`\eta \le \rho\,(\rho^{-1/(K+1)} - 1)`, which
+binds only for non-stiff problems.
 """
 
 import numpy as np
@@ -44,28 +40,28 @@ CONFIDENCE = 0.05
 """p: the bound holds with probability at least 1 - p."""
 
 
-def iterations(history, tol):
-    """Iterations until the residual first falls below ``tol``; infinity if it never does."""
-    return next((k + 1 for k, value in enumerate(history) if value < tol), np.inf)
+def iterations(history, restol):
+    """Iterations until the residual first falls below ``restol``; infinity if it never does."""
+    return next((k + 1 for k, value in enumerate(history) if value < restol), np.inf)
 
 
-def contraction(history, tol):
-    """Geometric mean of the ratio of successive residuals, over the iterations above ``tol``."""
-    above = [value for value in history if value >= tol]
+def contraction(history, restol):
+    """Geometric mean of the ratio of successive residuals, over the iterations above ``restol``."""
+    above = [value for value in history if value >= restol]
     return (above[-1] / above[0]) ** (1 / (len(above) - 1)) if len(above) > 1 else np.nan
 
 
-def test_matrices(z, Q, QD):
-    """The scalar test-equation matrices: residual map E(z), error injection F(z)."""
+def sdc_matrices(z, Q, QD):
+    """SDC for the Dahlquist test equation, z = dt * lambda: C, the iteration matrix K and P^-1 D."""
     eye = np.eye(len(Q))
-    P, C = eye - z * QD, eye - z * Q
-    CPinv = C @ np.linalg.inv(P)
-    return eye - CPinv, CPinv @ np.diag(np.diag(P))
+    C, P = eye - z * Q, eye - z * QD
+    Pinv = np.linalg.inv(P)
+    return C, eye - Pinv @ C, Pinv @ np.diag(np.diag(P))
 
 
 def exact_run(spec, maxiter=60):
     """
-    The exact run: residual history, each node's correction per sweep, the sweeper and the problem.
+    The exact run: residual history, each node's correction per iteration, the sweeper and the problem.
 
     The corrections are read off the sweeper, not off the solve, which works on a right-hand side
     scaled to unit size (the correction-solve contract).
@@ -92,37 +88,34 @@ def exact_run(spec, maxiter=60):
     return history, np.array(deltas), level.sweep, level.prob
 
 
-def spectral_measure(prob, dt):
+def eigenvalues(prob, dt):
     """
-    The spectral measure of dt times the implicit operator, in closed form: points, weights summing
-    to one, the delocalisation constant c_V and the number of unknowns. ``None`` for a problem without one.
+    dt times the eigenvalues of the implicit operator, in closed form, with the constant c_V and the
+    number of unknowns. ``None`` for a problem without them.
     """
     if isinstance(prob, heat_delta):  # 1D, Dirichlet, second order: a sine basis
         N = prob.A.shape[0]
-        k = np.arange(1, N + 1)
-        z = -dt * prob.nu * 4 * (N + 1) ** 2 * np.sin(k * np.pi / (2 * (N + 1))) ** 2
-        return z, np.full(N, 1 / N), 2 * N / (N + 1), N
+        ell = np.arange(1, N + 1)
+        return -dt * prob.nu * 4 * (N + 1) ** 2 * np.sin(ell * np.pi / (2 * (N + 1))) ** 2, 2 * N / (N + 1), N
     if isinstance(prob, advectionNd):  # 1D, periodic, fourth-order centred: a Fourier basis
         N = prob.A.shape[0]
         theta = 2 * np.pi * np.arange(N) / N
-        z = -dt * prob.c * 1j * N * (8 * np.sin(theta) - np.sin(2 * theta)) / 6
-        return z, np.full(N, 1 / N), 1.0, N
+        return -dt * prob.c * 1j * N * (8 * np.sin(theta) - np.sin(2 * theta)) / 6, 1.0, N
     if isinstance(prob, allencahn_delta):
         # the periodic Laplacian shifted by the reaction's derivative in the bulk, its median: away
         # from the thin interface the state sits in a well, where the derivative is -2/eps^2, and
         # almost all unknowns are there. The interface's few positive modes are left out -- an
-        # approximation, the Jacobian is not diagonalised by the Laplacian's basis
+        # approximation, the Jacobian is not diagonalised by the Fourier basis
         n = prob.nvars[0]
         one = -4 * n**2 * np.sin(np.pi * np.arange(n) / n) ** 2
         bulk = float(np.median(prob.reaction_prime(np.asarray(prob.u_exact(0.0)).ravel())))
-        z = dt * ((one[:, None] + one[None, :]).ravel() + bulk)
-        return z, np.full(n * n, 1 / n**2), 1.0, n * n
+        return dt * ((one[:, None] + one[None, :]).ravel() + bulk), 1.0, n * n
     return None
 
 
 def psi(spec, deltas, K, sweep, prob):
     """
-    Psi of Theorem B: from the spectral measure where there is one, else exactly from the full matrices.
+    Psi of Theorem 2: over the eigenvalues where they are known, else exactly from the full matrices.
 
     Returns
     -------
@@ -131,32 +124,29 @@ def psi(spec, deltas, K, sweep, prob):
     """
     Q, QD = sweep.coll.Qmat[1:, 1:], sweep.QI[1:, 1:]
     M = len(Q)
-    measure = spectral_measure(prob, spec['dt'])
-    if measure is not None:
-        zs, weights, c_V, N = measure
-        integral = np.zeros((K + 1, M, M))  # integral of |[E^n F]_mn|^2 d mu, for n = 0..K
-        for z, w in zip(zs, weights, strict=True):
-            E, F = test_matrices(z, Q, QD)
-            G = F
+    known = eigenvalues(prob, spec['dt'])
+    if known is not None:
+        zs, c_V, N = known
+        mean = np.zeros((K + 1, M, M))  # mean over the eigenvalues of |[C K^n P^-1 D]_mj|^2, n = 0..K
+        for z in zs:
+            C, Kz, G = sdc_matrices(z, Q, QD)
             for n in range(K + 1):
-                integral[n] += w * np.abs(G) ** 2
-                G = E @ G
-        total = sum(integral[K - j] @ deltas[j] ** 2 for j in range(K + 1))
+                mean[n] += np.abs(C @ G) ** 2 / len(zs)
+                G = Kz @ G
+        total = sum(mean[K - k] @ deltas[k] ** 2 for k in range(K + 1))
         return np.sqrt(c_V * total.max()), N
 
     # small or non-normal: the finite-dimensional formula, with the Jacobian at the initial value
     J = jacobian(prob)
     N = len(J)
     eye = np.eye(N * M)
-    P = eye - spec['dt'] * np.kron(QD, J)
     C = eye - spec['dt'] * np.kron(Q, J)
-    D = eye - spec['dt'] * np.kron(np.diag(np.diag(QD)), J)
-    CPinv = C @ np.linalg.inv(P)
-    E, G = eye - CPinv, CPinv @ D
+    Pinv = np.linalg.inv(eye - spec['dt'] * np.kron(QD, J))
+    Kz, G = eye - Pinv @ C, Pinv @ (eye - spec['dt'] * np.kron(np.diag(np.diag(QD)), J))
     total = np.zeros(N * M)
-    for j in range(K, -1, -1):  # G = E^(K-j) F
-        total += np.abs(G) ** 2 @ np.repeat(deltas[j] ** 2, N)
-        G = E @ G
+    for k in range(K, -1, -1):  # G = K^(K-k) P^-1 D
+        total += np.abs(C @ G) ** 2 @ np.repeat(deltas[k] ** 2, N)
+        G = Kz @ G
     return np.sqrt(total.max()), N
 
 
@@ -165,23 +155,23 @@ def jacobian(prob):
     if isinstance(prob, vanderpol_delta):
         x, y = prob.u0
         return np.array([[0.0, 1.0], [-2 * prob.mu * x * y - 1, prob.mu * (1 - x**2)]])
-    raise NotImplementedError(f'no spectral measure or Jacobian for {type(prob).__name__}')
+    raise NotImplementedError(f'no eigenvalues or Jacobian for {type(prob).__name__}')
 
 
 def bound(spec, p=CONFIDENCE):
     """
-    eta* from Theorem B and from the rate condition, and the smaller of the two.
+    eta* from Theorem 2 and from the rate condition, and the smaller of the two.
 
     Returns
     -------
     dict
-        ``theorem`` (eta*_B), ``rate`` and ``eta_star``.
+        ``theorem`` (eta* of Theorem 2), ``rate`` and ``eta_star``.
     """
     history, deltas, sweep, prob = exact_run(spec)
-    K = iterations(history, spec['tol'])
+    K = iterations(history, spec['restol'])
     value, N = psi(spec, deltas, K, sweep, prob)
     M = deltas.shape[1]
-    theorem = (spec['tol'] - history[K]) / (np.sqrt(2 * np.log(2 * M * N / p)) * value)
-    rho = contraction(history, spec['tol'])
+    theorem = (spec['restol'] - history[K]) / (np.sqrt(2 * np.log(2 * M * N / p)) * value)
+    rho = contraction(history, spec['restol'])
     rate = rho * (rho ** (-1 / (K + 1)) - 1)
     return {'theorem': theorem, 'rate': rate, 'eta_star': min(theorem, rate)}

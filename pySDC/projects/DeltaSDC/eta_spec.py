@@ -13,7 +13,7 @@ counted against :math:`\eta`. Two numbers come out:
     most one iteration more than the exact one.
 
 ``eta* predicted``
-    from :mod:`.precision_theory`, without running anything inexact: Theorem B of the note -- the
+    from :mod:`.precision_theory`, without running anything inexact: Theorem 2 of the note -- the
     extra residual independent, mean-zero solve errors leave, bounded with probability 95% -- in
     closed form over the operator's spectral measure, and the rate condition for the feedback of the
     errors into later corrections; the smaller of the two.
@@ -62,7 +62,7 @@ ALLEN_CAHN = {
 LINEAR = {'linear_implicit': True}
 
 
-def case(family, label, problem_class, problem_params, dt, tol, M=3, QI='LU', sweeper=None, eta_level=None):
+def case(family, label, problem_class, problem_params, dt, restol, M=3, QI='LU', sweeper=None, eta_level=None):
     """One configuration of the sweep, as a dict."""
     return {
         'family': family,
@@ -70,7 +70,7 @@ def case(family, label, problem_class, problem_params, dt, tol, M=3, QI='LU', sw
         'problem_class': problem_class,
         'problem_params': problem_params,
         'dt': dt,
-        'tol': tol,
+        'restol': restol,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': M, 'QI': QI, **(sweeper or {})},
         'eta_level': eta_level,
     }
@@ -161,8 +161,10 @@ def measure(spec, etas=ETAS, seeds=SEEDS):
         ``eta_star`` (``None`` if even the most accurate eta tried costs more than one iteration).
     """
     exact_history = residuals(spec)
-    exact = iterations(exact_history, spec['tol'])
-    counts = [float(np.median([iterations(residuals(spec, eta, seed), spec['tol']) for seed in seeds])) for eta in etas]
+    exact = iterations(exact_history, spec['restol'])
+    counts = [
+        float(np.median([iterations(residuals(spec, eta, seed), spec['restol']) for seed in seeds])) for eta in etas
+    ]
     # from the most accurate eta upwards: eta* is the last one before the first that costs more
     eta_star = None
     for eta, count in sorted(zip(etas, counts, strict=True)):
@@ -171,7 +173,7 @@ def measure(spec, etas=ETAS, seeds=SEEDS):
         eta_star = eta
     return {
         'exact': exact,
-        'rho': contraction(exact_history, spec['tol']),
+        'rho': contraction(exact_history, spec['restol']),
         'counts': counts,
         'eta_star': eta_star,
         'predicted': None if spec['eta_level'] else bound(spec),
@@ -222,7 +224,7 @@ def figure(results, etas=ETAS):
     line = np.array([1e-9, 1e1])
     right.loglog(line, line, color='#9a9a9a', linewidth=1, linestyle=':')
     right.fill_between(line, line / 3, line * 3, color='#9a9a9a', alpha=0.15, linewidth=0, label='within a factor 3')
-    right.set_xlabel(r'$\eta^*$ predicted: Theorem B and the rate condition')
+    right.set_xlabel(r'$\eta^*$ predicted: Theorem 2 and the rate condition')
     right.set_ylabel(r'$\eta^*$ measured')
     right.legend(frameon=False, loc='lower right')
     right.set_title(r'the accuracy a solve needs, predicted')
@@ -249,7 +251,7 @@ def main(specs=None, etas=ETAS, seeds=SEEDS):
         ``(spec, result)`` per configuration.
     """
     results = [(spec, measure(spec, etas, seeds)) for spec in (specs or cases())]
-    print(f"{'configuration':>30} | {'iter':>4} {'rho':>8} | {'eta*':>8} {'thm B':>8} {'rate':>8}")
+    print(f"{'configuration':>30} | {'iter':>4} {'rho':>8} | {'eta*':>8} {'thm 2':>8} {'rate':>8}")
     print('-' * 76)
     for spec, result in results:
         eta_star = '-' if result['eta_star'] is None else f"{result['eta_star']:.0e}"
