@@ -10,6 +10,9 @@ with a couple of multigrid cycles, is invisible here on purpose.
 Both solve routes of the correction-solve contract on :class:`~pySDC.core.problem.Problem` are
 spoiled: ``solve_system`` and, where the problem has it, ``solve_system_delta``. ``eta`` can be given
 per level, as pySDC spreads lists over the levels, so a fine or a coarse solve can be spoiled alone.
+``calls`` restricts the spoiling to chosen solve calls, counted from 0 -- with one call per node and
+sweep, sweep :math:`j` of an :math:`M`-node run is calls :math:`(j-1)M` to :math:`jM - 1` -- which is
+how a perturbation of a single sweep is measured.
 """
 
 import numpy as np
@@ -27,19 +30,22 @@ def inexact(problem_class):
     Returns
     -------
     type
-        The subclass. It takes two more parameters: ``eta`` (float or None, the relative accuracy;
-        ``None`` or 0 keeps the exact solve) and ``seed`` (int, for a reproducible perturbation).
+        The subclass. It takes three more parameters: ``eta`` (float or None, the relative accuracy;
+        ``None`` or 0 keeps the exact solve), ``seed`` (int, for a reproducible perturbation) and
+        ``calls`` (a collection of call indices to spoil; ``None``, the default, spoils every call).
     """
 
     class spoiled(problem_class):
-        def __init__(self, eta=None, seed=0, **kwargs):
+        def __init__(self, eta=None, seed=0, calls=None, **kwargs):
             super().__init__(**kwargs)
-            self._makeAttributeAndRegister('eta', 'seed', localVars=locals())
+            self._makeAttributeAndRegister('eta', 'seed', 'calls', localVars=locals())
             self.rng = np.random.default_rng(seed)
+            self._call = 0
 
         def _spoil(self, value):
             """Perturb ``value`` in place by ``eta`` times its maximum, in a random direction."""
-            if not self.eta:
+            call, self._call = self._call, self._call + 1
+            if not self.eta or (self.calls is not None and call not in self.calls):
                 return value
             x = np.asarray(value).reshape(-1)
             noise = self.rng.uniform(-1.0, 1.0, x.size)

@@ -59,5 +59,5 @@ def test_eta_sweep_runs():
     for spec, result in main(specs, etas=[1e-2, 1e-5, 1e-8], seeds=(0,)):
         assert np.isfinite(result['exact']) and 0 < result['rho'] < 1, spec['label']
         assert result['eta_star'] is not None, spec['label']
-        assert result['predicted'] > 0, spec['label']
+        assert result['predicted']['eta_star'] > 0, spec['label']
     assert os.path.isfile('data/eta_spec.png')

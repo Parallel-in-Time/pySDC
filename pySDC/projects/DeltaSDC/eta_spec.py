@@ -13,19 +13,24 @@ counted against :math:`\eta`. Two numbers come out:
     most one iteration more than the exact one.
 
 ``eta* predicted``
-    from linear error propagation, without running anything inexact. A sweep maps the collocation
-    error by :math:`K = I - L^{-1}R`, with :math:`L = I - \Delta t\,Q_\Delta \otimes A` and
-    :math:`R = I - \Delta t\,Q \otimes A`. A solve error :math:`\varepsilon` made in sweep :math:`j`
-    enters through the same lower-triangular sweep, as :math:`L^{-1} D \varepsilon` with :math:`D`
-    each node's own system matrix, is then contracted by every later sweep, and shows in the
-    residual through :math:`R`. Per mode :math:`\lambda` of :math:`A` that is an :math:`M \times M`
-    computation. With white noise of relative size :math:`\eta` on every solve -- what the spoiling
-    does, and what rounding does -- the expected maximum of the residual it leaves at iteration
-    :math:`K + 1` follows from the corrections' sizes in the exact run, and :math:`\eta^*` is where
-    that reaches the tolerance. A nonlinear problem uses its Jacobian at the initial value.
+    from first-order perturbation theory, with two mechanisms, and the smaller of the two:
 
-The measured contraction rate does not predict :math:`\eta^*`: the solve's error excites every mode,
-while the solution converges in its own. The propagation does, because it follows every mode.
+    *noise*. A solve error made in sweep :math:`j` alone leaves a residual :math:`T_j\,\eta` at
+    iteration :math:`K + 1`, measured by spoiling that sweep only. Independent errors superpose, so
+    errors in every sweep leave :math:`\eta\,(\sum_j T_j^2)^{1/2}`, and :math:`\eta^*_\mathrm{noise} =
+    \mathrm{tol}\,/\,(\sum_j T_j^2)^{1/2}`. Nothing is linearised and nothing is decomposed, so it holds
+    for nonlinear problems and opaque solvers alike; it costs :math:`K + 1` probing runs.
+
+    *rate*. The error is relative to the correction, so it feeds back: each sweep contracts by about
+    :math:`\rho + \eta` instead of :math:`\rho`, and an iteration is lost once :math:`(\rho +
+    \eta)^{K+1}` no longer beats :math:`\rho^K`: :math:`\eta^*_\mathrm{rate} = \rho\,(\rho^{-1/(K+1)} -
+    1)`, from the exact run alone. It is 1e-2 to 3e-2 throughout, so it binds only where the noise
+    does not -- non-stiff problems without a spectral gap -- and never for a format finer than
+    ``bfloat16``.
+
+The measured contraction rate alone does not predict :math:`\eta^*`: the solve's error excites every
+mode, while the solution converges in its own, and a stiff residual sees a solve error amplified by
+roughly :math:`\Delta t\,\|J\|`. The noise mechanism follows both.
 
 Run as ``python -m pySDC.projects.DeltaSDC.eta_spec``; prints the table and writes ``data/eta_spec``
 as PDF and PNG.
@@ -40,7 +45,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from pySDC.core.hooks import Hooks
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
@@ -129,7 +133,7 @@ def cases():
     ]
 
 
-def residuals(spec, eta=None, seed=0, maxiter=60):
+def residuals(spec, eta=None, seed=0, maxiter=60, calls=None):
     """
     Residual after every iteration of one step, with the solve spoiled by ``eta``.
 
@@ -138,7 +142,7 @@ def residuals(spec, eta=None, seed=0, maxiter=60):
     list
         One residual per iteration.
     """
-    params = dict(spec['problem_params'], eta=eta, seed=seed)
+    params = dict(spec['problem_params'], eta=eta, seed=seed, calls=calls)
     description = {
         'problem_class': inexact(spec['problem_class']),
         'problem_params': params,
@@ -170,83 +174,31 @@ def contraction(history, tol):
     return (above[-1] / above[0]) ** (1 / (len(above) - 1)) if len(above) > 1 else np.nan
 
 
-def exact_run(spec, maxiter=60):
+PROBE = 1e-2
+"""Relative size of the single-sweep perturbations that measure the transfer coefficients."""
+
+
+def predict(spec, seeds=SEEDS):
     """
-    One exact run of an SDC configuration, recording what the prediction needs.
+    eta* from first-order perturbation theory: the smaller of the noise and the rate bound.
 
     Returns
     -------
-    tuple
-        The residual history, the maximum of every node's correction per sweep (sweeps x nodes), the
-        preconditioner each sweep used (``MIN-SR-FLEX`` changes it), the sweeper and the problem.
+    dict
+        ``noise`` and ``rate``, the two bounds, and ``eta_star``, the smaller.
     """
-    deltas, preconditioners = [], []
-
-    class record(Hooks):
-        def post_sweep(self, step, level_number):
-            super().post_sweep(step, level_number)
-            sweep = step.levels[0].sweep
-            deltas.append([float(np.max(np.abs(np.asarray(delta)))) for delta in sweep._deltas])
-            preconditioners.append(np.array(sweep.QI[1:, 1:]))
-
-    description = {
-        'problem_class': spec['problem_class'],
-        'problem_params': spec['problem_params'],
-        'sweeper_class': delta_implicit,
-        'sweeper_params': spec['sweeper_params'],
-        'level_params': {'restol': -1, 'dt': spec['dt']},
-        'step_params': {'maxiter': maxiter},
-    }
-    controller = controller_nonMPI(1, {'logger_level': 40, 'hook_class': record}, description)
-    level = controller.MS[0].levels[0]
-    _, stats = controller.run(u0=level.prob.u_exact(0.0), t0=0.0, Tend=spec['dt'])
-    history = [value for _, value in get_sorted(stats, type='residual_post_iteration', sortby='iter')]
-    return history, np.array(deltas), preconditioners, level.sweep, level.prob
-
-
-def jacobian(prob):
-    """The implicit operator, or for a nonlinear problem its Jacobian at the initial value, as a dense matrix."""
-    if isinstance(prob, allencahn_delta):
-        u = np.asarray(prob.u_exact(0.0)).reshape(-1)
-        return prob.A.toarray() + np.diag(prob.reaction_prime(u))
-    if isinstance(prob, vanderpol_delta):
-        x, y = prob.u0
-        return np.array([[0.0, 1.0], [-2 * prob.mu * x * y - 1, prob.mu * (1 - x**2)]])
-    return prob.A.toarray()
-
-
-def predict(spec):
-    """
-    eta* from linear error propagation: where white solve noise leaves the tolerance at iteration K + 1.
-
-    Returns
-    -------
-    float
-        The predicted eta*.
-    """
-    history, deltas, preconditioners, sweep, prob = exact_run(spec)
-    end = iterations(history, spec['tol']) + 1
-    A = jacobian(prob)
-    modes = np.linalg.eigvalsh(A) if np.allclose(A, A.T) else np.linalg.eigvals(A)
-    Q = sweep.coll.Qmat[1:, 1:]
-    nodes = len(Q)
-    eye = np.eye(nodes)
-    variance = np.zeros(nodes)
-    for mode in modes:
-        z = spec['dt'] * mode
-        R = eye - z * Q
-        steps = [eye - z * QD for QD in preconditioners[:end]]
-        # the noise of sweep j, read after sweep `end`: R K_end ... K_(j+1) L_j^(-1) D_j
-        carry = R
-        for j in range(end - 1, -1, -1):
-            L = steps[j]
-            gain = carry @ np.linalg.solve(L, np.diag(np.diag(L)))
-            # uniform noise of amplitude eta * |delta| per node: variance (eta |delta|)^2 / 3, spread over the modes
-            variance += np.abs(gain) ** 2 @ (deltas[j] ** 2 / 3) / len(modes)
-            carry = carry @ (eye - np.linalg.solve(L, R))
-    # the expected maximum over all nodes and points of the residual the noise leaves, at eta = 1
-    noise = np.sqrt(2 * np.log(len(modes) * nodes)) * np.sqrt(variance.max())
-    return spec['tol'] / noise
+    history = residuals(spec)
+    K = iterations(history, spec['tol'])
+    nodes = spec['sweeper_params']['num_nodes']
+    transfer = []
+    for sweep in range(1, K + 2):
+        calls = set(range((sweep - 1) * nodes, sweep * nodes))
+        hit = np.median([residuals(spec, PROBE, seed, K + 1, calls)[K] for seed in seeds])
+        transfer.append(max(float(hit) - history[K], 0.0) / PROBE)
+    noise = spec['tol'] / np.sqrt(np.sum(np.square(transfer)))
+    rho = contraction(history, spec['tol'])
+    rate = rho * (rho ** (-1 / (K + 1)) - 1)
+    return {'noise': noise, 'rate': rate, 'eta_star': min(noise, rate)}
 
 
 def measure(spec, etas=ETAS, seeds=SEEDS):
@@ -273,7 +225,7 @@ def measure(spec, etas=ETAS, seeds=SEEDS):
         'rho': contraction(exact_history, spec['tol']),
         'counts': counts,
         'eta_star': eta_star,
-        'predicted': None if spec['eta_level'] else predict(spec),
+        'predicted': None if spec['eta_level'] else predict(spec, seeds),
     }
 
 
@@ -302,14 +254,16 @@ def figure(results, etas=ETAS):
     left.set_title('every configuration: flat, then a knee')
 
     for family, color in COLORS.items():
-        points = [(r['predicted'], r['eta_star']) for s, r in results if s['family'] == family and r['predicted']]
+        points = [
+            (r['predicted']['eta_star'], r['eta_star']) for s, r in results if s['family'] == family and r['predicted']
+        ]
         if points:
             predicted, measured = zip(*points, strict=True)
             right.loglog(predicted, measured, 'o', color=color, markersize=8, label=family)
     line = np.array([1e-9, 1e1])
     right.loglog(line, line, color='#9a9a9a', linewidth=1, linestyle=':')
     right.fill_between(line, line / 3, line * 3, color='#9a9a9a', alpha=0.15, linewidth=0, label='within a factor 3')
-    right.set_xlabel(r'$\eta^*$ predicted from linear error propagation')
+    right.set_xlabel(r'$\eta^*$ predicted by perturbation theory')
     right.set_ylabel(r'$\eta^*$ measured: largest $\eta$ at $\leq 1$ extra iteration')
     right.legend(frameon=False, loc='lower right')
     right.set_title(r'the accuracy a solve needs, predicted')
@@ -336,12 +290,13 @@ def main(specs=None, etas=ETAS, seeds=SEEDS):
         ``(spec, result)`` per configuration.
     """
     results = [(spec, measure(spec, etas, seeds)) for spec in (specs or cases())]
-    print(f"{'configuration':>30} | {'iter':>4} {'rho':>8} | {'eta*':>8} {'predicted':>10}")
-    print('-' * 72)
+    print(f"{'configuration':>30} | {'iter':>4} {'rho':>8} | {'eta*':>8} {'noise':>8} {'rate':>8}")
+    print('-' * 76)
     for spec, result in results:
         eta_star = '-' if result['eta_star'] is None else f"{result['eta_star']:.0e}"
-        predicted = '-' if result['predicted'] is None else f"{result['predicted']:.1e}"
-        print(f"{spec['label']:>30} | {result['exact']:>4} {result['rho']:>8.1e} | {eta_star:>8} {predicted:>10}")
+        p = result['predicted']
+        bounds = f"{'-':>8} {'-':>8}" if p is None else f"{p['noise']:>8.1e} {p['rate']:>8.1e}"
+        print(f"{spec['label']:>30} | {result['exact']:>4} {result['rho']:>8.1e} | {eta_star:>8} {bounds}")
     figure(results, etas)
     return results
 
