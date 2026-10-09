@@ -76,13 +76,31 @@ def test_round_to_formats():
 
 @pytest.mark.base
 def test_schedule_holds():
-    """The per-iteration schedule from Theorem 2 costs at most one iteration, with genuine rounding."""
-    from pySDC.projects.DeltaSDC.eta_spec import cases, residuals
-    from pySDC.projects.DeltaSDC.precision_theory import iterations, schedule
+    """The per-iteration schedule costs at most one iteration, with genuinely low-precision solves."""
+    from pySDC.projects.DeltaSDC.eta_spec import cases
+    from pySDC.projects.DeltaSDC.genuine import genuine
+    from pySDC.projects.DeltaSDC.precision_theory import iterations, record_run, schedule
 
     spec = next(c for c in cases() if c['label'] == 'advection CFL=2')
     formats = schedule(spec)
     assert formats[0] == 'fp64' and formats[-1] == 'fp16', formats
-    exact = iterations(residuals(spec), spec['restol'])
-    spec['problem_params'] = dict(spec['problem_params'], schedule=tuple(formats), nodes=3)
-    assert iterations(residuals(spec), spec['restol']) <= exact + 1
+    exact = iterations(record_run(spec)['history'], spec['restol'])
+    params = dict(spec['problem_params'], schedule=tuple(formats), nodes=3)
+    run = record_run(spec, problem_class=genuine(spec['problem_class']), problem_params=params, maxiter=exact + 3)
+    assert iterations(run['history'], spec['restol']) <= exact + 1
+
+
+@pytest.mark.base
+def test_genuine_lu_is_backward_stable():
+    """The LU really runs in the format: backward error about u, forward error up to about kappa u."""
+    from pySDC.projects.DeltaSDC.genuine import lu, lu_solve
+    from pySDC.projects.DeltaSDC.inexact import FORMATS
+
+    n = 64
+    B = np.eye(n) + 100.0 * (2 * np.eye(n) - np.eye(n, k=1) - np.eye(n, k=-1))
+    b = np.random.default_rng(0).standard_normal(n)
+    b /= np.abs(b).max()
+    for fmt in ('fp32', 'fp16', 'bf16'):
+        y = lu_solve(lu(B, fmt), b, fmt)
+        backward = np.abs(B @ y - b).max() / (np.abs(B).sum(1).max() * np.abs(y).max())
+        assert 0.01 * FORMATS[fmt] < backward < 4 * FORMATS[fmt], fmt

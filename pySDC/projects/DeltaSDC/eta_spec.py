@@ -176,7 +176,7 @@ def measure(spec, etas=ETAS, seeds=SEEDS):
         'rho': contraction(exact_history, spec['restol']),
         'counts': counts,
         'eta_star': eta_star,
-        'predicted': None if spec['eta_level'] else bound(spec),
+        'predicted': None if spec['eta_level'] else bound(spec, model='result'),
     }
 
 
