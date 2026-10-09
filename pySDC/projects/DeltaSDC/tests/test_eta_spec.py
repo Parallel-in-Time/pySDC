@@ -104,3 +104,14 @@ def test_genuine_lu_is_backward_stable():
         y = lu_solve(lu(B, fmt), b, fmt)
         backward = np.abs(B @ y - b).max() / (np.abs(B).sum(1).max() * np.abs(y).max())
         assert 0.01 * FORMATS[fmt] < backward < 4 * FORMATS[fmt], fmt
+
+
+@pytest.mark.base
+def test_work_precision_trajectory():
+    """Two heat steps: formats chosen live halve the work and keep the error of fp64."""
+    from pySDC.projects.DeltaSDC.work_precision import trajectory
+
+    u64, w64, _ = trajectory('heat', 0.05, 1e-8, 3, mixed=False)
+    u, w, used = trajectory('heat', 0.05, 1e-8, 3, mixed=True)
+    assert w < 0.6 * w64 and all(f != 'fp16' for step in used for f in step)
+    assert np.abs(u - u64).max() < 1e-7 * np.abs(u64).max()

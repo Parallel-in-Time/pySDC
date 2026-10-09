@@ -270,3 +270,9 @@ def schedule(spec, p=CONFIDENCE, formats=('fp16', 'fp32', 'fp64'), model='residu
         if score.max() < 0:  # nothing left to refine: the finest format everywhere is the best there is
             return [formats[-1]] * (kbar + 1)
         level[int(np.argmax(score))] += 1
+
+
+def kappa(spec):
+    """max_j ||I - dt q_jj J||_inf: known before any solve (one iteration builds the sweeper and problem)."""
+    run = record_run(spec, maxiter=1)
+    return float(node_norms(run['prob'], spec['dt'], run['sweep'].QI[1:, 1:]).max())
