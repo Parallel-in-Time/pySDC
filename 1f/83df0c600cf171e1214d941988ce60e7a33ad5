@@ -1,0 +1,28 @@
+pySDC/projects/DeltaSDC/eta_spec.py
+  s_3cfbaa2fb0772b::t_a6a1de86dccaeb 1-233
+  s_3cfbaa2fb0772b::t_57aa8594d88b3c 234-243
+pySDC/projects/DeltaSDC/inexact.py
+  s_3cfbaa2fb0772b::t_6d311d6eb3c14b 1-59
+pySDC/projects/DeltaSDC/problems.py
+  s_3cfbaa2fb0772b::t_3f3f50651c8687 32,362-436
+pySDC/projects/DeltaSDC/tests/inexact_problem.py
+  s_3cfbaa2fb0772b::t_44cfb9ef476c88 1,3,6
+pySDC/projects/DeltaSDC/tests/test_eta_spec.py
+  s_3cfbaa2fb0772b::t_a48fe76f826769 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1f83df0c600cf171e1214d941988ce60e7a33ad5",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
