@@ -1,0 +1,25 @@
+pySDC/projects/DeltaSDC/precision_theory.py
+  s_3cfbaa2fb0772b::t_9abe95a53bf3ce 168-177
+  s_3cfbaa2fb0772b::t_c483d01e61b0d2 1-167
+  s_3cfbaa2fb0772b::t_b8919e3c64f030 178-187
+pySDC/projects/DeltaSDC/eta_spec.py
+  s_3cfbaa2fb0772b::t_2fc7f25a878d63 16-19,41
+  s_3cfbaa2fb0772b::t_a6a1de86dccaeb 177,210-221,225-226
+  s_3cfbaa2fb0772b::t_71ef10d703bedd 252,257
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cd2431eadf98888b8b3b1e72c885f75e7c2a4c14",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
