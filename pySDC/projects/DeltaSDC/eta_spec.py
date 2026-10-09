@@ -13,24 +13,10 @@ counted against :math:`\eta`. Two numbers come out:
     most one iteration more than the exact one.
 
 ``eta* predicted``
-    from first-order perturbation theory, with two mechanisms, and the smaller of the two:
-
-    *noise*. A solve error made in sweep :math:`j` alone leaves a residual :math:`T_j\,\eta` at
-    iteration :math:`K + 1`, measured by spoiling that sweep only. Independent errors superpose, so
-    errors in every sweep leave :math:`\eta\,(\sum_j T_j^2)^{1/2}`, and :math:`\eta^*_\mathrm{noise} =
-    \mathrm{tol}\,/\,(\sum_j T_j^2)^{1/2}`. Nothing is linearised and nothing is decomposed, so it holds
-    for nonlinear problems and opaque solvers alike; it costs :math:`K + 1` probing runs.
-
-    *rate*. The error is relative to the correction, so it feeds back: each sweep contracts by about
-    :math:`\rho + \eta` instead of :math:`\rho`, and an iteration is lost once :math:`(\rho +
-    \eta)^{K+1}` no longer beats :math:`\rho^K`: :math:`\eta^*_\mathrm{rate} = \rho\,(\rho^{-1/(K+1)} -
-    1)`, from the exact run alone. It is 1e-2 to 3e-2 throughout, so it binds only where the noise
-    does not -- non-stiff problems without a spectral gap -- and never for a format finer than
-    ``bfloat16``.
-
-The measured contraction rate alone does not predict :math:`\eta^*`: the solve's error excites every
-mode, while the solution converges in its own, and a stiff residual sees a solve error amplified by
-roughly :math:`\Delta t\,\|J\|`. The noise mechanism follows both.
+    from :mod:`.precision_theory`, without running anything inexact: Theorem B of the note -- the
+    extra residual independent, mean-zero solve errors leave, bounded with probability 95% -- in
+    closed form over the operator's spectral measure, and the rate condition for the feedback of the
+    errors into later corrections; the smaller of the two.
 
 Run as ``python -m pySDC.projects.DeltaSDC.eta_spec``; prints the table and writes ``data/eta_spec``
 as PDF and PNG.
@@ -52,6 +38,7 @@ from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
 from pySDC.implementations.transfer_classes.BaseTransferDelta import delta_transfer
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.projects.DeltaSDC.inexact import inexact
+from pySDC.projects.DeltaSDC.precision_theory import bound, contraction, iterations
 from pySDC.projects.DeltaSDC.problems import allencahn_delta, heat_delta, vanderpol_delta
 
 ETAS = [10.0 ** (-k / 2) for k in range(2, 21)]
@@ -163,44 +150,6 @@ def residuals(spec, eta=None, seed=0, maxiter=60, calls=None):
     return [value for _, value in get_sorted(stats, type='residual_post_iteration', sortby='iter')]
 
 
-def iterations(history, tol):
-    """Iterations until the residual first falls below ``tol``; infinity if it never does."""
-    return next((k + 1 for k, value in enumerate(history) if value < tol), np.inf)
-
-
-def contraction(history, tol):
-    """Geometric mean of the ratio of successive residuals, over the iterations above ``tol``."""
-    above = [value for value in history if value >= tol]
-    return (above[-1] / above[0]) ** (1 / (len(above) - 1)) if len(above) > 1 else np.nan
-
-
-PROBE = 1e-2
-"""Relative size of the single-sweep perturbations that measure the transfer coefficients."""
-
-
-def predict(spec, seeds=SEEDS):
-    """
-    eta* from first-order perturbation theory: the smaller of the noise and the rate bound.
-
-    Returns
-    -------
-    dict
-        ``noise`` and ``rate``, the two bounds, and ``eta_star``, the smaller.
-    """
-    history = residuals(spec)
-    K = iterations(history, spec['tol'])
-    nodes = spec['sweeper_params']['num_nodes']
-    transfer = []
-    for sweep in range(1, K + 2):
-        calls = set(range((sweep - 1) * nodes, sweep * nodes))
-        hit = np.median([residuals(spec, PROBE, seed, K + 1, calls)[K] for seed in seeds])
-        transfer.append(max(float(hit) - history[K], 0.0) / PROBE)
-    noise = spec['tol'] / np.sqrt(np.sum(np.square(transfer)))
-    rho = contraction(history, spec['tol'])
-    rate = rho * (rho ** (-1 / (K + 1)) - 1)
-    return {'noise': noise, 'rate': rate, 'eta_star': min(noise, rate)}
-
-
 def measure(spec, etas=ETAS, seeds=SEEDS):
     """
     The exact run's iterations and contraction rate, the iterations per eta, and eta*.
@@ -225,7 +174,7 @@ def measure(spec, etas=ETAS, seeds=SEEDS):
         'rho': contraction(exact_history, spec['tol']),
         'counts': counts,
         'eta_star': eta_star,
-        'predicted': None if spec['eta_level'] else predict(spec, seeds),
+        'predicted': None if spec['eta_level'] else bound(spec),
     }
 
 
@@ -258,13 +207,23 @@ def figure(results, etas=ETAS):
             (r['predicted']['eta_star'], r['eta_star']) for s, r in results if s['family'] == family and r['predicted']
         ]
         if points:
-            predicted, measured = zip(*points, strict=True)
-            right.loglog(predicted, measured, 'o', color=color, markersize=8, label=family)
+            predicted, measured = (np.array(v) for v in zip(*points, strict=True))
+            # the measurement only brackets eta*: it passed at the value shown, not at the next one tried
+            right.errorbar(
+                predicted,
+                measured,
+                yerr=np.vstack([np.zeros_like(measured), measured * (np.sqrt(10) - 1)]),
+                fmt='o',
+                color=color,
+                markersize=7,
+                capsize=3,
+                label=family,
+            )
     line = np.array([1e-9, 1e1])
     right.loglog(line, line, color='#9a9a9a', linewidth=1, linestyle=':')
     right.fill_between(line, line / 3, line * 3, color='#9a9a9a', alpha=0.15, linewidth=0, label='within a factor 3')
-    right.set_xlabel(r'$\eta^*$ predicted by perturbation theory')
-    right.set_ylabel(r'$\eta^*$ measured: largest $\eta$ at $\leq 1$ extra iteration')
+    right.set_xlabel(r'$\eta^*$ predicted: Theorem B and the rate condition')
+    right.set_ylabel(r'$\eta^*$ measured')
     right.legend(frameon=False, loc='lower right')
     right.set_title(r'the accuracy a solve needs, predicted')
 
@@ -290,12 +249,12 @@ def main(specs=None, etas=ETAS, seeds=SEEDS):
         ``(spec, result)`` per configuration.
     """
     results = [(spec, measure(spec, etas, seeds)) for spec in (specs or cases())]
-    print(f"{'configuration':>30} | {'iter':>4} {'rho':>8} | {'eta*':>8} {'noise':>8} {'rate':>8}")
+    print(f"{'configuration':>30} | {'iter':>4} {'rho':>8} | {'eta*':>8} {'thm B':>8} {'rate':>8}")
     print('-' * 76)
     for spec, result in results:
         eta_star = '-' if result['eta_star'] is None else f"{result['eta_star']:.0e}"
         p = result['predicted']
-        bounds = f"{'-':>8} {'-':>8}" if p is None else f"{p['noise']:>8.1e} {p['rate']:>8.1e}"
+        bounds = f"{'-':>8} {'-':>8}" if p is None else f"{p['theorem']:>8.1e} {p['rate']:>8.1e}"
         print(f"{spec['label']:>30} | {result['exact']:>4} {result['rho']:>8.1e} | {eta_star:>8} {bounds}")
     figure(results, etas)
     return results
