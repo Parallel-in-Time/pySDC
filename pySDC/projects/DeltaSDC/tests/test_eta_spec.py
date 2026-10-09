@@ -61,3 +61,28 @@ def test_eta_sweep_runs():
         assert result['eta_star'] is not None, spec['label']
         assert result['predicted']['eta_star'] > 0, spec['label']
     assert os.path.isfile('data/eta_spec.png')
+
+
+@pytest.mark.base
+def test_round_to_formats():
+    """Rounding relative to the maximum is accurate to the format's unit roundoff, and nothing more."""
+    from pySDC.projects.DeltaSDC.inexact import FORMATS, round_to
+
+    x = np.random.default_rng(0).standard_normal(1000) * 1e-9
+    for fmt, u in FORMATS.items():
+        error = np.abs(round_to(x, fmt) - x).max() / np.abs(x).max()
+        assert 0.1 * u < error <= u, fmt
+
+
+@pytest.mark.base
+def test_schedule_holds():
+    """The per-iteration schedule from Theorem 2 costs at most one iteration, with genuine rounding."""
+    from pySDC.projects.DeltaSDC.eta_spec import cases, residuals
+    from pySDC.projects.DeltaSDC.precision_theory import iterations, schedule
+
+    spec = next(c for c in cases() if c['label'] == 'advection CFL=2')
+    formats = schedule(spec)
+    assert formats[0] == 'fp64' and formats[-1] == 'fp16', formats
+    exact = iterations(residuals(spec), spec['restol'])
+    spec['problem_params'] = dict(spec['problem_params'], schedule=tuple(formats), nodes=3)
+    assert iterations(residuals(spec), spec['restol']) <= exact + 1
