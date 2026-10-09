@@ -29,6 +29,7 @@ import numpy as np
 
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
+from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 
 TOLERANCE_SAFETY = 100.0
 """Unconditional minimum multiple of the working-precision epsilon."""
@@ -358,3 +359,78 @@ class heat_no_increment(heat_delta):
             Always. That is the point of the class.
         """
         raise AttributeError('control: the analytic increment is deliberately unavailable here')
+
+
+class vanderpol_delta(vanderpol):
+    r"""
+    Van der Pol with a node-local correction solve: a stiff nonlinear ODE for the correction-solve contract.
+
+    With :math:`u = (x, y)` and :math:`f(u) = (y,\ \mu(1 - x^2)y - x)`, the increment is expanded so
+    that every term carries a factor of the correction :math:`(\delta_x, \delta_y)`:
+
+    .. math::
+        f(w+\delta) - f(w) = \big(\delta_y,\ \mu\,[(1 - x^2)\,\delta_y - (2x\,\delta_x + \delta_x^2)(y + \delta_y)]
+        - \delta_x\big).
+
+    The correction equation :math:`\delta - \alpha\,[f(w+\delta) - f(w)] = r` is solved by Newton's
+    method around :math:`w + \delta`, whose linear step is the parent's analytic ``solve_jacobian``.
+    Its residual is relative to :math:`|r|`, as the contract asks, since an absolute tolerance would
+    cap the attainable accuracy.
+    """
+
+    def eval_f_increment(self, base, delta, t):
+        r"""
+        Evaluate :math:`f(base+\delta) - f(base)` without cancellation.
+
+        Parameters
+        ----------
+        base : dtype_u
+            The base state :math:`w`.
+        delta : dtype_u
+            The correction :math:`\delta`.
+        t : float
+            Current time, unused.
+
+        Returns
+        -------
+        dtype_f
+            The increment.
+        """
+        x, y = base[0], base[1]
+        dx, dy = delta[0], delta[1]
+        me = self.dtype_f(self.init)
+        me[0] = dy
+        me[1] = self.mu * ((1 - x**2) * dy - (2 * x * dx + dx**2) * (y + dy)) - dx
+        return me
+
+    def solve_system_delta(self, r, factor, base, f_base, t):
+        r"""
+        Solve :math:`\delta - factor\,[f(base+\delta) - f(base)] = r` for the correction, by Newton's method.
+
+        Parameters
+        ----------
+        r : dtype_u
+            Right-hand side of the correction equation.
+        factor : float
+            Implicit prefactor.
+        base : dtype_u
+            Base state :math:`w`.
+        f_base : dtype_f
+            ``f`` at ``base``, unused: the increment is expanded instead.
+        t : float
+            Current time.
+
+        Returns
+        -------
+        dtype_u
+            The correction.
+        """
+        delta = self.dtype_u(self.init, val=0.0)
+        size = float(abs(r))
+        for _ in range(self.newton_maxiter):
+            g = delta - factor * self.eval_f_increment(base, delta, t) - r
+            if float(abs(g)) <= 4 * np.finfo(float).eps * size:
+                break
+            delta -= self.solve_jacobian(g, factor, base + delta)
+            self.work_counters['newton']()
+        return delta
