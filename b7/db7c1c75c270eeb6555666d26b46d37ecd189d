@@ -1,0 +1,23 @@
+pySDC/helpers/stats_helper.py
+  s_3b5c9b59bdc1ee::t_425ade2c0c12f2 94-95
+  s_3b5c9b59bdc1ee::t_7e931c5416fc42 16-18
+  s_3b5c9b59bdc1ee::t_6608f13b682682 25-29
+  s_3b5c9b59bdc1ee::t_d6d116e4753e06 34
+  s_3b5c9b59bdc1ee::t_57be390df50d6b 52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b7db7c1c75c270eeb6555666d26b46d37ecd189d",
+  "prompts": {},
+  "sessions": {
+    "s_3b5c9b59bdc1ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f595a424-caf8-492a-8f50-5ba82874f9dc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
