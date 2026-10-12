@@ -326,15 +326,16 @@ class RungeKutta(Sweeper):
             if self.is_embedded():
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
                 for w2, k in zip(self.coll.weights[1], lvl.f[1:], strict=True):
-                    self.u_secondary += lvl.dt * w2 * k
+                    self.u_secondary += lvl.dt * w2 * self.get_full_f(k)
         else:
             lvl.uend = lvl.prob.dtype_u(lvl.u[0])
             if type(self.coll) == ButcherTableau:
                 for w, k in zip(self.coll.weights, lvl.f[1:], strict=True):
-                    lvl.uend += lvl.dt * w * k
+                    lvl.uend += lvl.dt * w * self.get_full_f(k)
             elif self.is_embedded():
                 self.u_secondary = lvl.prob.dtype_u(lvl.u[0])
                 for w1, w2, k in zip(self.coll.weights[0], self.coll.weights[1], lvl.f[1:], strict=True):
+                    k = self.get_full_f(k)
                     lvl.uend += lvl.dt * w1 * k
                     self.u_secondary += lvl.dt * w2 * k
 

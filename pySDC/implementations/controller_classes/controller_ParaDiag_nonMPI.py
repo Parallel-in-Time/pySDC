@@ -166,7 +166,7 @@ class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
             level = local_MS_running[0].levels[0]
             M = level.sweep.coll.num_nodes
 
-            u_avg = [level.prob.dtype_u(level.prob.init, val=0)] * M
+            u_avg = [level.prob.dtype_u(level.prob.init, val=0) for _ in range(M)]
 
             # communicate average solution
             for S in local_MS_running:

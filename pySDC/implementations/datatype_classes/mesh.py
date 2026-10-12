@@ -54,15 +54,23 @@ class mesh(np.ndarray):
     def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
         """
         Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
-        """
-        args = []
-        for _, input_ in enumerate(inputs):
-            if isinstance(input_, mesh):
-                args.append(input_.view(np.ndarray))
-            else:
-                args.append(input_)
 
-        results = super().__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
+        Outputs are handed on like the inputs, as plain views, so `a += b` and `np.add(a, b, out=a)` write
+        into `a` instead of allocating a new mesh.
+        """
+        args = [input_.view(np.ndarray) if isinstance(input_, mesh) else input_ for input_ in inputs]
+        if out is not None:
+            kwargs['out'] = tuple([output.view(np.ndarray) if isinstance(output, mesh) else output for output in out])
+
+        # called directly rather than through `ndarray.__array_ufunc__`: no mesh is left among the arguments, so
+        # its check for overrides finds nothing, and it costs more than the allocation an in-place operation saves
+        results = getattr(ufunc, method)(*args, **kwargs)
+
+        # written into what the caller gave, which keeps its own type and communicator
+        if out is not None:
+            return out[0] if len(out) == 1 else out
+
+        results = results.view(type(self))
 
         # the inputs were viewed as plain arrays just above, so the result has no communicator to
         # inherit through `__array_finalize__`; carry this one's over explicitly. A reduction or a
