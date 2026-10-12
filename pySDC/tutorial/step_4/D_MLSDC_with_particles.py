@@ -21,7 +21,6 @@
 # to restrict or interpolate but the values themselves.
 
 # %%
-import importlib.util
 import time
 
 import matplotlib.pyplot as plt
@@ -104,13 +103,9 @@ def run_penning_trap_simulation(mlsdc, finter=False):
 # ## Three runs
 #
 # SDC, MLSDC, and MLSDC with interpolation of the right-hand side (`finter`, see
-# [Part C](C_SDC_vs_MLSDC)). Where numba is available, it compiles the force computation the first time it is
-# called; a run beforehand keeps that out of the timings.
+# [Part C](C_SDC_vs_MLSDC)).
 
 # %%
-if importlib.util.find_spec('numba') is not None:
-    run_penning_trap_simulation(mlsdc=False)  # compiles the force computation
-
 # run SDC, MLSDC and MLSDC plus f-interpolation and compare
 stats_sdc, time_sdc, rhs_sdc = run_penning_trap_simulation(mlsdc=False)
 stats_mlsdc, time_mlsdc, rhs_mlsdc = run_penning_trap_simulation(mlsdc=True)
@@ -170,11 +165,9 @@ fig.tight_layout()
 # we saw in Part C. Only interpolating the right-hand side as well (`finter`) saves some of them.
 #
 # Whether that shows in the run times depends on how expensive the fine force really is compared with everything
-# else in a sweep. With numba, as when this page was built, 50 particles are cheap: SDC tends to be fastest, and
-# `finter` costs more than it saves. Without numba the forces weigh more and the gap closes; in our runs, MLSDC with
-# `finter` then came out slightly ahead of SDC in plain Python, while in the browser, which has no numba either, all
-# three were within a few percent. Press {octicon}`play` **Run in browser** to see for yourself. Timings depend on
-# the machine and the implementation; the counts above do not.
+# else in a sweep. For 50 particles the forces are cheap, computed for all pairs at once: SDC tends to be fastest,
+# and `finter` costs more than it saves. Press {octicon}`play` **Run in browser** to see for yourself. Timings depend
+# on the machine and the implementation; the counts above do not.
 #
 # :::{admonition} Important things to note
 # - Again, the number of MLSDC iterations is highly sensitive to the interplay of all the parameters (number of
