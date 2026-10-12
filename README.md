@@ -31,7 +31,7 @@
 | pySDC/helpers/pysdc\_helper.py                                                                      |       19 |        1 |     95% |        89 |
 | pySDC/helpers/setup\_helper.py                                                                      |       19 |        0 |    100% |           |
 | pySDC/helpers/spectral\_helper.py                                                                   |      796 |       57 |     93% |155, 196, 250, 353-354, 568, 924, 933, 1019-1022, 1087, 1175, 1274, 1323, 1624-1670, 1763-1766, 1800, 1811-1833, 1949, 2027-2029 |
-| pySDC/helpers/stats\_helper.py                                                                      |       36 |        0 |    100% |           |
+| pySDC/helpers/stats\_helper.py                                                                      |       34 |        0 |    100% |           |
 | pySDC/helpers/testing.py                                                                            |       30 |        0 |    100% |           |
 | pySDC/helpers/transfer\_helper.py                                                                   |      142 |        0 |    100% |           |
 | pySDC/helpers/visualization\_tools.py                                                               |       33 |        0 |    100% |           |
@@ -109,7 +109,7 @@
 | pySDC/implementations/problem\_classes/Lorenz.py                                                    |       54 |        3 |     94% |155, 158-159 |
 | pySDC/implementations/problem\_classes/NonlinearSchroedinger\_MPIFFT.py                             |       60 |        4 |     93% |80, 89, 229-230 |
 | pySDC/implementations/problem\_classes/OuterSolarSystem.py                                          |       58 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/PenningTrap\_3D.py                                           |      124 |       13 |     90% |5-8, 124-138, 183 |
+| pySDC/implementations/problem\_classes/PenningTrap\_3D.py                                           |      108 |        1 |     99% |       166 |
 | pySDC/implementations/problem\_classes/Piline.py                                                    |       44 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/Quench.py                                                    |      151 |       34 |     77% |205-206, 267-269, 340, 411-461 |
 | pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |107, 357, 456, 515 |
@@ -126,7 +126,7 @@
 | pySDC/implementations/problem\_classes/boussinesq\_helpers/standard\_integrators.py                 |      394 |      112 |     72% |21-25, 28-32, 36-50, 266-271, 274-276, 282, 288-301, 309-313, 316, 319-320, 326, 332-345, 372-378, 459-466, 472, 492-496, 499-511, 514-526, 551-580 |
 | pySDC/implementations/problem\_classes/boussinesq\_helpers/unflatten.py                             |        7 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/generic\_MPIFFT\_Laplacian.py                                |       89 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/generic\_ND\_FD.py                                           |      175 |        2 |     99% |  456, 499 |
+| pySDC/implementations/problem\_classes/generic\_ND\_FD.py                                           |      188 |        2 |     99% |  503, 546 |
 | pySDC/implementations/problem\_classes/generic\_spectral.py                                         |      244 |       41 |     83% |117, 271-273, 340-342, 357-358, 395, 411, 454, 479, 514, 521-526, 546-583 |
 | pySDC/implementations/problem\_classes/nonlinear\_ODE\_1.py                                         |       41 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/odeScalar.py                                                 |       53 |        0 |    100% |           |
@@ -379,8 +379,8 @@
 | pySDC/tutorial/step\_4/A\_spatial\_transfer\_operators.py                                           |       51 |        0 |    100% |           |
 | pySDC/tutorial/step\_4/B\_multilevel\_hierarchy.py                                                  |       18 |        0 |    100% |           |
 | pySDC/tutorial/step\_4/C\_SDC\_vs\_MLSDC.py                                                         |       58 |        0 |    100% |           |
-| pySDC/tutorial/step\_4/D\_MLSDC\_with\_particles.py                                                 |       58 |        0 |    100% |           |
-| pySDC/tutorial/step\_4/PenningTrap\_3D\_coarse.py                                                   |       12 |        0 |    100% |           |
+| pySDC/tutorial/step\_4/D\_MLSDC\_with\_particles.py                                                 |       55 |        0 |    100% |           |
+| pySDC/tutorial/step\_4/PenningTrap\_3D\_coarse.py                                                   |       10 |        0 |    100% |           |
 | pySDC/tutorial/step\_5/A\_multistep\_multilevel\_hierarchy.py                                       |       29 |        0 |    100% |           |
 | pySDC/tutorial/step\_5/B\_my\_first\_PFASST\_run.py                                                 |       50 |        0 |    100% |           |
 | pySDC/tutorial/step\_5/C\_advection\_and\_PFASST.py                                                 |       53 |        0 |    100% |           |
@@ -406,7 +406,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32799** | **4050** | **88%** |           |
+| **TOTAL**                                                                                           | **32789** | **4038** | **88%** |           |
 
 44 empty files skipped.
 
