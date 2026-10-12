@@ -138,8 +138,9 @@ def single_run(sweeper_name, dt, lambdas, use_RK_sweeper=True, Tend=None, useGPU
         sweeper_class = get_sweeper(sweeper_name)
     else:
         # a subclass rather than patching `generic_implicit` itself, which would leak into every later test
+        RK = get_sweeper(sweeper_name)
         sweeper_class = type(
-            'RKcoll', (generic_implicit,), {'compute_end_point': get_sweeper(sweeper_name).compute_end_point}
+            'RKcoll', (generic_implicit,), {'compute_end_point': RK.compute_end_point, 'get_full_f': RK.get_full_f}
         )
 
     description = {
@@ -369,7 +370,7 @@ def test_implicit_scheme_on_split_problem(sweeper_name):
     """
     `solve_system` of an IMEX problem only inverts the implicit part, so implicit stages of a non-IMEX scheme would
     silently drop the explicit part of the right hand side and converge to the wrong solution. Explicit schemes only
-    need the full right hand side and are fine.
+    need the full right hand side and have to get the right answer.
     """
     from pySDC.core.errors import ProblemError
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -390,7 +391,11 @@ def test_implicit_scheme_on_split_problem(sweeper_name):
         with pytest.raises(ProblemError, match='IMEX'):
             controller.run(u0=prob.u_exact(0), t0=0, Tend=1e-2)
     else:
-        controller.run(u0=prob.u_exact(0), t0=0, Tend=1e-2)
+        # the end point adds up the stages, which have to be summed over the split first: adding the split right hand
+        # side as it is used to broadcast it into a "solution" with a component per part
+        uend, _ = controller.run(u0=prob.u_exact(0), t0=0, Tend=1e-2)
+        assert uend.shape == prob.u_init.shape
+        assert abs(uend - prob.u_exact(1e-2)) < 1e-5
 
 
 @pytest.mark.base

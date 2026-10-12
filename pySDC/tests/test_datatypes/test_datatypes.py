@@ -147,3 +147,37 @@ def test_the_norm_stays_global_through_arithmetic():
     alone = mesh(init=((4,), None, np.dtype('float64')))
     alone[:] = comm.rank + 1
     assert alone.comm is None, 'a mesh built without a communicator acquired one'
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('name', ['mesh', 'imex_mesh'])
+def test_in_place_operations_write_into_the_mesh(name):
+    """`a += b` and `np.add(a, b, out=a)` write into `a`, as they would on a plain array.
+
+    `__array_ufunc__` used to drop `out`, so `+=` allocated a new mesh and rebound the name, leaving
+    every other reference to the old one stale, and an explicit `out=` was silently ignored.
+    """
+    import numpy as np
+
+    dtype_cls = get_dtype(name)
+    init = ((4,), None, np.dtype('float64'))
+
+    a = dtype_cls(init, val=1.0)
+    b = dtype_cls(init, val=2.0)
+    alias = a
+
+    a += b
+    assert a is alias, '`+=` made a new object'
+    assert np.all(alias == 3.0), '`+=` did not write into the mesh'
+
+    result = np.add(a, b, out=a)
+    assert result is a, '`out=` did not hand back the output it was given'
+    assert np.all(alias == 5.0), '`out=` was ignored'
+    assert type(a) is dtype_cls
+
+    # an output in a tuple, and one that is a plain array
+    np.multiply(a, b, out=(a,))
+    assert np.all(alias == 10.0)
+    plain = np.empty(a.shape)
+    assert np.subtract(a, b, out=plain) is plain
+    assert np.all(plain == 8.0)

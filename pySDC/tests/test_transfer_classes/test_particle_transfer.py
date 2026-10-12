@@ -39,8 +39,7 @@ def test_particles_to_particles(datatype, direction):
     before = {name: np.array(array) for name, array in arrays_of(source).items()}
     for name, array in arrays_of(transferred).items():
         assert np.allclose(array, before[name]), f'{name!r} did not survive the transfer'
-        # note that `array += 1` would not stick: `mesh` drops `out` in its `__array_ufunc__`
-        array[:] = array + 1.0
+        array += 1.0
 
     for name, array in arrays_of(source).items():
         assert np.allclose(array, before[name]), f'Writing to the result changed {name!r} on the source'

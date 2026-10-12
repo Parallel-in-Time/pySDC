@@ -93,7 +93,10 @@ class delta_implicit_MPI(DeltaFormMixin, generic_implicit_MPI):
 
         residual = self._residual_nodes()
         self._set_work_scale(residual)
-        delta = self._solve_correction(self._to_work(prob, residual[0]), alpha, u_old, f_old, t_node)
+        # a copy, as in the serial sweeper: the solve modifies its right-hand side in place, and the
+        # residual may be the one a transfer handed down, which is advanced after the sweep
+        rhs_corr = self._to_work(prob, residual[0])
+        delta = self._solve_correction(type(rhs_corr)(rhs_corr), alpha, u_old, f_old, t_node)
 
         lvl.u[rank + 1] = u_old + self._to_backend(prob, self._to_work(prob, delta))
         lvl.f[rank + 1] = prob.eval_f(lvl.u[rank + 1], t_node)

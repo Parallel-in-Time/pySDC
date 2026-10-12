@@ -54,14 +54,23 @@ class cupy_mesh(cp.ndarray):
     def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
         """
         Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
+
+        Only NumPy ufuncs come through here: CuPy's own `+=` calls its kernel with `out=self` directly and
+        is in place anyway. Outputs are handed on like the inputs, so `np.add(a, b, out=a)` writes into `a`.
         """
-        args = []
-        for _, input_ in enumerate(inputs):
-            if isinstance(input_, cupy_mesh):
-                args.append(input_.view(cp.ndarray))
-            else:
-                args.append(input_)
-        results = super(cupy_mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
+        args = [input_.view(cp.ndarray) if isinstance(input_, cupy_mesh) else input_ for input_ in inputs]
+        if out is not None:
+            kwargs['out'] = tuple(
+                [output.view(cp.ndarray) if isinstance(output, cupy_mesh) else output for output in out]
+            )
+
+        results = super(cupy_mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs)
+
+        # written into what the caller gave, which keeps its own type and communicator
+        if out is not None:
+            return out[0] if len(out) == 1 else out
+
+        results = results.view(type(self))
 
         # the inputs were viewed as plain arrays just above, so the result has no communicator to
         # inherit through `__array_finalize__`; carry this one's over explicitly. A reduction or a

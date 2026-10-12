@@ -289,6 +289,32 @@ def test_fft(L, M, N):
             assert np.allclose(controller.MS[l].levels[0].residual[m], data[l, m])
 
 
+@pytest.mark.base
+def test_average_jacobian_is_averaged_per_node():
+    """Each node gets the average over the steps of its own value, not a sum over all nodes.
+
+    The convergence test runs `average_jacobian` too, but a Jacobian taken at the wrong state still converges.
+    """
+    import numpy as np
+
+    L, M = 4, 3
+    controller, prob = get_composite_collocation_problem(L, M, 2, problem='vdp')
+    controller.params.average_jacobian = True
+
+    rng = np.random.default_rng(seed=3)
+    data = rng.random((L, M, 2))
+    for l in range(L):
+        for m in range(M):
+            controller.MS[l].levels[0].u[m + 1] = prob.u_init
+            controller.MS[l].levels[0].u[m + 1][:] = data[l, m]
+
+    controller.prepare_Jacobians(controller.MS)
+
+    for l in range(L):
+        for m in range(M):
+            assert np.allclose(controller.MS[l].levels[0].u_avg[m], data[:, m].mean(axis=0))
+
+
 if __name__ == '__main__':
     test_fft(3, 2, 2)
     # test_ParaDiag_convergence_rate(4, 3, 1, 1e-4)
