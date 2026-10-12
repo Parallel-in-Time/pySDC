@@ -677,7 +677,8 @@ single anyway – so <code class="docutils literal notranslate"><span class="pre
 single-precision arithmetic, which is the arrangement it has on real hardware too.</p></li>
 <li><p><strong>solver_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>optional</em>) – Type of solver. Can be <code class="docutils literal notranslate"><span class="pre">'direct'</span></code>, <code class="docutils literal notranslate"><span class="pre">'GMRES'</span></code>, <code class="docutils literal notranslate"><span class="pre">'CG'</span></code> or, on periodic grids, <code class="docutils literal notranslate"><span class="pre">'FFT'</span></code>:
 the operator is then circulant, so the FFT diagonalises it and a solve is two transforms
-and a division – exact, and the cheapest solve there is on a GPU.</p></li>
+and a division – exact, and the cheapest solve there is on a GPU. <code class="docutils literal notranslate"><span class="pre">'direct'</span></code> keeps the
+factorizations of the last <code class="docutils literal notranslate"><span class="pre">max_cached_factorizations</span></code> factors and reuses them.</p></li>
 <li><p><strong>solve_precision</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dtype-like</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <em>optional</em>) – Precision the implicit solve runs at, independently of the state’s <code class="docutils literal notranslate"><span class="pre">dtype</span></code>. <code class="docutils literal notranslate"><span class="pre">None</span></code>
 (default) solves at the operator’s precision, exactly as without it. Otherwise the solve
 genuinely works in that precision: the sparse solvers on a copy of the operator held at it,
@@ -793,6 +794,11 @@ subtracting two stored right-hand sides, whose cancellation error carries
 <dd><p>ND grids associated to the problem</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.max_cached_factorizations">
+<span class="sig-name descname"><span class="pre">max_cached_factorizations</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></span><a class="headerlink" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.max_cached_factorizations" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ndim</span></span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/generic_ND_FD.html#GenericNDimFinDiff.ndim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim" title="Link to this definition">#</a></dt>
@@ -883,6 +889,7 @@ subtracting two stored right-hand sides, whose cancellation error carries
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.eval_f_increment"><code class="docutils literal notranslate"><span class="pre">eval_f_increment()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.get_default_sweeper_class"><code class="docutils literal notranslate"><span class="pre">get_default_sweeper_class()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.grids"><code class="docutils literal notranslate"><span class="pre">grids</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.max_cached_factorizations"><code class="docutils literal notranslate"><span class="pre">max_cached_factorizations</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.ndim"><code class="docutils literal notranslate"><span class="pre">ndim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.setup_GPU"><code class="docutils literal notranslate"><span class="pre">setup_GPU()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>

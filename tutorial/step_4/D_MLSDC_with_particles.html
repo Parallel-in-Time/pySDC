@@ -546,8 +546,7 @@ the description simply becomes a list of two classes.</p>
 to restrict or interpolate but the values themselves.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -630,14 +629,10 @@ to restrict or interpolate but the values themselves.</p>
 <section id="three-runs">
 <h2>Three runs<a class="headerlink" href="#three-runs" title="Link to this heading">#</a></h2>
 <p>SDC, MLSDC, and MLSDC with interpolation of the right-hand side (<code class="docutils literal notranslate"><span class="pre">finter</span></code>, see
-<a class="reference internal" href="C_SDC_vs_MLSDC.html"><span class="doc std std-doc">Part C</span></a>). Where numba is available, it compiles the force computation the first time it is
-called; a run beforehand keeps that out of the timings.</p>
+<a class="reference internal" href="C_SDC_vs_MLSDC.html"><span class="doc std std-doc">Part C</span></a>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s1">'numba'</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># compiles the force computation</span>
-
-<span class="c1"># run SDC, MLSDC and MLSDC plus f-interpolation and compare</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># run SDC, MLSDC and MLSDC plus f-interpolation and compare</span>
 <span class="n">stats_sdc</span><span class="p">,</span> <span class="n">time_sdc</span><span class="p">,</span> <span class="n">rhs_sdc</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">stats_mlsdc</span><span class="p">,</span> <span class="n">time_mlsdc</span><span class="p">,</span> <span class="n">rhs_mlsdc</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">stats_mlsdc_finter</span><span class="p">,</span> <span class="n">time_mlsdc_finter</span><span class="p">,</span> <span class="n">rhs_mlsdc_finter</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">finter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -657,12 +652,9 @@ called; a run beforehand keeps that out of the timings.</p>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>step - WARNING: you have specified transfer classes, but only a single level
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>step - WARNING: you have specified transfer classes, but only a single level
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SDC          : 12 iterations,  1.738 s, right-hand side evaluations per level [66]
-MLSDC        :  6 iterations,  1.921 s, right-hand side evaluations per level [66, 66]
-MLSDC+finter :  7 iterations,  2.164 s, right-hand side evaluations per level [41, 77]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SDC          : 12 iterations,  0.314 s, right-hand side evaluations per level [66]
+MLSDC        :  6 iterations,  0.314 s, right-hand side evaluations per level [66, 66]
+MLSDC+finter :  7 iterations,  0.394 s, right-hand side evaluations per level [41, 77]
 </pre></div>
 </div>
 </div>
@@ -691,11 +683,11 @@ MLSDC+finter :  7 iterations,  2.164 s, right-hand side evaluations per level [4
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total energy and relative deviation in iteration  0: 407936.7556966486 -- 0.00000000e+00
-Total energy and relative deviation in iteration 12: 406977.9425667248 -- 2.35039652e-03
+Total energy and relative deviation in iteration 12: 406977.9425667247 -- 2.35039652e-03
 Total energy and relative deviation in iteration  0: 407936.7556966486 -- 0.00000000e+00
 Total energy and relative deviation in iteration  6: 406977.9425660007 -- 2.35039652e-03
 Total energy and relative deviation in iteration  0: 407936.7556966486 -- 0.00000000e+00
-Total energy and relative deviation in iteration  7: 406977.9428639796 -- 2.35039579e-03
+Total energy and relative deviation in iteration  7: 406977.9428639795 -- 2.35039579e-03
 </pre></div>
 </div>
 </div>
@@ -737,11 +729,9 @@ Total energy and relative deviation in iteration  7: 406977.9428639796 -- 2.3503
 the fine level: MLSDC needs as many as SDC, because each interpolation needs the fine right-hand side again, as
 we saw in Part C. Only interpolating the right-hand side as well (<code class="docutils literal notranslate"><span class="pre">finter</span></code>) saves some of them.</p>
 <p>Whether that shows in the run times depends on how expensive the fine force really is compared with everything
-else in a sweep. With numba, as when this page was built, 50 particles are cheap: SDC tends to be fastest, and
-<code class="docutils literal notranslate"><span class="pre">finter</span></code> costs more than it saves. Without numba the forces weigh more and the gap closes; in our runs, MLSDC with
-<code class="docutils literal notranslate"><span class="pre">finter</span></code> then came out slightly ahead of SDC in plain Python, while in the browser, which has no numba either, all
-three were within a few percent. Press <svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.879-2.773 4.264 2.559a.25.25 0 0 1 0 .428l-4.264 2.559A.25.25 0 0 1 6 10.559V5.442a.25.25 0 0 1 .379-.215Z"></path></svg> <strong>Run in browser</strong> to see for yourself. Timings depend on
-the machine and the implementation; the counts above do not.</p>
+else in a sweep. For 50 particles the forces are cheap, computed for all pairs at once: SDC tends to be fastest,
+and <code class="docutils literal notranslate"><span class="pre">finter</span></code> costs more than it saves. Press <svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.879-2.773 4.264 2.559a.25.25 0 0 1 0 .428l-4.264 2.559A.25.25 0 0 1 6 10.559V5.442a.25.25 0 0 1 .379-.215Z"></path></svg> <strong>Run in browser</strong> to see for yourself. Timings depend
+on the machine and the implementation; the counts above do not.</p>
 <div class="admonition-important-things-to-note admonition">
 <p class="admonition-title">Important things to note</p>
 <ul class="simple">
