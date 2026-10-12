@@ -16,7 +16,6 @@ dependencies:
   - scipy
   - matplotlib
   - dill
-  - numba
   - cupy
   - pip
   - pip:
