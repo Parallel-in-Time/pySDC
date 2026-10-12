@@ -61,7 +61,7 @@
 | pySDC/implementations/datatype\_classes/cupy\_mesh.py                                               |       66 |        6 |     91% |5-6, 12-13, 63, 71 |
 | pySDC/implementations/datatype\_classes/fenics\_mesh.py                                             |       33 |        0 |    100% |           |
 | pySDC/implementations/datatype\_classes/firedrake\_mesh.py                                          |       49 |        1 |     98% |        45 |
-| pySDC/implementations/datatype\_classes/mesh.py                                                     |       73 |        0 |    100% |           |
+| pySDC/implementations/datatype\_classes/mesh.py                                                     |       69 |        0 |    100% |           |
 | pySDC/implementations/datatype\_classes/particles.py                                                |       82 |       20 |     76% |63-73, 173-174, 188, 202-207 |
 | pySDC/implementations/datatype\_classes/petsc\_vec.py                                               |       30 |        0 |    100% |           |
 | pySDC/implementations/hooks/AllenCahn\_monitor.py                                                   |       60 |        0 |    100% |           |
@@ -406,7 +406,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32793** | **4037** | **88%** |           |
+| **TOTAL**                                                                                           | **32789** | **4037** | **88%** |           |
 
 44 empty files skipped.
 
