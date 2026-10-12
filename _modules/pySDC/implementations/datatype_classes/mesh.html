@@ -442,6 +442,8 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">MPI</span> <span class="o">=</span> <span class="kc">None</span>
 
+<span class="n">_NUMPY1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">NumpyVersion</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&lt;</span> <span class="s1">'2.0.0'</span>
+
 
 <div class="viewcode-block" id="mesh">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.mesh.html#pySDC.implementations.datatype_classes.mesh.mesh">[docs]</a>
@@ -487,34 +489,32 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__array_ufunc__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_wrap__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs</span>
+<span class="sd">        Hand a ufunc's result back as a mesh with this one's communicator, cf.</span>
+<span class="sd">        https://numpy.org/doc/stable/user/basics.subclassing.html#array-wrap-for-ufuncs-and-other-functions</span>
 
-<span class="sd">        Outputs are handed on like the inputs, as plain views, so `a += b` and `np.add(a, b, out=a)` write</span>
-<span class="sd">        into `a` instead of allocating a new mesh.</span>
+<span class="sd">        There is no `__array_ufunc__` here: NumPy's own dispatch computes in place where asked, writes into an</span>
+<span class="sd">        explicit `out` and returns it, and only the result passes through this method. On the way in, a Python</span>
+<span class="sd">        override cost more than the arithmetic for all but large meshes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (np.ndarray): the result as NumPy computed it</span>
+<span class="sd">            context: the ufunc and its arguments, unused</span>
+<span class="sd">            return_scalar (bool): whether NumPy wants a scalar, as from a reduction to a single value</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mesh or scalar: the result</span>
 <span class="sd">        """</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">input_</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_</span><span class="p">,</span> <span class="n">mesh</span><span class="p">)</span> <span class="k">else</span> <span class="n">input_</span> <span class="k">for</span> <span class="n">input_</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">'out'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">mesh</span><span class="p">)</span> <span class="k">else</span> <span class="n">output</span> <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">out</span><span class="p">])</span>
-
-        <span class="c1"># called directly rather than through `ndarray.__array_ufunc__`: no mesh is left among the arguments, so</span>
-        <span class="c1"># its check for overrides finds nothing, and it costs more than the allocation an in-place operation saves</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="c1"># written into what the caller gave, which keeps its own type and communicator</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">out</span>
-
-        <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
-
-        <span class="c1"># the inputs were viewed as plain arrays just above, so the result has no communicator to</span>
-        <span class="c1"># inherit through `__array_finalize__`; carry this one's over explicitly. A reduction or a</span>
-        <span class="c1"># comparison can return a scalar rather than an array, and a scalar takes no attributes.</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">results</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span>
-
-        <span class="k">return</span> <span class="n">results</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">mesh</span><span class="p">):</span>  <span class="c1"># written into a mesh passed as `out`: that one, with its own communicator</span>
+            <span class="k">return</span> <span class="n">obj</span>
+        <span class="c1"># NumPy 1 does not pass `return_scalar`, but there a ufunc turns a 0-d result into a scalar anyway</span>
+        <span class="k">if</span> <span class="n">return_scalar</span> <span class="ow">or</span> <span class="p">(</span><span class="n">_NUMPY1</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="p">[()]</span>
+        <span class="c1"># the result is a fresh array with no communicator to inherit through `__array_finalize__`</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span>
+        <span class="k">return</span> <span class="n">obj</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__array_finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
