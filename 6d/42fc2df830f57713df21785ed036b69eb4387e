@@ -1,0 +1,31 @@
+pySDC/tests/test_problems/test_FD_direct_cache.py
+  s_3b5c9b59bdc1ee::t_d7531d90bae8ca 11,21-22,39-47,49,52
+  s_3b5c9b59bdc1ee::t_d7b3249602ac05 69-70,75-91
+  s_3b5c9b59bdc1ee::t_b3b23f06859e67 1-10,12-20,23-38,48,50-51,53-68,71-74
+pySDC/implementations/problem_classes/generic_ND_FD.py
+  s_3b5c9b59bdc1ee::t_80b08fdc5537c8 58-59
+  s_3b5c9b59bdc1ee::t_3c234fe9fe23f5 412-419
+  s_3b5c9b59bdc1ee::t_eeec877625344d 406-411,420-436,439-441,444
+  s_3b5c9b59bdc1ee::t_9df53d9f3b3a69 477
+  s_3b5c9b59bdc1ee::t_f018259f89bb0c 461-465,468
+  s_3b5c9b59bdc1ee::t_694bd1bddd2ead 230-231
+  s_3b5c9b59bdc1ee::t_1d21ea1029741a 437-438,442-443
+  s_3b5c9b59bdc1ee::t_8fa084a778ff7f 109-110
+  s_3b5c9b59bdc1ee::t_f2e388b0a56fbb 379
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6d42fc2df830f57713df21785ed036b69eb4387e",
+  "prompts": {},
+  "sessions": {
+    "s_3b5c9b59bdc1ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f595a424-caf8-492a-8f50-5ba82874f9dc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
