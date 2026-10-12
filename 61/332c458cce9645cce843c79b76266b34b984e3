@@ -1,0 +1,36 @@
+pySDC/tutorial/step_4/PenningTrap_3D_coarse.py
+  s_3b5c9b59bdc1ee::t_0ab2def291f7ad 27-28
+pySDC/tests/test_problems/test_penningtrap.py
+  s_3b5c9b59bdc1ee::t_8665be34ab5f46 6-8,11-21
+  s_3b5c9b59bdc1ee::t_e1f0b7b169731b 37-38
+  s_3b5c9b59bdc1ee::t_83ecd729b54896 22,24-27,31-36,40-71
+  s_3b5c9b59bdc1ee::t_5fde65e3e11cf3 28-30
+pySDC/tutorial/step_4/D_MLSDC_with_particles.py
+  s_3b5c9b59bdc1ee::t_ed608c7ef61a6d 106
+  s_3b5c9b59bdc1ee::t_8805f8020504be 168-170
+pySDC/implementations/problem_classes/PenningTrap_3D.py
+  s_3b5c9b59bdc1ee::t_4269bc062cdfc6 349-355,358,361,363,367
+  s_3b5c9b59bdc1ee::t_abe31cb6da1950 319
+  s_3b5c9b59bdc1ee::t_030712c3e36e3c 99-103,121-123
+  s_3b5c9b59bdc1ee::t_fd1f2e5408a4f8 120
+  s_3b5c9b59bdc1ee::t_4de48cd41ecf05 172-173
+  s_3b5c9b59bdc1ee::t_ac2314780dba75 356,360,362,364-366
+  s_3b5c9b59bdc1ee::t_f6cd3474067b3b 357
+  s_3b5c9b59bdc1ee::t_ba37abe0f858c2 359
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "61332c458cce9645cce843c79b76266b34b984e3",
+  "prompts": {},
+  "sessions": {
+    "s_3b5c9b59bdc1ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f595a424-caf8-492a-8f50-5ba82874f9dc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
