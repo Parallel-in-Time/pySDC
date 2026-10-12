@@ -8,6 +8,8 @@ try:
 except ImportError:
     MPI = None
 
+_NUMPY1 = np.lib.NumpyVersion(np.__version__) < '2.0.0'
+
 
 class mesh(np.ndarray):
     """
@@ -51,34 +53,32 @@ class mesh(np.ndarray):
             raise NotImplementedError(type(init))
         return obj
 
-    def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
+    def __array_wrap__(self, obj, context=None, return_scalar=False):
         """
-        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
+        Hand a ufunc's result back as a mesh with this one's communicator, cf.
+        https://numpy.org/doc/stable/user/basics.subclassing.html#array-wrap-for-ufuncs-and-other-functions
 
-        Outputs are handed on like the inputs, as plain views, so `a += b` and `np.add(a, b, out=a)` write
-        into `a` instead of allocating a new mesh.
+        There is no `__array_ufunc__` here: NumPy's own dispatch computes in place where asked, writes into an
+        explicit `out` and returns it, and only the result passes through this method. On the way in, a Python
+        override cost more than the arithmetic for all but large meshes.
+
+        Args:
+            obj (np.ndarray): the result as NumPy computed it
+            context: the ufunc and its arguments, unused
+            return_scalar (bool): whether NumPy wants a scalar, as from a reduction to a single value
+
+        Returns:
+            mesh or scalar: the result
         """
-        args = [input_.view(np.ndarray) if isinstance(input_, mesh) else input_ for input_ in inputs]
-        if out is not None:
-            kwargs['out'] = tuple([output.view(np.ndarray) if isinstance(output, mesh) else output for output in out])
-
-        # called directly rather than through `ndarray.__array_ufunc__`: no mesh is left among the arguments, so
-        # its check for overrides finds nothing, and it costs more than the allocation an in-place operation saves
-        results = getattr(ufunc, method)(*args, **kwargs)
-
-        # written into what the caller gave, which keeps its own type and communicator
-        if out is not None:
-            return out[0] if len(out) == 1 else out
-
-        results = results.view(type(self))
-
-        # the inputs were viewed as plain arrays just above, so the result has no communicator to
-        # inherit through `__array_finalize__`; carry this one's over explicitly. A reduction or a
-        # comparison can return a scalar rather than an array, and a scalar takes no attributes.
-        if isinstance(results, np.ndarray):
-            results.comm = self.comm
-
-        return results
+        if isinstance(obj, mesh):  # written into a mesh passed as `out`: that one, with its own communicator
+            return obj
+        # NumPy 1 does not pass `return_scalar`, but there a ufunc turns a 0-d result into a scalar anyway
+        if return_scalar or (_NUMPY1 and obj.ndim == 0):
+            return obj[()]
+        # the result is a fresh array with no communicator to inherit through `__array_finalize__`
+        obj = obj.view(type(self))
+        obj.comm = self.comm
+        return obj
 
     def __array_finalize__(self, obj):
         """

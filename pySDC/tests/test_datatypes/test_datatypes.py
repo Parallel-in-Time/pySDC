@@ -151,6 +151,39 @@ def test_the_norm_stays_global_through_arithmetic():
 
 @pytest.mark.base
 @pytest.mark.parametrize('name', ['mesh', 'imex_mesh'])
+def test_ufunc_results_are_meshes_with_the_communicator(name):
+    """What NumPy computes comes back through `mesh.__array_wrap__`: a mesh of the same type carrying the
+    communicator, whichever side of the operation the mesh is on, while a reduction to one value is a plain
+    scalar on NumPy 1 and 2 alike. A stand-in communicator of one rank is enough to see it carried along.
+    """
+    import numpy as np
+
+    dtype_cls = get_dtype(name)
+    comm = type('OneRank', (), {'size': 1})()
+    a = dtype_cls(((4,), None, np.dtype('float64')), val=2.0)
+    a.comm = comm
+
+    for what, result in [
+        ('a sum', a + 1.0),
+        ('a plain array first', np.ones(a.shape) + a),
+        ('a NumPy scalar first', np.float64(3.0) * a),
+        ('a unary ufunc', np.sqrt(a)),
+        ('a comparison', a > 1.0),
+        ('a reduction along an axis', np.add.reduce(a, axis=-1, keepdims=True)),
+        *[(f'output {i} of divmod', part) for i, part in enumerate(np.divmod(a, 3.0))],
+    ]:
+        assert type(result) is dtype_cls, f'{what} gave a {type(result).__name__}'
+        assert result.comm is comm, f'{what} lost the communicator'
+
+    for what, result in [('np.max', np.max(a)), ('np.sum', np.sum(a)), ('abs()', abs(a))]:
+        assert not isinstance(result, np.ndarray) and result == (2.0 * a.size if what == 'np.sum' else 2.0), what
+
+    np.add.at(a, [0, 0], 1.0)  # a ufunc method that returns nothing
+    assert a[(0,) * a.ndim] == 4.0 and a.comm is comm
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('name', ['mesh', 'imex_mesh'])
 def test_in_place_operations_write_into_the_mesh(name):
     """`a += b` and `np.add(a, b, out=a)` write into `a`, as they would on a plain array.
 
