@@ -1,0 +1,26 @@
+pySDC/implementations/datatype_classes/mesh.py
+  s_3b5c9b59bdc1ee::t_ab36c3f075a5a7 11-12
+  s_3b5c9b59bdc1ee::t_4181d4936814c6 56,58-59,61-63,65-68,70-81
+pySDC/tests/test_datatypes/test_datatypes.py
+  s_3b5c9b59bdc1ee::t_d602a47129a415 179
+  s_3b5c9b59bdc1ee::t_f97a645dcdaaae 154-178,180-184
+  s_3b5c9b59bdc1ee::t_4f8240151624a8 152-153
+pySDC/projects/DAE/tests/test_MeshDAE.py
+  s_3b5c9b59bdc1ee::t_5f7c17ccc2dd9a 49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2f04420c7ad8ad4e13887a0cc48d29d802e5cf13",
+  "prompts": {},
+  "sessions": {
+    "s_3b5c9b59bdc1ee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f595a424-caf8-492a-8f50-5ba82874f9dc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
