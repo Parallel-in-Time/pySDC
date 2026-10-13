@@ -177,6 +177,9 @@ class GenericSpectralLinear(Problem):
         Returns:
             request
         """
+        # While unpickling, `__dict__` is still empty, so looking up `spectral` here would recurse forever
+        if name == 'spectral' or name.startswith('__'):
+            raise AttributeError(name)
         return getattr(self.spectral, name)
 
     def _setup_operator(self, LHS):
