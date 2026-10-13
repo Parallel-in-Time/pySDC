@@ -619,6 +619,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            request</span>
 <span class="sd">        """</span>
+        <span class="c1"># While unpickling, `__dict__` is still empty, so looking up `spectral` here would recurse forever</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">'spectral'</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'__'</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_setup_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LHS</span><span class="p">):</span>
