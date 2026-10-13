@@ -340,7 +340,7 @@ class Controller(object):
                         f'step(s). Use a preconditioner with fixed coefficients, e.g. MIN-SR-S or LU.'
                     )
 
-    def step_is_active(self, time: float, block_start: float, Tend: float) -> bool:
+    def step_is_active(self, time: float, block_start: float, Tend: float, dt: float) -> bool:
         """
         Whether a step starting at `time`, in a block starting at `block_start`, still has work.
 
@@ -348,15 +348,23 @@ class Controller(object):
         may be run partially. An algorithm that couples its steps too tightly to drop one of them
         answers this from `block_start` instead and runs the block whole.
 
+        "Before" means by more than half a step, i.e. the step runs only if its end is closer to
+        `Tend` than its start. The start times are accumulated by repeated addition, so their
+        round-off is about N^2 eps / 2 steps after N steps and can fall on either side of `Tend`;
+        any fixed tolerance below that lets a step starting at `Tend` up to round-off run past
+        it. Half a step is the largest tolerance that never moves the end of the run further from
+        `Tend`, which a step that ends more than half a step past `Tend` would.
+
         Args:
             time (float): when this step starts
             block_start (float): when the first step of this step's block starts
             Tend (float): ending time
+            dt (float): size of this step
 
         Returns:
             bool: whether this step takes part
         """
-        return time < Tend - 10 * np.finfo(float).eps
+        return time < Tend - 0.5 * dt
 
     def setup_convergence_controllers(self, description: Dict[str, Any]) -> None:
         '''

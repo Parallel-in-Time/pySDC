@@ -100,7 +100,7 @@ class controller_MPI(Controller):
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[: self.comm.rank])
 
-        active = self.step_is_active(time, t0, Tend)
+        active = self.step_is_active(time, t0, Tend, self.S.dt)
         comm_active = self.comm.Split(active)
         self.S.status.slot = comm_active.rank
 
@@ -152,10 +152,10 @@ class controller_MPI(Controller):
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[: self.S.status.slot])
 
-            active = self.step_is_active(time, tend, Tend)
+            active = self.step_is_active(time, tend, Tend, self.S.dt)
 
             # check if we need to split the communicator
-            if tend + sum(all_dt[: comm_active.size - 1]) >= Tend - 10 * np.finfo(float).eps:
+            if not all(comm_active.allgather(active)):
                 comm_active_new = comm_active.Split(active)
                 comm_active.Free()
                 comm_active = comm_active_new
