@@ -1,0 +1,30 @@
+pySDC/helpers/spectral_helper.py
+  s_8af9efb21347c1::t_e632bd77d7b253 1385,1392,1415
+pySDC/implementations/problem_classes/generic_spectral.py
+  s_8af9efb21347c1::t_e632bd77d7b253 133,276-290,292-294,330
+  s_8af9efb21347c1::t_7bf2a09a8f9809 291
+pySDC/core/base_transfer.py
+  s_8af9efb21347c1::t_872a5313e20f28 173-174
+pySDC/implementations/transfer_classes/BaseTransferMPI.py
+  s_8af9efb21347c1::t_872a5313e20f28 108
+pySDC/tests/test_transfer_classes/test_restricted_boundary_values.py
+  s_8af9efb21347c1::t_a9bf77e79be32c 1-46
+pySDC/core/problem.py
+  s_8af9efb21347c1::t_7c3f31badf9791 311-329
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "56f7b1ae8b4cf2db7baec87abe465b26a28c8319",
+  "prompts": {},
+  "sessions": {
+    "s_8af9efb21347c1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9baba716-16ad-4514-b3d0-82e4a4106289",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
