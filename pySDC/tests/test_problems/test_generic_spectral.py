@@ -86,5 +86,35 @@ def test_right_preconditioner_is_factorized_once(monkeypatch):
     assert len(calls) == 1, f'Factorized the right preconditioner {len(calls)} times'
 
 
+@pytest.mark.base
+@pytest.mark.parametrize('mssdc_jac', [True, False])
+def test_multistep_controller_copies_problem(mssdc_jac):
+    """The non-MPI controller makes its extra steps with `dill.copy`, which used to recurse forever in `__getattr__`."""
+    import numpy as np
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.Burgers import Burgers1D
+    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+
+    description = {
+        'problem_class': Burgers1D,
+        'problem_params': {'N': 32, 'epsilon': 0.1},
+        'sweeper_class': imex_1st_order,
+        'sweeper_params': {'num_nodes': 3, 'quad_type': 'RADAU-RIGHT', 'QI': 'LU'},
+        'level_params': {'dt': 1e-2, 'restol': 1e-12},
+        'step_params': {'maxiter': 50},
+    }
+
+    u = {}
+    for num_procs in [1, 2]:
+        controller = controller_nonMPI(
+            num_procs=num_procs, controller_params={'logger_level': 30, 'mssdc_jac': mssdc_jac}, description=description
+        )
+        P = controller.MS[0].levels[0].prob
+        u[num_procs], _ = controller.run(u0=P.u_exact(0), t0=0, Tend=4e-2)
+
+    assert controller.MS[1].levels[0].prob.spectral is not P.spectral
+    assert np.allclose(u[1], u[2], atol=1e-12)
+
+
 if __name__ == '__main__':
     test_initial_guess(False, True, 'bicgstab', True, True, 2**4)
