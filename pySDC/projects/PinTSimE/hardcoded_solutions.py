@@ -411,9 +411,9 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                 }
             elif dt == 1e-3:
                 expected = {
-                    'u': 5.9737411566014105,
-                    'e_global': 0.0005763403865515215,
-                    'sum_niters': 2226.0,
+                    'u': 5.971255816863172,
+                    'e_global': 0.0005763403865506334,
+                    'sum_niters': 2225.0,
                 }
         got.update(
             {
@@ -434,10 +434,10 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                 }
             elif dt == 1e-2:
                 expected = {
-                    'vC1': 83.97462422132232,
-                    'vC2': 80.52135774600202,
-                    'iLp': 16.09884649820726,
-                    'sum_niters': 7206.0,
+                    'vC1': 83.97535088144014,
+                    'vC2': 80.52142375242333,
+                    'iLp': 16.09650585135131,
+                    'sum_niters': 7202.0,
                 }
         got.update(
             {

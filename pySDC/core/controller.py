@@ -348,12 +348,12 @@ class Controller(object):
         may be run partially. An algorithm that couples its steps too tightly to drop one of them
         answers this from `block_start` instead and runs the block whole.
 
-        "Before" means by more than half a step, i.e. the step runs only if its end is closer to
-        `Tend` than its start. The start times are accumulated by repeated addition, so their
-        round-off is about N^2 eps / 2 steps after N steps and can fall on either side of `Tend`;
-        any fixed tolerance below that lets a step starting at `Tend` up to round-off run past
-        it. Half a step is the largest tolerance that never moves the end of the run further from
-        `Tend`, which a step that ends more than half a step past `Tend` would.
+        "Before" means by more than the round-off in `time`. The start times are accumulated by
+        repeated addition of `dt`, and each addition is off by at most eps |t| / 2. After the
+        N ~ |Tend| / dt additions it takes to get to `Tend`, plus the rounding of `dt` itself,
+        `time` can be off by (N + 1) eps |Tend| / 2, on either side of `Tend`. Twice that is the
+        tolerance here, so a step starting at `Tend` up to round-off does not run past it, while
+        a last step that does not fit into the interval still runs, past `Tend`.
 
         Args:
             time (float): when this step starts
@@ -364,7 +364,7 @@ class Controller(object):
         Returns:
             bool: whether this step takes part
         """
-        return time < Tend - 0.5 * dt
+        return time < Tend - (abs(Tend) / dt + 1) * np.finfo(float).eps * abs(Tend)
 
     def setup_convergence_controllers(self, description: Dict[str, Any]) -> None:
         '''
