@@ -1,0 +1,21 @@
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_67662a7fa7d158::t_c154c0c9051ec2 414-416,437-440
+pySDC/core/controller.py
+  s_67662a7fa7d158::t_3ddd64125656e6 351-356,367
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4ebd0a16037c76f21758b7ec8ceba2c4f6b6a152",
+  "prompts": {},
+  "sessions": {
+    "s_67662a7fa7d158": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8cac001f-333a-4df9-a979-d0e9f0079a34",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
