@@ -1,0 +1,19 @@
+pySDC/tests/test_transfer_classes/test_restricted_boundary_values.py
+  s_8af9efb21347c1::t_b41799ca4c5c61 52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2440797695689658bdac2cf41d8fdd85e0ad706d",
+  "prompts": {},
+  "sessions": {
+    "s_8af9efb21347c1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9baba716-16ad-4514-b3d0-82e4a4106289",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
