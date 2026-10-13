@@ -799,7 +799,7 @@
 
 <div class="viewcode-block" id="Controller.step_is_active">
 <a class="viewcode-back" href="../../../pySDC/pySDC.core.controller.html#pySDC.core.controller.Controller.step_is_active">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">step_is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">block_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Tend</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step_is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">block_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Tend</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Whether a step starting at `time`, in a block starting at `block_start`, still has work.</span>
 
@@ -807,15 +807,23 @@
 <span class="sd">        may be run partially. An algorithm that couples its steps too tightly to drop one of them</span>
 <span class="sd">        answers this from `block_start` instead and runs the block whole.</span>
 
+<span class="sd">        "Before" means by more than the round-off in `time`. The start times are accumulated by</span>
+<span class="sd">        repeated addition of `dt`, and each addition is off by at most eps |t| / 2. After the</span>
+<span class="sd">        N ~ |Tend| / dt additions it takes to get to `Tend`, plus the rounding of `dt` itself,</span>
+<span class="sd">        `time` can be off by (N + 1) eps |Tend| / 2, on either side of `Tend`. Twice that is the</span>
+<span class="sd">        tolerance here, so a step starting at `Tend` up to round-off does not run past it, while</span>
+<span class="sd">        a last step that does not fit into the interval still runs, past `Tend`.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            time (float): when this step starts</span>
 <span class="sd">            block_start (float): when the first step of this step's block starts</span>
 <span class="sd">            Tend (float): ending time</span>
+<span class="sd">            dt (float): size of this step</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: whether this step takes part</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="n">time</span> <span class="o">&lt;</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span></div>
+        <span class="k">return</span> <span class="n">time</span> <span class="o">&lt;</span> <span class="n">Tend</span> <span class="o">-</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Controller.setup_convergence_controllers">

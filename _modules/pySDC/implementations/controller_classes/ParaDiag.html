@@ -435,8 +435,6 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
 
 <div class="viewcode-block" id="ParaDiag">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag">[docs]</a>
@@ -547,7 +545,7 @@
 
 <div class="viewcode-block" id="ParaDiag.step_is_active">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.step_is_active">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">step_is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">block_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Tend</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step_is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">block_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Tend</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        ParaDiag diagonalizes across the whole block, so it cannot drop a step out of one. A block</span>
 <span class="sd">        that starts before `Tend` is run whole, past `Tend` if need be.</span>
@@ -556,13 +554,14 @@
 <span class="sd">            time (float): when this step starts</span>
 <span class="sd">            block_start (float): when the first step of this step's block starts</span>
 <span class="sd">            Tend (float): ending time</span>
+<span class="sd">            dt (float): size of this step, which is the size of every step in the block</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: whether this step takes part</span>
 <span class="sd">        """</span>
-        <span class="n">active</span> <span class="o">=</span> <span class="n">block_start</span> <span class="o">&lt;</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+        <span class="n">active</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">step_is_active</span><span class="p">(</span><span class="n">block_start</span><span class="p">,</span> <span class="n">block_start</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">active</span> <span class="ow">and</span> <span class="n">time</span> <span class="o">&gt;=</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">active</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">step_is_active</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">block_start</span><span class="p">,</span> <span class="n">Tend</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s1">'Warning: This controller will solve past your desired end time until the end of its block!'</span>
             <span class="p">)</span>

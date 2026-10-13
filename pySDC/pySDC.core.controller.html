@@ -788,17 +788,24 @@ count or a residual based stopping criterion, as well as all convergence control
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.core.controller.Controller.step_is_active">
-<span class="sig-name descname"><span class="pre">step_is_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/pySDC/core/controller.html#Controller.step_is_active"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.controller.Controller.step_is_active" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">step_is_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/pySDC/core/controller.html#Controller.step_is_active"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.controller.Controller.step_is_active" title="Link to this definition">#</a></dt>
 <dd><p>Whether a step starting at <cite>time</cite>, in a block starting at <cite>block_start</cite>, still has work.</p>
 <p>The default is that a step runs if it starts before the end of the interval, so a block
 may be run partially. An algorithm that couples its steps too tightly to drop one of them
 answers this from <cite>block_start</cite> instead and runs the block whole.</p>
+<p>“Before” means by more than the round-off in <cite>time</cite>. The start times are accumulated by
+repeated addition of <cite>dt</cite>, and each addition is off by at most eps <a href="#id1"><span class="problematic" id="id2">|t|</span></a> / 2. After the
+N ~ <a href="#id3"><span class="problematic" id="id4">|Tend|</span></a> / dt additions it takes to get to <cite>Tend</cite>, plus the rounding of <cite>dt</cite> itself,
+<cite>time</cite> can be off by (N + 1) eps <a href="#id5"><span class="problematic" id="id6">|Tend|</span></a> / 2, on either side of <cite>Tend</cite>. Twice that is the
+tolerance here, so a step starting at <cite>Tend</cite> up to round-off does not run past it, while
+a last step that does not fit into the interval still runs, past <cite>Tend</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – when this step starts</p></li>
 <li><p><strong>block_start</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – when the first step of this step’s block starts</p></li>
 <li><p><strong>Tend</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – ending time</p></li>
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – size of this step</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
