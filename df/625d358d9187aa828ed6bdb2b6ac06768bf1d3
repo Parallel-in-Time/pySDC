@@ -1,0 +1,16 @@
+pySDC/implementations/problem_classes/generic_spectral.py
+  h_c659f0e92ef98d 181-183
+pySDC/tests/test_problems/test_generic_spectral.py
+  h_c659f0e92ef98d 89-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "df625d358d9187aa828ed6bdb2b6ac06768bf1d3",
+  "prompts": {},
+  "humans": {
+    "h_c659f0e92ef98d": {
+      "author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
