@@ -49,7 +49,7 @@ def test_multilevel_matches_SDC_with_time_dependent_BCs(num_procs):
 @pytest.mark.parametrize(
     'kwargs',
     [
-        pytest.param({}, marks=pytest.mark.base),
+        pytest.param({}, marks=pytest.mark.mpi4py),
         pytest.param({'useGPU': True}, marks=pytest.mark.cupy),
         pytest.param({'useGPU': True, 'heterogeneous': True}, marks=pytest.mark.cupy),
     ],
