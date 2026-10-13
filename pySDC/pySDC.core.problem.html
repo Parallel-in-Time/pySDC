@@ -916,6 +916,28 @@ This defaults to an Euler step to accommodate linear problems.</p>
 <dd><p>Generate a data variable for u</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.core.problem.Problem.use_restricted_boundary_values">
+<span class="sig-name descname"><span class="pre">use_restricted_boundary_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pySDC/core/problem.html#Problem.use_restricted_boundary_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.problem.Problem.use_restricted_boundary_values" title="Link to this definition">#</a></dt>
+<dd><p>Called by the FAS restriction on the coarse problem with the restricted fine solution <cite>u</cite> at the coarse
+collocation nodes <cite>t</cite> (one entry per node held by this rank). Does nothing by default.</p>
+<p>A problem that imposes boundary data in <cite>solve_system</cite> should impose the boundary values of <cite>u</cite> in its solves
+at these times instead, until the next call. Then the coarse correction has homogeneous boundary conditions, as
+in multigrid, and the restricted converged fine solution is a fixed point of the coarse sweep. The tau
+correction cannot do this, because the boundary rows of the right hand side are replaced by the data. With
+its own data at the coarse nodes, MLSDC and PFASST converge to a different solution than SDC whenever the data
+depends on time: the restricted boundary values interpolate the data at the fine nodes, which is not the data
+at the coarse nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – Restricted solution at the coarse nodes</p></li>
+<li><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – Times of the coarse nodes</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -1011,6 +1033,7 @@ a function, e.g</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.problem.Problem.solve_jacobian"><code class="docutils literal notranslate"><span class="pre">solve_jacobian()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.problem.Problem.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.problem.Problem.u_init"><code class="docutils literal notranslate"><span class="pre">u_init</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.problem.Problem.use_restricted_boundary_values"><code class="docutils literal notranslate"><span class="pre">use_restricted_boundary_values()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.problem.WorkCounter"><code class="docutils literal notranslate"><span class="pre">WorkCounter</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">

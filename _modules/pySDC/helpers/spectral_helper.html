@@ -2024,13 +2024,14 @@
 
 <div class="viewcode-block" id="SpectralHelper.put_BCs_in_rhs_hat">
 <a class="viewcode-back" href="../../../pySDC/pySDC.helpers.spectral_helper.html#pySDC.helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">put_BCs_in_rhs_hat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs_hat</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put_BCs_in_rhs_hat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs_hat</span><span class="p">,</span> <span class="n">BCs_hat</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Put the BCs in the right hand side in spectral space for solving.</span>
 <span class="sd">        This function needs no transforms and caches a mask for faster subsequent use.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            rhs_hat: Right hand side in spectral space</span>
+<span class="sd">            BCs_hat: Boundary values to use instead of `rhs_BCs_hat`, zero outside the boundary rows</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            rhs in spectral space with BCs</span>
@@ -2053,7 +2054,7 @@
                             <span class="bp">self</span><span class="o">.</span><span class="n">_rhs_hat_zero_mask</span><span class="p">[(</span><span class="o">*</span><span class="n">slices</span><span class="p">,)]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">rhs_hat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_rhs_hat_zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">return</span> <span class="n">rhs_hat</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhs_BCs_hat</span></div>
+        <span class="k">return</span> <span class="n">rhs_hat</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rhs_BCs_hat</span> <span class="k">if</span> <span class="n">BCs_hat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">BCs_hat</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpectralHelper.put_BCs_in_rhs">

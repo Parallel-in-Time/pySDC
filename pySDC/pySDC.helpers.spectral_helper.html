@@ -1544,12 +1544,15 @@ Consider <cite>put_BCs_in_rhs_hat</cite> to add BCs with no extra transforms nee
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat">
-<span class="sig-name descname"><span class="pre">put_BCs_in_rhs_hat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs_hat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/spectral_helper.html#SpectralHelper.put_BCs_in_rhs_hat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">put_BCs_in_rhs_hat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BCs_hat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/helpers/spectral_helper.html#SpectralHelper.put_BCs_in_rhs_hat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.helpers.spectral_helper.SpectralHelper.put_BCs_in_rhs_hat" title="Link to this definition">#</a></dt>
 <dd><p>Put the BCs in the right hand side in spectral space for solving.
 This function needs no transforms and caches a mask for faster subsequent use.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rhs_hat</strong> – Right hand side in spectral space</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs_hat</strong> – Right hand side in spectral space</p></li>
+<li><p><strong>BCs_hat</strong> – Boundary values to use instead of <cite>rhs_BCs_hat</cite>, zero outside the boundary rows</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>rhs in spectral space with BCs</p>

@@ -786,6 +786,28 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
+<div class="viewcode-block" id="Problem.use_restricted_boundary_values">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.problem.html#pySDC.core.problem.Problem.use_restricted_boundary_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">use_restricted_boundary_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Called by the FAS restriction on the coarse problem with the restricted fine solution `u` at the coarse</span>
+<span class="sd">        collocation nodes `t` (one entry per node held by this rank). Does nothing by default.</span>
+
+<span class="sd">        A problem that imposes boundary data in `solve_system` should impose the boundary values of `u` in its solves</span>
+<span class="sd">        at these times instead, until the next call. Then the coarse correction has homogeneous boundary conditions, as</span>
+<span class="sd">        in multigrid, and the restricted converged fine solution is a fixed point of the coarse sweep. The tau</span>
+<span class="sd">        correction cannot do this, because the boundary rows of the right hand side are replaced by the data. With</span>
+<span class="sd">        its own data at the coarse nodes, MLSDC and PFASST converge to a different solution than SDC whenever the data</span>
+<span class="sd">        depends on time: the restricted boundary values interpolate the data at the fine nodes, which is not the data</span>
+<span class="sd">        at the coarse nodes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (list): Restricted solution at the coarse nodes</span>
+<span class="sd">            t (list): Times of the coarse nodes</span>
+<span class="sd">        """</span>
+        <span class="k">pass</span></div>
+
+
 <div class="viewcode-block" id="Problem.solve_jacobian">
 <a class="viewcode-back" href="../../../pySDC/pySDC.core.problem.html#pySDC.core.problem.Problem.solve_jacobian">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_jacobian</span><span class="p">(</span>

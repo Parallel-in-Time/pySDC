@@ -769,13 +769,30 @@ and <cite>M</cite> are stored with the suffix <cite>_CPU</cite>. On CPU, the <ci
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_itransform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_itransform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system" title="Link to this definition">#</a></dt>
 <dd><p>Do an implicit Euler step to solve M u_t + Lu = rhs, with M the mass matrix and L the linear operator as setup by
 <code class="docutils literal notranslate"><span class="pre">GenericSpectralLinear.setup_L</span></code> and <code class="docutils literal notranslate"><span class="pre">GenericSpectralLinear.setup_M</span></code>.</p>
 <p>The implicit Euler step is (M - dt L) u = M rhs. Note that M need not be invertible as long as (M + dt*L) is.
 This means solving with dt=0 to mimic explicit methods does not work for all problems, in particular simple DAEs.</p>
 <p>Note that by putting M rhs on the right hand side, this function can only solve algebraic conditions equal to
 zero. If you want something else, it should be easy to overload this function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.use_restricted_boundary_values">
+<span class="sig-name descname"><span class="pre">use_restricted_boundary_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/generic_spectral.html#GenericSpectralLinear.use_restricted_boundary_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.use_restricted_boundary_values" title="Link to this definition">#</a></dt>
+<dd><p>Impose the boundary values of the restricted solution <cite>u</cite> in the solves at the times <cite>t</cite> instead of the data,
+see <a class="reference internal" href="pySDC.core.problem.html#pySDC.core.problem.Problem.use_restricted_boundary_values" title="pySDC.core.problem.Problem.use_restricted_boundary_values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pySDC.core.problem.Problem.use_restricted_boundary_values()</span></code></a>. The values are the boundary condition
+operator applied to the coefficients, so this works for any boundary condition and for spatial coarsening, where
+the boundary values of the restricted coefficients need not be the restricted boundary values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – Restricted solution at the coarse nodes</p></li>
+<li><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – Times of the coarse nodes</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -861,6 +878,7 @@ zero. If you want something else, it should be easy to overload this function.</
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_M"><code class="docutils literal notranslate"><span class="pre">setup_M()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.setup_preconditioner"><code class="docutils literal notranslate"><span class="pre">setup_preconditioner()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_spectral.GenericSpectralLinear.use_restricted_boundary_values"><code class="docutils literal notranslate"><span class="pre">use_restricted_boundary_values()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.generic_spectral.compute_residual_DAE"><code class="docutils literal notranslate"><span class="pre">compute_residual_DAE()</span></code></a></li>
