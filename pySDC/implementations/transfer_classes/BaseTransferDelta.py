@@ -91,6 +91,7 @@ class delta_transfer(BaseTransfer):
             G.f[m] = PG.eval_f(G.u[m], G.time + G.dt * SG.coll.nodes[m - 1])
             G.uold[m] = PG.dtype_u(G.u[m])
             G.fold[m] = PG.dtype_f(G.f[m])
+        PG.use_restricted_boundary_values(G.u[1:], [G.time + G.dt * tau for tau in SG.coll.nodes])
 
         G.status.unlocked = True
         return None

@@ -284,12 +284,14 @@ class GenericSpectralLinear(Problem):
             u (list): Restricted solution at the coarse nodes
             t (list): Times of the coarse nodes
         """
-        self._restricted_BCs_hat = {
-            _t: (self.spectral.BCs @ (_u if self.spectral_space else self.spectral.transform(_u)).flatten()).reshape(
-                self.spectral.rhs_BCs_hat.shape
-            )
-            for _u, _t in zip(u, t, strict=True)
-        }
+        self.heterogeneous_setup()
+        on_CPU = self.heterogeneous and self.useGPU  # then the BC operator lives on the CPU
+
+        self._restricted_BCs_hat = {}
+        for _u, _t in zip(u, t, strict=True):
+            u_hat = (_u if self.spectral_space else self.spectral.transform(_u)).flatten()
+            BCs_hat = self.spectral.BCs @ (u_hat.get() if on_CPU else u_hat)
+            self._restricted_BCs_hat[_t] = self.xp.asarray(BCs_hat).reshape(self.spectral.rhs_BCs_hat.shape)
 
     def solve_system(self, rhs, dt, u0=None, t=None, *args, skip_itransform=False, **kwargs):
         """

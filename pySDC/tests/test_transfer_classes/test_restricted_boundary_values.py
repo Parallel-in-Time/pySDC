@@ -44,3 +44,31 @@ def test_multilevel_matches_SDC_with_time_dependent_BCs(num_procs):
     u_SDC = run([4], 1)
     u_ML = run([4, 2], num_procs)
     assert abs(u_ML - u_SDC) < 1e-12, abs(u_ML - u_SDC)
+
+
+@pytest.mark.parametrize(
+    'kwargs',
+    [
+        pytest.param({}, marks=pytest.mark.base),
+        pytest.param({'useGPU': True}, marks=pytest.mark.cupy),
+        pytest.param({'useGPU': True, 'heterogeneous': True}, marks=pytest.mark.cupy),
+    ],
+)
+def test_solves_keep_restricted_boundary_values(kwargs):
+    """A solve at a restricted time imposes the boundary values of the restricted solution, here with an integral BC"""
+    from pySDC.implementations.problem_classes.RayleighBenard import RayleighBenard
+
+    P = RayleighBenard(nx=16, nz=8, **kwargs)
+    u = P.u_exact(0, noise_level=1e-3) * 2
+
+    def boundary_values(v):
+        """On the CPU, where the heterogeneous mode keeps the BC operator"""
+        v_hat = (v if P.spectral_space else P.transform(v)).flatten()
+        values = P.spectral.BCs @ (v_hat.get() if P.heterogeneous else v_hat)
+        return values.get() if P.useGPU and not P.heterogeneous else values
+
+    P.use_restricted_boundary_values([u], [0.3])
+    kept = P.solve_system(P.u_exact(0), 1e-2, None, 0.3)
+    data = P.solve_system(P.u_exact(0), 1e-2, None, 0.4)
+    assert np.allclose(boundary_values(kept), boundary_values(u))
+    assert not np.allclose(boundary_values(data), boundary_values(u))
