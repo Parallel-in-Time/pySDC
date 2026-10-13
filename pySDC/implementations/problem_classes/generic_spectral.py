@@ -130,6 +130,7 @@ class GenericSpectralLinear(Problem):
         self.setup_preconditioner(Dirichlet_recombination, left_preconditioner)
 
         self.cached_factorizations = {}
+        self._restricted_BCs_hat = {}
 
         if self.heterogeneous:
             self.__heterogeneous_setup = False
@@ -272,7 +273,25 @@ class GenericSpectralLinear(Problem):
             self.logger.debug('Setting up right preconditioner on CPU due to memory error')
             self.Pr = self.spectral.sparse_lib.csc_matrix(operator.get() @ self.Pl.T.get())
 
-    def solve_system(self, rhs, dt, u0=None, *args, skip_itransform=False, **kwargs):
+    def use_restricted_boundary_values(self, u, t):
+        """
+        Impose the boundary values of the restricted solution `u` in the solves at the times `t` instead of the data,
+        see :meth:`pySDC.core.problem.Problem.use_restricted_boundary_values`. The values are the boundary condition
+        operator applied to the coefficients, so this works for any boundary condition and for spatial coarsening, where
+        the boundary values of the restricted coefficients need not be the restricted boundary values.
+
+        Args:
+            u (list): Restricted solution at the coarse nodes
+            t (list): Times of the coarse nodes
+        """
+        self._restricted_BCs_hat = {
+            _t: (self.spectral.BCs @ (_u if self.spectral_space else self.spectral.transform(_u)).flatten()).reshape(
+                self.spectral.rhs_BCs_hat.shape
+            )
+            for _u, _t in zip(u, t, strict=True)
+        }
+
+    def solve_system(self, rhs, dt, u0=None, t=None, *args, skip_itransform=False, **kwargs):
         """
         Do an implicit Euler step to solve M u_t + Lu = rhs, with M the mass matrix and L the linear operator as setup by
         ``GenericSpectralLinear.setup_L`` and ``GenericSpectralLinear.setup_M``.
@@ -308,7 +327,7 @@ class GenericSpectralLinear(Problem):
             u0_hat[...] = self._Pr_inv(u0_hat)
 
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
-        rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat)
+        rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat, self._restricted_BCs_hat.get(t))
         rhs_hat = self.Pl @ rhs_hat.flatten()
 
         if dt not in self.cached_factorizations.keys() or not self.solver_type.lower() == 'cached_direct':
