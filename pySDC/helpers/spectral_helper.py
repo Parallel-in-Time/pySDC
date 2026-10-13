@@ -1382,13 +1382,14 @@ class SpectralHelper:
         """
         return self.BC_line_zero_matrix @ A + self.BCs
 
-    def put_BCs_in_rhs_hat(self, rhs_hat):
+    def put_BCs_in_rhs_hat(self, rhs_hat, BCs_hat=None):
         """
         Put the BCs in the right hand side in spectral space for solving.
         This function needs no transforms and caches a mask for faster subsequent use.
 
         Args:
             rhs_hat: Right hand side in spectral space
+            BCs_hat: Boundary values to use instead of `rhs_BCs_hat`, zero outside the boundary rows
 
         Returns:
             rhs in spectral space with BCs
@@ -1411,7 +1412,7 @@ class SpectralHelper:
                             self._rhs_hat_zero_mask[(*slices,)] = True
 
         rhs_hat[self._rhs_hat_zero_mask] = 0
-        return rhs_hat + self.rhs_BCs_hat
+        return rhs_hat + (self.rhs_BCs_hat if BCs_hat is None else BCs_hat)
 
     def put_BCs_in_rhs(self, rhs):
         """

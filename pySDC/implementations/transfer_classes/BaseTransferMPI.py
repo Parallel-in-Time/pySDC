@@ -105,6 +105,7 @@ class base_transfer_MPI(BaseTransfer):
         # save u and rhs evaluations for interpolation
         G.uold[CG.rank + 1] = PG.dtype_u(G.u[CG.rank + 1])
         G.fold[CG.rank + 1] = PG.dtype_f(G.f[CG.rank + 1])
+        PG.use_restricted_boundary_values([G.u[CG.rank + 1]], [G.time + G.dt * SG.coll.nodes[CG.rank]])
 
         # works as a predictor
         G.status.unlocked = True
