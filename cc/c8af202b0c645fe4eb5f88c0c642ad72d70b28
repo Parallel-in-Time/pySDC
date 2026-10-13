@@ -1,0 +1,21 @@
+pySDC/tests/test_problems/test_generic_spectral.py
+  s_1cf1d565400711::t_51742f1e3bcd9e 89-118
+pySDC/implementations/problem_classes/generic_spectral.py
+  s_1cf1d565400711::t_42f7606fa2180b 180-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ccc8af202b0c645fe4eb5f88c0c642ad72d70b28",
+  "prompts": {},
+  "sessions": {
+    "s_1cf1d565400711": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "048e8cc3-283c-4a82-872a-377f0f5f1d5d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
