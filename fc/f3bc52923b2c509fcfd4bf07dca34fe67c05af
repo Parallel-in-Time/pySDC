@@ -1,0 +1,31 @@
+pySDC/implementations/controller_classes/controller_MPI.py
+  s_67662a7fa7d158::t_7c4b9250461d00 103,155,158
+pySDC/tests/test_controllers/test_step_is_active.py
+  s_67662a7fa7d158::t_05546dd039cbc2 9-10
+  s_67662a7fa7d158::t_7c4b9250461d00 1-8,11-34
+pySDC/core/controller.py
+  s_67662a7fa7d158::t_7c4b9250461d00 343,357,362
+  s_67662a7fa7d158::t_3ddd64125656e6 351-356,367
+pySDC/implementations/controller_classes/ParaDiag.py
+  s_67662a7fa7d158::t_7c4b9250461d00 98,107,112,114
+pySDC/implementations/controller_classes/controller_nonMPI.py
+  s_67662a7fa7d158::t_7c4b9250461d00 125,176
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_67662a7fa7d158::t_c154c0c9051ec2 414-416,437-440
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fcf3bc52923b2c509fcfd4bf07dca34fe67c05af",
+  "prompts": {},
+  "sessions": {
+    "s_67662a7fa7d158": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8cac001f-333a-4df9-a979-d0e9f0079a34",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
