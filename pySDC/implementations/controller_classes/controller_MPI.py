@@ -583,7 +583,6 @@ class controller_MPI(Controller):
 
             self.S.levels[0].sweep.updateVariableCoeffs(k + 1)  # update QDelta coefficients if variable preconditioner
             self.S.levels[0].sweep.update_nodes()
-            self.S.levels[0].sweep.compute_residual(stage='IT_FINE')
 
             for hook in self.hooks:
                 hook.post_sweep(step=self.S, level_number=0)
@@ -615,7 +614,6 @@ class controller_MPI(Controller):
                     hook.pre_sweep(step=self.S, level_number=l)
 
                 self.S.levels[l].sweep.update_nodes()
-                self.S.levels[l].sweep.compute_residual(stage='IT_DOWN')
                 for hook in self.hooks:
                     hook.post_sweep(step=self.S, level_number=l)
 
@@ -639,7 +637,6 @@ class controller_MPI(Controller):
         for hook in self.hooks:
             hook.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
         self.S.levels[-1].sweep.update_nodes()
-        self.S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
         for hook in self.hooks:
             hook.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
 
@@ -680,7 +677,6 @@ class controller_MPI(Controller):
                     for hook in self.hooks:
                         hook.pre_sweep(step=self.S, level_number=l - 1)
                     self.S.levels[l - 1].sweep.update_nodes()
-                    self.S.levels[l - 1].sweep.compute_residual(stage='IT_UP')
                     for hook in self.hooks:
                         hook.post_sweep(step=self.S, level_number=l - 1)
 

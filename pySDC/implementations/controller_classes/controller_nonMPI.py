@@ -571,13 +571,12 @@ class controller_nonMPI(Controller):
                 self.recv_full(S, level=0, add_to_stats=(k == nsweeps - 1))
 
             for S in local_MS_running:
-                # standard sweep workflow: update nodes, compute residual, log progress
+                # standard sweep workflow: update nodes, log progress (the residual follows once, in IT_CHECK)
                 for hook in self.hooks:
                     hook.pre_sweep(step=S, level_number=0)
 
                 S.levels[0].sweep.updateVariableCoeffs(k + 1)  # update QDelta coefficients if variable preconditioner
                 S.levels[0].sweep.update_nodes()
-                S.levels[0].sweep.compute_residual(stage='IT_FINE')
 
                 for hook in self.hooks:
                     hook.post_sweep(step=S, level_number=0)
@@ -613,7 +612,6 @@ class controller_nonMPI(Controller):
                     for hook in self.hooks:
                         hook.pre_sweep(step=S, level_number=l)
                     S.levels[l].sweep.update_nodes()
-                    S.levels[l].sweep.compute_residual(stage='IT_DOWN')
                     for hook in self.hooks:
                         hook.post_sweep(step=S, level_number=l)
 
@@ -641,7 +639,6 @@ class controller_nonMPI(Controller):
             for hook in self.hooks:
                 hook.pre_sweep(step=S, level_number=len(S.levels) - 1)
             S.levels[-1].sweep.update_nodes()
-            S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
             for hook in self.hooks:
                 hook.post_sweep(step=S, level_number=len(S.levels) - 1)
 
@@ -682,7 +679,6 @@ class controller_nonMPI(Controller):
                         for hook in self.hooks:
                             hook.pre_sweep(step=S, level_number=l - 1)
                         S.levels[l - 1].sweep.update_nodes()
-                        S.levels[l - 1].sweep.compute_residual(stage='IT_UP')
                         for hook in self.hooks:
                             hook.post_sweep(step=S, level_number=l - 1)
 

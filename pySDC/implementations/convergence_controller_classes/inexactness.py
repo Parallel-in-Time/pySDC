@@ -70,6 +70,9 @@ class NewtonInexactness(ConvergenceController):
             None
         """
         for lvl in step.levels:
+            # the controller computes the residual on the finest level only, so ask for it on the others
+            if lvl is not step.levels[0]:
+                lvl.sweep.compute_residual()
             SDC_accuracy = (
                 lvl.status.get('error_embedded_estimate', lvl.status.residual)
                 if self.params.use_e_tol
