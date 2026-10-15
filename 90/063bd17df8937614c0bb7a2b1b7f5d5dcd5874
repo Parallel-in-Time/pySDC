@@ -1,0 +1,33 @@
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_4c56c5a8aed02b::t_3e63f811c3d4f2 277,440,463
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_4c56c5a8aed02b::t_d8cf7cb4b56c8f 91,101-110,112
+pySDC/implementations/sweeper_classes/imex_1st_order.py
+  s_4c56c5a8aed02b::t_7f973bf9434611 48-50,56,78-81,87-89,92-93,95-96
+  s_4c56c5a8aed02b::t_e0b2536c2d095c 82-83,90-91
+pySDC/implementations/sweeper_classes/explicit.py
+  s_4c56c5a8aed02b::t_7171c2b1e470cd 70-72,77-79,81-82
+  s_4c56c5a8aed02b::t_e0b2536c2d095c 73,80
+pySDC/implementations/sweeper_classes/multi_implicit.py
+  s_4c56c5a8aed02b::t_7171c2b1e470cd 48-51,56,59-60,81,83-85,88-99,102-111,114
+pySDC/implementations/sweeper_classes/generic_implicit.py
+  s_4c56c5a8aed02b::t_e0b2536c2d095c 71,78
+  s_4c56c5a8aed02b::t_c7d3db66c2b39e 68-69,76-77
+  s_4c56c5a8aed02b::t_03d15901351aab 70,75,79-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "90063bd17df8937614c0bb7a2b1b7f5d5dcd5874",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": null
+    }
+  }
+}
