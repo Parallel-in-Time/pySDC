@@ -1,0 +1,40 @@
+pySDC/implementations/sweeper_classes/explicit.py
+  s_4c56c5a8aed02b::t_6410b6801da3bc 41-45,78-81,86-91,125-131
+pySDC/implementations/sweeper_classes/generic_implicit.py
+  s_4c56c5a8aed02b::t_dc96bec42c638f 40-44,76-79,84-89,128-134
+pySDC/implementations/sweeper_classes/imex_1st_order.py
+  s_4c56c5a8aed02b::t_9f31dcc4fec652 47-55,58,91-95,100-106,146-155
+pySDC/tests/test_sweepers/test_delta_form_MPI.py
+  s_4c56c5a8aed02b::t_9606e40718ff4f 71-72,76
+  s_4c56c5a8aed02b::t_07b4367c9d0326 73-75
+pySDC/implementations/datatype_classes/petsc_vec.py
+  s_4c56c5a8aed02b::t_2b3ee8b60c1347 24-46
+pySDC/implementations/sweeper_classes/multi_implicit.py
+  s_4c56c5a8aed02b::t_72541251f1f365 1-2,52-59,96-100,107-113,124-128,162-171
+pySDC/implementations/datatype_classes/fenics_mesh.py
+  s_4c56c5a8aed02b::t_2b3ee8b60c1347 97-119
+pySDC/implementations/datatype_classes/mesh.py
+  s_4c56c5a8aed02b::t_2b3ee8b60c1347 94-115
+pySDC/tests/test_datatypes/test_lincomb.py
+  s_4c56c5a8aed02b::t_f5788d931ae0c1 34
+  s_4c56c5a8aed02b::t_714d861087b4ab 1-18,21-24,28-30,32-33,35-41,43-46,49-113
+  s_4c56c5a8aed02b::t_71f6f24a432bfd 25,31,42
+  s_4c56c5a8aed02b::t_746caa8a70eb79 19-20,26-27
+  s_4c56c5a8aed02b::t_932d406ce2e7f4 47-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3182e51f73de2240093044ffe1824d1d8b52e698",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
