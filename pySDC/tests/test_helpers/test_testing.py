@@ -62,3 +62,24 @@ def test_DataChecker(tmp_path):
         pass
     else:
         raise AssertionError("data with incorrect size does not raise assertion error")
+
+
+@pytest.mark.base
+def test_DataChecker_crashed_reference_runs(tmp_path):
+    """A crashed reference run (inf) is not compared, but a finite reference that now crashes still fails."""
+    import numpy as np
+
+    script = str(tmp_path / 'script.py')
+    ref = DataChecker(script)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        ref.storeAndCheck('errors', [0.5, np.inf, 1e-3])
+    ref.writeToJSON()
+    os.rename(ref._dataFile, ref._dataRefFile)
+
+    DataChecker(script).storeAndCheck('errors', [0.5, 31044.0, 1e-3])
+    DataChecker(script).storeAndCheck('errors', [0.5, np.inf, 1e-3])
+    with pytest.raises(AssertionError):
+        DataChecker(script).storeAndCheck('errors', [0.5, 31044.0, np.inf])
+    with pytest.raises(AssertionError):
+        DataChecker(script).storeAndCheck('errors', [0.6, np.inf, 1e-3])
