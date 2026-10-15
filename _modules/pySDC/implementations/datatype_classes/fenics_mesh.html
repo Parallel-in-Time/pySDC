@@ -484,8 +484,8 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="c1"># always create new mesh, since otherwise c = a + b changes a as well!</span>
-            <span class="n">me</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">me</span> <span class="o">+=</span> <span class="n">other</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
@@ -504,9 +504,45 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="c1"># always create new mesh, since otherwise c = a - b changes a as well!</span>
-            <span class="n">me</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span>
+            <span class="n">me</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">me</span> <span class="o">-=</span> <span class="n">other</span>
             <span class="k">return</span> <span class="n">me</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Add another mesh in place, on the vector underneath, without copying through NumPy</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (fenics_mesh): mesh object to be added</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            DataError: if other is not a mesh object</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            fenics_mesh: the caller, now holding self+other</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span><span class="o">.</span><span class="n">axpy</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Subtract another mesh in place, on the vector underneath, without copying through NumPy</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (fenics_mesh): mesh object to be subtracted</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            DataError: if other is not a mesh object</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            fenics_mesh: the caller, now holding self-other</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span><span class="o">.</span><span class="n">axpy</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+            <span class="k">return</span> <span class="bp">self</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot subtract </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
 
@@ -525,7 +561,8 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
             <span class="c1"># always create new mesh, since otherwise c = f*a changes a as well!</span>
             <span class="n">me</span> <span class="o">=</span> <span class="n">fenics_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]</span>
+            <span class="n">vector</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span>
+            <span class="n">vector</span> <span class="o">*=</span> <span class="n">other</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot multiply </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
