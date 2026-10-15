@@ -1,0 +1,25 @@
+pySDC/projects/PinTSimE/battery_model.py
+  s_4c56c5a8aed02b::t_777fd4724350e8 398-400
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_4c56c5a8aed02b::t_777fd4724350e8 6,33-34,279,481-483,485,490,492
+pySDC/helpers/testing.py
+  s_4c56c5a8aed02b::t_be45d75982a975 101-105,107-111
+pySDC/tests/test_helpers/test_testing.py
+  s_4c56c5a8aed02b::t_be45d75982a975 65-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f71ce5eaa15898f4730f6e527fbaa1db3fda4a8c",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
