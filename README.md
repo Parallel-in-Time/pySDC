@@ -10,7 +10,7 @@
 | pySDC/core/common.py                                                                                |       23 |        0 |    100% |           |
 | pySDC/core/controller.py                                                                            |      187 |        1 |     99% |       104 |
 | pySDC/core/convergence\_controller.py                                                               |      111 |       18 |     84% |6-7, 438-448, 461-468, 489, 572, 585-589 |
-| pySDC/core/default\_hook.py                                                                         |       19 |        0 |    100% |           |
+| pySDC/core/default\_hook.py                                                                         |       15 |        0 |    100% |           |
 | pySDC/core/errors.py                                                                                |        9 |        0 |    100% |           |
 | pySDC/core/hooks.py                                                                                 |       57 |        2 |     96% |     6, 87 |
 | pySDC/core/level.py                                                                                 |       71 |        0 |    100% |           |
@@ -37,10 +37,10 @@
 | pySDC/helpers/visualization\_tools.py                                                               |       33 |        0 |    100% |           |
 | pySDC/helpers/vtkIO.py                                                                              |       51 |        1 |     98% |        90 |
 | pySDC/implementations/controller\_classes/ParaDiag.py                                               |       54 |        3 |     94% |48, 55, 115 |
-| pySDC/implementations/controller\_classes/controller\_MPI.py                                        |      299 |       46 |     85% |72, 238, 262, 284, 436, 446, 454, 458, 463, 484, 517, 550, 554, 574, 579, 603-623, 636, 649, 669-685 |
+| pySDC/implementations/controller\_classes/controller\_MPI.py                                        |      295 |       44 |     85% |72, 238, 262, 284, 436, 446, 454, 458, 463, 484, 517, 550, 554, 574, 579, 602-621, 634, 646, 666-681 |
 | pySDC/implementations/controller\_classes/controller\_ParaDiag\_MPI.py                              |       91 |        0 |    100% |           |
 | pySDC/implementations/controller\_classes/controller\_ParaDiag\_nonMPI.py                           |       86 |        0 |    100% |           |
-| pySDC/implementations/controller\_classes/controller\_nonMPI.py                                     |      297 |        3 |     99% |415-416, 458 |
+| pySDC/implementations/controller\_classes/controller\_nonMPI.py                                     |      293 |        3 |     99% |415-416, 458 |
 | pySDC/implementations/convergence\_controller\_classes/adaptive\_alpha.py                           |       36 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/adaptive\_collocation.py                     |       77 |        1 |     99% |       249 |
 | pySDC/implementations/convergence\_controller\_classes/adaptivity.py                                |      257 |       19 |     93% |130-131, 265, 274, 276, 299-308, 400, 407, 584, 729, 745, 1001-1002 |
@@ -52,7 +52,7 @@
 | pySDC/implementations/convergence\_controller\_classes/estimate\_extrapolation\_error.py            |      161 |        5 |     97% |103, 110, 364, 395, 399 |
 | pySDC/implementations/convergence\_controller\_classes/estimate\_polynomial\_error.py               |       97 |       10 |     90% |55, 210, 236-245 |
 | pySDC/implementations/convergence\_controller\_classes/hotrod.py                                    |       38 |        5 |     87% |85, 89, 96, 126-127 |
-| pySDC/implementations/convergence\_controller\_classes/inexactness.py                               |       24 |        2 |     92% |     50-54 |
+| pySDC/implementations/convergence\_controller\_classes/inexactness.py                               |       26 |        3 |     88% | 50-54, 75 |
 | pySDC/implementations/convergence\_controller\_classes/interpolate\_between\_restarts.py            |       41 |        3 |     93% | 55, 93-94 |
 | pySDC/implementations/convergence\_controller\_classes/spread\_step\_sizes.py                       |       61 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/step\_size\_limiter.py                       |       63 |        0 |    100% |           |
@@ -69,6 +69,7 @@
 | pySDC/implementations/hooks/log\_embedded\_error\_estimate.py                                       |       20 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_errors.py                                                          |       50 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_extrapolated\_error\_estimate.py                                   |        6 |        0 |    100% |           |
+| pySDC/implementations/hooks/log\_residual.py                                                        |        8 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_restarts.py                                                        |        6 |        0 |    100% |           |
 | pySDC/implementations/hooks/log\_solution.py                                                        |      144 |        4 |     97% |173, 349, 389, 419 |
 | pySDC/implementations/hooks/log\_step\_size.py                                                      |        6 |        0 |    100% |           |
@@ -115,7 +116,7 @@
 | pySDC/implementations/problem\_classes/RayleighBenard3D.py                                          |      223 |        4 |     98% |107, 357, 456, 515 |
 | pySDC/implementations/problem\_classes/RayleighBenard.py                                            |      257 |       14 |     95% |99, 325, 345, 492, 570, 736-751 |
 | pySDC/implementations/problem\_classes/TestEquation\_0D.py                                          |      101 |        0 |    100% |           |
-| pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        1 |     98% |       182 |
+| pySDC/implementations/problem\_classes/Van\_der\_Pol\_implicit.py                                   |       64 |        2 |     97% |  182, 185 |
 | pySDC/implementations/problem\_classes/VorticityVelocity\_2D\_FEniCS\_periodic.py                   |      111 |       23 |     79% |164-169, 188-197, 216-221, 240-243, 280-282 |
 | pySDC/implementations/problem\_classes/acoustic\_helpers/buildWave1DMatrix.py                       |       24 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/acoustic\_helpers/standard\_integrators.py                   |      259 |       11 |     96% |   301-313 |
@@ -138,14 +139,14 @@
 | pySDC/implementations/sweeper\_classes/Runge\_Kutta\_Nystrom.py                                     |       98 |        4 |     96% | 52-54, 68 |
 | pySDC/implementations/sweeper\_classes/boris\_2nd\_order.py                                         |      118 |        0 |    100% |           |
 | pySDC/implementations/sweeper\_classes/delta\_form.py                                               |      203 |        3 |     99% |138-139, 272 |
-| pySDC/implementations/sweeper\_classes/delta\_form\_MPI.py                                          |       62 |        5 |     92% |163-164, 169, 172-173 |
+| pySDC/implementations/sweeper\_classes/delta\_form\_MPI.py                                          |       62 |       14 |     77% |   161-177 |
 | pySDC/implementations/sweeper\_classes/explicit.py                                                  |       46 |        2 |     96% |   83, 125 |
 | pySDC/implementations/sweeper\_classes/generic\_implicit.py                                         |       50 |        0 |    100% |           |
-| pySDC/implementations/sweeper\_classes/generic\_implicit\_MPI.py                                    |      104 |        2 |     98% |   126-127 |
-| pySDC/implementations/sweeper\_classes/generic\_implicit\_mass.py                                   |       55 |        3 |     95% |29, 118-119 |
+| pySDC/implementations/sweeper\_classes/generic\_implicit\_MPI.py                                    |      104 |        3 |     97% |115, 126-127 |
+| pySDC/implementations/sweeper\_classes/generic\_implicit\_mass.py                                   |       55 |        5 |     91% |29, 118-119, 136, 139 |
 | pySDC/implementations/sweeper\_classes/imex\_1st\_order.py                                          |       73 |        0 |    100% |           |
 | pySDC/implementations/sweeper\_classes/imex\_1st\_order\_MPI.py                                     |       40 |        0 |    100% |           |
-| pySDC/implementations/sweeper\_classes/imex\_1st\_order\_mass.py                                    |       53 |        2 |     96% |   118-119 |
+| pySDC/implementations/sweeper\_classes/imex\_1st\_order\_mass.py                                    |       53 |        4 |     92% |118-119, 134, 137 |
 | pySDC/implementations/sweeper\_classes/multi\_implicit.py                                           |       59 |        8 |     86% |26, 28, 90, 151-156 |
 | pySDC/implementations/sweeper\_classes/verlet.py                                                    |       73 |        9 |     88% |76, 196-205 |
 | pySDC/implementations/transfer\_classes/BaseTransferDelta.py                                        |       65 |        1 |     98% |       140 |
@@ -233,7 +234,7 @@
 | pySDC/projects/Monodomain/run\_scripts/run\_MonodomainODE.py                                        |      205 |       27 |     87% |103, 344, 355-389 |
 | pySDC/projects/Monodomain/run\_scripts/run\_MonodomainODE\_cli.py                                   |       35 |        0 |    100% |           |
 | pySDC/projects/Monodomain/run\_scripts/run\_TestODE.py                                              |      168 |       16 |     90% |163-166, 210-237 |
-| pySDC/projects/Monodomain/sweeper\_classes/exponential\_runge\_kutta/imexexp\_1st\_order.py         |      121 |        6 |     95% |30, 277, 285, 287, 290-291 |
+| pySDC/projects/Monodomain/sweeper\_classes/exponential\_runge\_kutta/imexexp\_1st\_order.py         |      121 |        8 |     93% |30, 260-261, 277, 285, 287, 290-291 |
 | pySDC/projects/Monodomain/sweeper\_classes/runge\_kutta/imexexp\_1st\_order.py                      |       54 |        2 |     96% |    26, 93 |
 | pySDC/projects/Monodomain/transfer\_classes/TransferVectorOfDCTVectors.py                           |       25 |        0 |    100% |           |
 | pySDC/projects/Monodomain/transfer\_classes/Transfer\_DCT\_Vector.py                                |       24 |        0 |    100% |           |
@@ -361,8 +362,8 @@
 | pySDC/projects/parallelSDC\_reloaded/vanderpol\_accuracy.py                                         |       62 |        0 |    100% |           |
 | pySDC/projects/parallelSDC\_reloaded/vanderpol\_setup.py                                            |       36 |        0 |    100% |           |
 | pySDC/projects/soft\_failure/FaultHooks.py                                                          |       20 |        0 |    100% |           |
-| pySDC/projects/soft\_failure/generate\_statistics.py                                                |      206 |       49 |     76% |26-63, 71-111, 169, 171, 211, 213 |
-| pySDC/projects/soft\_failure/implicit\_sweeper\_faults.py                                           |      144 |        5 |     97% |44, 159-161, 258 |
+| pySDC/projects/soft\_failure/generate\_statistics.py                                                |      206 |       50 |     76% |26-63, 71-111, 169, 171, 211, 213, 285 |
+| pySDC/projects/soft\_failure/implicit\_sweeper\_faults.py                                           |      144 |        8 |     94% |44, 159-161, 201-204, 258 |
 | pySDC/projects/soft\_failure/visualization\_helper.py                                               |       54 |        0 |    100% |           |
 | pySDC/tutorial/step\_1/A\_spatial\_problem\_setup.py                                                |       32 |        0 |    100% |           |
 | pySDC/tutorial/step\_1/B\_spatial\_accuracy\_check.py                                               |       46 |        0 |    100% |           |
@@ -406,7 +407,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32808** | **4037** | **88%** |           |
+| **TOTAL**                                                                                           | **32806** | **4057** | **88%** |           |
 
 44 empty files skipped.
 
