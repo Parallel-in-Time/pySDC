@@ -63,6 +63,8 @@ class imexexp_1st_order(Sweeper):
         c = self.phi_coll.nodes
         b = self.phi_coll.weights
 
+        self.level.prob.work_counters['exp'].niter += factors.size * c.size * lmbda.shape[0]
+
         k = np.array(indeces)
         km1_fac = scipy.special.factorial(k - 1)  # (k-1)!
 
@@ -82,13 +84,16 @@ class imexexp_1st_order(Sweeper):
             # make some space for the old value of u[0]
             self.u_old = self.level.prob.dtype_u(init=self.level.prob.init, val=0.0)
 
-        # everything that is computed in this if statement depends on u[0] only
-        # To save computations we recompute that only if u[0] has changed.
+        # everything that is computed in this if statement depends on u[0] and dt only
+        # To save computations we recompute that only if u[0] or dt has changed (dt changes when adaptivity restarts a step).
         # Also, we check only for the first component u[0][0] of u[0] to save more computations.
         # Remember that u[0][0] is a vector representing the electric potential on the whole mesh and is enough to check if the whole u[0] has changed.
-        if not np.allclose(self.u_old[0], self.level.u[0][0], rtol=1e-10, atol=1e-10):
+        if getattr(self, "dt_old", None) != self.level.dt or not np.allclose(
+            np.asarray(self.u_old[0]), np.asarray(self.level.u[0][0]), rtol=1e-10, atol=1e-10
+        ):
 
             self.u_old[:] = self.level.u[0]
+            self.dt_old = self.level.dt
 
             L = self.level
             P = L.prob

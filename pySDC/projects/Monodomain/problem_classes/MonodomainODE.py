@@ -1,7 +1,7 @@
 from pathlib import Path
 import logging
 import numpy as np
-from pySDC.core.problem import Problem
+from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.projects.Monodomain.datatype_classes.my_mesh import imexexp_mesh
 from pySDC.projects.Monodomain.problem_classes.space_discretizazions.Parabolic_DCT import Parabolic_DCT
@@ -143,7 +143,13 @@ class MonodomainODE(Problem):
     def define_stimulus(self):
 
         stim_dur = 2.0
-        if "cuboid" in self.parabolic.domain_name:
+        if getattr(self, "stimulus", None) == "corner":
+            # a single small stimulus in the corner at the origin, giving a curved front through the whole domain
+            self.stim_protocol = [[0.0, stim_dur]]
+            self.stim_intensities = [50.0]
+            self.stim_centers = [[0.0, 0.0, 0.0]]
+            self.stim_radii = [[1.5, 1.5, 1.5]]
+        elif "cuboid" in self.parabolic.domain_name:
             self.stim_protocol = [[0.0, stim_dur]]  # list of stimuli times and stimuli durations
             self.stim_intensities = [50.0]  # list of stimuli intensities
             self.stim_centers = [[0.0, 0.0, 0.0]]  # list of stimuli centers
@@ -229,6 +235,11 @@ class MultiscaleMonodomainODE(MonodomainODE):
         self.define_splittings()
 
         self.constant_lambda_and_phi = False
+
+        # work counters, one per expensive kernel: calls into the C++ ionic model, DCT solves and Laplacians, and
+        # exponentials of a whole field (one per variable and factor, counted by the sweepers)
+        for key in ['f_expl', 'lmbda_yinf', 'lmbda', 'solve', 'laplacian', 'exp']:
+            self.work_counters[key] = WorkCounter()
 
     def define_splittings(self):
         """
@@ -320,6 +331,7 @@ class MultiscaleMonodomainODE(MonodomainODE):
         if u_sol is None:
             u_sol = self.dtype_u(init=self.init, val=0.0)
 
+        self.work_counters['solve']()
         self.parabolic.solve_system(rhs[0], factor, u0[0], t, u_sol[0])
 
         if rhs is not u_sol:
@@ -358,6 +370,7 @@ class MultiscaleMonodomainODE(MonodomainODE):
 
     def eval_f_nonstiff(self, u, t, fh_nonstiff, zero_untouched_indeces=True):
         # eval ionic model nonstiff terms
+        self.work_counters['f_expl']()
         self.eval_expr(self.im_f_nonstiff, u, fh_nonstiff, self.im_nonstiff_indeces, zero_untouched_indeces)
 
         if not zero_untouched_indeces and 0 not in self.im_nonstiff_indeces:
@@ -376,6 +389,7 @@ class MultiscaleMonodomainODE(MonodomainODE):
             fh_stiff[0][:] = 0.0
 
         # apply diffusion
+        self.work_counters['laplacian']()
         self.parabolic.add_disc_laplacian(u[0], fh_stiff[0])
 
         return fh_stiff
@@ -402,7 +416,9 @@ class MultiscaleMonodomainODE(MonodomainODE):
         return lmbda
 
     def eval_lmbda_yinf_exp(self, u, lmbda, yinf):
+        self.work_counters['lmbda_yinf']()
         self.im_lmbda_yinf_exp(u, lmbda, yinf)
 
     def eval_lmbda_exp(self, u, lmbda):
+        self.work_counters['lmbda']()
         self.im_lmbda_exp(u, lmbda)
