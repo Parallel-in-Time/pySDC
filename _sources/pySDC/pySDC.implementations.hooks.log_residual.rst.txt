@@ -1,0 +1,7 @@
+log\_residual
+=============
+
+.. automodule:: pySDC.implementations.hooks.log_residual
+   :members:
+   :show-inheritance:
+   :undoc-members:

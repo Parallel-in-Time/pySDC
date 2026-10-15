@@ -441,44 +441,11 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">DefaultHooks</span><span class="p">(</span><span class="n">Hooks</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Hook added to every controller, recording the residuals and the number of iterations of each step.</span>
+
+<span class="sd">    The residual is the one the convergence check reads, computed once per iteration after the new initial value has</span>
+<span class="sd">    come in. The residual after each sweep is not computed by default; add</span>
+<span class="sd">    :class:`~pySDC.implementations.hooks.log_residual.LogResidualPostSweep` to get it.</span>
 <span class="sd">    """</span>
-
-<div class="viewcode-block" id="DefaultHooks.post_sweep">
-<a class="viewcode-back" href="../../../pySDC/pySDC.core.default_hook.html#pySDC.core.default_hook.DefaultHooks.post_sweep">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">post_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Default routine called after each sweep</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            step (pySDC.Step.step): the current step</span>
-<span class="sd">            level_number (int): the current level number</span>
-<span class="sd">        """</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_sweep</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
-
-        <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s1">'Process </span><span class="si">%2i</span><span class="s1"> on time </span><span class="si">%8.6f</span><span class="s1"> at stage </span><span class="si">%15s</span><span class="s1">: Level: </span><span class="si">%s</span><span class="s1"> -- Iteration: </span><span class="si">%2i</span><span class="s1"> -- Sweep: </span><span class="si">%2i</span><span class="s1"> -- '</span> <span class="s1">'residual: </span><span class="si">%12.8e</span><span class="s1">'</span><span class="p">,</span>
-            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span><span class="p">,</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
-            <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
-            <span class="n">process_sweeper</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">level</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span>
-            <span class="nb">iter</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
-            <span class="n">sweep</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">sweep</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="s1">'residual_post_sweep'</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
 
 <div class="viewcode-block" id="DefaultHooks.post_iteration">
 <a class="viewcode-back" href="../../../pySDC/pySDC.core.default_hook.html#pySDC.core.default_hook.DefaultHooks.post_iteration">[docs]</a>
@@ -493,6 +460,14 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post_iteration</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">level_number</span><span class="p">)</span>
 
         <span class="n">L</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">level_number</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">'Process </span><span class="si">%2i</span><span class="s1"> on time </span><span class="si">%8.6f</span><span class="s1"> -- Iteration: </span><span class="si">%2i</span><span class="s1"> -- residual: </span><span class="si">%12.8e</span><span class="s1">'</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_to_stats</span><span class="p">(</span>
             <span class="n">process</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span>

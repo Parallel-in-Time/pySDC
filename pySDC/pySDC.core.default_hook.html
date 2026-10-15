@@ -457,6 +457,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_embedded_error_estimate.html">log_embedded_error_estimate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_errors.html">log_errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_extrapolated_error_estimate.html">log_extrapolated_error_estimate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_residual.html">log_residual</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_restarts.html">log_restarts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_solution.html">log_solution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.hooks.log_step_size.html">log_step_size</a></li>
@@ -646,6 +647,9 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DefaultHooks</span></span><a class="reference internal" href="../_modules/pySDC/core/default_hook.html#DefaultHooks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.default_hook.DefaultHooks" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pySDC.core.hooks.html#pySDC.core.hooks.Hooks" title="pySDC.core.hooks.Hooks"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hooks</span></code></a></p>
 <p>Hook added to every controller, recording the residuals and the number of iterations of each step.</p>
+<p>The residual is the one the convergence check reads, computed once per iteration after the new initial value has
+come in. The residual after each sweep is not computed by default; add
+<a class="reference internal" href="pySDC.implementations.hooks.log_residual.html#pySDC.implementations.hooks.log_residual.LogResidualPostSweep" title="pySDC.implementations.hooks.log_residual.LogResidualPostSweep"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogResidualPostSweep</span></code></a> to get it.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.core.default_hook.DefaultHooks.post_iteration">
 <span class="sig-name descname"><span class="pre">post_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/default_hook.html#DefaultHooks.post_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.default_hook.DefaultHooks.post_iteration" title="Link to this definition">#</a></dt>
@@ -664,20 +668,6 @@
 <dt class="sig sig-object py" id="pySDC.core.default_hook.DefaultHooks.post_step">
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/default_hook.html#DefaultHooks.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.default_hook.DefaultHooks.post_step" title="Link to this definition">#</a></dt>
 <dd><p>Default routine called after each step or block</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>step</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.Step.step</span></code>) – the current step</p></li>
-<li><p><strong>level_number</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – the current level number</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pySDC.core.default_hook.DefaultHooks.post_sweep">
-<span class="sig-name descname"><span class="pre">post_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/default_hook.html#DefaultHooks.post_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.default_hook.DefaultHooks.post_sweep" title="Link to this definition">#</a></dt>
-<dd><p>Default routine called after each sweep</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -742,7 +732,6 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.default_hook.DefaultHooks"><code class="docutils literal notranslate"><span class="pre">DefaultHooks</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.default_hook.DefaultHooks.post_iteration"><code class="docutils literal notranslate"><span class="pre">post_iteration()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.default_hook.DefaultHooks.post_step"><code class="docutils literal notranslate"><span class="pre">post_step()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.default_hook.DefaultHooks.post_sweep"><code class="docutils literal notranslate"><span class="pre">post_sweep()</span></code></a></li>
 </ul>
 </li>
 </ul>

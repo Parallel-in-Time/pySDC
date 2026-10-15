@@ -12,6 +12,7 @@ Submodules
    pySDC.implementations.hooks.log_embedded_error_estimate
    pySDC.implementations.hooks.log_errors
    pySDC.implementations.hooks.log_extrapolated_error_estimate
+   pySDC.implementations.hooks.log_residual
    pySDC.implementations.hooks.log_restarts
    pySDC.implementations.hooks.log_solution
    pySDC.implementations.hooks.log_step_size

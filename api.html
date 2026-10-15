@@ -459,6 +459,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_embedded_error_estimate.html">log_embedded_error_estimate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_errors.html">log_errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_extrapolated_error_estimate.html">log_extrapolated_error_estimate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_residual.html">log_residual</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_restarts.html">log_restarts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html">log_solution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_step_size.html">log_step_size</a></li>
@@ -1306,37 +1307,40 @@ roles, with the first sentence of their docstrings; each name links to its full 
 <tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_extrapolated_error_estimate.html#pySDC.implementations.hooks.log_extrapolated_error_estimate.LogExtrapolationErrorEstimate" title="pySDC.implementations.hooks.log_extrapolated_error_estimate.LogExtrapolationErrorEstimate"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogExtrapolationErrorEstimate</span></code></a></p></td>
 <td><p>Store the extrapolated error estimate at the end of each step as “error_extrapolation_estimate”.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_restarts.html#pySDC.implementations.hooks.log_restarts.LogRestarts" title="pySDC.implementations.hooks.log_restarts.LogRestarts"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogRestarts</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_residual.html#pySDC.implementations.hooks.log_residual.LogResidualPostSweep" title="pySDC.implementations.hooks.log_residual.LogResidualPostSweep"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogResidualPostSweep</span></code></a></p></td>
+<td><p>Compute the residual after every sweep, on every level, and store it as “residual_post_sweep”.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_restarts.html#pySDC.implementations.hooks.log_restarts.LogRestarts" title="pySDC.implementations.hooks.log_restarts.LogRestarts"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogRestarts</span></code></a></p></td>
 <td><p>Record restarts as <cite>restart</cite> at the beginning of the step.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogSolution" title="pySDC.implementations.hooks.log_solution.LogSolution"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogSolution</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogSolution" title="pySDC.implementations.hooks.log_solution.LogSolution"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogSolution</span></code></a></p></td>
 <td><p>Store the solution at the end of each step as “u”.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogSolutionAfterIteration" title="pySDC.implementations.hooks.log_solution.LogSolutionAfterIteration"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogSolutionAfterIteration</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogSolutionAfterIteration" title="pySDC.implementations.hooks.log_solution.LogSolutionAfterIteration"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogSolutionAfterIteration</span></code></a></p></td>
 <td><p>Store the solution at the end of each iteration as “u”.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogToPickleFile" title="pySDC.implementations.hooks.log_solution.LogToPickleFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogToPickleFile</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogToPickleFile" title="pySDC.implementations.hooks.log_solution.LogToPickleFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogToPickleFile</span></code></a></p></td>
 <td><p>Hook for logging the solution to file after the step using pickle.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogToPickleFileAfterXS" title="pySDC.implementations.hooks.log_solution.LogToPickleFileAfterXS"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogToPickleFileAfterXS</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogToPickleFileAfterXS" title="pySDC.implementations.hooks.log_solution.LogToPickleFileAfterXS"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogToPickleFileAfterXS</span></code></a></p></td>
 <td><p>Log to file after certain amount of time has passed instead of after every step</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogToFile" title="pySDC.implementations.hooks.log_solution.LogToFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogToFile</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_solution.html#pySDC.implementations.hooks.log_solution.LogToFile" title="pySDC.implementations.hooks.log_solution.LogToFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogToFile</span></code></a></p></td>
 <td><p>Write the solution every <cite>time_increment</cite> to one <cite>FieldsIO</cite> file set up by the problem, resuming an existing file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_step_size.html#pySDC.implementations.hooks.log_step_size.LogStepSize" title="pySDC.implementations.hooks.log_step_size.LogStepSize"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogStepSize</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_step_size.html#pySDC.implementations.hooks.log_step_size.LogStepSize" title="pySDC.implementations.hooks.log_step_size.LogStepSize"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogStepSize</span></code></a></p></td>
 <td><p>Store the step size at the end of each step as “dt”.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_work.html#pySDC.implementations.hooks.log_work.LogWork" title="pySDC.implementations.hooks.log_work.LogWork"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogWork</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_work.html#pySDC.implementations.hooks.log_work.LogWork" title="pySDC.implementations.hooks.log_work.LogWork"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogWork</span></code></a></p></td>
 <td><p>Log the increment of all work counters in the problem between steps</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_work.html#pySDC.implementations.hooks.log_work.LogSDCIterations" title="pySDC.implementations.hooks.log_work.LogSDCIterations"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogSDCIterations</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.log_work.html#pySDC.implementations.hooks.log_work.LogSDCIterations" title="pySDC.implementations.hooks.log_work.LogSDCIterations"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogSDCIterations</span></code></a></p></td>
 <td><p>Log the number of SDC iterations between steps.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.plotting.html#pySDC.implementations.hooks.plotting.PlottingHook" title="pySDC.implementations.hooks.plotting.PlottingHook"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlottingHook</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.plotting.html#pySDC.implementations.hooks.plotting.PlottingHook" title="pySDC.implementations.hooks.plotting.PlottingHook"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlottingHook</span></code></a></p></td>
 <td><p>Base class for hooks that plot the solution with the problem’s <cite>plot</cite> method, optionally saving each figure.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.plotting.html#pySDC.implementations.hooks.plotting.PlotPostStep" title="pySDC.implementations.hooks.plotting.PlotPostStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlotPostStep</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pySDC/pySDC.implementations.hooks.plotting.html#pySDC.implementations.hooks.plotting.PlotPostStep" title="pySDC.implementations.hooks.plotting.PlotPostStep"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlotPostStep</span></code></a></p></td>
 <td><p>Call a plotting function of the problem after every step</p></td>
 </tr>
 </tbody>
