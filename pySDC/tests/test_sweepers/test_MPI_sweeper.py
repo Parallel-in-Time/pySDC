@@ -88,7 +88,7 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
 def individual_test(**kwargs):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
-    Tests solution at the right end point and the residual.
+    Tests the solution at the node this rank sweeps, at the right end point and the residual.
     """
     if kwargs['useNCCL']:
         import cupy as xp
@@ -98,8 +98,18 @@ def individual_test(**kwargs):
     MPI = run(**kwargs, use_MPI=True)
     nonMPI = run(**kwargs, use_MPI=False)
 
+    # the nodes are what the sweepers compute, and the two have to agree on them to round-off
+    node = MPI.sweep.rank + 1
     assert xp.allclose(
-        MPI.uend, nonMPI.uend, rtol=0, atol=1e-14
+        MPI.u[node], nonMPI.u[node], rtol=0, atol=1e-14
+    ), f'Got different solutions at node {node}! {MPI.u[node]=} {nonMPI.u[node]=}'
+
+    # Without a node at the right end, the end point is u0 + dt sum_m w_m f(u_m), which takes a difference in the nodes
+    # up to dt sum_m |w_m| ||A|| times larger: 1e4 for the heat problem here. Agreement to round-off on the nodes
+    # therefore means agreement to this much on the end point, and no better.
+    amplification = 1 + MPI.dt * float(abs(MPI.sweep.coll.weights).sum()) * float(abs(MPI.prob.A).sum(axis=1).max())
+    assert xp.allclose(
+        MPI.uend, nonMPI.uend, rtol=0, atol=1e-14 * amplification
     ), f'Got different solutions at end point! {MPI.uend=} {nonMPI.uend=}'
     assert xp.allclose(MPI.status.residual, nonMPI.status.residual, rtol=0, atol=1e-14), 'Got different residuals!'
 

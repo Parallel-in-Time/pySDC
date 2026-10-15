@@ -65,26 +65,19 @@ class generic_implicit(Sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
-        # gather all terms which are known already (e.g. from the previous iteration)
-        # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
-
-        # get QF(u^k)
-        integral = self.integrate()
-        for m in range(M):
-            # get -QdF(u^k)_m
-            for j in range(1, M + 1):
-                integral[m] -= L.dt * self.QI[m + 1, j] * L.f[j]
-
-            # add initial value
-            integral[m] += L.u[0]
-            # add tau if associated
-            if L.tau[m] is not None:
-                integral[m] += L.tau[m]
+        # the terms which are known already (from the previous iteration) are u0 + QF(u^k) - QdF(u^k) + tau, built
+        # with Q - Qd in one pass over F(u^k), kept here because the sweep replaces L.f[m]
+        F = L.f[1:]
+        diff_weights = self.coll.Qmat - self.QI
 
         # do the sweep
         for m in range(0, M):
-            # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            rhs = P.dtype_u(integral[m])
+            # build rhs, consisting of the known values and new values from previous nodes (at k+1)
+            rhs = P.dtype_u(L.u[0])
+            for j in range(1, M + 1):
+                rhs += L.dt * diff_weights[m + 1, j] * F[j - 1]
+            if L.tau[m] is not None:
+                rhs += L.tau[m]
             for j in range(1, m + 1):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 

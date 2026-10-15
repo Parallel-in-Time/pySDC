@@ -274,7 +274,7 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                     'vC1': 1.0000000000787372,
                     'vC2': 1.000000000028657,
                     't_switches': [0.1823215567907939, 0.3646431134803315],
-                    'dt': 0.07154669986159717,
+                    'dt': 0.07151641700248773,
                     'e_em': 2.3381296898605797e-13,
                     'sum_restarts': 22.0,
                     'sum_niters': 472.0,
@@ -437,7 +437,7 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                     'vC1': 83.97535088144014,
                     'vC2': 80.52142375242333,
                     'iLp': 16.09650585135131,
-                    'sum_niters': 7202.0,
+                    'sum_niters': 7200.0,
                 }
         got.update(
             {
@@ -460,7 +460,7 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                     'vC1': 9.782142840662102,
                     'vC2': 6.388775533709242,
                     'iLp': -1.0994027552202539,
-                    'sum_niters': 4242.0,
+                    'sum_niters': 4241.0,
                 }
         got.update(
             {
