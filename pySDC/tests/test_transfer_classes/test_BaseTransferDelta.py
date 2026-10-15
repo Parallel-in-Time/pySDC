@@ -238,6 +238,8 @@ def test_coarse_level_reports_the_residual_it_tracks():
     def watched(transfer_class, key):
         class watcher(transfer_class):
             def prolong(self):
+                # the controller only computes the residual on the finest level, so ask for it here
+                self.coarse.sweep.compute_residual()
                 seen.setdefault(key, []).append(self.coarse.status.residual)
                 super().prolong()
 

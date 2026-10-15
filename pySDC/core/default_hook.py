@@ -5,41 +5,11 @@ from pySDC.core.hooks import Hooks
 class DefaultHooks(Hooks):
     """
     Hook added to every controller, recording the residuals and the number of iterations of each step.
+
+    The residual is the one the convergence check reads, computed once per iteration after the new initial value has
+    come in. The residual after each sweep is not computed by default; add
+    :class:`~pySDC.implementations.hooks.log_residual.LogResidualPostSweep` to get it.
     """
-
-    def post_sweep(self, step, level_number):
-        """
-        Default routine called after each sweep
-
-        Args:
-            step (pySDC.Step.step): the current step
-            level_number (int): the current level number
-        """
-        super().post_sweep(step, level_number)
-
-        L = step.levels[level_number]
-
-        self.logger.info(
-            'Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Sweep: %2i -- ' 'residual: %12.8e',
-            step.status.slot,
-            L.time,
-            step.status.stage,
-            L.level_index,
-            step.status.iter,
-            L.status.sweep,
-            L.status.residual,
-        )
-
-        self.add_to_stats(
-            process=step.status.slot,
-            process_sweeper=L.sweep.rank,
-            time=L.time,
-            level=L.level_index,
-            iter=step.status.iter,
-            sweep=L.status.sweep,
-            type='residual_post_sweep',
-            value=L.status.residual,
-        )
 
     def post_iteration(self, step, level_number):
         """
@@ -52,6 +22,14 @@ class DefaultHooks(Hooks):
         super().post_iteration(step, level_number)
 
         L = step.levels[level_number]
+
+        self.logger.info(
+            'Process %2i on time %8.6f -- Iteration: %2i -- residual: %12.8e',
+            step.status.slot,
+            L.time,
+            step.status.iter,
+            L.status.residual,
+        )
 
         self.add_to_stats(
             process=step.status.slot,
