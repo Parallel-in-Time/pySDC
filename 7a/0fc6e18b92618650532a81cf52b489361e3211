@@ -1,0 +1,35 @@
+pySDC/projects/Monodomain/run_scripts/work_precision.py
+  s_edc09aac9d24f7::t_d5d1aeac0a2922 116,118-119
+  s_edc09aac9d24f7::t_96d798795d4366 1-67,70-81,95-115,117,120-129,131-132,141-150,152-153,155,157-208
+  s_edc09aac9d24f7::t_a012e6dad24eb5 130,133-140
+  s_edc09aac9d24f7::t_9c15e74d1e0cf6 68-69,82-94,151,154,156
+pySDC/projects/Monodomain/sweeper_classes/runge_kutta/rush_larsen.py
+  s_edc09aac9d24f7::t_19710acacc7673 1-99
+pySDC/projects/Monodomain/sweeper_classes/exponential_runge_kutta/imexexp_1st_order.py
+  s_edc09aac9d24f7::t_b5fd3bc4dfea47 66-67
+  s_edc09aac9d24f7::t_7c7ad56fd9622b 87-88,91-93,96
+pySDC/projects/Monodomain/problem_classes/MonodomainODE.py
+  s_edc09aac9d24f7::t_ae2088f1aed453 239-243
+  s_edc09aac9d24f7::t_8912eec2be5715 4,334,373,392,419,423
+  s_edc09aac9d24f7::t_b5fd3bc4dfea47 146-152
+pySDC/projects/Monodomain/tests/test_monodomain_rush_larsen.py
+  s_edc09aac9d24f7::t_a092a77fd20aa2 1-14
+pySDC/projects/Monodomain/showcase/stage1_gate.md
+  s_edc09aac9d24f7::t_5885a487062183 1-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7a0fc6e18b92618650532a81cf52b489361e3211",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "unknown"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
