@@ -545,6 +545,9 @@ class controller_MPI(Controller):
         Args:
             comm: the communicator
         """
+        # nothing comes in for the first step or after the previous one is done
+        receives = not self.S.status.first and not self.S.status.prev_done
+
         self.send_full(comm=comm, level=0)
         if self.S.status.force_done:
             return None
@@ -553,7 +556,11 @@ class controller_MPI(Controller):
         if self.S.status.force_done:
             return None
 
-        self.S.levels[0].sweep.compute_residual(stage='IT_CHECK')
+        # compute current residual, unless the one from the last sweep still is: past the first
+        # iteration, nothing came in and nothing changed since (a sweep sets `updated`, the residual
+        # clears it)
+        if receives or self.S.status.iter == 0 or self.S.levels[0].status.updated:
+            self.S.levels[0].sweep.compute_residual(stage='IT_CHECK')
 
     def it_fine(self, comm, num_procs):
         """

@@ -540,12 +540,17 @@ class controller_nonMPI(Controller):
             local_MS_running (list): list of currently running steps
         """
         for S in local_MS_running:
+            # nothing comes in for the first step or after the previous one is done
+            receives = not S.status.first and not S.status.prev_done
             # send updated values forward
             self.send_full(S, level=0)
             # receive values
             self.recv_full(S, level=0)
-            # compute current residual
-            S.levels[0].sweep.compute_residual(stage='IT_CHECK')
+            # compute current residual, unless the one from the last sweep still is: past the first
+            # iteration, nothing came in and nothing changed since (a sweep sets `updated`, the residual
+            # clears it)
+            if receives or S.status.iter == 0 or S.levels[0].status.updated:
+                S.levels[0].sweep.compute_residual(stage='IT_CHECK')
 
     def it_fine(self, local_MS_running: list[Step]):
         """
