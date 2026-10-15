@@ -1,0 +1,32 @@
+pySDC/implementations/convergence_controller_classes/inexactness.py
+  s_4c56c5a8aed02b::t_2945acea26343f 73-75
+pySDC/implementations/hooks/log_residual.py
+  s_4c56c5a8aed02b::t_b77293b4394381 1-50
+pySDC/core/default_hook.py
+  s_4c56c5a8aed02b::t_b77293b4394381 8-11,14,16,22,27
+pySDC/implementations/controller_classes/controller_nonMPI.py
+  s_4c56c5a8aed02b::t_8a292307e70a1b 574
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta.py
+  s_4c56c5a8aed02b::t_2945acea26343f 241-242
+pySDC/tests/test_hooks/test_log_residual.py
+  s_4c56c5a8aed02b::t_2472e89f418a4f 1-3,5-9,12,14,18,21-23,25-39,41-46,48-54,56-62,65-78
+  s_4c56c5a8aed02b::t_ba6181d4500a88 4,10-11,13,15-17,19-20,24,40,47,55,63-64
+pySDC/tutorial/step_7/F_pySDC_with_Gusto.py
+  s_4c56c5a8aed02b::t_a525d8b7f9f414 43,239-240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4538b150306a28a73dcdceaa9c3c8867de1e002f",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
