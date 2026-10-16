@@ -1,0 +1,44 @@
+pySDC/projects/TDDFT/propagators.py
+  s_edc09aac9d24f7::t_4d120549f04963 41
+  s_edc09aac9d24f7::t_5f8851fa9337e7 1-40,42-103,105-181
+  s_edc09aac9d24f7::t_c7b2456060a5ca 104
+docs/source/projects/TDDFT.rst
+  s_edc09aac9d24f7::t_b0d1a3c779d86b 1
+pySDC/projects/TDDFT/sdc.py
+  s_edc09aac9d24f7::t_aa7b5cc960668f 1-69
+pySDC/projects/TDDFT/tests/test_tddft.py
+  s_edc09aac9d24f7::t_bcfa6a431ce13d 1-94
+.github/workflows/ci_pipeline.yml
+  s_edc09aac9d24f7::t_4d120549f04963 155
+pySDC/projects/gallery.yml
+  s_edc09aac9d24f7::t_4d120549f04963 125-129
+pySDC/projects/TDDFT/README.rst
+  s_edc09aac9d24f7::t_d9c50309e9727a 1-108
+pySDC/projects/TDDFT/.gitignore
+  s_edc09aac9d24f7::t_4d120549f04963 1
+pySDC/projects/TDDFT/problem.py
+  s_edc09aac9d24f7::t_4d120549f04963 86-102
+  s_edc09aac9d24f7::t_c6c2d8b2b98812 1-85,103-220
+pySDC/projects/TDDFT/environment.yml
+  s_edc09aac9d24f7::t_4d120549f04963 1-11
+pySDC/projects/TDDFT/work_precision.py
+  s_edc09aac9d24f7::t_4d120549f04963 47-51,67-74,166-177,200-202
+  s_edc09aac9d24f7::t_649eecd8f021c0 1-30,32-46,52-66,75-165,178-199,203-211
+  s_edc09aac9d24f7::t_e86345cbc55bfd 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5bdcc0861fb8dc5dd4c58878b08206fdd94b4901",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
