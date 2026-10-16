@@ -1,0 +1,32 @@
+pySDC/playgrounds/accuracy_probes/tddft/fronts_mol.py
+  s_edc09aac9d24f7::t_ca4359c3e17abd 1-75
+pySDC/playgrounds/accuracy_probes/tddft/molecule.py
+  s_edc09aac9d24f7::t_58a18f0d571155 71,84,94
+  s_edc09aac9d24f7::t_b8daafc5661e09 1-17,19-27,30-58,62-70,72-83,85-93,95-111,114,119,130-142
+  s_edc09aac9d24f7::t_c814d9a8e3ce87 28-29
+  s_edc09aac9d24f7::t_b9dc5f2b02178d 18,113,115,117-118,120-129
+  s_edc09aac9d24f7::t_bec6a379fbf44a 59-61,112,116
+pySDC/playgrounds/accuracy_probes/tddft/sweep_mol.py
+  s_edc09aac9d24f7::t_763d68112e0925 1-51
+pySDC/playgrounds/accuracy_probes/tddft/plot_mol.py
+  s_edc09aac9d24f7::t_dd2be3d44ccb6c 33-36
+  s_edc09aac9d24f7::t_37faea600d93d9 1-32,37-56
+pySDC/playgrounds/accuracy_probes/tddft/probe_mol.py
+  s_edc09aac9d24f7::t_0701c927a99245 1-217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a00a7d9a88180c4a75cfd170d75c15892175e26a",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
