@@ -1,0 +1,19 @@
+pySDC/projects/Monodomain/showcase/stability_and_local_adaptivity.md
+  s_edc09aac9d24f7::t_736e339b30175f 1-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "770f82174f8a78dc259126140d59b60c80ca6dfe",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "unknown"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
