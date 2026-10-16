@@ -1,0 +1,27 @@
+pySDC/playgrounds/accuracy_probes/fastions/tokamak.py
+  s_edc09aac9d24f7::t_1af0db9020391a 14,82
+  s_edc09aac9d24f7::t_3e27a11795b11a 1-13,15-81,83-131
+pySDC/playgrounds/accuracy_probes/fastions/probe.py
+  s_edc09aac9d24f7::t_17e86fd7916a63 1-78,80-119
+  s_edc09aac9d24f7::t_1af0db9020391a 79
+pySDC/playgrounds/accuracy_probes/fastions/REPORT.md
+  s_edc09aac9d24f7::t_04d7c061af28e9 1-41
+pySDC/playgrounds/accuracy_probes/fastions/regime.py
+  s_edc09aac9d24f7::t_4c52c784c88e68 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bc7d8c446be411e5866b5260dff7dd82ee8a571a",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
