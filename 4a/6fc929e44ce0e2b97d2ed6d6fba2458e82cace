@@ -1,0 +1,31 @@
+pySDC/playgrounds/accuracy_probes/relativity/dg.py
+  s_edc09aac9d24f7::t_8a8de49c7a0e96 1-80
+pySDC/playgrounds/accuracy_probes/relativity/REPORT.md
+  s_edc09aac9d24f7::t_ee510e6d18c007 1-58
+pySDC/playgrounds/accuracy_probes/README.md
+  s_edc09aac9d24f7::t_7e76dd8dcb215f 1-38
+pySDC/playgrounds/accuracy_probes/relativity/probe.py
+  s_edc09aac9d24f7::t_5307a421d98985 1-119
+pySDC/playgrounds/accuracy_probes/relativity/fronts.py
+  s_edc09aac9d24f7::t_121b87e17d4a35 1-34
+pySDC/playgrounds/accuracy_probes/relativity/sweep.py
+  s_edc09aac9d24f7::t_5a83bc10ef6c35 1-39
+pySDC/playgrounds/accuracy_probes/relativity/plot.py
+  s_edc09aac9d24f7::t_59e46e2dc7b67b 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4a6fc929e44ce0e2b97d2ed6d6fba2458e82cace",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "unknown"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
