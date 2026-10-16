@@ -1,0 +1,11 @@
+name: pySDC
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10,<3.14
+  - numpy
+  - scipy>=1.12
+  - matplotlib>=3.0
+  - pip
+  - pip:
+    - qmat>=0.1.8
