@@ -1,0 +1,21 @@
+pySDC/playgrounds/accuracy_probes/combustion/REPORT.md
+  s_edc09aac9d24f7::t_6914d75e7bc484 1-43
+pySDC/playgrounds/accuracy_probes/combustion/regime.py
+  s_edc09aac9d24f7::t_c49733e60804a6 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3b8843928a9c9723fb0ba6d28958610edfe4518d",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
