@@ -1,0 +1,42 @@
+pySDC/playgrounds/accuracy_probes/tddft/sweep.py
+  s_edc09aac9d24f7::t_d1053b8c710817 1-59
+pySDC/playgrounds/accuracy_probes/tddft/plot.py
+  s_edc09aac9d24f7::t_f98dd8cb2733c3 1-48,50-58
+  s_edc09aac9d24f7::t_997c2c8bb7e4e2 49
+pySDC/playgrounds/accuracy_probes/tddft/REPORT.md
+  s_edc09aac9d24f7::t_d99eea2e68a55c 1-75
+pySDC/playgrounds/accuracy_probes/tddft/analyze.py
+  s_edc09aac9d24f7::t_a875b5d5ac883a 1-24,27-47
+  s_edc09aac9d24f7::t_47185a1f5b5252 25-26
+pySDC/playgrounds/accuracy_probes/tddft/fronts.py
+  s_edc09aac9d24f7::t_0c66dc5034fe7c 25
+  s_edc09aac9d24f7::t_d040df168ed4ee 64-66
+  s_edc09aac9d24f7::t_2f8c213b556d93 1-15,22-24,26-36,38-63,67-84
+  s_edc09aac9d24f7::t_76e671a976f222 16-21,37
+pySDC/playgrounds/accuracy_probes/tddft/probe.py
+  s_edc09aac9d24f7::t_d710d1c7df2b9f 134
+  s_edc09aac9d24f7::t_463d16f403221a 71-91,93-94,116,121-122,125,130,135-136,170-171
+  s_edc09aac9d24f7::t_47a4bb1e2cd189 1-70,95-115,117-120,123-124,126-129,131-133,137-169,174-185,195-207,209-242
+  s_edc09aac9d24f7::t_0c66dc5034fe7c 92,172-173
+  s_edc09aac9d24f7::t_7cf30d90a05df7 186-194,208
+pySDC/playgrounds/accuracy_probes/tddft/problem.py
+  s_edc09aac9d24f7::t_d710d1c7df2b9f 96-100,109-110
+  s_edc09aac9d24f7::t_4eff438e45e62f 77
+  s_edc09aac9d24f7::t_a0b8cfab47b8f9 1-76,78-95,101-108,111-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "41944e637cfb48f9ed8caf06bb3f86b44e6615ad",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
