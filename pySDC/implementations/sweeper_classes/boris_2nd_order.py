@@ -1,5 +1,6 @@
 import numpy as np
 
+from pySDC.core.errors import ParameterError
 from pySDC.core.sweeper import Sweeper
 
 
@@ -44,6 +45,21 @@ class boris_2nd_order(Sweeper):
             self.Qx,
             self.Q,
         ] = self.__get_Qd()
+
+        # the Boris step adds back the trapezoid dt*d/2*(f[m]+f[m+1]) with d = diag(QI), so ST must be exactly that,
+        # otherwise the sweep converges to a wrong fixed point
+        M = self.coll.num_nodes
+        d = np.diag(self.QI)[1:]
+        T = np.zeros_like(self.ST)
+        T[range(1, M + 1), range(1, M + 1)] = d / 2
+        T[range(1, M + 1), range(M)] += d / 2
+        # entries are at most 1 and pass through a few roundings
+        if not np.allclose(self.ST[1:], T[1:], rtol=0, atol=4 * np.finfo(float).eps):
+            raise ParameterError(
+                f'boris_2nd_order converges to a wrong solution with QI={self.params.QI!r} and QE={self.params.QE!r}: '
+                'the velocity update needs QE to supply the trapezoid partner of the diagonal of QI. Use QI="IE" '
+                'with QE="EE" (the default), or QI="PIC" with QE="PIC".'
+            )
 
         self.qQ = np.dot(self.coll.weights, self.coll.Qmat[1:, 1:])
 
