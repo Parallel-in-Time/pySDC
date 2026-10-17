@@ -431,3 +431,15 @@ def test_max_restarts_MPI(crash_after_max_restarts):
 @pytest.mark.parametrize('crash_after_max_restarts', [False, True])
 def test_max_restarts_nonMPI(num_procs, crash_after_max_restarts):
     max_restarts_single_test(crash_after_max_restarts, useMPI=False, num_procs=num_procs)
+
+
+@pytest.mark.base
+def test_restarts_in_a_row_nonMPI():
+    """
+    The step at t=2 is restarted three times in a row on three steps: as the last step, because t=1 asks, then as the
+    second and as the first step, because it asks itself. This counts the same as with MPI and exceeds `max_restarts`.
+    """
+    from pySDC.core.errors import ConvergenceError
+
+    with pytest.raises(ConvergenceError):
+        run_problem(restarts=[1.0, 2.0, 2.0, 2.0], dt=1.0, n_steps=6, num_procs=3, max_restarts=2)
