@@ -1,12 +1,12 @@
 import numpy as np
 
-import pySDC.projects.node_failure.emulate_hard_faults as ft
+import pySDC.projects.deprecated.node_failure.emulate_hard_faults as ft
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 
 from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh
-from pySDC.projects.node_failure.controller_nonMPI_hard_faults import controller_nonMPI_hard_faults
+from pySDC.projects.deprecated.node_failure.controller_nonMPI_hard_faults import controller_nonMPI_hard_faults
 
 
 # noinspection PyShadowingNames,PyShadowingBuiltins
