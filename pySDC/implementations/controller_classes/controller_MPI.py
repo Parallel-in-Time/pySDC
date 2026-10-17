@@ -96,6 +96,10 @@ class controller_MPI(Controller):
         for hook in self.hooks:
             hook.reset_stats()
 
+        # start from the step size in the description, not the one adaptivity left from a previous run
+        for L in self.S.levels:
+            L.params.dt = L.params.dt_initial
+
         # setup time initially
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[: self.comm.rank])

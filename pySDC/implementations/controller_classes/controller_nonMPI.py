@@ -115,6 +115,11 @@ class controller_nonMPI(Controller):
         for hook in self.hooks:
             hook.reset_stats()
 
+        # start from the step size in the description, not the one adaptivity left from a previous run
+        for S in self.MS:
+            for L in S.levels:
+                L.params.dt = L.params.dt_initial
+
         # initial ordering of the steps: 0,1,...,Np-1
         slots = list(range(num_procs))
 
