@@ -1,7 +1,7 @@
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.check_convergence import CheckConvergence
 
-from pySDC.projects.node_failure.emulate_hard_faults import hard_fault_injection
+from pySDC.projects.deprecated.node_failure.emulate_hard_faults import hard_fault_injection
 
 
 class controller_nonMPI_hard_faults(controller_nonMPI):
