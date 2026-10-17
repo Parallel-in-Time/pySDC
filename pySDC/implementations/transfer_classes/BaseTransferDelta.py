@@ -41,15 +41,23 @@ class delta_transfer(BaseTransfer):
     corrections, so a hierarchy mixing delta-form and stock sweepers still runs.
     """
 
+    def __init__(self, fine_level, coarse_level, *args, **kwargs):
+        super().__init__(fine_level, coarse_level, *args, **kwargs)
+        # the levels are connected fine to coarse, so the transfer onto the fine level can only
+        # find this one through the level's sweeper, and only once it is asked: see coarse_reads_tau
+        fine_level.sweep.coarser_transfer = self
+
     def coarse_reads_tau(self):
         """
-        Whether the coarse level reads the FAS :math:`\\tau` at all.
+        Whether the coarse level's FAS :math:`\\tau` is read at all.
 
         The sweep does not -- it is handed the restricted fine residual, which is what :math:`\\tau`
         exists to produce -- and neither does :meth:`DeltaFormMixin.compute_residual`. The one
-        remaining reader is :meth:`compute_end_point`, and only when the end point comes from the
-        quadrature update rather than a copy of the last node. When nothing reads it, building it is
-        a coarse ``integrate()`` and a restriction spent on a quantity that is then discarded.
+        remaining reader on the level is :meth:`compute_end_point`, and only when the end point
+        comes from the quadrature update rather than a copy of the last node. The other is the
+        restriction to the next coarser level, which folds this :math:`\\tau` into its own when that
+        one is built, so the question covers every level below. When nothing reads it, building it
+        is a coarse ``integrate()`` and a restriction spent on a quantity that is then discarded.
 
         Returns
         -------
@@ -57,7 +65,10 @@ class delta_transfer(BaseTransfer):
             Whether :math:`\\tau` has to be built.
         """
         SG = self.coarse.sweep
-        return not (SG.coll.right_is_node and not SG.params.do_coll_update)
+        below = getattr(SG, 'coarser_transfer', None)
+        return not (SG.coll.right_is_node and not SG.params.do_coll_update) or (
+            below is not None and below.coarse_reads_tau()
+        )
 
     def restrict_state(self):
         """
