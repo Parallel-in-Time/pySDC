@@ -95,7 +95,7 @@ class ParaDiag:
         """
         S.levels[0].sweep.compute_residual()
 
-    def step_is_active(self, time: float, block_start: float, Tend: float, dt: float) -> bool:
+    def step_is_active(self, time: float, block_start: float, t0: float, Tend: float, dt: float) -> bool:
         """
         ParaDiag diagonalizes across the whole block, so it cannot drop a step out of one. A block
         that starts before `Tend` is run whole, past `Tend` if need be.
@@ -103,15 +103,16 @@ class ParaDiag:
         Args:
             time (float): when this step starts
             block_start (float): when the first step of this step's block starts
+            t0 (float): starting time of the run
             Tend (float): ending time
             dt (float): size of this step, which is the size of every step in the block
 
         Returns:
             bool: whether this step takes part
         """
-        active = super().step_is_active(block_start, block_start, Tend, dt)
+        active = super().step_is_active(block_start, block_start, t0, Tend, dt)
 
-        if active and not super().step_is_active(time, block_start, Tend, dt):
+        if active and not super().step_is_active(time, block_start, t0, Tend, dt):
             self.logger.warning(
                 'Warning: This controller will solve past your desired end time until the end of its block!'
             )
