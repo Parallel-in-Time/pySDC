@@ -32,7 +32,7 @@
 | pySDC/helpers/setup\_helper.py                                                                      |       19 |        0 |    100% |           |
 | pySDC/helpers/spectral\_helper.py                                                                   |      796 |       57 |     93% |155, 196, 250, 353-354, 568, 924, 933, 1019-1022, 1087, 1175, 1274, 1323, 1625-1671, 1764-1767, 1801, 1812-1834, 1950, 2028-2030 |
 | pySDC/helpers/stats\_helper.py                                                                      |       34 |        0 |    100% |           |
-| pySDC/helpers/testing.py                                                                            |       30 |        0 |    100% |           |
+| pySDC/helpers/testing.py                                                                            |       31 |        0 |    100% |           |
 | pySDC/helpers/transfer\_helper.py                                                                   |      142 |        0 |    100% |           |
 | pySDC/helpers/visualization\_tools.py                                                               |       33 |        0 |    100% |           |
 | pySDC/helpers/vtkIO.py                                                                              |       51 |        1 |     98% |        90 |
@@ -140,14 +140,14 @@
 | pySDC/implementations/sweeper\_classes/boris\_2nd\_order.py                                         |      118 |        0 |    100% |           |
 | pySDC/implementations/sweeper\_classes/delta\_form.py                                               |      203 |        3 |     99% |138-139, 272 |
 | pySDC/implementations/sweeper\_classes/delta\_form\_MPI.py                                          |       62 |       14 |     77% |   161-177 |
-| pySDC/implementations/sweeper\_classes/explicit.py                                                  |       46 |        2 |     96% |   83, 125 |
-| pySDC/implementations/sweeper\_classes/generic\_implicit.py                                         |       50 |        0 |    100% |           |
+| pySDC/implementations/sweeper\_classes/explicit.py                                                  |       45 |        2 |     96% |   82, 119 |
+| pySDC/implementations/sweeper\_classes/generic\_implicit.py                                         |       49 |        0 |    100% |           |
 | pySDC/implementations/sweeper\_classes/generic\_implicit\_MPI.py                                    |      104 |        3 |     97% |115, 126-127 |
 | pySDC/implementations/sweeper\_classes/generic\_implicit\_mass.py                                   |       55 |        5 |     91% |29, 118-119, 136, 139 |
-| pySDC/implementations/sweeper\_classes/imex\_1st\_order.py                                          |       73 |        0 |    100% |           |
+| pySDC/implementations/sweeper\_classes/imex\_1st\_order.py                                          |       77 |        0 |    100% |           |
 | pySDC/implementations/sweeper\_classes/imex\_1st\_order\_MPI.py                                     |       40 |        0 |    100% |           |
 | pySDC/implementations/sweeper\_classes/imex\_1st\_order\_mass.py                                    |       53 |        4 |     92% |118-119, 134, 137 |
-| pySDC/implementations/sweeper\_classes/multi\_implicit.py                                           |       59 |        8 |     86% |26, 28, 90, 151-156 |
+| pySDC/implementations/sweeper\_classes/multi\_implicit.py                                           |       60 |        8 |     87% |26, 28, 97, 141-146 |
 | pySDC/implementations/sweeper\_classes/verlet.py                                                    |       73 |        9 |     88% |76, 196-205 |
 | pySDC/implementations/transfer\_classes/BaseTransferDelta.py                                        |       65 |        1 |     98% |       140 |
 | pySDC/implementations/transfer\_classes/BaseTransferDeltaMPI.py                                     |       40 |        1 |     98% |        63 |
@@ -246,7 +246,7 @@
 | pySDC/projects/PinTSimE/buck\_model.py                                                              |       13 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/discontinuous\_test\_ODE.py                                                 |       26 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/estimation\_check.py                                                        |       31 |        0 |    100% |           |
-| pySDC/projects/PinTSimE/hardcoded\_solutions.py                                                     |      139 |        0 |    100% |           |
+| pySDC/projects/PinTSimE/hardcoded\_solutions.py                                                     |      140 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/paper\_PSCC2024/log\_event.py                                               |       14 |        5 |     64% |     35-42 |
 | pySDC/projects/PinTSimE/piline\_model.py                                                            |       13 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/switch\_estimator.py                                                        |      105 |        1 |     99% |       168 |
@@ -407,7 +407,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32815** | **4052** | **88%** |           |
+| **TOTAL**                                                                                           | **32820** | **4052** | **88%** |           |
 
 44 empty files skipped.
 
