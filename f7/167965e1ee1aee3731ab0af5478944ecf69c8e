@@ -1,0 +1,33 @@
+pySDC/projects/Resilience/piline.py
+  s_4c56c5a8aed02b::t_9dd83578d5805f 237-242,245
+  s_4c56c5a8aed02b::t_f14fecdf26822d 223-228,231
+pySDC/projects/Resilience/accuracy_check.py
+  s_4c56c5a8aed02b::t_6bc35faab5626c 63-66,68-70,73,76,79
+pySDC/tests/test_convergence_controllers/test_basic_restarting.py
+  s_4c56c5a8aed02b::t_a5615a69887dd5 306,310
+  s_4c56c5a8aed02b::t_bdd06402c25716 124
+  s_4c56c5a8aed02b::t_44fadd5fce1e1f 291-292,297-305,307-309,311-324
+  s_4c56c5a8aed02b::t_bc31aaecdbc80e 20
+  s_4c56c5a8aed02b::t_3f463f28a1bb80 293-296
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_4c56c5a8aed02b::t_0ebea4acd546fc 80,88,188,196,298,307,380,389
+pySDC/implementations/convergence_controller_classes/spread_step_sizes.py
+  s_4c56c5a8aed02b::t_d5a1175e2d9511 81-103,148-149,162,233
+  s_4c56c5a8aed02b::t_4d6e211b9e2578 104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f7167965e1ee1aee3731ab0af5478944ecf69c8e",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
