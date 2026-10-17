@@ -1,0 +1,21 @@
+pySDC/tests/test_convergence_controllers/test_basic_restarting.py
+  s_4c56c5a8aed02b::t_ab4288ab1a0133 434-445
+pySDC/implementations/convergence_controller_classes/basic_restarting.py
+  s_4c56c5a8aed02b::t_f663393e960c06 207-208,213-215
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fbfdd6bb82d99aaf9ddc8a4c88cf460f3dc80225",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
