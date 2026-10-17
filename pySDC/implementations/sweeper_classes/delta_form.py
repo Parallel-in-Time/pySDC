@@ -65,6 +65,7 @@ nothing down, so on a stock hierarchy this sweeper reproduces MLSDC and PFASST e
 
 import numpy as np
 
+from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
@@ -76,6 +77,18 @@ class DeltaFormMixin:
         """Read the optional sweeper parameters, and arm the per-sweep recorders."""
         token = getattr(self.params, 'correction_precision', None)
         self._work_dtype = None if token is None else np.dtype(token)
+        init = self.level.prob.init
+        if (
+            self._work_dtype is not None
+            and self._work_dtype.kind != 'c'
+            and isinstance(init, tuple)
+            and np.dtype(init[-1]).kind == 'c'
+        ):
+            # storing a complex correction in a real array keeps only its real part
+            raise ParameterError(
+                f'correction_precision={self._work_dtype} is real, but the problem is complex ({np.dtype(init[-1])}). '
+                'Use a complex correction_precision such as complex64.'
+            )
         self._linear_implicit = bool(getattr(self.params, 'linear_implicit', False))
         self._deltas, self._dfs = [], []
 
