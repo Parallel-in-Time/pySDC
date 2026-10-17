@@ -581,7 +581,8 @@ class controller_MPI(Controller):
             for hook in self.hooks:
                 hook.pre_sweep(step=self.S, level_number=0)
 
-            self.S.levels[0].sweep.updateVariableCoeffs(k + 1)  # update QDelta coefficients if variable preconditioner
+            # update QDelta coefficients if variable preconditioner, indexed by the sweep count across iterations
+            self.S.levels[0].sweep.updateVariableCoeffs((self.S.status.iter - 1) * nsweeps + k + 1)
             self.S.levels[0].sweep.update_nodes()
 
             for hook in self.hooks:
