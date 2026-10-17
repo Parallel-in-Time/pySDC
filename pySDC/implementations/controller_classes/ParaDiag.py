@@ -110,9 +110,9 @@ class ParaDiag:
         Returns:
             bool: whether this step takes part
         """
-        active = super().step_is_active(block_start, block_start, t0, Tend, dt)
+        active = super().step_is_active(block_start, block_start=block_start, t0=t0, Tend=Tend, dt=dt)
 
-        if active and not super().step_is_active(time, block_start, t0, Tend, dt):
+        if active and not super().step_is_active(time, block_start=block_start, t0=t0, Tend=Tend, dt=dt):
             self.logger.warning(
                 'Warning: This controller will solve past your desired end time until the end of its block!'
             )
