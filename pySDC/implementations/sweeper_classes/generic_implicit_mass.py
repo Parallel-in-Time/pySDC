@@ -24,10 +24,6 @@ class generic_implicit_mass(generic_implicit):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
-        # update the MIN-SR-FLEX preconditioner
-        if self.params.QI == 'MIN-SR-FLEX':
-            self.QI = self.get_Qdelta_implicit(qd_type="MIN-SR-FLEX", k=L.status.sweep)
-
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
 
