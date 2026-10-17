@@ -14,7 +14,13 @@ def getLevel(nvars, num_nodes, index, useMPI):
     level_params['problem_class'] = heatNd_unforced
     level_params['problem_params'] = {'nvars': nvars}
     level_params['sweeper_class'] = sweeper_class
-    level_params['sweeper_params'] = {'num_nodes': num_nodes, 'quad_type': 'GAUSS', 'do_coll_update': True}
+    # the MPI sweeper needs a diagonal QI
+    level_params['sweeper_params'] = {
+        'num_nodes': num_nodes,
+        'quad_type': 'GAUSS',
+        'QI': 'MIN-SR-S',
+        'do_coll_update': True,
+    }
     level_params['level_params'] = {'dt': 1.0}
     level_params['level_index'] = index
 

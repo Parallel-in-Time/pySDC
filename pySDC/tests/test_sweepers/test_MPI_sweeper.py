@@ -144,6 +144,53 @@ def test_sweeper(quad_type, residual_type, imex, init_guess, ML):
     )
 
 
+def make_level(sweeper, QI, QE):
+    from mpi4py import MPI
+    from pySDC.core.level import Level
+
+    if sweeper == 'imex':
+        from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as sweeper_class
+        from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced as problem_class
+    elif sweeper == 'delta':
+        from pySDC.implementations.sweeper_classes.delta_form_MPI import delta_implicit_MPI as sweeper_class
+        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
+    else:
+        from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI as sweeper_class
+        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
+
+    sweeper_params = {'num_nodes': MPI.COMM_WORLD.size, 'quad_type': 'RADAU-RIGHT', 'QI': QI, 'QE': QE}
+    return Level(problem_class, {}, sweeper_class, sweeper_params, {'dt': 0.1}, 0)
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(2)
+@pytest.mark.parametrize(
+    "sweeper, QI, QE",
+    [
+        ('generic', 'IE', 'PIC'),
+        ('generic', 'LU', 'PIC'),
+        ('delta', 'IE', 'PIC'),
+        ('imex', 'IE', 'PIC'),
+        ('imex', 'MIN-SR-S', 'EE'),
+    ],
+)
+def test_preconditioners_that_are_not_diagonal_are_refused(sweeper, QI, QE):
+    """Each rank keeps only its diagonal entry, so these used to run quietly as a different method than asked."""
+    from pySDC.core.errors import ParameterError
+
+    with pytest.raises(ParameterError):
+        make_level(sweeper, QI, QE)
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(2)
+@pytest.mark.parametrize("sweeper", ['generic', 'delta', 'imex'])
+@pytest.mark.parametrize("QI", ['MIN-SR-S', 'IEpar'])
+def test_diagonal_preconditioners_are_accepted(sweeper, QI):
+    """Also with an alias of Picard, which the IMEX sweeper used to reject by its name."""
+    assert make_level(sweeper, QI, 'Picard').sweep.parallelizable
+
+
 @pytest.mark.cupy
 @pytest.mark.parallel(2)
 @pytest.mark.parametrize("quad_type", ['GAUSS', 'RADAU-RIGHT'])

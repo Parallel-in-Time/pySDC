@@ -44,6 +44,7 @@ def get_controller(MPIsweeper, MPIcontroller):
     sweeper_params = {}
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
+    sweeper_params['QI'] = 'MIN-SR-S'  # the MPI sweeper needs a diagonal one, and nothing is swept here
     sweeper_params['comm'] = comm
 
     problem_params = {'degree': 12}

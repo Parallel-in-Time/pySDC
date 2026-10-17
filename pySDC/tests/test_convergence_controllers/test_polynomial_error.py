@@ -40,6 +40,7 @@ def get_controller(dt, num_nodes, quad_type, useMPI, useGPU, rel_error):
     sweeper_params = {}
     sweeper_params['quad_type'] = quad_type
     sweeper_params['num_nodes'] = num_nodes
+    sweeper_params['QI'] = 'MIN-SR-S'  # the MPI sweeper needs a diagonal one, and nothing is swept here
     sweeper_params['comm'] = comm
 
     problem_params = {

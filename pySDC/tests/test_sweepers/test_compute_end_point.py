@@ -25,7 +25,13 @@ def compute_end_point_generic_implicit(num_nodes, useMPI):
 
     description = {}
     description['sweeper_class'] = sweeper_class
-    description['sweeper_params'] = {'num_nodes': num_nodes, 'quad_type': 'GAUSS', 'do_coll_update': True, 'comm': comm}
+    description['sweeper_params'] = {
+        'num_nodes': num_nodes,
+        'quad_type': 'GAUSS',
+        'QI': 'MIN-SR-S',  # the MPI sweeper needs a diagonal one
+        'do_coll_update': True,
+        'comm': comm,
+    }
     description['problem_params'] = {'degree': num_nodes + 1}
     description['level_params'] = {'dt': 1.0}
     description['step_params'] = {}
