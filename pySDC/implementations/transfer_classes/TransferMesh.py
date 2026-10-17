@@ -25,6 +25,60 @@ def _unit_grid(nvars, periodic):
     return np.arange(nvars) / nvars if periodic else (np.arange(nvars) + 1) / (nvars + 1)
 
 
+def _transfer_matrices_1d(nvars_fine, nvars_coarse, params):
+    """
+    Interpolation and restriction matrix of one spatial dimension.
+
+    The ``equidist_nested`` shortcut of ``interpolation_matrix_1d`` and the restriction scale of 0.5
+    are only right for grids that are nested with coarsening factor two, that is ``nf = 2 nc`` for
+    periodic and ``nf = 2 nc + 1`` for Dirichlet grids. Any other pair of sizes takes the general
+    interpolation, and its restriction is the transposed interpolation normalised to reproduce
+    constants, which is what the factor 0.5 does on the nested grids.
+
+    Args:
+        nvars_fine (int): number of degrees of freedom on the fine level
+        nvars_coarse (int): number of degrees of freedom on the coarse level
+        params: the parameters of the transfer class
+
+    Returns:
+        tuple: the interpolation matrix (nf x nc) and the restriction matrix (nc x nf)
+    """
+    # if number of variables is the same on both levels, Rspace and Pspace are identity
+    if nvars_coarse == nvars_fine:
+        return sp.eye(nvars_fine), sp.eye(nvars_coarse)
+
+    nested = nvars_fine == 2 * nvars_coarse + (not params.periodic)
+    if not nested and min(params.iorder, params.rorder) == 0:
+        raise TransferError(
+            f'Order 0 (injection) needs grids nested with factor 2, got {nvars_fine} and {nvars_coarse} points'
+        )
+
+    fine_grid = _unit_grid(nvars_fine, params.periodic)
+    coarse_grid = _unit_grid(nvars_coarse, params.periodic)
+
+    def interpolation_matrix(k):
+        return th.interpolation_matrix_1d(
+            fine_grid,
+            coarse_grid,
+            k=k,
+            periodic=params.periodic,
+            equidist_nested=params.equidist_nested and nested,
+        )
+
+    # assemble restriction as transpose of interpolation
+    Pspace = interpolation_matrix(params.iorder)
+    RspaceT = Pspace.T if params.iorder == params.rorder else interpolation_matrix(params.rorder).T
+
+    if not nested:
+        return Pspace, sp.diags(1.0 / np.asarray(RspaceT.sum(axis=1)).ravel()) @ RspaceT
+
+    if params.rorder > 0:
+        restr_factor = 0.5
+    else:
+        restr_factor = 1.0
+    return Pspace, restr_factor * RspaceT
+
+
 class mesh_to_mesh(SpaceTransfer):
     """
     Space transfer between nd meshes by sparse interpolation matrices of even order, restricting by their transpose.
@@ -69,82 +123,16 @@ class mesh_to_mesh(SpaceTransfer):
 
         # we have a 1d problem
         if type(self.fine_prob.nvars) is int:
-            # if number of variables is the same on both levels, Rspace and Pspace are identity
-            if self.coarse_prob.nvars == self.fine_prob.nvars:
-                self.Rspace = sp.eye(self.coarse_prob.nvars)
-                self.Pspace = sp.eye(self.fine_prob.nvars)
-            # assemble restriction as transpose of interpolation
-            else:
-                fine_grid = _unit_grid(self.fine_prob.nvars, self.params.periodic)
-                coarse_grid = _unit_grid(self.coarse_prob.nvars, self.params.periodic)
-
-                self.Pspace = th.interpolation_matrix_1d(
-                    fine_grid,
-                    coarse_grid,
-                    k=self.params.iorder,
-                    periodic=self.params.periodic,
-                    equidist_nested=self.params.equidist_nested,
-                )
-                if self.params.rorder > 0:
-                    restr_factor = 0.5
-                else:
-                    restr_factor = 1.0
-
-                if self.params.iorder == self.params.rorder:
-                    self.Rspace = restr_factor * self.Pspace.T
-
-                else:
-                    self.Rspace = (
-                        restr_factor
-                        * th.interpolation_matrix_1d(
-                            fine_grid,
-                            coarse_grid,
-                            k=self.params.rorder,
-                            periodic=self.params.periodic,
-                            equidist_nested=self.params.equidist_nested,
-                        ).T
-                    )
+            self.Pspace, self.Rspace = _transfer_matrices_1d(self.fine_prob.nvars, self.coarse_prob.nvars, self.params)
 
         # we have an n-d problem
         else:
             Rspace = []
             Pspace = []
             for i in range(len(self.fine_prob.nvars)):
-                # if number of variables is the same on both levels, Rspace and Pspace are identity
-                if self.coarse_prob.nvars[i] == self.fine_prob.nvars[i]:
-                    Rspace.append(sp.eye(self.coarse_prob.nvars[i]))
-                    Pspace.append(sp.eye(self.fine_prob.nvars[i]))
-                # assemble restriction as transpose of interpolation
-                else:
-                    fine_grid = _unit_grid(self.fine_prob.nvars[i], self.params.periodic)
-                    coarse_grid = _unit_grid(self.coarse_prob.nvars[i], self.params.periodic)
-
-                    Pspace.append(
-                        th.interpolation_matrix_1d(
-                            fine_grid,
-                            coarse_grid,
-                            k=self.params.iorder,
-                            periodic=self.params.periodic,
-                            equidist_nested=self.params.equidist_nested,
-                        )
-                    )
-                    if self.params.rorder > 0:
-                        restr_factor = 0.5
-                    else:
-                        restr_factor = 1.0
-
-                    if self.params.iorder == self.params.rorder:
-                        Rspace.append(restr_factor * Pspace[-1].T)
-
-                    else:
-                        mat = th.interpolation_matrix_1d(
-                            fine_grid,
-                            coarse_grid,
-                            k=self.params.rorder,
-                            periodic=self.params.periodic,
-                            equidist_nested=self.params.equidist_nested,
-                        ).T
-                        Rspace.append(restr_factor * mat)
+                P, R = _transfer_matrices_1d(self.fine_prob.nvars[i], self.coarse_prob.nvars[i], self.params)
+                Pspace.append(P)
+                Rspace.append(R)
 
             # kronecker 1-d operators for n-d
             self.Pspace = Pspace[0]
