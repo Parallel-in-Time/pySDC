@@ -2,6 +2,8 @@ pySDC/implementations/datatype_classes/fenics_mesh.py
   s_4c56c5a8aed02b::t_139bcdbe61795d 51-52,71-72,77-112,128-129
 pySDC/tests/test_datatypes/test_fenics_mesh.py
   s_4c56c5a8aed02b::t_01bd5da07a701a 1-48
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_4c56c5a8aed02b::t_777fd4724350e8 277
 ---
 {
   "schema_version": "authorship/3.0.0",
