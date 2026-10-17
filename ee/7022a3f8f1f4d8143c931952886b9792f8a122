@@ -1,0 +1,24 @@
+pySDC/projects/PinTSimE/switch_estimator.py
+  s_4c56c5a8aed02b::t_e14e367f82318e 332-336
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_4c56c5a8aed02b::t_ed46b768ceb11f 197-199
+pySDC/projects/PinTSimE/tests/test_SwitchEstimator.py
+  s_4c56c5a8aed02b::t_737542736c7fff 166-186
+  s_4c56c5a8aed02b::t_1ba9aeeaa70edd 165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ee7022a3f8f1f4d8143c931952886b9792f8a122",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
