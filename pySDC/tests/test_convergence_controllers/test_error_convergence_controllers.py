@@ -233,3 +233,24 @@ def test_EstimateEmbeddedErrorCollocation(n_steps=6, thresh=0.01):
 
 if __name__ == '__main__':
     test_EstimateEmbeddedErrorCollocation()
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('name', ['HotRod', 'EstimateExtrapolationErrorNonMPI'])
+def test_residual_tolerance_is_refused(name):
+    """
+    Both need a fixed number of iterations per step, so they refuse a residual tolerance, which lives in the level
+    parameters.
+    """
+    from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
+        EstimateExtrapolationErrorNonMPI,
+    )
+    from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
+
+    classes = {
+        'HotRod': (HotRod, {'HotRod_tol': 1e-9}),
+        'EstimateExtrapolationErrorNonMPI': (EstimateExtrapolationErrorNonMPI, {'no_storage': False}),
+    }
+    error_estimator, params = classes[name]
+    with pytest.raises(AssertionError, match='restol'):
+        run_problem(maxiter=6, error_estimator=error_estimator, params=params, restol=1e-10)
