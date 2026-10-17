@@ -163,6 +163,28 @@ def testAdaptInterpolationInfo(quad_type):
 
 
 @pytest.mark.base
+def testGetSwitchStaysInStep():
+    r"""
+    On a step not much larger than the finite difference step of Newton's method in ``get_switch``, Newton could leave
+    the step and return an event time outside of it, which the switch estimator then took as an event at the boundary.
+    The state function changes its sign across the step, so the event time has to lie within the step.
+    """
+
+    from pySDC.core.collocation import CollBase
+    from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+    from pySDC.implementations.problem_classes.DiscontinuousTestODE import DiscontinuousTestODE
+
+    P = DiscontinuousTestODE()
+    dt = 1.5e-10
+    t0 = P.t_switch_exact - dt / 2
+    t_interp = [t0] + [t0 + dt * node for node in CollBase(num_nodes=5, quad_type='RADAU-RIGHT').nodes]
+
+    _, m_guess, state_function = P.get_switching_info([P.u_exact(t) for t in t_interp], t0)
+    t_switch = SwitchEstimator.get_switch(t_interp, state_function, m_guess)
+    assert t_interp[0] <= t_switch <= t_interp[-1], f'Event time {t_switch} is outside of the step {t_interp}!'
+
+
+@pytest.mark.base
 @pytest.mark.parametrize('num_nodes', [3, 4, 5])
 def testDetectionBoundary(num_nodes):
     """

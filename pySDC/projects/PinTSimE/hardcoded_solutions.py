@@ -193,10 +193,10 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection, maxite
                 }
             elif dt == 1e-3:
                 expected = {
-                    'iL': 0.5407340516779595,
-                    'vC': 0.9999999999936255,
-                    't_switches': [0.18232155676519302],
-                    'sum_restarts': 10.0,
+                    'iL': 0.5403849766692059,
+                    'vC': 0.9999166666681585,
+                    't_switches': [0.18232155679522236, 0.1823215567943357],
+                    'sum_restarts': 11.0,
                     'sum_niters': 2536.0,
                 }
             got.update(
