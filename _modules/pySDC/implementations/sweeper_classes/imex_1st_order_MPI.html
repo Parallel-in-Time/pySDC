@@ -444,19 +444,6 @@
 <span class="sd">    Node-parallel IMEX-SDC sweeper, one collocation node per MPI rank, so far only with Picard for the explicit part.</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Initialization routine for the sweeper, which additionally checks that the explicit preconditioner is Picard</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            *args: passed on to the parent classes, i.e. the parameters for the sweeper and the level</span>
-<span class="sd">            **kwargs: passed on to the parent classes</span>
-<span class="sd">        """</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span> <span class="o">==</span> <span class="s1">'PIC'</span>
-        <span class="p">),</span> <span class="sa">f</span><span class="s2">"Only Picard is implemented for explicit preconditioner so far in </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">! You chose </span><span class="se">\"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="si">}</span><span class="se">\"</span><span class="s2">"</span>
-
 <div class="viewcode-block" id="imex_1st_order_MPI.integrate">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html#pySDC.implementations.sweeper_classes.imex_1st_order_MPI.imex_1st_order_MPI.integrate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>

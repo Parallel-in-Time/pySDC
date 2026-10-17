@@ -434,7 +434,7 @@
   <h1>Source code for pySDC.implementations.convergence_controller_classes.estimate_embedded_error</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Pars</span><span class="p">,</span> <span class="n">Status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Pars</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.store_uold</span><span class="w"> </span><span class="kn">import</span> <span class="n">StoreUOld</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.Runge_Kutta</span><span class="w"> </span><span class="kn">import</span> <span class="n">RungeKutta</span>
@@ -832,13 +832,13 @@
         <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
             <span class="n">lvl</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">lvl</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span> <span class="o">+=</span> <span class="p">[</span><span class="n">lvl</span><span class="o">.</span><span class="n">uend</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">+=</span> <span class="p">[</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">]</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_u</span> <span class="o">+=</span> <span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">uend</span><span class="p">,)</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_iter</span> <span class="o">+=</span> <span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,)</span>
 
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_u</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate_collocation</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
-                    <span class="nb">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])]),</span>
+                    <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_iter</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+                    <span class="nb">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_u</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])]),</span>
                 <span class="p">)</span></div>
 
 
@@ -846,16 +846,33 @@
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_embedded_error.html#pySDC.implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.setup_status_variables">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Add the embedded error variable to the levels and add a status variable for previous steps.</span>
+<span class="sd">        Add the embedded error variable to the levels and add status variables for the collocation problems solved in</span>
+<span class="sd">        the current step.</span>
+
+<span class="sd">        These live on the step rather than on this object, since there is one instance of this class per controller,</span>
+<span class="sd">        which is a whole block of steps when running with more than one process. They are tuples, so that the same empty</span>
+<span class="sd">        value can be set on all steps and appending to it on one step does not change it on the others.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
 <span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s1">'u'</span><span class="p">,</span> <span class="s1">'iter'</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># the solutions of converged collocation problems</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># the iteration in which the solution converged</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">'coll_u'</span><span class="p">,</span> <span class="p">())</span>  <span class="c1"># the solutions of converged collocation problems</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">'coll_iter'</span><span class="p">,</span> <span class="p">())</span>  <span class="c1"># the iteration in which the solution converged</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_level</span><span class="p">(</span><span class="s1">'error_embedded_estimate_collocation'</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EstimateEmbeddedErrorCollocation.reset_status_variables">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.estimate_embedded_error.html#pySDC.implementations.convergence_controller_classes.estimate_embedded_error.EstimateEmbeddedErrorCollocation.reset_status_variables">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Forget the collocation problems solved in the previous step, or the previous attempt of this step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            controller (pySDC.Controller): The controller</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_step_status_variable</span><span class="p">(</span><span class="s1">'coll_u'</span><span class="p">,</span> <span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_step_status_variable</span><span class="p">(</span><span class="s1">'coll_iter'</span><span class="p">,</span> <span class="p">())</span></div>
 </div>
 
 </pre></div>

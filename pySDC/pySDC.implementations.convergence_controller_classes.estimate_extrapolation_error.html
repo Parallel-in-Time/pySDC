@@ -765,6 +765,25 @@ node on the finest level at the moment.</p>
 <dd><p>Bases: <a class="reference internal" href="#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase" title="pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorBase</span></code></a></p>
 <p>Implementation of the extrapolation error estimate for the non-MPI controller.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.check_parameters" title="Link to this definition">#</a></dt>
+<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>controller</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.Controller</span></code>) – The controller</p></li>
+<li><p><strong>params</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – The params passed for this specific convergence controller</p></li>
+<li><p><strong>description</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – The description object used to instantiate the controller</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>bool</em> – Whether the parameters are compatible
+str: Error message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error">
 <span class="sig-name descname"><span class="pre">get_extrapolated_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorNonMPI.get_extrapolated_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error" title="Link to this definition">#</a></dt>
 <dd><p>The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
@@ -986,6 +1005,7 @@ to be converged.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI"><code class="docutils literal notranslate"><span class="pre">EstimateExtrapolationErrorNonMPI</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_error"><code class="docutils literal notranslate"><span class="pre">get_extrapolated_error()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.get_extrapolated_solution"><code class="docutils literal notranslate"><span class="pre">get_extrapolated_solution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorNonMPI.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>

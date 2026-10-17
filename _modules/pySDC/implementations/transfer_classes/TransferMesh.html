@@ -459,6 +459,60 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nvars</span><span class="p">)</span> <span class="o">/</span> <span class="n">nvars</span> <span class="k">if</span> <span class="n">periodic</span> <span class="k">else</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nvars</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_transfer_matrices_1d</span><span class="p">(</span><span class="n">nvars_fine</span><span class="p">,</span> <span class="n">nvars_coarse</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Interpolation and restriction matrix of one spatial dimension.</span>
+
+<span class="sd">    The ``equidist_nested`` shortcut of ``interpolation_matrix_1d`` and the restriction scale of 0.5</span>
+<span class="sd">    are only right for grids that are nested with coarsening factor two, that is ``nf = 2 nc`` for</span>
+<span class="sd">    periodic and ``nf = 2 nc + 1`` for Dirichlet grids. Any other pair of sizes takes the general</span>
+<span class="sd">    interpolation, and its restriction is the transposed interpolation normalised to reproduce</span>
+<span class="sd">    constants, which is what the factor 0.5 does on the nested grids.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        nvars_fine (int): number of degrees of freedom on the fine level</span>
+<span class="sd">        nvars_coarse (int): number of degrees of freedom on the coarse level</span>
+<span class="sd">        params: the parameters of the transfer class</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: the interpolation matrix (nf x nc) and the restriction matrix (nc x nf)</span>
+<span class="sd">    """</span>
+    <span class="c1"># if number of variables is the same on both levels, Rspace and Pspace are identity</span>
+    <span class="k">if</span> <span class="n">nvars_coarse</span> <span class="o">==</span> <span class="n">nvars_fine</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nvars_fine</span><span class="p">),</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nvars_coarse</span><span class="p">)</span>
+
+    <span class="n">nested</span> <span class="o">=</span> <span class="n">nvars_fine</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nvars_coarse</span> <span class="o">+</span> <span class="p">(</span><span class="ow">not</span> <span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nested</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">rorder</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'Order 0 (injection) needs grids nested with factor 2, got </span><span class="si">{</span><span class="n">nvars_fine</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">nvars_coarse</span><span class="si">}</span><span class="s1"> points'</span>
+        <span class="p">)</span>
+
+    <span class="n">fine_grid</span> <span class="o">=</span> <span class="n">_unit_grid</span><span class="p">(</span><span class="n">nvars_fine</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
+    <span class="n">coarse_grid</span> <span class="o">=</span> <span class="n">_unit_grid</span><span class="p">(</span><span class="n">nvars_coarse</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">interpolation_matrix</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">th</span><span class="o">.</span><span class="n">interpolation_matrix_1d</span><span class="p">(</span>
+            <span class="n">fine_grid</span><span class="p">,</span>
+            <span class="n">coarse_grid</span><span class="p">,</span>
+            <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+            <span class="n">periodic</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">,</span>
+            <span class="n">equidist_nested</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">equidist_nested</span> <span class="ow">and</span> <span class="n">nested</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># assemble restriction as transpose of interpolation</span>
+    <span class="n">Pspace</span> <span class="o">=</span> <span class="n">interpolation_matrix</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span><span class="p">)</span>
+    <span class="n">RspaceT</span> <span class="o">=</span> <span class="n">Pspace</span><span class="o">.</span><span class="n">T</span> <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">iorder</span> <span class="o">==</span> <span class="n">params</span><span class="o">.</span><span class="n">rorder</span> <span class="k">else</span> <span class="n">interpolation_matrix</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nested</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Pspace</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">RspaceT</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span> <span class="o">@</span> <span class="n">RspaceT</span>
+
+    <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">rorder</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">restr_factor</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">restr_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">Pspace</span><span class="p">,</span> <span class="n">restr_factor</span> <span class="o">*</span> <span class="n">RspaceT</span>
+
+
 <div class="viewcode-block" id="mesh_to_mesh">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferMesh.html#pySDC.implementations.transfer_classes.TransferMesh.mesh_to_mesh">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">mesh_to_mesh</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
@@ -505,82 +559,16 @@
 
         <span class="c1"># we have a 1d problem</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
-            <span class="c1"># if number of variables is the same on both levels, Rspace and Pspace are identity</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
-            <span class="c1"># assemble restriction as transpose of interpolation</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">fine_grid</span> <span class="o">=</span> <span class="n">_unit_grid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
-                <span class="n">coarse_grid</span> <span class="o">=</span> <span class="n">_unit_grid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
-
-                <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">interpolation_matrix_1d</span><span class="p">(</span>
-                    <span class="n">fine_grid</span><span class="p">,</span>
-                    <span class="n">coarse_grid</span><span class="p">,</span>
-                    <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span><span class="p">,</span>
-                    <span class="n">periodic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">,</span>
-                    <span class="n">equidist_nested</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">equidist_nested</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">restr_factor</span> <span class="o">=</span> <span class="mf">0.5</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">restr_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
-
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">restr_factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span><span class="o">.</span><span class="n">T</span>
-
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">restr_factor</span>
-                        <span class="o">*</span> <span class="n">th</span><span class="o">.</span><span class="n">interpolation_matrix_1d</span><span class="p">(</span>
-                            <span class="n">fine_grid</span><span class="p">,</span>
-                            <span class="n">coarse_grid</span><span class="p">,</span>
-                            <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span><span class="p">,</span>
-                            <span class="n">periodic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">,</span>
-                            <span class="n">equidist_nested</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">equidist_nested</span><span class="p">,</span>
-                        <span class="p">)</span><span class="o">.</span><span class="n">T</span>
-                    <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rspace</span> <span class="o">=</span> <span class="n">_transfer_matrices_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 
         <span class="c1"># we have an n-d problem</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">Rspace</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">Pspace</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">)):</span>
-                <span class="c1"># if number of variables is the same on both levels, Rspace and Pspace are identity</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                    <span class="n">Rspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
-                    <span class="n">Pspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
-                <span class="c1"># assemble restriction as transpose of interpolation</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">fine_grid</span> <span class="o">=</span> <span class="n">_unit_grid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
-                    <span class="n">coarse_grid</span> <span class="o">=</span> <span class="n">_unit_grid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
-
-                    <span class="n">Pspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">th</span><span class="o">.</span><span class="n">interpolation_matrix_1d</span><span class="p">(</span>
-                            <span class="n">fine_grid</span><span class="p">,</span>
-                            <span class="n">coarse_grid</span><span class="p">,</span>
-                            <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span><span class="p">,</span>
-                            <span class="n">periodic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">,</span>
-                            <span class="n">equidist_nested</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">equidist_nested</span><span class="p">,</span>
-                        <span class="p">)</span>
-                    <span class="p">)</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">restr_factor</span> <span class="o">=</span> <span class="mf">0.5</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">restr_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
-
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iorder</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span><span class="p">:</span>
-                        <span class="n">Rspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">restr_factor</span> <span class="o">*</span> <span class="n">Pspace</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">mat</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">interpolation_matrix_1d</span><span class="p">(</span>
-                            <span class="n">fine_grid</span><span class="p">,</span>
-                            <span class="n">coarse_grid</span><span class="p">,</span>
-                            <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">rorder</span><span class="p">,</span>
-                            <span class="n">periodic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span><span class="p">,</span>
-                            <span class="n">equidist_nested</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">equidist_nested</span><span class="p">,</span>
-                        <span class="p">)</span><span class="o">.</span><span class="n">T</span>
-                        <span class="n">Rspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">restr_factor</span> <span class="o">*</span> <span class="n">mat</span><span class="p">)</span>
+                <span class="n">P</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">_transfer_matrices_1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+                <span class="n">Pspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+                <span class="n">Rspace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
 
             <span class="c1"># kronecker 1-d operators for n-d</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Pspace</span> <span class="o">=</span> <span class="n">Pspace</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

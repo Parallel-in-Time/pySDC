@@ -433,7 +433,7 @@
                   
   <h1>Source code for pySDC.implementations.convergence_controller_classes.adaptivity</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span><span class="p">,</span> <span class="n">Status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.convergence_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvergenceController</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.convergence_controller_classes.step_size_limiter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">StepSizeLimiter</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1194,7 +1194,11 @@
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.adaptivity.html#pySDC.implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.setup_status_variables">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Set up empty lists for the error estimates and orders of the collocation problems solved in the current step.</span>
+<span class="sd">        Set up empty tuples for the error estimates and orders of the collocation problems solved in the current step.</span>
+
+<span class="sd">        These live on the step rather than on this object, since there is one instance of this class per controller,</span>
+<span class="sd">        which is a whole block of steps when running with more than one process. They are tuples, so that the same empty</span>
+<span class="sd">        value can be set on all steps and appending to it on one step does not change it on the others.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
@@ -1202,16 +1206,15 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">([</span><span class="s1">'error'</span><span class="p">,</span> <span class="s1">'order'</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="p">[]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">'coll_error'</span><span class="p">,</span> <span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">'coll_order'</span><span class="p">,</span> <span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="AdaptivityCollocation.reset_status_variables">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.adaptivity.html#pySDC.implementations.convergence_controller_classes.adaptivity.AdaptivityCollocation.reset_status_variables">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Empty the lists of error estimates and orders, e.g. when restarting.</span>
+<span class="sd">        Empty the tuples of error estimates and orders at the start of a step or when restarting.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
@@ -1219,7 +1222,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_step_status_variable</span><span class="p">(</span><span class="s1">'coll_error'</span><span class="p">,</span> <span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_step_status_variable</span><span class="p">(</span><span class="s1">'coll_order'</span><span class="p">,</span> <span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="AdaptivityCollocation.dependencies">
@@ -1260,7 +1264,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: Whether all ``num_colls`` collocation problems have been solved</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">num_colls</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_order</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">num_colls</span></div>
 
 
 <div class="viewcode-block" id="AdaptivityCollocation.get_local_error_estimate">
@@ -1276,8 +1280,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            float: Embedded error estimate</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_error</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_error</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">0.0</span></div>
 
@@ -1294,8 +1298,8 @@
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
             <span class="n">lvl</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error</span> <span class="o">+=</span> <span class="p">[</span><span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate_collocation</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order</span> <span class="o">+=</span> <span class="p">[</span><span class="n">lvl</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">order</span><span class="p">]</span></div>
+            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_error</span> <span class="o">+=</span> <span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate_collocation</span><span class="p">,)</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_order</span> <span class="o">+=</span> <span class="p">(</span><span class="n">lvl</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">order</span><span class="p">,)</span></div>
 
 
 <div class="viewcode-block" id="AdaptivityCollocation.get_new_step_size">
@@ -1312,12 +1316,12 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">num_colls</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_order</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">num_colls</span><span class="p">:</span>
             <span class="n">lvl</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
             <span class="c1"># compute next step size</span>
             <span class="n">order</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">::])</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="nb">min</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_order</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">::])</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="p">)</span>  <span class="c1"># local order of less accurate of the last two collocation problems</span>
             <span class="n">e_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
 
@@ -1340,7 +1344,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">order</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">num_colls</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">coll_order</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">num_colls</span><span class="p">:</span>
             <span class="n">e_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_local_error_estimate</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">e_est</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">:</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="kc">True</span>

@@ -529,10 +529,10 @@
             <span class="n">controller</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Hot Rod needs a detection threshold, which is now set to infinity, such that a </span><span class="se">\</span>
 <span class="s2">restart is never triggered!"</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">"step_params"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"restol"</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s2">"level_params"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"restol"</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="kc">False</span><span class="p">,</span>
-                <span class="s2">"Hot Rod needs constant order in time and hence restol in the step parameters has to be </span><span class="se">\</span>
+                <span class="s2">"Hot Rod needs constant order in time and hence restol in the level parameters has to be </span><span class="se">\</span>
 <span class="s2">smaller than 0!"</span><span class="p">,</span>
             <span class="p">)</span>
 

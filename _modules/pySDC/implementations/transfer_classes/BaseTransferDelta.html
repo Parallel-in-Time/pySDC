@@ -477,17 +477,25 @@
 <span class="sd">    corrections, so a hierarchy mixing delta-form and stock sweepers still runs.</span>
 <span class="sd">    """</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fine_level</span><span class="p">,</span> <span class="n">coarse_level</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fine_level</span><span class="p">,</span> <span class="n">coarse_level</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># the levels are connected fine to coarse, so the transfer onto the fine level can only</span>
+        <span class="c1"># find this one through the level's sweeper, and only once it is asked: see coarse_reads_tau</span>
+        <span class="n">fine_level</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coarser_transfer</span> <span class="o">=</span> <span class="bp">self</span>
+
 <div class="viewcode-block" id="delta_transfer.coarse_reads_tau">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.BaseTransferDelta.html#pySDC.implementations.transfer_classes.BaseTransferDelta.delta_transfer.coarse_reads_tau">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">coarse_reads_tau</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Whether the coarse level reads the FAS :math:`\\tau` at all.</span>
+<span class="sd">        Whether the coarse level's FAS :math:`\\tau` is read at all.</span>
 
 <span class="sd">        The sweep does not -- it is handed the restricted fine residual, which is what :math:`\\tau`</span>
 <span class="sd">        exists to produce -- and neither does :meth:`DeltaFormMixin.compute_residual`. The one</span>
-<span class="sd">        remaining reader is :meth:`compute_end_point`, and only when the end point comes from the</span>
-<span class="sd">        quadrature update rather than a copy of the last node. When nothing reads it, building it is</span>
-<span class="sd">        a coarse ``integrate()`` and a restriction spent on a quantity that is then discarded.</span>
+<span class="sd">        remaining reader on the level is :meth:`compute_end_point`, and only when the end point</span>
+<span class="sd">        comes from the quadrature update rather than a copy of the last node. The other is the</span>
+<span class="sd">        restriction to the next coarser level, which folds this :math:`\\tau` into its own when that</span>
+<span class="sd">        one is built, so the question covers every level below. When nothing reads it, building it</span>
+<span class="sd">        is a coarse ``integrate()`` and a restriction spent on a quantity that is then discarded.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -495,7 +503,10 @@
 <span class="sd">            Whether :math:`\\tau` has to be built.</span>
 <span class="sd">        """</span>
         <span class="n">SG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">sweep</span>
-        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">SG</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">right_is_node</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">SG</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">)</span></div>
+        <span class="n">below</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">SG</span><span class="p">,</span> <span class="s1">'coarser_transfer'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">SG</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">right_is_node</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">SG</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="n">below</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">below</span><span class="o">.</span><span class="n">coarse_reads_tau</span><span class="p">()</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="delta_transfer.restrict_state">
