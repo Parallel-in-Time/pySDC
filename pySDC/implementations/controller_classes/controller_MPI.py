@@ -166,6 +166,11 @@ class controller_MPI(Controller):
             if active:
                 self.restart_block(comm_active.size, time, uend, comm=comm_active)
 
+        # ranks that sat out the last blocks hold an older value, but rank 0 takes part in every block
+        if self.comm.rank > 0:
+            uend = self.S.levels[0].prob.dtype_u(uend)
+        uend = uend.bcast(root=0, comm=self.comm)
+
         # call post-run hook
         for hook in self.hooks:
             hook.post_run(step=self.S, level_number=0)
@@ -494,6 +499,10 @@ class controller_MPI(Controller):
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.post_iteration_processing_block(self, comm=comm)
+
+        # share convergence only once every controller has decided, since some reopen `done`
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.communicate_convergence(self, self.S, comm=comm)
 
         # if not ready, keep doing stuff
         if not self.S.status.done:

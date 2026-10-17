@@ -103,10 +103,6 @@ class CheckConvergence(ConvergenceController):
             None
         """
         S.status.done = self.check_convergence(S, self)
-
-        if "comm" in kwargs.keys():
-            self.communicate_convergence(controller, S, **kwargs)
-
         S.status.force_continue = False
 
         return None
