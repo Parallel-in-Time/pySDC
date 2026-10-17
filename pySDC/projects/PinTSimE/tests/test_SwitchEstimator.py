@@ -342,7 +342,7 @@ def testDetectionDAE(num_nodes):
     from pySDC.projects.PinTSimE.paper_PSCC2024.log_event import LogEventDiscontinuousTestDAE
 
     problem = DiscontinuousTestDAE
-    problem_params = {'newton_tol': 1e-6}
+    problem_params = {'newton_tol': 1e-6, 'switch_on_state': False}
     t0 = 4.6
     Tend = 4.62
     dt = Tend - t0
@@ -394,7 +394,7 @@ def testDetectionDAE(num_nodes):
 
     t_switch = switches[-1]
     event_err = abs(t_switch - t_switch_exact)
-    assert np.isclose(event_err, 0, atol=2.2e-6), f'Event time error {event_err=} is not small enough!'
+    assert event_err < tol, f'Event time error {event_err=} is not small enough!'
 
     h = np.array([val[1] for val in get_sorted(stats, type='state_function', sortby='time', recomputed=False)])
     assert np.isclose(abs(h[-1]), 0.0, atol=2e-9), f'State function is not close to zero; value is {h[-1]}'
