@@ -249,7 +249,7 @@
 | pySDC/projects/PinTSimE/hardcoded\_solutions.py                                                     |      140 |        0 |    100% |           |
 | pySDC/projects/PinTSimE/paper\_PSCC2024/log\_event.py                                               |       14 |        5 |     64% |     35-42 |
 | pySDC/projects/PinTSimE/piline\_model.py                                                            |       13 |        0 |    100% |           |
-| pySDC/projects/PinTSimE/switch\_estimator.py                                                        |      105 |        1 |     99% |       168 |
+| pySDC/projects/PinTSimE/switch\_estimator.py                                                        |      107 |        6 |     94% |   168-183 |
 | pySDC/projects/RDC/equidistant\_RDC.py                                                              |       81 |        7 |     91% | 41-50, 57 |
 | pySDC/projects/RDC/vanderpol\_MLSDC\_PFASST\_test.py                                                |       63 |        0 |    100% |           |
 | pySDC/projects/RDC/vanderpol\_error\_test.py                                                        |       82 |       82 |      0% |     1-153 |
@@ -407,7 +407,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **32830** | **4048** | **88%** |           |
+| **TOTAL**                                                                                           | **32832** | **4053** | **88%** |           |
 
 44 empty files skipped.
 
