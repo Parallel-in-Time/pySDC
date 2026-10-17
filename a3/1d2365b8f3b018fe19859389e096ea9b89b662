@@ -1,0 +1,43 @@
+pySDC/tests/test_sweepers/test_boris_sweeper.py
+  s_4c56c5a8aed02b::t_2bdbc9992900cb 1-44
+pySDC/implementations/sweeper_classes/boris_2nd_order.py
+  s_4c56c5a8aed02b::t_fc39a4cb4a067c 3,49-55,60-66
+  s_4c56c5a8aed02b::t_645ac6352b6308 56-59
+pySDC/implementations/sweeper_classes/generic_implicit_MPI.py
+  s_4c56c5a8aed02b::t_c6c2015dee5706 45-51
+  s_4c56c5a8aed02b::t_8361eb2a97e23d 44
+pySDC/tests/test_convergence_controllers/test_crash.py
+  s_4c56c5a8aed02b::t_512320a0bc9080 47
+pySDC/tests/test_sweepers/test_compute_end_point.py
+  s_4c56c5a8aed02b::t_243cee1a87e6d0 28-34
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_4c56c5a8aed02b::t_327b98d69d69f4 147-193
+pySDC/tests/test_convergence_controllers/test_extrapolation_within_Q.py
+  s_4c56c5a8aed02b::t_a44a49d3634b21 52
+pySDC/tests/test_convergence_controllers/test_polynomial_error.py
+  s_4c56c5a8aed02b::t_a44a49d3634b21 43
+pySDC/tests/test_transfer_classes/test_base_transfer_MPI.py
+  s_4c56c5a8aed02b::t_b779cde77a7af1 17
+  s_4c56c5a8aed02b::t_56f3c33570e31a 18-23
+pySDC/implementations/sweeper_classes/delta_form.py
+  s_4c56c5a8aed02b::t_8eb6332a6561e1 68,80-91
+pySDC/tests/test_sweepers/test_delta_form.py
+  s_4c56c5a8aed02b::t_c6ace6a6a9d763 130,144
+  s_4c56c5a8aed02b::t_069ed6bbca0581 119-129,131-143,145-151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a31d2365b8f3b018fe19859389e096ea9b89b662",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
