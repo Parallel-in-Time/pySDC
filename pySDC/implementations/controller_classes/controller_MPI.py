@@ -96,11 +96,15 @@ class controller_MPI(Controller):
         for hook in self.hooks:
             hook.reset_stats()
 
+        # start from the step size in the description, not the one adaptivity left from a previous run
+        for L in self.S.levels:
+            L.params.dt = L.params.dt_initial
+
         # setup time initially
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[: self.comm.rank])
 
-        active = self.step_is_active(time, t0, Tend, self.S.dt)
+        active = self.step_is_active(time, block_start=t0, t0=t0, Tend=Tend, dt=self.S.dt)
         comm_active = self.comm.Split(active)
         self.S.status.slot = comm_active.rank
 
@@ -152,7 +156,7 @@ class controller_MPI(Controller):
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[: self.S.status.slot])
 
-            active = self.step_is_active(time, tend, Tend, self.S.dt)
+            active = self.step_is_active(time, block_start=tend, t0=t0, Tend=Tend, dt=self.S.dt)
 
             # check if we need to split the communicator
             if not all(comm_active.allgather(active)):
