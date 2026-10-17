@@ -1,0 +1,23 @@
+pySDC/implementations/transfer_classes/TransferMesh.py
+  s_4c56c5a8aed02b::t_f99b7db35abd90 28-81,126,133-135
+pySDC/tests/test_transfer_classes/test_space_transfer_properties.py
+  s_4c56c5a8aed02b::t_29472f606c520c 177-179,181-183,187,190-199,207
+  s_4c56c5a8aed02b::t_154128ad3e58a7 184-185,200-202
+  s_4c56c5a8aed02b::t_8bec81e9405a5b 175-176,180,186,188-189,203-206,208-226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "65d68f22e4709f0a2ab9e96c66c9c6ad5cb8476f",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
