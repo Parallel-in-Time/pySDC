@@ -45,12 +45,15 @@ class imex_1st_order(Sweeper):
         L = self.level
         P = L.prob
 
+        # sum the two parts once per node, not once per entry of Q
+        F = [L.f[j].impl + L.f[j].expl for j in range(1, self.coll.num_nodes + 1)]
+
         me = []
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
             me.append(P.dtype_u(P.init, val=0.0))
             for j in range(1, self.coll.num_nodes + 1):
-                me[m - 1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl)
+                me[m - 1] += L.dt * self.coll.Qmat[m, j] * F[j - 1]
 
         return me
 
@@ -72,27 +75,25 @@ class imex_1st_order(Sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
-        # gather all terms which are known already (e.g. from the previous iteration)
-        # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
-
-        # get QF(u^k)
-        integral = self.integrate()
-        for m in range(M):
-            # subtract QIFI(u^k)_m + QEFE(u^k)_m
-            for j in range(1, M + 1):
-                integral[m] -= L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
-            # add initial value
-            integral[m] += L.u[0]
-            # add tau if associated
-            if L.tau[m] is not None:
-                integral[m] += L.tau[m]
+        # the terms which are known already (from the previous iteration) are u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau,
+        # built with Q - QI and Q - QE in one pass over the parts of F(u^k), kept here because the sweep replaces L.f[m]
+        FI = [L.f[j].impl for j in range(1, M + 1)]
+        FE = [L.f[j].expl for j in range(1, M + 1)]
+        diff_weights_impl = self.coll.Qmat - self.QI
+        diff_weights_expl = self.coll.Qmat - self.QE
 
         # do the sweep
         for m in range(0, M):
-            # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            rhs = P.dtype_u(integral[m])
+            # build rhs, consisting of the known values and new values from previous nodes (at k+1)
+            rhs = P.dtype_u(L.u[0])
+            for j in range(1, M + 1):
+                rhs += L.dt * diff_weights_impl[m + 1, j] * FI[j - 1]
+                rhs += L.dt * diff_weights_expl[m + 1, j] * FE[j - 1]
+            if L.tau[m] is not None:
+                rhs += L.tau[m]
             for j in range(1, m + 1):
-                rhs += L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
+                rhs += L.dt * self.QI[m + 1, j] * L.f[j].impl
+                rhs += L.dt * self.QE[m + 1, j] * L.f[j].expl
 
             # implicit solve with prefactor stemming from QI
             L.u[m + 1] = P.solve_system(

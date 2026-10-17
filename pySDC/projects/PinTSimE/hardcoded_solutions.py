@@ -3,7 +3,7 @@ import numpy as np
 from pySDC.core.errors import ParameterError
 
 
-def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
+def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection, maxiter):
     r"""
     Test for numerical solution if values satisfy hardcoded values.
 
@@ -30,6 +30,8 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
         Indicates whether adaptivity is used in the simulation or not.
     use_detection : bool
         Indicates whether discontinuity handling is used in the simulation or not.
+    maxiter : int
+        Number of iterations per step, which is the order adaptivity works with (``restol=-1`` with adaptivity).
     """
 
     unknowns = u_num['unknowns']
@@ -437,7 +439,7 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                     'vC1': 83.97535088144014,
                     'vC2': 80.52142375242333,
                     'iLp': 16.09650585135131,
-                    'sum_niters': 7202.0,
+                    'sum_niters': 7200.0,
                 }
         got.update(
             {
@@ -460,7 +462,7 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                     'vC1': 9.782142840662102,
                     'vC2': 6.388775533709242,
                     'iLp': -1.0994027552202539,
-                    'sum_niters': 4242.0,
+                    'sum_niters': 4241.0,
                 }
         got.update(
             {
@@ -476,15 +478,18 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
     # - counts are integers and compared exactly
     # - e_em and e_event are errors that can be at round-off level (down to 2e-16) -> relative 1e-3, but at
     #   least 1e-14 absolute, which makes it an upper bound for the ones near round-off
-    # - dt is the last step size chosen by adaptivity -> relative 1e-4
+    # - dt is the last step size chosen by adaptivity, from the embedded error estimate as dt ~ e_em^(-1/k) with
+    #   k = maxiter: it is known as well as e_em is, divided by k. With e_em at round-off, a relative 1e-4 was
+    #   tighter than that: one ulp in QI moves the battery_n_capacitors step size by 3e-4.
     # - everything else (solution values, event times, global errors) -> relative 1e-10, absolute 1e-12
+    e_em_tols = {'rtol': 1e-3, 'atol': 1e-14}
     for key in expected.keys():
         if key in ['sum_niters', 'sum_restarts']:
             tols = {'rtol': 0, 'atol': 0}
         elif key in ['e_em', 'e_event']:
-            tols = {'rtol': 1e-3, 'atol': 1e-14}
+            tols = e_em_tols
         elif key == 'dt':
-            tols = {'rtol': 1e-4, 'atol': 0}
+            tols = {'rtol': (e_em_tols['rtol'] + e_em_tols['atol'] / abs(expected['e_em'])) / maxiter, 'atol': 0}
         else:
             tols = {'rtol': 1e-10, 'atol': 1e-12}
 
