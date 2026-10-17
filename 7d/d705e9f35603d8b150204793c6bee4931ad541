@@ -1,0 +1,26 @@
+pySDC/projects/DAE/tests/test_problems.py
+  s_4c56c5a8aed02b::t_26ba1e83e627fc 522-523
+  s_4c56c5a8aed02b::t_12e5532d899b09 519-520
+  s_4c56c5a8aed02b::t_b6cd970fed36d2 456
+pySDC/projects/DAE/problems/discontinuousTestDAE.py
+  s_4c56c5a8aed02b::t_eef7a7ac405dd0 33,37-40,47-49,66,69,103
+pySDC/projects/PinTSimE/tests/test_SwitchEstimator.py
+  s_4c56c5a8aed02b::t_26ba1e83e627fc 397
+  s_4c56c5a8aed02b::t_265f2533f93d46 345
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7dd705e9f35603d8b150204793c6bee4931ad541",
+  "prompts": {},
+  "sessions": {
+    "s_4c56c5a8aed02b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83429b08-9c7c-45aa-90a0-436f925ace67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
