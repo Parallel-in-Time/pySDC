@@ -231,6 +231,28 @@ def test_EstimateEmbeddedErrorCollocation(n_steps=6, thresh=0.01):
     ), f'Embedded error estimate failed! Relative difference to true error: {rel_diff}'
 
 
+@pytest.mark.base
+def test_AdaptivityCollocation_multiple_steps_per_block(e_tol=1e-7):
+    """
+    Every step accepted by collocation based adaptivity must have an error estimate below the tolerance, since steps
+    that don't are restarted. This must hold also when the steps of a block share the convergence controllers, which
+    only works if the estimate of each step is built from the collocation solutions of that step alone.
+    """
+    from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityCollocation
+    from pySDC.helpers.stats_helper import get_sorted
+
+    params = {'e_tol': e_tol, 'adaptive_coll_params': {'num_nodes': [2, 3]}}
+    stats = run_problem(
+        maxiter=99, num_procs=2, n_steps=4, error_estimator=AdaptivityCollocation, params=params, restol=1e-10
+    )
+
+    e_estimated = [me[1] for me in get_sorted(stats, type='error_embedded_estimate_collocation', recomputed=False)]
+    assert len(e_estimated) > 0, 'No collocation error estimates were recorded!'
+    assert (
+        max(e_estimated) < e_tol
+    ), f'Accepted a step with error estimate {max(e_estimated):.2e} above tolerance {e_tol:.2e}!'
+
+
 if __name__ == '__main__':
     test_EstimateEmbeddedErrorCollocation()
 
