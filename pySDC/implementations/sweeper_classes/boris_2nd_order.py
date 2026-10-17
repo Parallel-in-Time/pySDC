@@ -53,7 +53,10 @@ class boris_2nd_order(Sweeper):
         T = np.zeros_like(self.ST)
         T[range(1, M + 1), range(1, M + 1)] = d / 2
         T[range(1, M + 1), range(M)] += d / 2
-        # entries are at most 1 and pass through a few roundings
+        # For a working pair ST == T in exact arithmetic. In floating point, QI and QE round the same node distances
+        # independently (at most 1, so up to eps apart, eps / 2 after halving), and forming QT = (QI + QE) / 2 and its
+        # row differences rounds twice more (eps / 2 each): |ST - T| <= 2 eps. The bar is twice that; a wrong pair is
+        # off by O(0.1).
         if not np.allclose(self.ST[1:], T[1:], rtol=0, atol=4 * np.finfo(float).eps):
             raise ParameterError(
                 f'boris_2nd_order converges to a wrong solution with QI={self.params.QI!r} and QE={self.params.QE!r}: '
