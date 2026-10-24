@@ -340,7 +340,7 @@ class Controller(object):
                         f'step(s). Use a preconditioner with fixed coefficients, e.g. MIN-SR-S or LU.'
                     )
 
-    def step_is_active(self, time: float, block_start: float, Tend: float, dt: float) -> bool:
+    def step_is_active(self, time: float, block_start: float, t0: float, Tend: float, dt: float) -> bool:
         """
         Whether a step starting at `time`, in a block starting at `block_start`, still has work.
 
@@ -348,23 +348,26 @@ class Controller(object):
         may be run partially. An algorithm that couples its steps too tightly to drop one of them
         answers this from `block_start` instead and runs the block whole.
 
-        "Before" means by more than the round-off in `time`. The start times are accumulated by
-        repeated addition of `dt`, and each addition is off by at most eps |t| / 2. After the
-        N ~ |Tend| / dt additions it takes to get to `Tend`, plus the rounding of `dt` itself,
-        `time` can be off by (N + 1) eps |Tend| / 2, on either side of `Tend`. Twice that is the
-        tolerance here, so a step starting at `Tend` up to round-off does not run past it, while
-        a last step that does not fit into the interval still runs, past `Tend`.
+        "Before" means by more than the round-off in `time`. The start times are accumulated from
+        `t0` by repeated addition of `dt`, and each addition is off by at most eps T / 2, with
+        T = max(|t0|, |Tend|) bounding the times involved. After the N ~ |Tend - t0| / dt additions
+        it takes to get to `Tend`, plus the rounding of `dt` itself, which adds up to
+        eps |Tend - t0| / 2, `time` can be off by (N T + |Tend - t0|) eps / 2, on either side of
+        `Tend`. Twice that is the tolerance here, so a step starting at `Tend` up to round-off does
+        not run past it, while a last step that does not fit into the interval still runs, past
+        `Tend`.
 
         Args:
             time (float): when this step starts
             block_start (float): when the first step of this step's block starts
+            t0 (float): starting time of the run
             Tend (float): ending time
             dt (float): size of this step
 
         Returns:
             bool: whether this step takes part
         """
-        return time < Tend - (abs(Tend) / dt + 1) * np.finfo(float).eps * abs(Tend)
+        return time < Tend - (max(abs(t0), abs(Tend)) / dt + 1) * np.finfo(float).eps * abs(Tend - t0)
 
     def setup_convergence_controllers(self, description: Dict[str, Any]) -> None:
         '''
