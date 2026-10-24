@@ -1,3 +1,4 @@
+from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
@@ -141,7 +142,19 @@ class generic_implicit_mass(generic_implicit):
             res_norm.append(abs(res[m]))
 
         # find maximal residual over the nodes
-        L.status.residual = max(res_norm)
+        if L.params.residual_type == 'full_abs':
+            L.status.residual = max(res_norm)
+        elif L.params.residual_type == 'last_abs':
+            L.status.residual = res_norm[-1]
+        elif L.params.residual_type == 'full_rel':
+            L.status.residual = max(res_norm) / abs(L.u[0])
+        elif L.params.residual_type == 'last_rel':
+            L.status.residual = res_norm[-1] / abs(L.u[0])
+        else:
+            raise ParameterError(
+                f'residual_type = {L.params.residual_type} not implemented, choose '
+                f'full_abs, last_abs, full_rel or last_rel instead'
+            )
 
         # indicate that the residual has seen the new values
         L.status.updated = False
