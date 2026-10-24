@@ -54,9 +54,6 @@ class AdaptivityBase(ConvergenceController):
             step_limiter_params = {key: self.params.__dict__[key] for key in available_keys}
             controller.add_convergence_controller(StepSizeLimiter, params=step_limiter_params, description=description)
 
-        if self.params.useMPI:
-            self.prepare_MPI_logical_operations()
-
         return None
 
     def get_new_step_size(self, controller, S, **kwargs):
@@ -274,14 +271,6 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
             self.trigger_restart_upon_nonconvergence(S)
         elif S.levels[0].status.residual > self.params.residual_max_tol:
             self.trigger_restart_upon_nonconvergence(S)
-
-        if self.params.useMPI:
-            # borrow the reduction rather than storing it on the instance: an unbound function in an
-            # instance attribute shadows the hook of the same name, and needs an explicit `self` that
-            # nothing else in this API does
-            from pySDC.core.check_convergence import CheckConvergence
-
-            CheckConvergence.communicate_convergence(self, controller, S, **kwargs)
 
         self.res_last_iter = S.levels[0].status.residual * 1.0
 

@@ -135,19 +135,21 @@ def test_adaptive_collocation_MPI():
     single_test(useMPI=True)
 
 
-def run_block(num_procs, num_nodes=None):
+def run_block(num_procs, num_nodes=None, comm=None):
     """
     Run one block of `num_procs` steps and report the collocation method each step ended on.
 
     Args:
         num_procs (int): number of steps in the block
         num_nodes (list): the collocation methods to walk through, [2, 3] if not given
+        comm (mpi4py.MPI.Intracomm): run with `controller_MPI` on this communicator, one step per rank
 
     Returns:
         list: number of nodes each step finished with
     """
     num_nodes = [2, 3] if num_nodes is None else num_nodes
     from pySDC.implementations.problem_classes.polynomial_test_problem import polynomial_testequation
+    from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.convergence_controller_classes.adaptive_collocation import AdaptiveCollocation
     from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -163,6 +165,12 @@ def run_block(num_procs, num_nodes=None):
             AdaptiveCollocation: {'num_nodes': num_nodes, 'quad_type': ['RADAU-RIGHT'] * len(num_nodes)}
         },
     }
+
+    if comm is not None:
+        controller = controller_MPI(controller_params={'logger_level': 30}, description=description, comm=comm)
+        P = controller.S.levels[0].prob
+        controller.run(u0=P.u_exact(0), t0=0.0, Tend=num_procs * 1.0)
+        return comm.allgather(controller.S.levels[0].sweep.coll.num_nodes)
 
     controller = controller_nonMPI(num_procs=num_procs, controller_params={'logger_level': 30}, description=description)
     P = controller.MS[0].levels[0].prob
@@ -188,3 +196,22 @@ def test_all_steps_switch_collocation(num_procs):
     assert (
         nodes == [num_nodes[-1]] * num_procs
     ), f'Not all steps ended on the last collocation method: expected {[num_nodes[-1]] * num_procs}, got {nodes}'
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(2)
+def test_all_steps_switch_collocation_MPI():
+    """
+    Same as above with one step per rank. `controller_MPI` used to share convergence inside
+    `CheckConvergence`, before `AdaptiveCollocation` reopened `done` to switch method, so the first
+    step told the second it was done, then kept iterating itself, and the run hung.
+    """
+    from mpi4py import MPI
+
+    comm = MPI.COMM_WORLD
+    num_nodes = [2, 3]
+    nodes = run_block(comm.size, num_nodes=num_nodes, comm=comm)
+
+    assert (
+        nodes == [num_nodes[-1]] * comm.size
+    ), f'Not all steps ended on the last collocation method: expected {[num_nodes[-1]] * comm.size}, got {nodes}'
