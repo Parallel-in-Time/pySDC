@@ -299,7 +299,8 @@ class SwitchEstimator(ConvergenceController):
         LagrangeInterpolation = LagrangeApproximation(points=t_interp, fValues=state_function)
 
         def p(t):
-            return LagrangeInterpolation.__call__(t)
+            # qmat>=0.1.22 returns shape (1,) for a scalar t, which breaks formatting and brentq
+            return LagrangeInterpolation(t).item()
 
         def fprime(t):
             r"""
