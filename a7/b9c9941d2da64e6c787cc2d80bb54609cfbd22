@@ -1,0 +1,23 @@
+pySDC/projects/PinTSimE/switch_estimator.py
+  s_a53058ab6e7c7f::t_86caea171b0180 302-303
+.github/workflows/ci_pipeline.yml
+  s_a53058ab6e7c7f::t_8c3d93e2c2e52a 46-49
+pySDC/projects/FEM_with_FEniCS/environment.yml
+  s_a53058ab6e7c7f::t_35be5a9001b5cc 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a7b9c9941d2da64e6c787cc2d80bb54609cfbd22",
+  "prompts": {},
+  "sessions": {
+    "s_a53058ab6e7c7f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "415b0702-329c-46d6-9faa-56d9432164d7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
