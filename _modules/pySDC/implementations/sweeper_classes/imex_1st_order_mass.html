@@ -432,7 +432,8 @@
                 <article class="bd-article">
                   
   <h1>Source code for pySDC.implementations.sweeper_classes.imex_1st_order_mass</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit_mass</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit_mass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
 
 
 <div class="viewcode-block" id="imex_1st_order_mass">
@@ -542,57 +543,8 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="imex_1st_order_mass.compute_residual">
-<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.sweeper_classes.imex_1st_order_mass.html#pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Computation of the residual using the collocation matrix Q</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            stage (str): The current stage of the step the level belongs to</span>
-<span class="sd">        """</span>
-
-        <span class="c1"># get current level and problem description</span>
-        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
-        <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
-
-        <span class="c1"># Check if we want to skip the residual computation to gain performance</span>
-        <span class="c1"># Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!</span>
-        <span class="k">if</span> <span class="n">stage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">skip_residual_computation</span><span class="p">:</span>
-            <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="c1"># check if there are new values (e.g. from a sweep)</span>
-        <span class="c1"># assert L.status.updated</span>
-
-        <span class="c1"># compute the residual for each node</span>
-
-        <span class="c1"># build QF(u)</span>
-        <span class="n">res_norm</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">):</span>
-            <span class="c1"># This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level</span>
-            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">level_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">P</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
-            <span class="c1"># add tau if associated</span>
-            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
-            <span class="c1"># Due to different boundary conditions we might have to fix the residual</span>
-            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">fix_bc_for_residual</span><span class="p">:</span>
-                <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">fix_residual</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
-            <span class="c1"># use abs function from data type here</span>
-            <span class="n">res_norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">m</span><span class="p">]))</span>
-
-        <span class="c1"># find maximal residual over the nodes</span>
-        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res_norm</span><span class="p">)</span>
-
-        <span class="c1"># indicate that the residual has seen the new values</span>
-        <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">return</span> <span class="kc">None</span></div>
-</div>
+    <span class="c1"># same residual as the implicit mass sweeper: the mass matrix enters it the same way</span>
+    <span class="n">compute_residual</span> <span class="o">=</span> <span class="n">generic_implicit_mass</span><span class="o">.</span><span class="n">compute_residual</span></div>
 
 </pre></div>
 
