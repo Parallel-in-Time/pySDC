@@ -122,6 +122,11 @@
         end-at: 'self.step = NewtonStep(F, df.derivative(F, self.w))'
       summary: SDC with FEniCS for heat, convection-diffusion and incompressible Navier-Stokes flows.
 
+    - title: Real-time TDDFT with parallel SDC
+      page: TDDFT
+      image: data/tddft_work_precision.png
+      summary: A 1D Kohn-Sham molecule in a laser pulse, where SDC with the nodes in parallel needs 3.5-5x less critical-path work than commutator-free Magnus 4.
+
 - section: High-performance computing
   projects:
     - title: Performance analysis
