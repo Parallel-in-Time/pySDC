@@ -1,0 +1,47 @@
+pySDC/projects/Multirate/mri.py
+  s_3c4f92a9a3448a::t_652e63138ed9e7 15-16,20,284-301,316,329
+pySDC/projects/Multirate/results/autosplit_planets.txt
+  s_3c4f92a9a3448a::t_4bc20a2d6de6e8 1-14
+  s_3c4f92a9a3448a::t_1ef3c1ccfaded5 15
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_1447d93000300c 26-27,541-606,625-626
+pySDC/projects/Multirate/partitioned.py
+  s_3c4f92a9a3448a::t_ae479cc1ed4076 192,216-217,219-222,226,266-270,272-273,275,277,293-295
+  s_3c4f92a9a3448a::t_09a5fd7c6683db 193,223-225,271,274,276
+  s_3c4f92a9a3448a::t_ad5af46ad845ce 116,119-122,191,211-215,218,256-264
+pySDC/projects/Multirate/results/mri_others.txt
+  s_3c4f92a9a3448a::t_e4cc0f844c87a5 72-154
+  s_3c4f92a9a3448a::t_6b8a75c52c770d 1-71
+pySDC/projects/Multirate/run_autosplit.py
+  s_3c4f92a9a3448a::t_3fad30c79fcb1d 1,9-23,26-29,31-34,36-37,47,63,65,67-70,73,76-104
+  s_3c4f92a9a3448a::t_1ae55b495fe654 2-8,24-25,30,35,38-46,48-62,64,66,71-72,74-75
+pySDC/projects/Multirate/tests/test_multirate.py
+  s_3c4f92a9a3448a::t_5f25a06120bc78 239-273
+pySDC/projects/Multirate/run_mri_others.py
+  s_3c4f92a9a3448a::t_652e63138ed9e7 15,23,25,123-125,127-130
+  s_3c4f92a9a3448a::t_28659f2d625586 1-14,16-22,24,26-54,59-62,67-91,96-122,131-136
+  s_3c4f92a9a3448a::t_bf7f41c5cd4067 126
+  s_3c4f92a9a3448a::t_c7503ce15015c4 55-58,63-66,92-95
+pySDC/projects/Multirate/run_adaptive.py
+  s_3c4f92a9a3448a::t_66bec637331b99 40-51,53-67
+  s_3c4f92a9a3448a::t_6d9a59d7070b6a 69-75
+  s_3c4f92a9a3448a::t_09a5fd7c6683db 52
+pySDC/projects/Multirate/results/autosplit_species.txt
+  s_3c4f92a9a3448a::t_f753e7fb1918f7 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eb6eb0fff6fff378fd6de0a9048f7edf92069395",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
