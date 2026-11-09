@@ -1,0 +1,27 @@
+pySDC/projects/Multirate/tests/test_multirate.py
+  s_3c4f92a9a3448a::t_1060c8adf556c9 274-284
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_1060c8adf556c9 602-630,634-637
+pySDC/projects/Multirate/results/autosplit_advection.txt
+  s_3c4f92a9a3448a::t_6426e3f1d6a84c 1
+  s_3c4f92a9a3448a::t_697cddbb5dadbe 2-14
+pySDC/projects/Multirate/run_autosplit.py
+  s_3c4f92a9a3448a::t_6426e3f1d6a84c 103-143,160-171,173-177,183-188,190-194,196-201
+  s_3c4f92a9a3448a::t_697cddbb5dadbe 144-159,172,178-182,189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a2c304b2d5d84fbb27f69ed64788068eb9c52f6a",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
