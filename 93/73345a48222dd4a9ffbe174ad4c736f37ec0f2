@@ -1,0 +1,53 @@
+pySDC/projects/Multirate/run_dynamic.py
+  s_3c4f92a9a3448a::t_8d69f01377f149 147
+  s_3c4f92a9a3448a::t_f7a978a371506a 1-126,134-146,148-172
+  s_3c4f92a9a3448a::t_cb8af2fa72fe20 127-133
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_c0d8e08df56d96 443,460,469-470,483-487
+  s_3c4f92a9a3448a::t_67f4e20b093f5d 492-493,495-496,498-499,583,585-586
+  s_3c4f92a9a3448a::t_b9598e717560aa 640-684
+  s_3c4f92a9a3448a::t_09b90f6a0b8174 28,30-31
+  s_3c4f92a9a3448a::t_af006c6405881e 441-442
+  s_3c4f92a9a3448a::t_24c7f6229cf54b 728-729
+  s_3c4f92a9a3448a::t_565334a27d5a4b 24,26-27
+pySDC/projects/Multirate/adaptivity_multirate.py
+  s_3c4f92a9a3448a::t_e7c7565cbac65a 156-157,162,171
+  s_3c4f92a9a3448a::t_0fd97ecbb211f6 168-170
+  s_3c4f92a9a3448a::t_2c83dc4d67ffbd 158-161
+  s_3c4f92a9a3448a::t_88858d56340b61 10-11,187-223
+pySDC/projects/Multirate/results/boris_species_cap.txt
+  s_3c4f92a9a3448a::t_67f4e20b093f5d 2-13
+pySDC/projects/Multirate/results/boris_species_growth.txt
+  s_3c4f92a9a3448a::t_67f4e20b093f5d 2-15
+pySDC/projects/Multirate/results/dynamic_kick.txt
+  s_3c4f92a9a3448a::t_3d50ff5ecaf3f4 1-3
+  s_3c4f92a9a3448a::t_f0505ada4cbd84 4-6
+  s_3c4f92a9a3448a::t_1839335693dc60 7-8
+pySDC/projects/Multirate/boris_multirate.py
+  s_3c4f92a9a3448a::t_88858d56340b61 163-168,171-172,253,255-258,260-273
+pySDC/projects/Multirate/results/autosplit_species.txt
+  s_3c4f92a9a3448a::t_67f4e20b093f5d 5-12
+pySDC/projects/Multirate/tests/test_multirate.py
+  s_3c4f92a9a3448a::t_a1b8567f965f27 285-291,294,297-301
+  s_3c4f92a9a3448a::t_3d50ff5ecaf3f4 292-293,295-296
+pySDC/projects/Multirate/partitioned.py
+  s_3c4f92a9a3448a::t_31d80c67e6964d 194,291-292
+pySDC/projects/Multirate/results/dynamic_comet.txt
+  s_3c4f92a9a3448a::t_26878db4ce95d4 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9373345a48222dd4a9ffbe174ad4c736f37ec0f2",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
