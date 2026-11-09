@@ -1,0 +1,21 @@
+pySDC/projects/Multirate/multirate_sdc_summary.html
+  s_3c4f92a9a3448a::t_e92098dbc23f64 330-333
+  s_3c4f92a9a3448a::t_6649896b2eb7c2 107,233,288-296,298-305,307-329,334-336,358,391,414,508,530
+  s_3c4f92a9a3448a::t_4724eafd553f42 297,306
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "05593b66908c574d1d0ed1b718280a44c939914f",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
