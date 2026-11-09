@@ -1,0 +1,32 @@
+pySDC/projects/Multirate/results/mri.txt
+  s_3c4f92a9a3448a::t_5c4ce6c32de4e0 24-25
+  s_3c4f92a9a3448a::t_144d97c59cd1a8 3,29-105
+  s_3c4f92a9a3448a::t_95fe953464f319 1-2,4-23,26-28
+pySDC/projects/Multirate/tests/test_multirate.py
+  s_3c4f92a9a3448a::t_5c4ce6c32de4e0 219-238
+pySDC/projects/Multirate/mri.py
+  s_3c4f92a9a3448a::t_bf4aed987a556b 1-281,284-286,288-300,302-314
+  s_3c4f92a9a3448a::t_36fcceef83ae92 282-283,287,301,315
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_4631a7cef147b4 20-21,26,499-539,554-558,574-576,584
+pySDC/projects/Multirate/run_mri.py
+  s_3c4f92a9a3448a::t_36fcceef83ae92 1-15,17-19,25-32,36-44,47-52,54-74,81-112
+  s_3c4f92a9a3448a::t_3f50de309e8272 16,20-24,33-35,45-46,53,75,113-120
+  s_3c4f92a9a3448a::t_bc415f47c1ca4f 76-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e5ec8d5ba3aba888bcdd193d15023d08090838bc",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
