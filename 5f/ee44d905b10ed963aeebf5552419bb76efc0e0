@@ -1,0 +1,25 @@
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_e1b5f8044a0c13 699-706
+  s_3c4f92a9a3448a::t_21e62c136966bc 27,685-698,707-729
+pySDC/projects/Multirate/run_acoustic.py
+  s_3c4f92a9a3448a::t_7a7c16eec4a43c 1-128,130-145
+  s_3c4f92a9a3448a::t_fffe7961b03543 129
+pySDC/projects/Multirate/results/acoustic.txt
+  s_3c4f92a9a3448a::t_860e343bdb5062 1-188
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5fee44d905b10ed963aeebf5552419bb76efc0e0",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
