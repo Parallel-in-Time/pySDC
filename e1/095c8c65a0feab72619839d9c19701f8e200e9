@@ -1,0 +1,32 @@
+pySDC/projects/Multirate/README.rst
+  s_3c4f92a9a3448a::t_3323863e2fe977 730-731
+  s_3c4f92a9a3448a::t_ac9fadd8b69ec5 27,732-781
+  s_3c4f92a9a3448a::t_531b84279f8005 782
+pySDC/projects/Multirate/results/shallow_water_supplement.txt
+  s_3c4f92a9a3448a::t_3323863e2fe977 6
+  s_3c4f92a9a3448a::t_02839732a87ba8 3-5
+  s_3c4f92a9a3448a::t_e8d74590cc2095 7-9
+  s_3c4f92a9a3448a::t_5af98eab13754e 1-2,10-94
+pySDC/projects/Multirate/run_shallow_water.py
+  s_3c4f92a9a3448a::t_f618184b318d02 87-103,133-135,144
+  s_3c4f92a9a3448a::t_4978ae9508dd08 138-141,146-149,183-215,217-219
+  s_3c4f92a9a3448a::t_143083f2cf3dc1 1-86,104-132,136-137,142-143,145,150-182,216
+pySDC/projects/Multirate/results/shallow_water.txt
+  s_3c4f92a9a3448a::t_1a2459328f2f7c 1-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e1095c8c65a0feab72619839d9c19701f8e200e9",
+  "prompts": {},
+  "sessions": {
+    "s_3c4f92a9a3448a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "148e3c62-ebd9-4979-bcbb-f355b652f644",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
