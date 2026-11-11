@@ -112,3 +112,15 @@ def test_work_precision_trajectory():
     u, w, used = trajectory('heat', 0.05, 1e-8, 3, mixed=True)
     assert w < 0.6 * w64 and all(f != 'fp16' for step in used for f in step)
     assert np.abs(u - u64).max() < 1e-7 * np.abs(u64).max()
+
+
+@pytest.mark.base
+def test_spectrum_of_periodic_heat():
+    """The Fourier spectrum used for the periodic heat equation is that of its matrix."""
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
+    from pySDC.projects.DeltaSDC.precision_theory import spectrum
+
+    prob = heatNd_unforced(nvars=32, nu=0.5, freq=2, bc='periodic')
+    z, reduce, c, N = spectrum(prob, 1e-2)
+    assert (reduce, c, N) == ('mean', 1.0, 32)
+    assert np.allclose(np.sort(z), np.sort(1e-2 * np.linalg.eigvalsh(prob.A.toarray())))

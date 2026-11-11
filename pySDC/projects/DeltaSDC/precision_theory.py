@@ -27,6 +27,7 @@ from pySDC.core.hooks import Hooks
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
 from pySDC.projects.DeltaSDC.inexact import FORMATS
 from pySDC.projects.DeltaSDC.problems import allencahn_delta, heat_delta, vanderpol_delta
@@ -107,6 +108,10 @@ def spectrum(prob, dt):
         ell = np.arange(1, N + 1)
         z = -dt * prob.nu * 4 * (N + 1) ** 2 * np.sin(ell * np.pi / (2 * (N + 1))) ** 2
         return z, 'mean', 2 * N / (N + 1), N
+    periodic = getattr(prob, 'bc', None) == 'periodic' and len(getattr(prob, 'nvars', ())) == 1
+    if isinstance(prob, heatNd_unforced) and periodic and prob.order == 2:  # a Fourier basis
+        N = prob.nvars[0]
+        return -dt * prob.nu * 4 * N**2 * np.sin(np.pi * np.arange(N) / N) ** 2, 'mean', 1.0, N
     if isinstance(prob, advectionNd):  # 1D, periodic, fourth-order centred: a Fourier basis
         N = prob.A.shape[0]
         theta = 2 * np.pi * np.arange(N) / N
