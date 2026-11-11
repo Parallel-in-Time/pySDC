@@ -1,0 +1,39 @@
+pySDC/projects/DeltaSDC/reproduce/worst_case_bound.py
+  s_3cfbaa2fb0772b::t_4d20d926f43ba1 1-207
+  s_3cfbaa2fb0772b::t_94953388eed53e 208-212
+pySDC/projects/DeltaSDC/publication.md
+  s_3cfbaa2fb0772b::t_fe2c5c3b208171 1-4,9-10,30,32,88,93,119-122,139-143,147-148,150,154-157,161-164,171-173,178-180,182,186-187,189,193-196,204-211,231-232,234-235,247-250,253-259,264-266,271-275,286-288,292-296,305-307,310,312-314,316-317,330-333,338-342,345-347,350-351,353-354,357-360,365,367-368,371-375,381-386,390-394,397-399,408
+  s_3cfbaa2fb0772b::t_b74c99ebccc896 5-8,11-29,31,33-87,89-92,94-118,123-138,144-146,149,151-153,158-160,165-170,174-177,181,183-185,188,190-192,197-203,212-230,233,236-246,251-252,260-263,267-270,276-285,289-291,297-304,308-309,311,315,318-329,334-337,343-344,348-349,352,355-356,361-364,366,369-370,376-380,387-389,395-396,400-407
+  s_3cfbaa2fb0772b::t_727bf300b76748 409
+pySDC/projects/DeltaSDC/reproduce/naive_stall.py
+  s_3cfbaa2fb0772b::t_8e0268385a783d 1-150
+  s_3cfbaa2fb0772b::t_3dc9ce2a26efc3 151-158
+pySDC/projects/DeltaSDC/index.md
+  s_3cfbaa2fb0772b::t_e69c386250232d 3-8,56-58
+pySDC/projects/DeltaSDC/references.bib
+  s_3cfbaa2fb0772b::t_e470b7ec6d77ac 33-61
+pySDC/projects/DeltaSDC/results/naive_stall.csv
+  s_3cfbaa2fb0772b::t_b23049122a2d18 1-301
+pySDC/projects/DeltaSDC/results/naive_stall_numbers.json
+  s_3cfbaa2fb0772b::t_ce96c511b4c5cf 1-16
+pySDC/projects/DeltaSDC/results/worst_case_bound_numbers.json
+  s_3cfbaa2fb0772b::t_bbfe5ab42392e9 1-29
+pySDC/projects/DeltaSDC/results/worst_case_runs.csv
+  s_3cfbaa2fb0772b::t_a1eeddc1b71475 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "673fa6d9533b4f1de38bb03fc8ce3f3f5c19090f",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
