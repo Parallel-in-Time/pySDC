@@ -1,0 +1,23 @@
+pySDC/projects/DeltaSDC/genuine.py
+  s_3cfbaa2fb0772b::t_0cec77699eb672 76-81,83
+pySDC/projects/DeltaSDC/krylov.py
+  s_3cfbaa2fb0772b::t_d29b155a5bbb0a 11-12,65-104
+pySDC/projects/DeltaSDC/tests/test_krylov.py
+  s_3cfbaa2fb0772b::t_9572ea6cdb4a10 25-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "014c35fae00491b3a87b848f64cdedfa07f56dd4",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
