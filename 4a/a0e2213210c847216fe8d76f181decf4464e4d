@@ -1,0 +1,39 @@
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_3fb261e8b99961 4-7,12,20,22-27,29-32,37,41-43,46-71,77-79
+pySDC/projects/DeltaSDC/cascade.py
+  s_3cfbaa2fb0772b::t_56f93b3785f9c9 19-20
+pySDC/projects/DeltaSDC/eta_spec.py
+  s_3cfbaa2fb0772b::t_e999e28b2a9ab8 16
+pySDC/projects/DeltaSDC/precision_theory.py
+  s_3cfbaa2fb0772b::t_c36a97a818ae18 2,100-103,122
+pySDC/projects/DeltaSDC/run_gpu.py
+  s_3cfbaa2fb0772b::t_567ddd544d3054 79
+pySDC/projects/DeltaSDC/tests/test_emulation.py
+  s_3cfbaa2fb0772b::t_39db87929564b6 208-209
+pySDC/projects/DeltaSDC/tests/test_eta_spec.py
+  s_3cfbaa2fb0772b::t_4241893c373d43 54,56-57
+pySDC/projects/DeltaSDC/tests/test_problems.py
+  s_3cfbaa2fb0772b::t_67b828b58b3019 163
+pySDC/projects/DeltaSDC/work_precision.py
+  s_3cfbaa2fb0772b::t_f8d9e184af8375 5-6,77-79,81-88,93,96-97,99-100
+pySDC/projects/gallery.yml
+  s_3cfbaa2fb0772b::t_2d420c6db782d0 95
+pySDC/tests/test_projects/test_DeltaSDC/test_gpu.py
+  s_3cfbaa2fb0772b::t_1f2921e05fc965 96,153,168,186
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4aa0e2213210c847216fe8d76f181decf4464e4d",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
