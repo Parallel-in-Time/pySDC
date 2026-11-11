@@ -73,9 +73,14 @@ def genuine(problem_class):
             key = (fmt, factor)
             if key not in self._factors:
                 B = np.eye(self.A.shape[0]) - factor * self.A.toarray()
-                self._factors[key] = lu(B, fmt)
+                # each row divided by its diagonal entry, as a practical fp16 LU would, to stay in fp16's range
+                scale = 1 / np.diag(B)
+                self._factors[key] = (lu(scale[:, None] * B, fmt), scale)
+            factors, scale = self._factors[key]
+            b = np.asarray(rhs).reshape(-1) * scale
+            peak = float(np.abs(b).max())
             me = self.dtype_u(self.init)
-            me[:] = lu_solve(self._factors[key], np.asarray(rhs).reshape(-1), fmt).reshape(me.shape)
+            me[:] = 0.0 if peak == 0 else (lu_solve(factors, b / peak, fmt) * peak).reshape(me.shape)
             return me
 
     lowprec.__name__ = lowprec.__qualname__ = f'{problem_class.__name__}_genuine'

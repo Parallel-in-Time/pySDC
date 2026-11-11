@@ -8,6 +8,8 @@ is given as a function, so that it can be a stencil without an assembled matrix.
 
 import numpy as np
 
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
+
 DTYPES = {'fp64': 'float64', 'fp32': 'float32', 'fp16': 'float16'}
 
 
@@ -60,3 +62,43 @@ def cg(apply, b, fmt, rtol, maxiter, xp=np):
         p = r + dtype.type(rr / rr_old) * p
         k += 1
     return x, k, float(np.sqrt(rr / norm_b))
+
+
+class heat_cg(heatNd_unforced):
+    """
+    The 1D periodic heat equation with second-order differences, whose solves are CG on the stencil.
+
+    The system is divided by its constant diagonal first (Jacobi scaling), which keeps fp16 in range, and the
+    right-hand side is scaled to a maximum of one. CG runs in ``solve_format`` to the relative residual
+    ``cg_rtol``; the iterations of every solve are appended to ``cg_iterations``.
+    """
+
+    def __init__(self, solve_format='fp64', cg_rtol=1e-12, cg_maxiter=1000, **kwargs):
+        super().__init__(**kwargs)
+        if len(self.nvars) != 1 or self.bc != 'periodic' or self.order != 2:
+            raise ValueError('heat_cg needs a 1D periodic grid and second-order differences')
+        self._makeAttributeAndRegister('solve_format', 'cg_rtol', 'cg_maxiter', localVars=locals())
+        self.cg_iterations = []
+
+    def solve_system(self, rhs, factor, u0, t):
+        xp, n = self.xp, self.nvars[0]
+        a = factor * self.nu * n**2
+        diagonal = 1 + 2 * a
+        coupling = xp.dtype(DTYPES[self.solve_format]).type(a / diagonal)
+        b = rhs.view(xp.ndarray).reshape(-1) / diagonal
+        peak = float(xp.abs(b).max())
+        me = self.dtype_u(self.init)
+        if peak == 0:
+            me[:] = 0.0
+            return me
+        x, iterations, _ = cg(
+            lambda x: x - coupling * (xp.roll(x, 1) + xp.roll(x, -1)),
+            b / peak,
+            self.solve_format,
+            self.cg_rtol,
+            self.cg_maxiter,
+            xp=xp,
+        )
+        self.cg_iterations.append(iterations)
+        me[:] = (x.astype(xp.float64) * peak).reshape(me.shape)
+        return me
