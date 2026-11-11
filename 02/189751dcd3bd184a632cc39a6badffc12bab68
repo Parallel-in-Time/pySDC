@@ -1,0 +1,21 @@
+pySDC/projects/DeltaSDC/run_demo.py
+  s_3cfbaa2fb0772b::t_9d1d6e5c232566 106
+pySDC/tests/test_projects/test_DeltaSDC/test_gpu.py
+  s_3cfbaa2fb0772b::t_0eafb66e3b9799 119-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "02189751dcd3bd184a632cc39a6badffc12bab68",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
