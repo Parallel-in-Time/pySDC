@@ -130,3 +130,22 @@ def test_solve_precision_on_GPU(solver_type, precision, low, high):
     error = float(abs(solves[precision] - solves[None]) / abs(solves[None]))
     assert low <= error < high, f'{precision} {solver_type} solve off by {error:.1e}'
     assert solves[precision].dtype == cp.float64
+
+
+@pytest.mark.cupy
+@pytest.mark.parametrize('nvars', [256, (64, 64)])
+@pytest.mark.parametrize('precision', [None, 'float32', 'float16'])
+def test_fused_gpu_fft_solve_is_bitwise_the_unfused_one(nvars, precision):
+    """The fused FFT solve of a real state on a GPU computes what the array operations compute, bit for bit."""
+    import cupy as cp
+
+    prob = _problem('heat', nvars=nvars, solver_type='FFT', solve_precision=precision, useGPU=True)
+    rng = cp.random.default_rng(0)
+    shape = prob.nvars if isinstance(prob.nvars, tuple) else (prob.nvars,)
+    for factor in (1e-3, 2e-3, 1e-3):  # the third call reuses the cached factor
+        rhs = rng.standard_normal(shape) * 1e-9  # a plain array, as solve_system hands it over
+        fused = prob._solve_fft_gpu(rhs, factor)
+        assert fused.dtype == cp.float64
+        assert cp.array_equal(fused, prob._solve_fft_unfused(rhs, factor))
+    assert len(prob._fft_factors) == 2
+    assert not prob._solve_fft_gpu(cp.zeros(shape), 1e-3).any()
