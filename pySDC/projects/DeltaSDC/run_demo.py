@@ -103,7 +103,7 @@ def run(
     if multilevel:
         description['problem_params'] = dict(problem_params, nvars=[BASE_PARAMS['nvars'], COARSE_NVARS])
         description['space_transfer_class'] = mesh_to_mesh
-        description['space_transfer_params'] = {'iorder': 4, 'rorder': 2}
+        description['space_transfer_params'] = {'iorder': 4, 'rorder': 2, 'periodic': True}
         if base_transfer_class is not None:
             description['base_transfer_class'] = base_transfer_class
 
