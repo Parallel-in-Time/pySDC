@@ -96,11 +96,15 @@ class controller_MPI(Controller):
         for hook in self.hooks:
             hook.reset_stats()
 
+        # start from the step size in the description, not the one adaptivity left from a previous run
+        for L in self.S.levels:
+            L.params.dt = L.params.dt_initial
+
         # setup time initially
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[: self.comm.rank])
 
-        active = self.step_is_active(time, t0, Tend)
+        active = self.step_is_active(time, block_start=t0, t0=t0, Tend=Tend, dt=self.S.dt)
         comm_active = self.comm.Split(active)
         self.S.status.slot = comm_active.rank
 
@@ -152,10 +156,10 @@ class controller_MPI(Controller):
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[: self.S.status.slot])
 
-            active = self.step_is_active(time, tend, Tend)
+            active = self.step_is_active(time, block_start=tend, t0=t0, Tend=Tend, dt=self.S.dt)
 
             # check if we need to split the communicator
-            if tend + sum(all_dt[: comm_active.size - 1]) >= Tend - 10 * np.finfo(float).eps:
+            if not all(comm_active.allgather(active)):
                 comm_active_new = comm_active.Split(active)
                 comm_active.Free()
                 comm_active = comm_active_new
@@ -165,6 +169,11 @@ class controller_MPI(Controller):
             # initialize block of steps with u0
             if active:
                 self.restart_block(comm_active.size, time, uend, comm=comm_active)
+
+        # ranks that sat out the last blocks hold an older value, but rank 0 takes part in every block
+        if self.comm.rank > 0:
+            uend = self.S.levels[0].prob.dtype_u(uend)
+        uend = uend.bcast(root=0, comm=self.comm)
 
         # call post-run hook
         for hook in self.hooks:
@@ -495,6 +504,10 @@ class controller_MPI(Controller):
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.post_iteration_processing_block(self, comm=comm)
 
+        # share convergence only once every controller has decided, since some reopen `done`
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.communicate_convergence(self, self.S, comm=comm)
+
         # if not ready, keep doing stuff
         if not self.S.status.done:
             # increment iteration count here (and only here)
@@ -581,9 +594,9 @@ class controller_MPI(Controller):
             for hook in self.hooks:
                 hook.pre_sweep(step=self.S, level_number=0)
 
-            self.S.levels[0].sweep.updateVariableCoeffs(k + 1)  # update QDelta coefficients if variable preconditioner
+            # update QDelta coefficients if variable preconditioner, indexed by the sweep count across iterations
+            self.S.levels[0].sweep.updateVariableCoeffs((self.S.status.iter - 1) * nsweeps + k + 1)
             self.S.levels[0].sweep.update_nodes()
-            self.S.levels[0].sweep.compute_residual(stage='IT_FINE')
 
             for hook in self.hooks:
                 hook.post_sweep(step=self.S, level_number=0)
@@ -615,7 +628,6 @@ class controller_MPI(Controller):
                     hook.pre_sweep(step=self.S, level_number=l)
 
                 self.S.levels[l].sweep.update_nodes()
-                self.S.levels[l].sweep.compute_residual(stage='IT_DOWN')
                 for hook in self.hooks:
                     hook.post_sweep(step=self.S, level_number=l)
 
@@ -639,7 +651,6 @@ class controller_MPI(Controller):
         for hook in self.hooks:
             hook.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
         self.S.levels[-1].sweep.update_nodes()
-        self.S.levels[-1].sweep.compute_residual(stage='IT_COARSE')
         for hook in self.hooks:
             hook.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
 
@@ -680,7 +691,6 @@ class controller_MPI(Controller):
                     for hook in self.hooks:
                         hook.pre_sweep(step=self.S, level_number=l - 1)
                     self.S.levels[l - 1].sweep.update_nodes()
-                    self.S.levels[l - 1].sweep.compute_residual(stage='IT_UP')
                     for hook in self.hooks:
                         hook.post_sweep(step=self.S, level_number=l - 1)
 

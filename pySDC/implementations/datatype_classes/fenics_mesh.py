@@ -48,8 +48,8 @@ class fenics_mesh(object):
 
         if isinstance(other, type(self)):
             # always create new mesh, since otherwise c = a + b changes a as well!
-            me = fenics_mesh(other)
-            me.values.vector()[:] = self.values.vector()[:] + other.values.vector()[:]
+            me = fenics_mesh(self)
+            me += other
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
@@ -68,9 +68,45 @@ class fenics_mesh(object):
 
         if isinstance(other, type(self)):
             # always create new mesh, since otherwise c = a - b changes a as well!
-            me = fenics_mesh(other)
-            me.values.vector()[:] = self.values.vector()[:] - other.values.vector()[:]
+            me = fenics_mesh(self)
+            me -= other
             return me
+        else:
+            raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
+
+    def __iadd__(self, other):
+        """
+        Add another mesh in place, on the vector underneath, without copying through NumPy
+
+        Args:
+            other (fenics_mesh): mesh object to be added
+        Raises:
+            DataError: if other is not a mesh object
+        Returns:
+            fenics_mesh: the caller, now holding self+other
+        """
+
+        if isinstance(other, type(self)):
+            self.values.vector().axpy(1.0, other.values.vector())
+            return self
+        else:
+            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
+
+    def __isub__(self, other):
+        """
+        Subtract another mesh in place, on the vector underneath, without copying through NumPy
+
+        Args:
+            other (fenics_mesh): mesh object to be subtracted
+        Raises:
+            DataError: if other is not a mesh object
+        Returns:
+            fenics_mesh: the caller, now holding self-other
+        """
+
+        if isinstance(other, type(self)):
+            self.values.vector().axpy(-1.0, other.values.vector())
+            return self
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
 
@@ -89,7 +125,8 @@ class fenics_mesh(object):
         if isinstance(other, float):
             # always create new mesh, since otherwise c = f*a changes a as well!
             me = fenics_mesh(self)
-            me.values.vector()[:] = other * self.values.vector()[:]
+            vector = me.values.vector()
+            vector *= other
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))

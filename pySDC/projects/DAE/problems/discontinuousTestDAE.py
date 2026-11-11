@@ -30,9 +30,13 @@ class DiscontinuousTestDAE(ProblemDAE):
     .. math::
         (y(t), z(t)) = (cosh(t), sinh(t)),
 
-    and the event takes place at :math:`t^* = 0.5 * arccosh(50) = 4.60507` and event point :math:`(cosh(t^*), sinh(t^*))`.
+    and the event takes place at :math:`t^* = arccosh(50) = 4.60507` and event point :math:`(cosh(t^*), sinh(t^*))`.
     As soon as :math:`t \geq t^*`, i.e., for :math:`h(y) \geq 0`, the solution is given by the constant value
     :math:`(cosh(t^*), sinh(t^*))`.
+
+    After the event, :math:`h` stays at zero instead of changing its sign. A switch estimator, which looks for a sign
+    change, then only sees the overshoot of the iterates. So with ``switch_on_state=False``, the dynamics switch only
+    at the event time :math:`t_{switch}` the estimator has located, and :math:`h` changes its sign across the event.
 
     Parameters
     ----------
@@ -40,6 +44,9 @@ class DiscontinuousTestDAE(ProblemDAE):
         Number of unknowns of the system of DAEs.
     newton_tol : float
         Tolerance for Newton solver.
+    switch_on_state : bool, optional
+        Whether the dynamics switch where :math:`h(y) \geq 0`, or only after the located event time
+        :math:`t_{switch}`. Set it to False when the event is located by a switch estimator.
 
     Attributes
     ----------
@@ -56,9 +63,10 @@ class DiscontinuousTestDAE(ProblemDAE):
         Appl. Numer. Math. 178, 98-122 (2022).
     """
 
-    def __init__(self, newton_tol=1e-12):
+    def __init__(self, newton_tol=1e-12, switch_on_state=True):
         """Initialization routine"""
         super().__init__(nvars=2, newton_tol=newton_tol)
+        self._makeAttributeAndRegister('switch_on_state', localVars=locals(), readOnly=True)
 
         self.t_switch_exact = np.arccosh(50)
         self.t_switch = None
@@ -92,7 +100,7 @@ class DiscontinuousTestDAE(ProblemDAE):
         h = 2 * y - 100
         f = self.dtype_f(self.init)
 
-        if h >= 0 or t >= t_switch:
+        if (self.switch_on_state and h >= 0) or t >= t_switch:
             f.diff[0] = dy
             f.alg[0] = y**2 - z**2 - 1
         else:

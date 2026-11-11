@@ -308,6 +308,25 @@ class Problem(RegisterParams):
         """
         raise NotImplementedError
 
+    def use_restricted_boundary_values(self, u: list, t: list) -> None:
+        """
+        Called by the FAS restriction on the coarse problem with the restricted fine solution `u` at the coarse
+        collocation nodes `t` (one entry per node held by this rank). Does nothing by default.
+
+        A problem that imposes boundary data in `solve_system` should impose the boundary values of `u` in its solves
+        at these times instead, until the next call. Then the coarse correction has homogeneous boundary conditions, as
+        in multigrid, and the restricted converged fine solution is a fixed point of the coarse sweep. The tau
+        correction cannot do this, because the boundary rows of the right hand side are replaced by the data. With
+        its own data at the coarse nodes, MLSDC and PFASST converge to a different solution than SDC whenever the data
+        depends on time: the restricted boundary values interpolate the data at the fine nodes, which is not the data
+        at the coarse nodes.
+
+        Args:
+            u (list): Restricted solution at the coarse nodes
+            t (list): Times of the coarse nodes
+        """
+        pass
+
     def solve_jacobian(
         self, rhs: Any, dt: float, u: Optional[Any] = None, u0: Optional[Any] = None, t: float = 0, **kwargs: Any
     ) -> Any:

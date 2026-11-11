@@ -28,11 +28,13 @@ HEAT_PARAMS = {
     'solver_type': 'direct',
 }
 
-NVARS = [63, 31]
+# three levels, so that a level inherits a residual and then hands its advanced residual further down,
+# which is where a sweep that changes the residual it was handed shows up in the answer
+NVARS = [63, 31, 15]
 
 
 def run(use_MPI, num_nodes, stock_hierarchy):
-    """Run a two-level V-cycle and return the end value."""
+    """Run a three-level V-cycle and return the end value."""
     from pySDC.core.base_transfer import BaseTransfer
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced

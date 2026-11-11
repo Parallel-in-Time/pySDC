@@ -3,7 +3,7 @@ import numpy as np
 from pySDC.core.errors import ParameterError
 
 
-def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
+def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection, maxiter):
     r"""
     Test for numerical solution if values satisfy hardcoded values.
 
@@ -30,6 +30,8 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
         Indicates whether adaptivity is used in the simulation or not.
     use_detection : bool
         Indicates whether discontinuity handling is used in the simulation or not.
+    maxiter : int
+        Number of iterations per step, which is the order adaptivity works with (``restol=-1`` with adaptivity).
     """
 
     unknowns = u_num['unknowns']
@@ -191,10 +193,10 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                 }
             elif dt == 1e-3:
                 expected = {
-                    'iL': 0.5407340516779595,
-                    'vC': 0.9999999999936255,
-                    't_switches': [0.18232155676519302],
-                    'sum_restarts': 10.0,
+                    'iL': 0.5403849766692059,
+                    'vC': 0.9999166666681585,
+                    't_switches': [0.18232155679522236, 0.1823215567943357],
+                    'sum_restarts': 11.0,
                     'sum_niters': 2536.0,
                 }
             got.update(
@@ -411,9 +413,9 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                 }
             elif dt == 1e-3:
                 expected = {
-                    'u': 5.9737411566014105,
-                    'e_global': 0.0005763403865515215,
-                    'sum_niters': 2226.0,
+                    'u': 5.971255816863172,
+                    'e_global': 0.0005763403865506334,
+                    'sum_niters': 2225.0,
                 }
         got.update(
             {
@@ -434,10 +436,10 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                 }
             elif dt == 1e-2:
                 expected = {
-                    'vC1': 83.97462422132232,
-                    'vC2': 80.52135774600202,
-                    'iLp': 16.09884649820726,
-                    'sum_niters': 7206.0,
+                    'vC1': 83.97535088144014,
+                    'vC2': 80.52142375242333,
+                    'iLp': 16.09650585135131,
+                    'sum_niters': 7200.0,
                 }
         got.update(
             {
@@ -460,7 +462,7 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
                     'vC1': 9.782142840662102,
                     'vC2': 6.388775533709242,
                     'iLp': -1.0994027552202539,
-                    'sum_niters': 4242.0,
+                    'sum_niters': 4241.0,
                 }
         got.update(
             {
@@ -476,15 +478,18 @@ def testSolution(u_num, prob_cls_name, dt, use_adaptivity, use_detection):
     # - counts are integers and compared exactly
     # - e_em and e_event are errors that can be at round-off level (down to 2e-16) -> relative 1e-3, but at
     #   least 1e-14 absolute, which makes it an upper bound for the ones near round-off
-    # - dt is the last step size chosen by adaptivity -> relative 1e-4
+    # - dt is the last step size chosen by adaptivity, from the embedded error estimate as dt ~ e_em^(-1/k) with
+    #   k = maxiter: it is known as well as e_em is, divided by k. With e_em at round-off, a relative 1e-4 was
+    #   tighter than that: one ulp in QI moves the battery_n_capacitors step size by 3e-4.
     # - everything else (solution values, event times, global errors) -> relative 1e-10, absolute 1e-12
+    e_em_tols = {'rtol': 1e-3, 'atol': 1e-14}
     for key in expected.keys():
         if key in ['sum_niters', 'sum_restarts']:
             tols = {'rtol': 0, 'atol': 0}
         elif key in ['e_em', 'e_event']:
-            tols = {'rtol': 1e-3, 'atol': 1e-14}
+            tols = e_em_tols
         elif key == 'dt':
-            tols = {'rtol': 1e-4, 'atol': 0}
+            tols = {'rtol': (e_em_tols['rtol'] + e_em_tols['atol'] / abs(expected['e_em'])) / maxiter, 'atol': 0}
         else:
             tols = {'rtol': 1e-10, 'atol': 1e-12}
 

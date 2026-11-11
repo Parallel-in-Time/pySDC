@@ -46,7 +46,7 @@ def testInitializationGivenMesh():
 @pytest.mark.parametrize('shape', [(6,), (4, 6), (4, 6, 8)])
 def testArrayUFuncOperator(shape):
     """
-    Test if overloaded __array_ufunc__ operator of datatype does what it is supposed to do.
+    Test if arithmetic on the datatype, through NumPy's ufuncs, does what it is supposed to do.
     """
 
     import numpy as np

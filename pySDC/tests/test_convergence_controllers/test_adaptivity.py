@@ -231,5 +231,55 @@ def test_relative_increment_tolerance_is_clamped_to_the_given_bounds(e_tol_rel, 
     assert np.isclose(description['level_params']['e_tol'], expect)
 
 
+def rerun_with_adaptivity(useMPI, num_procs):
+    """
+    Run the same controller twice with adaptivity and return both end points, which a run that
+    starts from the step size it was set up with gives bit for bit the same.
+    """
+    import numpy as np
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+    from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+
+    description = {
+        'problem_class': testequation0d,
+        'problem_params': {'lambdas': np.array([-1.0]), 'u0': 1.0},
+        'sweeper_class': generic_implicit,
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'},
+        'level_params': {'dt': 0.05},
+        'step_params': {'maxiter': 4},
+        'convergence_controllers': {Adaptivity: {'e_tol': 1e-7}},
+    }
+    controller_params = {'logger_level': 30, 'mssdc_jac': False}
+
+    if useMPI:
+        from mpi4py import MPI
+        from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+
+        controller = controller_MPI(controller_params, description, comm=MPI.COMM_WORLD)
+        prob = controller.S.levels[0].prob
+    else:
+        from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+        controller = controller_nonMPI(num_procs, controller_params, description)
+        prob = controller.MS[0].levels[0].prob
+
+    return [controller.run(prob.u_exact(0.0), 0.0, 2.0)[0] for _ in range(2)]
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('num_procs', [1, 3])
+def test_rerun_with_adaptivity_nonMPI(num_procs):
+    first, second = rerun_with_adaptivity(useMPI=False, num_procs=num_procs)
+    assert first == second
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(3)
+def test_rerun_with_adaptivity_MPI():
+    first, second = rerun_with_adaptivity(useMPI=True, num_procs=None)
+    assert first == second
+
+
 if __name__ == '__main__':
     test_AdaptivityPolynomialError(4)

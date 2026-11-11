@@ -117,6 +117,39 @@ def test_correction_precision_storage(precision):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('precision', ['float32', 'float16'])
+def test_real_correction_precision_on_a_complex_problem_is_refused(precision):
+    """A real array keeps only the real part of a complex correction, which used to move the answer by 5e-2."""
+    from pySDC.core.errors import ParameterError
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+
+    with pytest.raises(ParameterError):
+        run(
+            testequation0d,
+            {'lambdas': np.array([-1.3 + 0.4j]), 'u0': 1.0},
+            delta_implicit,
+            sweeper_params(correction_precision=precision),
+            0.1,
+            1,
+            40,
+        )
+
+
+@pytest.mark.base
+def test_complex_correction_precision_on_a_complex_problem():
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+
+    problem_params = {'lambdas': np.array([-1.3 + 0.4j]), 'u0': 1.0}
+    u128, _, _ = run(testequation0d, problem_params, delta_implicit, sweeper_params(), 0.1, 1, 40)
+    u64, _, _ = run(
+        testequation0d, problem_params, delta_implicit, sweeper_params(correction_precision='complex64'), 0.1, 1, 40
+    )
+    assert abs(u128 - u64) < 1e-14, f'complex64 storage moved the answer by {abs(u128 - u64):.2e}'
+
+
+@pytest.mark.base
 def test_linear_implicit_reuses_stock_solve_system():
     """For a linear operator the stock solve_system already solves the correction equation."""
     from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced

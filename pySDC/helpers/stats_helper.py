@@ -13,21 +13,25 @@ def filter_stats(stats, comm=None, recomputed=None, **kwargs):
     Returns:
         dict: dictionary containing only the entries corresponding to the filter
     """
-    result = {}
-    for k, v in stats.items():
-        if all([k._asdict().get(k2, None) == v2 for k2, v2 in kwargs.items() if v2 is not None] + [True]):
-            result[k] = v
+    # read the fields straight off the key: building `k._asdict()` for every entry made this the slow part
+    filters = [(k2, v2) for k2, v2 in kwargs.items() if v2 is not None]
+    result = {k: v for k, v in stats.items() if all(getattr(k, k2, None) == v2 for k2, v2 in filters)}
 
     if comm is not None:
         # gather the results across all ranks
         result = {key: value for sub_result in comm.allgather(result) for key, value in sub_result.items()}
 
     if recomputed is not None:
+        # the entries by time, gathered once rather than filtered out of `result` again for every time below
+        by_time = {}
+        for me in result:
+            by_time.setdefault(me.time, []).append(me)
+
         # delete values that have been recorded and superseded by similar, but not identical keys
         times_restarted = np.unique([me.time for me in result.keys() if me.num_restarts > 0])
         for t in times_restarted:
             restarts = {}
-            stats_now = filter_stats(result, time=t)
+            stats_now = {me: result[me] for me in by_time.get(t, [])}  # a NaN time matches nothing, as `==` did
             for me in stats_now.keys():
                 restarts[me.type] = max([restarts.get(me.type, 0), me.num_restarts])
 
@@ -45,7 +49,8 @@ def filter_stats(stats, comm=None, recomputed=None, **kwargs):
                 key for key, val in filter_stats(stats, type='_recomputed', recomputed=False, comm=comm).items() if val
             ]
             for step in other_restarted_steps:
-                [result.pop(me) for me in filter_stats(result, time=step.time).keys()]
+                for me in by_time.get(step.time, []):
+                    result.pop(me, None)
 
     return result
 
@@ -86,11 +91,8 @@ def get_list_of_types(stats):
 
     """
 
-    type_list = []
-    for k, _ in stats.items():
-        if k.type not in type_list:
-            type_list.append(k.type)
-    return type_list
+    # in order of first appearance, as a dict keeps it, without searching a list for every entry
+    return list(dict.fromkeys(k.type for k in stats))
 
 
 def get_sorted(stats, sortby='time', **kwargs):

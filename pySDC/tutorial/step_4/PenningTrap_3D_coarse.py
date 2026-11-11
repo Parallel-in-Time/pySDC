@@ -19,15 +19,12 @@ class penningtrap_coarse(penningtrap):
             Fields for the particles (external only)
         """
 
-        N = self.nparts
-
         self.work_counters['rhs']()  # count the evaluations, as the fine problem does
         Emat = np.diag([1, 1, -2])
         f = self.dtype_f(self.init, val=0.0)
 
         # only compute external forces here: O(N) instead of O(N*N)
-        for n in range(N):
-            f.elec[:, n] = self.omega_E**2 / (part.q[n] / part.m[n]) * np.dot(Emat, part.pos[:, n])
-            f.magn[:, n] = self.omega_B * np.array([0, 0, 1])
+        f.elec[:] = self.omega_E**2 / (part.q / part.m) * (Emat @ part.pos)
+        f.magn[:] = self.omega_B * np.array([0, 0, 1])[:, None]
 
         return f

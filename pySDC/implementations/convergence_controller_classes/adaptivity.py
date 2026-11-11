@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.core.convergence_controller import ConvergenceController, Status
+from pySDC.core.convergence_controller import ConvergenceController
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import (
     StepSizeLimiter,
 )
@@ -53,9 +53,6 @@ class AdaptivityBase(ConvergenceController):
         if len(available_keys) > 0:
             step_limiter_params = {key: self.params.__dict__[key] for key in available_keys}
             controller.add_convergence_controller(StepSizeLimiter, params=step_limiter_params, description=description)
-
-        if self.params.useMPI:
-            self.prepare_MPI_logical_operations()
 
         return None
 
@@ -274,14 +271,6 @@ class AdaptivityForConvergedCollocationProblems(AdaptivityBase):
             self.trigger_restart_upon_nonconvergence(S)
         elif S.levels[0].status.residual > self.params.residual_max_tol:
             self.trigger_restart_upon_nonconvergence(S)
-
-        if self.params.useMPI:
-            # borrow the reduction rather than storing it on the instance: an unbound function in an
-            # instance attribute shadows the hook of the same name, and needs an explicit `self` that
-            # nothing else in this API does
-            from pySDC.core.check_convergence import CheckConvergence
-
-            CheckConvergence.communicate_convergence(self, controller, S, **kwargs)
 
         self.res_last_iter = S.levels[0].status.residual * 1.0
 
@@ -669,7 +658,11 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
 
     def setup_status_variables(self, controller, **kwargs):
         """
-        Set up empty lists for the error estimates and orders of the collocation problems solved in the current step.
+        Set up empty tuples for the error estimates and orders of the collocation problems solved in the current step.
+
+        These live on the step rather than on this object, since there is one instance of this class per controller,
+        which is a whole block of steps when running with more than one process. They are tuples, so that the same empty
+        value can be set on all steps and appending to it on one step does not change it on the others.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -677,13 +670,12 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         Returns:
             None
         """
-        self.status = Status(['error', 'order'])
-        self.status.error = []
-        self.status.order = []
+        self.add_status_variable_to_step('coll_error', ())
+        self.add_status_variable_to_step('coll_order', ())
 
     def reset_status_variables(self, controller, **kwargs):
         """
-        Empty the lists of error estimates and orders, e.g. when restarting.
+        Empty the tuples of error estimates and orders at the start of a step or when restarting.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -691,7 +683,8 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         Returns:
             None
         """
-        self.setup_status_variables(controller, **kwargs)
+        self.set_step_status_variable('coll_error', ())
+        self.set_step_status_variable('coll_order', ())
 
     def dependencies(self, controller, description, **kwargs):
         """
@@ -726,7 +719,7 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         Returns:
             bool: Whether all ``num_colls`` collocation problems have been solved
         """
-        return len(self.status.order) == self.params.num_colls
+        return len(S.status.coll_order) == self.params.num_colls
 
     def get_local_error_estimate(self, controller, S, **kwargs):
         """
@@ -739,8 +732,8 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         Returns:
             float: Embedded error estimate
         """
-        if len(self.status.error) > 1:
-            return self.status.error[-1][1]
+        if len(S.status.coll_error) > 1:
+            return S.status.coll_error[-1][1]
         else:
             return 0.0
 
@@ -754,8 +747,8 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         """
         if step.status.done:
             lvl = step.levels[0]
-            self.status.error += [lvl.status.error_embedded_estimate_collocation]
-            self.status.order += [lvl.sweep.coll.order]
+            step.status.coll_error += (lvl.status.error_embedded_estimate_collocation,)
+            step.status.coll_order += (lvl.sweep.coll.order,)
 
     def get_new_step_size(self, controller, S, **kwargs):
         """
@@ -769,12 +762,12 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         Returns:
             None
         """
-        if len(self.status.order) == self.params.num_colls:
+        if len(S.status.coll_order) == self.params.num_colls:
             lvl = S.levels[0]
 
             # compute next step size
             order = (
-                min(self.status.order[-2::]) + 1
+                min(S.status.coll_order[-2::]) + 1
             )  # local order of less accurate of the last two collocation problems
             e_est = self.get_local_error_estimate(controller, S)
 
@@ -794,7 +787,7 @@ class AdaptivityCollocation(AdaptivityForConvergedCollocationProblems):
         Returns:
             None
         """
-        if len(self.status.order) == self.params.num_colls:
+        if len(S.status.coll_order) == self.params.num_colls:
             e_est = self.get_local_error_estimate(controller, S)
             if e_est >= self.params.e_tol:
                 S.status.restart = True

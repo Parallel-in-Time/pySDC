@@ -175,6 +175,14 @@ class fenics_NSE_2D_Monolithic(Problem):
         self.newton = df.NewtonSolver()
         self.newton.parameters['absolute_tolerance'] = Sol_tol
 
+    def use_restricted_boundary_values(self, u, t):
+        """
+        Refuse multilevel runs: the solves impose the time-dependent boundary data, which at the coarse nodes is not
+        the restricted fine boundary values, so MLSDC and PFASST would not converge to the collocation solution. See
+        :meth:`pySDC.core.problem.Problem.use_restricted_boundary_values`.
+        """
+        raise NotImplementedError(f'{type(self).__name__} cannot impose restricted boundary values on coarse levels')
+
     def solve_system(self, rhs, factor, u0, t):
         r"""
         Dolfin's nonlinear solver for :

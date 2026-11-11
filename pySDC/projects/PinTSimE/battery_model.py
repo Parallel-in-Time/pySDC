@@ -395,7 +395,9 @@ def runSimulation(problem, sweeper, all_params, use_adaptivity, use_detection, h
 
                     plotSolution(u_num[dt][M][use_SE][use_A], prob_cls_name, use_A, use_SE)
 
-                    testSolution(u_num[dt][M_fix][use_SE][use_A], prob_cls_name, dt, use_A, use_SE)
+                    testSolution(
+                        u_num[dt][M_fix][use_SE][use_A], prob_cls_name, dt, use_A, use_SE, handling_params['maxiter']
+                    )
 
     return u_num
 

@@ -6,7 +6,6 @@ channels:
 dependencies:
   - python>=3.10,<3.14
   - numpy
-  - numba>=0.35
   - dill>=0.2.6
   - matplotlib>=3.0
   - scipy>=0.17.1

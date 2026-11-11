@@ -42,6 +42,14 @@ class SweeperMPI(Sweeper):
                 f'The communicator in the {type(self).__name__} sweeper needs to have one rank for each node as of now! That means we need {self.coll.num_nodes} nodes, but got {self.params.comm.size} processes.'
             )
 
+        # each rank uses only its diagonal entry of the preconditioners, so anything off the diagonal would be dropped
+        if not self.parallelizable:
+            raise ParameterError(
+                f'{type(self).__name__} needs diagonal preconditioners, but got QI={self.params.QI!r}'
+                + (f' and QE={self.params.QE!r}' if hasattr(self.params, 'QE') else '')
+                + '. Use a diagonal QI such as "MIN-SR-S", "MIN-SR-NS", "IEpar" or "MIN-SR-FLEX", and QE="PIC".'
+            )
+
     @property
     def comm(self):
         """

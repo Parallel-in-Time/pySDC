@@ -8,6 +8,8 @@ try:
 except ImportError:
     MPI = None
 
+_NUMPY1 = np.lib.NumpyVersion(np.__version__) < '2.0.0'
+
 
 class mesh(np.ndarray):
     """
@@ -51,26 +53,32 @@ class mesh(np.ndarray):
             raise NotImplementedError(type(init))
         return obj
 
-    def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
+    def __array_wrap__(self, obj, context=None, return_scalar=False):
         """
-        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
+        Hand a ufunc's result back as a mesh with this one's communicator, cf.
+        https://numpy.org/doc/stable/user/basics.subclassing.html#array-wrap-for-ufuncs-and-other-functions
+
+        There is no `__array_ufunc__` here: NumPy's own dispatch computes in place where asked, writes into an
+        explicit `out` and returns it, and only the result passes through this method. On the way in, a Python
+        override cost more than the arithmetic for all but large meshes.
+
+        Args:
+            obj (np.ndarray): the result as NumPy computed it
+            context: the ufunc and its arguments, unused
+            return_scalar (bool): whether NumPy wants a scalar, as from a reduction to a single value
+
+        Returns:
+            mesh or scalar: the result
         """
-        args = []
-        for _, input_ in enumerate(inputs):
-            if isinstance(input_, mesh):
-                args.append(input_.view(np.ndarray))
-            else:
-                args.append(input_)
-
-        results = super().__array_ufunc__(ufunc, method, *args, **kwargs).view(type(self))
-
-        # the inputs were viewed as plain arrays just above, so the result has no communicator to
-        # inherit through `__array_finalize__`; carry this one's over explicitly. A reduction or a
-        # comparison can return a scalar rather than an array, and a scalar takes no attributes.
-        if isinstance(results, np.ndarray):
-            results.comm = self.comm
-
-        return results
+        if isinstance(obj, mesh):  # written into a mesh passed as `out`: that one, with its own communicator
+            return obj
+        # NumPy 1 does not pass `return_scalar`, but there a ufunc turns a 0-d result into a scalar anyway
+        if return_scalar or (_NUMPY1 and obj.ndim == 0):
+            return obj[()]
+        # the result is a fresh array with no communicator to inherit through `__array_finalize__`
+        obj = obj.view(type(self))
+        obj.comm = self.comm
+        return obj
 
     def __array_finalize__(self, obj):
         """

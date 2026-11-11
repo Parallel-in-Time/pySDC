@@ -99,6 +99,7 @@ class base_transfer_mass(BaseTransfer):
         for m in range(1, SG.coll.num_nodes + 1):
             G.uold[m] = PG.dtype_u(G.u[m])
             G.fold[m] = PG.dtype_f(G.f[m])
+        PG.use_restricted_boundary_values(G.u[1:], [G.time + G.dt * tau for tau in SG.coll.nodes])
 
         # u0 lives in the DUAL space on every coarse level: the finest level supplies it as M u0,
         # and each further level restricts that dual vector with P^T. Without the else branch,

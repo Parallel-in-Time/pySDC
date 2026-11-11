@@ -45,15 +45,19 @@ class multi_implicit(Sweeper):
         # get current level and problem description
         L = self.level
         P = L.prob
+        M = self.coll.num_nodes
+
+        # sum the components once per node, not once per entry of Q
+        F = [L.f[j].comp1 + L.f[j].comp2 for j in range(1, M + 1)]
 
         me = []
 
         # integrate RHS over all collocation nodes
-        for m in range(1, self.coll.num_nodes + 1):
+        for m in range(1, M + 1):
             # new instance of dtype_u, initialize values with 0
             me.append(P.dtype_u(P.init, val=0.0))
-            for j in range(1, self.coll.num_nodes + 1):
-                me[-1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].comp1 + L.f[j].comp2)
+            for j in range(1, M + 1):
+                me[-1] += L.dt * self.coll.Qmat[m, j] * F[j - 1]
 
         return me
 
@@ -74,54 +78,40 @@ class multi_implicit(Sweeper):
 
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
+        Q, Q1, Q2 = self.coll.Qmat, self.Q1, self.Q2
 
-        # gather all terms which are known already (e.g. from the previous iteration)
-
-        # get QF(u^k)
-        integral = self.integrate()
-        for m in range(M):
-            # subtract Q1F1(u^k)_m
-            for j in range(1, M + 1):
-                integral[m] -= L.dt * self.Q1[m + 1, j] * L.f[j].comp1
-            # add initial value
-            integral[m] += L.u[0]
-            # add tau if associated
-            if L.tau[m] is not None:
-                integral[m] += L.tau[m]
-
-        # store Q2F2(u^k) for later usage
-        Q2int = []
-        for m in range(M):
-            Q2int.append(P.dtype_u(P.init, val=0.0))
-            for j in range(1, M + 1):
-                Q2int[-1] += L.dt * self.Q2[m + 1, j] * L.f[j].comp2
+        # the components of F(u^k), taken once: the sweep replaces L.f[m], so these stay the old values
+        F1 = [L.f[j].comp1 for j in range(1, M + 1)]
+        F2 = [L.f[j].comp2 for j in range(1, M + 1)]
 
         # do the sweep
-        for m in range(0, M):
-            # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            rhs = P.dtype_u(integral[m])
-            for j in range(1, m + 1):
-                rhs += L.dt * self.Q1[m + 1, j] * L.f[j].comp1
+        for m in range(1, M + 1):
+            t = L.time + L.dt * self.coll.nodes[m - 1]
+
+            # u0 + QF(u^k) - Q1F1(u^k) + tau, plus Q1F1(u^k+1) from the nodes already updated
+            rhs = P.dtype_u(L.u[0])
+            for j in range(1, M + 1):
+                rhs += L.dt * (Q[m, j] - Q1[m, j]) * F1[j - 1]
+                rhs += L.dt * Q[m, j] * F2[j - 1]
+            if L.tau[m - 1] is not None:
+                rhs += L.tau[m - 1]
+            for j in range(1, m):
+                rhs += L.dt * Q1[m, j] * L.f[j].comp1
 
             # implicit solve with prefactor stemming from Q1
-            L.u[m + 1] = P.solve_system_1(
-                rhs, L.dt * self.Q1[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
-            )
+            L.u[m] = P.solve_system_1(rhs, L.dt * Q1[m, m], L.u[m], t)
 
-            # substract Q2F2(u^k) and add Q2F(u^k+1)
-            rhs = L.u[m + 1] - Q2int[m]
-            for j in range(1, m + 1):
-                rhs += L.dt * self.Q2[m + 1, j] * L.f[j].comp2
+            # substract Q2F2(u^k) and add Q2F2(u^k+1)
+            rhs = P.dtype_u(L.u[m])
+            for j in range(1, M + 1):
+                rhs -= L.dt * Q2[m, j] * F2[j - 1]
+            for j in range(1, m):
+                rhs += L.dt * Q2[m, j] * L.f[j].comp2
 
-            L.u[m + 1] = P.solve_system_2(
-                rhs,
-                L.dt * self.Q2[m + 1, m + 1],
-                L.u[m + 1],  # TODO: is this a good guess?
-                L.time + L.dt * self.coll.nodes[m],
-            )
+            L.u[m] = P.solve_system_2(rhs, L.dt * Q2[m, m], L.u[m], t)  # TODO: is L.u[m] a good guess?
 
             # update function values
-            L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+            L.f[m] = P.eval_f(L.u[m], t)
 
         # indicate presence of new values at this level
         L.status.updated = True

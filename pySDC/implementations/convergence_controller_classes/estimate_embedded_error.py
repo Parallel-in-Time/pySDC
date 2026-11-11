@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.convergence_controller import ConvergenceController, Pars, Status
+from pySDC.core.convergence_controller import ConvergenceController, Pars
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 
 from pySDC.implementations.sweeper_classes.Runge_Kutta import RungeKutta
@@ -349,24 +349,38 @@ class EstimateEmbeddedErrorCollocation(ConvergenceController):
         if step.status.done:
             lvl = step.levels[0]
             lvl.sweep.compute_end_point()
-            self.status.u += [lvl.uend]
-            self.status.iter += [step.status.iter]
+            step.status.coll_u += (lvl.uend,)
+            step.status.coll_iter += (step.status.iter,)
 
-            if len(self.status.u) > 1:
+            if len(step.status.coll_u) > 1:
                 lvl.status.error_embedded_estimate_collocation = (
-                    self.status.iter[-2],
-                    max([np.finfo(float).eps, abs(self.status.u[-1] - self.status.u[-2])]),
+                    step.status.coll_iter[-2],
+                    max([np.finfo(float).eps, abs(step.status.coll_u[-1] - step.status.coll_u[-2])]),
                 )
 
     def setup_status_variables(self, *args, **kwargs):
         """
-        Add the embedded error variable to the levels and add a status variable for previous steps.
+        Add the embedded error variable to the levels and add status variables for the collocation problems solved in
+        the current step.
+
+        These live on the step rather than on this object, since there is one instance of this class per controller,
+        which is a whole block of steps when running with more than one process. They are tuples, so that the same empty
+        value can be set on all steps and appending to it on one step does not change it on the others.
 
         Args:
             controller (pySDC.Controller): The controller
         """
-        self.status = Status(['u', 'iter'])
-        self.status.u = []  # the solutions of converged collocation problems
-        self.status.iter = []  # the iteration in which the solution converged
+        self.add_status_variable_to_step('coll_u', ())  # the solutions of converged collocation problems
+        self.add_status_variable_to_step('coll_iter', ())  # the iteration in which the solution converged
 
         self.add_status_variable_to_level('error_embedded_estimate_collocation')
+
+    def reset_status_variables(self, *args, **kwargs):
+        """
+        Forget the collocation problems solved in the previous step, or the previous attempt of this step.
+
+        Args:
+            controller (pySDC.Controller): The controller
+        """
+        self.set_step_status_variable('coll_u', ())
+        self.set_step_status_variable('coll_iter', ())
