@@ -14,12 +14,12 @@ per level, as pySDC spreads lists over the levels, so a fine or a coarse solve c
 sweep, sweep :math:`j` of an :math:`M`-node run is calls :math:`(j-1)M` to :math:`jM - 1` -- which is
 how a perturbation of a single sweep is measured. ``schedule`` instead sets the accuracy per
 iteration: a noise level :math:`\eta` as above, or the name of a format the result is rounded to,
-relative to its maximum (``'fp64'``, ``'fp32'``, ``'fp16'``, ``'bf16'``).
+relative to its maximum (``'fp64'``, ``'fp32'``, ``'fp16'``).
 """
 
 import numpy as np
 
-FORMATS = {'fp64': 2.0**-53, 'fp32': 2.0**-24, 'fp16': 2.0**-11, 'bf16': 2.0**-8}
+FORMATS = {'fp64': 2.0**-53, 'fp32': 2.0**-24, 'fp16': 2.0**-11}
 """Unit roundoff of the formats a result can be rounded to."""
 
 
@@ -31,9 +31,6 @@ def round_to(x, fmt):
         y = y.astype(np.float32)
     elif fmt == 'fp16':
         y = y.astype(np.float16)
-    elif fmt == 'bf16':  # round to nearest even on the upper 16 bits of fp32
-        bits = y.astype(np.float32).view(np.uint32)
-        y = ((bits + np.uint32(0x7FFF) + ((bits >> 16) & np.uint32(1))) & np.uint32(0xFFFF0000)).view(np.float32)
     elif fmt != 'fp64':
         raise ValueError(f'unknown format {fmt}')
     return y.astype(np.float64) * scale

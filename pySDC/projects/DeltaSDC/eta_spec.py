@@ -25,8 +25,6 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
-from pySDC.implementations.transfer_classes.BaseTransferDelta import delta_transfer
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.projects.DeltaSDC.inexact import inexact
 from pySDC.projects.DeltaSDC.precision_theory import bound, contraction, iterations
 from pySDC.projects.DeltaSDC.problems import allencahn_delta, heat_delta, vanderpol_delta
@@ -52,7 +50,7 @@ ALLEN_CAHN = {
 LINEAR = {'linear_implicit': True}
 
 
-def case(family, label, problem_class, problem_params, dt, restol, M=3, QI='LU', sweeper=None, eta_level=None):
+def case(family, label, problem_class, problem_params, dt, restol, M=3, QI='LU', sweeper=None):
     """One configuration of the sweep, as a dict."""
     return {
         'family': family,
@@ -62,14 +60,13 @@ def case(family, label, problem_class, problem_params, dt, restol, M=3, QI='LU',
         'dt': dt,
         'restol': restol,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': M, 'QI': QI, **(sweeper or {})},
-        'eta_level': eta_level,
     }
 
 
 def cases():
     """
     The configurations: step size, nodes and preconditioner varied on heat, and the other problems
-    at a few step sizes each. ``eta_level`` marks an MLSDC run and which of its solves is spoiled.
+    at a few step sizes each.
     """
     dx = 1 / ADVECTION['nvars']
     return [
@@ -79,10 +76,6 @@ def cases():
         ],
         *[case('heat', f'heat M={M}', heat_delta, HEAT, 1e-1, 1e-11, M=M, sweeper=LINEAR) for M in [2, 5]],
         *[case('heat', f'heat {QI}', heat_delta, HEAT, 1e-1, 1e-11, QI=QI, sweeper=LINEAR) for QI in ['MIN-SR-S']],
-        *[
-            case('heat MLSDC', f'MLSDC {level} solve', heat_delta, HEAT, 1e-1, 1e-11, sweeper=LINEAR, eta_level=level)
-            for level in ['fine', 'coarse']
-        ],
         *[
             case('advection', f'advection CFL={cfl:g}', advectionNd, ADVECTION, cfl * dx, 1e-11, sweeper=LINEAR)
             for cfl in [0.5, 2.0, 8.0]
@@ -128,12 +121,6 @@ def residuals(spec, eta=None, seed=0, maxiter=60, calls=None):
         'level_params': {'restol': -1, 'dt': spec['dt']},
         'step_params': {'maxiter': maxiter},
     }
-    if spec['eta_level']:
-        params['nvars'] = [params['nvars'], (params['nvars'] - 1) // 2]
-        params['eta'] = [eta, None] if spec['eta_level'] == 'fine' else [None, eta]
-        description['space_transfer_class'] = mesh_to_mesh
-        description['space_transfer_params'] = {'iorder': 4, 'rorder': 2}
-        description['base_transfer_class'] = delta_transfer
     controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 40}, description=description)
     prob = controller.MS[0].levels[0].prob
     _, stats = controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=spec['dt'])
@@ -166,5 +153,5 @@ def measure(spec, etas=ETAS, seeds=SEEDS):
         'rho': contraction(exact_history, spec['restol']),
         'counts': counts,
         'eta_star': eta_star,
-        'predicted': None if spec['eta_level'] else bound(spec, model='result'),
+        'predicted': bound(spec, model='result'),
     }

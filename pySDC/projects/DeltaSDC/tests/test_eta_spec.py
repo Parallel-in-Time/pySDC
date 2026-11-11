@@ -97,7 +97,7 @@ def test_genuine_lu_is_backward_stable():
     B = np.eye(n) + 100.0 * (2 * np.eye(n) - np.eye(n, k=1) - np.eye(n, k=-1))
     b = np.random.default_rng(0).standard_normal(n)
     b /= np.abs(b).max()
-    for fmt in ('fp32', 'fp16', 'bf16'):
+    for fmt in ('fp32', 'fp16'):
         y = lu_solve(lu(B, fmt), b, fmt)
         backward = np.abs(B @ y - b).max() / (np.abs(B).sum(1).max() * np.abs(y).max())
         assert 0.01 * FORMATS[fmt] < backward < 4 * FORMATS[fmt], fmt

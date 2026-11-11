@@ -249,8 +249,7 @@ def schedule(spec, p=CONFIDENCE, formats=('fp16', 'fp32', 'fp64'), model='residu
 
     Greedy: start every iteration in the coarsest format and refine the one with the largest
     contribution until Theorem 2 and the rate condition, prod_k (rho + phi u_k) <= rho^kbar, both
-    hold. bf16 is left out by default: it costs as much as fp16 and is less accurate, and the
-    corrections are scaled to unit size, so its range does not help.
+    hold.
 
     Returns
     -------

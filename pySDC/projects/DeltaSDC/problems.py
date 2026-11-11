@@ -338,29 +338,6 @@ class heat_delta(heatNd_unforced):
         return me
 
 
-class heat_no_increment(heat_delta):
-    r"""
-    Control: the heat equation with its analytic increment deliberately out of reach.
-
-    Every problem built on :class:`GenericNDimFinDiff` supplies ``eval_f_increment``, so a sweeper on
-    one never falls back to forming :math:`\Delta f` by subtracting two stored right-hand sides.
-    This class hides it again, which is what makes the claim that the increment matters falsifiable.
-
-    The attribute raises rather than being absent, because the sweeper dispatches on ``hasattr`` and
-    a raising property is the way to make that report ``False`` for an inherited method.
-    """
-
-    @property
-    def eval_f_increment(self):
-        """
-        Raises
-        ------
-        AttributeError
-            Always. That is the point of the class.
-        """
-        raise AttributeError('control: the analytic increment is deliberately unavailable here')
-
-
 class vanderpol_delta(vanderpol):
     r"""
     Van der Pol with a node-local correction solve: a stiff nonlinear ODE for the correction-solve contract.

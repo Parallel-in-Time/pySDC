@@ -1,9 +1,9 @@
 """
-Node-local solves genuinely in fp32, fp16 or bf16 arithmetic, on any CPU.
+Node-local solves genuinely in fp32 or fp16 arithmetic, on any CPU.
 
 A dense LU with partial pivoting in which every operation is rounded to the format: computed in fp32,
 then correctly rounded, which for +, -, * and / is exactly the format's own arithmetic, since fp32
-carries more than twice the bits of fp16 and bf16 plus two (there is no fused multiply-add). Matrix
+carries more than twice the bits of fp16 plus two (there is no fused multiply-add). Matrix
 and right-hand side are rounded on input. The right-hand side arrives at unit size (the
 correction-solve contract); the matrix is not scaled, so it must fit the format's range.
 
@@ -19,15 +19,6 @@ def rounder(fmt):
         return lambda x: np.asarray(x, dtype=np.float32)
     if fmt == 'fp16':
         return lambda x: np.asarray(x, dtype=np.float32).astype(np.float16).astype(np.float32)
-    if fmt == 'bf16':
-
-        def bf16(x):
-            x = np.asarray(x, dtype=np.float32)
-            bits = np.atleast_1d(x).view(np.uint32)
-            out = ((bits + np.uint32(0x7FFF) + ((bits >> 16) & np.uint32(1))) & np.uint32(0xFFFF0000)).view(np.float32)
-            return out.reshape(x.shape)
-
-        return bf16
     raise ValueError(fmt)
 
 
@@ -118,7 +109,7 @@ def table(specs):
         b = bound(spec, run=exact)
         row = {'label': spec['label'], 'kbar': kbar, 'kappa': b['kappa'], 'theorem': b['theorem'], 'rate': b['rate']}
         nonlinear = spec['problem_class'] is allencahn_delta
-        for fmt in ('fp32', 'fp16') if nonlinear else ('fp32', 'fp16', 'bf16'):
+        for fmt in ('fp32', 'fp16'):
             if nonlinear:
                 params = dict(spec['problem_params'], solve_precision={'fp32': 'float32', 'fp16': 'float16'}[fmt])
                 run = record_run(spec, problem_params=params, maxiter=40)

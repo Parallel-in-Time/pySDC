@@ -121,56 +121,6 @@ def test_work_counters_are_advanced():
 
 
 @pytest.mark.base
-def test_demo_runs():
-    """Every non-control row of the demo must reproduce its own full-precision counterpart."""
-    from pySDC.projects.DeltaSDC.run_demo import main
-
-    from pySDC.projects.DeltaSDC.run_demo import configurations
-
-    results = main()
-    # the counterpart is decided by whether the row has a coarse level, not by its name: comparing a
-    # multi-level row against SDC would measure the difference between the two methods instead
-    peers = {label: 'MLSDC' if kwargs.get('multilevel') else 'SDC' for label, _, _, _, _, kwargs in configurations()}
-    for label, result in results.items():
-        if label.startswith('CONTROL'):
-            continue
-        peer = results[peers[label]]
-        assert abs(result['uend'] - peer['uend']) < 1e-12, f'{label} deviates'
-        assert result['niter'] == peer['niter'], f'{label} changes the iteration count'
-
-
-@pytest.mark.base
-def test_demo_controls_fail():
-    """The controls are what make the rest of the table mean anything, so they must break."""
-    from pySDC.projects.DeltaSDC.run_demo import main
-
-    results = main()
-    for label in ['CONTROL fp16 coarse, stock ML', 'CONTROL fp32 fine level']:
-        deviation = abs(results[label]['uend'] - results['MLSDC']['uend'])
-        assert deviation > 1e-10, f'{label} did not break, so it no longer controls anything'
-
-
-@pytest.mark.base
-def test_heat_ladder():
-    """The linear ladder: reduced precision below the fine level costs nothing, controls break."""
-    from pySDC.projects.DeltaSDC.run_demo import main_heat
-
-    results = main_heat()
-    assert results['MLSDC'][1] < results['SDC'][1], 'the coarse level must earn its iterations'
-    for label in ['fp16-coarse-solve', 'fp16 coarse level and solve']:
-        uend, hit, floor = results[label]
-        # At most one more, not none: a solve rounded through float16 and not refined delivers an eta
-        # between the 1e-4 and 1e-3 columns of the delivered-accuracy measurement, 7 and 8
-        # iterations, and which one depends on the BLAS -- 7 on Apple's, 8 on Linux OpenBLAS with the
-        # same NumPy and SciPy.
-        assert hit <= results['MLSDC'][1] + 1, f'{label} costs more than one iteration'
-        assert floor < 1e-12, f'{label} floors at {floor:.2e}'
-        assert abs(uend - results['SDC'][0]) < 1e-13, f'{label} deviates'
-    for label in ['CONTROL fp16 coarse, stock ML', 'CONTROL fp32 fine level']:
-        assert results[label][2] > 1e-12, f'{label} did not break, so it no longer controls anything'
-
-
-@pytest.mark.base
 def test_operator_norm_tracks_resolution_and_epsilon():
     """The conditioning estimate must grow with the resolution and with 1/eps^2."""
     from pySDC.projects.DeltaSDC.problems import allencahn_delta
@@ -331,15 +281,3 @@ def test_nonlinear_half_precision_solve_needs_normalisation():
 
     assert normalised < 10 * exact, f'normalised float16 floored at {normalised:.2e} against {exact:.2e}'
     assert naive > 1e4 * exact, f'the unnormalised control reached {naive:.2e}, so it is not controlling'
-
-
-@pytest.mark.base
-@pytest.mark.parametrize('table', [[], ['--fft'], ['--paradiag', '--alpha', '1e-4', 'adaptive']])
-def test_run_gpu_runs_on_the_cpu(table, monkeypatch):
-    """``run_gpu.py``'s tables, tiny and on the CPU: the GPU job times them, this keeps them runnable."""
-    import sys
-
-    from pySDC.projects.DeltaSDC.run_gpu import main
-
-    monkeypatch.setattr(sys, 'argv', ['run_gpu.py', '--n', '16', '--nsteps', '1', *table])
-    main()

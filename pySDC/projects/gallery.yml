@@ -90,9 +90,9 @@
       page: FEM_with_FEniCS
       image: data/fem_with_fenics_orders.png
       summary: SDC, MLSDC and PFASST with FEniCS, never inverting the mass matrix, and why high-order elements make MLSDC pay.
-    - title: Mixed precision in delta form
+    - title: Low-precision implicit solves in SDC
       page: DeltaSDC
-      summary: SDC and MLSDC solving for corrections, so that implicit solves and coarse levels can run in single or half precision.
+      summary: Implicit solves in SDC in single or half precision, without losing the accuracy of the collocation problem.
 
 - section: Applications
   projects:
