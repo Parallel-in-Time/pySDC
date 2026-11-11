@@ -1,5 +1,5 @@
 r"""
-Which precision may a node-local solve use? Theorem 2 of the note, in closed form.
+Which precision may a node-local solve use? A probabilistic bound on the additional iterations, in closed form.
 
 Notation as in Kremling and Speck (2021). For :math:`u' = Au` the collocation problem is
 :math:`CU = U_0` with :math:`C = I - \Delta t\,(Q \otimes A)`, SDC is preconditioned with
@@ -97,10 +97,10 @@ def spectrum(prob, dt):
     dt times the eigenvalues of the (frozen) Jacobian, how to reduce over them, the constant and the
     number of unknowns. ``None`` for a problem without them, which is then treated with full matrices.
 
-    Constant-coefficient problems use the mean over the eigenvalues, with c_V from the eigenvectors
-    (eq. (10) of the note). Allen-Cahn's Jacobian at u_0 is symmetric but not diagonalised by the
-    Fourier basis; it uses the maximum over the interval spanned by its extreme eigenvalues, which
-    bounds every row (Corollary 2 of the note).
+    Constant-coefficient problems use the mean over the eigenvalues, with c_V from the eigenvectors.
+    Allen-Cahn's Jacobian at u_0 is symmetric but not diagonalised by the Fourier basis; it uses the
+    maximum over the interval spanned by its extreme eigenvalues, its numerical range, which bounds
+    every row.
     """
     if isinstance(prob, heat_delta):  # 1D, Dirichlet, second order: a sine basis
         N = prob.A.shape[0]
@@ -119,7 +119,7 @@ def spectrum(prob, dt):
 
 
 MODELS = ('result', 'residual')
-"""How a solve errs (Assumption 1 of the note). ``result``: its result is off by up to eta times its
+"""How a solve errs. ``result``: its result is off by up to eta times its
 maximum -- a result rounded to a format, as :func:`.inexact.inexact` emulates. ``residual``: it solves
 a nearby system, its residual is up to u times ||D_j|| times its maximum -- a backward-stable solve
 in a format with unit roundoff u, or a Krylov solve stopped at a relative residual u."""

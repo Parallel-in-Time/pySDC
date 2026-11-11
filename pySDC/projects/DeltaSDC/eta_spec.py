@@ -13,23 +13,13 @@ counted against :math:`\eta`. Two numbers come out:
     most one iteration more than the exact one.
 
 ``eta* predicted``
-    from :mod:`.precision_theory`, without running anything inexact: Theorem 2 of the note -- the
+    from :mod:`.precision_theory`, without running anything inexact: the
     extra residual independent, mean-zero solve errors leave, bounded with probability 95% -- in
     closed form over the operator's spectral measure, and the rate condition for the feedback of the
     errors into later corrections; the smaller of the two.
-
-Run as ``python -m pySDC.projects.DeltaSDC.eta_spec``; prints the table and writes ``data/eta_spec``
-as PDF and PNG.
 """
 
-from pathlib import Path
-
 import numpy as np
-
-import matplotlib
-
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -178,89 +168,3 @@ def measure(spec, etas=ETAS, seeds=SEEDS):
         'eta_star': eta_star,
         'predicted': None if spec['eta_level'] else bound(spec, model='result'),
     }
-
-
-# one hue per family, from the project's palette
-COLORS = {
-    'heat': '#2a78d6',
-    'heat MLSDC': '#1c5cab',
-    'advection': '#eb6834',
-    'Allen-Cahn': '#4a3aa7',
-    'Van der Pol': '#2e9c6a',
-}
-
-
-def figure(results, etas=ETAS):
-    """Iterations over eta for every configuration, and eta* over the contraction rate."""
-    plt.rcParams.update({'font.size': 13, 'axes.labelsize': 14, 'legend.fontsize': 11})
-    fig, (left, right) = plt.subplots(1, 2, figsize=(13.0, 5.0))
-
-    for spec, result in results:
-        extra = [count - result['exact'] for count in result['counts']]
-        left.semilogx(etas, extra, color=COLORS[spec['family']], linewidth=1.2, alpha=0.8)
-    left.axhline(1, color='#6b6b6b', linewidth=1, linestyle='--')
-    left.set_xlabel(r'relative accuracy $\eta$ delivered by the solver')
-    left.set_ylabel('extra iterations')
-    left.set_ylim(-0.5, 10)
-    left.set_title('every configuration: flat, then a knee')
-
-    for family, color in COLORS.items():
-        points = [
-            (r['predicted']['eta_star'], r['eta_star']) for s, r in results if s['family'] == family and r['predicted']
-        ]
-        if points:
-            predicted, measured = (np.array(v) for v in zip(*points, strict=True))
-            # the measurement only brackets eta*: it passed at the value shown, not at the next one tried
-            right.errorbar(
-                predicted,
-                measured,
-                yerr=np.vstack([np.zeros_like(measured), measured * (np.sqrt(10) - 1)]),
-                fmt='o',
-                color=color,
-                markersize=7,
-                capsize=3,
-                label=family,
-            )
-    line = np.array([1e-9, 1e1])
-    right.loglog(line, line, color='#9a9a9a', linewidth=1, linestyle=':')
-    right.fill_between(line, line / 3, line * 3, color='#9a9a9a', alpha=0.15, linewidth=0, label='within a factor 3')
-    right.set_xlabel(r'$\eta^*$ predicted: Theorem 2 and the rate condition')
-    right.set_ylabel(r'$\eta^*$ measured')
-    right.legend(frameon=False, loc='lower right')
-    right.set_title(r'the accuracy a solve needs, predicted')
-
-    for axes in (left, right):
-        axes.grid(True, linewidth=0.6, alpha=0.4)
-        axes.set_axisbelow(True)
-        for side in ('top', 'right'):
-            axes.spines[side].set_visible(False)
-    fig.tight_layout()
-    Path('data').mkdir(exist_ok=True)
-    for suffix in ('pdf', 'png'):
-        fig.savefig(f'data/eta_spec.{suffix}', dpi=200)
-    plt.close(fig)
-
-
-def main(specs=None, etas=ETAS, seeds=SEEDS):
-    """
-    Measure every configuration, print the table and draw the figure.
-
-    Returns
-    -------
-    list
-        ``(spec, result)`` per configuration.
-    """
-    results = [(spec, measure(spec, etas, seeds)) for spec in (specs or cases())]
-    print(f"{'configuration':>30} | {'iter':>4} {'rho':>8} | {'eta*':>8} {'thm 2':>8} {'rate':>8}")
-    print('-' * 76)
-    for spec, result in results:
-        eta_star = '-' if result['eta_star'] is None else f"{result['eta_star']:.0e}"
-        p = result['predicted']
-        bounds = f"{'-':>8} {'-':>8}" if p is None else f"{p['theorem']:>8.1e} {p['rate']:>8.1e}"
-        print(f"{spec['label']:>30} | {result['exact']:>4} {result['rho']:>8.1e} | {eta_star:>8} {bounds}")
-    figure(results, etas)
-    return results
-
-
-if __name__ == '__main__':
-    main()

@@ -16,8 +16,8 @@ Both norms are already in hand, so the delta form supplies its own indicator -- 
 :math:`\Delta t`, nothing to calibrate per problem. The ladder is walked **monotonically**, so a run
 pays at most ``len(ladder) - 1`` conversions however many iterations it takes.
 
-See the project README for the measurements, for why stagnation detection is not used instead, and
-for the two things this requires of a run.
+It may only lower the precision of quantities the iteration later corrects, which excludes ``u[0]``:
+no sweep corrects the initial value, so rounding it changes the collocation problem itself.
 """
 
 import numpy as np

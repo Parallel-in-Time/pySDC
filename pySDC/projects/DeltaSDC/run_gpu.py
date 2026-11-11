@@ -76,7 +76,7 @@ def fft_configurations():
     """
     The delivered-accuracy specification, with the solve done by FFT at up to half precision.
 
-    The README's specification says what the iteration needs from a node-local solve: about four
+    Measured with spoiled solves, the iteration needs from a node-local solve about four
     digits for SDC's, six for MLSDC's fine one, two for MLSDC's coarse one. A half-precision FFT
     delivers about three, genuinely on a GPU -- so SDC should lose an iteration or so, MLSDC's
     coarse solve nothing, and MLSDC's fine solve clearly more. Same row format as

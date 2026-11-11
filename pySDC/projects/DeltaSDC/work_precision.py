@@ -2,13 +2,9 @@
 Work-precision with genuinely low-precision solves: for a target error at T, the cheapest (M, dt, restol) in fp64
 and with formats chosen live from the previous step (first step fp64). Work = node solves weighted by format cost.
 
-Usage: ``python -m pySDC.projects.DeltaSDC.work_precision <heat|advection|allencahn> <M>`` for one sweep
-(writes ``data/wp_<problem>_M<M>.pkl``; run all twelve in parallel), then
-``python -m pySDC.projects.DeltaSDC.work_precision figure`` for the fronts and the table of the note.
+:func:`sweep` runs one problem for one number of nodes over all step sizes and tolerances; the twelve sweeps
+(three problems, M = 2 to 5) take about an hour together on a laptop.
 """
-
-import pickle
-import sys
 
 import numpy as np
 
@@ -78,112 +74,27 @@ def reference(name):
     return np.asarray(u).copy()
 
 
-NAMES = {'heat': 'heat', 'advection': 'advection', 'allencahn': 'Allen--Cahn'}
-TARGETS = [1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10]
+def sweep(name, M):
+    """
+    Every step size and tolerance of one problem, in fp64 and with formats chosen from the previous step.
 
-
-def load(name):
-    """All sweeps of one problem."""
-    import glob
-
-    return [r for f in sorted(glob.glob(f'data/wp_{name}_M*.pkl')) for r in pickle.load(open(f, 'rb'))]
-
-
-def best(rows, mixed, target):
-    """The cheapest configuration of a kind that reaches the target error, or None."""
-    ok = [r for r in rows if r['mixed'] == mixed and r['err'] <= target]
-    return min(ok, key=lambda r: r['work']) if ok else None
-
-
-def shares(r):
-    """The share of each format over all solves of a configuration."""
-    import collections
-
-    c = collections.Counter(f for step in r['used'] for f in step)
-    return {k: v / sum(c.values()) for k, v in c.items()}
-
-
-def front(rows, mixed):
-    """The cheapest configuration for every error reached: (work, error) pairs."""
-    pts, out, e_best = sorted((r['work'], r['err']) for r in rows if r['mixed'] == mixed), [], np.inf
-    for w, e in pts:
-        if e < e_best:
-            e_best = e
-            out.append((w, e))
-    return out
-
-
-def figure():
-    """The fronts (data/work_precision.pdf) and the rows of the note's table (data/tab_wp.tex)."""
-    import matplotlib
-
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-
-    lines = []
-    fig, axes = plt.subplots(1, 3, figsize=(16, 4.6))
-    for ax, name in zip(axes, NAMES):
-        rows = load(name)
-        print(name, len(rows), 'runs')
-        for t in TARGETS:
-            a, b = best(rows, False, t), best(rows, True, t)
-            if not a or not b:
-                continue
-            sh = shares(b)
-            fm = ', '.join(f"{k} {100 * sh[k]:.0f}\\%" for k in ('fp16', 'fp32', 'fp64') if sh.get(k, 0) >= 0.005)
-            print(
-                f"  {t:.0e}: fp64 M={a['M']} dt={a['dt']:.2e} restol={a['restol']:.0e} W={a['work']:.1f} | mixed M={b['M']} dt={b['dt']:.2e} restol={b['restol']:.0e} W={b['work']:.1f} {fm} | gain {a['work'] / b['work']:.2f}"
-            )
-            tt = f'$10^{{{int(np.log10(t))}}}$'
-            lines.append(
-                f"{NAMES[name]} & {tt} & {a['M']} & {a['dt']:.1e} & {a['work']:.0f} & {b['M']} & {b['dt']:.1e} & {b['work']:.0f} & {fm} & {a['work'] / b['work']:.1f}"
-                + r' \\'
-            )
-        lines.append(r'\midrule')
-        for mixed, color, label in ((False, '#6b6b6b', 'fp64'), (True, '#2a78d6', 'formats from the previous step')):
-            pts = [(r['work'], r['err']) for r in rows if r['mixed'] == mixed]
-            ax.loglog(*zip(*pts), 'o', color=color, alpha=0.15, markersize=3)
-            ax.loglog(*zip(*front(rows, mixed)), '-o', color=color, label=label, markersize=4, drawstyle='steps-post')
-        ax.set_xlabel('work (node solves, weighted by format size)')
-        ax.set_ylabel('relative error at $T$')
-        ax.set_title(NAMES[name].replace('--', '-'))
-        ax.set_ylim(1e-12, 1e-1)
-        ax.grid(True, alpha=0.4, linewidth=0.6)
-        ax.legend(frameon=False, loc='lower left')
-        for s in ('top', 'right'):
-            ax.spines[s].set_visible(False)
-    fig.tight_layout()
-    fig.savefig('data/work_precision.pdf')
-    fig.savefig('data/work_precision.png', dpi=150)
-    open('data/tab_wp.tex', 'w').write('\n'.join(lines[:-1]) + '\n')
-
-
-if __name__ == '__main__':
-    if sys.argv[1] == 'figure':
-        figure()
-        sys.exit()
-    name, M = sys.argv[1], int(sys.argv[2])
-    try:
-        ref = pickle.load(open(f'data/ref_{name}.pkl', 'rb'))
-    except FileNotFoundError:
-        ref = reference(name)
-        pickle.dump(ref, open(f'data/ref_{name}.pkl', 'wb'))
+    Returns
+    -------
+    list
+        One dict per run: ``M``, ``dt``, ``restol``, ``mixed``, the relative error ``err`` at T against
+        :func:`reference`, the ``work`` and the formats ``used`` per step. A run that fails, e.g. because
+        Newton does not converge, has ``err`` infinite and the exception in ``failed``.
+    """
+    ref = reference(name)
     rows = []
     for dt in PROBLEMS[name]['dts']:
         for restol in RESTOLS:
             for mixed in (False, True):
+                row = dict(M=M, dt=dt, restol=restol, mixed=mixed)
                 try:
                     u, work, used = trajectory(name, dt, restol, M, mixed)
-                    err = np.abs(u - ref).max() / np.abs(ref).max()
-                except Exception as e:  # a configuration that fails (e.g. Newton) is reported, not fatal
-                    print(
-                        f'{name} M={M} dt={dt:.2e} restol={restol:.0e} {"mixed" if mixed else "fp64 "} failed: {e!r}',
-                        flush=True,
-                    )
+                except Exception as error:  # a failing configuration is part of the result, not the end of it
+                    rows.append(dict(row, err=np.inf, work=np.inf, used=[], failed=repr(error)))
                     continue
-                rows.append(dict(M=M, dt=dt, restol=restol, mixed=mixed, err=err, work=work, used=used))
-                print(
-                    f'{name} M={M} dt={dt:.2e} restol={restol:.0e} {"mixed" if mixed else "fp64 "} err={err:.2e} work={work:8.1f}',
-                    flush=True,
-                )
-    pickle.dump(rows, open(f'data/wp_{name}_M{M}.pkl', 'wb'))
+                rows.append(dict(row, err=np.abs(u - ref).max() / np.abs(ref).max(), work=work, used=used))
+    return rows

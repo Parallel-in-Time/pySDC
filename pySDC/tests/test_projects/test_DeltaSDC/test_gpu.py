@@ -93,7 +93,7 @@ def test_paradiag_complex64_on_device():
     assert 1e-9 < float(abs(solves[1] - solves[0]) / abs(solves[0])) < 1e-5
 
 
-# The README's two demo tables, as measured on a T4 under NumPy 2. Iteration counts are exact: the GPU
+# The two demo tables of run_demo.py, as measured on a T4 under NumPy 2. Iteration counts are exact: the GPU
 # reproduces the CPU run's, and a change here is a change in behaviour, not noise. Controls are `None`.
 HEAT_TABLE = {
     'SDC': 14,
@@ -150,7 +150,7 @@ def test_readme_heat_table_on_gpu(label):
     """The linear precision ladder, row by row, on the device."""
     uend, hit, floor = _heat_row(label)
     expected = HEAT_TABLE[label]
-    assert hit == expected, f'{label}: {hit} iterations, the README has {expected}'
+    assert hit == expected, f'{label}: {hit} iterations, expected {expected}'
     if expected is None:
         assert floor > 1e-6, f'{label} is a control and must stall, but reached {floor:.1e}'
     else:
@@ -165,7 +165,7 @@ def test_readme_allen_cahn_table_on_gpu(label):
 
     result = _allen_cahn_row(label)
     expected = ALLEN_CAHN_SWEEPS[label]
-    assert result['niter'] == expected, f"{label}: {result['niter']} sweeps, the README has {expected}"
+    assert result['niter'] == expected, f"{label}: {result['niter']} sweeps, expected {expected}"
     multilevel = next(config[-1] for config in configurations() if config[0] == label).get('multilevel')
     diff = float(abs(result['uend'] - _allen_cahn_row('MLSDC' if multilevel else 'SDC')['uend']))
     assert (diff > 1e-8) if label.startswith('CONTROL') else (diff < 1e-12), f'{label}: {diff:.1e} off'
@@ -183,7 +183,7 @@ def test_readme_tables_are_complete():
 @pytest.mark.cupy
 def test_half_precision_fft_follows_the_delivered_accuracy_spec():
     """
-    The README's specification, with genuine half-precision arithmetic: MLSDC's fine solve is the
+    The delivered-accuracy specification, with genuine half-precision arithmetic: MLSDC's fine solve is the
     demanding one, its coarse solve the forgiving one, and every row still reaches the answer.
     """
     from pySDC.projects.DeltaSDC.run_gpu import fft_configurations, run

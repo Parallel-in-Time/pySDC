@@ -51,16 +51,13 @@ def test_vanderpol_delta():
 @pytest.mark.base
 def test_eta_sweep_runs():
     """Two configurations, three etas: an exact run that converges, a contraction rate, an eta* and a prediction."""
-    import os
+    from pySDC.projects.DeltaSDC.eta_spec import cases, measure
 
-    from pySDC.projects.DeltaSDC.eta_spec import cases, main
-
-    specs = [c for c in cases() if c['label'] in ('heat dt=0.1', 'Van der Pol mu=10')]
-    for spec, result in main(specs, etas=[1e-2, 1e-5, 1e-8], seeds=(0,)):
+    for spec in [c for c in cases() if c['label'] in ('heat dt=0.1', 'Van der Pol mu=10')]:
+        result = measure(spec, etas=[1e-2, 1e-5, 1e-8], seeds=(0,))
         assert np.isfinite(result['exact']) and 0 < result['rho'] < 1, spec['label']
         assert result['eta_star'] is not None, spec['label']
         assert result['predicted']['eta_star'] > 0, spec['label']
-    assert os.path.isfile('data/eta_spec.png')
 
 
 @pytest.mark.base

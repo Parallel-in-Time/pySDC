@@ -192,22 +192,3 @@ def live(spec, steps=10):
         out.append((formats, its, its64, sum(COST[formats[min(k, len(formats) - 1)]] for k in range(its))))
         u, u64, previous = run['uend'], reference['uend'], run
     return out
-
-
-if __name__ == '__main__':
-    from pySDC.projects.DeltaSDC.eta_spec import cases
-
-    specs = [c for c in cases() if not c['eta_level'] and c['family'] in ('heat', 'advection', 'Allen-Cahn')]
-    for row in table(specs):
-        print(row, flush=True)
-    for label in ('heat dt=0.01', 'advection CFL=2', 'Allen-Cahn dt=0.001', 'Allen-Cahn dt=0.004'):
-        steps = live(next(c for c in cases() if c['label'] == label))
-        print(
-            label,
-            [(''.join(f[2:] + ' ' for f in s[0]).strip(), s[1], s[2]) for s in steps],
-            'cost',
-            sum(s[3] for s in steps),
-            'fp64',
-            sum(s[2] for s in steps),
-            flush=True,
-        )

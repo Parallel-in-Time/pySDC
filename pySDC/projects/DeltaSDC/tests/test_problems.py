@@ -160,7 +160,7 @@ def test_heat_ladder():
     for label in ['fp16-coarse-solve', 'fp16 coarse level and solve']:
         uend, hit, floor = results[label]
         # At most one more, not none: a solve rounded through float16 and not refined delivers an eta
-        # between the 1e-4 and 1e-3 columns of the README's delivered-accuracy table, 7 and 8
+        # between the 1e-4 and 1e-3 columns of the delivered-accuracy measurement, 7 and 8
         # iterations, and which one depends on the BLAS -- 7 on Apple's, 8 on Linux OpenBLAS with the
         # same NumPy and SciPy.
         assert hit <= results['MLSDC'][1] + 1, f'{label} costs more than one iteration'

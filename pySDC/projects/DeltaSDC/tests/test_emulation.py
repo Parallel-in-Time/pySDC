@@ -205,8 +205,8 @@ def test_delivered_accuracy_requirement():
 
     The point of measuring it this way rather than as a format is that it says nothing about how a
     solver reaches the accuracy -- low-precision kernels with iterative refinement, a loose Krylov
-    tolerance, a few multigrid cycles are all the same thing here. These are the numbers the README
-    quotes, and the third one is the control: the coarse solve tolerates four orders of magnitude
+    tolerance, a few multigrid cycles are all the same thing here. These are the measured numbers,
+    and the third one is the control: the coarse solve tolerates four orders of magnitude
     more error than the fine solve in the same run, which is the whole claim.
     """
     sdc, mlsdc = iterations(False), iterations(True)
