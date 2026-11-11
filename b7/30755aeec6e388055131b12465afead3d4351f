@@ -1,0 +1,31 @@
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_2fab904ee61895 1-2,4-9,14,23-41,46-47,52-54
+pySDC/projects/DeltaSDC/eta_spec.py
+  s_3cfbaa2fb0772b::t_5caed1dbde401c 53,69,156
+pySDC/projects/DeltaSDC/genuine.py
+  s_3cfbaa2fb0772b::t_f1b920d9c00236 2,6,112
+pySDC/projects/DeltaSDC/inexact.py
+  s_3cfbaa2fb0772b::t_99eb5c2d0a4521 17,22
+pySDC/projects/DeltaSDC/precision_theory.py
+  s_3cfbaa2fb0772b::t_15c7807163dc13 252
+pySDC/projects/DeltaSDC/tests/test_eta_spec.py
+  s_3cfbaa2fb0772b::t_6f7961bb8898d7 100
+pySDC/projects/gallery.yml
+  s_3cfbaa2fb0772b::t_7297260bd66bc2 93,95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b730755aeec6e388055131b12465afead3d4351f",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
