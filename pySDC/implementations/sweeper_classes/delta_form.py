@@ -63,11 +63,82 @@ ever rebuilt out of :math:`\mathcal{O}(1)` coarse state. :class:`~pySDC.core.bas
 nothing down, so on a stock hierarchy this sweeper reproduces MLSDC and PFASST exactly.
 """
 
+import sys
+
 import numpy as np
 
 from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+
+_ROW_KERNELS = {}
+
+
+def _row_kernel(num_nodes, split, residual, tau):
+    r"""
+    A CuPy kernel for one row of :math:`\Delta t\, Q F`, optionally completed to the residual
+    :math:`u_0 + \tau_m + \Delta t\, (Q F)_m - u_m`.
+
+    It performs the operations of the loops in :meth:`generic_implicit.integrate`,
+    :meth:`imex_1st_order.integrate` and :meth:`DeltaFormMixin._residual_nodes` one by one and in the
+    same order, with contraction into fused multiply-adds switched off, so its result is bitwise
+    theirs. It only reads every operand once, where the loops allocate and pass over a temporary for
+    every term; on a GPU, these passes over memory are the time.
+    """
+    key = (num_nodes, split, residual, tau)
+    if key not in _ROW_KERNELS:
+        import cupy as cp
+
+        if split:  # imex_1st_order sums the two parts first
+            arrays = [name for j in range(num_nodes) for name in (f'i{j}', f'e{j}')]
+            terms = [f'(i{j} + e{j})' for j in range(num_nodes)]
+        else:
+            arrays = [f'f{j}' for j in range(num_nodes)]
+            terms = list(arrays)  # a copy: u0, um and tau are operands, not terms
+        arrays += ['u0', 'um'] * residual + ['tau'] * tau
+        params = ', '.join([f'float64 {name}' for name in arrays] + [f'float64 c{j}' for j in range(num_nodes)])
+        body = 'double t = 0.0;' + ''.join(f' t = t + c{j} * {term};' for j, term in enumerate(terms))
+        body += ' t = t + u0; t = t - um;' * residual + ' t = t + tau;' * tau
+        _ROW_KERNELS[key] = cp.ElementwiseKernel(
+            params,
+            'float64 out',
+            body + ' out = t;',
+            f'delta_form_row_{num_nodes}_{split:d}{residual:d}{tau:d}',
+            options=('--fmad=false',),
+        )
+    return _ROW_KERNELS[key]
+
+
+def _gpu_rows(sweeper, residual):
+    r"""
+    :math:`\Delta t\, Q F` at every node, or the residual, in one GPU kernel per node.
+
+    Returns ``None`` unless every operand is a ``float64`` CuPy array, in which case the caller takes
+    its loop. A split right-hand side (``impl`` and ``expl``) is summed as
+    :meth:`imex_1st_order.integrate` sums it.
+    """
+    cp = sys.modules.get('cupy')
+    if cp is None:
+        return None
+    lvl = sweeper.level
+    num_nodes = sweeper.coll.num_nodes
+    f = lvl.f[1 : num_nodes + 1]
+    split = hasattr(f[0], 'impl')
+    terms = [part for value in f for part in ((value.impl, value.expl) if split else (value,))]
+    operands = []
+    for m in range(1, num_nodes + 1):
+        extra = [lvl.u[0], lvl.u[m]] + [lvl.tau[m - 1]] * (lvl.tau[m - 1] is not None) if residual else []
+        operands.append(terms + extra)
+    if not all(isinstance(a, cp.ndarray) and a.dtype == cp.float64 for row in operands for a in row):
+        return None
+    rows = []
+    for m, row in enumerate(operands, start=1):
+        coefficients = [lvl.dt * sweeper.coll.Qmat[m, j] for j in range(1, num_nodes + 1)]
+        tau = residual and lvl.tau[m - 1] is not None
+        out = lvl.prob.dtype_u(lvl.prob.init)
+        _row_kernel(num_nodes, split, residual, tau)(*row, *coefficients, out)
+        rows.append(out)
+    return rows
 
 
 class DeltaFormMixin:
@@ -337,6 +408,10 @@ class DeltaFormMixin:
         if self.eps_in is not None:
             return self.eps_in
 
+        # the residual in one pass, where the sweeper's own integrate is the one in this module
+        eps = _gpu_rows(self, residual=True) if type(self).integrate in _GPU_INTEGRATES else None
+        if eps is not None:
+            return eps
         lvl = self.level
         eps = self.integrate()
         for m in range(self.coll.num_nodes):
@@ -494,6 +569,19 @@ class delta_implicit(DeltaFormMixin, generic_implicit):
     parameters ``correction_precision`` and ``linear_implicit``.
     """
 
+    def integrate(self):
+        """
+        Integrate the right-hand side, as the parent sweeper does; on a GPU in one kernel per node,
+        with bitwise the same result.
+
+        Returns
+        -------
+        list
+            :math:`\\Delta t\\, (Q F)_m` at every node.
+        """
+        rows = _gpu_rows(self, residual=False)
+        return super().integrate() if rows is None else rows
+
     def _sweep_nodes(self):
         """
         Perform one delta-form sweep over all collocation nodes.
@@ -522,8 +610,9 @@ class delta_implicit(DeltaFormMixin, generic_implicit):
                     rhs_corr += self._coeff(lvl.dt * self.QI[m + 1, j]) * df[j]
 
             alpha = lvl.dt * self.QI[m + 1, m + 1]
-            u_old = prob.dtype_u(lvl.u[m + 1])
-            f_old = prob.dtype_f(lvl.f[m + 1])
+            # no copies: both are read only (the correction-solve contract), and the level gets new objects below
+            u_old = lvl.u[m + 1]
+            f_old = lvl.f[m + 1]
 
             delta = self._solve_correction(rhs_corr, alpha, u_old, f_old, t_node)
 
@@ -544,6 +633,19 @@ class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
     The correction equation contains only differences of ``f``, never a Jacobian, so the
     explicit/implicit splitting is untouched.
     """
+
+    def integrate(self):
+        """
+        Integrate the right-hand side, as the parent sweeper does; on a GPU in one kernel per node,
+        with bitwise the same result.
+
+        Returns
+        -------
+        list
+            :math:`\\Delta t\\, (Q F)_m` at every node.
+        """
+        rows = _gpu_rows(self, residual=False)
+        return super().integrate() if rows is None else rows
 
     def _sweep_nodes(self):
         """
@@ -580,8 +682,9 @@ class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
                     rhs_corr += self._coeff(lvl.dt * self.QE[m + 1, j]) * df_expl[j]
 
             alpha = lvl.dt * self.QI[m + 1, m + 1]
-            u_old = prob.dtype_u(lvl.u[m + 1])
-            f_old = prob.dtype_f(lvl.f[m + 1])
+            # no copies: both are read only (the correction-solve contract), and the level gets new objects below
+            u_old = lvl.u[m + 1]
+            f_old = lvl.f[m + 1]
 
             delta = self._solve_correction(rhs_corr, alpha, u_old, f_old, t_node, implicit_part=f_old.impl)
 
@@ -594,6 +697,9 @@ class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
 
         lvl.status.updated = True
         return None
+
+
+_GPU_INTEGRATES = (delta_implicit.integrate, delta_imex_1st_order.integrate)
 
 
 def total_increment(prob, increment):
