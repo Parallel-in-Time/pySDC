@@ -56,13 +56,20 @@ class GenericNDimFinDiff(Problem):
         Type of solver. Can be ``'direct'``, ``'GMRES'``, ``'CG'`` or, on periodic grids, ``'FFT'``:
         the operator is then circulant, so the FFT diagonalises it and a solve is two transforms
         and a division -- exact, and the cheapest solve there is on a GPU. ``'direct'`` keeps the
-        factorizations of the last ``max_cached_factorizations`` factors and reuses them.
+        factorizations of the last ``max_cached_factorizations`` factors and reuses them. ``'MG'`` is
+        geometric multigrid (:class:`~pySDC.helpers.multigrid.GeometricMultigrid`), for the
+        second-order Laplacian on periodic grids (``derivative=2``, ``order=2``,
+        ``stencil_type='center'``) and real states: V-cycles from a zero guess until the relative
+        residual is below ``lintol``, the accuracy of the solve's format is reached, or after
+        ``liniter`` cycles, whose number the work counter ``'MG'`` adds up. It needs no matrix, and on a
+        GPU in 3D it runs on fused kernels.
     solve_precision : dtype-like or None, optional
         Precision the implicit solve runs at, independently of the state's ``dtype``. ``None``
         (default) solves at the operator's precision, exactly as without it. Otherwise the solve
         genuinely works in that precision: the sparse solvers on a copy of the operator held at it,
         ``'FFT'`` with transforms at it, and the result is widened back to ``dtype``. Sparse
-        matrices stop at single precision in SciPy and CuPy alike, so ``float16`` needs ``'FFT'``.
+        matrices stop at single precision in SciPy and CuPy alike, so ``float16`` needs ``'FFT'`` or
+        ``'MG'``; multigrid stores in half precision and computes in single, on a CPU too.
         On a GPU those are cuFFT's half-precision transforms (power-of-two grids), with every value
         stored and every product rounded in half precision. A CPU has no half-precision FFT, so
         there ``float16`` is *emulated*, by rounding through it around a single-precision
@@ -229,6 +236,7 @@ class GenericNDimFinDiff(Problem):
 
         self._factorizations = {}
 
+        self._coeff, self._derivative = coeff, derivative  # what the multigrid solve needs to know of A
         solve_precision = None if solve_precision is None else np.dtype(solve_precision)
         self._makeAttributeAndRegister('solve_precision', localVars=locals(), readOnly=True)
         self._setup_solve(solver_type, solve_precision, bc)
@@ -253,9 +261,22 @@ class GenericNDimFinDiff(Problem):
             first_column[0] = 1.0
             self._eigenvalues = self._fft.fftn((self.A @ first_column).reshape(self.nvars))
             self._half_plan = None
+        elif solver_type == 'MG':
+            from pySDC.helpers.multigrid import GeometricMultigrid
+
+            if (bc, self._derivative, self.order, self.stencil_type) != ('periodic', 2, 2, 'center'):
+                raise ProblemError(
+                    'multigrid solves the second-order Laplacian on periodic grids: needs bc="periodic", '
+                    f'derivative=2, order=2, stencil_type="center", got {bc}, {self._derivative}, {self.order}, '
+                    f'{self.stencil_type}'
+                )
+            if self.dtype.kind == 'c' or np.iscomplexobj(self._coeff):
+                raise ProblemError('multigrid solves real systems only')
+            self._multigrid = GeometricMultigrid(self.nvars[0], self.ndim, xp=self.xp)
+            self._mg_dtype = np.dtype(np.float16) if self._half else precision
         elif solve_precision is not None:
             if self._half:
-                raise ProblemError('sparse matrices stop at single precision; float16 needs solver_type="FFT"')
+                raise ProblemError('sparse matrices stop at single precision; float16 needs solver_type="FFT" or "MG"')
             self._A_solve = self.A.astype(precision)
             self._Id_solve = self.Id.astype(precision)
 
@@ -362,7 +383,7 @@ class GenericNDimFinDiff(Problem):
         sol : dtype_u
             The solution of the linear solver.
         """
-        if self.solver_type == 'FFT' or self.solve_precision is not None:
+        if self.solver_type in ['FFT', 'MG'] or self.solve_precision is not None:
             return self._solve_at_precision(rhs, factor, u0)
 
         solver_type, Id, A, nvars, lintol, liniter, sol = (
@@ -456,6 +477,9 @@ class GenericNDimFinDiff(Problem):
             sol[:] = self._solve_fft(rhs.view(self.xp.ndarray).reshape(self.nvars), factor)
             self.work_counters['FFT']()
             return sol
+        if self.solver_type == 'MG':
+            sol[:] = self._solve_mg(rhs.view(self.xp.ndarray).reshape(self.nvars), factor)
+            return sol
 
         precision = self._solve_dtype
 
@@ -489,6 +513,26 @@ class GenericNDimFinDiff(Problem):
             )
         sol[:] = x.reshape(self.nvars)
         return sol
+
+    def _solve_mg(self, b, factor):
+        """
+        Multigrid for ``(I - factor * A) x = b`` in the solve's format, returned in that format.
+
+        In half precision, the right-hand side is scaled to a maximum of one first and the result
+        widened and scaled back, as in ``_solve_fft``: a correction of 1e-10 is below ``float16``'s
+        smallest subnormal.
+        """
+        scale = float(abs(b).max()) if self._half else 1.0
+        if scale == 0.0:
+            return self.xp.zeros_like(b)
+        x, cycles = self._multigrid.solve(
+            (b if scale == 1.0 else b / scale).astype(self._mg_dtype, copy=False),
+            factor * self._coeff,
+            self.lintol,
+            self.liniter,
+        )
+        self.work_counters['MG'].niter += cycles
+        return x if scale == 1.0 else x.astype(self.dtype) * scale
 
     def _solve_fft(self, b, factor):
         """
