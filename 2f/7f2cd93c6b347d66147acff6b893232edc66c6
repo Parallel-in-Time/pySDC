@@ -1,0 +1,23 @@
+etc/run_mpi_tests.sh
+  s_8dd430a1287f24::t_a723f51e8ce3bb 19-20,27,82-83
+pySDC/tests/test_ci/test_run_mpi_tests.py
+  s_8dd430a1287f24::t_fb6269ad5a94c7 104-105
+  s_8dd430a1287f24::t_a723f51e8ce3bb 50-51,62,65-67,97-103
+  s_8dd430a1287f24::t_961ca01c8693d3 106-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2f7f2cd93c6b347d66147acff6b893232edc66c6",
+  "prompts": {},
+  "sessions": {
+    "s_8dd430a1287f24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7dbec754-a32f-4804-9bbe-a6f6101a772e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
