@@ -16,8 +16,6 @@ dependencies:
   - openmpi
   - mpi4py
   - h5py=*=mpi_openmpi_*
-  # for Gusto; the netCDF4 wheel would bring its own HDF5 into the process next to this one
-  - netcdf4=*=mpi_openmpi_*
   - pandas
   # building Firedrake and its JIT-compiled kernels
   - compilers

@@ -358,8 +358,9 @@ jobs:
             coverage_firedrake.dat
 
   user_firedrake_tests_conda:
-    # The same tests as user_firedrake_tests, without the Docker image: Firedrake pip-installed on
-    # top of conda-forge's PETSc (see etc/environment-firedrake.yml), which also works on macOS.
+    # The Firedrake tests of user_firedrake_tests without the Docker image: Firedrake pip-installed on
+    # top of conda-forge's PETSc (see etc/environment-firedrake.yml), which also works on macOS. The
+    # Gusto tests stay in the Docker job only: Gusto has no releases and follows Firedrake's own images.
     runs-on: ubuntu-latest
     env:
       # must match the petsc4py pin in etc/environment-firedrake.yml
@@ -375,13 +376,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-      - name: Checkout gusto
-        uses: actions/checkout@v7
-        with:
-          repository: firedrakeproject/gusto
-          path: ./gusto_repo
-          # the same commit as user_firedrake_tests
-          ref: b81bc873b0a21a88aa8455e43f53cc2c9c3e3c1c
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v3
         with:
@@ -399,17 +393,16 @@ jobs:
           pip install --no-build-isolation --no-deps "firedrake==$FIREDRAKE_VERSION"
           # then its Python dependencies, which the step above skipped
           pip install "firedrake==$FIREDRAKE_VERSION"
-      - name: Install pySDC and gusto
+      - name: Install pySDC
         run: |
           pip install --no-deps -e .
-          pip install -e ./gusto_repo
-          python -c "import firedrake, gusto, pySDC; print(firedrake.__file__, gusto.__file__, pySDC.__file__)"
+          python -c "import firedrake, pySDC; print(firedrake.__file__, pySDC.__file__)"
       - name: Run pytest
         run: |
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
-          bash etc/run_mpi_tests.sh pySDC/tests firedrake
+          bash etc/run_mpi_tests.sh pySDC/tests 'firedrake and not gusto'
         timeout-minutes: 45
       - name: Make coverage report
         run: |
