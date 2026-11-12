@@ -1,33 +1,53 @@
 r"""
-Geometric multigrid for :math:`(I - s \Delta_h)\, x = b` on periodic grids, on a CPU (NumPy) or a GPU (CuPy).
+Geometric multigrid for :math:`(I - s A_h)\, x = b` with :math:`A_h = \nu \Delta_h - c \cdot \nabla_h`, on a CPU
+(NumPy) or a GPU (CuPy).
 
-This is the system an implicit Euler step, and so every node solve of SDC, of a diffusion term
-:math:`\nu \Delta u` leads to, with :math:`s = \text{factor}\cdot\nu`. :math:`\Delta_h` is the second-order
-Laplacian (3, 5 or 7 points) on :math:`N` points per direction of a periodic interval, square or cube of side
-length :math:`L`. :class:`GeometricMultigrid` takes and returns plain arrays and does not depend on the rest of
-pySDC; :class:`~pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff` uses it for
+This is the system an implicit Euler step, and so every node solve of SDC, of an advection-diffusion term
+:math:`\nu \Delta u - c \cdot \nabla u` leads to, with :math:`s` the factor of the step. :math:`\Delta_h` is the
+second-order Laplacian (3, 5 or 7 points) and :math:`\nabla_h` the first-order upwind gradient, each component of
+:math:`c` differenced on the side it comes from, on :math:`N` points per direction of an interval, square or cube of
+side length :math:`L`. The grid is periodic (``bc='periodic'``, spacing :math:`h = L / N`) or has zero Dirichlet
+values (``bc='dirichlet-zero'``: :math:`N` interior points of a vertex-centered grid, :math:`h = L / (N + 1)`). Both
+are the grids, and :math:`A_h` the matrix, of pySDC's finite differences
+(:func:`~pySDC.helpers.problem_helper.get_finite_difference_matrix` with ``order=2, stencil_type='center'`` for
+:math:`\Delta_h` and ``order=1, stencil_type='upwind'`` for positive velocities). Without a velocity it is pure
+diffusion, :math:`A_h = \nu \Delta_h`. :class:`GeometricMultigrid` takes and returns plain arrays and does not depend
+on the rest of pySDC; :class:`~pySDC.implementations.problem_classes.generic_ND_FD.GenericNDimFinDiff` uses it for
 ``solver_type='MG'``.
 
-**The method.** V(2,2)-cycles with weighted Jacobi smoothing (:math:`\omega = 0.8`), full-weighting restriction,
-linear interpolation, the same stencil on every grid, and an exact solve with a dense inverse on the coarsest grid,
-which has at most ``COARSEST`` points. The exact coarse solve is needed: the smooth modes of :math:`I - s \Delta_h`
-are damped only by the identity part, which Jacobi does not do. A solve starts from zero and stops when the 2-norm
-of the residual is below ``rtol`` times that of ``b``, or when a V-cycle no longer halves it, which is where the
+**The method.** V(2,2)-cycles with weighted Jacobi smoothing (:math:`\omega = 0.8`, with the diagonal of the whole
+operator), full-weighting restriction, linear interpolation, the same stencil on every grid, and an exact solve with a
+dense inverse on the coarsest grid, which has at most ``COARSEST`` points. A periodic grid coarsens from :math:`N` to
+:math:`N / 2` points per direction, a Dirichlet grid from :math:`N` to :math:`(N - 1) / 2` interior points, with zero
+boundary values in the transfers. The exact coarse solve is needed: the smooth modes of :math:`I - s \Delta_h` are
+damped only by the identity part, which Jacobi does not do. A solve starts from zero and stops when the 2-norm of the
+residual is below ``rtol`` times that of ``b``, or when a V-cycle no longer halves it, which is where the
 floating-point format of ``b`` ends (about :math:`\kappa u`, with :math:`\kappa` the condition number and :math:`u`
 the unit roundoff), or after ``maxiter`` cycles. A cycle that does not reduce the residual at all is discarded, so
 that a format too coarse for the system returns its best iterate, zero in the worst case, rather than one that is
 worse.
 
+**Advection.** Point Jacobi smooths reliably while diffusion dominates on every grid, and the coarsest grid has the
+largest spacing: measured in 1D to 3D, periodic and Dirichlet, with stiffness :math:`s \nu h^{-2}` up to
+:math:`10^6`, every solve reaches ``rtol`` while the grid Peclet number :math:`|c_a| H / \nu` on the coarsest grid
+(spacing :math:`H`) is at most about 2, which is :math:`|c_a| h / \nu` up to :math:`2 h / H` on the finest. Beyond,
+in 2D and 3D and for stiff systems, a V-cycle reduces the residual by only 0.5 to 0.85 (the coarse grids, upwinded
+on their own spacing, approximate the smooth components along the flow badly), the stall rule takes that for the end
+of the format, and the solve stops after a few cycles with a residual of :math:`10^{-6}` to :math:`10^{-2}`, without
+saying so: check the residual there. 1D solves converge at every Peclet number measured (up to 32 on the coarsest
+grid), and so do many 2D and 3D ones with fewer levels.
+
 **Formats.** A solve computes in the floating-point type of its right-hand side: ``float64`` and ``float32`` arrays
 are solved in their own arithmetic, and ``float16`` is a storage format, as on GPUs: every array is stored in half
 precision, every operation computes in single precision. The result has the type of the right-hand side.
 
-**Speed.** On a GPU, 3D grids run on fused CUDA kernels: one pass over the arrays for the residual, the Jacobi step,
-the restriction and the interpolation each, with the grid size compiled in. With ``fma=False`` (default), the
+**Speed.** On a GPU, periodic 3D grids run on fused CUDA kernels: one pass over the arrays for the residual, the
+Jacobi step, the restriction and the interpolation each, with the grid size compiled in. With ``fma=False`` (default), the
 stencil kernels compute bit for bit what the array operations compute, which is what the tests check; ``fma=True``
 lets the compiler contract multiplications and additions, which is faster where the arithmetic and not the memory
 limits the kernels (fp64 on GPUs with few fp64 units). Measured at :math:`640^3` with V(2,2)-cycles, one Jacobi step
-moves data at about 3 TB/s on an H100 in fp64. 1D and 2D grids, and every grid on a CPU, use array operations.
+moves data at about 3 TB/s on an H100 in fp64. The fused kernels are for periodic pure diffusion; 1D and 2D grids,
+Dirichlet grids, advection, and every grid on a CPU use array operations.
 """
 
 import re
@@ -57,9 +77,11 @@ class _Ops:
         np.dtype(np.float16): ('__half', 'float'),
     }
 
-    def __init__(self, xp, fma=False):
+    def __init__(self, xp, fma=False, periodic=True):
         self.xp = xp
         self.gpu = xp is not np
+        self.periodic = periodic
+        self.start = 0 if periodic else 1  # the fine index of the first coarse point
         # off, the kernels compute bit for bit what the array operations do; on, they are faster where arithmetic
         # limits them
         self.options = () if fma else ('--fmad=false',)
@@ -69,35 +91,52 @@ class _Ops:
         self.section = 64
 
     def fused(self, x):
-        """Whether ``x`` is handled by the fused kernels: a 3D grid of a supported type on a GPU."""
-        return self.gpu and x.ndim == 3 and x.dtype in self._TYPES
+        """Whether ``x`` is handled by the fused kernels: a periodic 3D grid of a supported type on a GPU."""
+        return self.gpu and self.periodic and x.ndim == 3 and x.dtype in self._TYPES
 
     @staticmethod
-    def omega_over_d(x, sh):
+    def omega_over_d(x, sh, q=None):
         r"""
-        :math:`\omega / (1 + 2 d\, s h^{-2})`, the Jacobi factor for ``d``-dimensional ``x``, computed once on the
-        host in the compute type: no division per point, which costs real time where fp64 arithmetic is slow.
+        :math:`\omega / (1 + 2 d\, s \nu h^{-2} + \sum_a |s c_a h^{-1}|)`, the Jacobi factor for ``d``-dimensional
+        ``x``, with ``sh`` :math:`= s \nu h^{-2}` and ``q`` the :math:`s c_a h^{-1}`, computed once on the host in the
+        compute type: no division per point, which costs real time where fp64 arithmetic is slow.
         """
         ct = compute_type(x.dtype).type
-        return ct(OMEGA) / (ct(1) + ct(2 * x.ndim) * ct(sh))
+        diagonal = ct(1) + ct(2 * x.ndim) * ct(sh)
+        if q:
+            diagonal = diagonal + ct(sum(abs(v) for v in q))
+        return ct(OMEGA) / diagonal
+
+    def shift(self, y, k, axis):
+        """``y`` moved by ``k`` = 1 or -1 along ``axis`` as by ``numpy.roll``: periodic, or with zero boundary values."""
+        if self.periodic:
+            return self.xp.roll(y, k, axis)
+        out = self.xp.zeros_like(y)
+        inner, before = (slice(1, None), slice(None, -1)), (slice(None),) * axis
+        destination, source = inner if k == 1 else inner[::-1]
+        out[before + (destination,)] = y[before + (source,)]
+        return out
 
     # --- the operations ---------------------------------------------------------------------------------------------
-    def stencil(self, kind, x, b, p1, p2=0.0, out=None):
+    def stencil(self, kind, x, b, p1, p2=0.0, out=None, q=None):
         r"""
-        A stencil operation with ``p1`` the scale of the Laplacian: 0 gives :math:`p_1 \Delta x` (unscaled
-        :math:`\Delta`), 1 the residual :math:`b - (x - p_1 \Delta x)`, 2 the Jacobi step
-        :math:`x + p_2 (b - (x - p_1 \Delta x))`, with ``p2`` from :meth:`omega_over_d`.
+        A stencil operation with :math:`B x = p_1 \Delta x - \sum_a q_a D_a x`, ``p1`` the scale of the Laplacian
+        (unscaled :math:`\Delta`) and ``q`` (or None) the signed scales of the first-order upwind differences
+        :math:`D_a`: 0 gives :math:`B x`, 1 the residual :math:`b - (x - B x)`, 2 the Jacobi step
+        :math:`x + p_2 (b - (x - B x))`, with ``p2`` from :meth:`omega_over_d`.
         """
-        if self.fused(x):
+        if q is None and self.fused(x):
             return self._stencil_fused(kind, x, b, p1, p2, out)
-        xp, ct = self.xp, compute_type(x.dtype)
+        ct = compute_type(x.dtype)
         y = x.astype(ct, copy=False)
-        s = sum(xp.roll(y, shift, axis) for axis in range(y.ndim) for shift in (1, -1))
+        s = sum(self.shift(y, shift, axis) for axis in range(y.ndim) for shift in (1, -1))
         lap = s - (2 * y.ndim) * y
-        if kind == 0:
-            result = lap * ct.type(p1)
-        else:
-            result = b.astype(ct, copy=False) - (y - ct.type(p1) * lap)
+        result = ct.type(p1) * lap
+        for axis, qa in enumerate(q or ()):
+            if qa:  # q_a D_a x = |q_a| (x_i - x_upwind), the upwind neighbour on the side the velocity comes from
+                result = result - ct.type(abs(qa)) * (y - self.shift(y, 1 if qa > 0 else -1, axis))
+        if kind != 0:
+            result = b.astype(ct, copy=False) - (y - result)
             if kind == 2:
                 result = y + ct.type(p2) * result
         if out is None:
@@ -105,16 +144,16 @@ class _Ops:
         out[...] = result
         return out
 
-    def residual(self, x, b, s, h2inv):
-        return self.stencil(1, x, b, s * h2inv)
+    def residual(self, x, b, s, h2inv, q=None):
+        return self.stencil(1, x, b, s * h2inv, q=q)
 
-    def jacobi(self, x, b, s, h2inv):
+    def jacobi(self, x, b, s, h2inv, q=None):
         """One weighted Jacobi step, out of place."""
-        return self.stencil(2, x, b, s * h2inv, self.omega_over_d(x, s * h2inv))
+        return self.stencil(2, x, b, s * h2inv, self.omega_over_d(x, s * h2inv, q), q=q)
 
-    def jacobi_from_zero(self, b, s, h2inv):
+    def jacobi_from_zero(self, b, s, h2inv, q=None):
         """The Jacobi step from x = 0, which is (omega / d) b: one pass over b instead of a stencil over zeros."""
-        wd = self.omega_over_d(b, s * h2inv)
+        wd = self.omega_over_d(b, s * h2inv, q)
         if self.fused(b):
             return self._kernel('jacobi_zero', b)(b, self._scalar(b, wd), self.xp.empty_like(b))
         return (wd * b.astype(compute_type(b.dtype), copy=False)).astype(b.dtype, copy=False)
@@ -124,22 +163,20 @@ class _Ops:
         if self.fused(r):
             n = r.shape[0] // 2
             return self._kernel('restrict', r, n)(r, self.xp.empty((n, n, n), dtype=r.dtype), size=n**3)
-        xp = self.xp
         y = r.astype(compute_type(r.dtype), copy=False)
         for axis in range(r.ndim):
-            y = 0.25 * xp.roll(y, 1, axis) + 0.5 * y + 0.25 * xp.roll(y, -1, axis)
-        return y[(slice(None, None, 2),) * r.ndim].astype(r.dtype)
+            y = 0.25 * self.shift(y, 1, axis) + 0.5 * y + 0.25 * self.shift(y, -1, axis)
+        return y[(slice(self.start, None, 2),) * r.ndim].astype(r.dtype)
 
     def prolong_add(self, x, e):
         """x += linear interpolation of the coarse correction e, in place."""
         if self.fused(x):
             self._kernel('prolong', x)(e, x, size=e.size)
             return x
-        xp = self.xp
-        fine = xp.zeros(x.shape, dtype=compute_type(x.dtype))
-        fine[(slice(None, None, 2),) * x.ndim] = e
+        fine = self.xp.zeros(x.shape, dtype=compute_type(x.dtype))
+        fine[(slice(self.start, None, 2),) * x.ndim] = e
         for axis in range(x.ndim):
-            fine = 0.5 * xp.roll(fine, 1, axis) + fine + 0.5 * xp.roll(fine, -1, axis)
+            fine = 0.5 * self.shift(fine, 1, axis) + fine + 0.5 * self.shift(fine, -1, axis)
         x[...] = x.astype(fine.dtype, copy=False) + fine
         return x
 
@@ -337,23 +374,33 @@ class _Ops:
 
 class GeometricMultigrid:
     r"""
-    Geometric multigrid for :math:`(I - s \Delta_h)\, x = b` on a periodic grid of :math:`N^d` points with side
-    length :math:`L`, with the second-order Laplacian :math:`\Delta_h`. See :mod:`pySDC.helpers.multigrid` for the
-    method, the formats and the speed.
+    Geometric multigrid for :math:`(I - s A_h)\, x = b` with :math:`A_h = \nu \Delta_h - c \cdot \nabla_h` on a grid
+    of :math:`N^d` points with side length :math:`L`, periodic or with zero Dirichlet values: :math:`\Delta_h` is the
+    second-order Laplacian and :math:`\nabla_h` the first-order upwind gradient. See :mod:`pySDC.helpers.multigrid`
+    for the method, the formats and the speed.
 
     Parameters
     ----------
     N : int
-        Points per direction. Halving it has to reach a grid of at most ``COARSEST`` points.
+        Points per direction. Periodic: :math:`N = m 2^k` with :math:`m^d` at most ``COARSEST``; zero Dirichlet: the
+        interior points, :math:`N = 2^k - 1` (or :math:`m 2^k - 1` with :math:`(m - 1)^d` at most ``COARSEST``).
     ndim : int
         Dimension: 1, 2 or 3.
     L : float
-        Side length of the periodic domain.
+        Side length of the domain.
     xp : module
         ``numpy`` or ``cupy``: where the arrays live.
     fma : bool
         On a GPU, let the compiler contract multiplications and additions into fused multiply-adds: faster where
         arithmetic limits the kernels, but no longer bit for bit what the array operations compute.
+    bc : str
+        ``'periodic'`` (grid spacing :math:`h = L / N`) or ``'dirichlet-zero'``: :math:`N` interior points of a
+        vertex-centered grid with :math:`h = L / (N + 1)` and zero values on the boundary.
+    nu : float
+        Diffusion coefficient :math:`\nu`, positive.
+    velocity : sequence of float or None
+        Constant velocity :math:`c`, one entry per dimension; None or zeros give pure diffusion. Each component is
+        upwinded on the side it comes from.
 
     Examples
     --------
@@ -361,31 +408,51 @@ class GeometricMultigrid:
     >>> mg = GeometricMultigrid(64, ndim=2)
     >>> b = np.random.default_rng(0).standard_normal((64, 64))
     >>> x, cycles = mg.solve(b, s=1e-2, rtol=1e-10, maxiter=50)
-    >>> bool(np.linalg.norm(b - (x - 1e-2 * mg.laplacian(x))) < 1e-10 * np.linalg.norm(b))
+    >>> bool(np.linalg.norm(b - (x - mg.apply(x, 1e-2))) < 1e-10 * np.linalg.norm(b))
+    True
+    >>> mg = GeometricMultigrid(63, ndim=2, bc='dirichlet-zero', nu=0.1, velocity=(1.0, -0.5))
+    >>> b = np.random.default_rng(0).standard_normal((63, 63))
+    >>> x, cycles = mg.solve(b, s=1e-1, rtol=1e-10, maxiter=50)
+    >>> bool(np.linalg.norm(b - (x - mg.apply(x, 1e-1))) < 1e-10 * np.linalg.norm(b))
     True
     """
 
-    def __init__(self, N, ndim=3, L=1.0, xp=np, fma=False):
+    def __init__(self, N, ndim=3, L=1.0, xp=np, fma=False, bc='periodic', nu=1.0, velocity=None):
         if ndim not in (1, 2, 3):
             raise ValueError(f'ndim has to be 1, 2 or 3, got {ndim}')
-        n = N
-        while n % 2 == 0 and n**ndim > COARSEST:
-            n //= 2
-        if n**ndim > COARSEST:
+        if bc not in ('periodic', 'dirichlet-zero'):
+            raise ValueError(f'bc has to be "periodic" or "dirichlet-zero", got {bc}')
+        if velocity is not None:
+            velocity = tuple(float(c) for c in velocity)
+            if len(velocity) != ndim:
+                raise ValueError(f'velocity needs one entry per dimension, {ndim}, got {len(velocity)}')
+            velocity = velocity if any(velocity) else None  # pure diffusion keeps the fused kernels
+        periodic = bc == 'periodic'
+        # halve the grid: n -> n / 2 on periodic grids, n -> (n - 1) / 2 interior points with Dirichlet values
+        self.sizes = [N]
+        while self.sizes[-1] ** ndim > COARSEST and self.sizes[-1] % 2 == (0 if periodic else 1):
+            self.sizes.append(self.sizes[-1] // 2)
+        if self.sizes[-1] ** ndim > COARSEST:
+            form = f'm 2^k with m^{ndim}' if periodic else f'2^k - 1, or m 2^k - 1 with (m - 1)^{ndim}'
             raise ValueError(
-                f'N = {N} does not coarsen to at most {COARSEST} points in {ndim}D: '
-                f'use N = m 2^k with m^{ndim} <= {COARSEST}'
+                f'N = {N} does not coarsen to at most {COARSEST} points in {ndim}D: use N = {form} <= {COARSEST}'
             )
-        self.N, self.ndim, self.L, self.xp, self.ops = N, ndim, L, xp, _Ops(xp, fma)
-        self.sizes = [N >> level for level in range((N // n).bit_length())]
+        self.N, self.ndim, self.L, self.xp, self.ops = N, ndim, L, xp, _Ops(xp, fma, periodic)
+        self.bc, self.nu, self.velocity = bc, nu, velocity
         self._coarse = {}
 
-    def _h2inv(self, n):
-        return float((n / self.L) ** 2)
+    def _scales(self, n, s):
+        r"""
+        For the grid of ``n`` points per direction: :math:`s \nu`, :math:`h^{-2}` and the signed
+        :math:`s c_a h^{-1}` (None without advection), which is how :class:`_Ops` takes the operator.
+        """
+        hinv = (n if self.ops.periodic else n + 1) / self.L
+        q = None if self.velocity is None else tuple(float(s * c * hinv) for c in self.velocity)
+        return s * self.nu, float(hinv**2), q
 
     def solve(self, b, s, rtol, maxiter):
         r"""
-        Solve :math:`(I - s \Delta_h)\, x = b` from a zero guess, in the format of ``b``.
+        Solve :math:`(I - s A_h)\, x = b` from a zero guess, in the format of ``b``.
 
         Stops when the 2-norm of the residual is below ``rtol`` times that of ``b``, when a V-cycle no longer halves
         it (the accuracy of the format), or after ``maxiter`` V-cycles.
@@ -395,7 +462,7 @@ class GeometricMultigrid:
         b : array
             Right-hand side, of shape ``(N,) * ndim`` and type float64, float32 or float16.
         s : float
-            Factor of the Laplacian, positive.
+            Factor of the operator, positive.
         rtol : float
             Relative tolerance for the residual.
         maxiter : int
@@ -417,7 +484,7 @@ class GeometricMultigrid:
         while cycles < maxiter:
             candidate = self._vcycle(0, x, b, s)
             cycles += 1
-            norm_r = self._norm(self.ops.residual(candidate, b, s, self._h2inv(self.N)))
+            norm_r = self._norm(self.ops.residual(candidate, b, *self._scales(self.N, s)))
             if norm_r >= previous:  # past the accuracy of the format: the cycle made it worse, keep what was there
                 break
             x = candidate
@@ -427,9 +494,10 @@ class GeometricMultigrid:
             previous = norm_r
         return (self.xp.zeros_like(b) if x is None else x), cycles
 
-    def laplacian(self, x, scale=1.0, out=None):
-        r""":math:`\text{scale}\cdot\Delta_h x` on the finest grid, in the type of ``x``, into ``out`` if given."""
-        return self.ops.stencil(0, x, None, scale * self._h2inv(self.N), out=out)
+    def apply(self, x, scale=1.0, out=None):
+        r""":math:`\text{scale}\cdot A_h x` on the finest grid, in the type of ``x``, into ``out`` if given."""
+        sn, h2inv, q = self._scales(self.N, scale)
+        return self.ops.stencil(0, x, None, sn * h2inv, out=out, q=q)
 
     def _norm(self, v):
         """The 2-norm; on a GPU by cuBLAS, in one pass, where cupy.linalg.norm reaches a third of the bandwidth."""
@@ -443,13 +511,13 @@ class GeometricMultigrid:
     def _vcycle(self, level, x, b, s):
         if level == len(self.sizes) - 1:
             return self._coarse_solve(b, s)
-        h2inv = self._h2inv(self.sizes[level])
-        x = self.ops.jacobi_from_zero(b, s, h2inv) if x is None else self.ops.jacobi(x, b, s, h2inv)
-        x = self.ops.jacobi(x, b, s, h2inv)
-        coarse = self.ops.restrict(self.ops.residual(x, b, s, h2inv))
+        scales = self._scales(self.sizes[level], s)
+        x = self.ops.jacobi_from_zero(b, *scales) if x is None else self.ops.jacobi(x, b, *scales)
+        x = self.ops.jacobi(x, b, *scales)
+        coarse = self.ops.restrict(self.ops.residual(x, b, *scales))
         x = self.ops.prolong_add(x, self._vcycle(level + 1, None, coarse, s))
         for _ in range(2):
-            x = self.ops.jacobi(x, b, s, h2inv)
+            x = self.ops.jacobi(x, b, *scales)
         return x
 
     def _coarse_solve(self, b, s):
@@ -459,9 +527,11 @@ class GeometricMultigrid:
         if key not in self._coarse:
             if len(self._coarse) >= 12:  # an adaptive step size keeps changing s
                 self._coarse.pop(next(iter(self._coarse)))
-            shape, h2inv = (n,) * self.ndim, self._h2inv(n)
-            ops = _Ops(np)
-            columns = [e - ops.stencil(0, e.reshape(shape), None, s * h2inv).reshape(-1) for e in np.eye(n**self.ndim)]
+            shape, (sn, h2inv, q) = (n,) * self.ndim, self._scales(n, s)
+            ops = _Ops(np, periodic=self.ops.periodic)
+            columns = [
+                e - ops.stencil(0, e.reshape(shape), None, sn * h2inv, q=q).reshape(-1) for e in np.eye(n**self.ndim)
+            ]
             self._coarse[key] = self.xp.asarray(np.linalg.inv(np.array(columns).T)).astype(ct)
         inverse = self._coarse[key]
         return (inverse @ b.reshape(-1).astype(ct, copy=False)).astype(b.dtype).reshape(b.shape)

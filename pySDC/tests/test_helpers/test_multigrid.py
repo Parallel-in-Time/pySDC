@@ -1,12 +1,45 @@
 """
-The geometric multigrid helper: convergence in 1D, 2D and 3D, the formats, the domain length, the guards, and on a
-GPU the fused 3D kernels against the array operations.
+The geometric multigrid helper: convergence in 1D, 2D and 3D, periodic and with zero Dirichlet values, with and
+without advection, the formats, the domain length, the guards, and on a GPU the fused 3D kernels against the array
+operations.
 """
 
 import numpy as np
 import pytest
 
 CASES = [(1, 4096), (2, 128), (3, 32)]  # coarsened three to four times each
+DIRICHLET_CASES = [(1, 4095), (2, 127), (3, 31)]  # the same, N + 1 = 2^k
+PECLET_CASES = [(1, 4095), (2, 63), (3, 15)]  # coarsest grid spacing 8, 2 and 2 times the finest
+DIRECTIONS = (1.0, -0.5, 0.25)  # velocity components relative to the largest, of either sign
+
+
+def _fd_operator(N, ndim, bc, nu=1.0, velocity=None):
+    r"""
+    :math:`\nu \Delta_h - c \cdot \nabla_h` assembled from pySDC's finite-difference matrices, independently of the
+    solver: the second-order Laplacian and, per direction, first-order upwind differences.
+    """
+    import scipy.sparse as sp
+
+    from pySDC.helpers.problem_helper import get_1d_grid, get_finite_difference_matrix
+
+    dx, _ = get_1d_grid(N, bc)
+
+    def matrix(derivative, order, stencil_type):
+        return get_finite_difference_matrix(derivative, order, stencil_type, dx=dx, size=N, dim=1, bc=bc)[0]
+
+    operator = 0
+    for axis in range(ndim):
+        one_d = nu * matrix(2, 2, 'center')
+        c = 0.0 if velocity is None else velocity[axis]
+        if c:  # pySDC's 'upwind' is the backward difference, for positive velocities
+            one_d = one_d - c * matrix(1, 1, 'upwind' if c > 0 else 'forward')
+        factors = [sp.eye(N)] * ndim
+        factors[axis] = one_d
+        term = factors[0]
+        for factor in factors[1:]:
+            term = sp.kron(term, factor)
+        operator = operator + term
+    return sp.csc_matrix(operator)
 
 
 def _residual(mg, x, b, s):
@@ -67,8 +100,8 @@ def test_hopeless_format_returns_no_worse_than_zero():
 
 
 @pytest.mark.base
-def test_domain_length_and_laplacian():
-    """The side length sets the grid spacing; ``laplacian`` is the operator the solve inverts."""
+def test_domain_length_and_operator():
+    """The side length sets the grid spacing; ``apply`` is the operator the solve inverts."""
     from pySDC.helpers.multigrid import GeometricMultigrid
 
     N, L = 64, 2 * np.pi
@@ -77,9 +110,106 @@ def test_domain_length_and_laplacian():
     u = np.sin(x)[:, None] * np.cos(2 * x)[None, :]
     h = L / N
     eigenvalue = -(2 - 2 * np.cos(h)) / h**2 - (2 - 2 * np.cos(2 * h)) / h**2  # of the discrete Laplacian, ~ -5
-    assert np.abs(mg.laplacian(u) - eigenvalue * u).max() < 1e-12
-    x_solved, _ = mg.solve(u - 0.1 * mg.laplacian(u), 0.1, rtol=1e-12, maxiter=50)
+    assert np.abs(mg.apply(u) - eigenvalue * u).max() < 1e-12
+    x_solved, _ = mg.solve(u - mg.apply(u, 0.1), 0.1, rtol=1e-12, maxiter=50)
     assert np.abs(x_solved - u).max() < 1e-11
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('ndim, N', DIRICHLET_CASES)
+@pytest.mark.parametrize('stiffness', [1e-2, 1e2, 1e5])
+def test_dirichlet_vcycles_converge(ndim, N, stiffness):
+    """With zero Dirichlet values, a V-cycle reduces the residual of pySDC's FD heat operator by at most 0.3."""
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    mg = GeometricMultigrid(N, ndim, bc='dirichlet-zero')
+    s = stiffness / (N + 1) ** 2  # s h^-2 = stiffness
+    b = np.random.default_rng(4).standard_normal((N,) * ndim)
+    x, cycles = mg.solve(b, s, rtol=1e-11, maxiter=50)
+    A = _fd_operator(N, ndim, 'dirichlet-zero')
+    assert np.linalg.norm(b.ravel() - (x.ravel() - s * (A @ x.ravel()))) < 1e-11 * np.linalg.norm(b)
+    assert cycles <= np.ceil(np.log(1e-11) / np.log(0.3)), f'{cycles} V-cycles'
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('bc, N', [('periodic', 16), ('dirichlet-zero', 15)])
+@pytest.mark.parametrize('ndim', [1, 2, 3])
+@pytest.mark.parametrize('advection', [False, True])
+def test_operator_is_pySDCs_FD_matrix(bc, N, ndim, advection):
+    """
+    The operator is that of pySDC's finite differences, upwinded by the sign of each velocity component, and the
+    solve agrees with a direct sparse solve of it.
+    """
+    from scipy.sparse import eye
+    from scipy.sparse.linalg import spsolve
+
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    nu, velocity = 0.1, (DIRECTIONS[:ndim] if advection else None)
+    mg = GeometricMultigrid(N, ndim, bc=bc, nu=nu, velocity=velocity)
+    A = _fd_operator(N, ndim, bc, nu, velocity)
+    x = np.random.default_rng(5).standard_normal((N,) * ndim)
+    assert np.abs(mg.apply(x).ravel() - A @ x.ravel()).max() < 1e-12 * np.abs(A @ x.ravel()).max()
+    s = 0.05
+    solved, _ = mg.solve(x, s, rtol=1e-13, maxiter=50)
+    exact = spsolve(eye(N**ndim, format='csc') - s * A, x.ravel())
+    assert np.abs(solved.ravel() - exact).max() < 1e-11 * np.abs(exact).max()
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('ndim, N', PECLET_CASES)
+@pytest.mark.parametrize('peclet', [0.5, 2])
+@pytest.mark.parametrize('stiffness', [1e-2, 1e2, 1e5])
+def test_advection_diffusion_converges(ndim, N, peclet, stiffness):
+    """At grid Peclet numbers |c| h / nu of 0.5 and 2 on the finest grid, a V-cycle still reduces the residual by 0.3."""
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    nu, h = 0.1, 1 / (N + 1)
+    velocity = [peclet * nu / h * d for d in DIRECTIONS[:ndim]]
+    mg = GeometricMultigrid(N, ndim, bc='dirichlet-zero', nu=nu, velocity=velocity)
+    s = stiffness * h**2 / nu
+    b = np.random.default_rng(6).standard_normal((N,) * ndim)
+    x, cycles = mg.solve(b, s, rtol=1e-11, maxiter=50)
+    A = _fd_operator(N, ndim, 'dirichlet-zero', nu, velocity)
+    assert np.linalg.norm(b.ravel() - (x.ravel() - s * (A @ x.ravel()))) < 1e-11 * np.linalg.norm(b)
+    assert cycles <= np.ceil(np.log(1e-11) / np.log(0.3)), f'{cycles} V-cycles'
+
+
+@pytest.mark.base
+def test_advection_beyond_the_peclet_limit_stops_early():
+    """
+    The documented limit: at a grid Peclet number of 16 on the coarsest grid (2 on the finest, three coarsenings), a
+    V-cycle reduces the residual by about 0.55, the stall rule takes that for the end of the format and stops, and the
+    result is not converged, but no worse than zero.
+    """
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    N, nu = 255, 1.0
+    mg = GeometricMultigrid(N, 2, bc='dirichlet-zero', nu=nu, velocity=(2.0 * (N + 1), 2.0 * (N + 1)))
+    s = 1e4 / (N + 1) ** 2
+    b = np.random.default_rng(7).standard_normal((N, N))
+    x, cycles = mg.solve(b, s, rtol=1e-10, maxiter=50)
+    residual = np.linalg.norm(b - (x - mg.apply(x, s))) / np.linalg.norm(b)
+    assert cycles < 10
+    assert 1e-4 < residual < 1
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('ndim, N', PECLET_CASES)
+@pytest.mark.parametrize('dtype, low, high', [(np.float32, 1e-9, 1e-5), (np.float16, 1e-5, 3e-3)])
+def test_formats_dirichlet_advection(ndim, N, dtype, low, high):
+    """With zero Dirichlet values and advection, float32 and float16 end at the accuracy of their format too."""
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    nu, h = 0.1, 1 / (N + 1)
+    mg = GeometricMultigrid(N, ndim, bc='dirichlet-zero', nu=nu, velocity=[0.5 * nu / h * d for d in DIRECTIONS[:ndim]])
+    s = 1e2 * h**2 / nu
+    b = np.random.default_rng(8).standard_normal((N,) * ndim)
+    exact, _ = mg.solve(b, s, rtol=1e-13, maxiter=50)
+    x, cycles = mg.solve(b.astype(dtype), s, rtol=1e-13, maxiter=50)
+    assert x.dtype == dtype
+    assert cycles < 50, 'the stall rule ends the solve at the accuracy of the format'
+    assert low <= np.abs(x - exact).max() / np.abs(exact).max() < high
 
 
 @pytest.mark.base
@@ -88,6 +218,13 @@ def test_guards():
 
     with pytest.raises(ValueError, match='coarsen'):
         GeometricMultigrid(22, 3)  # 11^3 > 1000 and 11 is odd
+    with pytest.raises(ValueError, match='coarsen'):
+        GeometricMultigrid(64, 3, bc='dirichlet-zero')  # Dirichlet grids have N = 2^k - 1 interior points
+    with pytest.raises(ValueError, match='bc'):
+        GeometricMultigrid(64, 2, bc='neumann')
+    with pytest.raises(ValueError, match='velocity'):
+        GeometricMultigrid(64, 2, velocity=(1.0, 0.0, 0.0))
+    assert GeometricMultigrid(64, 2, velocity=(0.0, 0.0)).velocity is None, 'zero velocity is pure diffusion'
     with pytest.raises(ValueError, match='ndim'):
         GeometricMultigrid(16, 4)
     with pytest.raises(ValueError, match='shape'):
@@ -147,3 +284,22 @@ def test_solve_on_GPU(ndim, N, fma):
     assert abs(cycles - cycles_cpu) <= 1
     # both within the tolerance, which bounds the error up to the condition number (about 1200 here)
     assert float(cp.abs(x - cp.asarray(x_cpu)).max()) < 1e-7 * float(np.abs(x_cpu).max())
+
+
+@pytest.mark.cupy
+@pytest.mark.parametrize('ndim, N', PECLET_CASES)
+def test_dirichlet_advection_on_GPU(ndim, N):
+    """With zero Dirichlet values and advection, the array operations on a GPU solve as those on the CPU."""
+    import cupy as cp
+
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    nu, h = 0.1, 1 / (N + 1)
+    params = {'bc': 'dirichlet-zero', 'nu': nu, 'velocity': [0.5 * nu / h * d for d in DIRECTIONS[:ndim]]}
+    s = 1e2 * h**2 / nu
+    b = np.random.default_rng(9).standard_normal((N,) * ndim)
+    x_cpu, cycles_cpu = GeometricMultigrid(N, ndim, **params).solve(b, s, rtol=1e-11, maxiter=50)
+    mg = GeometricMultigrid(N, ndim, xp=cp, **params)
+    x, cycles = mg.solve(cp.asarray(b), s, rtol=1e-11, maxiter=50)
+    assert abs(cycles - cycles_cpu) <= 1
+    assert float(cp.abs(x - cp.asarray(x_cpu)).max()) < 1e-8 * float(np.abs(x_cpu).max())
