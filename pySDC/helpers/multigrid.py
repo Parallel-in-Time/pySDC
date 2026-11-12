@@ -21,7 +21,7 @@ dense inverse on the coarsest grid, which has at most ``COARSEST`` points. A per
 :math:`N / 2` points per direction, a Dirichlet grid from :math:`N` to :math:`(N - 1) / 2` interior points, with zero
 boundary values in the transfers. The exact coarse solve is needed: the smooth modes of :math:`I - s \Delta_h` are
 damped only by the identity part, which Jacobi does not do. A solve starts from zero and stops when the 2-norm of the
-residual is below ``rtol`` times that of ``b``, or when a V-cycle no longer halves it, which is where the
+residual is below ``rtol`` times that of ``b``, or when a V-cycle no longer halves it (``stall``), which is where the
 floating-point format of ``b`` ends (about :math:`\kappa u`, with :math:`\kappa` the condition number and :math:`u`
 the unit roundoff), or after ``maxiter`` cycles. A cycle that does not reduce the residual at all is discarded, so
 that a format too coarse for the system returns its best iterate, zero in the worst case, rather than one that is
@@ -33,8 +33,10 @@ largest spacing: measured in 1D to 3D, periodic and Dirichlet, with stiffness :m
 (spacing :math:`H`) is at most about 2, which is :math:`|c_a| h / \nu` up to :math:`2 h / H` on the finest. Beyond,
 in 2D and 3D and for stiff systems, a V-cycle reduces the residual by only 0.5 to 0.85 (the coarse grids, upwinded
 on their own spacing, approximate the smooth components along the flow badly), the stall rule takes that for the end
-of the format, and the solve stops after a few cycles with a residual of :math:`10^{-6}` to :math:`10^{-2}`, without
-saying so: check the residual there. 1D solves converge at every Peclet number measured (up to 32 on the coarsest
+of the format, and the solve stops after a few cycles with a residual of :math:`10^{-6}` to :math:`10^{-2}`. The
+residual is in ``relative_residual`` after every solve; raising ``stall`` (to 0.8 or 0.9) lets such solves go on to
+``rtol``, in 35 V-cycles at a coarsest-grid Peclet number of 16 in 2D, at the price of about one more cycle at the
+end of a low format. 1D solves converge at every Peclet number measured (up to 32 on the coarsest
 grid), and so do many 2D and 3D ones with fewer levels.
 
 **Formats.** A solve computes in the floating-point type of its right-hand side: ``float64`` and ``float32`` arrays
@@ -56,7 +58,7 @@ import numpy as np
 
 OMEGA = 0.8  # Jacobi weight
 COARSEST = 1000  # grids with at most this many points are solved exactly
-STALL = 0.5  # a V-cycle that reduces the residual by less than this is at the accuracy of the format
+STALL = 0.5  # default: a V-cycle that reduces the residual by less than this is at the accuracy of the format
 
 
 def compute_type(dtype):
@@ -401,6 +403,16 @@ class GeometricMultigrid:
     velocity : sequence of float or None
         Constant velocity :math:`c`, one entry per dimension; None or zeros give pure diffusion. Each component is
         upwinded on the side it comes from.
+    stall : float
+        The stall rule: a V-cycle that reduces the residual by a factor larger than this ends the solve, taken for
+        the accuracy of the format. Raise it (to 0.9, say) where V-cycles contract slowly, as on advection-dominated
+        coarse grids, so that they go on to ``rtol``; the price is more cycles spent at the accuracy of a low format
+        (fp16, fp32) before the solve notices it.
+
+    Attributes
+    ----------
+    relative_residual : float
+        The 2-norm of the residual of the iterate the last :meth:`solve` returned, relative to that of ``b``.
 
     Examples
     --------
@@ -417,7 +429,7 @@ class GeometricMultigrid:
     True
     """
 
-    def __init__(self, N, ndim=3, L=1.0, xp=np, fma=False, bc='periodic', nu=1.0, velocity=None):
+    def __init__(self, N, ndim=3, L=1.0, xp=np, fma=False, bc='periodic', nu=1.0, velocity=None, stall=STALL):
         if ndim not in (1, 2, 3):
             raise ValueError(f'ndim has to be 1, 2 or 3, got {ndim}')
         if bc not in ('periodic', 'dirichlet-zero'):
@@ -438,7 +450,8 @@ class GeometricMultigrid:
                 f'N = {N} does not coarsen to at most {COARSEST} points in {ndim}D: use N = {form} <= {COARSEST}'
             )
         self.N, self.ndim, self.L, self.xp, self.ops = N, ndim, L, xp, _Ops(xp, fma, periodic)
-        self.bc, self.nu, self.velocity = bc, nu, velocity
+        self.bc, self.nu, self.velocity, self.stall = bc, nu, velocity, stall
+        self.relative_residual = None
         self._coarse = {}
 
     def _scales(self, n, s):
@@ -454,8 +467,11 @@ class GeometricMultigrid:
         r"""
         Solve :math:`(I - s A_h)\, x = b` from a zero guess, in the format of ``b``.
 
-        Stops when the 2-norm of the residual is below ``rtol`` times that of ``b``, when a V-cycle no longer halves
-        it (the accuracy of the format), or after ``maxiter`` V-cycles.
+        Stops when the 2-norm of the residual is below ``rtol`` times that of ``b``, when a V-cycle reduces it by
+        less than ``stall`` (the accuracy of the format), or after ``maxiter`` V-cycles. A solve that stops on the
+        stall rule may not have reached ``rtol``: where V-cycles contract slowly, as beyond the Peclet limit (see
+        :mod:`pySDC.helpers.multigrid`), the stall rule mistakes that for the end of the format. The relative
+        residual of the returned iterate is in :attr:`relative_residual` after every solve.
 
         Parameters
         ----------
@@ -479,6 +495,7 @@ class GeometricMultigrid:
             raise ValueError(f'expected a right-hand side of shape {(self.N,) * self.ndim}, got {b.shape}')
         norm_b = self._norm(b)
         if norm_b == 0:
+            self.relative_residual = 0.0
             return self.xp.zeros_like(b), 0
         x, cycles, previous = None, 0, norm_b  # x = None is zero, which the first smoothing step knows without reading
         while cycles < maxiter:
@@ -487,15 +504,22 @@ class GeometricMultigrid:
             norm_r = self._norm(self.ops.residual(candidate, b, *self._scales(self.N, s)))
             if norm_r >= previous:  # past the accuracy of the format: the cycle made it worse, keep what was there
                 break
-            x = candidate
+            x, stalled, previous = candidate, norm_r > self.stall * previous, norm_r
             # converged, or at the accuracy the format allows: a V-cycle otherwise reduces the residual by 0.1 to 0.3
-            if norm_r <= rtol * norm_b or norm_r > STALL * previous:
+            if norm_r <= rtol * norm_b or stalled:
                 break
-            previous = norm_r
+        self.relative_residual = previous / norm_b
         return (self.xp.zeros_like(b) if x is None else x), cycles
 
+    def laplacian(self, x, scale=1.0, out=None):
+        r"""
+        :math:`\text{scale}\cdot\Delta_h x` on the finest grid, without :math:`\nu` and the advection, in the type
+        of ``x``, into ``out`` if given; on a GPU on periodic 3D grids by the fused kernel.
+        """
+        return self.ops.stencil(0, x, None, scale * self._scales(self.N, 1.0)[1], out=out)
+
     def apply(self, x, scale=1.0, out=None):
-        r""":math:`\text{scale}\cdot A_h x` on the finest grid, in the type of ``x``, into ``out`` if given."""
+        r""":math:`\text{scale}\cdot A_h x` on the finest grid, the operator the solve inverts, in the type of ``x``."""
         sn, h2inv, q = self._scales(self.N, scale)
         return self.ops.stencil(0, x, None, sn * h2inv, out=out, q=q)
 

@@ -100,8 +100,8 @@ def test_hopeless_format_returns_no_worse_than_zero():
 
 
 @pytest.mark.base
-def test_domain_length_and_operator():
-    """The side length sets the grid spacing; ``apply`` is the operator the solve inverts."""
+def test_domain_length_and_laplacian():
+    """The side length sets the grid spacing; ``laplacian`` is the operator the solve inverts."""
     from pySDC.helpers.multigrid import GeometricMultigrid
 
     N, L = 64, 2 * np.pi
@@ -110,9 +110,28 @@ def test_domain_length_and_operator():
     u = np.sin(x)[:, None] * np.cos(2 * x)[None, :]
     h = L / N
     eigenvalue = -(2 - 2 * np.cos(h)) / h**2 - (2 - 2 * np.cos(2 * h)) / h**2  # of the discrete Laplacian, ~ -5
-    assert np.abs(mg.apply(u) - eigenvalue * u).max() < 1e-12
-    x_solved, _ = mg.solve(u - mg.apply(u, 0.1), 0.1, rtol=1e-12, maxiter=50)
+    assert np.abs(mg.laplacian(u) - eigenvalue * u).max() < 1e-12
+    x_solved, _ = mg.solve(u - 0.1 * mg.laplacian(u), 0.1, rtol=1e-12, maxiter=50)
     assert np.abs(x_solved - u).max() < 1e-11
+
+
+@pytest.mark.base
+def test_apply_and_laplacian():
+    """
+    ``apply`` is the whole operator, scaled: nu times the Laplacian less the upwind advection; ``laplacian`` stays the
+    plain Laplacian, whatever nu and the velocity.
+    """
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    N, nu, velocity = 32, 0.1, (3.0, -2.0)
+    diffusion = GeometricMultigrid(N, 2)
+    mg = GeometricMultigrid(N, 2, nu=nu, velocity=velocity)
+    x = np.random.default_rng(10).standard_normal((N, N))
+    assert np.array_equal(mg.laplacian(x, 0.5), diffusion.laplacian(x, 0.5))
+    upwind = velocity[0] * (x - np.roll(x, 1, 0)) * N + velocity[1] * (np.roll(x, -1, 1) - x) * N
+    assert np.abs(mg.apply(x, 0.5) - 0.5 * (nu * mg.laplacian(x) - upwind)).max() < 1e-12 * np.abs(upwind).max()
+    out = np.empty_like(x)
+    assert mg.laplacian(x, 0.5, out=out) is out
 
 
 @pytest.mark.base
@@ -180,18 +199,39 @@ def test_advection_beyond_the_peclet_limit_stops_early():
     """
     The documented limit: at a grid Peclet number of 16 on the coarsest grid (2 on the finest, three coarsenings), a
     V-cycle reduces the residual by about 0.55, the stall rule takes that for the end of the format and stops, and the
-    result is not converged, but no worse than zero.
+    result is not converged, but no worse than zero, which ``relative_residual`` tells. A higher ``stall`` goes on to
+    ``rtol``.
     """
     from pySDC.helpers.multigrid import GeometricMultigrid
 
-    N, nu = 255, 1.0
-    mg = GeometricMultigrid(N, 2, bc='dirichlet-zero', nu=nu, velocity=(2.0 * (N + 1), 2.0 * (N + 1)))
+    N, nu, rtol = 255, 1.0, 1e-10
     s = 1e4 / (N + 1) ** 2
     b = np.random.default_rng(7).standard_normal((N, N))
-    x, cycles = mg.solve(b, s, rtol=1e-10, maxiter=50)
-    residual = np.linalg.norm(b - (x - mg.apply(x, s))) / np.linalg.norm(b)
-    assert cycles < 10
-    assert 1e-4 < residual < 1
+    for stall in (0.5, 0.8):
+        mg = GeometricMultigrid(N, 2, bc='dirichlet-zero', nu=nu, velocity=(2.0 * (N + 1),) * 2, stall=stall)
+        x, cycles = mg.solve(b, s, rtol=rtol, maxiter=50)
+        residual = np.linalg.norm(b - (x - mg.apply(x, s))) / np.linalg.norm(b)
+        assert mg.relative_residual == pytest.approx(residual, rel=1e-6)
+        if stall == 0.5:
+            assert cycles < 10
+            assert 1e-4 < mg.relative_residual < 1
+        else:
+            assert cycles < 50
+            assert mg.relative_residual < rtol
+
+
+@pytest.mark.base
+def test_relative_residual_is_set_by_every_solve():
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    mg = GeometricMultigrid(64, 1)
+    b = np.random.default_rng(11).standard_normal(64)
+    mg.solve(b, 1e-3, rtol=1e-10, maxiter=50)
+    assert 0 < mg.relative_residual < 1e-10
+    mg.solve(b, 1e-3, rtol=1e-10, maxiter=0)
+    assert mg.relative_residual == 1.0, 'no cycle: the residual of zero'
+    mg.solve(np.zeros(64), 1e-3, rtol=1e-10, maxiter=50)
+    assert mg.relative_residual == 0.0
 
 
 @pytest.mark.base
