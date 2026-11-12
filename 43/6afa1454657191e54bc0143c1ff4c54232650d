@@ -1,0 +1,24 @@
+.github/workflows/ci_pipeline.yml
+  s_234ff217a70910::t_a4ad723c57c020 394-396
+  s_234ff217a70910::t_8ba79e8d9e911a 358-364,366-393,397-420
+  s_234ff217a70910::t_04b9e610c54761 365
+etc/environment-firedrake.yml
+  s_234ff217a70910::t_04b9e610c54761 5-7,12-15
+  s_234ff217a70910::t_e5eab953f87dbc 1-4,8-11,16-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "436afa1454657191e54bc0143c1ff4c54232650d",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
