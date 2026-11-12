@@ -443,3 +443,35 @@ def test_restarts_in_a_row_nonMPI():
 
     with pytest.raises(ConvergenceError):
         run_problem(restarts=[1.0, 2.0, 2.0, 2.0], dt=1.0, n_steps=6, num_procs=3, max_restarts=2)
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(2)
+def test_nonblocking_send_keeps_its_buffer():
+    """
+    `Send` used to drop the request of a non-blocking send, and with it the only reference to the temporary buffer.
+    MPI could then read the buffer after it was freed: ParaStationMPI delivered garbage restart flags, one step crashed
+    with too many restarts nobody asked for, and the other hung. OpenMPI copies small messages at once and hid it.
+    """
+    import gc
+    import weakref
+    import numpy as np
+    from mpi4py import MPI
+    from pySDC.core.convergence_controller import ConvergenceController
+
+    comm = MPI.COMM_WORLD
+    C = ConvergenceController(controller=None, params={'useMPI': True, 'control_order': 0}, description={})
+    sent = np.array([False, True, False])
+
+    if comm.rank == 0:
+        buff = sent.copy()
+        alive = weakref.ref(buff)
+        C.Send(comm, dest=1, buffer=[buff, C.MPI_BOOL])
+        del buff
+        gc.collect()
+        assert alive() is not None, 'The buffer of a pending send was freed'
+        MPI.Request.Waitall(C.pending_sends)
+    else:
+        buff = np.empty(3, dtype=bool)
+        C.Recv(comm, source=0, buffer=[buff, C.MPI_BOOL])
+        assert np.array_equal(buff, sent), f'Received {buff}, expected {sent}'
