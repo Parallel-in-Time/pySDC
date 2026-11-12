@@ -1,0 +1,27 @@
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_ecfa0bd3d07693 39-42,56-57
+pySDC/projects/DeltaSDC/krylov.py
+  s_3cfbaa2fb0772b::t_bb2c9545a75876 16-52,70-72,82-93,106-110,114-117,122-137,165-169,171
+pySDC/projects/DeltaSDC/multigrid.py
+  s_3cfbaa2fb0772b::t_dcb81732ea79ce 1-103
+pySDC/projects/DeltaSDC/tests/test_multigrid.py
+  s_3cfbaa2fb0772b::t_01372e87c0b63b 1-23
+pySDC/tests/test_projects/test_DeltaSDC/test_gpu.py
+  s_3cfbaa2fb0772b::t_c75589163b1abe 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b9668fa1f32824e1c6378810978ae4a46d5891ba",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
