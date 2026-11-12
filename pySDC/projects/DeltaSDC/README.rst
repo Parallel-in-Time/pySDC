@@ -36,6 +36,10 @@ Organisation of the project
 - ``inexact.py`` turns any problem class into one whose solves deliver only a given relative accuracy,
   or round their result to fp32 or fp16.
 - ``genuine.py`` provides an LU decomposition which computes in fp32 or fp16 arithmetic.
+- ``krylov.py`` provides conjugate gradients in fp64, fp32 or fp16, on a CPU or a GPU (there with fused
+  kernels), and the periodic heat equation with CG node solves.
+- ``multigrid.py`` provides the 3D periodic heat equation with geometric multigrid node solves
+  (``pySDC.helpers.multigrid``) in fp64, fp32 or fp16, on a CPU or a GPU.
 - ``precision_theory.py`` predicts how many additional iterations a less accurate solve costs.
 - ``eta_spec.py`` collects the test cases and measures how accurate a solve has to be.
 - ``work_precision.py`` computes the work needed to reach a given accuracy.
@@ -48,6 +52,8 @@ All tests are in ``tests`` and run with
 .. code-block:: bash
 
     pytest pySDC/projects/DeltaSDC/tests
+
+The GPU tests are in ``pySDC/tests/test_projects/test_DeltaSDC`` and run with the other GPU tests of pySDC.
 
 The results of an earlier, broader study with emulated low precision on the coarse levels of MLSDC,
 storage precision raised during the iteration, ParaDiag and runs on GPUs are kept in the git tag
