@@ -436,6 +436,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.firedrake_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">firedrake_mesh</span><span class="p">,</span> <span class="n">IMEX_firedrake_mesh</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
 
@@ -639,7 +640,7 @@
 
 <div class="viewcode-block" id="Heat1DForcedFiredrake.x">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.x">[docs]</a>
-    <span class="nd">@fd</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">cached_property</span>
+    <span class="nd">@cached_property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Spatial coordinate of the mesh, cached after the first access.</span>

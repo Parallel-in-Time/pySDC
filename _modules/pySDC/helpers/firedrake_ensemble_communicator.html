@@ -437,6 +437,14 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_function</span><span class="p">(</span><span class="n">buf</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    The Firedrake function behind `buf`. `Ensemble` passes anything that is not a `Function` on to mpi4py's pickling</span>
+<span class="sd">    methods, so pySDC's `firedrake_mesh` must be unwrapped first.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s1">'functionspace'</span><span class="p">,</span> <span class="n">buf</span><span class="p">)</span>
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">_Requests</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    The requests Firedrake returns for sending or receiving a function, one per subfunction, to be waited on together</span>
@@ -518,7 +526,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">ensemble_comm</span><span class="o">.</span><span class="n">Reduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">op</span> <span class="o">==</span> <span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">_function</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">),</span> <span class="n">_function</span><span class="p">(</span><span class="n">recvbuf</span><span class="p">),</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FiredrakeEnsembleCommunicator.Allreduce">
@@ -532,7 +540,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">ensemble_comm</span><span class="o">.</span><span class="n">Allreduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">op</span> <span class="o">==</span> <span class="n">MPI</span><span class="o">.</span><span class="n">SUM</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">,</span> <span class="n">recvbuf</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="n">_function</span><span class="p">(</span><span class="n">sendbuf</span><span class="p">),</span> <span class="n">_function</span><span class="p">(</span><span class="n">recvbuf</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="FiredrakeEnsembleCommunicator.Bcast">
@@ -542,7 +550,7 @@
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">ensemble_comm</span><span class="o">.</span><span class="n">Bcast</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">_function</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FiredrakeEnsembleCommunicator.Irecv">
@@ -554,7 +562,7 @@
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">ensemble_comm</span><span class="o">.</span><span class="n">Irecv</span><span class="p">(</span><span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_Requests</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">irecv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">_Requests</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">irecv</span><span class="p">(</span><span class="n">_function</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">source</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="FiredrakeEnsembleCommunicator.Isend">
@@ -566,7 +574,7 @@
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">ensemble_comm</span><span class="o">.</span><span class="n">Isend</span><span class="p">(</span><span class="n">buf</span><span class="o">=</span><span class="n">buf</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_Requests</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">isend</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">_Requests</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">isend</span><span class="p">(</span><span class="n">_function</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">dest</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="FiredrakeEnsembleCommunicator.Free">
