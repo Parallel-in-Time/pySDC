@@ -1,0 +1,86 @@
+docs/source/conf.py
+  s_3cfbaa2fb0772b::t_17d6793cb35b0e 639-655,657
+  s_3cfbaa2fb0772b::t_f61f7a70d5cb80 85-87
+  s_3cfbaa2fb0772b::t_de01b1144672f7 67-68,74,84
+pySDC/projects/DeltaSDC/results/nonlinear_numbers.json
+  s_3cfbaa2fb0772b::t_f6abbff2143beb 3
+pySDC/projects/DeltaSDC/references.bib
+  s_3cfbaa2fb0772b::t_f61f7a70d5cb80 190-365
+pySDC/projects/DeltaSDC/reproduce/nonlinear.py
+  s_3cfbaa2fb0772b::t_f6abbff2143beb 145-149
+pySDC/projects/DeltaSDC/publication.md
+  s_3cfbaa2fb0772b::t_6580dd5aec8e2a 2099-2101,2106-2111,2119-2128,2133-2134
+  s_3cfbaa2fb0772b::t_b447002826df6f 257-264
+  s_3cfbaa2fb0772b::t_064dde0736d8dc 24-33
+  s_3cfbaa2fb0772b::t_9eb140c0ae41d5 1726-1730,1814-1817,1819,1847-1857,1868-1869,1887-1904,1909-1910,1914-1915
+  s_3cfbaa2fb0772b::t_6bffc41cf1fb89 1239,1287-1289
+  s_3cfbaa2fb0772b::t_c56d731b44c71d 1486,1489,1660
+  s_3cfbaa2fb0772b::t_cd272b33f71796 1171-1173,1193,1200-1204,1210-1212,1259
+  s_3cfbaa2fb0772b::t_95a39866cfae42 1051-1055
+  s_3cfbaa2fb0772b::t_d82d1b1599d336 492-494
+  s_3cfbaa2fb0772b::t_3d60a945619445 90-91
+  s_3cfbaa2fb0772b::t_53fa73708663e3 85-89,92-95
+  s_3cfbaa2fb0772b::t_fb6ecb88bcf60f 191-192
+  s_3cfbaa2fb0772b::t_43f5b66207c3c1 567-573
+  s_3cfbaa2fb0772b::t_e2ddfe362db280 574,1296,1312-1313,1696
+  s_3cfbaa2fb0772b::t_982923ce2887b2 1487-1488
+  s_3cfbaa2fb0772b::t_09ddee5b06955b 1818,1927,1947-1952,1962-1970,1978-1985,2000-2003,2009-2010
+  s_3cfbaa2fb0772b::t_6f2d4be8be696a 696-698
+  s_3cfbaa2fb0772b::t_4658f573c08eac 2035-2046,2050-2058,2072-2080
+  s_3cfbaa2fb0772b::t_90e15d1f8711a5 880-881,887
+  s_3cfbaa2fb0772b::t_7114a0b48c379b 464,469-473,477-481
+  s_3cfbaa2fb0772b::t_ee22cea304ca69 593-594
+  s_3cfbaa2fb0772b::t_157d8404c523e6 684-686,688-695
+  s_3cfbaa2fb0772b::t_ee1feedfa3dc4d 657-658
+  s_3cfbaa2fb0772b::t_b29676e2dfce14 186-190,193-196
+  s_3cfbaa2fb0772b::t_4677d017f9e11f 108-110
+  s_3cfbaa2fb0772b::t_ae78b187caa30f 287-290
+  s_3cfbaa2fb0772b::t_84ec0bef17fe36 575-576
+  s_3cfbaa2fb0772b::t_ab0bdf85b2ed62 1170,1190,1196,1205,1267,1343-1344
+  s_3cfbaa2fb0772b::t_b91cc80c2b0b6b 124-133
+  s_3cfbaa2fb0772b::t_8d72d0d653af29 246-248
+  s_3cfbaa2fb0772b::t_8488e7d3c12945 1080-1083
+  s_3cfbaa2fb0772b::t_e197cdd1b8b4d6 221-222
+  s_3cfbaa2fb0772b::t_e5227b1bf73f04 847-879,882-886,888-931,933,936-940,945-949,957
+  s_3cfbaa2fb0772b::t_11ea0c26e1f06b 956
+  s_3cfbaa2fb0772b::t_b4c1a6196956f4 1515-1519,1559,1581,1623-1628
+  s_3cfbaa2fb0772b::t_769da4c32e1390 749,1016,1086,1138,1543,1632
+  s_3cfbaa2fb0772b::t_f78eb041c64dd6 331,336-341,343-348,350-360,363,368,371-375,377-383,2172
+  s_3cfbaa2fb0772b::t_aacd4d28d288ca 1788-1791
+  s_3cfbaa2fb0772b::t_3f57da9de6ca4a 633-656,659-664
+  s_3cfbaa2fb0772b::t_7055929f51853e 2061,2145-2146,2149-2150,2160-2163,2167
+  s_3cfbaa2fb0772b::t_787d0c924775d2 955,1695
+  s_3cfbaa2fb0772b::t_95aa67693da6a2 1359-1360,1390-1392,1405-1417
+  s_3cfbaa2fb0772b::t_65cd6c21c9abec 34-35,41,2168-2171,2173
+pySDC/projects/DeltaSDC/reproduce/worst_case_bound.py
+  s_3cfbaa2fb0772b::t_729119a0ff48fa 187-283,285,287-300,302-346,349-381,470,473
+  s_3cfbaa2fb0772b::t_f6abbff2143beb 183-185
+  s_3cfbaa2fb0772b::t_51e114dde75bb4 284,286
+  s_3cfbaa2fb0772b::t_491948dd01ead3 347-348
+  s_3cfbaa2fb0772b::t_d48e44c7b4741d 42,186,301,414,447-448,459-469,471-472
+pySDC/projects/DeltaSDC/reproduce/sdc_runs.py
+  s_3cfbaa2fb0772b::t_6e36972277fa66 215-244,330-339,466-468
+  s_3cfbaa2fb0772b::t_f6abbff2143beb 32-33
+  s_3cfbaa2fb0772b::t_21ed88d53ec2e3 214
+pySDC/projects/DeltaSDC/results/sdc_runs_numbers.json
+  s_3cfbaa2fb0772b::t_6e36972277fa66 112-115
+pySDC/projects/DeltaSDC/results/worst_case_bound_numbers.json
+  s_3cfbaa2fb0772b::t_4307c46a99e9fe 83
+  s_3cfbaa2fb0772b::t_bd2ed0317c878c 56-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "66c39356f55fed52c1598cba15504145e77f6bf4",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
