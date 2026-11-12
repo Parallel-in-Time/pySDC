@@ -363,7 +363,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # must match the petsc4py pin in etc/environment-firedrake.yml
-      FIREDRAKE_VERSION: '2025.10.3'
+      FIREDRAKE_VERSION: '2026.10.0'
       # PyOP2 picks the flags for its run-time kernel builds from the first word of `cc --version`,
       # and conda-forge's gcc calls itself `x86_64-conda-linux-gnu-cc`, which it does not know. It
       # then compiles with no flags at all, i.e. links an executable, and every kernel fails.
@@ -381,7 +381,7 @@ jobs:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
           # the same commit as user_firedrake_tests
-          ref: f11fba9ee858aa84281baf41baa09704431ac0ff
+          ref: b81bc873b0a21a88aa8455e43f53cc2c9c3e3c1c
       - name: Install Conda environment with Micromamba
         uses: mamba-org/setup-micromamba@v3
         with:
@@ -397,9 +397,8 @@ jobs:
           # itself must build without isolation, or pip builds a second petsc4py for it.
           pip install libsupermesh firedrake-rtree petsctools
           pip install --no-build-isolation --no-deps "firedrake==$FIREDRAKE_VERSION"
-          # Its dependencies are lower bounds only, and later releases break this Firedrake: UFL
-          # 2025.3 made topological_dimension a property. Bump these with FIREDRAKE_VERSION.
-          pip install "firedrake==$FIREDRAKE_VERSION" "fenics-ufl<2025.3" "firedrake-fiat<2026" "pyadjoint-ad<2026"
+          # then its Python dependencies, which the step above skipped
+          pip install "firedrake==$FIREDRAKE_VERSION"
       - name: Install pySDC and gusto
         run: |
           pip install --no-deps -e .
