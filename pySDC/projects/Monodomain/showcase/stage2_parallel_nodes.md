@@ -1,7 +1,9 @@
 # Stage 2: exponential SDC with the nodes in parallel
 
-**Verdict: on counted work, node-parallel ESDC beats second-order Rush-Larsen at practical accuracy. One GPU cannot
-deliver that gain for realistic tissue sizes.**
+**Verdict: on counted work, node-parallel ESDC beats second-order Rush-Larsen at practical accuracy. On real
+hardware it does not: one GPU cannot deliver the gain for realistic tissue sizes, and on 4 CPU cores of JUSUF it is
+only as fast as RL2 on one, because ESDC's own quadrature costs more than the ionic model the counting assumed
+dominant.**
 
 - **Counted on the critical path** (1D cable), node-parallel ESDC is cheaper than RL2 at every accuracy measured. At
   0.4 ms of activation-time error it is 1.7x cheaper, at 0.1 ms 3.5x, at 0.01 ms 14x. The crossover of stage 1
@@ -103,6 +105,38 @@ The cable result holds in 2D:
 With dt = 0.1 and the same restol, the error is larger than with dt = 0.2. The relative residual tolerance, not the
 step, limits that run. The serial ESDC runs were dropped from the 2D check: they took several hours each on this
 machine, and the cable already gives the serial comparison.
+
+## Real multi-device run on JUSUF
+
+`sweeper_classes/exponential_runge_kutta/imexexp_parallel_MPI.py` puts one collocation node on each MPI rank. The
+integral to node m is reduced onto rank m, and the integral computed for the residual check is reused by the next
+sweep. Its final state agrees with the same sweep on one rank to 1e-12. `run_scripts/mpi_timing.py` times the runs.
+
+One JUSUF CPU node (job 906602, 7 minutes, about 15 core-hours at full-node billing), one core per rank, short
+windows. RL2 at dt = 0.0125 and node-parallel ESDC (M = 4, dt = 0.1, restol 1e-5) reach about the same activation
+error, about 0.12 ms, in the 2D check above:
+
+| case | RL2, 1 core | ESDC serial, 1 core | ESDC parallel, 1 core | ESDC parallel, 4 cores | speedup 1 -> 4 cores | 4-core ESDC vs RL2 |
+|---|---|---|---|---|---|---|
+| 128², 10 ms | 33.3 s | 56.8 s | 61.1 s | 31.5 s | 1.94 | 1.06x |
+| 256², 3 ms | 51.2 s | -- | 101.3 s | 45.5 s | 2.23 | 1.13x |
+
+**On real hardware, node-parallel ESDC on 4 cores is only as fast as RL2 on 1 core.** The counted 3x does not
+materialize, for two reasons:
+
+- **ESDC's work is not dominated by the ionic model.** A profile of the node-parallel sweep on 128² (3 ms window)
+  attributes 54% of the time to ESDC's collocation integral (`integrate`), 15% to the phi functions set up once per
+  step, and only 31% to ionic-model evaluations. The counting model of stages 1 and 2 weighted only ionic
+  evaluations, solves and field exponentials, so it missed most of ESDC's cost.
+- **Parallel efficiency is 49-56%.** Every rank repeats the per-step phi setup, and the integral is reduced once per
+  sweep.
+
+How much of the overhead is implementation: a vectorized integral (stacked node arrays, `einsum`) is 2.5x faster than
+the current loops over nodes and indices, and agrees to 2e-16. Even then the integral costs about two ionic
+evaluations per sweep for all nodes on 128². Its exponential part alone streams M² x 12 per-cell weights per sweep and
+is limited by memory bandwidth, about 0.8 ionic evaluations. That overhead is inherent to ESDC with per-cell rates;
+Rush-Larsen has none. Rough estimate with that overhead removed as far as it can be: about 2x over RL2 on 4 cores for
+128² tissue, i.e. half the cores' worth. Not measured.
 
 ## Assessment
 
