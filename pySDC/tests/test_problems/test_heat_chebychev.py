@@ -64,7 +64,7 @@ def heat2d_params():
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('a, b, c, fx, fy, base_x, base_y', heat2d_params())
+@pytest.mark.parametrize('a, b, c, fx, fy, base_x, base_y', list(heat2d_params()))
 def test_heat2d_chebychev(a, b, c, fx, fy, base_x, base_y, nx=2**5 + 1, ny=2**5 + 1):
     import numpy as np
 
