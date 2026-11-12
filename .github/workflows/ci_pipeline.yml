@@ -363,6 +363,11 @@ jobs:
     env:
       # must match the petsc4py pin in etc/environment-firedrake.yml
       FIREDRAKE_VERSION: '2025.10.3'
+      # PyOP2 picks the flags for its run-time kernel builds from the first word of `cc --version`,
+      # and conda-forge's gcc calls itself `x86_64-conda-linux-gnu-cc`, which it does not know. It
+      # then compiles with no flags at all, i.e. links an executable, and every kernel fails.
+      PYOP2_CFLAGS: '-fPIC -std=gnu11 -O3'
+      PYOP2_LDFLAGS: '-shared'
     defaults:
       run:
         shell: bash -l {0}
