@@ -509,6 +509,7 @@
         <span class="k">assert</span> <span class="n">params_ok</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> -- </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1">'</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending_sends</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">useMPI</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prepare_MPI_datatypes</span><span class="p">()</span>
@@ -954,8 +955,25 @@
             <span class="n">req</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">req</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">isend</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keep_until_sent</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">req</span></div>
+
+
+<div class="viewcode-block" id="ConvergenceController.keep_until_sent">
+<a class="viewcode-back" href="../../../pySDC/pySDC.core.convergence_controller.html#pySDC.core.convergence_controller.ConvergenceController.keep_until_sent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keep_until_sent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Hold on to a non-blocking send until it has completed.</span>
+
+<span class="sd">        The request is the only reference to the send buffer, which is usually a temporary. Callers fire and forget,</span>
+<span class="sd">        and once the request is garbage collected, MPI may read the buffer from freed memory: OpenMPI copies small</span>
+<span class="sd">        messages straight away, but ParaStationMPI does not, and the receiver got garbage.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            req (mpi4py.MPI.Request): request handle of the send</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending_sends</span> <span class="o">=</span> <span class="p">[</span><span class="n">me</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_sends</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">me</span><span class="o">.</span><span class="n">Test</span><span class="p">()]</span> <span class="o">+</span> <span class="p">[</span><span class="n">req</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="ConvergenceController.recv">
@@ -1005,6 +1023,7 @@
             <span class="n">req</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">req</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Isend</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keep_until_sent</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">req</span></div>
 

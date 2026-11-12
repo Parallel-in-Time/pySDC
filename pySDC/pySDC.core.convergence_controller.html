@@ -867,6 +867,20 @@ This variable is an integer and you can see what the current order is by using
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pySDC.core.convergence_controller.ConvergenceController.keep_until_sent">
+<span class="sig-name descname"><span class="pre">keep_until_sent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/convergence_controller.html#ConvergenceController.keep_until_sent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.convergence_controller.ConvergenceController.keep_until_sent" title="Link to this definition">#</a></dt>
+<dd><p>Hold on to a non-blocking send until it has completed.</p>
+<p>The request is the only reference to the send buffer, which is usually a temporary. Callers fire and forget,
+and once the request is garbage collected, MPI may read the buffer from freed memory: OpenMPI copies small
+messages straight away, but ParaStationMPI does not, and the receiver got garbage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>req</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">mpi4py.MPI.Request</span></code>) – request handle of the send</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pySDC.core.convergence_controller.ConvergenceController.log">
 <span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pySDC.core.step.html#pySDC.core.step.Step" title="pySDC.core.step.Step"><span class="pre">Step</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pySDC/core/convergence_controller.html#ConvergenceController.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.core.convergence_controller.ConvergenceController.log" title="Link to this definition">#</a></dt>
 <dd><p>Shortcut that has a default level for the logger. 15 is above debug but below info.</p>
@@ -1274,6 +1288,7 @@ relevant information about the controller are known.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.convergence_controller.ConvergenceController.dependencies"><code class="docutils literal notranslate"><span class="pre">dependencies()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.convergence_controller.ConvergenceController.determine_restart"><code class="docutils literal notranslate"><span class="pre">determine_restart()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.convergence_controller.ConvergenceController.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">get_new_step_size()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.convergence_controller.ConvergenceController.keep_until_sent"><code class="docutils literal notranslate"><span class="pre">keep_until_sent()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.convergence_controller.ConvergenceController.log"><code class="docutils literal notranslate"><span class="pre">log()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.convergence_controller.ConvergenceController.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.core.convergence_controller.ConvergenceController.post_iteration_processing_block"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing_block()</span></code></a></li>
