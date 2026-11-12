@@ -1,0 +1,19 @@
+pySDC/projects/Monodomain/showcase/README.md
+  s_edc09aac9d24f7::t_41ea04f3f818c0 1-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d22b6ba2f235d8a50b1a42f2cdec8f3c5e5c2485",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
