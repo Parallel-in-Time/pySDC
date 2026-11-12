@@ -1,0 +1,21 @@
+pySDC/helpers/multigrid.py
+  s_3cfbaa2fb0772b::t_b8be282dd436a3 24,36-39,61,406-415,432,453-454,470-474,498,507,509,511,514-520,522
+pySDC/tests/test_helpers/test_multigrid.py
+  s_3cfbaa2fb0772b::t_a2c7c15c7ca976 103-104,113-114,118-136,202-203,207,210-234
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "768f01b1543d2115278b16e9eb4dff159ab75814",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
