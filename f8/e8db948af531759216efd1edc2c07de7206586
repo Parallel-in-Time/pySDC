@@ -1,0 +1,221 @@
+docs/source/_templates/layout.html
+  s_3cfbaa2fb0772b::t_e0f072686f7acd 2-6
+docs/source/conf.py
+  s_3cfbaa2fb0772b::t_8363142a5d3f1a 5,36-37,52-55,57-115,123,194,198-199,275,639-655,657
+docs/source/projects/DeltaSDC
+  s_3cfbaa2fb0772b::t_dacbb121504d65 1
+etc/environment-postprocess.yml
+  s_3cfbaa2fb0772b::t_38d0652d3427c9 12,24
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_49ac70a903321c 3-4,6-9,11-14,16,18,20,22,24-26,28-33,35-37,39-118,120-124
+pySDC/projects/DeltaSDC/barebone.py
+  s_3cfbaa2fb0772b::t_7a3cc63f8cb26c 1-288
+pySDC/projects/DeltaSDC/collect_results.py
+  s_3cfbaa2fb0772b::t_a9db26013a8921 1-308
+pySDC/projects/DeltaSDC/index.md
+  s_3cfbaa2fb0772b::t_f86b1197d82595 1-34
+pySDC/projects/DeltaSDC/modal_gpu_runs.py
+  s_3cfbaa2fb0772b::t_b087485546c12e 1-56
+pySDC/projects/DeltaSDC/modal_sdc_gpu.py
+  s_3cfbaa2fb0772b::t_b70617aac8c9a7 1-100
+pySDC/projects/DeltaSDC/modal_timings.py
+  s_3cfbaa2fb0772b::t_f1320f5602a4df 1-70
+pySDC/projects/DeltaSDC/publication.md
+  s_3cfbaa2fb0772b::t_9c2742f7d3474e 1-2443
+pySDC/projects/DeltaSDC/references.bib
+  s_3cfbaa2fb0772b::t_53d5896ffaa0e5 1-376
+pySDC/projects/DeltaSDC/references.md
+  s_3cfbaa2fb0772b::t_bdc0d74a62f077 1-4
+pySDC/projects/DeltaSDC/reproduce/advection_diffusion.py
+  s_3cfbaa2fb0772b::t_bd3d623aeb6056 1-321
+pySDC/projects/DeltaSDC/reproduce/estimates.py
+  s_3cfbaa2fb0772b::t_49d1174696009f 1-364
+pySDC/projects/DeltaSDC/reproduce/naive_stall.py
+  s_3cfbaa2fb0772b::t_ae3534e0e44428 1-249
+pySDC/projects/DeltaSDC/reproduce/node_solves.py
+  s_3cfbaa2fb0772b::t_a7cac4e17db400 1-245
+pySDC/projects/DeltaSDC/reproduce/nonlinear.py
+  s_3cfbaa2fb0772b::t_e0bbc4830efa75 1-354
+pySDC/projects/DeltaSDC/reproduce/sdc_runs.py
+  s_3cfbaa2fb0772b::t_363678ba33c647 1-666
+pySDC/projects/DeltaSDC/reproduce/time_to_tolerance.py
+  s_3cfbaa2fb0772b::t_3149221373bb8d 1-311
+pySDC/projects/DeltaSDC/reproduce/timings.py
+  s_3cfbaa2fb0772b::t_393afd08572cfe 1-330
+pySDC/projects/DeltaSDC/reproduce/worst_case_bound.py
+  s_3cfbaa2fb0772b::t_d04906e97edad9 1-800
+pySDC/projects/DeltaSDC/results/advection_diffusion_numbers.json
+  s_3cfbaa2fb0772b::t_aae4eb980bf4c6 1-18
+pySDC/projects/DeltaSDC/results/advection_diffusion_runs.csv
+  s_3cfbaa2fb0772b::t_796e6380c944cc 1-43
+pySDC/projects/DeltaSDC/results/barebone_runs.csv
+  s_3cfbaa2fb0772b::t_737e7d37f6dd60 1-73
+pySDC/projects/DeltaSDC/results/estimates_numbers.json
+  s_3cfbaa2fb0772b::t_450beb0cdde6dc 1-16
+pySDC/projects/DeltaSDC/results/estimates_runs.csv
+  s_3cfbaa2fb0772b::t_52453f82b7cd89 1-751
+pySDC/projects/DeltaSDC/results/genuine_solves_numbers.json
+  s_3cfbaa2fb0772b::t_9c57bc71e23d26 1-10
+pySDC/projects/DeltaSDC/results/mg_kernels.txt
+  s_3cfbaa2fb0772b::t_912bdb05b864be 1-154
+pySDC/projects/DeltaSDC/results/multistep_runs.csv
+  s_3cfbaa2fb0772b::t_2b998b8476fe9e 1-46
+pySDC/projects/DeltaSDC/results/naive_stall.csv
+  s_3cfbaa2fb0772b::t_ea5c9faae5b2e1 1-301
+pySDC/projects/DeltaSDC/results/naive_stall_numbers.json
+  s_3cfbaa2fb0772b::t_6dd356b841e3e6 1-16
+pySDC/projects/DeltaSDC/results/node_solves.csv
+  s_3cfbaa2fb0772b::t_502c170bd23eb0 1-271
+pySDC/projects/DeltaSDC/results/node_solves_numbers.json
+  s_3cfbaa2fb0772b::t_5a269972c084ee 1-25
+pySDC/projects/DeltaSDC/results/nonlinear_numbers.json
+  s_3cfbaa2fb0772b::t_42c877f7a09e54 1-8
+pySDC/projects/DeltaSDC/results/nonlinear_runs.csv
+  s_3cfbaa2fb0772b::t_1c5c673ef536d6 1-2011
+pySDC/projects/DeltaSDC/results/raw/advection_diffusion.txt
+  s_3cfbaa2fb0772b::t_91308233899b04 1-42
+pySDC/projects/DeltaSDC/results/raw/barebone-B300.txt
+  s_3cfbaa2fb0772b::t_5a74795e0c9652 1-35
+pySDC/projects/DeltaSDC/results/raw/barebone-H100.txt
+  s_3cfbaa2fb0772b::t_8dd3dd25541116 1-35
+pySDC/projects/DeltaSDC/results/raw/estimates_cpu.txt
+  s_3cfbaa2fb0772b::t_3b94701c71abac 1-20
+pySDC/projects/DeltaSDC/results/raw/estimates_gpu.txt
+  s_3cfbaa2fb0772b::t_2f5e29125d24c0 1-44
+pySDC/projects/DeltaSDC/results/raw/increments.txt
+  s_3cfbaa2fb0772b::t_d9fa4661b389de 1-4
+pySDC/projects/DeltaSDC/results/raw/multistep.txt
+  s_3cfbaa2fb0772b::t_4b2706d275e90c 1-134
+pySDC/projects/DeltaSDC/results/raw/naive_stall.txt
+  s_3cfbaa2fb0772b::t_d082f8f4db63c9 1-104
+pySDC/projects/DeltaSDC/results/raw/naive_stall_stiff.txt
+  s_3cfbaa2fb0772b::t_3daf3dc757f019 1-44
+pySDC/projects/DeltaSDC/results/raw/node_solves_cg.txt
+  s_3cfbaa2fb0772b::t_bfc97043bf83cb 1-336
+pySDC/projects/DeltaSDC/results/raw/node_solves_fft.txt
+  s_3cfbaa2fb0772b::t_f62e6fa8edc48c 1-122
+pySDC/projects/DeltaSDC/results/raw/node_solves_lu.txt
+  s_3cfbaa2fb0772b::t_ae1228cc5d9d70 1-114
+pySDC/projects/DeltaSDC/results/raw/nonlinear_cpu.txt
+  s_3cfbaa2fb0772b::t_1ed936ba06a78b 1-64
+pySDC/projects/DeltaSDC/results/raw/nonlinear_gpu.txt
+  s_3cfbaa2fb0772b::t_ecfbb8bf96899b 1-48
+pySDC/projects/DeltaSDC/results/raw/passes.txt
+  s_3cfbaa2fb0772b::t_aee137a3b5b4a1 1-52
+pySDC/projects/DeltaSDC/results/raw/sdc_runs-A100-1.txt
+  s_3cfbaa2fb0772b::t_af059f6ea00ec0 1-89
+pySDC/projects/DeltaSDC/results/raw/sdc_runs-A100-2.txt
+  s_3cfbaa2fb0772b::t_c46e7e4b97f9bf 1-90
+pySDC/projects/DeltaSDC/results/raw/sdc_runs-B200-1.txt
+  s_3cfbaa2fb0772b::t_a4f012eb999d2c 1-89
+pySDC/projects/DeltaSDC/results/raw/sdc_runs-B200-2.txt
+  s_3cfbaa2fb0772b::t_fdf12b0d151dbd 1-89
+pySDC/projects/DeltaSDC/results/raw/sdc_runs-B300-1.txt
+  s_3cfbaa2fb0772b::t_2c5bec08ebaa41 1-90
+pySDC/projects/DeltaSDC/results/raw/sdc_runs-B300-2.txt
+  s_3cfbaa2fb0772b::t_35b47a8a535c4a 1-89
+pySDC/projects/DeltaSDC/results/raw/sdc_runs-H100-1.txt
+  s_3cfbaa2fb0772b::t_4c0310c81bf4f4 1-91
+pySDC/projects/DeltaSDC/results/raw/sdc_runs-H100-2.txt
+  s_3cfbaa2fb0772b::t_61834507030311 1-89
+pySDC/projects/DeltaSDC/results/raw/sdc_runs_mg-B300-1.txt
+  s_3cfbaa2fb0772b::t_a1d6d6478b5fa0 1-105
+pySDC/projects/DeltaSDC/results/raw/sdc_runs_mg-B300-2.txt
+  s_3cfbaa2fb0772b::t_9129787649803d 1-27
+pySDC/projects/DeltaSDC/results/raw/sdc_runs_mg-H100-1.txt
+  s_3cfbaa2fb0772b::t_d39be841005050 1-105
+pySDC/projects/DeltaSDC/results/raw/sdc_runs_mg-H100-2.txt
+  s_3cfbaa2fb0772b::t_c0553bd560c12a 1-27
+pySDC/projects/DeltaSDC/results/raw/timings-A100-1.txt
+  s_3cfbaa2fb0772b::t_c02497d3f2ebb2 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-A100-2.txt
+  s_3cfbaa2fb0772b::t_36b11048d2ae4b 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-A100-3.txt
+  s_3cfbaa2fb0772b::t_f90331327b2566 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-B200-1.txt
+  s_3cfbaa2fb0772b::t_b6fa1bd51c1af9 1-156
+pySDC/projects/DeltaSDC/results/raw/timings-B200-2.txt
+  s_3cfbaa2fb0772b::t_b367ddd4f29240 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-B200-3.txt
+  s_3cfbaa2fb0772b::t_57ad50289c3a40 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-B300-1.txt
+  s_3cfbaa2fb0772b::t_8b8d54288400d2 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-B300-2.txt
+  s_3cfbaa2fb0772b::t_1815c48a356c3d 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-B300-3.txt
+  s_3cfbaa2fb0772b::t_2027fce0adf5f7 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-H100-1.txt
+  s_3cfbaa2fb0772b::t_8d7d2e37666c6c 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-H100-2.txt
+  s_3cfbaa2fb0772b::t_1444e742c54594 1-192
+pySDC/projects/DeltaSDC/results/raw/timings-H100-3.txt
+  s_3cfbaa2fb0772b::t_cd9fbb64b57140 1-192
+pySDC/projects/DeltaSDC/results/raw/tolerance.txt
+  s_3cfbaa2fb0772b::t_6b7a8a1c7d003a 1-62
+pySDC/projects/DeltaSDC/results/sdc_runs.csv
+  s_3cfbaa2fb0772b::t_8e96640b57ab02 1-769
+pySDC/projects/DeltaSDC/results/sdc_runs_numbers.json
+  s_3cfbaa2fb0772b::t_4c4e7d9a7472b8 1-133
+pySDC/projects/DeltaSDC/results/time_to_tolerance_numbers.json
+  s_3cfbaa2fb0772b::t_30ced270c103dd 1-64
+pySDC/projects/DeltaSDC/results/time_to_tolerance_runs.csv
+  s_3cfbaa2fb0772b::t_4518ca355ca070 1-91
+pySDC/projects/DeltaSDC/results/timings.csv
+  s_3cfbaa2fb0772b::t_8d72d780075015 1-7993
+pySDC/projects/DeltaSDC/results/timings_numbers.json
+  s_3cfbaa2fb0772b::t_e41154c1db6d64 1-119
+pySDC/projects/DeltaSDC/results/tolerance_runs.csv
+  s_3cfbaa2fb0772b::t_fd38864e9f5495 1-1681
+pySDC/projects/DeltaSDC/results/worst_case_bound_numbers.json
+  s_3cfbaa2fb0772b::t_8da650eebeaddd 1-155
+pySDC/projects/DeltaSDC/results/worst_case_runs.csv
+  s_3cfbaa2fb0772b::t_1932b59eadfbf4 1-31
+pySDC/projects/DeltaSDC/run_advection_diffusion.py
+  s_3cfbaa2fb0772b::t_52f0d9401808b7 1-180
+pySDC/projects/DeltaSDC/run_estimates.py
+  s_3cfbaa2fb0772b::t_7d614908fff2d6 1-102
+pySDC/projects/DeltaSDC/run_increments.py
+  s_3cfbaa2fb0772b::t_4632671b05d7da 1-56
+pySDC/projects/DeltaSDC/run_mg_kernels.py
+  s_3cfbaa2fb0772b::t_222576494ae023 1-45
+pySDC/projects/DeltaSDC/run_multistep.py
+  s_3cfbaa2fb0772b::t_9122a28fc027fb 1-104
+pySDC/projects/DeltaSDC/run_naive_stall.py
+  s_3cfbaa2fb0772b::t_9430d67fd6eed2 1-93
+pySDC/projects/DeltaSDC/run_node_solves.py
+  s_3cfbaa2fb0772b::t_ce0e5ceaab7eef 1-177
+pySDC/projects/DeltaSDC/run_nonlinear.py
+  s_3cfbaa2fb0772b::t_d20d96ff0e1dc9 1-318
+pySDC/projects/DeltaSDC/run_passes.py
+  s_3cfbaa2fb0772b::t_7ad7df9370b30e 1-167
+pySDC/projects/DeltaSDC/run_sdc_gpu.py
+  s_3cfbaa2fb0772b::t_8be28b82236eec 1-178
+pySDC/projects/DeltaSDC/run_time_to_tolerance.py
+  s_3cfbaa2fb0772b::t_38cd710c1c09c4 1-145
+pySDC/projects/DeltaSDC/run_timings.py
+  s_3cfbaa2fb0772b::t_352808507837ce 1-160
+pySDC/projects/DeltaSDC/run_tolerance.py
+  s_3cfbaa2fb0772b::t_39e68b78f5b380 1-64
+pySDC/projects/DeltaSDC/tests/test_barebone.py
+  s_3cfbaa2fb0772b::t_e477bdbb8ecad1 1-27
+pySDC/projects/gallery.yml
+  s_3cfbaa2fb0772b::t_c1ca0b066f746d 94-95
+pySDC/tests/test_projects/test_DeltaSDC/test_gpu.py
+  s_3cfbaa2fb0772b::t_019778832ea5ac 38-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f8e8db948af531759216efd1edc2c07de7206586",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
