@@ -42,7 +42,7 @@ class firedrake_mesh(object):
         """
         Get a numpy array of the values associated with this data
         """
-        return self.functionspace.dat._numpy_data
+        return self.functionspace.dat.data
 
     def __add__(self, other):
         if isinstance(other, type(self)):
