@@ -1,0 +1,56 @@
+pySDC/projects/DeltaSDC/collect_results.py
+  s_3cfbaa2fb0772b::t_4c03f0bcdc7b31 25,282-296,299
+pySDC/projects/DeltaSDC/modal_gpu_runs.py
+  s_3cfbaa2fb0772b::t_fd109f41eac019 19-20
+pySDC/projects/DeltaSDC/reproduce/sdc_runs.py
+  s_3cfbaa2fb0772b::t_2389a968fd9a37 354
+  s_3cfbaa2fb0772b::t_799903872a0520 382,387,643
+  s_3cfbaa2fb0772b::t_4166db983e6d58 340-353,355-381,383-386,388-389,638-642
+  s_3cfbaa2fb0772b::t_80e1c0f57b8371 339
+pySDC/projects/DeltaSDC/results/sdc_runs_numbers.json
+  s_3cfbaa2fb0772b::t_9afd4ea67761e0 116-120
+  s_3cfbaa2fb0772b::t_799903872a0520 121
+pySDC/projects/DeltaSDC/modal_sdc_gpu.py
+  s_3cfbaa2fb0772b::t_2389a968fd9a37 49-50
+  s_3cfbaa2fb0772b::t_4b8d48e076651e 78,93
+  s_3cfbaa2fb0772b::t_fd109f41eac019 24-25,85
+  s_3cfbaa2fb0772b::t_483d7806637581 90,94
+  s_3cfbaa2fb0772b::t_ea94d3212e5366 19,79-81,84,91-92
+  s_3cfbaa2fb0772b::t_42ba4583ea3f87 7,60-64,95
+pySDC/projects/DeltaSDC/modal_timings.py
+  s_3cfbaa2fb0772b::t_fd109f41eac019 21-22,50,57
+  s_3cfbaa2fb0772b::t_ea94d3212e5366 16,51-53,56,63-64
+pySDC/projects/DeltaSDC/barebone.py
+  s_3cfbaa2fb0772b::t_ab92bdec1d3e62 203-205,285
+  s_3cfbaa2fb0772b::t_424d6e2a4d42a4 117,122,124-125,134,140,243
+  s_3cfbaa2fb0772b::t_a2498711142c05 1-23,25-116,118-121,123,126-133,135-139,141-146,148-202,206-242,244-284,286-288
+  s_3cfbaa2fb0772b::t_09031c7423aa33 24
+  s_3cfbaa2fb0772b::t_ed6f08c3a3bb9c 147
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_2eafb96cdd0db2 783-784,786-787
+  s_3cfbaa2fb0772b::t_2389a968fd9a37 785
+pySDC/projects/DeltaSDC/publication.md
+  s_3cfbaa2fb0772b::t_7d638411084478 2134-2142,2181-2190,2334-2336
+pySDC/projects/DeltaSDC/results/barebone_runs.csv
+  s_3cfbaa2fb0772b::t_4c03f0bcdc7b31 1-37
+pySDC/projects/DeltaSDC/results/raw/barebone-H100.txt
+  s_3cfbaa2fb0772b::t_ce58885df28fcc 1-35
+pySDC/projects/DeltaSDC/tests/test_barebone.py
+  s_3cfbaa2fb0772b::t_b3151b0642e33d 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ac73d4579ef693b646bf7cbfb452867245da0a45",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
