@@ -1,0 +1,20 @@
+pySDC/projects/Monodomain/showcase/stage2_parallel_nodes.md
+  s_edc09aac9d24f7::t_431312513e6762 109-140
+  s_edc09aac9d24f7::t_958a8cbe6452a6 3-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c1930515a28a9d38054384be09206a7fd69ca8a8",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
