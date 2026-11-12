@@ -97,6 +97,34 @@ def test_hopeless_format_returns_no_worse_than_zero():
     x, cycles = mg.solve(b, 1.0, rtol=1e-10, maxiter=50)
     assert cycles < 50
     assert _residual(mg, x, b, 1.0) <= 1.0
+    # a first cycle that overflows float16 is not kept, though the first cycle is not judged by its residual otherwise
+    mg = GeometricMultigrid(4096, 1)
+    grid = np.arange(4096) / 4096
+    b = (np.sin(np.pi * grid) + grid).astype(np.float16)
+    x, cycles = mg.solve(b, 1e8 / 4096**2, rtol=1e-10, maxiter=50)
+    assert cycles == 1 and not x.any() and mg.relative_residual == 1.0
+
+
+@pytest.mark.base
+def test_first_cycle_is_judged_by_the_second():
+    """
+    With advection, a smooth right-hand side and a stiff system, the first V-cycle from zero leaves its error in the
+    outflow boundary layer and increases the residual, though at a coarsest-grid Peclet number of 0.06; the cycles
+    after it converge, and the solve with them.
+    """
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    N, rtol = 1023, 1e-10
+    mg = GeometricMultigrid(N, 1, bc='dirichlet-zero', velocity=(32.0,))  # H = 1/512
+    grid = np.arange(1, N + 1) / (N + 1)
+    b = np.sin(np.pi * grid) + grid
+    s = 1e6 / (N + 1) ** 2
+    x, cycles = mg.solve(b, s, rtol=rtol, maxiter=1)
+    assert cycles == 1 and not x.any(), 'one cycle alone is worse than zero, and zero is returned'
+    x, cycles = mg.solve(b, s, rtol=rtol, maxiter=50)
+    assert np.linalg.norm(b - (x - mg.apply(x, s))) < rtol * np.linalg.norm(b)
+    assert mg.relative_residual < rtol
+    assert cycles <= np.ceil(np.log(rtol) / np.log(0.3)), f'{cycles} V-cycles'
 
 
 @pytest.mark.base

@@ -25,7 +25,8 @@ stops when the 2-norm of the residual is below ``rtol`` times that of ``b``, or 
 (``stall``), which is where the floating-point format of ``b`` ends (about :math:`\kappa u`, with :math:`\kappa` the
 condition number and :math:`u` the unit roundoff), or after ``maxiter`` cycles. A cycle that does not reduce the
 residual at all is discarded, so that a format too coarse for the system returns its best iterate, zero in the worst
-case, rather than one that is worse.
+case, rather than one that is worse. Both rules judge a cycle against the one before from the second cycle on: the first
+cycle is kept unless it overflows, and a solve that ends worse than zero returns zero.
 
 **Advection.** Point Jacobi smooths reliably while diffusion dominates on every grid, and the grid Peclet number
 :math:`|c_a| H / \nu` is largest on the coarsest grid actually used (spacing :math:`H`, set by ``coarsest``), which is
@@ -36,16 +37,16 @@ only 0.5 to 0.85 in 2D and 3D (the coarse grids, upwinded on their own spacing, 
 along the flow badly), the stall rule takes that for the end of the format, and the solve stops after a few cycles
 with a residual of :math:`10^{-6}` to :math:`10^{-2}`.
 
-The first V-cycle is a second, separate trap, in 1D as in 2D: for a smooth right-hand side and a stiff system
-(:math:`s \nu h^{-2} \gtrsim 10^4`) with advection, the first cycle from zero leaves its error in the outflow
-boundary layer, where the residual is large, and reduces the 2-norm of the residual by only 0.5 to 0.9, or increases
-it (up to four times measured), even at coarsest-grid Peclet numbers far below 1 (0.03 at :math:`N = 1023` and
-:math:`H = 1/512`). The cycles after it contract by 0.15 to 0.7. The stall rule then ends the solve after the first
-cycle, or, if the residual grew, the solve discards it and returns zero. Raising ``stall`` (to 0.8 or 0.9) lets
-slowly contracting solves go on to ``rtol`` (in 35 V-cycles at a coarsest-grid Peclet number of 16 in 2D, at the
-price of about one more cycle at the end of a low format), and is needed near the limit; it does not help where the
-first cycle increases the residual. Every solve leaves the relative residual of what it returns in
-``relative_residual``: check it with advection.
+Raising ``stall`` (to 0.8 or 0.9) lets such slowly contracting solves go on to ``rtol`` (in 35 V-cycles at a
+coarsest-grid Peclet number of 16 in 2D, at the price of about one more cycle at the end of a low format), and is
+needed near the limit. Every solve leaves the relative residual of what it returns in ``relative_residual``: check it
+with advection.
+
+The first V-cycle is judged by the second, which matters for advection: with a smooth right-hand side and a stiff system
+(:math:`s \nu h^{-2} \gtrsim 10^4`), the first cycle from zero leaves its error in the outflow boundary layer, where the
+residual is large, and reduces the 2-norm of the residual by only 0.5 to 0.9 or increases it (up to four times
+measured), even at coarsest-grid Peclet numbers far below 1 (0.03 at :math:`N = 1023` and :math:`H = 1/512`), in 1D as
+in 2D. The cycles after it contract by 0.15 to 0.7, and the solve converges as usual.
 
 **Formats.** A solve computes in the floating-point type of its right-hand side: ``float64`` and ``float32`` arrays
 are solved in their own arithmetic, and ``float16`` is a storage format, as on GPUs: every array is stored in half
@@ -482,11 +483,12 @@ class GeometricMultigrid:
         r"""
         Solve :math:`(I - s A_h)\, x = b` from a zero guess, in the format of ``b``.
 
-        Stops when the 2-norm of the residual is below ``rtol`` times that of ``b``, when a V-cycle reduces it by
-        less than ``stall`` (the accuracy of the format), or after ``maxiter`` V-cycles. A solve that stops on the
-        stall rule may not have reached ``rtol``: where V-cycles contract slowly, as beyond the Peclet limit (see
-        :mod:`pySDC.helpers.multigrid`), the stall rule mistakes that for the end of the format. The relative
-        residual of the returned iterate is in :attr:`relative_residual` after every solve.
+        Stops when the 2-norm of the residual is below ``rtol`` times that of ``b``, when a V-cycle from the second
+        on reduces it by less than ``stall`` (the accuracy of the format), or after ``maxiter`` V-cycles; a cycle from
+        the second on that does not reduce it at all is discarded, and a solve that ends worse than zero returns zero.
+        A solve that stops on the stall rule may not have reached ``rtol``: where V-cycles contract slowly, as beyond
+        the Peclet limit (see :mod:`pySDC.helpers.multigrid`), the stall rule mistakes that for the end of the format.
+        The relative residual of the returned iterate is in :attr:`relative_residual` after every solve.
 
         Parameters
         ----------
@@ -517,12 +519,18 @@ class GeometricMultigrid:
             candidate = self._vcycle(0, x, b, s)
             cycles += 1
             norm_r = self._norm(self.ops.residual(candidate, b, *self._scales(self.N, s)))
-            if norm_r >= previous:  # past the accuracy of the format: the cycle made it worse, keep what was there
+            # the first cycle is judged by the second: with advection, it can leave its error in the outflow boundary
+            # layer, where the residual is large, and still be a good start
+            first = cycles == 1
+            # past the accuracy of the format: keep what was there; written to stop on a NaN of an overflow too
+            if not (norm_r < previous or first and np.isfinite(norm_r)):
                 break
-            x, stalled, previous = candidate, norm_r > self.stall * previous, norm_r
+            x, stalled, previous = candidate, norm_r > self.stall * previous and not first, norm_r
             # converged, or at the accuracy the format allows: a V-cycle otherwise reduces the residual by 0.1 to 0.3
             if norm_r <= rtol * norm_b or stalled:
                 break
+        if not previous < norm_b:  # worse than zero, which only a first cycle can leave: return zero
+            x, previous = None, norm_b
         self.relative_residual = previous / norm_b
         return (self.xp.zeros_like(b) if x is None else x), cycles
 
