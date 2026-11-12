@@ -9,7 +9,7 @@
 | pySDC/core/collocation.py                                                                           |       42 |        1 |     98% |        78 |
 | pySDC/core/common.py                                                                                |       23 |        0 |    100% |           |
 | pySDC/core/controller.py                                                                            |      187 |        1 |     99% |       104 |
-| pySDC/core/convergence\_controller.py                                                               |      111 |       18 |     84% |6-7, 438-448, 461-468, 489, 572, 585-589 |
+| pySDC/core/convergence\_controller.py                                                               |      116 |       19 |     84% |6-7, 439-450, 476-483, 504, 588, 601-605 |
 | pySDC/core/default\_hook.py                                                                         |       15 |        0 |    100% |           |
 | pySDC/core/errors.py                                                                                |        9 |        0 |    100% |           |
 | pySDC/core/hooks.py                                                                                 |       57 |        2 |     96% |     6, 87 |
@@ -411,7 +411,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **33315** | **4067** | **88%** |           |
+| **TOTAL**                                                                                           | **33320** | **4068** | **88%** |           |
 
 45 empty files skipped.
 
