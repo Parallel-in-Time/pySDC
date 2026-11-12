@@ -227,7 +227,7 @@ jobs:
           fi
       # This step only rents the GPU: the container runs pytest under coverage and its output is
       # streamed back here, so the log below is an ordinary pytest log.
-      - name: Run the cupy-marked tests on a T4
+      - name: Run the cupy-marked tests on four GPUs (T4, else L4, else A10G)
         env:
           MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
           MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
