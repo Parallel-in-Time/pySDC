@@ -17,15 +17,15 @@ on the rest of pySDC; :class:`~pySDC.implementations.problem_classes.generic_ND_
 
 **The method.** V(2,2)-cycles with weighted Jacobi smoothing (:math:`\omega = 0.8`, with the diagonal of the whole
 operator), full-weighting restriction, linear interpolation, the same stencil on every grid, and an exact solve with a
-dense inverse on the coarsest grid, which has at most ``coarsest`` points (default ``COARSEST``, 1000). A periodic
-grid coarsens from :math:`N` to :math:`N / 2` points per direction, a Dirichlet grid from :math:`N` to
-:math:`(N - 1) / 2` interior points, with zero boundary values in the transfers. The exact coarse solve is needed: the smooth modes of :math:`I - s \Delta_h` are
-damped only by the identity part, which Jacobi does not do. A solve starts from zero and stops when the 2-norm of the
-residual is below ``rtol`` times that of ``b``, or when a V-cycle no longer halves it (``stall``), which is where the
-floating-point format of ``b`` ends (about :math:`\kappa u`, with :math:`\kappa` the condition number and :math:`u`
-the unit roundoff), or after ``maxiter`` cycles. A cycle that does not reduce the residual at all is discarded, so
-that a format too coarse for the system returns its best iterate, zero in the worst case, rather than one that is
-worse.
+dense inverse on the coarsest grid, which has at most ``coarsest`` points (default ``COARSEST``, 1000). A periodic grid
+coarsens from :math:`N` to :math:`N / 2` points per direction, a Dirichlet grid from :math:`N` to :math:`(N - 1) / 2`
+interior points, with zero boundary values in the transfers. The exact coarse solve is needed: the smooth modes of
+:math:`I - s \Delta_h` are damped only by the identity part, which Jacobi does not do. A solve starts from zero and
+stops when the 2-norm of the residual is below ``rtol`` times that of ``b``, or when a V-cycle no longer halves it
+(``stall``), which is where the floating-point format of ``b`` ends (about :math:`\kappa u`, with :math:`\kappa` the
+condition number and :math:`u` the unit roundoff), or after ``maxiter`` cycles. A cycle that does not reduce the
+residual at all is discarded, so that a format too coarse for the system returns its best iterate, zero in the worst
+case, rather than one that is worse.
 
 **Advection.** Point Jacobi smooths reliably while diffusion dominates on every grid, and the grid Peclet number
 :math:`|c_a| H / \nu` is largest on the coarsest grid actually used (spacing :math:`H`, set by ``coarsest``), which is
@@ -51,13 +51,13 @@ first cycle increases the residual. Every solve leaves the relative residual of 
 are solved in their own arithmetic, and ``float16`` is a storage format, as on GPUs: every array is stored in half
 precision, every operation computes in single precision. The result has the type of the right-hand side.
 
-**Speed.** On a GPU, periodic 3D grids run on fused CUDA kernels: one pass over the arrays for the residual, the
-Jacobi step, the restriction and the interpolation each, with the grid size compiled in. With ``fma=False`` (default), the
-stencil kernels compute bit for bit what the array operations compute, which is what the tests check; ``fma=True``
-lets the compiler contract multiplications and additions, which is faster where the arithmetic and not the memory
-limits the kernels (fp64 on GPUs with few fp64 units). Measured at :math:`640^3` with V(2,2)-cycles, one Jacobi step
-moves data at about 3 TB/s on an H100 in fp64. The fused kernels are for periodic pure diffusion; 1D and 2D grids,
-Dirichlet grids, advection, and every grid on a CPU use array operations.
+**Speed.** On a GPU, periodic 3D grids run on fused CUDA kernels: one pass over the arrays for the residual, the Jacobi
+step, the restriction and the interpolation each, with the grid size compiled in. With ``fma=False`` (default), the
+stencil kernels compute bit for bit what the array operations compute, which is what the tests check; ``fma=True`` lets
+the compiler contract multiplications and additions, which is faster where the arithmetic and not the memory limits the
+kernels (fp64 on GPUs with few fp64 units). Measured at :math:`640^3` with V(2,2)-cycles, one Jacobi step moves data at
+about 3 TB/s on an H100 in fp64. The fused kernels are for periodic pure diffusion; 1D and 2D grids, Dirichlet grids,
+advection, and every grid on a CPU use array operations.
 """
 
 import re
@@ -118,7 +118,7 @@ class _Ops:
         return ct(OMEGA) / diagonal
 
     def shift(self, y, k, axis):
-        """``y`` moved by ``k`` = 1 or -1 along ``axis`` as by ``numpy.roll``: periodic, or with zero boundary values."""
+        """``y`` moved by ``k`` = 1 or -1 along ``axis`` like ``numpy.roll``: periodic or with zero boundary values."""
         if self.periodic:
             return self.xp.roll(y, k, axis)
         out = self.xp.zeros_like(y)

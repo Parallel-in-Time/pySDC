@@ -180,7 +180,7 @@ def test_operator_is_pySDCs_FD_matrix(bc, N, ndim, advection):
 @pytest.mark.parametrize('peclet', [0.5, 2])
 @pytest.mark.parametrize('stiffness', [1e-2, 1e2, 1e5])
 def test_advection_diffusion_converges(ndim, N, peclet, stiffness):
-    """At grid Peclet numbers |c| h / nu of 0.5 and 2 on the finest grid, a V-cycle still reduces the residual by 0.3."""
+    """At grid Peclet numbers |c| h / nu of 0.5 and 2 on the finest grid, a V-cycle reduces the residual by 0.3."""
     from pySDC.helpers.multigrid import GeometricMultigrid
 
     nu, h = 0.1, 1 / (N + 1)
