@@ -682,11 +682,11 @@ the operator is then circulant, so the FFT diagonalises it and a solve is two tr
 and a division – exact, and the cheapest solve there is on a GPU. <code class="docutils literal notranslate"><span class="pre">'direct'</span></code> keeps the
 factorizations of the last <code class="docutils literal notranslate"><span class="pre">max_cached_factorizations</span></code> factors and reuses them. <code class="docutils literal notranslate"><span class="pre">'MG'</span></code> is
 geometric multigrid (<a class="reference internal" href="pySDC.helpers.multigrid.html#pySDC.helpers.multigrid.GeometricMultigrid" title="pySDC.helpers.multigrid.GeometricMultigrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeometricMultigrid</span></code></a>), for the
-second-order Laplacian on periodic grids (<code class="docutils literal notranslate"><span class="pre">derivative=2</span></code>, <code class="docutils literal notranslate"><span class="pre">order=2</span></code>,
-<code class="docutils literal notranslate"><span class="pre">stencil_type='center'</span></code>) and real states: V-cycles from a zero guess until the relative
+second-order Laplacian (<code class="docutils literal notranslate"><span class="pre">derivative=2</span></code>, <code class="docutils literal notranslate"><span class="pre">order=2</span></code>, <code class="docutils literal notranslate"><span class="pre">stencil_type='center'</span></code>) on periodic
+grids or with <code class="docutils literal notranslate"><span class="pre">bc='dirichlet-zero'</span></code>, and real states: V-cycles from a zero guess until the relative
 residual is below <code class="docutils literal notranslate"><span class="pre">lintol</span></code>, the accuracy of the solve’s format is reached, or after
 <code class="docutils literal notranslate"><span class="pre">liniter</span></code> cycles, whose number the work counter <code class="docutils literal notranslate"><span class="pre">'MG'</span></code> adds up. It needs no matrix, and on a
-GPU in 3D it runs on fused kernels.</p></li>
+GPU on periodic 3D grids it runs on fused kernels.</p></li>
 <li><p><strong>solve_precision</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dtype-like</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <em>optional</em>) – Precision the implicit solve runs at, independently of the state’s <code class="docutils literal notranslate"><span class="pre">dtype</span></code>. <code class="docutils literal notranslate"><span class="pre">None</span></code>
 (default) solves at the operator’s precision, exactly as without it. Otherwise the solve
 genuinely works in that precision: the sparse solvers on a copy of the operator held at it,
