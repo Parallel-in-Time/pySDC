@@ -1,0 +1,21 @@
+pySDC/helpers/fieldsIO.py
+  s_dca63db95f783a::t_236cac08104f0d 334,339,445-446
+pySDC/tests/test_problems/test_heat_chebychev.py
+  s_dca63db95f783a::t_59ecb591123ce0 67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ba407a99b0bbe344377de742b1e34aef4a039883",
+  "prompts": {},
+  "sessions": {
+    "s_dca63db95f783a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c00dcdb0-f19f-43e8-afa2-9436844c6831",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
