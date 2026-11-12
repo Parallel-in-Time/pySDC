@@ -34,11 +34,14 @@ RESULTS = ['data/step_7_G_out.txt']
 #: Four of them. The space-time tests ask for four ranks and NCCL wants a GPU per rank, and the
 #: serial pass -- most of the job -- is spread over the same four rather than leaving three idle.
 #: That costs about what two did, because the split more than pays for the extra devices: 101
-#: seconds of serial tests become 39.
-GPUS = 'T4:4'
+#: seconds of serial tests become 39. Four on one host can be scarce (four T4s once took over an
+#: hour to come up), so Modal takes the first of these that is free: T4s ($0.59 an hour each), then
+#: L4s ($0.80), then A10Gs ($1.10). The job prints which ones it got.
+GPUS = ['T4:4', 'L4:4', 'A10G:4']
 
 #: Kept in step with `GPUS`, so that there is one `pytest-xdist` worker per device.
-WORKERS = int(GPUS.split(':')[1])
+WORKERS = int(GPUS[0].split(':')[1])
+assert all(gpu.endswith(f':{WORKERS}') for gpu in GPUS), 'every choice needs the same number of devices'
 
 app = modal.App('pySDC-gpu-tests')
 
