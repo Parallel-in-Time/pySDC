@@ -221,6 +221,25 @@ def test_advection_beyond_the_peclet_limit_stops_early():
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('velocity', [None, (4.0,)])
+def test_coarsest(velocity):
+    """``coarsest`` sets how far the grid is halved: N = 255 in 1D, solved directly by default, gets five levels."""
+    from pySDC.helpers.multigrid import GeometricMultigrid
+
+    N = 255
+    assert GeometricMultigrid(N, 1, bc='dirichlet-zero').sizes == [N]
+    mg = GeometricMultigrid(N, 1, bc='dirichlet-zero', velocity=velocity, coarsest=15)
+    assert mg.sizes == [255, 127, 63, 31, 15]
+    s = 1e4 / (N + 1) ** 2
+    b = np.random.default_rng(12).standard_normal(N)
+    x, cycles = mg.solve(b, s, rtol=1e-11, maxiter=50)
+    assert np.linalg.norm(b - (x - mg.apply(x, s))) < 1e-11 * np.linalg.norm(b)
+    assert cycles <= np.ceil(np.log(1e-11) / np.log(0.3)), f'{cycles} V-cycles'
+    with pytest.raises(ValueError, match='at most 15 points'):
+        GeometricMultigrid(64, 1, bc='dirichlet-zero', coarsest=15)
+
+
+@pytest.mark.base
 def test_relative_residual_is_set_by_every_solve():
     from pySDC.helpers.multigrid import GeometricMultigrid
 

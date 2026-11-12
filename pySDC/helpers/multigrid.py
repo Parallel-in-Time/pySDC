@@ -17,9 +17,9 @@ on the rest of pySDC; :class:`~pySDC.implementations.problem_classes.generic_ND_
 
 **The method.** V(2,2)-cycles with weighted Jacobi smoothing (:math:`\omega = 0.8`, with the diagonal of the whole
 operator), full-weighting restriction, linear interpolation, the same stencil on every grid, and an exact solve with a
-dense inverse on the coarsest grid, which has at most ``COARSEST`` points. A periodic grid coarsens from :math:`N` to
-:math:`N / 2` points per direction, a Dirichlet grid from :math:`N` to :math:`(N - 1) / 2` interior points, with zero
-boundary values in the transfers. The exact coarse solve is needed: the smooth modes of :math:`I - s \Delta_h` are
+dense inverse on the coarsest grid, which has at most ``coarsest`` points (default ``COARSEST``, 1000). A periodic
+grid coarsens from :math:`N` to :math:`N / 2` points per direction, a Dirichlet grid from :math:`N` to
+:math:`(N - 1) / 2` interior points, with zero boundary values in the transfers. The exact coarse solve is needed: the smooth modes of :math:`I - s \Delta_h` are
 damped only by the identity part, which Jacobi does not do. A solve starts from zero and stops when the 2-norm of the
 residual is below ``rtol`` times that of ``b``, or when a V-cycle no longer halves it (``stall``), which is where the
 floating-point format of ``b`` ends (about :math:`\kappa u`, with :math:`\kappa` the condition number and :math:`u`
@@ -27,17 +27,25 @@ the unit roundoff), or after ``maxiter`` cycles. A cycle that does not reduce th
 that a format too coarse for the system returns its best iterate, zero in the worst case, rather than one that is
 worse.
 
-**Advection.** Point Jacobi smooths reliably while diffusion dominates on every grid, and the coarsest grid has the
-largest spacing: measured in 1D to 3D, periodic and Dirichlet, with stiffness :math:`s \nu h^{-2}` up to
-:math:`10^6`, every solve reaches ``rtol`` while the grid Peclet number :math:`|c_a| H / \nu` on the coarsest grid
-(spacing :math:`H`) is at most about 2, which is :math:`|c_a| h / \nu` up to :math:`2 h / H` on the finest. Beyond,
-in 2D and 3D and for stiff systems, a V-cycle reduces the residual by only 0.5 to 0.85 (the coarse grids, upwinded
-on their own spacing, approximate the smooth components along the flow badly), the stall rule takes that for the end
-of the format, and the solve stops after a few cycles with a residual of :math:`10^{-6}` to :math:`10^{-2}`. The
-residual is in ``relative_residual`` after every solve; raising ``stall`` (to 0.8 or 0.9) lets such solves go on to
-``rtol``, in 35 V-cycles at a coarsest-grid Peclet number of 16 in 2D, at the price of about one more cycle at the
-end of a low format. 1D solves converge at every Peclet number measured (up to 32 on the coarsest
-grid), and so do many 2D and 3D ones with fewer levels.
+**Advection.** Point Jacobi smooths reliably while diffusion dominates on every grid, and the grid Peclet number
+:math:`|c_a| H / \nu` is largest on the coarsest grid actually used (spacing :math:`H`, set by ``coarsest``), which is
+what bounds it; at ``coarsest=15``, a 1D grid has :math:`H = 1/16` whatever :math:`N`. Measured with random
+right-hand sides in 1D to 3D, periodic and Dirichlet, with stiffness :math:`s \nu h^{-2}` up to :math:`10^6`, every
+solve reaches ``rtol`` while that Peclet number is at most about 1 to 2. Beyond, a V-cycle reduces the residual by
+only 0.5 to 0.85 in 2D and 3D (the coarse grids, upwinded on their own spacing, approximate the smooth components
+along the flow badly), the stall rule takes that for the end of the format, and the solve stops after a few cycles
+with a residual of :math:`10^{-6}` to :math:`10^{-2}`.
+
+The first V-cycle is a second, separate trap, in 1D as in 2D: for a smooth right-hand side and a stiff system
+(:math:`s \nu h^{-2} \gtrsim 10^4`) with advection, the first cycle from zero leaves its error in the outflow
+boundary layer, where the residual is large, and reduces the 2-norm of the residual by only 0.5 to 0.9, or increases
+it (up to four times measured), even at coarsest-grid Peclet numbers far below 1 (0.03 at :math:`N = 1023` and
+:math:`H = 1/512`). The cycles after it contract by 0.15 to 0.7. The stall rule then ends the solve after the first
+cycle, or, if the residual grew, the solve discards it and returns zero. Raising ``stall`` (to 0.8 or 0.9) lets
+slowly contracting solves go on to ``rtol`` (in 35 V-cycles at a coarsest-grid Peclet number of 16 in 2D, at the
+price of about one more cycle at the end of a low format), and is needed near the limit; it does not help where the
+first cycle increases the residual. Every solve leaves the relative residual of what it returns in
+``relative_residual``: check it with advection.
 
 **Formats.** A solve computes in the floating-point type of its right-hand side: ``float64`` and ``float32`` arrays
 are solved in their own arithmetic, and ``float16`` is a storage format, as on GPUs: every array is stored in half
@@ -57,7 +65,7 @@ import re
 import numpy as np
 
 OMEGA = 0.8  # Jacobi weight
-COARSEST = 1000  # grids with at most this many points are solved exactly
+COARSEST = 1000  # default: grids with at most this many points are solved exactly
 STALL = 0.5  # default: a V-cycle that reduces the residual by less than this is at the accuracy of the format
 
 
@@ -384,8 +392,8 @@ class GeometricMultigrid:
     Parameters
     ----------
     N : int
-        Points per direction. Periodic: :math:`N = m 2^k` with :math:`m^d` at most ``COARSEST``; zero Dirichlet: the
-        interior points, :math:`N = 2^k - 1` (or :math:`m 2^k - 1` with :math:`(m - 1)^d` at most ``COARSEST``).
+        Points per direction. Periodic: :math:`N = m 2^k` with :math:`m^d` at most ``coarsest``; zero Dirichlet: the
+        interior points, :math:`N = 2^k - 1` (or :math:`m 2^k - 1` with :math:`(m - 1)^d` at most ``coarsest``).
     ndim : int
         Dimension: 1, 2 or 3.
     L : float
@@ -403,6 +411,11 @@ class GeometricMultigrid:
     velocity : sequence of float or None
         Constant velocity :math:`c`, one entry per dimension; None or zeros give pure diffusion. Each component is
         upwinded on the side it comes from.
+    coarsest : int
+        The largest number of points the coarsest grid may have, which is solved exactly with a dense inverse: the grid
+        is halved until it has at most this many. Default ``COARSEST`` (1000); smaller values give more levels, and
+        a coarsest grid with a larger spacing, which is what bounds the Peclet number (see
+        :mod:`pySDC.helpers.multigrid`).
     stall : float
         The stall rule: a V-cycle that reduces the residual by a factor larger than this ends the solve, taken for
         the accuracy of the format. Raise it (to 0.9, say) where V-cycles contract slowly, as on advection-dominated
@@ -429,7 +442,9 @@ class GeometricMultigrid:
     True
     """
 
-    def __init__(self, N, ndim=3, L=1.0, xp=np, fma=False, bc='periodic', nu=1.0, velocity=None, stall=STALL):
+    def __init__(
+        self, N, ndim=3, L=1.0, xp=np, fma=False, bc='periodic', nu=1.0, velocity=None, stall=STALL, coarsest=COARSEST
+    ):
         if ndim not in (1, 2, 3):
             raise ValueError(f'ndim has to be 1, 2 or 3, got {ndim}')
         if bc not in ('periodic', 'dirichlet-zero'):
@@ -442,12 +457,12 @@ class GeometricMultigrid:
         periodic = bc == 'periodic'
         # halve the grid: n -> n / 2 on periodic grids, n -> (n - 1) / 2 interior points with Dirichlet values
         self.sizes = [N]
-        while self.sizes[-1] ** ndim > COARSEST and self.sizes[-1] % 2 == (0 if periodic else 1):
+        while self.sizes[-1] ** ndim > coarsest and self.sizes[-1] % 2 == (0 if periodic else 1):
             self.sizes.append(self.sizes[-1] // 2)
-        if self.sizes[-1] ** ndim > COARSEST:
+        if self.sizes[-1] ** ndim > coarsest:
             form = f'm 2^k with m^{ndim}' if periodic else f'2^k - 1, or m 2^k - 1 with (m - 1)^{ndim}'
             raise ValueError(
-                f'N = {N} does not coarsen to at most {COARSEST} points in {ndim}D: use N = {form} <= {COARSEST}'
+                f'N = {N} does not coarsen to at most {coarsest} points in {ndim}D: use N = {form} <= {coarsest}'
             )
         self.N, self.ndim, self.L, self.xp, self.ops = N, ndim, L, xp, _Ops(xp, fma, periodic)
         self.bc, self.nu, self.velocity, self.stall = bc, nu, velocity, stall
