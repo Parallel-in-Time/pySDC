@@ -1,0 +1,42 @@
+docs/source/_templates/layout.html
+  s_3cfbaa2fb0772b::t_7669c55dfdf913 2-6
+pySDC/projects/DeltaSDC/reproduce/worst_case_bound.py
+  s_3cfbaa2fb0772b::t_1cbce41f416cce 164,170,242
+  s_3cfbaa2fb0772b::t_76f56ec7a1dbdd 57-59,89-93,107-111,131-135,137-146,148-152,169,171
+pySDC/projects/DeltaSDC/index.md
+  s_3cfbaa2fb0772b::t_8660b4b8658585 58
+pySDC/projects/DeltaSDC/results/node_solves.csv
+  s_3cfbaa2fb0772b::t_19aa052d9644b1 1-271
+pySDC/projects/DeltaSDC/reproduce/node_solves.py
+  s_3cfbaa2fb0772b::t_418deb92f7327e 1-116,118-202,211,214-218
+  s_3cfbaa2fb0772b::t_0c3bac14bc80c0 117,203-210,212-213
+pySDC/projects/DeltaSDC/results/node_solves_numbers.json
+  s_3cfbaa2fb0772b::t_19aa052d9644b1 1-11,19,21-22,25
+  s_3cfbaa2fb0772b::t_0c3bac14bc80c0 12-18,20,23-24
+pySDC/projects/DeltaSDC/publication.md
+  s_3cfbaa2fb0772b::t_1b332103a33020 62-72,74-87
+  s_3cfbaa2fb0772b::t_9e9235e1e5ddec 417-419
+  s_3cfbaa2fb0772b::t_7669c55dfdf913 5-8,32-37,91,141,237,357
+  s_3cfbaa2fb0772b::t_8c9ae7e312f70b 264,284-285
+  s_3cfbaa2fb0772b::t_b6e82aea714333 230-233,236,238-249,252,255-263,265-283,286-356,358-374,379-380,383-396,399-400,403-416,420-425,427-430,436-456,461-511,515-517,525-531,574,579-581,584,587-596,599-621,625-632,635-648,652-658,661-668,674-677
+pySDC/projects/DeltaSDC/results/worst_case_bound_numbers.json
+  s_3cfbaa2fb0772b::t_1cbce41f416cce 11-21,31-41,43,45,47-53
+pySDC/projects/DeltaSDC/references.bib
+  s_3cfbaa2fb0772b::t_717fd03340a75a 62-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d4ac3f6cfc39eef42285b318a8ddc7aa039823f7",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}

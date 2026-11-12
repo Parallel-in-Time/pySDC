@@ -1,0 +1,73 @@
+pySDC/projects/DeltaSDC/results/sdc_runs_numbers.json
+  s_3cfbaa2fb0772b::t_40b470a71b300c 2-4,60-95
+  s_3cfbaa2fb0772b::t_eade7a4cbd96a9 11-12,14-15,17-18,20-21
+  s_3cfbaa2fb0772b::t_0a4561bd323805 1,5-10,13,16,19,22-59,96-113
+pySDC/projects/DeltaSDC/results/mg_kernels.txt
+  s_3cfbaa2fb0772b::t_2d228032cb394d 1-154
+pySDC/projects/DeltaSDC/run_sdc_gpu.py
+  s_3cfbaa2fb0772b::t_912b13f33dbfae 2-3,5-10,12-16,18-22
+  s_3cfbaa2fb0772b::t_25606c9e9060d1 1,4,11,17,23-205
+pySDC/projects/DeltaSDC/results/timings_numbers.json
+  s_3cfbaa2fb0772b::t_58fefbfe7de394 1-5,23-119
+  s_3cfbaa2fb0772b::t_e51ded9e24ddbe 6-22
+pySDC/projects/DeltaSDC/publication.md
+  s_3cfbaa2fb0772b::t_d82aec6d5a0ea1 5,7-8
+  s_3cfbaa2fb0772b::t_45836e88b9488c 126-139
+  s_3cfbaa2fb0772b::t_dcd5ffe8158f47 1476,1486
+  s_3cfbaa2fb0772b::t_e925d968c8390e 91-101
+  s_3cfbaa2fb0772b::t_efa7a41abcea72 1442-1446,1463-1475,1477-1485,1487-1498,1562-1566,1620-1621,1649-1656
+  s_3cfbaa2fb0772b::t_68684433a33062 102
+  s_3cfbaa2fb0772b::t_9c05569f04930a 30-32
+  s_3cfbaa2fb0772b::t_d664b1fe2009c7 1447-1456,1458-1461,1499-1515,1517-1522,1528,1530-1531,1534,1537-1559,1567-1604,1610-1613,1616-1619,1622-1641,1645-1648
+  s_3cfbaa2fb0772b::t_40b470a71b300c 1457,1462,1516,1523-1527,1529,1532-1533,1560-1561,1605-1609,1614-1615
+  s_3cfbaa2fb0772b::t_99be2f9a721b64 1642-1644
+  s_3cfbaa2fb0772b::t_eade7a4cbd96a9 1535-1536
+pySDC/projects/DeltaSDC/results/sdc_runs.csv
+  s_3cfbaa2fb0772b::t_a34aa47897aff4 1-769
+pySDC/projects/DeltaSDC/reproduce/sdc_runs.py
+  s_3cfbaa2fb0772b::t_0a4561bd323805 233-235,241,243-252,285-287
+  s_3cfbaa2fb0772b::t_eade7a4cbd96a9 272
+  s_3cfbaa2fb0772b::t_40b470a71b300c 101-103,126
+  s_3cfbaa2fb0772b::t_be4e3b4ea7d0eb 1-100,104-125,127-232,236-240,242,253-271,273-284,288-306
+pySDC/projects/DeltaSDC/reproduce/timings.py
+  s_3cfbaa2fb0772b::t_e925d968c8390e 13
+  s_3cfbaa2fb0772b::t_1f9b2e4ab7411a 1-12,14,19-24,28-52,54-61,63-89,92-100,102,104-123,125-138,214-218,225-232,234-237,239-244
+  s_3cfbaa2fb0772b::t_68684433a33062 25-27,141-213,220-224
+  s_3cfbaa2fb0772b::t_96fa104556f2cf 53,62,90-91,101,103,124,139-140,219,233,238
+  s_3cfbaa2fb0772b::t_9c05569f04930a 15-16
+  s_3cfbaa2fb0772b::t_a80bbbc11b64f3 17-18
+pySDC/projects/DeltaSDC/index.md
+  s_3cfbaa2fb0772b::t_68684433a33062 63
+  s_3cfbaa2fb0772b::t_e925d968c8390e 62
+pySDC/projects/DeltaSDC/results/tolerance_runs.csv
+  s_3cfbaa2fb0772b::t_ed04b0adc11fee 1-1681
+pySDC/projects/DeltaSDC/multigrid.py
+  s_3cfbaa2fb0772b::t_f1bd468490b889 13-15
+  s_3cfbaa2fb0772b::t_25606c9e9060d1 1-12,16-502
+pySDC/projects/DeltaSDC/references.bib
+  s_3cfbaa2fb0772b::t_d664b1fe2009c7 169-189
+pySDC/projects/DeltaSDC/krylov.py
+  s_3cfbaa2fb0772b::t_25606c9e9060d1 1-170
+pySDC/projects/DeltaSDC/results/timings.csv
+  s_3cfbaa2fb0772b::t_58fefbfe7de394 668-7993
+  s_3cfbaa2fb0772b::t_96fa104556f2cf 1-667
+pySDC/projects/DeltaSDC/modal_sdc_gpu.py
+  s_3cfbaa2fb0772b::t_25606c9e9060d1 1,11-17,20-39,41-46,48-80,82,84-88
+  s_3cfbaa2fb0772b::t_912b13f33dbfae 2-10,18-19,40,47,81,83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "080ddc74e1b15f2c2999ce5faa63e6868ba9dd7a",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
