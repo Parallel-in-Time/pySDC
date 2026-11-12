@@ -1,0 +1,33 @@
+pySDC/implementations/datatype_classes/firedrake_mesh.py
+  s_6db286626c530e::t_9da86a6625b172 45
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_6db286626c530e::t_f23c120463d784 21-23,42-44,64-65,86,103-108,125-130,146-149,160,163,172,174
+pySDC/helpers/firedrake_ensemble_communicator.py
+  s_6db286626c530e::t_9da86a6625b172 6-13,82,93,100,109,118
+pySDC/implementations/transfer_classes/TransferFiredrakeMesh.py
+  s_6db286626c530e::t_2d7b27a6046cb6 1,7-10,79,84
+pySDC/implementations/problem_classes/HeatFiredrake.py
+  s_6db286626c530e::t_bffd242a8c6db9 5,199
+pySDC/tests/test_transfer_classes/test_firedrake_transfer.py
+  s_6db286626c530e::t_d588b3bfd8c8b1 113-127
+  s_6db286626c530e::t_f23c120463d784 7,49
+  s_6db286626c530e::t_551d1f4b996745 89-112,128
+.github/workflows/ci_pipeline.yml
+  s_6db286626c530e::t_81434ab6a006bf 287-288,310-311
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9b0bba64c1dc8d17de165230e3495d9e4e60178a",
+  "prompts": {},
+  "sessions": {
+    "s_6db286626c530e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60f6a570-b7b0-4cfe-a46b-61af65b5a9ce",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
