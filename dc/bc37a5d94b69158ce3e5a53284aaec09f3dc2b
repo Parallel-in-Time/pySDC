@@ -1,0 +1,21 @@
+pySDC/projects/Monodomain/run_scripts/mpi_timing.py
+  s_edc09aac9d24f7::t_1f1478091f52cc 1-58
+pySDC/projects/Monodomain/sweeper_classes/exponential_runge_kutta/imexexp_parallel_MPI.py
+  s_edc09aac9d24f7::t_a622c8fa8f650d 1-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dcbc37a5d94b69158ce3e5a53284aaec09f3dc2b",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
