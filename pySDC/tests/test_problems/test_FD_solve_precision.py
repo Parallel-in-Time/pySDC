@@ -69,7 +69,7 @@ def test_misconfigurations_raise():
     with pytest.raises(ProblemError, match='periodic'):
         _problem('heat', nvars=63, bc='dirichlet-zero', solver_type='FFT')
     with pytest.raises(ProblemError, match='second-order Laplacian'):
-        _problem('heat', nvars=63, bc='dirichlet-zero', solver_type='MG')
+        _problem('heat', nvars=63, bc='neumann-zero', solver_type='MG')
     with pytest.raises(ProblemError, match='second-order Laplacian'):
         _problem('heat', nvars=64, order=4, solver_type='MG')
     with pytest.raises(ProblemError, match='second-order Laplacian'):
@@ -125,11 +125,18 @@ def test_half_precision_solve_reaches_double_precision_in_delta_form(useGPU, sol
 
 
 @pytest.mark.base
-@pytest.mark.parametrize('nvars', [4096, (64, 64), (16, 16, 16)])
+@pytest.mark.parametrize(
+    'bc, nvars',
+    [('periodic', 4096), ('periodic', (64, 64)), ('periodic', (16, 16, 16))]
+    + [('dirichlet-zero', 2047), ('dirichlet-zero', (63, 63)), ('dirichlet-zero', (15, 15, 15))],
+)
 @pytest.mark.parametrize('precision, low, high', [(None, 0, 1e-12), ('float32', 1e-9, 1e-5), ('float16', 1e-5, 3e-3)])
-def test_multigrid_solve(nvars, precision, low, high):
-    """Multigrid reaches the accuracy of its format in 1D, 2D and 3D, and counts its V-cycles."""
-    prob = _problem('heat', nvars=nvars, solver_type='MG', solve_precision=precision)
+def test_multigrid_solve(bc, nvars, precision, low, high):
+    """
+    Multigrid reaches the accuracy of its format in 1D, 2D and 3D, periodic and with zero Dirichlet values, against a
+    direct solve with the class's own matrix, and counts its V-cycles.
+    """
+    prob = _problem('heat', nvars=nvars, bc=bc, solver_type='MG', solve_precision=precision)
     assert low <= _error(prob, 1e-3) < high
     assert prob.work_counters['MG'].niter > 0
 

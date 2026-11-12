@@ -107,11 +107,11 @@ class GenericNDimFinDiff(Problem):
         and a division -- exact, and the cheapest solve there is on a GPU. ``'direct'`` keeps the
         factorizations of the last ``max_cached_factorizations`` factors and reuses them. ``'MG'`` is
         geometric multigrid (:class:`~pySDC.helpers.multigrid.GeometricMultigrid`), for the
-        second-order Laplacian on periodic grids (``derivative=2``, ``order=2``,
-        ``stencil_type='center'``) and real states: V-cycles from a zero guess until the relative
+        second-order Laplacian (``derivative=2``, ``order=2``, ``stencil_type='center'``) on periodic
+        grids or with ``bc='dirichlet-zero'``, and real states: V-cycles from a zero guess until the relative
         residual is below ``lintol``, the accuracy of the solve's format is reached, or after
         ``liniter`` cycles, whose number the work counter ``'MG'`` adds up. It needs no matrix, and on a
-        GPU in 3D it runs on fused kernels.
+        GPU on periodic 3D grids it runs on fused kernels.
     solve_precision : dtype-like or None, optional
         Precision the implicit solve runs at, independently of the state's ``dtype``. ``None``
         (default) solves at the operator's precision, exactly as without it. Otherwise the solve
@@ -313,15 +313,16 @@ class GenericNDimFinDiff(Problem):
         elif solver_type == 'MG':
             from pySDC.helpers.multigrid import GeometricMultigrid
 
-            if (bc, self._derivative, self.order, self.stencil_type) != ('periodic', 2, 2, 'center'):
+            laplacian = (self._derivative, self.order, self.stencil_type) == (2, 2, 'center')
+            if bc not in ('periodic', 'dirichlet-zero') or not laplacian:
                 raise ProblemError(
-                    'multigrid solves the second-order Laplacian on periodic grids: needs bc="periodic", '
-                    f'derivative=2, order=2, stencil_type="center", got {bc}, {self._derivative}, {self.order}, '
-                    f'{self.stencil_type}'
+                    'multigrid solves the second-order Laplacian on periodic or zero-Dirichlet grids: needs '
+                    'bc="periodic" or "dirichlet-zero", derivative=2, order=2, stencil_type="center", got '
+                    f'{bc}, {self._derivative}, {self.order}, {self.stencil_type}'
                 )
             if self.dtype.kind == 'c' or np.iscomplexobj(self._coeff):
                 raise ProblemError('multigrid solves real systems only')
-            self._multigrid = GeometricMultigrid(self.nvars[0], self.ndim, xp=self.xp)
+            self._multigrid = GeometricMultigrid(self.nvars[0], self.ndim, xp=self.xp, bc=bc)
             self._mg_dtype = np.dtype(np.float16) if self._half else precision
         elif solve_precision is not None:
             if self._half:
