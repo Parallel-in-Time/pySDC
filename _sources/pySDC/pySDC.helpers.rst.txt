@@ -13,6 +13,7 @@ Submodules
    pySDC.helpers.fft_helper
    pySDC.helpers.fieldsIO
    pySDC.helpers.firedrake_ensemble_communicator
+   pySDC.helpers.multigrid
    pySDC.helpers.plot_helper
    pySDC.helpers.problem_helper
    pySDC.helpers.pySDC_as_gusto_time_discretization

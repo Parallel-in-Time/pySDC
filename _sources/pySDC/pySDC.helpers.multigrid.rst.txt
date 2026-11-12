@@ -1,0 +1,7 @@
+multigrid
+=========
+
+.. automodule:: pySDC.helpers.multigrid
+   :members:
+   :show-inheritance:
+   :undoc-members:
