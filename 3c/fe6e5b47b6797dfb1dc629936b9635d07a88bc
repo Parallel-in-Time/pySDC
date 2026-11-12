@@ -1,0 +1,23 @@
+pySDC/projects/DeltaSDC/run_advection_diffusion.py
+  s_3cfbaa2fb0772b::t_59230b142fbdf4 6
+pySDC/projects/DeltaSDC/reproduce/advection_diffusion.py
+  s_3cfbaa2fb0772b::t_5ed2afc67bb041 27,30
+pySDC/projects/DeltaSDC/README.rst
+  s_3cfbaa2fb0772b::t_5ed2afc67bb041 755
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3cfe6e5b47b6797dfb1dc629936b9635d07a88bc",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
