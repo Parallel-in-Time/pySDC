@@ -20,6 +20,7 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.Monodomain.problem_classes.MonodomainODE import MultiscaleMonodomainODE
 from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_1st_order import imexexp_1st_order
+from pySDC.projects.Monodomain.sweeper_classes.exponential_runge_kutta.imexexp_parallel import imexexp_parallel
 from pySDC.projects.Monodomain.sweeper_classes.runge_kutta.rush_larsen import rush_larsen
 
 V_THRESHOLD = -20.0  # mV
@@ -115,7 +116,7 @@ def problem_params(domain='cube_2D', refinements=-2, model='TTP', Tend=200.0):
 
 def description(method, dt, M=4, sweeps=None, restol=1e-10, QI='IE', e_tol=None, dt_max=1.0, **kwargs):
     """
-    method: 'RL1', 'RL2' (Strang DRD), 'RL2_RDR', 'ESDC' or 'ESDC_adaptive'. ESDC with a fixed number of sweeps if
+    method: 'RL1', 'RL2' (Strang DRD), 'RL2_RDR', 'ESDC', 'ESDC_par' (node-parallel sweep) or 'ESDC_adaptive'. ESDC with a fixed number of sweeps if
     sweeps is given, else iterating to restol. ESDC_adaptive controls dt to the local tolerance e_tol, up to dt_max.
     """
     desc = dict(problem_class=MultiscaleMonodomainODE, problem_params=problem_params(**kwargs))
@@ -128,7 +129,7 @@ def description(method, dt, M=4, sweeps=None, restol=1e-10, QI='IE', e_tol=None,
         desc['level_params'] = dict(dt=dt, restol=-1)
         desc['step_params'] = dict(maxiter=1)
     elif method.startswith('ESDC'):
-        desc['sweeper_class'] = imexexp_1st_order
+        desc['sweeper_class'] = imexexp_parallel if method == 'ESDC_par' else imexexp_1st_order
         desc['sweeper_params'] = dict(initial_guess='copy', quad_type='RADAU-RIGHT', num_nodes=M, QI=QI)
         if method == 'ESDC_adaptive':
             # dt is the initial step; the step-size controller needs a fixed number of sweeps
