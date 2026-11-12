@@ -47,7 +47,8 @@ def _stub_bin(tmp_path, exit_code=0, fail_on=None):
     bin_dir.mkdir()
     log = tmp_path / 'launches.log'
 
-    (bin_dir / 'mpiexec').write_text('#!/bin/bash\n' f'echo "mpiexec $*" >> "{log}"\n' 'shift 2\nexec "$@"\n')
+    for launcher in ['mpiexec', 'srun']:
+        (bin_dir / launcher).write_text('#!/bin/bash\n' f'echo "{launcher} $*" >> "{log}"\n' 'shift 2\nexec "$@"\n')
     if fail_on:
         body = f'case "$*" in *"{fail_on}"*) exit 1 ;; esac\nexit 0\n'
     else:
@@ -58,9 +59,12 @@ def _stub_bin(tmp_path, exit_code=0, fail_on=None):
     return bin_dir, log
 
 
-def _run(tree, tmp_path, *, exit_code=0, marker=None, fail_on=None):
+def _run(tree, tmp_path, *, exit_code=0, marker=None, fail_on=None, mpiexec=None):
     bin_dir, log = _stub_bin(tmp_path, exit_code, fail_on)
     env = dict(os.environ)
+    env.pop('MPIEXEC', None)
+    if mpiexec:
+        env['MPIEXEC'] = mpiexec
     env['PATH'] = f"{bin_dir}{os.pathsep}{os.path.dirname(sys.executable)}{os.pathsep}{env['PATH']}"
     env['PYTEST'] = 'fakepytest'
     env['PYTHONPATH'] = f"{REPO}{os.pathsep}{env.get('PYTHONPATH', '')}"
@@ -88,6 +92,17 @@ def test_one_pass_per_declared_rank_count(tmp_path):
     assert any('parallel[2]' in s for s in selections), selections
     assert any('parallel[3]' in s for s in selections), selections
     assert any('parallel[1]' in s for s in selections), 'the serial pass must always run'
+
+
+@pytest.mark.mpi4py
+def test_mpiexec_can_be_replaced(tmp_path):
+    """`MPIEXEC=srun` launches every MPI pass with `srun`, for MPI libraries without `mpiexec`."""
+    tree = _make_tree(tmp_path / 'tree', ranks=(2, 3))
+    proc, launches = _run(tree, tmp_path, mpiexec='srun')
+
+    assert proc.returncode == 0, proc.stderr
+    launchers = [l.split()[:3] for l in launches if not l.startswith('pytest')]
+    assert sorted(launchers) == [['srun', '-n', '2'], ['srun', '-n', '3']], launches
 
 
 @pytest.mark.mpi4py
