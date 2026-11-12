@@ -1,0 +1,31 @@
+pySDC/projects/DeltaSDC/results/nonlinear_numbers.json
+  s_3cfbaa2fb0772b::t_171406fb9803c2 1-2,4-8
+  s_3cfbaa2fb0772b::t_beeafab936f46b 3
+pySDC/projects/DeltaSDC/reproduce/nonlinear.py
+  s_3cfbaa2fb0772b::t_f41a50acb83dfb 1-100,102-117,120-248,250-265,267-281
+  s_3cfbaa2fb0772b::t_171406fb9803c2 101,249,266
+  s_3cfbaa2fb0772b::t_beeafab936f46b 118-119
+pySDC/projects/DeltaSDC/results/nonlinear_runs.csv
+  s_3cfbaa2fb0772b::t_171406fb9803c2 1-2011
+pySDC/projects/DeltaSDC/publication.md
+  s_3cfbaa2fb0772b::t_339eba00b1eb75 1119,1142,1160,1189,1259-1262,1269-1272,1292,1356,1364-1365
+  s_3cfbaa2fb0772b::t_d2ea7e2f13bf26 5-7,1077-1118,1120-1141,1143-1159,1161-1188,1190-1258,1263-1268,1273-1291,1293-1355,1357-1363,1366-1415
+pySDC/projects/DeltaSDC/index.md
+  s_3cfbaa2fb0772b::t_d2ea7e2f13bf26 61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9a75ffca5023b2ade7d579da4444cc77c766ad12",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}

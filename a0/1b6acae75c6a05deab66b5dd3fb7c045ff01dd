@@ -1,0 +1,20 @@
+pySDC/projects/DeltaSDC/index.md
+  s_3cfbaa2fb0772b::t_e9de9b14ebfe19 42-49
+  s_3cfbaa2fb0772b::t_1295dd73e591d0 14,32-33,50-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a01b6acae75c6a05deab66b5dd3fb7c045ff01dd",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
