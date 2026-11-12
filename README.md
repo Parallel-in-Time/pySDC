@@ -24,7 +24,7 @@
 | pySDC/helpers/blocks.py                                                                             |       68 |        9 |     87% |47-49, 52-55, 70-71 |
 | pySDC/helpers/fft\_helper.py                                                                        |        6 |        1 |     83% |        26 |
 | pySDC/helpers/fieldsIO.py                                                                           |      308 |        7 |     98% |89-90, 98-99, 418, 606-607 |
-| pySDC/helpers/firedrake\_ensemble\_communicator.py                                                  |       53 |        8 |     85% |71, 81-85, 90, 100, 132 |
+| pySDC/helpers/firedrake\_ensemble\_communicator.py                                                  |       55 |        8 |     85% |79, 89-93, 98, 108, 140 |
 | pySDC/helpers/multigrid.py                                                                          |      188 |        1 |     99% |       576 |
 | pySDC/helpers/plot\_helper.py                                                                       |       33 |        2 |     94% |  118, 167 |
 | pySDC/helpers/problem\_helper.py                                                                    |      103 |        0 |    100% |           |
@@ -105,7 +105,7 @@
 | pySDC/implementations/problem\_classes/HeatEquation\_2D\_PETSc\_forced.py                           |       90 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/HeatEquation\_Chebychev.py                                   |      222 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/HeatEquation\_ND\_FD.py                                      |       68 |        1 |     99% |       123 |
-| pySDC/implementations/problem\_classes/HeatFiredrake.py                                             |       63 |        1 |     98% |       169 |
+| pySDC/implementations/problem\_classes/HeatFiredrake.py                                             |       64 |        1 |     98% |       170 |
 | pySDC/implementations/problem\_classes/HenonHeiles.py                                               |       31 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/LogisticEquation.py                                          |       40 |       20 |     50% |   119-155 |
 | pySDC/implementations/problem\_classes/Lorenz.py                                                    |       54 |        3 |     94% |155, 158-159 |
@@ -411,7 +411,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **33320** | **4068** | **88%** |           |
+| **TOTAL**                                                                                           | **33323** | **4068** | **88%** |           |
 
 45 empty files skipped.
 
