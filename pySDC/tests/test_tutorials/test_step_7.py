@@ -69,6 +69,7 @@ def test_E_MPI():
 
 
 @pytest.mark.firedrake
+@pytest.mark.gusto
 def test_F(monkeypatch):
     """
     Test that the same result is obtained using the pySDC and Gusto coupling compared to only using Gusto after a few time steps.
@@ -107,6 +108,7 @@ def test_F(monkeypatch):
 
 
 @pytest.mark.firedrake
+@pytest.mark.gusto
 def test_F_ML(monkeypatch):
     """
     Test that the Gusto coupling with multiple levels in space converges

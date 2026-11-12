@@ -2,6 +2,7 @@ from pySDC.core.problem import Problem, WorkCounter
 from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh, IMEX_firedrake_mesh
 import firedrake as fd
 import numpy as np
+from functools import cached_property
 from mpi4py import MPI
 
 
@@ -195,7 +196,7 @@ class Heat1DForcedFiredrake(Problem):
         self.work_counters['solves']()
         return me
 
-    @fd.utils.cached_property
+    @cached_property
     def x(self):
         """
         Spatial coordinate of the mesh, cached after the first access.

@@ -18,9 +18,9 @@ def test_addition(n=3, v1=1, v2=2):
 
     c = a + b
 
-    assert np.allclose(c.dat._numpy_data, v1 + v2)
-    assert np.allclose(a.dat._numpy_data, v1)
-    assert np.allclose(b.dat._numpy_data, v2)
+    assert np.allclose(c.dat.data_ro, v1 + v2)
+    assert np.allclose(a.dat.data_ro, v1)
+    assert np.allclose(b.dat.data_ro, v2)
 
 
 @pytest.mark.firedrake
@@ -39,9 +39,9 @@ def test_subtraction(n=3, v1=1, v2=2):
 
     c = a - b
 
-    assert np.allclose(c.dat._numpy_data, v1 - v2)
-    assert np.allclose(a.dat._numpy_data, v1)
-    assert np.allclose(b.dat._numpy_data, v2)
+    assert np.allclose(c.dat.data_ro, v1 - v2)
+    assert np.allclose(a.dat.data_ro, v1)
+    assert np.allclose(b.dat.data_ro, v2)
 
 
 @pytest.mark.firedrake
@@ -61,8 +61,8 @@ def test_right_multiplication(n=3, v1=1, v2=2):
 
     b = v2 * a
 
-    assert np.allclose(b.dat._numpy_data, v1 * v2)
-    assert np.allclose(a.dat._numpy_data, v1)
+    assert np.allclose(b.dat.data_ro, v1 * v2)
+    assert np.allclose(a.dat.data_ro, v1)
 
     with pytest.raises(DataError):
         'Dat kölsche Dom' * b
@@ -83,7 +83,7 @@ def test_norm(n=3, v1=-1):
     b = abs(a)
 
     assert np.isclose(b, np.sqrt(2) * abs(v1)), f'{b=}, {v1=}'
-    assert np.allclose(a.dat._numpy_data, v1)
+    assert np.allclose(a.dat.data_ro, v1)
 
 
 @pytest.mark.firedrake
@@ -100,12 +100,12 @@ def test_addition_rhs(n=3, v1=1, v2=2):
 
     c = a + b
 
-    assert np.allclose(c.impl.dat._numpy_data, v1 + v2)
-    assert np.allclose(c.expl.dat._numpy_data, v1 + v2)
-    assert np.allclose(a.impl.dat._numpy_data, v1)
-    assert np.allclose(b.impl.dat._numpy_data, v2)
-    assert np.allclose(a.expl.dat._numpy_data, v1)
-    assert np.allclose(b.expl.dat._numpy_data, v2)
+    assert np.allclose(c.impl.dat.data_ro, v1 + v2)
+    assert np.allclose(c.expl.dat.data_ro, v1 + v2)
+    assert np.allclose(a.impl.dat.data_ro, v1)
+    assert np.allclose(b.impl.dat.data_ro, v2)
+    assert np.allclose(a.expl.dat.data_ro, v1)
+    assert np.allclose(b.expl.dat.data_ro, v2)
 
 
 @pytest.mark.firedrake
@@ -122,12 +122,12 @@ def test_subtraction_rhs(n=3, v1=1, v2=2):
 
     c = a - b
 
-    assert np.allclose(c.impl.dat._numpy_data, v1 - v2)
-    assert np.allclose(c.expl.dat._numpy_data, v1 - v2)
-    assert np.allclose(a.impl.dat._numpy_data, v1)
-    assert np.allclose(b.impl.dat._numpy_data, v2)
-    assert np.allclose(a.expl.dat._numpy_data, v1)
-    assert np.allclose(b.expl.dat._numpy_data, v2)
+    assert np.allclose(c.impl.dat.data_ro, v1 - v2)
+    assert np.allclose(c.expl.dat.data_ro, v1 - v2)
+    assert np.allclose(a.impl.dat.data_ro, v1)
+    assert np.allclose(b.impl.dat.data_ro, v2)
+    assert np.allclose(a.expl.dat.data_ro, v1)
+    assert np.allclose(b.expl.dat.data_ro, v2)
 
 
 @pytest.mark.firedrake
@@ -143,10 +143,10 @@ def test_rmul_rhs(n=3, v1=1, v2=2):
 
     b = v2 * a
 
-    assert np.allclose(a.impl.dat._numpy_data, v1)
-    assert np.allclose(b.impl.dat._numpy_data, v2 * v1)
-    assert np.allclose(a.expl.dat._numpy_data, v1)
-    assert np.allclose(b.expl.dat._numpy_data, v2 * v1)
+    assert np.allclose(a.impl.dat.data_ro, v1)
+    assert np.allclose(b.impl.dat.data_ro, v2 * v1)
+    assert np.allclose(a.expl.dat.data_ro, v1)
+    assert np.allclose(b.expl.dat.data_ro, v2 * v1)
 
 
 def _test_p2p_communication(comm, u):
@@ -157,10 +157,10 @@ def _test_p2p_communication(comm, u):
         u.assign(3.14)
         req = u.isend(dest=1, comm=comm, tag=0)
     elif comm.rank == 1:
-        assert not np.allclose(u.dat._numpy_data, 3.14)
+        assert not np.allclose(u.dat.data_ro, 3.14)
         req = u.irecv(source=0, comm=comm, tag=0)
     req.wait()
-    assert np.allclose(u.dat._numpy_data, 3.14)
+    assert np.allclose(u.dat.data_ro, 3.14)
 
 
 def _test_bcast(comm, u):
@@ -169,9 +169,9 @@ def _test_bcast(comm, u):
     if comm.rank == 0:
         u.assign(3.14)
     else:
-        assert not np.allclose(u.dat._numpy_data, 3.14)
+        assert not np.allclose(u.dat.data_ro, 3.14)
     u.bcast(root=0, comm=comm)
-    assert np.allclose(u.dat._numpy_data, 3.14)
+    assert np.allclose(u.dat.data_ro, 3.14)
 
 
 @pytest.mark.firedrake

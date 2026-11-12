@@ -1,9 +1,12 @@
-from firedrake import assemble, prolong, inject
-from firedrake.__future__ import interpolate
+from firedrake import assemble, interpolate, TransferManager
 
 from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
 from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh, IMEX_firedrake_mesh
+
+# Firedrake's plain `inject` and `prolong` reject mixed spaces and give NaN when injecting H(div) spaces such as BDM
+# on immersed manifolds (Gusto's sphere); the transfer manager handles both.
+_transfer_manager = TransferManager()
 
 
 class MeshToMeshFiredrake(SpaceTransfer):
@@ -73,12 +76,12 @@ class MeshToMeshFiredrakeHierarchy(SpaceTransfer):
     @staticmethod
     def _restrict(u_fine, u_coarse):
         """Perform restriction in Firedrake"""
-        inject(u_fine.functionspace, u_coarse.functionspace)
+        _transfer_manager.inject(u_fine.functionspace, u_coarse.functionspace)
 
     @staticmethod
     def _prolong(u_coarse, u_fine):
         """Perform prolongation in Firedrake"""
-        prolong(u_coarse.functionspace, u_fine.functionspace)
+        _transfer_manager.prolong(u_coarse.functionspace, u_fine.functionspace)
 
     def restrict(self, F):
         """
