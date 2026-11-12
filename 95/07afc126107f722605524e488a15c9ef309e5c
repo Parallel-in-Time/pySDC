@@ -1,0 +1,32 @@
+pySDC/tests/test_helpers/test_multigrid.py
+  s_3cfbaa2fb0772b::t_fed5d503690fa1 1-77,81-148
+  s_3cfbaa2fb0772b::t_9b8e1a3b2299f1 78-80
+  s_3cfbaa2fb0772b::t_902cc97f99bb47 149
+pySDC/helpers/multigrid.py
+  s_3cfbaa2fb0772b::t_698ab56dcb5ce7 467
+  s_3cfbaa2fb0772b::t_19eaa268401e6b 422,424-428
+  s_3cfbaa2fb0772b::t_df7aace11aae45 19-21
+  s_3cfbaa2fb0772b::t_1f6ac1ce069335 1-18,22-421,423,429-466
+pySDC/implementations/problem_classes/HeatEquation_ND_FD.py
+  s_3cfbaa2fb0772b::t_7d3b0de4bf733d 40-41
+pySDC/implementations/problem_classes/generic_ND_FD.py
+  s_3cfbaa2fb0772b::t_e38fedcd6638ed 59-65,71-72,239,264-276,279,386,480-482,517-536
+pySDC/tests/test_problems/test_FD_solve_precision.py
+  s_3cfbaa2fb0772b::t_22c6564f36f821 71-78,81,85,90,92,106,109,127-136,139-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9507afc126107f722605524e488a15c9ef309e5c",
+  "prompts": {},
+  "sessions": {
+    "s_3cfbaa2fb0772b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c088221b-867c-498f-acf6-9de164871ddc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
