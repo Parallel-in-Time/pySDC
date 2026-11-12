@@ -1,0 +1,27 @@
+docs/contrib/02_continuous_integration.md
+  s_8dd430a1287f24::t_ab9b649f89afbc 245-249,263-264,282-284,287-288
+pySDC/projects/GPU/etc/venv_jusuf/config.sh
+  s_8dd430a1287f24::t_b51737164b0bae 15-17
+pySDC/projects/GPU/etc/venv_jusuf/modules.sh
+  s_8dd430a1287f24::t_ad52200941ac82 2-3
+pySDC/projects/GPU/etc/venv_jusuf/readme.md
+  s_8dd430a1287f24::t_c81553b6f61681 21-28
+pySDC/projects/GPU/etc/venv_jusuf/setup.sh
+  s_8dd430a1287f24::t_ab3f5e9a2aca77 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "76f8e2f5246365b86500250baafe8f1d1372fa28",
+  "prompts": {},
+  "sessions": {
+    "s_8dd430a1287f24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7dbec754-a32f-4804-9bbe-a6f6101a772e",
+        "model": "unknown"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
