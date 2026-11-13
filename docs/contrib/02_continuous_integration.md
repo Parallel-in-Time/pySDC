@@ -151,30 +151,7 @@ pytest -v pySDC/tests
 > deliberately does not run). A test without one would never run anywhere, so collection stops with an error
 > that names it; see `pySDC/tests/conftest.py`.
 
-## Running CI on HPC from pull requests
-
-> :warning: **Note:** The GitLab mirror integration is currently disabled due to technical issues. This section describes functionality that is temporarily unavailable.
-
-By syncing the GitHub repository to a certain Gitlab instance, CI-Jobs can be run on HPC machines. This can be helpful for benchmarks or when running on accelerators that are not available as GitHub runners.
-
-For security and accounting reasons, a few extra steps are needed in order to run the contents of a pull request on HPC:
-
-- The pull request needs to have the tag "gitlab-mirror" assigned to it.
-- A person with write-permission for the Parallel-in-Time pySDC repository needs to trigger the workflow. Ask for someone with the required permissions to rerun the workflow if needed.
-- The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. In this case, please merge upstream changes, fix all conflicts, and rerun the workflow.
-
-> :bell: Note that direct pushes to Parallel-in-Time/pySDC will always trigger the HPC pipeline on Gitlab
-
-Regardless of why the Gitlab pipeline was triggered, the following holds true:
-
-- The return-state from Gitlab is transmitted to GitHub (Success/Failure) leading to the same result in GitHub
-- Logs from Gitlab are also transferred. The full logs of all jobs can be read from within GitHub. For better overview, these are folded, so unfolding is needed before reading.
-- Artifacts from Gitlab jobs are also transferred back to GitHub
-- Information, such as coverage is transferred to GitHub, but not yet merged across multiple GitHub workflows. Therefore, there is no complete summary of e.g. coverage-reports across all jobs in all workflows.
-
-> :warning: The coverage report from the HPC tests is not yet merged with other reports. The test coverage will not show up on the respective website or in the badge. We are working on this.
-
-### HPC test environments
+### GPU tests
 
 In order to run tests on GPUs, please use the pytest marker `cupy`.
 
@@ -232,11 +209,98 @@ and takes about three minutes; the free tier covers several hundred a month.
 > `etc/modal_gpu_tests.py` installs at a pinned commit. `etc/environment-cupy.yml` on its own is
 > not enough to run that code.
 
-If you want to create a new HPC test environment, the following steps need to be completed:
+### Running the test suite on a Slurm cluster
 
-- Create a new slurm job-script in `etc/juwels_*.sh`. The name and location of the file is important.
-- Adapt `.gitlab-ci.yml` to include the new job-script. For this, add a name in the job "test_JUWELS" in the section `parallel: matrix: SHELL_SCRIPT`. The name there must match the name of the newly created file.
-As a starting point it is recommended to copy and adapt an existing file (e.g. `etc/juwels_cupy.sh`).
+CI runs every MPI test with all ranks on one machine and with one MPI library, OpenMPI. A cluster
+differs in two ways that CI cannot see: the ranks of one test sit on different nodes, and the MPI
+library is often a vendor one. Both have hidden bugs. Under ParaStationMPI, the default MPI library
+on the JSC machines, a dropped `Isend` request delivered garbage and hung a whole block of steps
+(#821), and two tests that shared files through rank 0's node-local `/tmp` hung as soon as their
+ranks were on different nodes (#822). It is worth running the suite on a cluster before merging
+larger changes to the MPI code.
+
+**Environment.** Use micromamba with the same environment files as CI, `etc/environment-mpi4py.yml`
+for the CPU tests or `etc/environment-cupy.yml` for the GPU tests, together with
+`etc/environment-tests.yml`. Change one thing: MPI. The `openmpi` these files install does not know
+the cluster's batch system or network, so replace it with conda-forge's *external* MPI placeholder,
+which builds mpi4py and mpi4py-fft against the MPI interface but loads the cluster's own MPI library
+at run time:
+
+- Pick the placeholder that matches the cluster's MPI. MPICH-based libraries, such as
+  ParaStationMPI, use `mpich=4.3.*=external_*` (they share MPICH's `libmpi.so.12` interface); for an OpenMPI module, use `openmpi=5.*=external_*` with the matching version. The
+  placeholders live on the label `conda-forge/label/mpi-external`, which has to be listed *before*
+  `conda-forge`, or strict channel priority hides them.
+- Create the environment in one command from both files, so that conda does not overwrite what pip
+  installed:
+
+  ```bash
+  micromamba create -n pySDC -f environment.yml -f etc/environment-tests.yml \
+      --override-channels -c conda-forge/label/mpi-external -c conda-forge --strict-channel-priority
+  ```
+
+  where `environment.yml` is a copy of `etc/environment-mpi4py.yml` with `openmpi` replaced. Then
+  install pySDC with `pip install --no-deps -e .`.
+- Load the cluster's MPI module, and nothing else that brings Python packages, before anything imports
+  mpi4py: during the setup as much as in the job. Python, SciPy or mpi4py modules would shadow the
+  environment's packages through `PYTHONPATH`, and so would modules that load Python themselves
+  (on JUSUF, `texlive` does).
+- Put micromamba's root prefix (`MAMBA_ROOT_PREFIX`) on a scratch filesystem if project storage is
+  short of inodes: an environment is 30,000 to 50,000 files, and it is quick to rebuild when scratch
+  is purged. The job has to use the same root prefix to find the environment.
+
+For the GPU tests, start from `etc/environment-cupy.yml` and add `cuda-version=12.*` (or whatever the
+driver supports), and a C compiler, `cython` and `setuptools` to build the mpi4py-fft fork described in
+the warning above on top of it. `environment-cupy.yml` has no `mpi-pytest`, so install
+`mpi-pytest>=2026.0` with pip as well. `pySDC/projects/GPU/etc/venv_jusuf/setup.sh` does all of this
+for JUSUF.
+
+**Running.** Use `etc/run_mpi_tests.sh`, as CI does. It asks the tests which rank counts they need
+and runs one pytest pass per count, then the serial pass. Run it inside a batch job, never on the
+login node, and set two environment variables:
+
+- `MPIEXEC=srun` (or e.g. `srun --mpi=pspmix` for OpenMPI under Slurm): the launcher of the MPI
+  passes, `mpiexec` by default. Some MPI libraries, ParaStationMPI among them, have no `mpiexec`.
+  Use `srun -l`, which prefixes every output line with its rank: every rank prints its full pytest
+  output, and without the prefix the log has each line once per rank, interleaved.
+- `PYTEST="python -m pytest -v --timeout=240 --timeout-method=thread"`. The `thread` method
+  matters: the default `signal` method, which `pyproject.toml` sets, cannot interrupt a rank that is
+  blocked inside an MPI call, so a hang would keep the job until its time limit. With `thread`,
+  pytest dumps the stacks of the hung rank and exits, and `srun` ends the step.
+
+Start the job in a directory on a shared filesystem, because the MPI tests share files through
+`./data` and every rank has to see them. A job script for the CPU suite on two nodes:
+
+```bash
+#!/bin/bash
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=8      # the MPI tests ask for up to 9 ranks
+#SBATCH --time=00:30:00
+#SBATCH --partition=batch        # site specific, as is --account
+#SBATCH --chdir=/path/on/shared/filesystem/pySDC
+
+module load <the MPI module>     # before activating, and nothing that brings Python
+export MAMBA_ROOT_PREFIX=/path/to/micromamba/root  # where the environment was created
+eval "$(/path/to/micromamba shell hook --shell bash)"
+micromamba activate pySDC        # the name given to `micromamba create -n`
+
+export OMP_NUM_THREADS=1 MPLBACKEND=Agg  # one thread per rank, plots without a display
+export MPIEXEC="srun -l"
+export PYTEST="python -m pytest -v -p no:cacheprovider --timeout=240 --timeout-method=thread"
+bash etc/run_mpi_tests.sh pySDC/tests mpi4py
+```
+
+For the GPU suite, run `etc/run_mpi_tests.sh pySDC/tests cupy` (and `pySDC/projects/GPU/tests cupy`)
+with one rank per GPU, and set `NCCL_CUMEM_HOST_ENABLE=0` as the CI job does: on some hosts NCCL's
+host buffers fail to import and leave the CUDA context unusable. With one GPU per node, the
+scheduler gives each rank its own device; `etc/gpu_bind.py` is only needed for several GPUs per
+host without a scheduler.
+
+On JUSUF with Stages/2026, the only modules needed are
+`module load Stages/2026 GCC/14.3.0 ParaStationMPI/5.13.0-1`, plus `MPI-settings/CUDA` for the GPU
+suite, with the MPICH placeholder above. The CUDA-enabled ParaStationMPI loads CUDA and NCCL modules
+as dependencies, but CuPy still uses the CUDA runtime and NCCL from the environment. A clean CPU run takes about 2.5 minutes on two nodes, the GPU
+suite about 3 minutes on four nodes with one V100 each, and NCCL uses InfiniBand between the nodes.
+Most sites bill whole nodes, so keep the time limits short.
 
 ## Code coverage
 
