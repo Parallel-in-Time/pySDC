@@ -1,0 +1,24 @@
+pySDC/implementations/problem_classes/VorticityVelocity_2D_Firedrake_periodic.py
+  s_defc4032430111::t_e4432ef419dd5f 1-227
+pySDC/tests/test_problems/test_vortex_firedrake.py
+  s_defc4032430111::t_d55425a0ad9f13 1-93
+pySDC/implementations/problem_classes/FormFiredrake.py
+  s_defc4032430111::t_f3ef06468ea8aa 93-96
+  s_defc4032430111::t_7d87613680e795 115,132,258-260
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3e22b9142ff8abf3d91fc77eee817c4142c70e3b",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
