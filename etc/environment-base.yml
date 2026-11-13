@@ -10,6 +10,7 @@ dependencies:
   - sympy>=1.0
   - dill>=0.2.6
   - vtk
+  - fenics-ufl
   - pip
   - pip:
     - qmat>=0.1.8
