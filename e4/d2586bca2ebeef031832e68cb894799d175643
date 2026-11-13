@@ -1,0 +1,19 @@
+pySDC/projects/Monodomain/run_scripts/masked_campaign.py
+  s_60b4f017613324::t_b246cba16c13c6 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e4d2586bca2ebeef031832e68cb894799d175643",
+  "prompts": {},
+  "sessions": {
+    "s_60b4f017613324": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b9301952-2679-45a7-8e75-16851afd4e03",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
