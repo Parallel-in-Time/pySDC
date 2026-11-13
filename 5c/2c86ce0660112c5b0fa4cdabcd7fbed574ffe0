@@ -1,0 +1,21 @@
+pySDC/projects/SDC4SDEs/problem_classes.py
+  s_a18ed19b091a87::t_c1838a221505e4 40-41
+pySDC/projects/SDC4SDEs/studies.py
+  s_a18ed19b091a87::t_dcb118feb6806e 212-219,224-227,236
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c2c86ce0660112c5b0fa4cdabcd7fbed574ffe0",
+  "prompts": {},
+  "sessions": {
+    "s_a18ed19b091a87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3435dccb-3189-4958-8af0-f9c484a3f2b9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
