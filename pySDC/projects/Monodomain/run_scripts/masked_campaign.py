@@ -3,7 +3,10 @@ Runs the masked-ESDC vs RL2 timing campaign on one node: every configuration is 
 its own core, at most NPAR at a time, one per core complex (cores 0, STRIDE, 2*STRIDE, ...), so that runs do not share
 an L3 cache and each socket's memory channels serve only a few of them.
 
-    python masked_campaign.py OUT [NPAR=16] [STRIDE=8] [Tend=50]
+    python masked_campaign.py OUT [NPAR=16] [STRIDE=8] [Tend=50] [SET=1]
+
+SET 1 is the main campaign (it also computes REF). SET 2 adds the low-accuracy end (loose tolerances, large RL2 steps) and
+the per-cell error-tolerance mode (mask=err); run it into the same OUT after SET 1.
 
 Every run writes OUT/TAG.npz and appends to OUT/runs.jsonl (see masked_timing.py); its log goes to OUT/TAG.log.
 Runs whose TAG.npz exists are skipped, so the campaign can be resumed.
@@ -14,6 +17,20 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+
+
+def configs2():
+    """Follow-up: loose tolerances, RL2 at large steps, mask=err (per-cell floor restol, theta=1)."""
+    for dt in [0.1, 0.2]:
+        for tol in ['1e-4', '1e-3']:
+            yield f'masked_res_dt{dt:g}_tol{tol}', 'ESDC_masked', dt, ['mask=res', f'restol={tol}']
+    for tol in ['1e-4', '1e-3']:
+        yield f'masked_inc_dt0.2_tol{tol}', 'ESDC_masked', 0.2, ['mask=inc', f'restol={tol}']
+    for dt in [0.1, 0.2]:
+        for kappa in ['0', '1']:
+            yield f'masked_err_k{kappa}_dt{dt:g}_tol1e-5', 'ESDC_masked', dt, ['mask=err', 'theta=1', f'kappa={kappa}', 'restol=1e-5']
+    yield 'masked_err_k0_dt0.2_tol1e-4', 'ESDC_masked', 0.2, ['mask=err', 'theta=1', 'kappa=0', 'restol=1e-4']
+    yield 'RL2_0.1', 'RL2', 0.1, []
 
 
 def configs():
@@ -41,10 +58,11 @@ def main():
     npar = int(sys.argv[2]) if len(sys.argv) > 2 else 16
     stride = int(sys.argv[3]) if len(sys.argv) > 3 else 8
     Tend = sys.argv[4] if len(sys.argv) > 4 else '50'
+    which = configs2 if len(sys.argv) > 5 and sys.argv[5] == '2' else configs
     out.mkdir(parents=True, exist_ok=True)
     script = Path(__file__).with_name('masked_timing.py')
     env = dict(os.environ, OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1', MKL_NUM_THREADS='1')
-    todo = [c for c in configs() if not (out / f'{c[0]}.npz').exists()]
+    todo = [c for c in which() if not (out / f'{c[0]}.npz').exists()]
     free = [i * stride for i in range(npar)]
     running = {}
     while todo or running:

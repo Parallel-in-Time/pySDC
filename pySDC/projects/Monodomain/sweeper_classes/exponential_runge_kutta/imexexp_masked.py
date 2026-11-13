@@ -61,16 +61,32 @@ class imexexp_masked(imexexp_parallel):
       error) exceeds ``theta * restol``, plus the neighbours of such cells, whose diffusion input changed. Frozen cells
       are not looked at again, so there is no residual halo. Stops when the relative norm of the increments is below
       ``restol``.
+    - ``mask='err'``: like ``'res'``, but each cell gets its own tolerance: it is frozen once its residual is below
+      ``max(theta * restol, kappa * e)``, with e an estimate of the cell's own time-discretization error in this step,
+      and the step ends when no cell is active. There is no point in converging a cell far below its discretization
+      error, which is largest at the upstroke, where most sweeps are spent. e is the defect of the degree M-1
+      polynomial through u0, u_1, ..., u_{M-1} extrapolated to the last node, |u_M - q(1)|, an O(dt^M) quantity, so it
+      overestimates the collocation error; ``kappa`` absorbs that. e only loosens the tolerance from sweep ``kmin`` on,
+      so that a crude early iterate cannot freeze itself.
+
+    Reactivation is exact for ``'res'`` and ``'err'``: a frozen cell's residual depends on its own state (unchanged),
+    the stimulus (fixed within the step) and its neighbours' potential, so recomputing the residual on every
+    neighbour of an updated cell after each sweep catches every cell that something can have woken up, for example
+    resting tissue that the arriving front starts to depolarise during the iteration. ``'inc'`` only adds the
+    neighbours of cells whose increment is still large.
 
     The diffusion solve is a global DCT and is done on the whole tissue; only its result is masked. f at the step
     start is taken from the previous step's last node instead of being re-evaluated.
     """
 
     def __init__(self, params, level):
-        for k, v in dict(mask='res', theta=0.1).items():
+        for k, v in dict(mask='res', theta=0.1, kappa=0.1, kmin=2).items():
             params.setdefault(k, v)
         super().__init__(params, level)
-        assert self.params.mask in ['none', 'res', 'inc']
+        assert self.params.mask in ['none', 'res', 'inc', 'err']
+        M, c = self.coll.num_nodes, self.coll.nodes
+        x = np.concatenate([[0.0], c[:-1]])  # u0 and the first M-1 nodes, extrapolated to the last node
+        self.extrap = np.array([np.prod([(c[-1] - x[i]) / (x[j] - x[i]) for i in range(M) if i != j]) for j in range(M)])
         self.f_end = None
         self.active_history = []  # (time, active fraction) per sweep
 
@@ -165,6 +181,9 @@ class imexexp_masked(imexexp_parallel):
             self.lmbda = np.zeros((ne, self.n))
         self.phi_ready = np.zeros(self.n, bool)
         self.first = True
+        self.k = 0
+        self.ecell = np.zeros(self.n)
+        self.scale = scale
 
         if self.params.mask == 'none':
             self.dirty = None
@@ -213,6 +232,21 @@ class imexexp_masked(imexexp_parallel):
             c = self._c(d)
             U = np.stack([np.asarray(L.u[m])[:, c] for m in range(1, M + 1)])
             self.res.set(d, np.asarray(L.u[0])[:, c][None] + self.integrate_cells(d) - U)
+        if self.params.mask == 'err':
+            thr = np.full(self.n, self.params.theta * L.params.restol)
+            if d is None or d.size:
+                c = self._c(d)
+                U = [np.asarray(L.u[0])[:, c]] + [np.asarray(L.u[m])[:, c] for m in range(1, M)]
+                e = np.abs(np.asarray(L.u[M])[:, c] - sum(w * u for w, u in zip(self.extrap, U)))
+                self.ecell[c] = (e / self.scale[:, None]).max(axis=0)
+            if self.k >= self.params.kmin:
+                thr = np.maximum(thr, self.params.kappa * self.ecell)
+            ratio = self.res.cellmax / thr
+            self.active = np.flatnonzero(ratio > 1.0)
+            # below restol exactly when every cell is below its own tolerance
+            L.status.residual = L.params.restol * min(ratio.max(), 1e3) if self.active.size else 0.0
+            L.status.updated = False
+            return
         tracked = self.inc if (self.params.mask == 'inc' and not self.first) else self.res
         L.status.residual = tracked.rel_norm(self.u0norm)
         if L.status.residual < L.params.restol:  # confirm without accumulated round-off
@@ -246,7 +280,7 @@ class imexexp_masked(imexexp_parallel):
             incmax = np.abs(d) if incmax is None else np.maximum(incmax, np.abs(d))
             self._eval_f_cells(m, cells)
 
-        if self.params.mask == 'res':
+        if self.params.mask in ['res', 'err']:
             self.dirty = None if cells is None else self._neighbours(cells)
         elif self.params.mask == 'inc':
             self.inc.set(cells, incmax[None])
@@ -254,6 +288,7 @@ class imexexp_masked(imexexp_parallel):
             self.active = self._neighbours(hot)
             self.dirty = self.active
         self.first = False
+        self.k += 1
         L.status.updated = True
 
     def compute_end_point(self):

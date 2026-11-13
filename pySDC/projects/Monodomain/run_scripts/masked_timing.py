@@ -8,7 +8,8 @@ one JSON line (wall time, sweeps, work counters, mean active fraction) to OUT/ru
 rest=eq (default) starts every method from the cell model's equilibrated resting state, rest=paper from its published
 initial values.
 
-METHOD: RL2, ESDC_par (unmasked reference implementation) or ESDC_masked (with mask = none | res | inc).
+METHOD: RL2, ESDC_par (unmasked reference implementation) or ESDC_masked (with mask = none | res | inc | err;
+err also takes kappa=0.1 and kmin=2).
 """
 
 import json
@@ -44,7 +45,7 @@ def resting_state(P, T=6e4):
 
 def main():
     out, tag, method, dt = Path(sys.argv[1]), sys.argv[2], sys.argv[3], float(sys.argv[4])
-    kw = dict(restol='1e-5', mask='res', theta='0.1', domain='cuboid_2D', refinements='1', Tend='50', M='4', rest='eq')
+    kw = dict(restol='1e-5', mask='res', theta='0.1', domain='cuboid_2D', refinements='1', Tend='50', M='4', rest='eq', kappa='0.1', kmin='2')
     kw.update(a.split('=', 1) for a in sys.argv[5:])
     prob = dict(domain=kw['domain'], refinements=int(kw['refinements']), model='TTP', Tend=float(kw['Tend']))
     if method == 'RL2':
@@ -53,7 +54,7 @@ def main():
         desc = wp.description('ESDC_par', dt, M=int(kw['M']), restol=float(kw['restol']), **prob)
         if method == 'ESDC_masked':
             desc['sweeper_class'] = imexexp_masked
-            desc['sweeper_params'].update(mask=kw['mask'], theta=float(kw['theta']))
+            desc['sweeper_params'].update(mask=kw['mask'], theta=float(kw['theta']), kappa=float(kw['kappa']), kmin=int(kw['kmin']))
     hook = type('Hook', (wp.ActivationHook,), dict(label=tag))
     ctrl = controller_nonMPI(
         num_procs=1, controller_params=dict(logger_level=30, hook_class=[hook], mssdc_jac=False), description=desc
