@@ -1,0 +1,17 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "86156302c9efedb01db8a0309c4e68b914be142b",
+  "prompts": {},
+  "sessions": {
+    "s_8dd430a1287f24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7dbec754-a32f-4804-9bbe-a6f6101a772e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
