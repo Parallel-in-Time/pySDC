@@ -1,0 +1,19 @@
+pySDC/projects/Monodomain/sweeper_classes/exponential_runge_kutta/imexexp_masked.py
+  s_60b4f017613324::t_da332766e23c2c 104-105,107-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "577dd0e3dc11ddf570a6934c998d798550acf798",
+  "prompts": {},
+  "sessions": {
+    "s_60b4f017613324": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b9301952-2679-45a7-8e75-16851afd4e03",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
