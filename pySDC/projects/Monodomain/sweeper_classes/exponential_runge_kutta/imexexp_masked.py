@@ -101,10 +101,11 @@ class imexexp_masked(imexexp_parallel):
         grid = np.zeros(self.n, bool)
         grid[cells] = True
         grid = grid.reshape(P.parabolic.shape)
-        cross = np.zeros((3,) * grid.ndim, bool)
+        r = P.parabolic.order // 2  # stencil radius: 1 for the 3-point, 2 for the 4th-order 5-point Laplacian
+        cross = np.zeros((2 * r + 1,) * grid.ndim, bool)
         for d in range(grid.ndim):
-            idx = [1] * grid.ndim
-            for s in (0, 1, 2):
+            idx = [r] * grid.ndim
+            for s in range(2 * r + 1):
                 idx[d] = s
                 cross[tuple(idx)] = True
         return np.flatnonzero(binary_dilation(grid, structure=cross))
