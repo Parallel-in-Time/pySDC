@@ -1,0 +1,25 @@
+pySDC/projects/Monodomain/run_scripts/masked_spatial.py
+  s_60b4f017613324::t_d1611e9eccd124 1-42
+pySDC/projects/Monodomain/run_scripts/masked_timing.py
+  s_60b4f017613324::t_01f2355c8fc106 5-7,49-74,87,102
+pySDC/projects/Monodomain/run_scripts/masked_analyze.py
+  s_60b4f017613324::t_d1611e9eccd124 3-4,20-21,24-28,30-31,33-36,39,41
+pySDC/projects/Monodomain/run_scripts/masked_campaign.py
+  s_60b4f017613324::t_84fb10a411d9c0 6-11,58-77,83,87,92,94-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6eb3c61320fd860f1f2a487375081828d7d6e014",
+  "prompts": {},
+  "sessions": {
+    "s_60b4f017613324": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b9301952-2679-45a7-8e75-16851afd4e03",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
