@@ -102,3 +102,19 @@ def test_initial_value_only():
         P.u_exact(0)
         with pytest.raises(AssertionError):
             P.u_exact(0.5)
+
+
+@pytest.mark.firedrake
+def test_study_heat_h():
+    """
+    The study's heat example, CG4 with h-coarsening, gives the speed-ups of the FEniCS study (1.24x on two levels,
+    1.57x on three), and MLSDC converges to the SDC solution.
+    """
+    import numpy as np
+    from pySDC.projects.FEM_with_FEniCS.run_examples_firedrake import _diff, compare_mlsdc
+
+    results = compare_mlsdc('heat', out=lambda *args: None)
+    speedups = [results[1]['work'] / results[n]['work'] for n in (2, 3)]
+    assert np.allclose(speedups, [1.24, 1.57], atol=0.01), speedups
+    for n in (2, 3):
+        assert _diff(results[n]['uend'], results[1]['uend']) < 1e-8
