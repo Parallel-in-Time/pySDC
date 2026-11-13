@@ -135,7 +135,7 @@ class ParaDiag:
     # ------------------------------------------------------------------ alpha and the transform
 
     @staticmethod
-    def resolve_alpha(alpha: Any, k: int = 0) -> float:
+    def resolve_alpha(alpha: Any, k: int, n_steps: int) -> float:
         """
         Read the alpha for iteration `k` out of whatever the user supplied.
 
@@ -148,15 +148,25 @@ class ParaDiag:
         Args:
             alpha: the alpha parameter as supplied by the user
             k (int): iteration index
+            n_steps (int): number of steps in the block
 
         Returns:
             float: alpha to use for this iteration
         """
         if callable(alpha):
-            return float(alpha(k))
-        if hasattr(alpha, '__len__'):
-            return float(alpha[min(k, len(alpha) - 1)])
-        return float(alpha)
+            value = float(alpha(k))
+        elif hasattr(alpha, '__len__'):
+            value = float(alpha[min(k, len(alpha) - 1)])
+        else:
+            value = float(alpha)
+
+        # The weights of the FFT in time are alpha**(-l / n_steps): NaN for a negative alpha, and infinite for alpha = 0
+        # once there is more than one step. A single step with alpha = 0 is the plain collocation problem.
+        if value < 0 or (value == 0 and n_steps > 1):
+            raise ValueError(
+                f'ParaDiag needs alpha > 0 with {n_steps} steps in the block, but got alpha={value} in iteration {k}'
+            )
+        return value
 
     def get_alpha(self, k: int = 0) -> float:
         """
@@ -168,7 +178,7 @@ class ParaDiag:
         Returns:
             float: alpha to use for this iteration
         """
-        return self.resolve_alpha(self.params.alpha, k)
+        return self.resolve_alpha(self.params.alpha, k, self.n_steps)
 
     def get_FFT_matrices(self, k: int = 0) -> Any:
         """

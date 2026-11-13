@@ -298,7 +298,8 @@ def test_average_jacobian_is_averaged_per_node():
     import numpy as np
 
     L, M = 4, 3
-    controller, prob = get_composite_collocation_problem(L, M, 2, problem='vdp')
+    # any valid alpha: ParaDiag needs alpha > 0, and only the averaging is tested here
+    controller, prob = get_composite_collocation_problem(L, M, 2, alpha=1e-4, problem='vdp')
     controller.params.average_jacobian = True
 
     rng = np.random.default_rng(seed=3)
@@ -313,6 +314,27 @@ def test_average_jacobian_is_averaged_per_node():
     for l in range(L):
         for m in range(M):
             assert np.allclose(controller.MS[l].levels[0].u_avg[m], data[:, m].mean(axis=0))
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('L, alpha', [(4, 0), (4, -1e-4), (1, -1e-4), (4, [1e-4, 0])])
+def test_invalid_alpha_is_rejected(L, alpha):
+    """The FFT in time is weighted by alpha**(-l / L): NaN for alpha < 0, and infinite for alpha = 0 with several steps."""
+    if isinstance(alpha, list):
+        # an iteration-dependent alpha is checked when the iteration that uses it comes
+        controller, _ = get_composite_collocation_problem(L, 3, 2, alpha=alpha)
+        with pytest.raises(ValueError, match='alpha > 0'):
+            controller.get_alpha(1)
+    else:
+        with pytest.raises(ValueError, match='alpha > 0'):
+            get_composite_collocation_problem(L, 3, 2, alpha=alpha)
+
+
+@pytest.mark.base
+def test_single_step_accepts_alpha_zero():
+    """With one step, alpha = 0 is the plain collocation problem, which the diagonalization solves exactly."""
+    controller, _ = get_composite_collocation_problem(1, 3, 2, alpha=0)
+    assert controller.get_alpha(0) == 0
 
 
 if __name__ == '__main__':
