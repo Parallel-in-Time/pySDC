@@ -574,8 +574,8 @@
 
         <span class="c1"># evaluate explicit part.</span>
         <span class="c1"># Because it does not depend on the current solution, we can simply interpolate the expression</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">SpatialCoordinate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
-        <span class="n">me</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">me</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forcing</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]()</span>
 
@@ -653,6 +653,51 @@
         <span class="k">return</span> <span class="n">fd</span><span class="o">.</span><span class="n">SpatialCoordinate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Heat1DForcedFiredrake.t">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t">[docs]</a>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Time as a Firedrake constant, assigned before each interpolation so the kernels compile only once.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        t : firedrake.Constant</span>
+<span class="sd">            Time at which the time-dependent expressions are evaluated.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Heat1DForcedFiredrake.forcing">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.forcing">[docs]</a>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Symbolic forcing term :math:`f(x, t)` in terms of the time constant :attr:`t`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        f : ufl.core.expr.Expr</span>
+<span class="sd">            Forcing term, interpolated in :meth:`eval_f`.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="Heat1DForcedFiredrake.exact_solution">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.exact_solution">[docs]</a>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exact_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Symbolic exact solution :math:`u(x, t)` in terms of the time constant :attr:`t`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        u : ufl.core.expr.Expr</span>
+<span class="sd">            Exact solution, interpolated in :meth:`u_exact`.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">fd</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span></div>
+
+
 <div class="viewcode-block" id="Heat1DForcedFiredrake.u_exact">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.u_exact">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
@@ -669,8 +714,9 @@
 <span class="sd">        me : dtype_u</span>
 <span class="sd">            Exact solution.</span>
 <span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
-        <span class="n">me</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">me</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exact_solution</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 </div>
 
