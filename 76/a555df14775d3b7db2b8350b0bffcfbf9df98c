@@ -1,0 +1,33 @@
+pySDC/tests/test_tutorials/test_step_7.py
+  s_defc4032430111::t_bc8995eeae4ec7 72-77
+  s_defc4032430111::t_a3b9380cddf3ae 71
+pySDC/helpers/ufl_forms.py
+  s_defc4032430111::t_bc8995eeae4ec7 6-8
+docs/source/tutorial/step_7.rst
+  s_defc4032430111::t_bc8995eeae4ec7 13
+pySDC/tutorial/step_7/README.rst
+  s_defc4032430111::t_bc8995eeae4ec7 17-18,21
+docs/source/conf.py
+  s_defc4032430111::t_bc8995eeae4ec7 100
+pySDC/tests/test_helpers/test_ufl_forms.py
+  s_defc4032430111::t_bc8995eeae4ec7 2-3,74,92,116,129
+pySDC/tutorial/step_7/H_pySDC_with_Firedrake_forms.py
+  s_defc4032430111::t_8f629ddebd089a 101-102,202,207
+  s_defc4032430111::t_0d4d658bb0b41f 1-100,103-201,203-206,208-228
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "76a555df14775d3b7db2b8350b0bffcfbf9df98c",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
