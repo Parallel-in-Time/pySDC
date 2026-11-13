@@ -116,6 +116,11 @@ def get_forms(imex, n=8):
 #
 # The boundary values enter only in the solves. As a result, the rows of the SDC residual that belong to boundary
 # nodes carry no equation, and the problem class leaves them out of the residual it reports.
+#
+# The residual is a load vector like $R(u)$, and its size is measured with the norm that belongs to load vectors: the
+# $L^2$ norm of the function it represents, $\sqrt{r^T M^{-1} r}$. It does not shrink as the mesh is refined, so a
+# residual tolerance means the same on every mesh. Here, `restol = 1e-8` is where the iterations reach the accuracy
+# of the collocation problem; a smaller one only adds iterations.
 
 
 # %%
@@ -140,7 +145,7 @@ def setup(imex):
         'problem_params': get_forms(imex),
         'sweeper_class': imex_1st_order_mass if imex else generic_implicit_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'},
-        'level_params': {'restol': 1e-10, 'dt': 0.1},
+        'level_params': {'restol': 1e-8, 'dt': 0.1},
         'step_params': {'maxiter': 20},
     }
     controller_params = {'logger_level': 30, 'hook_class': [LogGlobalErrorPostRun, LogWork]}
@@ -203,8 +208,8 @@ def main():
         assert result['work_solver_setup'] == 3, result
         assert result['work_solver'] == 3 * result['niter'], result
 
-    # the reaction is mild enough that moving it to the explicit side costs no iterations here
-    assert implicit['niter'] == imex['niter'] == 58, (implicit, imex)
+    # the reaction is mild enough that moving it to the explicit side costs no extra iterations here
+    assert implicit['niter'] == 61 and imex['niter'] == 59, (implicit, imex)
     # the IMEX systems are linear: one linear solve each, while Newton needs a few
     assert imex['work_ksp'] == imex['work_solver'], imex
     assert implicit['work_ksp'] > implicit['work_solver'], implicit

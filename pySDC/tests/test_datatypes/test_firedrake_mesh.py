@@ -87,6 +87,64 @@ def test_norm(n=3, v1=-1):
 
 
 @pytest.mark.firedrake
+def test_dual_data(n=3):
+    """Dual data stay dual through copies and arithmetic, and cannot be mixed with primal data."""
+    from pySDC.core.errors import DataError
+    from pySDC.implementations.datatype_classes.firedrake_mesh import (
+        firedrake_mesh,
+        firedrake_dual_mesh,
+        IMEX_firedrake_dual_mesh,
+    )
+    import numpy as np
+    import firedrake as fd
+
+    V = fd.FunctionSpace(fd.UnitSquareMesh(n, n), "CG", 2)
+
+    a = firedrake_dual_mesh(V, val=1.0)
+    b = firedrake_mesh(fd.assemble(fd.TestFunction(V) * fd.dx))
+    assert isinstance(a.functionspace, fd.Cofunction) and a.is_dual and b.is_dual
+
+    for c in [firedrake_mesh(a), firedrake_dual_mesh(a), a + b, a - b, 2.0 * a]:
+        assert c.is_dual
+    assert np.allclose((a + 2.0 * b).dat.data_ro, 1 + 2 * b.dat.data_ro)
+
+    u = firedrake_mesh(V, val=1.0)
+    assert not u.is_dual
+    for operation in [lambda: u + a, lambda: a - u]:
+        with pytest.raises(DataError):
+            operation()
+
+    f = IMEX_firedrake_dual_mesh(V)
+    assert f.impl.is_dual and f.expl.is_dual and (f.impl + f.expl).is_dual
+
+
+@pytest.mark.firedrake
+def test_dual_norm():
+    """
+    The norm of dual data is that of the function they represent, so the load vector of a function has the norm of its
+    L2 projection on every mesh, while the norm of the entries shrinks with the mesh width.
+    """
+    from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
+    import numpy as np
+    import firedrake as fd
+
+    norms, entries = [], []
+    for n in [4, 16]:
+        V = fd.FunctionSpace(fd.UnitSquareMesh(n, n), "CG", 2)
+        x, y = fd.SpatialCoordinate(V.mesh())
+        expr = fd.sin(np.pi * x) * y
+        r = firedrake_mesh(fd.assemble(expr * fd.TestFunction(V) * fd.dx))
+
+        assert np.isclose(abs(r), fd.norm(fd.project(expr, V)), rtol=1e-6)
+        norms.append(abs(r))
+        entries.append(np.linalg.norm(r.dat.data_ro))
+
+    exact = (1 / 6) ** 0.5  # L2 norm of sin(pi x) y on the unit square
+    assert np.allclose(norms, exact, rtol=1e-3), norms
+    assert entries[1] < entries[0] / 3, entries
+
+
+@pytest.mark.firedrake
 def test_addition_rhs(n=3, v1=1, v2=2):
     from pySDC.implementations.datatype_classes.firedrake_mesh import IMEX_firedrake_mesh
     import numpy as np

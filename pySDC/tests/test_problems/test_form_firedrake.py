@@ -178,7 +178,7 @@ def test_boundary_rows_of_residual():
 
 @pytest.mark.firedrake
 def test_solve_system_and_caching():
-    """Factor 0 inverts the mass matrix, and the solver cache evicts the oldest factor."""
+    """Factor 0 inverts the mass matrix, the solver cache evicts the oldest factor, and load vectors stay dual."""
     import firedrake as fd
     from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
 
@@ -196,3 +196,12 @@ def test_solve_system_and_caching():
 
     with pytest.raises(NotImplementedError):
         FormFiredrake(V, params['mass'], params['rhs']).u_exact(0)
+
+    # load vectors and solutions are kept apart: R(u) and M u are dual, u is not
+    from pySDC.core.errors import DataError
+
+    assert P.eval_f(u, 0.3).is_dual and P.apply_mass_matrix(u).is_dual and not u.is_dual
+    with pytest.raises(DataError):
+        P.solve_system(u, 0.1, u, 0.3)
+    with pytest.raises(DataError):
+        P.eval_f(P.apply_mass_matrix(u), 0.3)

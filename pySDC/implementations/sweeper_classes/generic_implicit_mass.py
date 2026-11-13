@@ -2,8 +2,42 @@ from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
+def integrate_load_vectors(sweeper, F):
+    """
+    Integrate right-hand side values over the collocation nodes, dt Q F, for the mass-matrix sweepers.
+
+    Unlike the parent sweepers' ``integrate``, each sum starts from its first term instead of a zero ``dtype_u``: in
+    the mass formulation the right-hand side is a load vector, which a backend may keep apart from solution data (the
+    Firedrake data types do, and refuse to mix them).
+
+    Args:
+        sweeper: The mass-matrix sweeper
+        F (list): Right-hand side values at the nodes 1, ..., M
+
+    Returns:
+        list: dt Q F at the nodes 1, ..., M
+    """
+    L = sweeper.level
+    Q = sweeper.coll.Qmat
+    me = []
+    for m in range(1, sweeper.coll.num_nodes + 1):
+        me.append(L.dt * Q[m, 1] * F[0])
+        for j in range(2, sweeper.coll.num_nodes + 1):
+            me[-1] += L.dt * Q[m, j] * F[j - 1]
+    return me
+
+
 class generic_implicit_mass(generic_implicit):
     """Fully implicit SDC sweeper for the mass-matrix formulation (no M^-1 anywhere)."""
+
+    def integrate(self):
+        """
+        Integrate the right-hand side, see :func:`integrate_load_vectors`.
+
+        Returns:
+            list: dt Q f at the nodes 1, ..., M, load vectors like f
+        """
+        return integrate_load_vectors(self, self.level.f[1:])
 
     def update_nodes(self):
         """
