@@ -298,7 +298,8 @@ def test_average_jacobian_is_averaged_per_node():
     import numpy as np
 
     L, M = 4, 3
-    controller, prob = get_composite_collocation_problem(L, M, 2, problem='vdp')
+    # any valid alpha: ParaDiag needs alpha > 0, and only the averaging is tested here
+    controller, prob = get_composite_collocation_problem(L, M, 2, alpha=1e-4, problem='vdp')
     controller.params.average_jacobian = True
 
     rng = np.random.default_rng(seed=3)
