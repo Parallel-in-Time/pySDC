@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_d6839539e65473f5_controller_nonMPI_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.2">coverage.py v7.17.2</a>,
-            created at 2026-11-13 01:59 +0000
+            created at 2026-11-13 02:53 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -116,7 +116,7 @@
     <p class="run"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">prepare_ParaDiag_params</span><span class="op">(</span><span class="nam">controller_params</span><span class="op">,</span> <span class="nam">description</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">sweeper_params</span> <span class="op">=</span> <span class="nam">description</span><span class="op">[</span><span class="str">&#x27;sweeper_params&#x27;</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">_G_inv_alpha</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">resolve_alpha</span><span class="op">(</span><span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;alpha&#x27;</span><span class="op">]</span><span class="op">,</span> <span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">_G_inv_alpha</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">resolve_alpha</span><span class="op">(</span><span class="nam">controller_params</span><span class="op">[</span><span class="str">&#x27;alpha&#x27;</span><span class="op">]</span><span class="op">,</span> <span class="num">0</span><span class="op">,</span> <span class="nam">num_procs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">        <span class="com"># the steps are copies of the first one, so give that one its own G^-1 before they are built</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">        <span class="nam">description</span><span class="op">[</span><span class="str">&#x27;sweeper_params&#x27;</span><span class="op">]</span><span class="op">[</span><span class="str">&#x27;G_inv&#x27;</span><span class="op">]</span> <span class="op">=</span> <span class="nam">get_G_inv_matrix</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
@@ -320,7 +320,7 @@
             <a class="nav" href="z_d6839539e65473f5_controller_nonMPI_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.2">coverage.py v7.17.2</a>,
-            created at 2026-11-13 01:59 +0000
+            created at 2026-11-13 02:53 +0000
         </p>
     </div>
 </footer>
