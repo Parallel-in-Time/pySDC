@@ -1,0 +1,23 @@
+pySDC/tests/test_transfer_classes/test_firedrake_p_coarsening.py
+  s_defc4032430111::t_a00aa046e8a254 1-22,27-100
+  s_defc4032430111::t_5f8a4d3caf1c63 23-26
+pySDC/implementations/transfer_classes/TransferFiredrakeMesh.py
+  s_defc4032430111::t_17133317e84833 1,20-27,72-106
+  s_defc4032430111::t_db1fb94010bbee 107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "193276957cfcba4fba73efe42cab77974a11eb95",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
