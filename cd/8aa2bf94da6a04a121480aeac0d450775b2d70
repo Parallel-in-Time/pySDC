@@ -1,0 +1,37 @@
+pySDC/implementations/problem_classes/FormFiredrake.py
+  s_defc4032430111::t_09fbd0fe11bb88 1,141-142,192-194
+  s_defc4032430111::t_ea50fefc1f8e89 4-8,32-35,69,131,136,139,144,170,172,182,195,256
+pySDC/implementations/sweeper_classes/imex_1st_order_mass.py
+  s_defc4032430111::t_3e49bbbd7e7a25 1,15-23
+  s_defc4032430111::t_9fd57d7c6c1fa2 24
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_defc4032430111::t_a0e75e9efb4d36 89-146
+pySDC/implementations/sweeper_classes/generic_implicit_mass.py
+  s_defc4032430111::t_3e49bbbd7e7a25 5-29,33-40
+  s_defc4032430111::t_661b3fd232938f 41
+pySDC/implementations/datatype_classes/firedrake_mesh.py
+  s_defc4032430111::t_cbcbf2890ad77e 89,99,102
+  s_defc4032430111::t_c6795ca4b003c3 1-2,10-23,26-31,34,40-42,47-50,53,55-56,63-67,75-85,94,103,120,135,138-142,144,146-148,203-221,233-244
+  s_defc4032430111::t_41d00cc294fb21 87-88,90-93,95-98,105-106,109,125-129
+  s_defc4032430111::t_2f117903c682a4 86,104
+pySDC/tests/test_problems/test_form_firedrake.py
+  s_defc4032430111::t_a0e75e9efb4d36 181,199-207
+pySDC/tutorial/step_7/H_pySDC_with_Firedrake_forms.py
+  s_defc4032430111::t_9c43e43df1c194 119-123,148,211-212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cd8aa2bf94da6a04a121480aeac0d450775b2d70",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
