@@ -1,0 +1,40 @@
+pySDC/implementations/transfer_classes/TransferFiredrakeMesh.py
+  s_defc4032430111::t_9fcd60cf3c1d63 5-11,69-72,139-178
+pySDC/implementations/problem_classes/FormFiredrake.py
+  s_defc4032430111::t_8450fd0d9c2ffb 321
+  s_defc4032430111::t_cb1aab0a2e03e4 8,148,155-157,165-169,171,191-192
+  s_defc4032430111::t_9fcd60cf3c1d63 100-103,218-224,232,247-257
+  s_defc4032430111::t_405c28b1ac8a7b 44-51
+  s_defc4032430111::t_135f400f7c8d29 258
+pySDC/tests/test_transfer_classes/test_firedrake_transfer.py
+  s_defc4032430111::t_d466244b7d5655 131-166
+pySDC/tutorial/step_7/H_pySDC_with_Firedrake_forms.py
+  s_defc4032430111::t_3bc8a8adfa20af 165-178,228,231,233,243-245,253,257-260
+  s_defc4032430111::t_2f548980bbe5f3 209-210
+  s_defc4032430111::t_dba759090a8651 61,67,126,132,140-141,145-148,151-152,157-158,187,189,193,202,211-212,214,216
+pySDC/implementations/transfer_classes/BaseTransfer_mass.py
+  s_defc4032430111::t_cb1aab0a2e03e4 45-50
+pySDC/tutorial/step_7/README.rst
+  s_defc4032430111::t_3bc8a8adfa20af 18
+pySDC/tests/test_problems/test_form_firedrake.py
+  s_defc4032430111::t_cb1aab0a2e03e4 281-284
+  s_defc4032430111::t_405c28b1ac8a7b 29,33-35,42
+  s_defc4032430111::t_d466244b7d5655 71-72,82,84,146-215
+  s_defc4032430111::t_8cb39acbba1dab 216-217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "390f847d30c75746fc8a0b6539126c5ae87a187b",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
