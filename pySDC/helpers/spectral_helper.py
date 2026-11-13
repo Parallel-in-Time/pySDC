@@ -384,12 +384,20 @@ class ChebychevHelper(SpectralHelper1D):
         S = self.sparse_lib.diags(1 / (self.xp.arange(self.N - 1) + 1), offsets=-1) @ self.get_conv('T2U')
         n = self.xp.arange(self.N)
         if lbnd == 0:
-            S = S.tocsc()
-            S[0, 1::2] = (
+            first_row = (
                 (n / (2 * (self.xp.arange(self.N) + 1)))[1::2]
                 * (-1) ** (self.xp.arange(self.N // 2))
                 / (np.append([1], self.xp.arange(self.N // 2 - 1) + 1))
             ) * self.lin_trf_fac
+            # the first row of S is empty, so adding it as a separate matrix is the same as setting it, without
+            # changing the sparsity structure of S in place
+            cols = self.xp.arange(1, self.N, 2)
+            S = (
+                S
+                + self.sparse_lib.coo_matrix(
+                    (first_row, (self.xp.zeros_like(cols), cols)), shape=S.shape, dtype=first_row.dtype
+                )
+            ).tocsc()
         else:
             raise NotImplementedError(f'This function allows to integrate only from x=0, you attempted from x={lbnd}.')
         return S
@@ -663,7 +671,12 @@ class UltrasphericalHelper(ChebychevHelper):
         xp = self.xp
         N = self.N
         l = p
-        return 2 ** (l - 1) * factorial(l - 1) * sp.diags(xp.arange(N - l) + l, offsets=l) / self.lin_trf_fac**p
+        return (
+            2 ** (l - 1)
+            * factorial(l - 1)
+            * sp.diags(xp.arange(N - l, dtype=float) + l, offsets=l)
+            / self.lin_trf_fac**p
+        )
 
     def get_S(self, lmbda):
         """
