@@ -152,6 +152,7 @@ jobs:
           - Resilience
           - RayleighBenard
           - SDC_showdown
+          - SDC4SDEs
           - Second_orderSDC
           - soft_failure
           - TOMS
