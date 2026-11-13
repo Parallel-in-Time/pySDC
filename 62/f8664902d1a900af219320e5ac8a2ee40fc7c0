@@ -1,0 +1,19 @@
+pySDC/projects/Monodomain/run_scripts/masked_timing.py
+  s_60b4f017613324::t_c7d2b81ae280e1 15,77,83-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "62f8664902d1a900af219320e5ac8a2ee40fc7c0",
+  "prompts": {},
+  "sessions": {
+    "s_60b4f017613324": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b9301952-2679-45a7-8e75-16851afd4e03",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
