@@ -23,7 +23,7 @@ from pathlib import Path
 def configs():
     """(tag, method, dt, extra args), longest first. Sized for one JUSUF node (2x EPYC 7742, 16 at a time) in < 3 h."""
     # reference: residual-masked ESDC converges to the same collocation solution as the unmasked one
-    yield 'REF', 'ESDC_masked', 0.05, ['mask=res', 'restol=1e-9']
+    yield 'REF', 'ESDC_masked', 0.05, ['mask=res', 'restol=1e-8']
     yield 'RL2_0.00625', 'RL2', 0.00625, []
     for tol in ['1e-7', '1e-6']:
         yield f'masked_res_dt0.1_tol{tol}', 'ESDC_masked', 0.1, ['mask=res', f'restol={tol}']
