@@ -282,3 +282,52 @@ def test_solve_system_and_caching():
 
     # a load vector is evaluated at the function it represents, as on coarse levels, where u0 is M u0
     assert abs(P.eval_f(P.apply_mass_matrix(u), 0.3) - P.eval_f(u, 0.3)) < 1e-10 * abs(P.eval_f(u, 0.3))
+
+
+@pytest.mark.firedrake
+@pytest.mark.parametrize('n_coarse, saves_iterations', [(4, True), (64, False)])
+def test_spatial_error_floor(n_coarse, saves_iterations):
+    """
+    With a large spatial error (8 cells), the residual floor from the spatial error estimate stops the iterations
+    early without losing accuracy. With a small one (128 cells), the time error dominates and restol decides alone.
+    """
+    import firedrake as fd
+    import numpy as np
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake import (
+        SpatialErrorFloorFiredrake,
+    )
+    from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
+    from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+
+    coarse_mesh, fine_mesh = fd.MeshHierarchy(fd.UnitIntervalMesh(n_coarse), 1)
+    coarse_space = fd.FunctionSpace(coarse_mesh, 'CG', 2)
+    params = nonlinear_forms(fd.FunctionSpace(fine_mesh, 'CG', 2), 0.1, False, smooth=False)
+
+    def go(convergence_controllers):
+        description = {
+            'problem_class': FormFiredrake,
+            'problem_params': params,
+            'sweeper_class': generic_implicit_mass,
+            'sweeper_params': SWEEPER_PARAMS,
+            'level_params': {'dt': 0.1, 'restol': 1e-8},
+            'step_params': {'maxiter': 50},
+            'convergence_controllers': convergence_controllers,
+        }
+        controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+        P = controller.MS[0].levels[0].prob
+        uend, stats = controller.run(u0=P.u_exact(0), t0=0, Tend=1.0)
+        # the L2 error against the exact solution itself: its interpolant would hide the spatial error
+        P.t.assign(1.0)
+        error = fd.sqrt(fd.assemble((P.u_exact_expr - uend.functionspace) ** 2 * fd.dx(degree=10)))
+        return sum(me[1] for me in get_sorted(stats, type='niter')), error
+
+    iterations_restol, error_restol = go({})
+    iterations, error = go({SpatialErrorFloorFiredrake: {'coarse_space': coarse_space, 'Tend': 1.0}})
+
+    assert np.isclose(error, error_restol, rtol=1e-3), (error, error_restol)
+    if saves_iterations:
+        assert iterations < 0.7 * iterations_restol, (iterations, iterations_restol)
+    else:
+        assert iterations == iterations_restol, (iterations, iterations_restol)
