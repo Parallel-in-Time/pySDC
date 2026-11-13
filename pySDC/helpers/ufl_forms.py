@@ -3,9 +3,9 @@ Form manipulation for problems given as UFL weak forms, written against ``ufl`` 
 
 A problem is given by a mass form :math:`m(u, v)` and right-hand side forms :math:`r(u, v)` (and optionally an explicit
 part :math:`r_E(u, v)`), all as callables of the solution :math:`u` and the test function :math:`v`. The semi-discrete
-system is :math:`M u' = R(u)`. Nothing here imports a finite element backend, so this module can be used and tested
-with the pure-Python ``fenics-ufl`` package alone; the backends (for now only
-:class:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake`) do the assembly and the solves.
+system is :math:`M u' = R(u)`. Nothing here imports a finite element backend: the backends (for now only
+:class:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake`) do the assembly and the solves, and
+another UFL-based backend could reuse this module as it is.
 """
 
 import ufl

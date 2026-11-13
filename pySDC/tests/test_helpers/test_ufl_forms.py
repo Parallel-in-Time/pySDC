@@ -1,5 +1,6 @@
 """
-Tests for the backend-free form helpers. They need only the pure-Python `fenics-ufl`, so they run in the base env.
+Tests for the backend-free form helpers. They use UFL alone, without Firedrake's elements or assembly, so they also
+check that the helpers stay backend-free. UFL is not in the base env, so they run with the Firedrake tests.
 
 UFL has no finite elements of its own, so a minimal scalar Lagrange element stands in for a backend's. The forms are
 checked by evaluating their integrands at a point, which UFL can do without assembling anything.
@@ -70,7 +71,7 @@ def integrand_at(form, mapping, x=0.3):
     return sum(integral.integrand()((x,), mapping) for integral in expand_derivatives(form).integrals())
 
 
-@pytest.mark.base
+@pytest.mark.firedrake
 def test_total_rhs():
     import ufl
     from pySDC.helpers.ufl_forms import total_rhs
@@ -88,7 +89,7 @@ def test_total_rhs():
     assert integrand_at(full, {s['u']: 2.0, s['v']: 1.0}) == pytest.approx(-8 + 4)
 
 
-@pytest.mark.base
+@pytest.mark.firedrake
 def test_implicit_system():
     """F(u) = m(u, v) - factor r(u, v) and its Jacobian, for a nonlinear right-hand side."""
     import ufl
@@ -112,7 +113,7 @@ def test_implicit_system():
     assert integrand_at(J, point) == pytest.approx(1 - factor * (-3 * 2.0**2))
 
 
-@pytest.mark.base
+@pytest.mark.firedrake
 def test_time_derivative():
     import ufl
     from pySDC.helpers.ufl_forms import time_derivative
@@ -125,7 +126,7 @@ def test_time_derivative():
     assert dt_expr((0.3,), {t: 0.7}) == pytest.approx(-ufl.sin(0.7) * 0.3 + 2 * 0.7)
 
 
-@pytest.mark.base
+@pytest.mark.firedrake
 def test_manufactured_forcing():
     """g(v) = m(u_e', v) - r(u_e, v), with the time derivative from UFL."""
     import numpy as np
