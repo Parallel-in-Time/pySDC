@@ -781,6 +781,7 @@
                     <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">liniter</span><span class="p">,</span>
                     <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                     <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'linear'</span><span class="p">],</span>
+                    <span class="n">callback_type</span><span class="o">=</span><span class="s1">'legacy'</span><span class="p">,</span>
                 <span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>

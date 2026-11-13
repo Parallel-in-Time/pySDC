@@ -627,6 +627,7 @@
             <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gmres_maxiter</span><span class="p">,</span>
             <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">,</span>
+            <span class="n">callback_type</span><span class="o">=</span><span class="s1">'legacy'</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call</span>
         <span class="k">if</span> <span class="n">factor</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
