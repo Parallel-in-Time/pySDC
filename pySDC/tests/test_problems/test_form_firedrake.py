@@ -331,3 +331,97 @@ def test_spatial_error_floor(n_coarse, saves_iterations):
         assert iterations < 0.7 * iterations_restol, (iterations, iterations_restol)
     else:
         assert iterations == iterations_restol, (iterations, iterations_restol)
+
+
+def two_component_forms(V0, kind):
+    """
+    A two-component reaction-diffusion system with a Dirichlet condition on the first component only, on a mixed
+    space (`kind='mixed'`, the condition on `W.sub(0)`) or a vector space (`kind='vector'`, on `V.sub(0)`). The second
+    component has a natural boundary condition. The manufactured solution is quadratic in space, so all error is from
+    the time stepping.
+    """
+    import firedrake as fd
+    from pySDC.helpers.ufl_forms import manufactured_forcing
+
+    mesh = V0.mesh()
+    V = V0 * V0 if kind == 'mixed' else fd.VectorFunctionSpace(mesh, 'CG', V0.ufl_element().embedded_superdegree, dim=2)
+    x = fd.SpatialCoordinate(mesh)[0]
+    t = fd.Constant(0.0)
+    u_exact = fd.as_vector([fd.cos(t) * (1 + x**2), fd.sin(t) * x**2 + 1])
+
+    def mass(w, q):
+        return fd.inner(w, q) * fd.dx
+
+    def rhs(w, q):
+        reaction = w[0] * w[1] ** 2
+        return (-0.1 * fd.inner(fd.grad(w), fd.grad(q)) - reaction * q[0] + reaction * q[1]) * fd.dx
+
+    forcing = manufactured_forcing(mass, rhs, u_exact, t, fd.TestFunction(V))
+    return {
+        'V': V,
+        'mass': mass,
+        'rhs': lambda w, q: rhs(w, q) + forcing,
+        'bcs': (fd.DirichletBC(V.sub(0), u_exact[0], 'on_boundary'),),
+        't': t,
+        'u_exact': u_exact,
+        'solver_parameters': {'snes_rtol': 1e-14, 'snes_atol': 1e-15},
+    }
+
+
+@pytest.mark.firedrake
+@pytest.mark.parametrize('kind', ['mixed', 'vector'])
+def test_dirichlet_on_one_component(kind):
+    """
+    A Dirichlet condition on one component of a mixed or vector space is imposed on that component only, with its
+    time-dependent values, and MLSDC with restricted boundary values on the coarse level converges to SDC.
+    """
+    import firedrake as fd
+    import numpy as np
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
+    from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+    from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
+
+    meshes = list(fd.MeshHierarchy(fd.UnitIntervalMesh(4), 1))[::-1]
+    forms = [two_component_forms(fd.FunctionSpace(mesh, 'CG', 2), kind) for mesh in meshes]
+
+    def go(levels):
+        description = {
+            'problem_class': FormFiredrake,
+            'problem_params': {key: [level[key] for level in forms[:levels]] for key in forms[0]},
+            'sweeper_class': generic_implicit_mass,
+            'sweeper_params': SWEEPER_PARAMS,
+            'level_params': {'dt': 0.125, 'restol': 1e-11},
+            'step_params': {'maxiter': 50},
+            'base_transfer_class': base_transfer_mass,
+            'space_transfer_class': MeshToMeshFiredrakeHierarchy,
+        }
+        controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+        P = controller.MS[0].levels[0].prob
+        uend, stats = controller.run(u0=P.u_exact(0), t0=0, Tend=0.5)
+        return controller, uend, [me[1] for me in get_sorted(stats, type='niter')]
+
+    controller, u_sdc, iterations_sdc = go(1)
+    L = controller.MS[0].levels[0]
+    P = L.prob
+
+    # the solves impose the data on the first component at every node, and the solution is accurate
+    nodes = P.bcs[0].nodes
+    for m, tau in enumerate(L.sweep.coll.nodes):
+        exact = P.u_exact(L.time + L.dt * tau)
+        first = [part.dat.data_ro for part in (L.u[m + 1], exact)]
+        if kind == 'mixed':
+            first = [data[0] for data in first]
+        else:
+            first = [data[:, 0] for data in first]
+        assert np.allclose(first[0][nodes], first[1][nodes], rtol=0, atol=1e-14)
+    assert abs(u_sdc - P.u_exact(0.5)) < 1e-6
+
+    _, u_mlsdc, iterations_mlsdc = go(2)
+    difference = max(
+        np.abs(np.asarray(a) - np.asarray(b)).max() for a, b in zip(u_mlsdc.dat.data_ro, u_sdc.dat.data_ro, strict=True)
+    )
+    assert difference < 1e-10, difference
+    assert max(iterations_mlsdc) <= max(iterations_sdc), (iterations_mlsdc, iterations_sdc)

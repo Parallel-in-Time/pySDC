@@ -11,6 +11,23 @@ import firedrake as fd
 from firedrake.assemble import get_assembler
 
 
+def part_of(f, space):
+    """
+    The view of `f` on `space`: its own space, or a sub-space of it at any depth, such as ``W.sub(0)`` of a mixed space
+    or ``V.sub(1)``, a component of a vector space. Writing to the view writes to `f`.
+
+    Args:
+        f (firedrake.Function): Function on the whole space
+        space (firedrake.FunctionSpace): The space of `f` or one of its sub-spaces
+
+    Returns:
+        firedrake.Function: `f` on `space`
+    """
+    if space == f.function_space():
+        return f
+    return part_of(f, space.parent).sub(space.index if space.index is not None else space.component)
+
+
 class FormFiredrake(Problem):
     r"""
     Generic problem given by UFL weak forms and solved with Firedrake, with the right-hand side treated implicitly.
@@ -60,7 +77,8 @@ class FormFiredrake(Problem):
     rhs_exp : callable, optional
         Explicit part :math:`r_E(u, v)` of the right-hand side
     bcs : tuple of firedrake.DirichletBC, optional
-        Boundary conditions imposed in the solves. Their values may depend on `t`. Pass a tuple, not a list: pySDC reads
+        Boundary conditions imposed in the solves. Their values may depend on `t`, and they may act on a sub-space,
+        such as one field of a mixed space or one component of a vector space. Pass a tuple, not a list: pySDC reads
         lists in the problem parameters as one entry per level.
     t : firedrake.Constant, optional
         The time the forms depend on. A new one is made if none is given.
@@ -97,9 +115,10 @@ class FormFiredrake(Problem):
         self.rhs = rhs
         self.rhs_exp = rhs_exp
         self.bcs = () if bcs is None else bcs
-        # the solves take their boundary values from this buffer: the data, or restricted values on coarse levels
+        # the solves take their boundary values from this buffer: the data, or restricted values on coarse levels. A
+        # condition on a sub-space reads the matching part of it.
         self._g = fd.Function(V)
-        self._solve_bcs = tuple(bc.reconstruct(g=self._g) for bc in self.bcs)
+        self._solve_bcs = tuple(bc.reconstruct(g=part_of(self._g, bc.function_space())) for bc in self.bcs)
         self._restricted = {}
         self.t = fd.Constant(0.0) if t is None else t
         self.u_exact_expr = u_exact
