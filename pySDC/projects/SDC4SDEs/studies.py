@@ -209,19 +209,22 @@ def ornstein_uhlenbeck(
     return result
 
 
-def print_orders(name, result, kinds=('strong', 'weak')):
-    """Print the fitted orders of the methods of a study from convergence_and_work."""
+def print_orders(name, result):
+    """
+    Print the strong orders of the methods of a study from convergence_and_work, fitted on the four finest steps with
+    errors above round-off, where the order holds (explicit methods blow up on some paths for large steps).
+
+    Weak orders are not fitted: at fine steps, the weak error of Euler-Maruyama is below the sampling error of the
+    mean, so that a fit says nothing; the plots show the weak errors.
+    """
     print(name)
     for method, r in result.items():
         if method == 'plot':
             continue
-        fits = []
-        for kind in kinds:
-            e = r[kind][:, 0]
-            # fit only where the error is above round-off and finite
-            ok = np.isfinite(e) & (e > 1e-12)
-            fits.append(f'{kind} {order(r["dt"][ok], e[ok]):5.2f}' if ok.sum() > 1 else f'{kind}   -  ')
-        print(f'  {method:15s} ' + '  '.join(fits))
+        e = r['strong'][:, 0]
+        ok = np.isfinite(e) & (e > 1e-10)
+        ok[np.flatnonzero(ok)[:-4]] = False
+        print(f'  {method:15s} ' + (f'{order(r["dt"][ok], e[ok]):5.2f}' if ok.sum() > 1 else '  -'))
 
 
 if __name__ == '__main__':
@@ -230,7 +233,7 @@ if __name__ == '__main__':
     for initial_guess in ['euler', 'euler_maruyama']:
         print(f'  {initial_guess:15s}', ' '.join(f'{order(result["dt"], e):5.2f}' for e in result[initial_guess]))
     for problem in PROBLEMS:
-        print_orders(f'{problem} SDE, orders of component 1:', convergence_and_work(problem))
+        print_orders(f'{problem} SDE, strong orders of component 1:', convergence_and_work(problem))
     result = ornstein_uhlenbeck()
     print('Ornstein-Uhlenbeck, strong orders:')
     for name, e in result.items():

@@ -37,8 +37,8 @@ class SDEProblem(Problem):
     :meth:`drift`, :meth:`diffusion`, :meth:`diffusion_derivative` and :meth:`u_exact`.
 
     The right-hand side returned by :meth:`eval_f` is a mesh of shape ``(1 + R, n_samples, ndim)``: the Stratonovich
-    drift first, then the R diffusion vectors :math:`b_r`. :meth:`rhs` combines them with the derivative of the
-    bridge.
+    drift first, then the R diffusion vectors :math:`b_r`. The sweeper combines them with the derivative :meth:`dB`
+    of the bridge.
 
     Work is counted per evaluation of the whole ensemble, so that it is the work per sample: ``drift`` counts
     evaluations of the drift (Itô or Stratonovich), ``diffusion`` evaluations of all R diffusion vectors, and
@@ -62,7 +62,6 @@ class SDEProblem(Problem):
         n_samples = brownian_path.shape[1]
         super().__init__(init=((n_samples, self.ndim), None, np.dtype('float64')))
         self._makeAttributeAndRegister('brownian_path', 'T', 'n_bridge_terms', localVars=locals(), readOnly=True)
-        self.n_samples = n_samples
         self.dt_fine = T / (brownian_path.shape[2] - 1)
         self.init_f = ((1 + self.n_noise, n_samples, self.ndim), None, np.dtype('float64'))
         for key in ['drift', 'diffusion', 'diffusion_derivative']:
@@ -106,10 +105,6 @@ class SDEProblem(Problem):
         self.work_counters['drift']()
         self.work_counters['diffusion']()
         return f
-
-    def rhs(self, f, t):
-        """Right-hand side of the SBB-ODE at time t of the current step, from the output of eval_f."""
-        return f[0] + (self.dB(t)[..., None] * f[1:]).sum(axis=0)
 
     def ito_drift(self, u, t):
         r"""Drift of the Itô form, :math:`\underline{a} + \frac{1}{2} \sum_r (b_r \cdot \nabla) b_r`."""
