@@ -326,7 +326,7 @@ def test_tau_method2D(bc, nz, nx, bc_val, plotting=False):
     Ix = fft.get_Id()
     Dz = cheby.get_differentiation_matrix()
     Iz = cheby.get_Id()
-    A = sp.kron(Ix, Dz) - sp.kron(Dx, Iz)
+    A = (sp.kron(Ix, Dz) - sp.kron(Dx, Iz)).tolil()
 
     # put BCs in the system matrix
     BCz = sp.lil_matrix((nz, nz))
