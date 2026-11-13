@@ -1,9 +1,12 @@
 docs/contrib/02_continuous_integration.md
-  s_8dd430a1287f24::t_1dea0868d47a3d 154,212-280
+  s_8dd430a1287f24::t_1dea0868d47a3d 154,212-280,269
 pySDC/projects/GPU/etc/venv_jusuf/requirements.txt
   s_8dd430a1287f24::t_986a43350f72aa 6-7
 pySDC/projects/GPU/etc/venv_jusuf/setup.sh
   s_8dd430a1287f24::t_b182eb0eb49088 16,18-21
+pySDC/projects/GPU/etc/venv_jusuf/readme.md
+  s_8dd430a1287f24::t_666ed1e790e0f6 39,41
+  s_8dd430a1287f24::t_c81553b6f61681 46
 ---
 {
   "schema_version": "authorship/3.0.0",
