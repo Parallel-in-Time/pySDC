@@ -1,4 +1,4 @@
-from firedrake import assemble, interpolate, TransferManager
+from firedrake import assemble, interpolate, TestFunction, TransferManager
 
 from pySDC.core.errors import TransferError
 from pySDC.core.space_transfer import SpaceTransfer
@@ -17,7 +17,14 @@ _transfer_manager = TransferManager()
 
 class MeshToMeshFiredrake(SpaceTransfer):
     """
-    This implementation can restrict and prolong between Firedrake meshes
+    This implementation can restrict and prolong between Firedrake meshes, by interpolation.
+
+    On the same mesh, between Lagrange spaces of different degrees (p-coarsening), interpolation into the finer space
+    is the exact inclusion of the coarse space. For the mass-matrix formulation, used through
+    :class:`~pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass`, :meth:`restrict_dual`
+    restricts load vectors with the transpose of that prolongation and :meth:`project` restricts solutions by
+    :math:`L^2` projection, which are then exact as well. For meshes of a hierarchy, use
+    :class:`MeshToMeshFiredrakeHierarchy`.
     """
 
     def restrict(self, F):
@@ -61,6 +68,42 @@ class MeshToMeshFiredrake(SpaceTransfer):
             raise TransferError('Unknown type of coarse data, got %s' % type(G))
 
         return u_fine
+
+    def restrict_dual(self, F):
+        r"""
+        Restrict a load vector (dual data) with :math:`P^T`, the adjoint of the interpolation :meth:`prolong` uses.
+
+        For nested spaces, such as lower-degree Lagrange elements on the same mesh, every coarse basis function is a
+        combination of fine ones through :math:`P`, so this gives exactly the coarse load vector of the same
+        functional.
+
+        Args:
+            F (firedrake_mesh): Fine dual data, e.g. the FAS correction or :math:`M u_0`
+
+        Returns:
+            firedrake_dual_mesh: Coarse dual data
+        """
+        if not (isinstance(F, firedrake_mesh) and F.is_dual):
+            raise TransferError(f'restrict_dual needs dual data, got {type(F)}')
+        G = firedrake_dual_mesh(self.coarse_prob.init)
+        assemble(interpolate(TestFunction(self.coarse_prob.init), F.functionspace), tensor=G.functionspace)
+        return G
+
+    def project(self, F):
+        r"""
+        Restrict a solution by :math:`L^2` projection, :math:`M_c^{-1} P^T M_f u`, with :math:`P^T` as in
+        :meth:`restrict_dual`. The mass matrices are factored once per space.
+
+        Args:
+            F (firedrake_mesh): Fine solution
+
+        Returns:
+            firedrake_mesh: Coarse solution
+        """
+        if not (isinstance(F, firedrake_mesh) and not F.is_dual):
+            raise TransferError(f'project needs primal data, got {type(F)}')
+        load = firedrake_mesh(riesz_map(self.fine_prob.init)(F.functionspace))
+        return firedrake_mesh(riesz_map(self.coarse_prob.init)(self.restrict_dual(load).functionspace))
 
 
 class MeshToMeshFiredrakeHierarchy(SpaceTransfer):
