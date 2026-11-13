@@ -80,3 +80,104 @@ def test_boundary_ids():
     assert np.allclose(lengths[:3], [0.41, 0.41, 4.4]), lengths
     assert np.isclose(lengths[3], 2 * np.pi * 0.05, rtol=1e-2), lengths
     assert np.isclose(sum(lengths), fd.assemble(one * fd.ds(domain=mesh))), lengths
+
+
+# u_x, u_y and p of the Taylor-Green problem after two steps of dt = 0.05 (16 x 16 squares, nu = 0.05, two
+# RADAU-RIGHT nodes, LU, exactly three iterations), computed with `fenics_NSE_2D_TaylorGreen` and its Newton
+# tolerances tightened to 1e-13 / 1e-15, for time-dependent Dirichlet (False) and periodic (True) boundaries in x.
+TAYLOR_GREEN_POINTS = [[0.1, 0.2], [-0.3, -0.1], [0.45, 0.3], [-0.2, 0.4]]
+TAYLOR_GREEN_FENICS = {
+    False: [
+        [0.999726491161949, -0.44125662925840736, 1.0832928076702906],
+        [0.8829651353597946, 0.49320504968302314, 1.0316227614608828],
+        [0.7415568521416037, 0.13663961216880038, 0.9797246235242725],
+        [1.1884337485737229, 0.019251220181781426, 0.9719320069725023],
+    ],
+    True: [
+        [0.9996888211906914, -0.44100097173070424, 1.084260314424162],
+        [0.8837206570498065, 0.49289575383441103, 1.0319411694124747],
+        [0.740913013555852, 0.13710285013486995, 0.980577482854738],
+        [1.1886075690931954, 0.019843126697488833, 0.9733450742555501],
+    ],
+}
+
+
+def taylor_green(dt, Tend, periodic, num_nodes, maxiter, restol, nelems, nu):
+    """Run the Taylor-Green problem with SDC and return the problem and the end point."""
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
+        NavierStokes2DTaylorGreenFiredrake,
+    )
+
+    description = {
+        'problem_class': NavierStokes2DTaylorGreenFiredrake,
+        'problem_params': {
+            'nelems': nelems,
+            'nu': nu,
+            'periodic': periodic,
+            'solver_parameters': {'snes_atol': 1e-13, 'snes_rtol': 1e-13},
+        },
+        'sweeper_class': generic_implicit_mass,
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': num_nodes, 'QI': 'LU'},
+        'level_params': {'dt': dt, 'restol': restol},
+        'step_params': {'maxiter': maxiter},
+    }
+    controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+    P = controller.MS[0].levels[0].prob
+    uend, _ = controller.run(u0=P.u_exact(0.0), t0=0.0, Tend=Tend)
+    return P, uend
+
+
+def relative_differences(u, ref):
+    """Relative L2 differences in velocity and pressure of two solutions of identically built problems."""
+    import firedrake as fd
+
+    difference = fd.Function(ref.function_space())
+    for d, a, b in zip(difference.dat.data_wo, u.dat.data_ro, ref.dat.data_ro, strict=True):
+        d[:] = a - b
+    return [
+        fd.norm(d) / fd.norm(r) for d, r in zip(difference.subfunctions, ref.functionspace.subfunctions, strict=True)
+    ]
+
+
+@pytest.mark.firedrake
+@pytest.mark.parametrize('periodic', [False, True])
+def test_taylor_green_reproduces_FEniCS(periodic):
+    """
+    The same steps as the FEniCS version give the same solution to round-off, with time-dependent Dirichlet and with
+    periodic boundaries in x. This needs the forcing interpolated with equispaced nodes, as DOLFIN does: with
+    Firedrake's default nodes for degree 4 the two differ by 3e-8.
+    """
+    import firedrake as fd
+    import numpy as np
+
+    P, uend = taylor_green(0.05, 0.1, periodic, num_nodes=2, maxiter=3, restol=-1.0, nelems=16, nu=0.05)
+    u, p = uend.functionspace.subfunctions
+    evaluate = fd.PointEvaluator(P.mesh, TAYLOR_GREEN_POINTS).evaluate
+    values = np.column_stack([evaluate(u), evaluate(p)])
+    assert np.allclose(values, TAYLOR_GREEN_FENICS[periodic], rtol=0, atol=1e-12), values
+
+
+@pytest.mark.firedrake
+def test_taylor_green_order_reduction():
+    """
+    The finding of the FEniCS version: with four RADAU-RIGHT nodes, the same exact solution reaches the design order
+    7 with periodic boundaries in x, while time-dependent Dirichlet data there pulls the pressure down towards the
+    stiff order 5. Consecutive step sizes are compared with each other, which cancels the spatial error.
+    """
+    import numpy as np
+
+    dts, Tend, num_nodes = [0.2, 0.1, 0.05, 0.025], 0.2, 4
+    orders, finest = {}, {}
+    for periodic in [True, False]:
+        solutions = [taylor_green(dt, Tend, periodic, num_nodes, 40, 1e-11, 16, 0.1)[1] for dt in dts]
+        errors = np.array([relative_differences(u, ref) for u, ref in zip(solutions[:-1], solutions[1:], strict=True)])
+        orders[periodic] = np.log2(errors[:-1] / errors[1:])[-1]
+        finest[periodic] = errors[-1]
+
+    design, stiff = 2 * num_nodes - 1, num_nodes + 1
+    assert orders[True][0] > design - 1.0, orders
+    assert orders[False][1] < (design + stiff) / 2, orders
+    assert orders[True][1] - orders[False][1] > 1.0, orders
+    assert finest[False][1] / finest[True][1] > 10.0, finest
