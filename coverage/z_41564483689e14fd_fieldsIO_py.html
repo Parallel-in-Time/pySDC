@@ -54,10 +54,10 @@
             </div>
         </aside>
         <h2>
-            <span class="text">308 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">301<span class="text"> run</span></button>
+            <span class="text">309 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">302<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">7<span class="text"> missing</span></button>
-            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">12<span class="text"> excluded</span></button>
+            <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">11<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
             <a id="prevFileLink" class="nav" href="z_41564483689e14fd_fft_helper_py.html">&#xab; prev</a> &nbsp; &nbsp;
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_41564483689e14fd_firedrake_ensemble_communicator_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-12 23:49 +0000
+            created at 2026-11-13 02:59 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -413,12 +413,12 @@
     <p class="run"><span class="n"><a id="t331" href="#t331">331</a></span><span class="t">            <span class="nam">f</span><span class="op">.</span><span class="nam">seek</span><span class="op">(</span><span class="nam">offset</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t332" href="#t332">332</a></span><span class="t">            <span class="nam">t</span> <span class="op">=</span> <span class="nam">float</span><span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">fromfile</span><span class="op">(</span><span class="nam">f</span><span class="op">,</span> <span class="nam">dtype</span><span class="op">=</span><span class="nam">T_DTYPE</span><span class="op">,</span> <span class="nam">count</span><span class="op">=</span><span class="num">1</span><span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t333" href="#t333">333</a></span><span class="t">            <span class="nam">field</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">fromfile</span><span class="op">(</span><span class="nam">f</span><span class="op">,</span> <span class="nam">dtype</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">dtype</span><span class="op">,</span> <span class="nam">count</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">nItems</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t334" href="#t334">334</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">reshape</span><span class="op">(</span><span class="nam">field</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t334" href="#t334">334</a></span><span class="t">        <span class="nam">field</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">reshape</span><span class="op">(</span><span class="nam">field</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t335" href="#t335">335</a></span><span class="t">        <span class="key">return</span> <span class="nam">t</span><span class="op">,</span> <span class="nam">field</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t336" href="#t336">336</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t337" href="#t337">337</a></span><span class="t">    <span class="key">def</span> <span class="nam">reshape</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">field</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t338" href="#t338">338</a></span><span class="t">        <span class="str">&quot;&quot;&quot;Eventually reshape the field to correspond to the grid structure&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t339" href="#t339">339</a></span><span class="t">        <span class="key">pass</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t339" href="#t339">339</a></span><span class="t">        <span class="key">return</span> <span class="nam">field</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t340" href="#t340">340</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t341" href="#t341">341</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t342" href="#t342">342</a></span><span class="t"><span class="op">@</span><span class="nam">FieldsIO</span><span class="op">.</span><span class="nam">register</span><span class="op">(</span><span class="nam">sID</span><span class="op">=</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -524,8 +524,8 @@
     <p class="run"><span class="n"><a id="t442" href="#t442">442</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">setHeader</span><span class="op">(</span><span class="nam">nVar</span><span class="op">,</span> <span class="nam">coords</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t443" href="#t443">443</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t444" href="#t444">444</a></span><span class="t">    <span class="key">def</span> <span class="nam">reshape</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">fields</span><span class="op">:</span> <span class="nam">np</span><span class="op">.</span><span class="nam">ndarray</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t445" href="#t445">445</a></span><span class="t">        <span class="str">&quot;&quot;&quot;Reshape the fields to a N-d array (inplace operation)&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t446" href="#t446">446</a></span><span class="t">        <span class="nam">fields</span><span class="op">.</span><span class="nam">shape</span> <span class="op">=</span> <span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">nVar</span><span class="op">,</span> <span class="op">*</span><span class="nam">self</span><span class="op">.</span><span class="nam">gridSizes</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t445" href="#t445">445</a></span><span class="t">        <span class="str">&quot;&quot;&quot;Reshape the fields to a N-d array (returns a view, no copy)&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t446" href="#t446">446</a></span><span class="t">        <span class="key">return</span> <span class="nam">fields</span><span class="op">.</span><span class="nam">reshape</span><span class="op">(</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">nVar</span><span class="op">,</span> <span class="op">*</span><span class="nam">self</span><span class="op">.</span><span class="nam">gridSizes</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t447" href="#t447">447</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t448" href="#t448">448</a></span><span class="t">    <span class="com"># -------------------------------------------------------------------------</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t449" href="#t449">449</a></span><span class="t">    <span class="com"># Class specifics</span>&nbsp;</span><span class="r"></span></p>
@@ -898,7 +898,7 @@
             <a class="nav" href="z_41564483689e14fd_firedrake_ensemble_communicator_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-12 23:49 +0000
+            created at 2026-11-13 02:59 +0000
         </p>
     </div>
 </footer>

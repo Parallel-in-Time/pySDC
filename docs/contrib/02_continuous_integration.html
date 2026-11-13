@@ -604,34 +604,8 @@ markers <code class="docutils literal notranslate"><span class="pre">base</span>
 deliberately does not run). A test without one would never run anywhere, so collection stops with an error
 that names it; see <code class="docutils literal notranslate"><span class="pre">pySDC/tests/conftest.py</span></code>.</p>
 </div></blockquote>
-</section>
-<section id="running-ci-on-hpc-from-pull-requests">
-<span id="docs-contrib-02-continuous-integration-running-ci-on-hpc-from-pull-requests"></span><h2>Running CI on HPC from pull requests<a class="headerlink" href="#running-ci-on-hpc-from-pull-requests" title="Link to this heading">#</a></h2>
-<blockquote>
-<div><p>⚠️ <strong>Note:</strong> The GitLab mirror integration is currently disabled due to technical issues. This section describes functionality that is temporarily unavailable.</p>
-</div></blockquote>
-<p>By syncing the GitHub repository to a certain Gitlab instance, CI-Jobs can be run on HPC machines. This can be helpful for benchmarks or when running on accelerators that are not available as GitHub runners.</p>
-<p>For security and accounting reasons, a few extra steps are needed in order to run the contents of a pull request on HPC:</p>
-<ul class="simple">
-<li><p>The pull request needs to have the tag “gitlab-mirror” assigned to it.</p></li>
-<li><p>A person with write-permission for the Parallel-in-Time pySDC repository needs to trigger the workflow. Ask for someone with the required permissions to rerun the workflow if needed.</p></li>
-<li><p>The workflow checks if the code can be merged. If this is not the case, the code is not mirrored and the workflow fails. In this case, please merge upstream changes, fix all conflicts, and rerun the workflow.</p></li>
-</ul>
-<blockquote>
-<div><p>🔔 Note that direct pushes to Parallel-in-Time/pySDC will always trigger the HPC pipeline on Gitlab</p>
-</div></blockquote>
-<p>Regardless of why the Gitlab pipeline was triggered, the following holds true:</p>
-<ul class="simple">
-<li><p>The return-state from Gitlab is transmitted to GitHub (Success/Failure) leading to the same result in GitHub</p></li>
-<li><p>Logs from Gitlab are also transferred. The full logs of all jobs can be read from within GitHub. For better overview, these are folded, so unfolding is needed before reading.</p></li>
-<li><p>Artifacts from Gitlab jobs are also transferred back to GitHub</p></li>
-<li><p>Information, such as coverage is transferred to GitHub, but not yet merged across multiple GitHub workflows. Therefore, there is no complete summary of e.g. coverage-reports across all jobs in all workflows.</p></li>
-</ul>
-<blockquote>
-<div><p>⚠️ The coverage report from the HPC tests is not yet merged with other reports. The test coverage will not show up on the respective website or in the badge. We are working on this.</p>
-</div></blockquote>
-<section id="hpc-test-environments">
-<span id="docs-contrib-02-continuous-integration-hpc-test-environments"></span><h3>HPC test environments<a class="headerlink" href="#hpc-test-environments" title="Link to this heading">#</a></h3>
+<section id="gpu-tests">
+<span id="docs-contrib-02-continuous-integration-gpu-tests"></span><h3>GPU tests<a class="headerlink" href="#gpu-tests" title="Link to this heading">#</a></h3>
 <p>In order to run tests on GPUs, please use the pytest marker <code class="docutils literal notranslate"><span class="pre">cupy</span></code>.</p>
 <section id="running-the-gpu-tests">
 <h4>Running the GPU tests<a class="headerlink" href="#running-the-gpu-tests" title="Link to this heading">#</a></h4>
@@ -678,13 +652,94 @@ and takes about three minutes; the free tier covers several hundred a month.</p>
 <code class="docutils literal notranslate"><span class="pre">etc/modal_gpu_tests.py</span></code> installs at a pinned commit. <code class="docutils literal notranslate"><span class="pre">etc/environment-cupy.yml</span></code> on its own is
 not enough to run that code.</p>
 </div></blockquote>
-<p>If you want to create a new HPC test environment, the following steps need to be completed:</p>
-<ul class="simple">
-<li><p>Create a new slurm job-script in <code class="docutils literal notranslate"><span class="pre">etc/juwels_*.sh</span></code>. The name and location of the file is important.</p></li>
-<li><p>Adapt <code class="docutils literal notranslate"><span class="pre">.gitlab-ci.yml</span></code> to include the new job-script. For this, add a name in the job “test_JUWELS” in the section <code class="docutils literal notranslate"><span class="pre">parallel:</span> <span class="pre">matrix:</span> <span class="pre">SHELL_SCRIPT</span></code>. The name there must match the name of the newly created file.
-As a starting point it is recommended to copy and adapt an existing file (e.g. <code class="docutils literal notranslate"><span class="pre">etc/juwels_cupy.sh</span></code>).</p></li>
-</ul>
 </section>
+</section>
+<section id="running-the-test-suite-on-a-slurm-cluster">
+<span id="docs-contrib-02-continuous-integration-running-the-test-suite-on-a-slurm-cluster"></span><h3>Running the test suite on a Slurm cluster<a class="headerlink" href="#running-the-test-suite-on-a-slurm-cluster" title="Link to this heading">#</a></h3>
+<p>CI runs every MPI test with all ranks on one machine and with one MPI library, OpenMPI. A cluster
+differs in two ways that CI cannot see: the ranks of one test sit on different nodes, and the MPI
+library is often a vendor one. Both have hidden bugs. Under ParaStationMPI, the default MPI library
+on the JSC machines, a dropped <code class="docutils literal notranslate"><span class="pre">Isend</span></code> request delivered garbage and hung a whole block of steps
+(#821), and two tests that shared files through rank 0’s node-local <code class="docutils literal notranslate"><span class="pre">/tmp</span></code> hung as soon as their
+ranks were on different nodes (#822). It is worth running the suite on a cluster before merging
+larger changes to the MPI code.</p>
+<p><strong>Environment.</strong> Use micromamba with the same environment files as CI, <code class="docutils literal notranslate"><span class="pre">etc/environment-mpi4py.yml</span></code>
+for the CPU tests or <code class="docutils literal notranslate"><span class="pre">etc/environment-cupy.yml</span></code> for the GPU tests, together with
+<code class="docutils literal notranslate"><span class="pre">etc/environment-tests.yml</span></code>. Change one thing: MPI. The <code class="docutils literal notranslate"><span class="pre">openmpi</span></code> these files install does not know
+the cluster’s batch system or network, so replace it with conda-forge’s <em>external</em> MPI placeholder,
+which builds mpi4py and mpi4py-fft against the MPI interface but loads the cluster’s own MPI library
+at run time:</p>
+<ul>
+<li><p>Pick the placeholder that matches the cluster’s MPI. MPICH-based libraries, such as
+ParaStationMPI, use <code class="docutils literal notranslate"><span class="pre">mpich=4.3.*=external_*</span></code> (they share MPICH’s <code class="docutils literal notranslate"><span class="pre">libmpi.so.12</span></code> interface); for an OpenMPI module, use <code class="docutils literal notranslate"><span class="pre">openmpi=5.*=external_*</span></code> with the matching version. The
+placeholders live on the label <code class="docutils literal notranslate"><span class="pre">conda-forge/label/mpi-external</span></code>, which has to be listed <em>before</em>
+<code class="docutils literal notranslate"><span class="pre">conda-forge</span></code>, or strict channel priority hides them.</p></li>
+<li><p>Create the environment in one command from both files, so that conda does not overwrite what pip
+installed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>pySDC<span class="w"> </span>-f<span class="w"> </span>environment.yml<span class="w"> </span>-f<span class="w"> </span>etc/environment-tests.yml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--override-channels<span class="w"> </span>-c<span class="w"> </span>conda-forge/label/mpi-external<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>--strict-channel-priority
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">environment.yml</span></code> is a copy of <code class="docutils literal notranslate"><span class="pre">etc/environment-mpi4py.yml</span></code> with <code class="docutils literal notranslate"><span class="pre">openmpi</span></code> replaced. Then
+install pySDC with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--no-deps</span> <span class="pre">-e</span> <span class="pre">.</span></code>.</p>
+</li>
+<li><p>Load the cluster’s MPI module, and nothing else that brings Python packages, before anything imports
+mpi4py: during the setup as much as in the job. Python, SciPy or mpi4py modules would shadow the
+environment’s packages through <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>, and so would modules that load Python themselves
+(on JUSUF, <code class="docutils literal notranslate"><span class="pre">texlive</span></code> does).</p></li>
+<li><p>Put micromamba’s root prefix (<code class="docutils literal notranslate"><span class="pre">MAMBA_ROOT_PREFIX</span></code>) on a scratch filesystem if project storage is
+short of inodes: an environment is 30,000 to 50,000 files, and it is quick to rebuild when scratch
+is purged. The job has to use the same root prefix to find the environment.</p></li>
+</ul>
+<p>For the GPU tests, start from <code class="docutils literal notranslate"><span class="pre">etc/environment-cupy.yml</span></code> and add <code class="docutils literal notranslate"><span class="pre">cuda-version=12.*</span></code> (or whatever the
+driver supports), and a C compiler, <code class="docutils literal notranslate"><span class="pre">cython</span></code> and <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> to build the mpi4py-fft fork described in
+the warning above on top of it. <code class="docutils literal notranslate"><span class="pre">environment-cupy.yml</span></code> has no <code class="docutils literal notranslate"><span class="pre">mpi-pytest</span></code>, so install
+<code class="docutils literal notranslate"><span class="pre">mpi-pytest&gt;=2026.0</span></code> with pip as well. <code class="docutils literal notranslate"><span class="pre">pySDC/projects/GPU/etc/venv_jusuf/setup.sh</span></code> does all of this
+for JUSUF.</p>
+<p><strong>Running.</strong> Use <code class="docutils literal notranslate"><span class="pre">etc/run_mpi_tests.sh</span></code>, as CI does. It asks the tests which rank counts they need
+and runs one pytest pass per count, then the serial pass. Run it inside a batch job, never on the
+login node, and set two environment variables:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MPIEXEC=srun</span></code> (or e.g. <code class="docutils literal notranslate"><span class="pre">srun</span> <span class="pre">--mpi=pspmix</span></code> for OpenMPI under Slurm): the launcher of the MPI
+passes, <code class="docutils literal notranslate"><span class="pre">mpiexec</span></code> by default. Some MPI libraries, ParaStationMPI among them, have no <code class="docutils literal notranslate"><span class="pre">mpiexec</span></code>.
+Use <code class="docutils literal notranslate"><span class="pre">srun</span> <span class="pre">-l</span></code>, which prefixes every output line with its rank: every rank prints its full pytest
+output, and without the prefix the log has each line once per rank, interleaved.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PYTEST=&quot;python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">-v</span> <span class="pre">--timeout=240</span> <span class="pre">--timeout-method=thread&quot;</span></code>. The <code class="docutils literal notranslate"><span class="pre">thread</span></code> method
+matters: the default <code class="docutils literal notranslate"><span class="pre">signal</span></code> method, which <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> sets, cannot interrupt a rank that is
+blocked inside an MPI call, so a hang would keep the job until its time limit. With <code class="docutils literal notranslate"><span class="pre">thread</span></code>,
+pytest dumps the stacks of the hung rank and exits, and <code class="docutils literal notranslate"><span class="pre">srun</span></code> ends the step.</p></li>
+</ul>
+<p>Start the job in a directory on a shared filesystem, because the MPI tests share files through
+<code class="docutils literal notranslate"><span class="pre">./data</span></code> and every rank has to see them. A job script for the CPU suite on two nodes:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#SBATCH --nodes=2</span>
+<span class="c1">#SBATCH --ntasks-per-node=8      # the MPI tests ask for up to 9 ranks</span>
+<span class="c1">#SBATCH --time=00:30:00</span>
+<span class="c1">#SBATCH --partition=batch        # site specific, as is --account</span>
+<span class="c1">#SBATCH --chdir=/path/on/shared/filesystem/pySDC</span>
+
+module<span class="w"> </span>load<span class="w"> </span>&lt;the<span class="w"> </span>MPI<span class="w"> </span>module&gt;<span class="w">     </span><span class="c1"># before activating, and nothing that brings Python</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MAMBA_ROOT_PREFIX</span><span class="o">=</span>/path/to/micromamba/root<span class="w">  </span><span class="c1"># where the environment was created</span>
+<span class="nb">eval</span><span class="w"> </span><span class="s2">"</span><span class="k">$(</span>/path/to/micromamba<span class="w"> </span>shell<span class="w"> </span>hook<span class="w"> </span>--shell<span class="w"> </span>bash<span class="k">)</span><span class="s2">"</span>
+micromamba<span class="w"> </span>activate<span class="w"> </span>pySDC<span class="w">        </span><span class="c1"># the name given to `micromamba create -n`</span>
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">MPLBACKEND</span><span class="o">=</span>Agg<span class="w">  </span><span class="c1"># one thread per rank, plots without a display</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MPIEXEC</span><span class="o">=</span><span class="s2">"srun -l"</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYTEST</span><span class="o">=</span><span class="s2">"python -m pytest -v -p no:cacheprovider --timeout=240 --timeout-method=thread"</span>
+bash<span class="w"> </span>etc/run_mpi_tests.sh<span class="w"> </span>pySDC/tests<span class="w"> </span>mpi4py
+</pre></div>
+</div>
+<p>For the GPU suite, run <code class="docutils literal notranslate"><span class="pre">etc/run_mpi_tests.sh</span> <span class="pre">pySDC/tests</span> <span class="pre">cupy</span></code> (and <code class="docutils literal notranslate"><span class="pre">pySDC/projects/GPU/tests</span> <span class="pre">cupy</span></code>)
+with one rank per GPU, and set <code class="docutils literal notranslate"><span class="pre">NCCL_CUMEM_HOST_ENABLE=0</span></code> as the CI job does: on some hosts NCCL’s
+host buffers fail to import and leave the CUDA context unusable. With one GPU per node, the
+scheduler gives each rank its own device; <code class="docutils literal notranslate"><span class="pre">etc/gpu_bind.py</span></code> is only needed for several GPUs per
+host without a scheduler.</p>
+<p>On JUSUF with Stages/2026, the only modules needed are
+<code class="docutils literal notranslate"><span class="pre">module</span> <span class="pre">load</span> <span class="pre">Stages/2026</span> <span class="pre">GCC/14.3.0</span> <span class="pre">ParaStationMPI/5.13.0-1</span></code>, plus <code class="docutils literal notranslate"><span class="pre">MPI-settings/CUDA</span></code> for the GPU
+suite, with the MPICH placeholder above. The CUDA-enabled ParaStationMPI loads CUDA and NCCL modules
+as dependencies, but CuPy still uses the CUDA runtime and NCCL from the environment. A clean CPU run takes about 2.5 minutes on two nodes, the GPU
+suite about 3 minutes on four nodes with one V100 each, and NCCL uses InfiniBand between the nodes.
+Most sites bill whole nodes, so keep the time limits short.</p>
 </section>
 </section>
 <section id="code-coverage">
@@ -862,12 +917,12 @@ python<span class="w"> </span>docs/check_run_in_browser.py<span class="w"> </spa
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-pre-commit-hooks-recommended">Using pre-commit hooks (Recommended)</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-testing">Code testing</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-ci-on-hpc-from-pull-requests">Running CI on HPC from pull requests</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hpc-test-environments">HPC test environments</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-testing">Code testing</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gpu-tests">GPU tests</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-gpu-tests">Running the GPU tests</a></li>
 </ul>
 </li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-test-suite-on-a-slurm-cluster">Running the test suite on a Slurm cluster</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-coverage">Code coverage</a><ul class="pst-show_toc_level nav section-nav flex-column">

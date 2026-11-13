@@ -591,7 +591,7 @@
 <div class="viewcode-block" id="ParaDiag.resolve_alpha">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.controller_classes.ParaDiag.html#pySDC.implementations.controller_classes.ParaDiag.ParaDiag.resolve_alpha">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_alpha</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_alpha</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Read the alpha for iteration `k` out of whatever the user supplied.</span>
 
@@ -604,15 +604,25 @@
 <span class="sd">        Args:</span>
 <span class="sd">            alpha: the alpha parameter as supplied by the user</span>
 <span class="sd">            k (int): iteration index</span>
+<span class="sd">            n_steps (int): number of steps in the block</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: alpha to use for this iteration</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="s1">'__len__'</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)])</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span></div>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="s1">'__len__'</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+
+        <span class="c1"># The weights of the FFT in time are alpha**(-l / n_steps): NaN for a negative alpha, and infinite for alpha = 0</span>
+        <span class="c1"># once there is more than one step. A single step with alpha = 0 is the plain collocation problem.</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_steps</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">'ParaDiag needs alpha &gt; 0 with </span><span class="si">{</span><span class="n">n_steps</span><span class="si">}</span><span class="s1"> steps in the block, but got alpha=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1"> in iteration </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">'</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></div>
 
 
 <div class="viewcode-block" id="ParaDiag.get_alpha">
@@ -627,7 +637,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            float: alpha to use for this iteration</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_alpha</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_alpha</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ParaDiag.get_FFT_matrices">

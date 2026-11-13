@@ -817,7 +817,7 @@
             <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
             <span class="n">t</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">T_DTYPE</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nItems</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">field</span></div>
 
 
@@ -825,7 +825,7 @@
 <a class="viewcode-back" href="../../../pySDC/pySDC.helpers.fieldsIO.html#pySDC.helpers.fieldsIO.FieldsIO.reshape">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Eventually reshape the field to correspond to the grid structure"""</span>
-        <span class="k">pass</span></div>
+        <span class="k">return</span> <span class="n">field</span></div>
 </div>
 
 
@@ -964,8 +964,8 @@
 <div class="viewcode-block" id="Rectilinear.reshape">
 <a class="viewcode-back" href="../../../pySDC/pySDC.helpers.fieldsIO.html#pySDC.helpers.fieldsIO.Rectilinear.reshape">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Reshape the fields to a N-d array (inplace operation)"""</span>
-        <span class="n">fields</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">)</span></div>
+<span class="w">        </span><span class="sd">"""Reshape the fields to a N-d array (returns a view, no copy)"""</span>
+        <span class="k">return</span> <span class="n">fields</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nVar</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">gridSizes</span><span class="p">))</span></div>
 
 
     <span class="c1"># -------------------------------------------------------------------------</span>

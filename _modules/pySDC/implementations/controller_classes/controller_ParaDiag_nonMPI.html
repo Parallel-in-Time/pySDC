@@ -470,7 +470,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">prepare_ParaDiag_params</span><span class="p">(</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sweeper_params</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_G_inv_alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_alpha</span><span class="p">(</span><span class="n">controller_params</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_G_inv_alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_alpha</span><span class="p">(</span><span class="n">controller_params</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">num_procs</span><span class="p">)</span>
 
         <span class="c1"># the steps are copies of the first one, so give that one its own G^-1 before they are built</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_params'</span><span class="p">][</span><span class="s1">'G_inv'</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_G_inv_matrix</span><span class="p">(</span>
