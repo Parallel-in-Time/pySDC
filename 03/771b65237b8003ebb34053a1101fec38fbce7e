@@ -1,0 +1,62 @@
+pySDC/projects/SDC4SDEs/run.py
+  s_a18ed19b091a87::t_70aa19068d7140 1-40,48-104
+  s_a18ed19b091a87::t_c75bcd980caa64 41-47
+pySDC/projects/SDC4SDEs/brownian.py
+  s_a18ed19b091a87::t_24d15731979502 52,54,56-57,61,65-66,69,72,74,77-95,104,111-112
+  s_a18ed19b091a87::t_65a53a3308cd2c 1-51,53,55,58-60,62-64,67-68,70-71,73,75-76,96-103,105-110
+pySDC/projects/SDC4SDEs/problem_classes.py
+  s_a18ed19b091a87::t_b421d37e6d8dba 1-111,113-116,118-216,218-219,221-225,227-257,259-262
+  s_a18ed19b091a87::t_c75bcd980caa64 112,117,217,220
+  s_a18ed19b091a87::t_e9008dc1a2a66c 226,258
+  s_a18ed19b091a87::t_80e1af65c1205b 263-282
+.github/workflows/ci_pipeline.yml
+  s_a18ed19b091a87::t_d1939c336e16df 155
+pySDC/projects/SDC4SDEs/environment.yml
+  s_a18ed19b091a87::t_d1939c336e16df 1-13
+docs/source/project_papers.json
+  s_a18ed19b091a87::t_d1939c336e16df 186-198
+pySDC/projects/SDC4SDEs/sweeper.py
+  s_a18ed19b091a87::t_c75bcd980caa64 93,97,107,127
+  s_a18ed19b091a87::t_8cfc4384c40d21 92,95-96,132-133,137
+  s_a18ed19b091a87::t_7a00ba369d7372 142
+  s_a18ed19b091a87::t_97b0ac332f54ea 1-91,94,98-102,104-106,108-111,113-116,125-126,128-131,134-136,138-141,143-153,155-160
+  s_a18ed19b091a87::t_2745abe8dc922f 103,112,117-124,154
+docs/source/projects/SDC4SDEs.rst
+  s_a18ed19b091a87::t_d1939c336e16df 1
+pySDC/projects/SDC4SDEs/baselines.py
+  s_a18ed19b091a87::t_c75bcd980caa64 29,56-57
+  s_a18ed19b091a87::t_992163b24ce9f1 1-28,30-55,58-59
+pySDC/projects/SDC4SDEs/studies.py
+  s_a18ed19b091a87::t_5c8c24849db517 1-28,30-95,97-102,104-136,141-148,150-201,203-238
+  s_a18ed19b091a87::t_090256aced21ed 29
+  s_a18ed19b091a87::t_7a00ba369d7372 96,137-140,202
+  s_a18ed19b091a87::t_542ab9773b550c 103,149
+pySDC/projects/gallery.yml
+  s_a18ed19b091a87::t_d1939c336e16df 96-101
+pySDC/projects/SDC4SDEs/README.rst
+  s_a18ed19b091a87::t_7c52b19d338109 1-71,73-86,88-125
+  s_a18ed19b091a87::t_7b55f4d6b92b68 72
+  s_a18ed19b091a87::t_3da524e52f9bc2 87
+pySDC/projects/SDC4SDEs/tests/test_sdc4sdes.py
+  s_a18ed19b091a87::t_4b8ce4d1cf9a7a 57-61,66,74,83,88
+  s_a18ed19b091a87::t_c0cf10145739ab 41-44,50-51,65
+  s_a18ed19b091a87::t_d586e30fb57696 1-40,45-49,52-56,62-64,72-73,75-82,84-87,89-91,95-118,120,122,124-158
+  s_a18ed19b091a87::t_372bef158e0654 67-71,92-94
+  s_a18ed19b091a87::t_7a00ba369d7372 119,121,123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "03771b65237b8003ebb34053a1101fec38fbce7e",
+  "prompts": {},
+  "sessions": {
+    "s_a18ed19b091a87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3435dccb-3189-4958-8af0-f9c484a3f2b9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
