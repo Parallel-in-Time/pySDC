@@ -1,0 +1,32 @@
+pySDC/implementations/problem_classes/Quench.py
+  s_8dd430a1287f24::t_dc05a97ed83824 337
+pySDC/implementations/problem_classes/boussinesq_helpers/standard_integrators.py
+  s_8dd430a1287f24::t_dc05a97ed83824 255,299,344,627
+pySDC/tests/test_helpers/test_spectral_helper_1d_chebychev.py
+  s_8dd430a1287f24::t_8459628dae2110 332,338,426
+  s_8dd430a1287f24::t_dc05a97ed83824 413,417
+pySDC/helpers/spectral_helper.py
+  s_8dd430a1287f24::t_618beae6ce1b23 387,392-400,674-679
+pySDC/implementations/problem_classes/generic_spectral.py
+  s_8dd430a1287f24::t_618beae6ce1b23 332-334,440-442
+pySDC/tests/test_problems/test_RayleighBenard3D.py
+  s_8dd430a1287f24::t_529668223f7add 128
+pySDC/implementations/problem_classes/Boussinesq_2D_FD_imex.py
+  s_8dd430a1287f24::t_dc05a97ed83824 192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "71b69f70d30112f3f15040c95538a1d7e8ac57e8",
+  "prompts": {},
+  "sessions": {
+    "s_8dd430a1287f24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7dbec754-a32f-4804-9bbe-a6f6101a772e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
