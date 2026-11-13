@@ -181,3 +181,72 @@ def test_taylor_green_order_reduction():
     assert orders[False][1] < (design + stiff) / 2, orders
     assert orders[True][1] - orders[False][1] > 1.0, orders
     assert finest[False][1] / finest[True][1] > 10.0, finest
+
+
+# The projection scheme after two steps of dt = 1/1600 from t0 = 3.125e-4 (two RADAU-RIGHT nodes, LU implicit, Picard
+# explicit, exactly three iterations), computed with `fenics_NSE_2D_mass` and `imex_1st_order_mass_NSE`: drag and
+# lift, then u_x, u_y and p at the points of FENICS_POINTS.
+PROJECTION_FENICS_DRAG_LIFT = (0.1412337727444787, -0.00027963313489825364)
+PROJECTION_FENICS_POINTS = [
+    [0.0007391793277933225, 0.0001430702172714647, 0.8404115351086197],
+    [0.0006138307177725508, -8.080310231710478e-07, 0.6859610805277692],
+    [0.0006170498773377232, 2.742331940577588e-07, 0.48537034723473604],
+    [0.000625531433988877, -1.72714695699517e-07, 0.08102075727895316],
+]
+# drag and lift at t = 0.005 from the FEATFLOW benchmark solution
+PROJECTION_FEATFLOW_DRAG_LIFT = (1.4903278329e-01, -2.3003337267e-04)
+
+
+def projection(level_params, maxiter, nsteps=None, Tend=None):
+    """Run the projection scheme from t0 = 3.125e-4 and return the problem, the end point and the iterations."""
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_projection_Firedrake import (
+        NavierStokes2DProjectionFiredrake,
+    )
+    from pySDC.projects.StroemungsRaum.sweepers.imex_1st_order_mass_NSE import imex_1st_order_mass_NSE
+
+    dt, t0 = 1 / 1600, 3.125e-4
+    description = {
+        'problem_class': NavierStokes2DProjectionFiredrake,
+        'problem_params': {},
+        'sweeper_class': imex_1st_order_mass_NSE,
+        'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 2, 'QI': 'LU', 'QE': 'PIC'},
+        'level_params': {'dt': dt, **level_params},
+        'step_params': {'maxiter': maxiter},
+    }
+    controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+    P = controller.MS[0].levels[0].prob
+    uend, stats = controller.run(u0=P.u_exact(t0), t0=t0, Tend=t0 + nsteps * dt if Tend is None else Tend)
+    return P, uend, [me[1] for me in get_sorted(stats, type='niter')]
+
+
+@pytest.mark.firedrake
+def test_projection_reproduces_FEniCS():
+    """The same steps of the projection scheme as the FEniCS version give the same solution to round-off."""
+    import firedrake as fd
+    import numpy as np
+
+    P, uend, _ = projection({'restol': -1.0}, maxiter=3, nsteps=2)
+    assert np.allclose(P.drag_lift(uend), PROJECTION_FENICS_DRAG_LIFT, rtol=0, atol=1e-12)
+
+    evaluate = fd.PointEvaluator(P.mesh, [list(x) for x in FENICS_POINTS]).evaluate
+    values = np.column_stack([evaluate(uend.functionspace), evaluate(P.pn)])
+    assert np.allclose(values, PROJECTION_FENICS_POINTS, rtol=0, atol=1e-12), values
+
+
+@pytest.mark.firedrake
+def test_projection_benchmark():
+    """
+    The project's setup, stopping on the increment (`e_tol`), takes the same iterations as the FEniCS version, lands on
+    the same drag and lift, and is within the tolerances of the FEniCS test against FEATFLOW.
+    """
+    import numpy as np
+
+    P, uend, iterations = projection({'e_tol': 1e-9}, maxiter=10, Tend=0.005)
+    drag_lift = P.drag_lift(uend)
+
+    assert iterations == [4] * 7 + [3], iterations
+    assert np.allclose(drag_lift, (1.4635256617e-01, -1.9517335230e-04), rtol=1e-9, atol=0), drag_lift
+    errors = np.abs(np.array(drag_lift) - PROJECTION_FEATFLOW_DRAG_LIFT)
+    assert errors[0] < 5e-3 and errors[1] < 5e-5, errors

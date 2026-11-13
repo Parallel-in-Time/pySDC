@@ -50,6 +50,27 @@ def cylinder_mesh(comm=fd.COMM_WORLD):
     return fd.Mesh(plex, comm=comm)
 
 
+def drag_lift(u, p, nu, mesh):
+    """
+    Drag and lift coefficients of the cylinder, as in the DFG benchmark and the FEniCS versions.
+
+    Args:
+        u: Velocity, a function or a UFL expression of one
+        p: Pressure, a function or a UFL expression of one
+        nu (float): Kinematic viscosity
+        mesh (firedrake.MeshGeometry): Mesh from :func:`cylinder_mesh`
+
+    Returns:
+        tuple of float: Drag and lift coefficients
+    """
+    n = -fd.FacetNormal(mesh)
+    u_t = fd.inner(fd.as_vector((n[1], -n[0])), u)
+    ds = fd.ds(CYLINDER, domain=mesh)
+    drag = 2 / 0.1 * (nu * fd.inner(fd.grad(u_t), n) * n[1] - p * n[0]) * ds
+    lift = -2 / 0.1 * (nu * fd.inner(fd.grad(u_t), n) * n[0] + p * n[1]) * ds
+    return fd.assemble(drag), fd.assemble(lift)
+
+
 class NavierStokes2DMonolithicFiredrake(FormFiredrake):
     r"""
     Incompressible Navier-Stokes flow around a cylinder (the DFG benchmark 2D-3), monolithic, with Firedrake and
@@ -144,7 +165,7 @@ class NavierStokes2DMonolithicFiredrake(FormFiredrake):
 
     def drag_lift(self, w):
         """
-        Drag and lift coefficients of the cylinder, as in the DFG benchmark and the FEniCS version.
+        Drag and lift coefficients of the cylinder, see :func:`drag_lift`.
 
         Args:
             w (dtype_u): Velocity and pressure
@@ -153,9 +174,4 @@ class NavierStokes2DMonolithicFiredrake(FormFiredrake):
             tuple of float: Drag and lift coefficients
         """
         u, p = fd.split(w.functionspace)
-        n = -fd.FacetNormal(self.mesh)
-        u_t = fd.inner(fd.as_vector((n[1], -n[0])), u)
-        ds = fd.ds(CYLINDER)
-        drag = 2 / 0.1 * (self.nu * fd.inner(fd.grad(u_t), n) * n[1] - p * n[0]) * ds
-        lift = -2 / 0.1 * (self.nu * fd.inner(fd.grad(u_t), n) * n[0] + p * n[1]) * ds
-        return fd.assemble(drag), fd.assemble(lift)
+        return drag_lift(u, p, self.nu, self.mesh)
