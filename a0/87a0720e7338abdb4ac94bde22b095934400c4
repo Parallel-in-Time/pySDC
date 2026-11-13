@@ -1,0 +1,22 @@
+pySDC/implementations/problem_classes/HeatFiredrake.py
+  s_9674afe8ec3c17::t_0e946b3d2b869e 139,261
+  s_9674afe8ec3c17::t_b0afe13d9b5a1a 140,211-246,263
+pySDC/tests/test_problems/test_heat_firedrake.py
+  s_9674afe8ec3c17::t_baeaca38134602 64-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a087a0720e7338abdb4ac94bde22b095934400c4",
+  "prompts": {},
+  "sessions": {
+    "s_9674afe8ec3c17": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "047e4b68-601a-472e-b36c-76694ed589fa",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
