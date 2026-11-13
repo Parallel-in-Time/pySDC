@@ -90,6 +90,10 @@ class FormFiredrake(Problem):
         Number of solvers kept, one per factor
     stop_at_divergence : bool, optional
         Raise if a solve does not converge, instead of logging it
+    nullspace : firedrake.VectorSpaceBasis or firedrake.MixedVectorSpaceBasis, optional
+        Null space of the implicit systems, e.g. the constants of a pressure or stream function with no Dirichlet
+        condition. Passed on to the solves; a direct solver then needs null pivot detection, such as MUMPS with
+        ``'mat_mumps_icntl_24': 1``.
     """
 
     dtype_u = firedrake_mesh
@@ -108,6 +112,7 @@ class FormFiredrake(Problem):
         solver_parameters=None,
         LHS_cache_size=12,
         stop_at_divergence=True,
+        nullspace=None,
     ):
         """Initialization, see the class docstring for the arguments."""
         self.V = V
@@ -124,6 +129,7 @@ class FormFiredrake(Problem):
         self.u_exact_expr = u_exact
         self.solver_parameters = solver_parameters
         self.stop_at_divergence = stop_at_divergence
+        self.nullspace = nullspace
 
         super().__init__(V)
         self._makeAttributeAndRegister('LHS_cache_size', localVars=locals(), readOnly=True)
@@ -249,7 +255,9 @@ class FormFiredrake(Problem):
                 self.mass, self.implicit_rhs, self._x, self._v, fd.TrialFunction(self.V), fd.Constant(factor)
             )
             problem = fd.NonlinearVariationalProblem(F - self._b, self._x, bcs=self._solve_bcs, J=J)
-            self.solvers[factor] = fd.NonlinearVariationalSolver(problem, solver_parameters=self.solver_parameters)
+            self.solvers[factor] = fd.NonlinearVariationalSolver(
+                problem, solver_parameters=self.solver_parameters, nullspace=self.nullspace
+            )
             self.work_counters['solver_setup']()
 
         try:
