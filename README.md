@@ -105,7 +105,7 @@
 | pySDC/implementations/problem\_classes/HeatEquation\_2D\_PETSc\_forced.py                           |       90 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/HeatEquation\_Chebychev.py                                   |      222 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/HeatEquation\_ND\_FD.py                                      |       68 |        1 |     99% |       123 |
-| pySDC/implementations/problem\_classes/HeatFiredrake.py                                             |       64 |        1 |     98% |       170 |
+| pySDC/implementations/problem\_classes/HeatFiredrake.py                                             |       74 |        1 |     99% |       170 |
 | pySDC/implementations/problem\_classes/HenonHeiles.py                                               |       31 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/LogisticEquation.py                                          |       40 |       20 |     50% |   119-155 |
 | pySDC/implementations/problem\_classes/Lorenz.py                                                    |       54 |        3 |     94% |155, 158-159 |
@@ -411,7 +411,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **33329** | **4068** | **88%** |           |
+| **TOTAL**                                                                                           | **33339** | **4068** | **88%** |           |
 
 45 empty files skipped.
 
