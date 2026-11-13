@@ -12,7 +12,7 @@ rest=eq (default) starts every method from the cell model's equilibrated resting
 initial values.
 
 METHOD: RL2, ESDC_par (unmasked reference implementation) or ESDC_masked (with mask = none | res | inc | err;
-err also takes kappa=0.1 and kmin=2).
+err also takes kappa=0.1 and kmin=2). sweeps=K runs exactly K sweeps per step instead of stopping on restol.
 """
 
 import json
@@ -74,13 +74,14 @@ class Hook(wp.ActivationHook):
 
 def main():
     out, tag, method, dt = Path(sys.argv[1]), sys.argv[2], sys.argv[3], float(sys.argv[4])
-    kw = dict(restol='1e-5', mask='res', theta='0.1', domain='cuboid_2D', refinements='1', Tend='50', M='4', rest='eq', kappa='0.1', kmin='2')
+    kw = dict(restol='1e-5', mask='res', theta='0.1', domain='cuboid_2D', refinements='1', Tend='50', M='4', rest='eq', kappa='0.1', kmin='2', sweeps='')
     kw.update(a.split('=', 1) for a in sys.argv[5:])
     prob = dict(domain=kw['domain'], refinements=int(kw['refinements']), model='TTP', Tend=float(kw['Tend']))
     if method == 'RL2':
         desc = wp.description('RL2', dt, **prob)
     else:
-        desc = wp.description('ESDC_par', dt, M=int(kw['M']), restol=float(kw['restol']), **prob)
+        sweeps = int(kw['sweeps']) if kw['sweeps'] else None  # fixed number of sweeps instead of residual stopping
+        desc = wp.description('ESDC_par', dt, M=int(kw['M']), restol=float(kw['restol']), sweeps=sweeps, **prob)
         if method == 'ESDC_masked':
             desc['sweeper_class'] = imexexp_masked
             desc['sweeper_params'].update(mask=kw['mask'], theta=float(kw['theta']), kappa=float(kw['kappa']), kmin=int(kw['kmin']))
