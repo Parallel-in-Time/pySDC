@@ -1,0 +1,24 @@
+pySDC/projects/StroemungsRaum/problem_classes/ConvectionDiffusion_2D_Firedrake.py
+  s_defc4032430111::t_4dcfa647359ac0 1-75
+pySDC/projects/StroemungsRaum/problem_classes/HeatEquation_2D_Firedrake.py
+  s_defc4032430111::t_2827564cf95fa8 1-67
+pySDC/tests/test_projects/test_StroemungsRaum/test_heat_convdiff_firedrake.py
+  s_defc4032430111::t_9cc39d7e04dafa 1-70,72,75
+  s_defc4032430111::t_4343811875eac8 71,73-74,76-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c7f5e7cad4edea59426d077c1e7de617f54495e4",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
