@@ -125,7 +125,7 @@ def test_Poisson_problems(nx, component):
     rhs = P.put_BCs_in_rhs_hat(rhs)
     u = P.sparse_lib.linalg.spsolve(A, P.M @ rhs.flatten()).reshape(rhs.shape).real
 
-    u_exact = P.u_init_forward.astype('d')
+    u_exact = P.u_init_forward.real.copy()
     if P.comm.rank == 0:
         u_exact[idx][0, 0, 4] = 1 / 8
         u_exact[idx][0, 0, 2] = 1 / 2
