@@ -1,0 +1,23 @@
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_projection_Firedrake.py
+  s_defc4032430111::t_5c84843012f685 1-145
+pySDC/tests/test_projects/test_StroemungsRaum/test_navier_stokes_firedrake.py
+  s_defc4032430111::t_6eb0250f0a32c9 184-252
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_Firedrake.py
+  s_defc4032430111::t_273d027ae0c6d6 53-73,168,177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "614eaa951ab16a822d7c29bee0d023fe5ac51ee8",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
