@@ -58,18 +58,17 @@ from pySDC.helpers.ufl_forms import manufactured_forcing, total_rhs
 NU = 0.1
 
 
-def get_forms(imex, n=8):
+def get_forms(imex, mesh):
     """
     The problem as forms, for `FormFiredrake` or `FormFiredrakeIMEX`.
 
     Args:
         imex (bool): Whether to put the reaction into the explicit part
-        n (int): Number of elements per direction
+        mesh (firedrake.MeshGeometry): The mesh
 
     Returns:
         dict: The problem parameters
     """
-    mesh = fd.UnitSquareMesh(n, n)
     V = fd.FunctionSpace(mesh, 'CG', 2)
     x, y = fd.SpatialCoordinate(mesh)
     t = fd.Constant(0.0)
@@ -124,12 +123,13 @@ def get_forms(imex, n=8):
 
 
 # %%
-def setup(imex):
+def setup(imex, levels=1):
     """
     Helper routine to set up parameters
 
     Args:
         imex (bool): Whether to run IMEX SDC instead of fully implicit SDC
+        levels (int): Number of levels, 1 for SDC or 2 for MLSDC
 
     Returns:
         description and controller_params parameter dictionaries
@@ -137,22 +137,45 @@ def setup(imex):
     from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake, FormFiredrakeIMEX
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
     from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+    from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
     from pySDC.implementations.hooks.log_work import LogWork
 
+    # an 8x8 mesh made by refining a 4x4 one, so that the two can be levels
+    meshes = fd.MeshHierarchy(fd.UnitSquareMesh(4, 4), 1)[::-1][:levels]
+    forms = [get_forms(imex, mesh) for mesh in meshes]
+
     description = {
         'problem_class': FormFiredrakeIMEX if imex else FormFiredrake,
-        'problem_params': get_forms(imex),
+        # one entry per level, finest first: each level has its own mesh, and so its own spaces and boundary values
+        'problem_params': {key: [level[key] for level in forms] for key in forms[0]},
         'sweeper_class': imex_1st_order_mass if imex else generic_implicit_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'},
         'level_params': {'restol': 1e-8, 'dt': 0.1},
         'step_params': {'maxiter': 20},
+        'base_transfer_class': base_transfer_mass,
+        'space_transfer_class': MeshToMeshFiredrakeHierarchy,
     }
     controller_params = {'logger_level': 30, 'hook_class': [LogGlobalErrorPostRun, LogWork]}
     return description, controller_params
 
 
 # %% [markdown]
+# ## Several levels
+#
+# For multilevel SDC (MLSDC) and PFASST, each level needs its own problem on its own mesh. We take the meshes from a
+# Firedrake `MeshHierarchy`, so that they are nested, and give the problem parameters as lists, one entry per level,
+# finest first. Two transfer classes move data between the levels:
+#
+# - `MeshToMeshFiredrakeHierarchy` restricts solutions by $L^2$ projection, restricts load vectors such as $M u_0$ with
+#   the transpose of the prolongation, and prolongs corrections;
+# - `base_transfer_mass` puts these together into the FAS correction for the mass formulation.
+#
+# On the coarse level, the solves impose the boundary values of the restricted fine solution rather than the boundary
+# data, so that the coarse correction vanishes on the boundary. Without this, MLSDC would not converge to the solution
+# of SDC.
+#
 # ## Running it
 #
 # The run prints the error at the end, the SDC iterations and the work of the problem class: how many solvers it set
@@ -161,12 +184,13 @@ def setup(imex):
 
 
 # %%
-def run(imex):
+def run(imex, levels=1):
     """
-    Run the example with fully implicit or IMEX SDC
+    Run the example with fully implicit or IMEX SDC, or MLSDC
 
     Args:
         imex (bool): Whether to run IMEX SDC instead of fully implicit SDC
+        levels (int): Number of levels, 1 for SDC or 2 for MLSDC
 
     Returns:
         dict: Error, iterations and work of the run
@@ -175,19 +199,21 @@ def run(imex):
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.helpers.stats_helper import get_sorted
 
-    description, controller_params = setup(imex)
+    description, controller_params = setup(imex, levels)
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     P = controller.MS[0].levels[0].prob
     uend, stats = controller.run(u0=P.u_exact(0.0), t0=0.0, Tend=1.0)
 
     result = {'error': get_sorted(stats, type='e_global_post_run')[0][1]}
-    for key in ['niter', 'work_solver_setup', 'work_solver', 'work_ksp']:
-        result[key] = int(np.sum([me[1] for me in get_sorted(stats, type=key)]))
+    result['niter'] = int(np.sum([me[1] for me in get_sorted(stats, type='niter')]))
+    for key in ['work_solver_setup', 'work_solver', 'work_ksp']:
+        # the work on the finest level
+        result[key] = int(np.sum([me[1] for me in get_sorted(stats, type=key, level=0)]))
 
-    variant = 'IMEX' if imex else 'implicit'
+    variant = ('IMEX' if imex else 'implicit') + (' SDC' if levels == 1 else ' MLSDC')
     summary = (
-        f'{variant:8s} SDC: error {result["error"]:.2e}, {result["niter"]} iterations, '
+        f'{variant:14s}: error {result["error"]:.2e}, {result["niter"]} iterations, '
         f'{result["work_solver_setup"]} solver setups, {result["work_solver"]} solves, '
         f'{result["work_ksp"]} linear solves'
     )
@@ -199,11 +225,12 @@ def run(imex):
 
 
 def main():
-    """Run both variants and check that we got the same as last time."""
+    """Run the variants and check that we got the same as last time."""
     implicit = run(imex=False)
     imex = run(imex=True)
+    multilevel = run(imex=False, levels=2)
 
-    for result in [implicit, imex]:
+    for result in [implicit, imex, multilevel]:
         assert result['error'] < 1e-8, result
         assert result['work_solver_setup'] == 3, result
         assert result['work_solver'] == 3 * result['niter'], result
@@ -213,7 +240,9 @@ def main():
     # the IMEX systems are linear: one linear solve each, while Newton needs a few
     assert imex['work_ksp'] == imex['work_solver'], imex
     assert implicit['work_ksp'] > implicit['work_solver'], implicit
-    return implicit, imex
+    # MLSDC reaches the same accuracy, in about as many iterations as SDC, see below
+    assert multilevel['niter'] == 66, multilevel
+    return implicit, imex, multilevel
 
 
 # %%
@@ -221,9 +250,13 @@ if __name__ == "__main__":
     main()
 
 # %% [markdown]
-# Both variants reach the same accuracy. IMEX SDC solves one linear system per node and iteration, where fully implicit
+# All variants reach the same accuracy. IMEX SDC solves one linear system per node and iteration, where fully implicit
 # SDC runs Newton's method. Which one is cheaper overall depends on how stiff the explicit part is: a stiffer reaction
 # would cost IMEX SDC iterations, or a smaller step size.
+#
+# MLSDC does not pay off for this problem: SDC already converges in about six iterations per step, and MLSDC needs as
+# many, plus the sweeps on the coarse level. A coarse level helps when SDC needs many iterations, for instance with
+# stronger diffusion or larger steps, and it is what lets PFASST compute several steps in parallel.
 #
 # Firedrake does not run in the browser, nor in the environment this website is built in. Our CI runs this part in a
 # Firedrake container and checks its errors and work counts. These are its results, in the run that built this page:

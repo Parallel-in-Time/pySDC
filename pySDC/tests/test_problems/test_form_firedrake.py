@@ -26,19 +26,20 @@ def heat_forms(V, nu, c, t):
     }
 
 
-def nonlinear_forms(V, nu, imex):
+def nonlinear_forms(V, nu, imex, smooth=True):
     """
     Reaction-diffusion u' = nu u'' - u^3 + g with a manufactured solution and time-dependent Dirichlet values.
 
-    The solution is quadratic in space, so it lies in the finite element space and all error is from the time stepping.
-    The forcing g comes from differentiating the exact solution with UFL.
+    With `smooth`, the solution is quadratic in space, so it lies in the finite element space and all error is from the
+    time stepping. Otherwise it is not, so that coarser meshes see a different problem. The forcing g comes from
+    differentiating the exact solution with UFL.
     """
     import firedrake as fd
     from pySDC.helpers.ufl_forms import manufactured_forcing, total_rhs
 
     x = fd.SpatialCoordinate(V.mesh())[0]
     t = fd.Constant(0.0)
-    u_exact = fd.cos(t) * (1 + x**2) + t * x
+    u_exact = fd.cos(t) * (1 + x**2) + t * x if smooth else fd.cos(t) * fd.sin(3 * x) + t * x + 1
 
     def mass(u, v):
         return u * v * fd.dx
@@ -67,8 +68,8 @@ def nonlinear_forms(V, nu, imex):
     return forms
 
 
-def run(problem_class, problem_params, sweeper_class, dt, Tend, maxiter, restol=-1.0):
-    """Run SDC on one level and return the controller and the end point."""
+def run(problem_class, problem_params, sweeper_class, dt, Tend, maxiter, restol=-1.0, num_procs=1, **description):
+    """Run SDC, or MLSDC and PFASST with more `description`, and return the controller and the end point."""
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     description = {
@@ -78,8 +79,9 @@ def run(problem_class, problem_params, sweeper_class, dt, Tend, maxiter, restol=
         'sweeper_params': SWEEPER_PARAMS,
         'level_params': {'dt': dt, 'restol': restol},
         'step_params': {'maxiter': maxiter},
+        **description,
     }
-    controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params={'logger_level': 30}, description=description)
     P = controller.MS[0].levels[0].prob
     uend, _ = controller.run(u0=P.u_exact(0), t0=0, Tend=Tend)
     return controller, uend
@@ -139,6 +141,78 @@ def test_manufactured_solution_converges(imex):
     orders = np.log(np.array(errors[:-1]) / errors[1:]) / np.log(2)
     # the order approaches 5 from below: 4.59, 4.66, 4.74, 4.82 from dt = 0.5 on
     assert np.all(orders > 4.7), f'expected order 5, got {orders} from errors {errors}'
+
+
+def multilevel(levels, num_nodes, num_procs, maxiter=50):
+    """
+    Run the nonlinear problem with a solution outside the finite element space on a mesh hierarchy.
+
+    Returns:
+        The end point and the iterations per step
+    """
+    import firedrake as fd
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
+    from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+    from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
+
+    hierarchy = fd.MeshHierarchy(fd.UnitIntervalMesh(4), 2)
+    per_level = [nonlinear_forms(fd.FunctionSpace(mesh, 'CG', 2), 0.1, False, smooth=False) for mesh in hierarchy]
+    # pySDC reads lists in the problem parameters as one entry per level, finest first
+    problem_params = {key: [forms[key] for forms in per_level[::-1][:levels]] for key in per_level[0]}
+
+    description = {
+        'problem_class': FormFiredrake,
+        'problem_params': problem_params,
+        'sweeper_class': generic_implicit_mass,
+        'sweeper_params': {**SWEEPER_PARAMS, 'num_nodes': num_nodes},
+        'level_params': {'dt': 0.125, 'restol': 1e-11},
+        'step_params': {'maxiter': maxiter},
+        'base_transfer_class': base_transfer_mass,
+        'space_transfer_class': MeshToMeshFiredrakeHierarchy,
+    }
+    controller = controller_nonMPI(num_procs=num_procs, controller_params={'logger_level': 30}, description=description)
+    P = controller.MS[0].levels[0].prob
+    uend, stats = controller.run(u0=P.u_exact(0), t0=0, Tend=0.5)
+    return uend, [me[1] for me in get_sorted(stats, type='niter')]
+
+
+@pytest.mark.firedrake
+@pytest.mark.parametrize(
+    'levels, num_nodes, num_procs, max_iter',
+    [(2, [3, 3], 1, 9), (2, [3, 2], 1, 13), (3, [3, 3, 2], 1, 9), (2, [3, 2], 4, 16)],
+)
+def test_multilevel_matches_SDC(levels, num_nodes, num_procs, max_iter):
+    """
+    MLSDC and PFASST converge to the solution of SDC on the finest level, with time-dependent boundary values, in
+    space and in time coarsening. SDC takes 12 iterations per step here.
+    """
+    import numpy as np
+
+    u_SDC, iterations_SDC = multilevel(1, 3, 1)
+    assert iterations_SDC == [12] * 4
+
+    u, iterations = multilevel(levels, num_nodes, num_procs)
+    assert np.abs(u.dat.data_ro - u_SDC.dat.data_ro).max() < 1e-10
+    assert max(iterations) <= max_iter, iterations
+
+
+@pytest.mark.firedrake
+def test_multilevel_needs_restricted_boundary_values(monkeypatch):
+    """
+    Without the restricted boundary values in the coarse solves, the coarse correction is not zero on the boundary
+    and MLSDC stalls away from SDC, even though L2 projection is the only thing that changes the boundary values.
+    """
+    import numpy as np
+    from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
+
+    u_SDC, _ = multilevel(1, 3, 1)
+    monkeypatch.setattr(FormFiredrake, 'use_restricted_boundary_values', lambda self, u, t: None)
+    u, iterations = multilevel(2, [3, 3], 1, maxiter=20)
+    assert iterations == [20] * 4
+    assert np.abs(u.dat.data_ro - u_SDC.dat.data_ro).max() > 1e-8
 
 
 @pytest.mark.firedrake
@@ -204,4 +278,7 @@ def test_solve_system_and_caching():
     with pytest.raises(DataError):
         P.solve_system(u, 0.1, u, 0.3)
     with pytest.raises(DataError):
-        P.eval_f(P.apply_mass_matrix(u), 0.3)
+        P.apply_mass_matrix(P.apply_mass_matrix(u))
+
+    # a load vector is evaluated at the function it represents, as on coarse levels, where u0 is M u0
+    assert abs(P.eval_f(P.apply_mass_matrix(u), 0.3) - P.eval_f(u, 0.3)) < 1e-10 * abs(P.eval_f(u, 0.3))

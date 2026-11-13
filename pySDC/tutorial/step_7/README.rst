@@ -15,7 +15,7 @@ In the following, we show a few examples of pySDC + X.
   ``F_2_plot_pySDC_with_Gusto_result.py`` plots its results.
 - **Part G: pySDC on GPUs.** A heat equation in finite differences with SDC, MLSDC and PFASST, all of it on the device.
 - **Part H: pySDC from Firedrake forms.** A nonlinear reaction-diffusion equation given only by its weak forms, with no
-  problem class of its own, solved with fully implicit and with IMEX SDC.
+  problem class of its own, solved with fully implicit and IMEX SDC, and with MLSDC on a mesh hierarchy.
 
 Each part is a Python script in `jupytext <https://jupytext.readthedocs.io>`_ "percent" format: run it with ``python``
 (or ``mpirun``) in an environment with the library it needs, or read it on the website. Parts A, B, D, F, G and H also

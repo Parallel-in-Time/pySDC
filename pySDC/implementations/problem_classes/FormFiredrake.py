@@ -5,6 +5,7 @@ from pySDC.implementations.datatype_classes.firedrake_mesh import (
     firedrake_mesh,
     firedrake_dual_mesh,
     IMEX_firedrake_dual_mesh,
+    riesz_map,
 )
 import firedrake as fd
 from firedrake.assemble import get_assembler
@@ -39,6 +40,14 @@ class FormFiredrake(Problem):
     interior nodes. The boundary values are imposed only by the solves, where Firedrake replaces the boundary rows by
     :math:`u = g(t)`. The boundary rows of the sweeper's residual therefore carry no equation; ``fix_residual`` zeros
     them (the sweepers call it because ``fix_bc_for_residual`` is set).
+
+    **Several levels.** MLSDC and PFASST work with
+    :class:`~pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass` and
+    :class:`~pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy` on the
+    meshes of a Firedrake ``MeshHierarchy``. Give `V`, `bcs` and `u_exact` per level, as lists in the problem
+    parameters, since each lives on its level's mesh. On coarse levels, the solves impose the boundary values of the
+    restricted fine solution instead of the data (``use_restricted_boundary_values``), so the coarse correction is
+    zero on the boundary.
 
     Parameters
     ----------
@@ -88,6 +97,10 @@ class FormFiredrake(Problem):
         self.rhs = rhs
         self.rhs_exp = rhs_exp
         self.bcs = () if bcs is None else bcs
+        # the solves take their boundary values from this buffer: the data, or restricted values on coarse levels
+        self._g = fd.Function(V)
+        self._solve_bcs = tuple(bc.reconstruct(g=self._g) for bc in self.bcs)
+        self._restricted = {}
         self.t = fd.Constant(0.0) if t is None else t
         self.u_exact_expr = u_exact
         self.solver_parameters = solver_parameters
@@ -132,15 +145,16 @@ class FormFiredrake(Problem):
 
         Args:
             assembler: Firedrake assembler of a form in terms of ``self._u``
-            u (dtype_u): Where to evaluate
+            u (firedrake_mesh): Where to evaluate, a solution or a load vector, see ``eval_f``
             out (firedrake_dual_mesh): Where to put the result
 
         Returns:
             firedrake_dual_mesh: `out`
         """
         if u.is_dual:
-            raise DataError('Forms are evaluated at a solution (a Function), not at a load vector (a Cofunction)')
-        self._u.assign(u.functionspace)
+            self._u.assign(riesz_map(self.V)(u.functionspace))
+        else:
+            self._u.assign(u.functionspace)
         assembler.assemble(tensor=out.functionspace)
         return out
 
@@ -148,8 +162,13 @@ class FormFiredrake(Problem):
         """
         Evaluate the right-hand side :math:`R(u)` at time `t`, without inverting the mass matrix.
 
+        On coarse levels, the mass-matrix sweepers keep the initial value as the load vector :math:`M u_0`, and the
+        controllers evaluate the right-hand side there too. A load vector is evaluated at the function it represents,
+        :math:`M^{-1} u`. (The sweepers do not depend on this value, it enters their right-hand sides and the known
+        terms they subtract alike.)
+
         Args:
-            u (dtype_u): Solution at which to evaluate
+            u (firedrake_mesh): Solution at which to evaluate, or a load vector
             t (float): Time at which to evaluate
 
         Returns:
@@ -169,6 +188,8 @@ class FormFiredrake(Problem):
         Returns:
             firedrake_dual_mesh: :math:`M u`
         """
+        if u.is_dual:
+            raise DataError('The mass matrix applies to a solution (a Function), not to a load vector (a Cofunction)')
         return self._assemble(self._mass_assembler, u, firedrake_dual_mesh(self.init))
 
     def solve_system(self, rhs, factor, u0, t):
@@ -194,6 +215,13 @@ class FormFiredrake(Problem):
             raise DataError('The right-hand side of the solve must be a load vector (a Cofunction), not a Function')
         self._b.assign(rhs.functionspace)
 
+        restricted = self._restricted.get(t)
+        if restricted is None:
+            for bc in self.bcs:
+                bc.apply(self._g)
+        else:
+            self._g.assign(restricted.functionspace)
+
         if factor not in self.solvers:
             if len(self.solvers) >= self.LHS_cache_size:
                 self.solvers.pop(next(iter(self.solvers)))
@@ -201,7 +229,7 @@ class FormFiredrake(Problem):
             F, J = implicit_system(
                 self.mass, self.implicit_rhs, self._x, self._v, fd.TrialFunction(self.V), fd.Constant(factor)
             )
-            problem = fd.NonlinearVariationalProblem(F - self._b, self._x, bcs=self.bcs, J=J)
+            problem = fd.NonlinearVariationalProblem(F - self._b, self._x, bcs=self._solve_bcs, J=J)
             self.solvers[factor] = fd.NonlinearVariationalSolver(problem, solver_parameters=self.solver_parameters)
             self.work_counters['solver_setup']()
 
@@ -215,6 +243,18 @@ class FormFiredrake(Problem):
         self.work_counters['ksp'].niter += self.solvers[factor].snes.getLinearSolveIterations()
         self.work_counters['solver']()
         return self.dtype_u(self._x)
+
+    def use_restricted_boundary_values(self, u, t):
+        """
+        Impose the boundary values of the restricted solution `u` in the solves at the times `t`, instead of the
+        boundary data, see :meth:`pySDC.core.problem.Problem.use_restricted_boundary_values`. FAS calls this on
+        coarse levels, so the coarse correction has homogeneous boundary values.
+
+        Args:
+            u (list of dtype_u): Restricted solution at the coarse nodes
+            t (list of float): Times of the coarse nodes
+        """
+        self._restricted = {_t: self.dtype_u(_u) for _u, _t in zip(u, t, strict=True)}
 
     def fix_residual(self, res):
         """
@@ -278,7 +318,7 @@ class FormFiredrakeIMEX(FormFiredrake):
         Evaluate the implicit and explicit right-hand sides at time `t`, without inverting the mass matrix.
 
         Args:
-            u (dtype_u): Solution at which to evaluate
+            u (firedrake_mesh): Solution at which to evaluate, or a load vector, see :meth:`FormFiredrake.eval_f`
             t (float): Time at which to evaluate
 
         Returns:
