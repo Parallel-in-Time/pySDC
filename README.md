@@ -288,6 +288,12 @@
 | pySDC/projects/Resilience/sweepers.py                                                               |      107 |        8 |     93% |34-40, 112, 216 |
 | pySDC/projects/Resilience/vdp.py                                                                    |      195 |       35 |     82% |28-54, 181-183, 189-192, 265-267, 334, 363-371, 454 |
 | pySDC/projects/Resilience/work\_precision.py                                                        |      486 |      134 |     72% |75-76, 120-121, 133, 163-168, 176-177, 279, 295, 299, 301, 303-305, 309-316, 325-328, 330-331, 333-334, 336-337, 373, 377, 433-438, 734-769, 940-943, 947-954, 973, 992-1050, 1075-1076, 1138-1139, 1783-1815, 1943-1950 |
+| pySDC/projects/SDC4SDEs/baselines.py                                                                |       18 |        0 |    100% |           |
+| pySDC/projects/SDC4SDEs/brownian.py                                                                 |       21 |        0 |    100% |           |
+| pySDC/projects/SDC4SDEs/problem\_classes.py                                                         |      131 |        1 |     99% |       248 |
+| pySDC/projects/SDC4SDEs/run.py                                                                      |       29 |        0 |    100% |           |
+| pySDC/projects/SDC4SDEs/studies.py                                                                  |      119 |        9 |     92% |126, 220-227 |
+| pySDC/projects/SDC4SDEs/sweeper.py                                                                  |       79 |        1 |     99% |       151 |
 | pySDC/projects/SDC\_showdown/SDC\_timing\_Fisher.py                                                 |      109 |        0 |    100% |           |
 | pySDC/projects/SDC\_showdown/SDC\_timing\_GrayScott.py                                              |      146 |       30 |     79% |   218-269 |
 | pySDC/projects/Second\_orderSDC/check\_data\_folder.py                                              |        4 |        4 |      0% |       1-8 |
@@ -411,9 +417,9 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **33339** | **4068** | **88%** |           |
+| **TOTAL**                                                                                           | **33736** | **4079** | **88%** |           |
 
-45 empty files skipped.
+46 empty files skipped.
 
 
 ## Setup coverage badge
