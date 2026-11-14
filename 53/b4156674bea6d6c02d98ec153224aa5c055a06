@@ -1,0 +1,33 @@
+pySDC/projects/StroemungsRaum/plotting/plots_convection_diffusion_equation_Firedrake.py
+  s_defc4032430111::t_d7ecd5fb6fddb5 1-65
+pySDC/projects/StroemungsRaum/plotting/plots_Navier_Stokes_projection_Firedrake.py
+  s_defc4032430111::t_d7ecd5fb6fddb5 1-63
+pySDC/projects/StroemungsRaum/run_convection_diffusion_equation_Firedrake.py
+  s_defc4032430111::t_85549b7e4c5bf5 1-78
+pySDC/projects/StroemungsRaum/run_heat_equation_Firedrake.py
+  s_defc4032430111::t_85549b7e4c5bf5 1-78
+pySDC/projects/StroemungsRaum/hooks/hooks_NSE_IMEX_Firedrake.py
+  s_defc4032430111::t_94427cb9e921be 1-99
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_equations_Firedrake.py
+  s_defc4032430111::t_85549b7e4c5bf5 1-79
+pySDC/projects/StroemungsRaum/plotting/plots_heat_equation_Firedrake.py
+  s_defc4032430111::t_d7ecd5fb6fddb5 1-75
+pySDC/tests/test_projects/test_StroemungsRaum/test_hooks_plotting_firedrake.py
+  s_defc4032430111::t_26610d78a75006 1-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "53b4156674bea6d6c02d98ec153224aa5c055a06",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
