@@ -136,8 +136,8 @@ class Heat1DForcedFiredrake(Problem):
 
         # evaluate explicit part.
         # Because it does not depend on the current solution, we can simply interpolate the expression
-        x = fd.SpatialCoordinate(self.mesh)
-        me.expl.interpolate(-(np.sin(t) - self.nu * np.pi**2 * np.cos(t)) * fd.sin(np.pi * x[0]))
+        self.t.assign(t)
+        me.expl.interpolate(self.forcing)
 
         self.work_counters['rhs']()
 
@@ -208,6 +208,42 @@ class Heat1DForcedFiredrake(Problem):
         """
         return fd.SpatialCoordinate(self.mesh)
 
+    @cached_property
+    def t(self):
+        """
+        Time as a Firedrake constant, assigned before each interpolation so the kernels compile only once.
+
+        Returns
+        -------
+        t : firedrake.Constant
+            Time at which the time-dependent expressions are evaluated.
+        """
+        return fd.Constant(0.0)
+
+    @cached_property
+    def forcing(self):
+        """
+        Symbolic forcing term :math:`f(x, t)` in terms of the time constant :attr:`t`.
+
+        Returns
+        -------
+        f : ufl.core.expr.Expr
+            Forcing term, interpolated in :meth:`eval_f`.
+        """
+        return -(fd.sin(self.t) - self.nu * np.pi**2 * fd.cos(self.t)) * fd.sin(np.pi * self.x[0])
+
+    @cached_property
+    def exact_solution(self):
+        """
+        Symbolic exact solution :math:`u(x, t)` in terms of the time constant :attr:`t`.
+
+        Returns
+        -------
+        u : ufl.core.expr.Expr
+            Exact solution, interpolated in :meth:`u_exact`.
+        """
+        return fd.cos(self.t) * fd.sin(np.pi * self.x[0]) + self.c
+
     def u_exact(self, t):
         r"""
         Routine to compute the exact solution at time :math:`t`.
@@ -222,6 +258,7 @@ class Heat1DForcedFiredrake(Problem):
         me : dtype_u
             Exact solution.
         """
+        self.t.assign(t)
         me = self.u_init
-        me.interpolate(np.cos(t) * fd.sin(np.pi * self.x[0]) + self.c)
+        me.interpolate(self.exact_solution)
         return me

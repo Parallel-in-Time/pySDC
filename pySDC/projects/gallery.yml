@@ -93,6 +93,12 @@
     - title: Low-precision implicit solves in SDC
       page: DeltaSDC
       summary: Implicit solves in SDC in single or half precision, without losing the accuracy of the collocation problem.
+    - title: SDC for stochastic differential equations
+      page: SDC4SDEs
+      papers:
+        - 10.48550/arXiv.2610.23693
+      image: data/SDC4SDEs_sweeps_and_order.png
+      summary: Explicit SDC with smooth Brownian bridges, for strong and weak orders beyond Euler-Maruyama and Milstein.
 
 - section: Applications
   projects:

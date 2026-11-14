@@ -61,6 +61,13 @@ def test_eval_f():
     P.eval_f(me, 0)
     assert P._solv_eval_f_implicit is solver
 
+    # the time-dependent expressions are built once and follow the time they are evaluated at
+    for t in [0.3, 1.7]:
+        expect.interpolate(-(np.sin(t) - P.nu * np.pi**2 * np.cos(t)) * fd.sin(np.pi * x[0]))
+        assert abs(P.eval_f(me, t).expl - expect) / abs(expect) < 1e-12
+        expect.interpolate(np.cos(t) * fd.sin(np.pi * x[0]) + P.c)
+        assert abs(P.u_exact(t) - expect) / abs(expect) < 1e-12
+
 
 if __name__ == '__main__':
     test_solve_system(0)
