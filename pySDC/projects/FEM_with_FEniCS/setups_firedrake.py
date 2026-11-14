@@ -50,6 +50,7 @@ SETUPS = {
         'nsteps': 8,
         'restol': 5e-10 / 500,
         'maxiter': 20,
+        'utol': 1e-8,
         'order_study': (1, 2, 4),
     },
     'burgers': {
@@ -63,6 +64,7 @@ SETUPS = {
         'nsteps': 8,
         'restol': 1e-9,
         'maxiter': 30,
+        'utol': 1e-6,
         'order_study': (1, 2, 4),
     },
     'grayscott': {
@@ -76,6 +78,7 @@ SETUPS = {
         'nsteps': 8,
         'restol': 1e-9,
         'maxiter': 30,
+        'utol': 1e-6,
         'order_study': (1, 2, 4),
     },
     'vortex': {
@@ -90,27 +93,57 @@ SETUPS = {
         'nsteps': 8,
         'restol': 5e-9 / 500,
         'maxiter': 30,
+        'utol': 1e-6,
         'order_study': (),
+        'pays_off': False,
     },
 }
 
 
+PFASST_PROCS = (1, 2, 4, 8)
+
+
+def _setup(example):
+    """The settings of one example, see :data:`SETUPS`."""
+    if example not in SETUPS:
+        raise ValueError(f'unknown example {example!r}, expected one of {EXAMPLES}')
+    return SETUPS[example]
+
+
 def get_families(example):
     """Element families this example has a problem class for."""
-    return tuple(SETUPS[example]['classes'])
+    return tuple(_setup(example)['classes'])
 
 
 def get_coarsenings(example):
     """Coarsening directions this example is set up for."""
-    return SETUPS[example].get('coarsenings', COARSENINGS)
+    return _setup(example).get('coarsenings', COARSENINGS)
 
 
 def get_order_study(example):
     """Element orders to compare at equal dof counts, or empty where that has no meaning."""
-    return SETUPS[example]['order_study']
+    return _setup(example)['order_study']
 
 
-def get_description(example, nlevels=1, family='CG', coarsening='h', order=None, restol=None, nsteps=None):
+def get_tolerance(example):
+    """Tolerance for comparing solutions of the same example across configurations, in the L2 norm."""
+    return _setup(example)['utol']
+
+
+def get_pfasst_procs(example):
+    """Process counts PFASST is run on for this example."""
+    _setup(example)
+    return PFASST_PROCS
+
+
+def pays_off(example):
+    """Whether the coarse level is expected to cost less than it saves on this example."""
+    return _setup(example).get('pays_off', True)
+
+
+def get_description(
+    example, nlevels=1, family='CG', coarsening='h', order=None, dt=None, restol=None, maxiter=None, nsteps=None
+):
     """
     The pySDC description of one configuration, as :func:`pySDC.projects.FEM_with_FEniCS.setups.get_description`.
 
@@ -120,20 +153,38 @@ def get_description(example, nlevels=1, family='CG', coarsening='h', order=None,
         family (str): 'CG' or 'DG'
         coarsening (str): 'h' for coarser meshes at fixed degree, 'p' for lower degrees on the fine mesh
         order (int, optional): Degree for h-coarsening, with the refinements shifted to keep the dofs per level
+        dt (float, optional): Step size
         restol (float, optional): Residual tolerance in the dual norm. By default the FEniCS one, scaled by
             :func:`norm_ratio`
+        maxiter (int, optional): Maximum number of iterations
         nsteps (int, optional): Number of steps
 
     Returns:
         description (dict), controller_params (dict), t0 (float), Tend (float)
     """
-    s = SETUPS[example]
+    s = _setup(example)
+    if family not in FAMILIES:
+        raise ValueError(f'unknown family {family!r}, expected one of {FAMILIES}')
+    if coarsening not in COARSENINGS:
+        raise ValueError(f'unknown coarsening {coarsening!r}, expected one of {COARSENINGS}')
+    if family not in get_families(example):
+        raise ValueError(f'{example!r} has no {family} problem class, only {get_families(example)}')
+    if coarsening not in get_coarsenings(example):
+        raise ValueError(f'{example!r} is only set up for {get_coarsenings(example)}-coarsening')
+    if not 1 <= nlevels <= 3:
+        raise ValueError(f'nlevels must be 1, 2 or 3, got {nlevels}')
     if coarsening == 'h':
         refinements = list(s['refinements'][:nlevels])
         degree = s['orders'][0] if order is None else order
         if order is not None:
             # keep the dof count: halving the degree and doubling the cells leaves it alone in 1D
             refinements = [r + round(math.log2(s['orders'][0] / order)) for r in refinements]
+            if min(refinements) < 0:
+                # a negative index would silently pick a level from the fine end of the hierarchy
+                raise ValueError(
+                    f'{example!r} cannot hold its dof count at order {order}: that needs refinements '
+                    f'{refinements}, and a negative refinement is not a coarsening'
+                )
         hierarchy = fd.MeshHierarchy(s['base_mesh'](), max(refinements))
         meshes = [hierarchy[r] for r in refinements]
         orders = [degree] * nlevels
@@ -157,15 +208,15 @@ def get_description(example, nlevels=1, family='CG', coarsening='h', order=None,
         'problem_params': problem_params,
         'sweeper_class': s['sweeper_class'],
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'QI': 'LU', 'num_nodes': [3] * nlevels},
-        'level_params': {'restol': restol, 'dt': s['dt']},
-        'step_params': {'maxiter': s['maxiter']},
+        'level_params': {'restol': restol, 'dt': s['dt'] if dt is None else dt},
+        'step_params': {'maxiter': s['maxiter'] if maxiter is None else maxiter},
     }
     if nlevels > 1:
         description['space_transfer_class'] = transfer
         description['base_transfer_class'] = base_transfer_mass
         description['base_transfer_params'] = {'finter': False}
     nsteps = s['nsteps'] if nsteps is None else nsteps
-    return description, {'logger_level': 30}, 0.0, nsteps * s['dt']
+    return description, {'logger_level': 30}, 0.0, nsteps * description['level_params']['dt']
 
 
 _RATIOS = {}
