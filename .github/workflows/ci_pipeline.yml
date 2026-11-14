@@ -323,6 +323,8 @@ jobs:
           pip install "mpi-pytest>=2026.0"
           # test installation
           python -c "import pySDC; print(f'pySDC module: {pySDC}')"
+          # what Firedrake needs but does not declare, see etc/environment-firedrake.yml
+          python -c "import sys, numpy; v = tuple(int(x) for x in numpy.__version__.split('.')[:2]); assert sys.version_info >= (3, 11) and v >= (2, 1), f'Firedrake needs Python >= 3.11 and NumPy >= 2.1, got {sys.version_info[:2]} and {numpy.__version__}'"
       - name: Install gusto
         run: |
           . venv-pySDC/bin/activate
@@ -398,6 +400,8 @@ jobs:
         run: |
           pip install --no-deps -e .
           python -c "import firedrake, pySDC; print(firedrake.__file__, pySDC.__file__)"
+          # what Firedrake needs but does not declare, see etc/environment-firedrake.yml
+          python -c "import sys, numpy; v = tuple(int(x) for x in numpy.__version__.split('.')[:2]); assert sys.version_info >= (3, 11) and v >= (2, 1), f'Firedrake needs Python >= 3.11 and NumPy >= 2.1, got {sys.version_info[:2]} and {numpy.__version__}'"
       - name: Run pytest
         run: |
           echo "print('Loading sitecustomize.py...')
