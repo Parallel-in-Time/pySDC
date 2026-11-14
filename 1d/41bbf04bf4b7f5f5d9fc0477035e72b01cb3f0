@@ -1,0 +1,27 @@
+pySDC/tests/test_projects/test_FEM_with_FEniCS/test_examples_firedrake.py
+  s_defc4032430111::t_ee423d872f706c 97-100,243-246
+  s_defc4032430111::t_6ef0aaf101154d 123
+  s_defc4032430111::t_21904a96a16424 85-86,88,166,185-186
+  s_defc4032430111::t_6f37ec27f2b25f 1-6,9-10,13-25,34-41,43-59,61-84,87,89-96,101-122,124-137,142-165,167-174,178-179,181-184,187-242,247-261
+  s_defc4032430111::t_fd7bae65af3884 7-8,11-12,26-33,42,60,138-141,175-177,180
+pySDC/projects/FEM_with_FEniCS/setups_firedrake.py
+  s_defc4032430111::t_cb75cac7a8c1d5 53,67,81,96,98,103-112,115,120,125-141,144-146,156,159,165-175,182-187,211-212,219
+pySDC/tests/test_projects/test_FEM_with_FEniCS/test_setups_firedrake.py
+  s_defc4032430111::t_876041b45d5588 1-215
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1d41bbf04bf4b7f5f5d9fc0477035e72b01cb3f0",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
