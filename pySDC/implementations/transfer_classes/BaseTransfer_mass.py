@@ -42,8 +42,12 @@ class base_transfer_mass(BaseTransfer):
         for m in range(1, SF.coll.num_nodes + 1):
             tmp_u.append(self.space_transfer.project(F.u[m]))
 
-        # restrict collocation values
-        G.u[0] = self.space_transfer.project(F.u[0])
+        # restrict collocation values. Below the finest level, u0 is the load vector M u0, which f[0] is evaluated at.
+        # f[0] does not enter the mass-matrix sweeps, as it appears in their right-hand sides and the known terms alike.
+        if F.level_index == 0:
+            G.u[0] = self.space_transfer.project(F.u[0])
+        else:
+            G.u[0] = self.space_transfer.restrict_dual(F.u[0])
         for n in range(1, SG.coll.num_nodes + 1):
             G.u[n] = self.Rcoll[n - 1, 0] * tmp_u[0]
             for m in range(1, SF.coll.num_nodes):
