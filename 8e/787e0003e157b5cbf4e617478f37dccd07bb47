@@ -1,0 +1,26 @@
+pySDC/tests/test_sweepers/test_delta_form_mass.py
+  s_defc4032430111::t_f9743d92000fa9 1-32,38,40-41,43-44,46-47,49-55,57-60,64-70,72-91,97-106,109-127,140-144,146-180
+  s_defc4032430111::t_3d728a4db4f6d1 61-63,71,94,107-108,128-135,139
+  s_defc4032430111::t_63213424d34029 33-37,39,42,45,48,56
+  s_defc4032430111::t_0e1e9e8a4395de 92-93,95-96,136-138,145
+pySDC/implementations/sweeper_classes/delta_form.py
+  s_defc4032430111::t_51bc0f3a3859e9 72,74,707-737,739-762,764-833
+  s_defc4032430111::t_63213424d34029 738,763
+  s_defc4032430111::t_25ec834072b92d 834-835
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8e787e0003e157b5cbf4e617478f37dccd07bb47",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
