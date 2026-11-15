@@ -14,15 +14,15 @@ class fenics_grayscott(Problem):
     1D Gray-Scott reaction-diffusion system with FEniCS finite elements, fully implicit with FEniCS' Newton solver.
 
     The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,
-    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,
-    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for
+    where they diffuse over time. :math:`u` is fed in with rate :math:`A` and used up by the reaction, which
+    produces :math:`v`, and :math:`v` decays with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for
     :math:`u,\, v`. This process is described by the one-dimensional model with homogeneous Neumann boundary conditions
 
     .. math::
         \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),
 
     .. math::
-        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u
+        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B v
 
     for :math:`x \in \Omega:=[0, 100]`. The *weak formulation* of the problem can be obtained by multiplying the
     system with a test function :math:`q`:
@@ -31,7 +31,7 @@ class fenics_grayscott(Problem):
         \int_\Omega u_t q\,dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,
 
     .. math::
-        \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,
+        \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B v q\,dx,
 
     The Laplacians are integrated by parts, and no Dirichlet conditions are imposed, so the boundary terms drop out and
     the boundaries are zero-flux. The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.
@@ -57,9 +57,9 @@ class fenics_grayscott(Problem):
     Dv: float, optional
         Diffusion rate for :math:`v`.
     A : float, optional
-        Feed rate for :math:`v`.
+        Feed rate for :math:`u`.
     B : float, optional
-        Overall decay rate for :math:`u`.
+        Decay rate for :math:`v`.
     newton_tol : float, optional
         Absolute tolerance of the node-local Newton solve. It has to be tighter than the SDC residual
         tolerance, otherwise the node-local solve, not the SDC iteration, sets the accuracy floor.

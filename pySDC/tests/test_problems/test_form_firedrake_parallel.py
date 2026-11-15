@@ -24,11 +24,13 @@ def setup(case, comm):
 
     - `imex`: Part H of tutorial step 7, IMEX SDC with time-dependent Dirichlet values on a 2D mesh
     - `mlsdc`: the same fully implicit, on two levels, so that the coarse solves take restricted boundary values
+    - `grayscott`: Gray-Scott, two unknowns on a mixed space, on three levels
     - `floor`: the 1D nonlinear manufactured problem with the residual floor from the spatial error
     """
     import firedrake as fd
     from pySDC.tutorial.step_7.H_pySDC_with_Firedrake_forms import get_forms
     from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake, FormFiredrakeIMEX
+    from pySDC.implementations.problem_classes.GrayScott_1D_Firedrake import GrayScott1DFiredrake
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
     from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
     from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
@@ -53,6 +55,14 @@ def setup(case, comm):
         else:
             description.update(transfer)
         return description, [[0.3, 0.4], [0.5, 0.5], [0.8, 0.1]]
+
+    if case == 'grayscott':
+        meshes = list(fd.MeshHierarchy(fd.IntervalMesh(32, 100, comm=comm), 2))[::-1]
+        description['problem_class'] = GrayScott1DFiredrake
+        description['problem_params'] = {'mesh': meshes, 'solver_parameters': {'snes_rtol': 1e-13, 'snes_atol': 1e-14}}
+        description['level_params']['dt'] = 1.0
+        description.update(transfer)
+        return description, [[40.0], [45.0], [50.0]]
 
     if case == 'floor':
         from test_form_firedrake import nonlinear_forms
@@ -87,7 +97,7 @@ def run_nonMPI(case, comm, num_procs=1, Tend=None):
 
 @pytest.mark.firedrake
 @pytest.mark.parallel(2)
-@pytest.mark.parametrize('case', ['imex', 'mlsdc', 'floor'])
+@pytest.mark.parametrize('case', ['imex', 'mlsdc', 'grayscott', 'floor'])
 def test_space_parallel_matches_serial(case):
     """The same run distributed in space and serial gives the same solution, in the same iterations."""
     import numpy as np
