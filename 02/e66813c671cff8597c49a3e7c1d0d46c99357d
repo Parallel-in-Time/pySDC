@@ -1,0 +1,261 @@
+pySDC/projects/StroemungsRaum/hooks/hooks_NSE_IMEX_Firedrake.py
+  s_defc4032430111::t_307224fcd699c7 2-3,51
+docs/source/conf.py
+  s_619b2228c15391::t_f752df1f7dfebe 104
+  s_619b2228c15391::t_2bbeaa39071c74 93-98
+  s_defc4032430111::t_f9291f369ec8a5 99
+  s_619b2228c15391::t_4fa0d776990ea3 233
+  s_619b2228c15391::t_e7404ee85c990f 48
+  s_619b2228c15391::t_d4991e4ab2eb24 85
+  s_defc4032430111::t_150a58f7f94d15 73
+pySDC/tutorial/step_7/A_pySDC_with_mpi4pyfft.py
+  s_defc4032430111::t_471cae53f46eaa 25,101,171-172,180,199
+  s_619b2228c15391::t_1d461ce89a31bc 13
+pySDC/tutorial/step_7/G_pySDC_with_Firedrake_forms.py
+  s_defc4032430111::t_ad27b2222bafae 15,19
+  s_defc4032430111::t_765287e2d1a583 13
+  s_defc4032430111::t_ca9f242f82ad14 222,264
+pySDC/projects/FEM_with_Firedrake/run_examples_firedrake.py
+  s_defc4032430111::t_737426f23fdf83 2-5,15,26-27,190-193
+.github/workflows/ci_pipeline.yml
+  s_619b2228c15391::t_8b748579d1419b 474
+  s_49cd64ba5df0ad::t_b176c8c1ff4b58 90
+  s_defc4032430111::t_c3f029e1141ce7 242
+  s_defc4032430111::t_90fd13670ff1b3 85
+  s_619b2228c15391::t_7ad19bcca21b46 510
+pySDC/playgrounds/PinT_Workshop_2025/1_Add_problem_class.ipynb
+  s_defc4032430111::t_e8ad298f8dc254 623
+pySDC/tests/test_projects/test_FEM_with_Firedrake/test_examples_firedrake.py
+  s_defc4032430111::t_4d307171a7460d 2-5,10,30,49,67,123,134,144-145,161,175,178-179,181-184,197-199,205,232-233,267-268
+pySDC/tutorial/step_7/E_pySDC_with_Gusto.py
+  s_defc4032430111::t_34a7355d0d6cf9 377,448
+  s_619b2228c15391::t_2309d995c25bd8 13
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_equations_monolithic_Firedrake.py
+  s_defc4032430111::t_87b3a2e82a3e76 2-3
+pySDC/projects/StroemungsRaum/README.rst
+  s_defc4032430111::t_c404bef3fc3012 29-31,33-34,139-161,163-164,166-174
+  s_f7abae475b06d6::t_f6c41a780e92e2 35-39,41-129,133,138
+pySDC/implementations/datatype_classes/container.py
+  s_defc4032430111::t_38e469bf29e6dc 9,17,19
+pySDC/core/problem.py
+  s_defc4032430111::t_4f9e1bed462fa3 118-121
+docs/source/index.rst
+  s_619b2228c15391::t_87cb5ec66bb660 13
+pySDC/tests/test_projects/test_StroemungsRaum/test_navier_stokes_firedrake.py
+  s_defc4032430111::t_e6018142ed5c39 2-3,8-10,26-27,58,65,86-88,137-138,154,176-178,213
+pySDC/tests/test_problems/test_form_firedrake_parallel.py
+  s_defc4032430111::t_39c86723c8d92d 31
+  s_defc4032430111::t_bdd59421a8c8bc 25
+pySDC/tests/test_tutorials/test_step_7.py
+  s_defc4032430111::t_54648233d922ef 4,6,13
+  s_9af5c84054669f::t_8d9a941f26fa4d 151,154
+  s_defc4032430111::t_11716255250f42 14,16,21-22,24,29-30,32,36,43,50-51,58-59,66,78,102,116,142,152
+  s_defc4032430111::t_f7a99afd3db411 65
+  s_15a3c3cad5de95::t_2b5b55d1fb4f47 73,112
+pySDC/implementations/problem_classes/GrayScott_1D_Firedrake.py
+  s_defc4032430111::t_1745b44b11c16f 23,32-34
+.github/workflows/sbom.yml
+  s_410ce2888ad51b::t_3b7c94154b3773 5,79,106
+pySDC/playgrounds/time_dep_BCs/README.rst
+  s_f5d0618f463037::t_5c5f8d081ef5b6 8
+  s_defc4032430111::t_3dc1502888cc83 9
+pySDC/tutorial/step_7/B_pySDC_with_PETSc.py
+  s_defc4032430111::t_41142dcd2eb63d 43,116,201,207,210,221,227,233
+  s_619b2228c15391::t_528bbc80d7f69e 13
+pySDC/tutorial/step_7/README.rst
+  s_619b2228c15391::t_667ad827fd6a0e 15
+  s_defc4032430111::t_52b919f04c2d90 14
+  s_619b2228c15391::t_1b5a127c892456 21
+  s_defc4032430111::t_c4b1dc7a25a8e7 11-12,16,20
+  s_619b2228c15391::t_e7404ee85c990f 7-8,13
+  s_619b2228c15391::t_2de509277a4c85 9
+pySDC/playgrounds/time_dep_BCs/heat_time_dep_BCs.py
+  s_f5d0618f463037::t_5c6f493daf1671 22
+pySDC/projects/FEM_with_Firedrake/problem_classes/Burgers_1D_Firedrake.py
+  s_defc4032430111::t_193d09f792a760 8-9,29-30,38-39
+pySDC/tutorial/step_7/D_pySDC_with_Firedrake.py
+  s_defc4032430111::t_e9554caa060bc4 17
+  s_619b2228c15391::t_8a19ca2c5b634b 13,15-16
+  s_defc4032430111::t_39a3509099a1df 18-19
+  s_defc4032430111::t_70f3f063b99762 21,204,223-225,263
+pySDC/tutorial/step_7/F_pySDC_on_GPU.py
+  s_619b2228c15391::t_2fdda990e3c8d9 13
+  s_defc4032430111::t_1b13c70338758f 135,158,178
+pySDC/projects/FEM_with_Firedrake/setups_firedrake.py
+  s_defc4032430111::t_41b23664564cd3 2-14,31-32,41-42,46-48,92-94,159-160,169,215-216,242,253
+pySDC/implementations/problem_classes/HeatEquation_1D_FormFiredrake.py
+  s_defc4032430111::t_6087708d99bea6 9,17-18,27-29
+pySDC/projects/StroemungsRaum/run_accuracy/run_accuracy_heat_equation_Firedrake.py
+  s_defc4032430111::t_17e9595b296868 2-3
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_equations_Firedrake.py
+  s_defc4032430111::t_a461849b2ec9b0 2-4,26
+  s_defc4032430111::t_d003e254e5dc60 27
+pySDC/tests/test_projects/test_FEM_with_Firedrake/test_fem_firedrake.py
+  s_defc4032430111::t_62e55bcacfa5df 2-3,12-13,58,70,94-95,110-111
+pySDC/projects/FEM_with_Firedrake/problem_classes/DG_1D_Firedrake.py
+  s_defc4032430111::t_3d74a20a73b0a3 2-4,8-9,11-12,68,76,132,153-154,212
+pySDC/implementations/problem_classes/VorticityVelocity_2D_Firedrake_periodic.py
+  s_defc4032430111::t_aa9868d4f2bed4 14,40-41,59-60,94,116
+pySDC/projects/StroemungsRaum/run_convection_diffusion_equation_Firedrake.py
+  s_defc4032430111::t_2b0a65711350e3 2-4
+pySDC/projects/StroemungsRaum/plotting/plots_heat_equation_Firedrake.py
+  s_defc4032430111::t_6b0fb7557b2720 2-4
+docs/source/projects/FEM_with_Firedrake.rst
+  s_defc4032430111::t_3b9187db911325 1
+pySDC/tests/test_projects/test_StroemungsRaum/test_heat_convdiff_firedrake.py
+  s_defc4032430111::t_1714443f4d206a 2,7-10,52,63,71
+README.md
+  s_defc4032430111::t_6da78d4673bf65 32-36,39-41,87,89-92
+  s_defc4032430111::t_eacb3d0cc8eb6e 93-94
+pySDC/tutorial/step_7/C_pySDC_with_PyTorch.py
+  s_619b2228c15391::t_f989779d57c002 13
+  s_defc4032430111::t_dc32c6341227eb 124,144
+docs/contrib/02_continuous_integration.md
+  s_15a3c3cad5de95::t_b4b7c8cfc01f54 150
+pySDC/playgrounds/PinT_Workshop_2025/2_Coupling_pySDC_to_libraries.ipynb
+  s_defc4032430111::t_56071fbbf31dfa 17,169,352-357
+pySDC/tests/test_projects/test_StroemungsRaum/test_run_scripts_firedrake.py
+  s_defc4032430111::t_1a19c7a8a3dcad 2-3,28
+.gitignore
+  s_defc4032430111::t_299bea793b1ea1 168
+pySDC/tests/test_projects/test_FEM_with_Firedrake/test_setups_firedrake.py
+  s_defc4032430111::t_19ceda21065ece 2-3,15-16,43,52,68,92-93,98,105,115,132,140,152,168,177,195,212
+pySDC/tests/conftest.py
+  s_defc4032430111::t_c0045594c0cf3f 20
+pySDC/tutorial/README.rst
+  s_619b2228c15391::t_667ad827fd6a0e 7
+pySDC/projects/StroemungsRaum/plotting/plots_Navier_Stokes_projection_Firedrake.py
+  s_defc4032430111::t_10bdd1f6904474 3-4,6
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_projection_Firedrake.py
+  s_defc4032430111::t_980d2765589e85 15
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_TaylorGreen_Firedrake.py
+  s_defc4032430111::t_45a31fa50ef870 2-4
+pySDC/projects/StroemungsRaum/problem_classes/HeatEquation_2D_Firedrake.py
+  s_defc4032430111::t_81e34482378c00 10,15-17,36
+pySDC/projects/StroemungsRaum/run_heat_equation_Firedrake.py
+  s_defc4032430111::t_98ccdc94f50510 2-4
+pySDC/projects/StroemungsRaum/problem_classes/ConvectionDiffusion_2D_Firedrake.py
+  s_defc4032430111::t_18b2a015338497 9,20-22,41
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_Firedrake.py
+  s_defc4032430111::t_6e83b49961fc2a 16-19,55-57,126-127,156-157
+pySDC/playgrounds/12th_PinT_Workshop/2_Add_new_problem.ipynb
+  s_defc4032430111::t_4876e74536465a 402
+docs/source/tutorial/step_7.rst
+  s_defc4032430111::t_7ff1b8ae831d86 6-12
+pySDC/tutorial/step_7/torch_heat.py
+  s_47f4e6e9073fc4::t_1ff8af08c734de 2
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_Firedrake.py
+  s_defc4032430111::t_2b871ada3e3622 11,25-27,43-44,51,74
+pySDC/tests/test_projects/test_StroemungsRaum/test_hooks_plotting_firedrake.py
+  s_defc4032430111::t_5856c3c83cc94b 2,31
+  s_defc4032430111::t_15fecefd33076d 32
+SECURITY.md
+  s_410ce2888ad51b::t_782724a05e1b6f 53
+pySDC/tests/test_sweepers/test_mass_residual.py
+  s_defc4032430111::t_eb6a9e80a03e5f 1-3,5,8
+pySDC/projects/StroemungsRaum/plotting/plots_convection_diffusion_equation_Firedrake.py
+  s_defc4032430111::t_091a0688de107d 2-4
+aidecl.yaml
+  s_defc4032430111::t_360a04c627c934 50,121-131
+  s_619b2228c15391::t_a7e96543171bd8 94
+  s_defc4032430111::t_5b4b14bb2f76b6 120,132-133
+  s_defc4032430111::t_086785f4ac5583 51-52
+pySDC/projects/gallery.yml
+  s_f7ba080f6ae9bc::t_e66dd69d9092ad 91-92
+  s_619b2228c15391::t_ee91d297888b8d 129-131
+  s_f7ba080f6ae9bc::t_0313b6e1306564 90
+  s_619b2228c15391::t_667ad827fd6a0e 132
+etc/modal_gpu_tests.py
+  s_619b2228c15391::t_a28c9a22794ed3 30
+  s_defc4032430111::t_83543d08457a4e 32
+pySDC/projects/FEM_with_Firedrake/README.rst
+  s_defc4032430111::t_ba3dce2d30af50 4-22,27,30-37,39-42,44-46,48-49,51-53,55-57,62-81,84-90,92,94,102-104,106-130,135-136,141-143,146,148-150,152-155,157-160,165-169,177,184,186,189,191-194,196-198,203-209,211-213,220,226-229,231-235,240-241,243,246,251,256-260,263-265,267-270,275-326
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "02e66813c671cff8597c49a3e7c1d0d46c99357d",
+  "prompts": {},
+  "sessions": {
+    "s_15a3c3cad5de95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02349290-0df3-4bc8-ab77-49f4545ebefb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_410ce2888ad51b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aa3129b0-226b-485d-8376-47de5b709237",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_47f4e6e9073fc4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83989a12-7ba1-4847-b831-775832472169",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_49cd64ba5df0ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04d74de8-913f-4d9d-81b6-67c9503b5491",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_619b2228c15391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d40f5ef9-dc28-4c78-b77e-fe269aea5bb5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_9af5c84054669f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "780f456a-56e4-497a-91ff-6f8c46264ff6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_f5d0618f463037": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8a8807b1-a7d0-4475-b122-01e961450309",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_f7abae475b06d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286e22f6-e817-491d-96d0-af97966f39af",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_f7ba080f6ae9bc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "613cd850-a16c-4a71-8fea-0a5703957a96",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
