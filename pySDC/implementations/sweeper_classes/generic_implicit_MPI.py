@@ -113,16 +113,8 @@ class SweeperMPI(Sweeper):
             L.status.residual = 0.0 if L.status.residual is None else L.status.residual
             return None
 
-        # compute the residual for each node
-
-        # build QF(u)
-        res = self.integrate(last_only=L.params.residual_type[:4] == 'last')
-        res += L.u[0] - L.u[self.rank + 1]
-        # add tau if associated
-        if L.tau[self.rank] is not None:
-            res += L.tau[self.rank]
         # use abs function from data type here
-        res_norm = abs(res)
+        res_norm = abs(self.node_residual(last_only=L.params.residual_type[:4] == 'last'))
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':
@@ -140,6 +132,24 @@ class SweeperMPI(Sweeper):
         L.status.updated = False
 
         return None
+
+    def node_residual(self, last_only=False):
+        """
+        The collocation residual u0 + dt (QF)_m + tau_m - u_m at the node this rank administers.
+
+        Args:
+            last_only (bool): Only the residual at the last node is needed, the other ranks may return anything
+
+        Returns:
+            dtype_u: the residual
+        """
+        L = self.level
+        res = self.integrate(last_only=last_only)
+        res += L.u[0] - L.u[self.rank + 1]
+        # add tau if associated
+        if L.tau[self.rank] is not None:
+            res += L.tau[self.rank]
+        return res
 
     def predict(self):
         """

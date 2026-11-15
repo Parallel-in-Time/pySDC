@@ -9,8 +9,8 @@ In the following, we show a few examples of pySDC + X.
 - **Part C: Time-parallel pySDC with space-parallel PETSc.** Space and time communicators, split by coloring.
 - **Part D: pySDC and PyTorch.** A tensor data type, and a network trained at the collocation nodes;
   ``torch_heat.py`` holds the data type, the heat equation using it and the network.
-- **Part E: pySDC and Firedrake.** The heat equation of Part A, in Firedrake, serial, parallel across the nodes, or
-  on three levels.
+- **Part E: pySDC and Firedrake.** The heat equation of Part A, in Firedrake and in mass-matrix form, serial,
+  parallel across the nodes, or on three levels.
 - **Part F: pySDC and Gusto.** pySDC as a time discretization for Gusto, in the Williamson 5 test case;
   ``F_2_plot_pySDC_with_Gusto_result.py`` plots its results.
 - **Part G: pySDC on GPUs.** A heat equation in finite differences with SDC, MLSDC and PFASST, all of it on the device.

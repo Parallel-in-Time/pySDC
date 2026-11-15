@@ -172,7 +172,8 @@ class MeshToMeshFiredrakeHierarchy(SpaceTransfer):
             F = self.fine_prob.u_init
             self._prolong(u_coarse=G, u_fine=F)
         elif isinstance(G, IMEX_firedrake_mesh):
-            F = self.fine_prob.f_init
+            # primal like G: the fine problem's own right-hand sides may be load vectors
+            F = IMEX_firedrake_mesh(self.fine_prob.init)
             self._prolong(u_coarse=G.impl, u_fine=F.impl)
             self._prolong(u_coarse=G.expl, u_fine=F.expl)
         else:

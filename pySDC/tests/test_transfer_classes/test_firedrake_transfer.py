@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.firedrake
 def test_Firedrake_transfer():
     import firedrake as fd
-    from firedrake import interpolate
+    from pySDC.implementations.datatype_classes.firedrake_mesh import IMEX_firedrake_mesh
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
     from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrake
     import numpy as np
@@ -17,7 +17,8 @@ def test_Firedrake_transfer():
     functions = [fd.Function(me.V).interpolate(me.x**2) for me in probs]
     data = [me.u_init for me in probs]
     [data[i].assign(functions[i]) for i in range(len(functions))]
-    rhs = [me.f_init for me in probs]
+    # primal right-hand sides, as GenericGusto has them; the heat problem's own are load vectors
+    rhs = [IMEX_firedrake_mesh(me.V) for me in probs]
     [rhs[i].impl.assign(functions[i]) for i in range(len(functions))]
     [rhs[i].expl.assign(functions[i]) for i in range(len(functions))]
 
@@ -46,7 +47,7 @@ def test_Firedrake_transfer():
 @pytest.mark.firedrake
 def test_Firedrake_transfer_hierarchy():
     import firedrake as fd
-    from firedrake import interpolate
+    from pySDC.implementations.datatype_classes.firedrake_mesh import IMEX_firedrake_mesh
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
     from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
     import numpy as np
@@ -60,7 +61,8 @@ def test_Firedrake_transfer_hierarchy():
     functions = [fd.Function(me.V).interpolate(me.x**2) for me in probs]
     data = [me.u_init for me in probs]
     [data[i].assign(functions[i]) for i in range(len(functions))]
-    rhs = [me.f_init for me in probs]
+    # primal right-hand sides, as GenericGusto has them; the heat problem's own are load vectors
+    rhs = [IMEX_firedrake_mesh(me.V) for me in probs]
     [rhs[i].impl.assign(functions[i]) for i in range(len(functions))]
     [rhs[i].expl.assign(functions[i]) for i in range(len(functions))]
 

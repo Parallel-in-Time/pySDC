@@ -87,34 +87,46 @@ def run(problem_class, problem_params, sweeper_class, dt, Tend, maxiter, restol=
     return controller, uend
 
 
+#: u at POINTS after 5 steps of dt = 0.1 (16 cells, CG4, nu = 0.1, three RADAU-RIGHT nodes, LU, exactly four
+#: iterations), computed with `Heat1DForcedFiredrake` when it still inverted the mass matrix and ran with `imex_1st_order`
+#: (before it became a forms class). Kept so that the mass form is checked against the M^-1 one.
+POINTS = [0.1, 0.33, 0.5, 0.77]
+M_INVERSE_REFERENCE = {
+    0: [0.27118792356803023, 0.7553722034851669, 0.8775825707723329, 0.5803557620368015],
+    3.14: [3.411187923568031, 3.895372203485166, 4.017582570772335, 3.720355762036801],
+}
+
+
 @pytest.mark.firedrake
 @pytest.mark.parametrize('c', [0, 3.14])
 def test_heat_reproduces_HeatFiredrake(c):
-    """The heat equation as forms with the mass sweeper gives what `Heat1DForcedFiredrake` gives with M^-1."""
+    """
+    The heat equation as forms with the mass sweeper gives what `Heat1DForcedFiredrake` gave with M^-1 and the plain
+    IMEX sweeper, and so does `Heat1DForcedFiredrake` now, which is the same thing in mass form.
+    """
     import firedrake as fd
-    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
+    import numpy as np
     from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrakeIMEX
-    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
     from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 
     nu, n, order = 0.1, 16, 4
-    _, u_ref = run(Heat1DForcedFiredrake, {'n': n, 'nu': nu, 'c': c, 'order': order}, imex_1st_order, 0.1, 0.5, 4)
-
     V = fd.FunctionSpace(fd.UnitIntervalMesh(n), 'CG', order)
-    controller, u_form = run(
-        FormFiredrakeIMEX, heat_forms(V, nu, c, fd.Constant(0.0)), imex_1st_order_mass, 0.1, 0.5, 4
-    )
+    for problem_class, params in [
+        (FormFiredrakeIMEX, heat_forms(V, nu, c, fd.Constant(0.0))),
+        (Heat1DForcedFiredrake, {'n': n, 'nu': nu, 'c': c, 'order': order}),
+    ]:
+        controller, uend = run(problem_class, params, imex_1st_order_mass, 0.1, 0.5, 4)
+        P = controller.MS[0].levels[0].prob
+        values = fd.PointEvaluator(P.V.mesh(), [[x] for x in POINTS]).evaluate(uend.functionspace)
+        assert np.allclose(values, M_INVERSE_REFERENCE[c], rtol=0, atol=1e-12), (problem_class.__name__, values)
 
-    diff = abs(u_ref.dat.data_ro - u_form.dat.data_ro).max()
-    assert diff < 1e-12, f'forms and Heat1DForcedFiredrake differ by {diff:.2e}'
+        # it is a real time integration, not the initial condition coming back
+        assert abs(uend - P.u_exact(0.5)) < 1e-6
 
-    # it is a real time integration, not the initial condition coming back
-    P = controller.MS[0].levels[0].prob
-    assert abs(u_form - P.u_exact(0.5)) < 1e-6
-
-    # one solver per distinct LU diagonal entry, all reused across steps and iterations
-    assert P.work_counters['solver_setup'].niter == 3
-    assert P.work_counters['solver'].niter == 5 * 4 * 3
+        # one solver per distinct LU diagonal entry, all reused across steps and iterations
+        assert P.work_counters['solver_setup'].niter == 3
+        assert P.work_counters['solver'].niter == 5 * 4 * 3
 
 
 @pytest.mark.firedrake
