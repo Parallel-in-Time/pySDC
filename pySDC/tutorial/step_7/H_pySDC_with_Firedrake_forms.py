@@ -12,11 +12,11 @@
 # %% [markdown]
 # # Part H: pySDC from Firedrake forms
 #
-# In [Part E](E_pySDC_with_Firedrake), the heat equation comes with a hand-written problem class: it sets up its own
-# Firedrake solvers for the right-hand side and for the implicit systems pySDC needs. Here we skip that class. We write
-# down the weak form of the equation, as we would for Firedrake anyway, and the generic problem class
+# In [Part E](E_pySDC_with_Firedrake), the heat equation comes with a ready-made problem class. Here we write our own
+# problem without writing a class at all: we write down the weak form of the equation, as we would for Firedrake
+# anyway, and the generic problem class
 # [`FormFiredrake`](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/FormFiredrake.py)
-# builds everything pySDC needs from it.
+# builds everything pySDC needs from it. Part E's heat equation is itself built this way.
 #
 # ## The equation and its weak form
 #
@@ -40,9 +40,9 @@
 # $$
 #
 # These *forms* are all `FormFiredrake` needs. We give each as a Python function of the solution `u` and the test
-# function `v`, written in [UFL](https://fenics.readthedocs.io/projects/ufl), the form language Firedrake uses. Time
-# enters through a Firedrake `Constant` `t`: pySDC sets it to the right time before every evaluation and solve, so
-# forms, boundary values and the exact solution may all depend on it.
+# function `v`, written in [UFL](https://www.firedrakeproject.org/variational-problems.html), the form language
+# Firedrake uses. Time enters through a Firedrake `Constant` `t`: pySDC sets it to the right time before every
+# evaluation and solve, so forms, boundary values and the exact solution may all depend on it.
 #
 # The forcing is the one part we do not write by hand. `manufactured_forcing` inserts $u_e$ into the forms, and UFL
 # differentiates it in time, so $g$ is exact for whatever $u_e$ we choose. Ours is quadratic in space, so the finite
