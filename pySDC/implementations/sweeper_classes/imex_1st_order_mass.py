@@ -1,4 +1,4 @@
-from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass, integrate_load_vectors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
@@ -11,6 +11,16 @@ class imex_1st_order_mass(imex_1st_order):
     The end point is only available as a copy of the last node: ``compute_end_point`` raises unless the right end of
     the interval is a node and ``do_coll_update`` is off.
     """
+
+    def integrate(self):
+        """
+        Integrate the sum of the implicit and explicit right-hand sides, see
+        :func:`~pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors`.
+
+        Returns:
+            list: dt Q (f_I + f_E) at the nodes 1, ..., M, load vectors like f
+        """
+        return integrate_load_vectors(self, [f.impl + f.expl for f in self.level.f[1:]])
 
     def update_nodes(self):
         """

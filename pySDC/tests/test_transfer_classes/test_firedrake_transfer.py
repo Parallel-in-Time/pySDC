@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.firedrake
 def test_Firedrake_transfer():
     import firedrake as fd
-    from firedrake import interpolate
+    from pySDC.implementations.datatype_classes.firedrake_mesh import IMEX_firedrake_mesh
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
     from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrake
     import numpy as np
@@ -17,7 +17,8 @@ def test_Firedrake_transfer():
     functions = [fd.Function(me.V).interpolate(me.x**2) for me in probs]
     data = [me.u_init for me in probs]
     [data[i].assign(functions[i]) for i in range(len(functions))]
-    rhs = [me.f_init for me in probs]
+    # primal right-hand sides, as GenericGusto has them; the heat problem's own are load vectors
+    rhs = [IMEX_firedrake_mesh(me.V) for me in probs]
     [rhs[i].impl.assign(functions[i]) for i in range(len(functions))]
     [rhs[i].expl.assign(functions[i]) for i in range(len(functions))]
 
@@ -46,7 +47,7 @@ def test_Firedrake_transfer():
 @pytest.mark.firedrake
 def test_Firedrake_transfer_hierarchy():
     import firedrake as fd
-    from firedrake import interpolate
+    from pySDC.implementations.datatype_classes.firedrake_mesh import IMEX_firedrake_mesh
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
     from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
     import numpy as np
@@ -60,7 +61,8 @@ def test_Firedrake_transfer_hierarchy():
     functions = [fd.Function(me.V).interpolate(me.x**2) for me in probs]
     data = [me.u_init for me in probs]
     [data[i].assign(functions[i]) for i in range(len(functions))]
-    rhs = [me.f_init for me in probs]
+    # primal right-hand sides, as GenericGusto has them; the heat problem's own are load vectors
+    rhs = [IMEX_firedrake_mesh(me.V) for me in probs]
     [rhs[i].impl.assign(functions[i]) for i in range(len(functions))]
     [rhs[i].expl.assign(functions[i]) for i in range(len(functions))]
 
@@ -128,3 +130,39 @@ def test_Firedrake_transfer_hierarchy_mixed():
 
 if __name__ == '__main__':
     test_Firedrake_transfer_hierarchy()
+
+
+@pytest.mark.firedrake
+def test_Firedrake_transfer_hierarchy_mass_formulation():
+    """
+    Load vectors are restricted with P^T, which is exact for nested spaces, and solutions by L2 projection, which
+    returns a prolonged coarse function exactly. Each refuses data of the other kind.
+    """
+    import firedrake as fd
+    import numpy as np
+    from pySDC.core.errors import TransferError
+    from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
+    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
+
+    hierarchy = fd.MeshHierarchy(fd.UnitIntervalMesh(4), 1)
+    coarse, fine = [Heat1DForcedFiredrake(mesh=mesh, order=2) for mesh in hierarchy]
+    transfer = MeshToMeshFiredrakeHierarchy(fine, coarse, {})
+
+    def load_vector(prob):
+        x = fd.SpatialCoordinate(prob.mesh)[0]
+        return firedrake_mesh(fd.assemble(fd.sin(3 * x) * fd.TestFunction(prob.V) * fd.dx(degree=12)))
+
+    restricted = transfer.restrict_dual(load_vector(fine))
+    assert restricted.is_dual
+    assert np.allclose(restricted.dat.data_ro, load_vector(coarse).dat.data_ro, atol=1e-15)
+
+    u_coarse = coarse.u_exact(0.3)
+    projected = transfer.project(transfer.prolong(u_coarse))
+    assert not projected.is_dual
+    assert abs(projected - u_coarse) < 1e-12 * abs(u_coarse)
+
+    with pytest.raises(TransferError):
+        transfer.restrict_dual(fine.u_exact(0))
+    with pytest.raises(TransferError):
+        transfer.project(load_vector(fine))

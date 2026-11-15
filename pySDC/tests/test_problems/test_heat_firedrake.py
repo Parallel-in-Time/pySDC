@@ -4,14 +4,15 @@ import pytest
 @pytest.mark.parametrize('c', [0, 3.14])
 @pytest.mark.firedrake
 def test_solve_system(c):
-    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
-    import numpy as np
+    """solve_system solves (M + factor nu K) u = rhs for a load vector rhs, with the boundary values c."""
     import firedrake as fd
+    import numpy as np
+    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
 
     # test we get the initial conditions back when solving with zero step size
     P = Heat1DForcedFiredrake(n=128, c=c)
     u0 = P.u_exact(0)
-    un = P.solve_system(u0, 0)
+    un = P.solve_system(P.apply_mass_matrix(u0), 0, u0, 0)
     assert abs(u0 - un) < 1e-8
 
     # test we get the expected solution to a Poisson problem by setting very large step size
@@ -21,54 +22,48 @@ def test_solve_system(c):
     u0.interpolate(fd.sin(np.pi * x[0]))
     expect = P.u_init
     expect.interpolate(1 / (P.nu * np.pi**2 * dt) * fd.sin(np.pi * x[0]) + P.c)
-    un = P.solve_system(u0, dt)
+    un = P.solve_system(P.apply_mass_matrix(u0), dt, u0, 0)
     error = abs(un - expect) / abs(expect)
     assert error < 1e-4, error
 
-    # test that we arrive back where we started when going forward with IMEX Euler and backward with explicit Euler
+    # an IMEX Euler step satisfies its equation away from the boundary, where the boundary values replace it
     dt = 1e0
     u0 = P.u_exact(0)
     f = P.eval_f(u0, 0)
-    un2 = P.solve_system(u0 + dt * f.expl, dt)
-    fn2 = P.eval_f(un2, 0)
-    u02 = un2 - dt * (fn2.impl + fn2.expl)
-    error = abs(u02 - u0) / abs(u02)
-    assert error < 1e-8, error
+    rhs = P.apply_mass_matrix(u0) + dt * f.expl
+    un = P.solve_system(rhs, dt, u0, 0)
+    residual = P.apply_mass_matrix(un) - dt * P.eval_f(un, 0).impl - rhs
+    P.fix_residual(residual)
+    error = abs(residual) / abs(rhs)
+    # round-off of the direct solve, 6e-12 to 1e-11 here
+    assert error < 1e-10, error
 
 
 @pytest.mark.firedrake
 def test_eval_f():
-    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
-    import numpy as np
+    """eval_f gives the load vectors -nu K u and M f, the latter for the forcing at the time asked for."""
     import firedrake as fd
+    import numpy as np
+    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
 
     P = Heat1DForcedFiredrake(n=128)
+    x = fd.SpatialCoordinate(P.mesh)
 
     me = P.u_init
-    x = fd.SpatialCoordinate(P.mesh)
     me.interpolate(-fd.sin(np.pi * x[0]))
-
     expect = P.u_init
     expect.interpolate(P.nu * np.pi**2 * fd.sin(np.pi * x[0]))
 
-    get = P.eval_f(me, 0).impl
-
-    error = abs(expect - get) / abs(expect)
+    # -nu K u = M nu u'' for u = 0 on the boundary, up to the boundary rows, where integration by parts leaves a term
+    difference = P.eval_f(me, 0).impl - P.apply_mass_matrix(expect)
+    P.fix_residual(difference)
+    error = abs(difference) / abs(P.apply_mass_matrix(expect))
     assert error < 1e-8, error
 
-    # the solver for the Laplacian is set up once and then reused
-    solver = P._solv_eval_f_implicit
-    P.eval_f(me, 0)
-    assert P._solv_eval_f_implicit is solver
-
-    # the time-dependent expressions are built once and follow the time they are evaluated at
+    # the time-dependent expressions follow the time they are evaluated at
     for t in [0.3, 1.7]:
         expect.interpolate(-(np.sin(t) - P.nu * np.pi**2 * np.cos(t)) * fd.sin(np.pi * x[0]))
-        assert abs(P.eval_f(me, t).expl - expect) / abs(expect) < 1e-12
+        error = abs(P.eval_f(me, t).expl - P.apply_mass_matrix(expect)) / abs(P.apply_mass_matrix(expect))
+        assert error < 1e-12, error
         expect.interpolate(np.cos(t) * fd.sin(np.pi * x[0]) + P.c)
         assert abs(P.u_exact(t) - expect) / abs(expect) < 1e-12
-
-
-if __name__ == '__main__':
-    test_solve_system(0)
-    # test_eval_f()

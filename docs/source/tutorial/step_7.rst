@@ -10,3 +10,4 @@
    step_7/E_pySDC_with_Firedrake
    step_7/F_pySDC_with_Gusto
    step_7/G_pySDC_on_GPU
+   step_7/H_pySDC_with_Firedrake_forms

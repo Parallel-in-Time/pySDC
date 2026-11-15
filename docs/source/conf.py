@@ -97,6 +97,7 @@ NOT_IN_BROWSER = {
     'tutorial/step_7/E_*': 'it needs Firedrake.',
     'tutorial/step_7/F_*': 'it needs Firedrake and Gusto.',
     'tutorial/step_7/G_*': 'it needs a GPU and CuPy.',
+    'tutorial/step_7/H_*': 'it needs Firedrake.',
     'tutorial/step_9/E_*': 'it runs on several processes with MPI (mpi4py).',
 }
 nb_execution_excludepatterns = [f'{page}.py' for page in NOT_IN_BROWSER]

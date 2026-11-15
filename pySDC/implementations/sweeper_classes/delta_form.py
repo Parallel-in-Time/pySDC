@@ -69,7 +69,9 @@ import numpy as np
 
 from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 
 _ROW_KERNELS = {}
 
@@ -700,6 +702,135 @@ class delta_imex_1st_order(DeltaFormMixin, imex_1st_order):
 
 
 _GPU_INTEGRATES = (delta_implicit.integrate, delta_imex_1st_order.integrate)
+
+
+class DeltaFormMassMixin(DeltaFormMixin):
+    r"""
+    The delta form for problems in mass-matrix form, :math:`M u' = F(u)`, as the mass-matrix sweepers solve them.
+
+    The collocation residual is then a load vector, :math:`r_m = M u_0 + \tau_m + \Delta t (Q F^k)_m - M u^k_m`, and
+    the correction equation at node :math:`m` becomes
+
+    .. math::
+        M \delta_m - \alpha \left[F(u^k_m + \delta_m) - F(u^k_m)\right]
+        = r_m + \Delta t \sum_{j<m} Q^\Delta_{mj}\, \Delta F_j.
+
+    Everything else is the delta form of :class:`DeltaFormMixin`. As with the mass-matrix sweepers, the initial value
+    below the finest level is already the load vector :math:`M u_0`.
+
+    The correction is solved by the problem's ``solve_system_delta``, which has to solve the equation above, or by
+    substituting :math:`y = u^k_m + \delta_m` into ``solve_system``, which is exact. The latter also handles a node with
+    :math:`\alpha = 0`, where the correction needs a mass solve. ``linear_implicit`` is not available: it relies on
+    ``solve_system`` for the correction itself, which would impose the boundary data on the correction instead of
+    the difference between the data and :math:`u^k_m`.
+    """
+
+    def _delta_setup(self):
+        """Read the optional sweeper parameters and refuse those the mass form cannot honour."""
+        super()._delta_setup()
+        if self._linear_implicit:
+            raise ParameterError(
+                'linear_implicit is not available for the mass-matrix delta form: solve_system would impose the '
+                'boundary data on the correction, which needs the difference between the data and the current value'
+            )
+
+    def _residual_nodes(self):
+        r"""
+        Compute the residual :math:`r_m = M u_0 + \tau_m + \Delta t (Q F^k)_m - M u^k_m`, a load vector, unless a
+        transfer handed one down.
+
+        Returns
+        -------
+        list
+            One residual per collocation node.
+        """
+        if self.eps_in is not None:
+            return self.eps_in
+        lvl = self.level
+        prob = lvl.prob
+        eps = self.integrate()
+        for m in range(self.coll.num_nodes):
+            # below the finest level, u0 is already the load vector M u0
+            if lvl.level_index == 0:
+                eps[m] += prob.apply_mass_matrix(lvl.u[0] - lvl.u[m + 1])
+            else:
+                eps[m] += lvl.u[0] - prob.apply_mass_matrix(lvl.u[m + 1])
+            if lvl.tau[m] is not None:
+                eps[m] += lvl.tau[m]
+        return eps
+
+    def advance_residual(self, eps, deltas, dfs):
+        r"""
+        Advance a residual by an update, :math:`r \leftarrow r - M \delta + \Delta t (Q \Delta F)`.
+
+        Parameters
+        ----------
+        eps, deltas, dfs : list
+            As for :meth:`DeltaFormMixin.advance_residual`; the corrections are applied to the nodal values, so the
+            residual changes by their load vectors.
+
+        Returns
+        -------
+        list
+            The advanced residual.
+        """
+        prob = self.level.prob
+        return super().advance_residual(eps, [prob.apply_mass_matrix(delta) for delta in deltas], dfs)
+
+    def _solve_correction(self, rhs_corr, alpha, u_old, f_old, t_node, implicit_part=None):
+        """
+        Solve the node-local correction equation of the mass form, see the class docstring.
+
+        Parameters
+        ----------
+        rhs_corr : dtype_u
+            Right-hand side of the correction equation, a load vector.
+        alpha : float
+            Implicit prefactor.
+        u_old : dtype_u
+            Current nodal value, the base state of the correction.
+        f_old : dtype_f
+            ``F`` at ``u_old``.
+        t_node : float
+            Physical time of the collocation node.
+        implicit_part : dtype_u, optional
+            The implicit component of ``f_old`` for IMEX problems. Defaults to ``f_old``.
+
+        Returns
+        -------
+        dtype_u
+            The correction.
+        """
+        prob = self.level.prob
+        rhs = self._to_backend(prob, rhs_corr)
+        if hasattr(prob, 'solve_system_delta'):
+            delta = prob.solve_system_delta(rhs, alpha, u_old, f_old, t_node)
+        else:
+            # substitute y = u_old + delta: M y - alpha F_I(y) = rhs + M u_old - alpha F_I(u_old)
+            f_impl_old = f_old if implicit_part is None else implicit_part
+            rhs = rhs + prob.apply_mass_matrix(u_old) - alpha * f_impl_old
+            delta = prob.dtype_u(prob.solve_system(rhs, alpha, u_old, t_node))
+            delta -= u_old
+        self._deltas.append(delta)
+        return delta
+
+
+class delta_implicit_mass(DeltaFormMassMixin, generic_implicit_mass):
+    """
+    Delta-form counterpart of :class:`~pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass`,
+    for problems in mass-matrix form. Mathematically identical to it; see :class:`DeltaFormMassMixin`.
+    """
+
+    _sweep_nodes = delta_implicit._sweep_nodes
+
+
+class delta_imex_1st_order_mass(DeltaFormMassMixin, imex_1st_order_mass):
+    """
+    Delta-form counterpart of :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass`,
+    for problems in mass-matrix form. Mathematically identical to it; see :class:`DeltaFormMassMixin`.
+    """
+
+    _sweep_nodes = delta_imex_1st_order._sweep_nodes
 
 
 def total_increment(prob, increment):
