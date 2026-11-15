@@ -1,7 +1,7 @@
 """
-The projection scheme for the flow around the cylinder of
-:mod:`pySDC.projects.StroemungsRaum.run_Navier_Stokes_equations_FEniCS`, with the Firedrake port of the problem class
-and its sweeper. Drag and lift are logged by :class:`~pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_Firedrake.LogLiftDrag`;
+The projection scheme for the flow around the cylinder (the DFG benchmark 2D-3), with
+:class:`NavierStokes2DProjectionFiredrake` and its sweeper. Drag and lift are logged by
+:class:`~pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_Firedrake.LogLiftDrag`;
 add :class:`~pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_Firedrake.LogWriteSolutions` to the hooks to write the
 solutions for ``plotting/plots_Navier_Stokes_projection_Firedrake.py``.
 """
@@ -24,7 +24,8 @@ DEFAULT_PATH = f'{os.path.dirname(__file__)}/data/navier_stokes/'
 
 def setup(t0=3.125e-4):
     """
-    The parameters of the FEniCS version.
+    The parameters of the project's original study. The iteration stops when the increment between two iterations
+    falls below `e_tol`.
 
     Returns:
         description and controller_params dictionaries, and t0

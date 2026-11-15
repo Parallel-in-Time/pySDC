@@ -8,9 +8,7 @@ diffuses,
     \omega_t = \nu \Delta \omega - u \cdot \nabla \omega, \quad u = (\psi_y, -\psi_x), \quad -\Delta \psi = \omega,
 
 starting from a double shear layer. :class:`Vortex2DFiredrake` solves for the vorticity and computes the stream
-function :math:`\psi` by a Poisson solve in every right-hand side evaluation. This is the port of
-:class:`~pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass`, with the
-sign of the advection corrected, see :func:`advection`. On the periodic domain :math:`\psi` is only defined up to a
+function :math:`\psi` by a Poisson solve in every right-hand side evaluation. On the periodic domain :math:`\psi` is only defined up to a
 constant, which drops out of the velocity; the Poisson solves remove it with a null space.
 """
 
@@ -30,8 +28,8 @@ MUMPS_NULL_PIVOTS = {
 
 def double_shear_layer(mesh, rho, delta):
     """
-    The initial vorticity of the FEniCS version, two shear layers of steepness `rho` with a perturbation of amplitude
-    `delta`, summed over periodic images in y.
+    The initial vorticity, two shear layers of steepness `rho` with a perturbation of amplitude `delta`, summed over
+    periodic images in y.
 
     Args:
         mesh (firedrake.MeshGeometry): The mesh
@@ -56,8 +54,8 @@ def double_shear_layer(mesh, rho, delta):
 def advection(psi, w, v):
     r"""
     The advection form :math:`-(u \cdot \nabla \omega, v) = (\psi_x \omega_y - \psi_y \omega_x, v)` with
-    :math:`u = (\psi_y, -\psi_x)`. The FEniCS version has the opposite sign, which advects the vorticity with
-    :math:`-u`, a velocity it does not induce.
+    :math:`u = (\psi_y, -\psi_x)`. (pySDC's earlier version of this problem had the opposite sign, which advects the
+    vorticity with :math:`-u`, a velocity it does not induce.)
     """
     return (psi.dx(0) * w.dx(1) - psi.dx(1) * w.dx(0)) * v * fd.dx
 
@@ -87,9 +85,7 @@ def poisson_solver(V, w, psi):
 class Vortex2DFiredrake(FormFiredrakeIMEX):
     r"""
     The periodic vorticity problem, with the stream function computed by a Poisson solve in every right-hand side
-    evaluation; see the module docstring. Diffusion is implicit, advection explicit. This is the port of
-    :class:`~pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass`, with
-    the sign of the advection corrected.
+    evaluation; see the module docstring. Diffusion is implicit, advection explicit.
 
     Parameters
     ----------

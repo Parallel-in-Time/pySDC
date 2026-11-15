@@ -41,9 +41,10 @@ def test_solve_system(c):
 
 @pytest.mark.firedrake
 def test_eval_f():
-    """eval_f gives the load vectors -nu K u and M f, the latter for the forcing at the time asked for."""
+    """eval_f gives the load vectors -nu K u and (f, v), the latter for the forcing at the time asked for."""
     import firedrake as fd
     import numpy as np
+    from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
 
     P = Heat1DForcedFiredrake(n=128)
@@ -60,10 +61,11 @@ def test_eval_f():
     error = abs(difference) / abs(P.apply_mass_matrix(expect))
     assert error < 1e-8, error
 
-    # the time-dependent expressions follow the time they are evaluated at
+    # the time-dependent expressions follow the time they are evaluated at; the forcing is integrated as an expression
     for t in [0.3, 1.7]:
-        expect.interpolate(-(np.sin(t) - P.nu * np.pi**2 * np.cos(t)) * fd.sin(np.pi * x[0]))
-        error = abs(P.eval_f(me, t).expl - P.apply_mass_matrix(expect)) / abs(P.apply_mass_matrix(expect))
+        forcing = -(np.sin(t) - P.nu * np.pi**2 * np.cos(t)) * fd.sin(np.pi * x[0])
+        load = firedrake_mesh(fd.assemble(forcing * fd.TestFunction(P.V) * fd.dx))
+        error = abs(P.eval_f(me, t).expl - load) / abs(load)
         assert error < 1e-12, error
         expect.interpolate(np.cos(t) * fd.sin(np.pi * x[0]) + P.c)
         assert abs(P.u_exact(t) - expect) / abs(expect) < 1e-12

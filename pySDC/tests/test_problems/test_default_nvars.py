@@ -20,10 +20,3 @@ def test_allencahn_temp_imex():
     from pySDC.implementations.problem_classes.AllenCahn_Temp_MPIFFT import allencahn_temp_imex
 
     assert allencahn_temp_imex().nvars == (128, 128)
-
-
-@pytest.mark.fenics
-def test_fenics_vortex_2d():
-    from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d
-
-    assert fenics_vortex_2d().c_nvars == (32, 32)

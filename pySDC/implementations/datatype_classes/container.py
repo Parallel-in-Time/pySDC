@@ -6,7 +6,7 @@ class MultiComponentContainer(object):
     Datatype with multiple components, each one an object of its own.
 
     This is the counterpart of ``MultiComponentMeshMixin`` for backends whose data cannot simply grow an axis:
-    a FEniCS ``Function`` lives on a ``FunctionSpace`` and a PETSc ``Vec`` on a ``DMDA``, so the components
+    a Firedrake ``Function`` lives on a ``FunctionSpace`` and a PETSc ``Vec`` on a ``DMDA``, so the components
     cannot be views into one contiguous array and have to be separate objects instead.
 
     To make a specific multi-component datatype, derive from this class, list the components as strings in
@@ -14,9 +14,9 @@ class MultiComponentContainer(object):
 
     .. code-block:: python
 
-        class rhs_fenics_mesh(MultiComponentContainer):
+        class IMEX_firedrake_mesh(MultiComponentContainer):
             components = ['impl', 'expl']
-            component_type = fenics_mesh
+            component_type = firedrake_mesh
 
     Instantiating such a datatype builds one component of ``component_type`` per name, either by copying the
     components of another instance or by passing ``init`` and ``val`` on to each of them. The arithmetic is

@@ -1,11 +1,9 @@
 """
 Plots of the flow around the cylinder from :mod:`pySDC.projects.StroemungsRaum.run_Navier_Stokes_equations_Firedrake`,
-as those of the FEniCS version: velocity field, pressure, vorticity, velocity magnitude and streamlines, frame by
-frame. Reads the ``CheckpointFile`` that
-:class:`~pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_Firedrake.LogWriteSolutions` writes.
+velocity field, pressure, vorticity, velocity magnitude and streamlines, frame by frame. Reads the ``CheckpointFile``
+that :class:`~pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_Firedrake.LogWriteSolutions` writes.
 
-The streamlines are drawn from the velocity directly, where the FEniCS version contours a stream function from a
-Poisson solve.
+The streamlines are drawn from the velocity directly, without computing a stream function.
 """
 
 import json

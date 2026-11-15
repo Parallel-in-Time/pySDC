@@ -20,8 +20,7 @@ class GrayScott1DFiredrake(FormFiredrake):
     for :math:`x \in [0, 100]`, with zero-flux boundaries. Multiplying by test functions :math:`q_u, q_v` and
     integrating the Laplacians by parts gives the forms below; the boundary terms vanish, so there are no boundary
     conditions to impose. Everything else, the mass-matrix formulation, the solves and several levels, comes from
-    :class:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake`. This is the same problem as
-    :class:`~pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott_mass`.
+    :class:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake`.
 
     Parameters
     ----------

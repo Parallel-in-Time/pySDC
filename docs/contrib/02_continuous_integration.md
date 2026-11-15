@@ -147,7 +147,7 @@ pytest -v pySDC/tests
 > ```
 
 > :warning: CI runs `pySDC/tests` once per environment with `-m <marker>`, so every test there needs one of the
-> markers `base`, `fenics`, `mpi4py`, `petsc`, `pytorch`, `firedrake` or `cupy` (or `benchmark`, which CI
+> markers `base`, `mpi4py`, `petsc`, `pytorch`, `firedrake` or `cupy` (or `benchmark`, which CI
 > deliberately does not run). A test without one would never run anywhere, so collection stops with an error
 > that names it; see `pySDC/tests/conftest.py`.
 

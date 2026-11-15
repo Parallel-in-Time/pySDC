@@ -5,16 +5,14 @@ SWEEPER_PARAMS = {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'}
 
 def heat_forms(V, nu, c, t):
     """
-    The forced heat equation of `Heat1DForcedFiredrake`, written as forms for `FormFiredrakeIMEX`.
-
-    The forcing is interpolated inside the form, as `Heat1DForcedFiredrake` interpolates it, so both discretise the
-    same equation.
+    The forced heat equation of `Heat1DForcedFiredrake`, written as forms for `FormFiredrakeIMEX`, with the forcing
+    as an expression, as there, so that both discretise the same equation.
     """
     import firedrake as fd
     import numpy as np
 
     x = fd.SpatialCoordinate(V.mesh())[0]
-    forcing = fd.interpolate(-(fd.sin(t) - nu * np.pi**2 * fd.cos(t)) * fd.sin(np.pi * x), V)
+    forcing = -(fd.sin(t) - nu * np.pi**2 * fd.cos(t)) * fd.sin(np.pi * x)
     return {
         'V': V,
         'mass': lambda u, v: u * v * fd.dx,
@@ -88,21 +86,20 @@ def run(problem_class, problem_params, sweeper_class, dt, Tend, maxiter, restol=
 
 
 #: u at POINTS after 5 steps of dt = 0.1 (16 cells, CG4, nu = 0.1, three RADAU-RIGHT nodes, LU, exactly four
-#: iterations), computed with `Heat1DForcedFiredrake` when it still inverted the mass matrix and ran with `imex_1st_order`
-#: (before it became a forms class). Kept so that the mass form is checked against the M^-1 one.
+#: iterations), recorded with `Heat1DForcedFiredrake` (Firedrake 2026.10) as a check against unintended changes. (The
+#: class agreed to 1e-11 with its predecessor that inverted the mass matrix and interpolated its forcing.)
 POINTS = [0.1, 0.33, 0.5, 0.77]
-M_INVERSE_REFERENCE = {
-    0: [0.27118792356803023, 0.7553722034851669, 0.8775825707723329, 0.5803557620368015],
-    3.14: [3.411187923568031, 3.895372203485166, 4.017582570772335, 3.720355762036801],
+HEAT_REFERENCE = {
+    0: [0.27118792355851057, 0.7553722034832705, 0.8775825707724594, 0.5803557620288665],
+    3.14: [3.411187923558511, 3.8953722034832694, 4.0175825707724595, 3.720355762028867],
 }
 
 
 @pytest.mark.firedrake
 @pytest.mark.parametrize('c', [0, 3.14])
-def test_heat_reproduces_HeatFiredrake(c):
+def test_heat_forms_match_HeatFiredrake(c):
     """
-    The heat equation as forms with the mass sweeper gives what `Heat1DForcedFiredrake` gave with M^-1 and the plain
-    IMEX sweeper, and so does `Heat1DForcedFiredrake` now, which is the same thing in mass form.
+    The heat equation written as forms gives the recorded values of `Heat1DForcedFiredrake`, and so does the class.
     """
     import firedrake as fd
     import numpy as np
@@ -119,7 +116,7 @@ def test_heat_reproduces_HeatFiredrake(c):
         controller, uend = run(problem_class, params, imex_1st_order_mass, 0.1, 0.5, 4)
         P = controller.MS[0].levels[0].prob
         values = fd.PointEvaluator(P.V.mesh(), [[x] for x in POINTS]).evaluate(uend.functionspace)
-        assert np.allclose(values, M_INVERSE_REFERENCE[c], rtol=0, atol=1e-12), (problem_class.__name__, values)
+        assert np.allclose(values, HEAT_REFERENCE[c], rtol=0, atol=1e-12), (problem_class.__name__, values)
 
         # it is a real time integration, not the initial condition coming back
         assert abs(uend - P.u_exact(0.5)) < 1e-6

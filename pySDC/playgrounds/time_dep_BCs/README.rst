@@ -5,7 +5,8 @@ The heat equation :math:`u_t = \nu u_{xx}` on :math:`(-1, 1)` with Dirichlet dat
 :math:`a\cos t` and :math:`b\cos t`, discretized with the ultraspherical method of
 ``Heat1DUltraspherical``. The boundary conditions sit in the last two rows of the linear system, so
 changing them per collocation node is one assignment. There is no spatial error floor above roundoff,
-which makes this a cleaner testbed than the FEniCS sibling in ``playgrounds/FEniCS/order_reduction``
+which makes this a cleaner testbed than the FEniCS sibling in ``playgrounds/deprecated/FEniCS/order_reduction``
+(which no longer runs, as pySDC dropped FEniCS)
 or the Taylor-Green study in ``projects/StroemungsRaum``.
 
 Idea and first version by Thomas Baumann, pull request #634.

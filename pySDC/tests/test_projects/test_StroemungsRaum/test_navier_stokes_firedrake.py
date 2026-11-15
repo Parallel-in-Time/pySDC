@@ -1,6 +1,6 @@
 """
-Tests for the Firedrake port of StroemungsRaum's monolithic Navier-Stokes problem. They live here rather than in the
-project, because the project's own tests run in its FEniCS environment, and these need Firedrake.
+Tests for StroemungsRaum's Navier-Stokes problems: the cylinder flow, monolithic and with the projection method, and
+the Taylor-Green flow.
 """
 
 import pytest
@@ -61,7 +61,7 @@ def test_reference_values():
 
 @pytest.mark.firedrake
 def test_boundary_ids():
-    """The mesh read from the DOLFIN file has its boundary facets labelled, with the expected lengths."""
+    """The cylinder mesh has its boundary facets labelled, with the expected lengths."""
     import firedrake as fd
     import numpy as np
     from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_Firedrake import (

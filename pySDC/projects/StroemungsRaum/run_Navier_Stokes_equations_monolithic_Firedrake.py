@@ -1,7 +1,6 @@
 """
-The monolithic flow around the cylinder of
-:mod:`pySDC.projects.StroemungsRaum.run_Navier_Stokes_equations_monolithic_FEniCS`, with the Firedrake port of the
-problem class. Drag and lift are logged per step by
+The flow around the cylinder (the DFG benchmark 2D-3), monolithic, with :class:`NavierStokes2DMonolithicFiredrake`.
+Drag and lift are logged per step by
 :class:`~pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_Firedrake.LogLiftDrag`.
 """
 
@@ -15,9 +14,9 @@ from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_Fi
 
 def setup(t0=3.125e-4):
     """
-    The parameters of the FEniCS version, with its residual tolerance 1e-10 converted to the dual norm the Firedrake
-    data types use: on the cylinder mesh, the dual norm of a residual is about 2800 times the norm FEniCS takes (the L2
-    norm of the function with the residual's entries as coefficients), so 1e-10 becomes about 3e-7.
+    The parameters of the project's original study. Its residual tolerance, 1e-10 in the L2 norm of the function with
+    the residual's entries as coefficients, is converted to the dual norm the Firedrake data types use: on the cylinder
+    mesh, the dual norm of a residual is about 2800 times larger, so 1e-10 becomes about 3e-7.
 
     Returns:
         description and controller_params dictionaries, and t0

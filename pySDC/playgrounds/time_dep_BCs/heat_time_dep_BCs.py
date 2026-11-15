@@ -19,7 +19,7 @@ class Heat1DTimeDepBCs(Heat1DUltraspherical):
       collocation quadrature, :math:`u_B(\tau_m) = g(t_0) + \Delta t \sum_j Q_{mj} \dot g(\tau_j)`.
       Needs the :class:`generic_implicit_diffbc` sweeper, which hands over the step.
 
-    This is the spectral sibling of ``playgrounds/FEniCS/order_reduction`` and of the Taylor-Green
+    This is the spectral sibling of ``playgrounds/deprecated/FEniCS/order_reduction`` and of the Taylor-Green
     study in ``projects/StroemungsRaum``: it has no spatial error floor above roundoff, so orders
     can be read off down to about 1e-12. Idea and first version by Thomas Baumann, pull request #634.
 

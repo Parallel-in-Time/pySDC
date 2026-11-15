@@ -1,6 +1,6 @@
 """
-The temporal accuracy study of :mod:`pySDC.projects.StroemungsRaum.run_accuracy.run_accuracy_heat_equation_FEniCS`
-with the Firedrake port, :mod:`pySDC.projects.StroemungsRaum.run_heat_equation_Firedrake`.
+The temporal accuracy study of the heat equation of :mod:`pySDC.projects.StroemungsRaum.run_heat_equation_Firedrake`:
+the relative error at t = 1 for halved step sizes, and the observed order fitted to it.
 """
 
 import os

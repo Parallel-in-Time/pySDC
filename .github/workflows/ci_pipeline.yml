@@ -82,12 +82,12 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
+        env: ['base', 'mpi4py', 'petsc', 'pytorch']
         python: ['3.10', '3.11', '3.12', '3.13']
         numpy: ['', '=1']
         # pySDC supports both NumPy majors, so every backend is run against both. NumPy 1 gets one
         # python rather than four: 1.26 is the last 1.x release, it does not support 3.13 at all,
-        # and 3.12 is the newest python all five backends still have NumPy 1 builds for.
+        # and 3.12 is the newest python all four backends still have NumPy 1 builds for.
         exclude:
           - {numpy: '=1', python: '3.10'}
           - {numpy: '=1', python: '3.11'}
@@ -156,8 +156,6 @@ jobs:
           - Second_orderSDC
           - soft_failure
           - TOMS
-          - StroemungsRaum
-          - FEM_with_FEniCS
         numpy: ['', '=1']
         # Both NumPy majors here too. No python axis to exclude against: every project environment
         # allows the whole 3.10-3.13 range, so `numpy=1` simply resolves the newest python that has
@@ -241,7 +239,7 @@ jobs:
           name: test-artifacts-gpu-hardware
           path: |
             coverage_GPU_hardware.dat
-            data/step_7_G_out.txt
+            data/step_7_F_out.txt
 
   user_libpressio_tests:
     runs-on: ubuntu-latest
@@ -473,7 +471,7 @@ jobs:
     # that the tests themselves write into `data/` (which is gitignored), so
     # the "image file not readable" check is meaningless on a bare checkout -
     # every one of those images would be missing. The same goes for the tutorial
-    # results included from `data/`, among them step 7 G's from the GPU job, so a
+    # results included from `data/`, among them step 7 F's from the GPU job, so a
     # pull request from a fork, which cannot reach the GPUs, gets no docs build.
     needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux, gpu_hardware_tests]
     defaults:
@@ -509,7 +507,7 @@ jobs:
             grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg"
             exit 1
           fi
-          # The same for the results the tutorial parts that need MPI, FEniCS, ... include from the test jobs.
+          # The same for the results the tutorial parts that need MPI, Firedrake, ... include from the test jobs.
           includes_not_found=$(grep "WARNING: Include file" < sphinx_build.log | wc -l)
           if [ $includes_not_found != "0" ] ; then
             echo "Some included files were not found:"

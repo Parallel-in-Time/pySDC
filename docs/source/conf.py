@@ -45,7 +45,7 @@ exclude_patterns = [
     'tutorial/step_*/HookClass_*.py',
     'tutorial/step_4/PenningTrap_3D_coarse.py',
     'tutorial/step_*/[a-z]*.py',  # helper modules, such as step_9/paradiag_setup.py
-    'tutorial/step_7/F_2_*.py',  # the plotting script of part F
+    'tutorial/step_7/E_2_*.py',  # the plotting script of part E
 ]
 
 # Ported tutorials are jupytext "percent" scripts, linked into docs/source/tutorial. Sphinx runs them as notebooks.
@@ -70,7 +70,7 @@ napoleon_type_aliases = {
     'dtype_f': ':py:attr:`~pySDC.core.problem.Problem.dtype_f`',
     'matrix': 'matrix',
 }
-autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy', 'firedrake', 'gusto', 'ufl', 'vtk', 'vtkmodules']
+autodoc_mock_imports = ['mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy', 'firedrake', 'gusto', 'ufl', 'vtk', 'vtkmodules']
 # the source of members imported from mocked modules (Firedrake, Gusto, ...) is not there to show
 viewcode_follow_imported_members = False
 
@@ -82,7 +82,7 @@ pygments_dark_style = 'github-dark'  # the theme's default dark style is loud
 html_css_files = ['custom.css']
 html_js_files = [('run-in-browser.js', {'type': 'module'})]
 
-# Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, FEniCS,
+# Tutorials whose code runs in the browser, in Pyodide. Which ones can, and why the others cannot (MPI, Firedrake,
 # PETSc, ...), was measured by running every tutorial there. The wheels are built by docs/update_apidocs.sh;
 # without them, no page gets the button.
 BROWSER_PAGES = ['tutorial/step_*/*']
@@ -90,19 +90,18 @@ BROWSER_PAGES = ['tutorial/step_*/*']
 # things; their pages show the results of the CI jobs that have them.
 NOT_IN_BROWSER = {
     'tutorial/step_6/C_*': 'it runs on several processes with MPI (mpi4py).',
-    'tutorial/step_7/A_*': 'it needs FEniCS.',
-    'tutorial/step_7/B_*': 'it needs mpi4py-fft and MPI.',
-    'tutorial/step_7/C_*': 'it needs PETSc (petsc4py) and MPI.',
-    'tutorial/step_7/D_*': 'it needs PyTorch.',
-    'tutorial/step_7/E_*': 'it needs Firedrake.',
-    'tutorial/step_7/F_*': 'it needs Firedrake and Gusto.',
-    'tutorial/step_7/G_*': 'it needs a GPU and CuPy.',
-    'tutorial/step_7/H_*': 'it needs Firedrake.',
+    'tutorial/step_7/A_*': 'it needs mpi4py-fft and MPI.',
+    'tutorial/step_7/B_*': 'it needs PETSc (petsc4py) and MPI.',
+    'tutorial/step_7/C_*': 'it needs PyTorch.',
+    'tutorial/step_7/D_*': 'it needs Firedrake.',
+    'tutorial/step_7/E_*': 'it needs Firedrake and Gusto.',
+    'tutorial/step_7/F_*': 'it needs a GPU and CuPy.',
+    'tutorial/step_7/G_*': 'it needs Firedrake.',
     'tutorial/step_9/E_*': 'it runs on several processes with MPI (mpi4py).',
 }
 nb_execution_excludepatterns = [f'{page}.py' for page in NOT_IN_BROWSER]
 # of those, the parts Colab can run as they are (PyTorch is preinstalled there): they keep their Colab button
-COLAB_TOO = ['tutorial/step_7/D_*']
+COLAB_TOO = ['tutorial/step_7/C_*']
 BROWSER_WHEELS = sorted(wheel.name for wheel in Path(__file__).parent.glob('_static/wheels/*.whl'))
 html_theme_options = {
     'logo': {'image_light': '_static/pysdc-logo.svg', 'image_dark': '_static/pysdc-logo-dark.svg', 'alt_text': 'pySDC'},
@@ -231,7 +230,7 @@ def add_project_gallery(app, docname, source):
 
 
 # The API overview on api.rst: one table per role in a run, with the first sentence of each class's docstring. The
-# classes are read with ast, so that modules whose imports are missing here (FEniCS, PETSc, ...) are listed too.
+# classes are read with ast, so that modules whose imports are missing here (Firedrake, PETSc, ...) are listed too.
 API_CATEGORIES = [
     (
         'Problems',
