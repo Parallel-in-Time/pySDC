@@ -93,7 +93,7 @@ def test_Firedrake_transfer_hierarchy_mixed():
     """Mixed function spaces, as Gusto uses, are transferred exactly as well."""
     import firedrake as fd
     from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
-    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import run_transfer
     import numpy as np
 
     hierarchy = fd.MeshHierarchy(fd.UnitIntervalMesh(2), 1)
@@ -107,8 +107,8 @@ def test_Firedrake_transfer_hierarchy_mixed():
         data.append(u)
 
     coarse, fine = firedrake_mesh(spaces[0]), firedrake_mesh(spaces[1])
-    MeshToMeshFiredrakeHierarchy._restrict(u_fine=data[1], u_coarse=coarse)
-    MeshToMeshFiredrakeHierarchy._prolong(u_coarse=data[0], u_fine=fine)
+    run_transfer('inject', data[1].functionspace, coarse.functionspace, {})
+    run_transfer('prolong', data[0].functionspace, fine.functionspace, {})
     for got, expect in [(coarse, data[0]), (fine, data[1])]:
         assert np.isclose(abs(got - expect), 0), 'Mixed function was not transferred exactly'
 
@@ -122,7 +122,7 @@ def test_Firedrake_transfer_hierarchy_mixed():
     x = fd.SpatialCoordinate(hierarchy[1])
     fine.functionspace.subfunctions[0].project(fd.as_vector([-x[1], x[0], 0]))
     coarse = firedrake_mesh(spaces[0])
-    MeshToMeshFiredrakeHierarchy._restrict(u_fine=fine, u_coarse=coarse)
+    run_transfer('inject', fine.functionspace, coarse.functionspace, {})
     velocity = coarse.functionspace.subfunctions[0]
     assert np.isfinite(velocity.dat.data_ro).all(), 'Injection of BDM on the sphere gave non-finite values'
     assert np.isclose(fd.norm(velocity), fd.norm(fine.functionspace.subfunctions[0]), rtol=0.1)
@@ -166,3 +166,45 @@ def test_Firedrake_transfer_hierarchy_mass_formulation():
         transfer.restrict_dual(fine.u_exact(0))
     with pytest.raises(TransferError):
         transfer.project(load_vector(fine))
+
+
+@pytest.mark.firedrake
+def test_transfer_records_do_not_grow():
+    """
+    Firedrake's transfer manager keeps a record for every pair of source and target it sees, and never drops one. The
+    transfers and the spatial error floor go through buffers, so repeating them adds no records: a long run with
+    millions of transfers would otherwise grow by about 260 bytes per transfer.
+    """
+    import firedrake as fd
+    from pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake import coarse_space_error
+    from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh, IMEX_firedrake_mesh
+    from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import (
+        MeshToMeshFiredrakeHierarchy,
+        _transfer_manager,
+    )
+
+    def records():
+        return sum(len(cache._dat_versions) for cache in _transfer_manager.caches.values())
+
+    coarse, fine = [Heat1DForcedFiredrake(mesh=mesh, order=2) for mesh in fd.MeshHierarchy(fd.UnitIntervalMesh(4), 1)]
+    transfer = MeshToMeshFiredrakeHierarchy(fine, coarse, {})
+    buffers = {}
+
+    def transfer_everything():
+        u = fine.u_exact(0.3)
+        transfer.prolong(transfer.restrict(u))
+        transfer.restrict_dual(fine.apply_mass_matrix(u))
+        transfer.project(u)
+        transfer.prolong(transfer.restrict(IMEX_firedrake_mesh(fine.init)))
+        coarse_space_error(u.functionspace, coarse.V, buffers)
+
+    transfer_everything()
+    before = records()
+    for _ in range(5):
+        transfer_everything()
+    assert records() == before, f'{records() - before} records added by 5 repetitions'
+
+    # and the results are still right: projecting a coarse function from the fine space gives it back
+    u_coarse = firedrake_mesh(fd.Function(coarse.V).interpolate(fd.SpatialCoordinate(coarse.mesh)[0] ** 2))
+    assert abs(transfer.project(transfer.prolong(u_coarse)) - u_coarse) < 1e-12

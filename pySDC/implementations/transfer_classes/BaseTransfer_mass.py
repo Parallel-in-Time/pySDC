@@ -42,10 +42,12 @@ class base_transfer_mass(BaseTransfer):
         for m in range(1, SF.coll.num_nodes + 1):
             tmp_u.append(self.space_transfer.project(F.u[m]))
 
-        # restrict collocation values. Below the finest level, u0 is the load vector M u0, which f[0] is evaluated at.
-        # f[0] does not enter the mass-matrix sweeps, as it appears in their right-hand sides and the known terms alike.
+        # u0 is a load vector on every coarse level: the finest level supplies it as M u0, and each further level
+        # restricts that with P^T (L2-projecting it there as if it were a solution made three levels fail). f[0] is
+        # evaluated at the function it represents; it does not enter the mass-matrix sweeps anyway, as it appears in
+        # their right-hand sides and the known terms alike.
         if F.level_index == 0:
-            G.u[0] = self.space_transfer.project(F.u[0])
+            G.u[0] = self.space_transfer.restrict_dual(PF.apply_mass_matrix(F.u[0]))
         else:
             G.u[0] = self.space_transfer.restrict_dual(F.u[0])
         for n in range(1, SG.coll.num_nodes + 1):
@@ -104,15 +106,6 @@ class base_transfer_mass(BaseTransfer):
             G.uold[m] = PG.dtype_u(G.u[m])
             G.fold[m] = PG.dtype_f(G.f[m])
         PG.use_restricted_boundary_values(G.u[1:], [G.time + G.dt * tau for tau in SG.coll.nodes])
-
-        # u0 lives in the DUAL space on every coarse level: the finest level supplies it as M u0,
-        # and each further level restricts that dual vector with P^T. Without the else branch,
-        # level 1 -> 2 kept the primal `project` result from above and L2-projected an already-dual
-        # vector, which is why 2 levels worked and 3 did not.
-        if F.level_index == 0:
-            G.u[0] = self.space_transfer.restrict_dual(PF.apply_mass_matrix(F.u[0]))
-        else:
-            G.u[0] = self.space_transfer.restrict_dual(F.u[0])
 
         # works as a predictor
         G.status.unlocked = True

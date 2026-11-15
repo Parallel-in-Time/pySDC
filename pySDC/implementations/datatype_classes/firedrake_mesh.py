@@ -5,12 +5,20 @@ from pySDC.implementations.datatype_classes.container import MultiComponentConta
 from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 
 
+#: how :func:`riesz_map` solves with the mass matrix, accurate to round-off
+MASS_SOLVER = {'ksp_type': 'cg', 'pc_type': 'jacobi', 'ksp_rtol': 1e-14, 'ksp_atol': 0.0}
+
+
 def riesz_map(V):
     """
-    The L2 Riesz map of a primal space, one per space so its mass matrix is factored once.
+    The L2 Riesz map of a primal space, one per space so its mass matrix is assembled once.
+
+    The mass matrix is solved with conjugate gradients and a Jacobi preconditioner, which converges in a few dozen
+    iterations whatever the mesh size, since the mass matrix is spectrally equivalent to its diagonal. A direct solver
+    would store a factorization of it on every level, only to measure residuals.
 
     The maps are kept on the mesh, so they go when the mesh goes. A cache that outlives the mesh would keep the mesh,
-    the factored mass matrix and their MPI communicators alive for the whole process, and MPI runs out of
+    its mass matrix, its solver and their MPI communicators alive for the whole process, and MPI runs out of
     communicators after a few hundred problems.
 
     Args:
@@ -25,7 +33,7 @@ def riesz_map(V):
         maps = mesh._pysdc_riesz_maps = {}
     # keyed by equality, since spaces are often rebuilt, e.g. by `Cofunction.function_space().dual()`
     if V not in maps:
-        maps[V] = fd.RieszMap(V, 'L2', constant_jacobian=True)
+        maps[V] = fd.RieszMap(V, 'L2', constant_jacobian=True, solver_parameters=MASS_SOLVER)
     return maps[V]
 
 

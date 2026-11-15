@@ -2,11 +2,10 @@ import firedrake as fd
 
 from pySDC.core.convergence_controller import ConvergenceController
 from pySDC.implementations.datatype_classes.firedrake_mesh import riesz_map
+from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import run_transfer
 
-_transfer_manager = fd.TransferManager()
 
-
-def coarse_space_error(u, coarse_space):
+def coarse_space_error(u, coarse_space, buffers):
     r"""
     The part of `u` that a coarser space cannot represent, :math:`\|u - P R u\|_{L^2}`.
 
@@ -17,14 +16,16 @@ def coarse_space_error(u, coarse_space):
     Args:
         u (firedrake.Function): Function on a mesh of a Firedrake ``MeshHierarchy``
         coarse_space (firedrake.FunctionSpace): Space on the next coarser mesh of the same hierarchy
+        buffers (dict): Transfer buffers, kept by the caller, see
+            :func:`~pySDC.implementations.transfer_classes.TransferFiredrakeMesh.run_transfer`
 
     Returns:
         float: :math:`\|u - P R u\|_{L^2}`
     """
-    coarse_load = fd.Cofunction(coarse_space.dual())
-    _transfer_manager.restrict(riesz_map(u.function_space())(u), coarse_load)
-    back = fd.Function(u.function_space())
-    _transfer_manager.prolong(riesz_map(coarse_space)(coarse_load), back)
+    coarse_load = run_transfer(
+        'restrict', riesz_map(u.function_space())(u), fd.Cofunction(coarse_space.dual()), buffers
+    )
+    back = run_transfer('prolong', riesz_map(coarse_space)(coarse_load), fd.Function(u.function_space()), buffers)
     return fd.norm(u - back)
 
 
@@ -49,7 +50,10 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
     constant, which is why :math:`\gamma = 1` is a safe default.
 
     The estimate assumes a smooth solution, so that the error of a degree :math:`p` space falls by :math:`2^{p+1}` when
-    the mesh is refined once. It needs a coarse space on the next coarser mesh of a ``MeshHierarchy``.
+    the mesh is refined once. It needs a coarse space on the next coarser mesh of a ``MeshHierarchy``, an absolute
+    residual (``residual_type`` ``'full_abs'`` or ``'last_abs'``), since a relative one is not comparable with the error,
+    and one step at a time (SDC or MLSDC): it stops its step through ``force_done``, which a block of PFASST steps
+    shares, so one step meeting its budget would stop all of them.
 
     Parameters:
         coarse_space (firedrake.FunctionSpace): Space of the same kind on the next coarser mesh of the hierarchy
@@ -73,7 +77,7 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
 
     def check_parameters(self, controller, params, description, **kwargs):
         """
-        Make sure the coarse space and the end time are given.
+        Make sure the coarse space and the end time are given, and the residual is absolute.
 
         Returns:
             bool: Whether the parameters are compatible
@@ -82,7 +86,32 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
         for key in ['coarse_space', 'Tend']:
             if key not in params:
                 return False, f'{type(self).__name__} needs the parameter `{key}`'
+        residual_type = description.get('level_params', {}).get('residual_type', 'full_abs')
+        if residual_type.endswith('rel'):
+            return False, f'{type(self).__name__} compares the residual with an absolute error, got {residual_type!r}'
         return True, ''
+
+    def setup_status_variables(self, controller, **kwargs):
+        """
+        Refuse several steps at once, once the controller knows how many it runs.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            MS (list, optional): The steps of a non-MPI controller
+            comm (mpi4py.MPI.Intracomm, optional): The time communicator of an MPI controller
+
+        Returns:
+            None
+        """
+        super().setup_status_variables(controller, **kwargs)
+        #: the transfer buffers of :func:`coarse_space_error`
+        self.buffers = {}
+        steps, comm = kwargs.get('MS'), kwargs.get('comm')
+        if (steps is not None and len(steps) > 1) or (comm is not None and comm.size > 1):
+            raise NotImplementedError(
+                f'{type(self).__name__} works on one step at a time: in a block of PFASST steps, one step meeting its '
+                'budget would stop all of them'
+            )
 
     def post_iteration_processing(self, controller, S, **kwargs):
         """
@@ -98,7 +127,7 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
         L = S.levels[0]
         u = L.u[-1].functionspace
         degree = u.function_space().ufl_element().embedded_superdegree
-        e_x = coarse_space_error(u, self.params.coarse_space) / 2 ** (degree + 1)
+        e_x = coarse_space_error(u, self.params.coarse_space, self.buffers) / 2 ** (degree + 1)
         if L.status.residual <= self.params.gamma * e_x * L.dt / self.params.Tend:
             self.debug(f'Residual {L.status.residual:.2e} below the spatial error budget of {e_x:.2e}', S)
             S.status.force_done = True

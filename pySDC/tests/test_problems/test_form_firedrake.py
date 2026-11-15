@@ -324,13 +324,18 @@ def test_newton_divergence(stop):
 
 @pytest.mark.firedrake
 def test_spatial_error_floor_needs_its_parameters():
-    """The residual floor cannot do without the coarse space and the end time, and says which one is missing."""
+    """
+    The residual floor cannot do without the coarse space and the end time, and says which one is missing. It also
+    refuses a relative residual and more than one step at a time.
+    """
     import firedrake as fd
     from pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake import (
         SpatialErrorFloorFiredrake,
     )
     from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
     coarse_mesh, fine_mesh = fd.MeshHierarchy(fd.UnitIntervalMesh(4), 1)
     coarse_space = fd.FunctionSpace(coarse_mesh, 'CG', 2)
@@ -345,6 +350,24 @@ def test_spatial_error_floor_needs_its_parameters():
                 1,
                 convergence_controllers={SpatialErrorFloorFiredrake: given},
             )
+
+    # a relative residual is not comparable with the error, and in a PFASST block one step would stop all of them
+    def description(residual_type):
+        return {
+            'problem_class': FormFiredrake,
+            'problem_params': nonlinear_forms(fd.FunctionSpace(fine_mesh, 'CG', 2), 0.1, False),
+            'sweeper_class': generic_implicit_mass,
+            'sweeper_params': SWEEPER_PARAMS,
+            'level_params': {'dt': 0.1, 'restol': 1e-8, 'residual_type': residual_type},
+            'step_params': {'maxiter': 5},
+            'convergence_controllers': {SpatialErrorFloorFiredrake: {'coarse_space': coarse_space, 'Tend': 1.0}},
+        }
+
+    with pytest.raises(AssertionError, match='last_rel'):
+        controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description('last_rel'))
+    with pytest.raises(NotImplementedError, match='one step at a time'):
+        controller_nonMPI(num_procs=2, controller_params={'logger_level': 30}, description=description('last_abs'))
+    controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description('last_abs'))
 
 
 @pytest.mark.firedrake

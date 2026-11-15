@@ -15,6 +15,34 @@ from firedrake import Cofunction
 _transfer_manager = TransferManager()
 
 
+def run_transfer(op, source, target, buffers):
+    """
+    Run the transfer `op` (``'prolong'``, ``'restrict'`` or ``'inject'``) of Firedrake's transfer manager from `source`
+    to `target`, through buffers kept in `buffers`.
+
+    The manager records the data versions of every pair of source and target it has seen, and never forgets a pair, so
+    transferring fresh objects every time adds one record per call, which a long run accumulates. Through the buffers
+    it sees the same pair every time. `buffers` is a dict owned by the caller, which keeps the buffers as long as it
+    lives.
+
+    Args:
+        op (str): The transfer
+        source (firedrake.Function or firedrake.Cofunction): What to transfer
+        target (firedrake.Function or firedrake.Cofunction): Where the result goes
+        buffers (dict): The caller's buffers, filled on first use
+
+    Returns:
+        `target`
+    """
+    key = (op, source.function_space(), target.function_space())
+    if key not in buffers:
+        buffers[key] = (type(source)(source.function_space()), type(target)(target.function_space()))
+    source_buffer, target_buffer = buffers[key]
+    source_buffer.assign(source)
+    getattr(_transfer_manager, op)(source_buffer, target_buffer)
+    return target.assign(target_buffer)
+
+
 class MeshToMeshFiredrake(SpaceTransfer):
     """
     This implementation can restrict and prolong between Firedrake meshes, by interpolation.
@@ -92,7 +120,7 @@ class MeshToMeshFiredrake(SpaceTransfer):
     def project(self, F):
         r"""
         Restrict a solution by :math:`L^2` projection, :math:`M_c^{-1} P^T M_f u`, with :math:`P^T` as in
-        :meth:`restrict_dual`. The mass matrices are factored once per space.
+        :meth:`restrict_dual`. The mass matrices are assembled once per space.
 
         Args:
             F (firedrake_mesh): Fine solution
@@ -126,15 +154,19 @@ class MeshToMeshFiredrakeHierarchy(SpaceTransfer):
 
     """
 
-    @staticmethod
-    def _restrict(u_fine, u_coarse):
-        """Perform restriction in Firedrake"""
-        _transfer_manager.inject(u_fine.functionspace, u_coarse.functionspace)
+    def __init__(self, *args, **kwargs):
+        """Initialization, see :class:`~pySDC.core.space_transfer.SpaceTransfer`."""
+        super().__init__(*args, **kwargs)
+        #: the buffers of :func:`run_transfer`, one pair per kind of transfer
+        self.buffers = {}
 
-    @staticmethod
-    def _prolong(u_coarse, u_fine):
+    def _restrict(self, u_fine, u_coarse):
+        """Perform restriction in Firedrake"""
+        run_transfer('inject', u_fine.functionspace, u_coarse.functionspace, self.buffers)
+
+    def _prolong(self, u_coarse, u_fine):
         """Perform prolongation in Firedrake"""
-        _transfer_manager.prolong(u_coarse.functionspace, u_fine.functionspace)
+        run_transfer('prolong', u_coarse.functionspace, u_fine.functionspace, self.buffers)
 
     def restrict(self, F):
         """
@@ -198,7 +230,7 @@ class MeshToMeshFiredrakeHierarchy(SpaceTransfer):
         if not (isinstance(F, firedrake_mesh) and F.is_dual):
             raise TransferError(f'restrict_dual needs dual data, got {type(F)}')
         G = firedrake_dual_mesh(self.coarse_prob.init)
-        _transfer_manager.restrict(F.functionspace, G.functionspace)
+        run_transfer('restrict', F.functionspace, G.functionspace, self.buffers)
         return G
 
     def project(self, F):
@@ -206,7 +238,7 @@ class MeshToMeshFiredrakeHierarchy(SpaceTransfer):
         Restrict a solution by :math:`L^2` projection, :math:`M_c^{-1} P^T M_f u`.
 
         Unlike injection, this is well defined for discontinuous spaces and does not depend on point values. The mass
-        matrices are factored once per space, see
+        matrices are assembled once per space, see
         :func:`~pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map`.
 
         Args:
@@ -218,5 +250,5 @@ class MeshToMeshFiredrakeHierarchy(SpaceTransfer):
         if not (isinstance(F, firedrake_mesh) and not F.is_dual):
             raise TransferError(f'project needs primal data, got {type(F)}')
         coarse_load = Cofunction(self.coarse_prob.init.dual())
-        _transfer_manager.restrict(riesz_map(self.fine_prob.init)(F.functionspace), coarse_load)
+        run_transfer('restrict', riesz_map(self.fine_prob.init)(F.functionspace), coarse_load, self.buffers)
         return firedrake_mesh(riesz_map(self.coarse_prob.init)(coarse_load))
