@@ -71,6 +71,54 @@ def drag_lift(u, p, nu, mesh):
     return fd.assemble(drag), fd.assemble(lift)
 
 
+def velocity_bcs(V, t):
+    r"""
+    The velocity conditions of :class:`NavierStokes2DMonolithicFiredrake`: no-slip on the walls and the cylinder, and
+    the inflow profile :math:`u = (6 \sin(\pi t / 8)\, y (0.41 - y) / 0.41^2, 0)` at :math:`x = 0`.
+
+    Args:
+        V (firedrake.FunctionSpace): Velocity space on a mesh from :func:`cylinder_mesh`, or the velocity part of a
+            mixed space
+        t (firedrake.Constant): Time of the inflow profile
+
+    Returns:
+        tuple of firedrake.DirichletBC: No-slip and inflow condition
+    """
+    y = fd.SpatialCoordinate(V.mesh())[1]
+    u_in = fd.as_vector([4.0 * 1.5 * fd.sin(fd.pi * t / 8) * y * (0.41 - y) / 0.41**2, 0.0])
+    return fd.DirichletBC(V, fd.Constant((0.0, 0.0)), (WALLS, CYLINDER)), fd.DirichletBC(V, u_in, INFLOW)
+
+
+def navier_stokes_forms(nu, forcing=None):
+    """
+    Mass and right-hand side forms of :class:`NavierStokes2DMonolithicFiredrake` for Taylor-Hood elements, as functions
+    of the mixed (trial or current) function and the mixed test function, as ``FormFiredrake`` takes them.
+
+    Args:
+        nu (float): Kinematic viscosity
+        forcing (optional): Body force, a UFL vector, added to the right-hand side of the momentum equation
+
+    Returns:
+        tuple of callable: The mass and the right-hand side form
+    """
+
+    def mass(w, z):
+        u, _ = fd.split(w)
+        v, _ = fd.split(z)
+        return fd.inner(u, v) * fd.dx
+
+    def rhs(w, z):
+        u, p = fd.split(w)
+        v, q = fd.split(z)
+        momentum = -fd.inner(fd.dot(u, fd.nabla_grad(u)), v) - nu * fd.inner(fd.nabla_grad(u), fd.nabla_grad(v))
+        momentum = momentum + p * fd.div(v)
+        if forcing is not None:
+            momentum = momentum + fd.inner(forcing, v)
+        return (momentum + fd.div(u) * q) * fd.dx
+
+    return mass, rhs
+
+
 class NavierStokes2DMonolithicFiredrake(FormFiredrake):
     r"""
     Incompressible Navier-Stokes flow around a cylinder (the DFG benchmark 2D-3), monolithic, with Firedrake and
@@ -116,30 +164,10 @@ class NavierStokes2DMonolithicFiredrake(FormFiredrake):
         V = fd.VectorFunctionSpace(mesh, 'CG', order)
         Q = fd.FunctionSpace(mesh, 'CG', order - 1)
         W = V * Q
-
-        def mass(w, z):
-            u, _ = fd.split(w)
-            v, _ = fd.split(z)
-            return fd.inner(u, v) * fd.dx
-
-        def rhs(w, z):
-            u, p = fd.split(w)
-            v, q = fd.split(z)
-            return (
-                -fd.inner(fd.dot(u, fd.nabla_grad(u)), v)
-                - nu * fd.inner(fd.nabla_grad(u), fd.nabla_grad(v))
-                + p * fd.div(v)
-                + fd.div(u) * q
-            ) * fd.dx
+        mass, rhs = navier_stokes_forms(nu)
 
         t = fd.Constant(0.0)
-        y = fd.SpatialCoordinate(mesh)[1]
-        u_in = fd.as_vector([4.0 * 1.5 * fd.sin(fd.pi * t / 8) * y * (0.41 - y) / 0.41**2, 0.0])
-        bcs = (
-            fd.DirichletBC(W.sub(0), fd.Constant((0.0, 0.0)), (WALLS, CYLINDER)),
-            fd.DirichletBC(W.sub(1), 0.0, OUTFLOW),
-            fd.DirichletBC(W.sub(0), u_in, INFLOW),
-        )
+        bcs = velocity_bcs(W.sub(0), t) + (fd.DirichletBC(W.sub(1), 0.0, OUTFLOW),)
         if solver_parameters is None:
             solver_parameters = {'snes_atol': 1e-10, 'snes_rtol': 1e-9}
 

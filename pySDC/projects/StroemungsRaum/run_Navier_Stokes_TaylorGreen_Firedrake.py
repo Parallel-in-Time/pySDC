@@ -14,9 +14,11 @@ from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_m
 )
 
 
-def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxiter=40, restol=1e-11, newton_tol=1e-13):
+def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxiter=40, restol=2e-9, newton_tol=1e-13):
     """
-    The parameters of the FEniCS version, with the residual tolerance in the dual norm the Firedrake data types use.
+    The parameters of the FEniCS version, with its residual tolerance 1e-12 converted to the dual norm the Firedrake
+    data types use: on the default mesh, the dual norm of a residual is about 1700 times the norm FEniCS takes (the L2
+    norm of the function with the residual's entries as coefficients), so 1e-12 becomes about 2e-9.
 
     Args:
         t0 (float): Initial time

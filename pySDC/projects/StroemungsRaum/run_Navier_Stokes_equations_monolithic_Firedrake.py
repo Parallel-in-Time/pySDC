@@ -15,7 +15,9 @@ from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_Fi
 
 def setup(t0=3.125e-4):
     """
-    The parameters of the FEniCS version, with the residual tolerance in the dual norm the Firedrake data types use.
+    The parameters of the FEniCS version, with its residual tolerance 1e-10 converted to the dual norm the Firedrake
+    data types use: on the cylinder mesh, the dual norm of a residual is about 2800 times the norm FEniCS takes (the L2
+    norm of the function with the residual's entries as coefficients), so 1e-10 becomes about 3e-7.
 
     Returns:
         description and controller_params dictionaries, and t0
@@ -25,7 +27,7 @@ def setup(t0=3.125e-4):
         'problem_params': {'nu': 0.001, 'order': 2},
         'sweeper_class': generic_implicit_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 2, 'QI': 'LU'},
-        'level_params': {'restol': 1e-10, 'dt': 1 / 100},
+        'level_params': {'restol': 3e-7, 'dt': 1 / 100},
         'step_params': {'maxiter': 10},
     }
     return description, {'logger_level': 20, 'hook_class': [LogLiftDrag]}, t0

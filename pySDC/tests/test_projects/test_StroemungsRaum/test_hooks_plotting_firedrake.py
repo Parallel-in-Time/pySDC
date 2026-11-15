@@ -8,8 +8,9 @@ import pytest
 @pytest.mark.firedrake
 def test_lift_drag_hook():
     """
-    The drag and lift the hook records at the last step are those of the FEniCS hook (same iterations, so the same
-    values to ten digits), within the tolerances of the FEniCS test against FEATFLOW.
+    The project's setup, stopping on the increment (`e_tol`), takes the same iterations as the FEniCS version, and the
+    drag and lift the hook records at the last step are those of the FEniCS hook (same iterations, so the same values
+    to ten digits), within the tolerances of the FEniCS test against FEATFLOW.
     """
     import numpy as np
     from pySDC.helpers.stats_helper import get_sorted
@@ -20,12 +21,18 @@ def test_lift_drag_hook():
     P, stats, uend = run_simulation(description, controller_params, t0, Tend=0.005)
     drag = get_sorted(stats, type='drag_post_step', sortby='time')
     lift = get_sorted(stats, type='lift_post_step', sortby='time')
+    iterations = [me[1] for me in get_sorted(stats, type='niter', sortby='time')]
 
+    assert iterations == [4] * 7 + [3], iterations
+    # eight steps of 1/1600 to pass Tend = 0.005, the last one ends at t0 + 8 dt = 0.0053125
     assert len(drag) == len(lift) == 8
+    assert np.isclose(drag[-1][0], t0 + 8 * description['level_params']['dt'], rtol=1e-12, atol=0), drag[-1][0]
     assert np.allclose([drag[-1][1], lift[-1][1]], P.drag_lift(uend), rtol=1e-12, atol=0)
     # the last values of the FEniCS hook, LogLiftDrag of hooks_NSE_IMEX_FEniCS, with the same setup
     assert np.allclose([drag[-1][1], lift[-1][1]], [1.4635256617e-01, -1.9517335230e-04], rtol=1e-9, atol=0)
-    # FEATFLOW at t = 0.0046875
+    # The FEATFLOW values of the FEniCS test, which labels them t = 0.0046875, the start of the last step (the FEniCS
+    # hook records the start time). The values here are at its end, t = 0.0053125; over that step drag and lift change
+    # by about 1e-3 and 5e-6, which the tolerances of the FEniCS test cover.
     assert abs(drag[-1][1] - 1.4903278329e-01) < 5e-3 and abs(lift[-1][1] + 2.3003337267e-04) < 5e-5
 
 

@@ -54,14 +54,17 @@ def run_simulation(description, controller_params, t0, Tend):
 
 
 def run_postprocessing(description, stats, path=DEFAULT_PATH):
-    """Write the parameters to a JSON file and time, drag and lift of every step to ``Lift_Drag_Coefficients.txt``."""
+    """
+    Write the parameters to a JSON file and the end time, drag and lift of every step to ``Lift_Drag_Coefficients.txt``.
+    """
     Path(path).mkdir(parents=True, exist_ok=True)
     lift = get_sorted(stats, type='lift_post_step', sortby='time')
     drag = get_sorted(stats, type='drag_post_step', sortby='time')
     parameters = {
         **description['problem_params'],
         **description['level_params'],
-        't0': lift[0][0],
+        # the hook records the end time of each step
+        't0': lift[0][0] - description['level_params']['dt'],
         'Tend': lift[-1][0],
         'timing': get_sorted(stats, type='timing_run', sortby='time')[0][1],
     }

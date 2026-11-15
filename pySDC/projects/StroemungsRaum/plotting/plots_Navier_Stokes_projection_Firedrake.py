@@ -28,7 +28,7 @@ def plot_solutions(path=DEFAULT_PATH, animate=True):
     """
     with open(f'{path}/Navier_Stokes_Firedrake_parameters.json') as f:
         parameters = json.load(f)
-    nsteps = int(round((parameters['Tend'] - parameters['t0']) / parameters['dt'])) + 1
+    nsteps = int(round((parameters['Tend'] - parameters['t0']) / parameters['dt']))
 
     with fd.CheckpointFile(f'{path}/Cylinder_solutions.h5', 'r') as file:
         mesh = file.load_mesh()

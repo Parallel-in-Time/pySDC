@@ -2,6 +2,7 @@ import firedrake as fd
 
 from pySDC.helpers.ufl_forms import time_derivative
 from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
+from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_Firedrake import navier_stokes_forms
 
 
 class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
@@ -73,21 +74,7 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         # interpolated with equispaced nodes, where DOLFIN puts them: Firedrake's default for high degrees differs
         forcing = fd.interpolate(forcing, fd.VectorFunctionSpace(mesh, 'CG', order + 2, variant='equispaced'))
 
-        def mass(w, z):
-            u, _ = fd.split(w)
-            v, _ = fd.split(z)
-            return fd.inner(u, v) * fd.dx
-
-        def rhs(w, z):
-            u, p = fd.split(w)
-            v, q = fd.split(z)
-            return (
-                -fd.inner(fd.dot(u, fd.nabla_grad(u)), v)
-                - nu * fd.inner(fd.nabla_grad(u), fd.nabla_grad(v))
-                + p * fd.div(v)
-                + fd.inner(forcing, v)
-                + fd.div(u) * q
-            ) * fd.dx
+        mass, rhs = navier_stokes_forms(nu, forcing)
 
         # the exact solution is constant on y = +-0.5
         bcs = (

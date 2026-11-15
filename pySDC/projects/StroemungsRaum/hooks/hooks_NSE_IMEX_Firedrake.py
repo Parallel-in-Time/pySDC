@@ -18,8 +18,8 @@ DEFAULT_PATH = f'{os.path.dirname(__file__)}/../data/navier_stokes/'
 class LogLiftDrag(Hooks):
     """
     Record the drag and lift coefficients of the cylinder at the end of every step, as ``drag_post_step`` and
-    ``lift_post_step``. Works with every problem class that has ``drag_lift(uend)``, i.e. the monolithic and the
-    projection port.
+    ``lift_post_step``, with the time the step ends at (the time of ``uend``). Works with every problem class that has
+    ``drag_lift(uend)``, i.e. the monolithic and the projection port.
     """
 
     def post_step(self, step, level_number):
@@ -37,7 +37,7 @@ class LogLiftDrag(Hooks):
         for kind, value in [('drag', drag), ('lift', lift)]:
             self.add_to_stats(
                 process=step.status.slot,
-                time=L.time,
+                time=L.time + L.dt,
                 level=L.level_index,
                 iter=step.status.iter,
                 sweep=L.status.sweep,

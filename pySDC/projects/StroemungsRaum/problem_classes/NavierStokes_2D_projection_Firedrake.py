@@ -2,12 +2,10 @@ import firedrake as fd
 
 from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrakeIMEX
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_Firedrake import (
-    CYLINDER,
-    INFLOW,
     OUTFLOW,
-    WALLS,
     cylinder_mesh,
     drag_lift,
+    velocity_bcs,
 )
 
 
@@ -63,18 +61,12 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
             return -fd.inner(fd.dot(u, fd.nabla_grad(u)), v) * fd.dx
 
         t = fd.Constant(0.0)
-        y = fd.SpatialCoordinate(mesh)[1]
-        u_in = fd.as_vector([4.0 * 1.5 * fd.sin(fd.pi * t / 8) * y * (0.41 - y) / 0.41**2, 0.0])
-        bcs = (
-            fd.DirichletBC(V, fd.Constant((0.0, 0.0)), (WALLS, CYLINDER)),
-            fd.DirichletBC(V, u_in, INFLOW),
-        )
         super().__init__(
             V,
             mass,
             viscous,
             convection,
-            bcs=bcs,
+            bcs=velocity_bcs(V, t),
             t=t,
             u_exact=fd.as_vector([0.0, 0.0]),
             # the tentative velocity solve is linear
@@ -83,7 +75,6 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
         )
         self._makeAttributeAndRegister('nu', 'order', localVars=locals(), readOnly=True)
         self.mesh = mesh
-        self.Q = Q
 
         # pressure Poisson equation and velocity correction, set up once: the step and u* come in through buffers
         self.pn = fd.Function(Q)
@@ -96,6 +87,7 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
             -(1 / self._dtau) * fd.div(self._u_star) * q * fd.dx,
             self.pn,
             bcs=fd.DirichletBC(Q, 0.0, OUTFLOW),
+            constant_jacobian=True,
         )
         u, v = fd.TrialFunction(V), fd.TestFunction(V)
         correction = fd.LinearVariationalProblem(
@@ -104,6 +96,7 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
             self._u_new,
             # the same boundary values as the tentative velocity: the data, or restricted values on coarse levels
             bcs=self._solve_bcs,
+            constant_jacobian=True,
         )
         self._poisson = fd.LinearVariationalSolver(poisson)
         self._correction = fd.LinearVariationalSolver(correction)
