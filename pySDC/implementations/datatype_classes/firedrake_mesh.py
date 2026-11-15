@@ -1,5 +1,3 @@
-from functools import cache
-
 import firedrake as fd
 
 from pySDC.core.errors import DataError
@@ -7,10 +5,13 @@ from pySDC.implementations.datatype_classes.container import MultiComponentConta
 from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 
 
-@cache
 def riesz_map(V):
     """
     The L2 Riesz map of a primal space, one per space so its mass matrix is factored once.
+
+    The maps are kept on the mesh, so they go when the mesh goes. A cache that outlives the mesh would keep the mesh,
+    the factored mass matrix and their MPI communicators alive for the whole process, and MPI runs out of
+    communicators after a few hundred problems.
 
     Args:
         V (firedrake.FunctionSpace): The primal space
@@ -18,7 +19,14 @@ def riesz_map(V):
     Returns:
         firedrake.RieszMap: Maps a cofunction r to the function w with (w, v) = r(v) for all v in `V`
     """
-    return fd.RieszMap(V, 'L2', constant_jacobian=True)
+    mesh = V.mesh()
+    maps = getattr(mesh, '_pysdc_riesz_maps', None)
+    if maps is None:
+        maps = mesh._pysdc_riesz_maps = {}
+    # keyed by equality, since spaces are often rebuilt, e.g. by `Cofunction.function_space().dual()`
+    if V not in maps:
+        maps[V] = fd.RieszMap(V, 'L2', constant_jacobian=True)
+    return maps[V]
 
 
 class firedrake_mesh(object):

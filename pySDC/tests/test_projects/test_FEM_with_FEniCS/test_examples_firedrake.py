@@ -4,8 +4,6 @@ The claims of ``pySDC/projects/FEM_with_FEniCS/tests/test_examples.py``, for the
 solutions are compared through their dof vectors, which identical constructions number alike.
 """
 
-from functools import cache
-
 import pytest
 
 #: keep the runs small enough for CI; the physics is unchanged, only the number of steps (the FEniCS tests run 4)
@@ -25,17 +23,30 @@ def l2_diff(u, v):
     return fd.norm(u.functionspace - w)
 
 
-@cache
-def mlsdc(example, family, coarsening):
-    """SDC and MLSDC on 2 and 3 levels, shared by the tests that compare them."""
+@pytest.fixture(scope='module')
+def mlsdc():
+    """
+    SDC and MLSDC on 2 and 3 levels, shared by the tests that compare them. The runs are kept for this module only:
+    they hold meshes and solvers, and with them MPI communicators, of which a process has about 2000.
+    """
     from pySDC.projects.FEM_with_FEniCS.run_examples_firedrake import compare_mlsdc
 
-    return compare_mlsdc(example, family=family, coarsening=coarsening, out=lambda *a: None, **SHORT)
+    runs = {}
+
+    def get(example, family, coarsening):
+        if (example, family, coarsening) not in runs:
+            runs[(example, family, coarsening)] = compare_mlsdc(
+                example, family=family, coarsening=coarsening, out=lambda *a: None, **SHORT
+            )
+        return runs[(example, family, coarsening)]
+
+    yield get
+    runs.clear()
 
 
 @pytest.mark.firedrake
 @pytest.mark.parametrize('example, family', SAVINGS)
-def test_mlsdc_beats_sdc(example, family):
+def test_mlsdc_beats_sdc(example, family, mlsdc):
     """MLSDC on a coarser mesh must cost less than SDC, with 'work' charging each level for its dofs."""
     from pySDC.projects.FEM_with_FEniCS.setups_firedrake import get_tolerance
 
@@ -53,7 +64,7 @@ def test_mlsdc_beats_sdc(example, family):
 
 @pytest.mark.firedrake
 @pytest.mark.parametrize('example, family', SAVINGS)
-def test_h_coarsening_beats_p_coarsening(example, family):
+def test_h_coarsening_beats_p_coarsening(example, family, mlsdc):
     """Coarsen the mesh, not the element order: both converge, but the lower order buys fewer iterations."""
     from pySDC.projects.FEM_with_FEniCS.setups_firedrake import get_tolerance
 

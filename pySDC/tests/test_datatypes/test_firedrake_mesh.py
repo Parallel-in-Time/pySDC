@@ -145,6 +145,30 @@ def test_dual_norm():
 
 
 @pytest.mark.firedrake
+def test_riesz_map_lives_with_its_mesh():
+    """
+    Equal spaces share one Riesz map, and the map does not keep its mesh alive: a cache that did would keep every
+    mesh's communicators too, and a long run of many problems would exhaust MPI's.
+    """
+    import gc
+    import weakref
+
+    import firedrake as fd
+    from pySDC.implementations.datatype_classes.firedrake_mesh import riesz_map
+
+    mesh = fd.UnitIntervalMesh(4)
+    V = fd.FunctionSpace(mesh, 'CG', 2)
+    r = fd.assemble(fd.TestFunction(V) * fd.dx)
+    assert riesz_map(V) is riesz_map(r.function_space().dual())
+    riesz_map(V)(r)
+
+    alive = weakref.ref(mesh)
+    del mesh, V, r
+    gc.collect()
+    assert alive() is None, 'the Riesz map keeps its mesh alive'
+
+
+@pytest.mark.firedrake
 def test_addition_rhs(n=3, v1=1, v2=2):
     from pySDC.implementations.datatype_classes.firedrake_mesh import IMEX_firedrake_mesh
     import numpy as np
