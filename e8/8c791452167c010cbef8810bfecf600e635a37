@@ -1,0 +1,47 @@
+pySDC/implementations/transfer_classes/TransferFiredrakeMesh.py
+  s_defc4032430111::t_553bedb68c756e 175-176
+pySDC/tests/test_problems/test_heat_firedrake.py
+  s_defc4032430111::t_5b2c8fbfafd684 7,9-10,15,25,29,33-37,44,46-47,50,57-60,63,66-67
+  s_defc4032430111::t_56580bbb69d81e 38-39
+pySDC/tests/test_sweepers/test_imex_1st_order_mass_MPI.py
+  s_defc4032430111::t_c0a32fcb79b71c 44-46
+  s_defc4032430111::t_4c03034232067c 1-6,8-14,17-43
+  s_defc4032430111::t_5bc46221d9a7b5 7,15-16
+pySDC/tests/test_problems/test_form_firedrake.py
+  s_defc4032430111::t_aa6bce6ea7ef35 90-99,103-106,108,110,115-129
+pySDC/implementations/sweeper_classes/generic_implicit_MPI.py
+  s_defc4032430111::t_d8de815c22e71b 117,136-152
+  s_defc4032430111::t_0147be86ecce4b 153
+pySDC/tutorial/step_7/README.rst
+  s_defc4032430111::t_0324a1c4f871a7 12-13
+pySDC/tests/test_convergence_controllers/test_polynomial_error.py
+  s_defc4032430111::t_5bfe3239dab1ab 240-242,247,310,318
+pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py
+  s_defc4032430111::t_485d7e11224f11 93-95
+  s_defc4032430111::t_3b4d9554a7d29a 213,216-217
+  s_defc4032430111::t_2a5d4c5f777a54 17-21,45-46,82,107-108,139,144,185
+pySDC/tests/test_transfer_classes/test_firedrake_transfer.py
+  s_defc4032430111::t_5bfe3239dab1ab 7,20-21,50,64-65
+pySDC/implementations/problem_classes/HeatFiredrake.py
+  s_defc4032430111::t_a9c2de77942c38 68
+  s_defc4032430111::t_9d21cab0f8dfd5 2-3,6,8-9,11-12,34,36-37,39-43,47-48,53-54,57-58,60,64,67
+pySDC/implementations/sweeper_classes/imex_1st_order_mass_MPI.py
+  s_defc4032430111::t_ecb41403057eb8 99,106-113,115
+  s_defc4032430111::t_d8de815c22e71b 1-98,100-105,114,116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e88c791452167c010cbef8810bfecf600e635a37",
+  "prompts": {},
+  "sessions": {
+    "s_defc4032430111": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f329317f-a187-41f4-be8c-5ec2f144f3b4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
