@@ -70,7 +70,7 @@ napoleon_type_aliases = {
     'dtype_f': ':py:attr:`~pySDC.core.problem.Problem.dtype_f`',
     'matrix': 'matrix',
 }
-autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy', 'firedrake', 'gusto', 'vtk', 'vtkmodules']
+autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy', 'firedrake', 'gusto', 'ufl', 'vtk', 'vtkmodules']
 # the source of members imported from mocked modules (Firedrake, Gusto, ...) is not there to show
 viewcode_follow_imported_members = False
 
