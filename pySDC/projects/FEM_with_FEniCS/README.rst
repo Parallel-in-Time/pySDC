@@ -37,6 +37,9 @@ What is here
 ``tests/``
     Asserts the claims below, so they stay true.
 
+``setups_firedrake.py``, ``run_examples_firedrake.py``
+    The same study with the Firedrake ports of the problem classes, see `Re-measured with Firedrake`_.
+
 How to run it
 -------------
 
@@ -196,6 +199,44 @@ PFASST is the direction that is sensitive to the solution restriction: ``base_tr
 restricts ``u`` by L2 projection rather than by sampling, which the MLSDC table above cannot tell
 apart but which is worth up to a factor of two here, and on the vortex at 8 steps the difference
 between a converged answer and an O(1) wrong one.
+
+Re-measured with Firedrake
+--------------------------
+
+``run_examples_firedrake.py`` runs the whole study with the Firedrake ports of the problem classes (each reproduces
+its FEniCS original to round-off with fixed iterations), the mesh hierarchy transfer for h and the interpolation
+transfer for p, and writes ``data/fem_with_firedrake_out.txt`` and ``data/fem_with_firedrake_orders.png``:
+
+.. code-block:: bash
+
+    python -m pySDC.projects.FEM_with_FEniCS.run_examples_firedrake
+
+The one setting that cannot carry over unchanged is the residual tolerance. FEniCS measured the residual, a load
+vector, by the L2 norm of its entries read as a function; the Firedrake data types measure it in the norm dual to L2,
+which does not shrink with the mesh. ``setups_firedrake.py`` scales each FEniCS tolerance by the ratio of the two
+norms on a fine-level residual (about 8 for Gray-Scott on [0, 100], 800-1700 for the problems on [0, 1], 8700 for the
+vortex).
+
+**Result: every conclusion above holds.** High order pays and CG1 does not, h beats p, CG and DG behave the same,
+and PFASST grows 1.2-1.9x out to 8 parallel steps. Of the 109 numbers in the element-order, MLSDC and PFASST tables
+above, 86 come out identical. 7 of the rest are the vortex (below); the other 16 differ by one iteration in a few of
+the 8 steps, for instance:
+
+==========================  ===========  ======================
+config                      FEniCS       Firedrake, dual norm
+==========================  ===========  ======================
+heat CG1, 3 levels          1.05x        0.84x
+heat DG p, 2 levels         4.92 (work)  5.33 (work)
+grayscott DG h, 3 levels    1.14x        1.09x
+grayscott CG h, PFASST 2    3.75 iters   3.88 iters
+grayscott CG1, 3 levels     0.70x        0.66x
+==========================  ===========  ======================
+
+That is where the iterations stop, not a difference in the methods: the two norms are not proportional, so no single
+ratio makes every stopping decision come out the same. Measuring the residual the FEniCS way, with the FEniCS
+tolerances, Firedrake reproduces these five exactly (the other eleven were not rerun that way). The vortex is the exception (SDC 5.50 against 5.75, MLSDC
+0.74x/0.69x against 0.73x/0.67x): DOLFIN's ``refine`` triangulates the square differently from any Firedrake mesh,
+so it is a slightly different discretization.
 
 Why earlier attempts did not pay off
 ------------------------------------
