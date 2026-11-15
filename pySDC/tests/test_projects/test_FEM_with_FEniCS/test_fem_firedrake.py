@@ -111,10 +111,10 @@ def test_study_heat_h():
     1.57x on three), and MLSDC converges to the SDC solution.
     """
     import numpy as np
-    from pySDC.projects.FEM_with_FEniCS.run_examples_firedrake import _diff, compare_mlsdc
+    from pySDC.projects.FEM_with_FEniCS.run_examples_firedrake import compare_mlsdc, l2_diff
 
     results = compare_mlsdc('heat', out=lambda *args: None)
     speedups = [results[1]['work'] / results[n]['work'] for n in (2, 3)]
     assert np.allclose(speedups, [1.24, 1.57], atol=0.01), speedups
     for n in (2, 3):
-        assert _diff(results[n]['uend'], results[1]['uend']) < 1e-8
+        assert l2_diff(results[n]['uend'], results[1]['uend']) < 1e-8

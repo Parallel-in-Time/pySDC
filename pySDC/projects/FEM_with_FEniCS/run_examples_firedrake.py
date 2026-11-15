@@ -6,6 +6,7 @@ the setups of :mod:`pySDC.projects.FEM_with_FEniCS.setups_firedrake`. Writes the
 
 from pathlib import Path
 
+import firedrake as fd
 import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
@@ -16,10 +17,9 @@ from pySDC.projects.FEM_with_FEniCS.setups_firedrake import (
     get_description,
     get_families,
     get_order_study,
+    get_pfasst_procs,
     norm_ratio,
 )
-
-PFASST_PROCS = (1, 2, 4, 8)
 
 #: Cost of one solution restriction as a fraction of one fine-level sweep. Measured across the
 #: examples as 0.006-0.014 for the L2 projection and 0.023-0.037 for point sampling, so it is a
@@ -60,14 +60,15 @@ def run(example, nlevels=1, num_procs=1, **kwargs):
     }
 
 
-def _diff(u, v):
-    """Max norm of the difference of two end points; separate runs build separate (identical) meshes."""
-    parts = (
-        [(u.dat.data_ro, v.dat.data_ro)]
-        if isinstance(u.dat.data_ro, np.ndarray)
-        else zip(u.dat.data_ro, v.dat.data_ro, strict=True)
-    )
-    return max(np.abs(a - b).max() for a, b in parts)
+def l2_diff(u, v):
+    """
+    L2 norm of the difference of two end points. Separate runs build separate (identical) meshes, so the
+    coefficients of `v` are copied onto the space of `u` first.
+    """
+    w = fd.Function(u.functionspace.function_space())
+    with v.dat.vec_ro as source, w.dat.vec_wo as target:
+        source.copy(target)
+    return fd.norm(u.functionspace - w)
 
 
 def compare_mlsdc(example, family='CG', coarsening='h', out=print, **kwargs):
@@ -82,7 +83,7 @@ def compare_mlsdc(example, family='CG', coarsening='h', out=print, **kwargs):
     out(f'  {"levels":>7s} {"dofs":>22s} {"niter":>7s} {"work":>7s} {"speed-up":>9s} {"|u - u_SDC|":>12s}')
     for nlevels, res in results.items():
         speedup = ref['work'] / res['work']
-        diff = _diff(res['uend'], ref['uend'])
+        diff = l2_diff(res['uend'], ref['uend'])
         out(
             f'  {nlevels:7d} {str(res["dofs"]):>22s} {res["niter"]:7.2f} {res["work"]:7.2f} '
             f'{speedup:8.2f}x {diff:12.2e}'
@@ -92,7 +93,7 @@ def compare_mlsdc(example, family='CG', coarsening='h', out=print, **kwargs):
 
 def check_pfasst(example, nlevels=2, family='CG', coarsening='h', procs=None, out=print, **kwargs):
     """PFASST over a growing number of parallel steps. Returns the results keyed by num_procs."""
-    procs = PFASST_PROCS if procs is None else procs
+    procs = get_pfasst_procs(example) if procs is None else procs
     results = {
         p: run(example, nlevels=nlevels, num_procs=p, family=family, coarsening=coarsening, **kwargs) for p in procs
     }
@@ -101,7 +102,7 @@ def check_pfasst(example, nlevels=2, family='CG', coarsening='h', procs=None, ou
     out(f'\n{example} [{family}, {coarsening}]: PFASST with {nlevels} levels, iterations over parallel steps')
     out(f'  {"procs":>6s} {"niter":>7s} {"|u - u_serial|":>15s}')
     for p, res in results.items():
-        out(f'  {p:6d} {res["niter"]:7.2f} {_diff(res["uend"], ref["uend"]):15.2e}')
+        out(f'  {p:6d} {res["niter"]:7.2f} {l2_diff(res["uend"], ref["uend"]):15.2e}')
     return results
 
 

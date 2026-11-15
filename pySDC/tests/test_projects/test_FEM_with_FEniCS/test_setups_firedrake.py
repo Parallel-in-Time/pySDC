@@ -126,6 +126,7 @@ def test_tolerance_lookup():
         ({'example': 'heat', 'nlevels': 4}, 'nlevels must be'),
         ({'example': 'heat', 'family': 'RT'}, 'unknown family'),
         ({'example': 'heat', 'coarsening': 'hp'}, 'unknown coarsening'),
+        ({'example': 'heat', 'nlevels': 2, 'coarsening': 'p', 'order': 1}, 'only applies to h-coarsening'),
     ],
 )
 def test_bad_input_raises(kwargs, match):

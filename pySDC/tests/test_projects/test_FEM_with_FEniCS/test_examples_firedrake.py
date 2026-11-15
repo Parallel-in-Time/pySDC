@@ -14,13 +14,10 @@ CASES = SAVINGS + [('vortex', 'CG')]
 
 
 def l2_diff(u, v):
-    """L2 norm of the difference of two solutions of identically built problems."""
-    import firedrake as fd
+    """L2 norm of the difference of two solutions of identically built problems, as the study reports it."""
+    from pySDC.projects.FEM_with_FEniCS.run_examples_firedrake import l2_diff
 
-    w = fd.Function(u.functionspace.function_space())
-    with v.dat.vec_ro as source, w.dat.vec_wo as target:
-        source.copy(target)
-    return fd.norm(u.functionspace - w)
+    return l2_diff(u, v)
 
 
 @pytest.fixture(scope='module')

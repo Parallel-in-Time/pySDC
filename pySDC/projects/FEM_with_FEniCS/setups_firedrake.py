@@ -190,6 +190,8 @@ def get_description(
         orders = [degree] * nlevels
         transfer = MeshToMeshFiredrakeHierarchy
     else:
+        if order is not None:
+            raise ValueError('the order override only applies to h-coarsening')
         fine = fd.MeshHierarchy(s['base_mesh'](), s['refinements'][0])[-1]
         refinements = [s['refinements'][0]] * nlevels
         meshes = [fine] * nlevels
@@ -202,7 +204,7 @@ def get_description(
         problem_params['penalty'] = [SIGMA * orders[0] ** 2 * 2 ** (refinements[0] - r) for r in refinements]
 
     if restol is None:
-        restol = s['restol'] * norm_ratio(example, family)
+        restol = s['restol'] * norm_ratio(example, family, order)
     description = {
         'problem_class': s['classes'][family],
         'problem_params': problem_params,
@@ -222,18 +224,24 @@ def get_description(
 _RATIOS = {}
 
 
-def norm_ratio(example, family):
+def norm_ratio(example, family, order=None):
     """
-    Ratio of the dual norm to the FEniCS norm of a residual on the fine level, measured once per example and family on
-    the residual after two SDC iterations of the first step.
+    Ratio of the dual norm to the FEniCS norm of a residual on the fine level, measured once per example, family and
+    element order on the residual after two SDC iterations of the first step. The ratio depends on the order and the
+    mesh, so each order of the element-order study gets its own.
+
+    Args:
+        example (str): One of :data:`EXAMPLES`
+        family (str): 'CG' or 'DG'
+        order (int, optional): Degree, as for :func:`get_description`; by default the example's
 
     Returns:
         float: |r|_dual / |r|_FEniCS
     """
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-    if (example, family) not in _RATIOS:
-        description, controller_params, t0, _ = get_description(example, family=family, restol=-1.0)
+    if (example, family, order) not in _RATIOS:
+        description, controller_params, t0, _ = get_description(example, family=family, order=order, restol=-1.0)
         description['step_params']['maxiter'] = 2
         controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
         L = controller.MS[0].levels[0]
@@ -244,5 +252,5 @@ def norm_ratio(example, family):
         entries = fd.Function(P.V)
         with res.dat.vec_ro as source, entries.dat.vec_wo as target:
             source.copy(target)
-        _RATIOS[(example, family)] = abs(res) / fd.norm(entries)
-    return _RATIOS[(example, family)]
+        _RATIOS[(example, family, order)] = abs(res) / fd.norm(entries)
+    return _RATIOS[(example, family, order)]

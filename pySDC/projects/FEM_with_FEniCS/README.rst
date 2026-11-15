@@ -219,7 +219,7 @@ vortex).
 
 **Result: every conclusion above holds.** High order pays and CG1 does not, h beats p, CG and DG behave the same,
 and PFASST grows 1.2-1.9x out to 8 parallel steps. Of the 109 numbers in the element-order, MLSDC and PFASST tables
-above, 86 come out identical. 7 of the rest are the vortex (below); the other 16 differ by one iteration in a few of
+above, 87 come out identical. 7 of the rest are the vortex (below); the other 15 differ by one iteration in a few of
 the 8 steps, for instance:
 
 ==========================  ===========  ======================
@@ -229,14 +229,14 @@ heat CG1, 3 levels          1.05x        0.84x
 heat DG p, 2 levels         4.92 (work)  5.33 (work)
 grayscott DG h, 3 levels    1.14x        1.09x
 grayscott CG h, PFASST 2    3.75 iters   3.88 iters
-grayscott CG1, 3 levels     0.70x        0.66x
+grayscott CG1, 3 levels     0.70x        0.65x
 ==========================  ===========  ======================
 
 That is where the iterations stop, not a difference in the methods: the two norms are not proportional, so no single
 ratio makes every stopping decision come out the same. Measuring the residual the FEniCS way, with the FEniCS
-tolerances, Firedrake reproduces these five exactly (the other eleven were not rerun that way). The vortex is the exception (SDC 5.50 against 5.75, MLSDC
-0.74x/0.69x against 0.73x/0.67x): DOLFIN's ``refine`` triangulates the square differently from any Firedrake mesh,
-so it is a slightly different discretization.
+tolerances, Firedrake reproduces these five exactly (the other ten were not rerun that way). The vortex is the exception
+(SDC 5.50 against 5.75, MLSDC 0.74x/0.69x against 0.73x/0.67x): DOLFIN's ``refine`` triangulates the square differently
+from any Firedrake mesh, so it is a slightly different discretization.
 
 Why earlier attempts did not pay off
 ------------------------------------
