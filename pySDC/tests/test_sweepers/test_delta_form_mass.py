@@ -100,6 +100,34 @@ def test_delta_implicit_mass_matches_generic_implicit_mass(with_delta_solve, QI,
 
 
 @pytest.mark.base
+def test_handed_down_residual():
+    """
+    Given a residual from the transfer (`eps_in`), the mass-form delta sweeper uses it as it is, and advances it by
+    the load vectors of the corrections: r - M delta + dt Q dF.
+    """
+    import numpy as np
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit_mass
+
+    controller, _ = run(mass_heat_class(False), {}, delta_implicit_mass, 0.05, 1, 1)
+    S = controller.MS[0].levels[0].sweep
+    P = S.level.prob
+    rng = np.random.default_rng(0)
+    eps, deltas, dfs = ([P._wrap(rng.normal(size=P.nvars)) for _ in range(S.coll.num_nodes)] for _ in range(3))
+
+    S.eps_in = eps
+    try:
+        assert S._residual_nodes() is eps
+        advanced = S.advance_residual(eps, deltas, dfs)
+    finally:
+        S.eps_in = None
+
+    dt, Q = S.level.dt, S.coll.Qmat
+    for m in range(S.coll.num_nodes):
+        expect = eps[m] - P.M @ deltas[m] + sum(dt * Q[m + 1, j + 1] * dfs[j] for j in range(S.coll.num_nodes))
+        assert np.allclose(advanced[m], expect, rtol=0, atol=1e-14)
+
+
+@pytest.mark.base
 def test_linear_implicit_is_refused():
     from pySDC.core.errors import ParameterError
     from pySDC.implementations.sweeper_classes.delta_form import delta_implicit_mass

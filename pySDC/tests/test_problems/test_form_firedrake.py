@@ -297,6 +297,57 @@ def test_solve_system_and_caching():
 
 
 @pytest.mark.firedrake
+@pytest.mark.parametrize('stop', [True, False])
+def test_newton_divergence(stop):
+    """
+    A Newton solve that does not converge stops the run, or, with `stop_at_divergence=False`, is logged and its last
+    iterate returned.
+    """
+    import firedrake as fd
+    import numpy as np
+    from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
+
+    V = fd.FunctionSpace(fd.UnitIntervalMesh(8), 'CG', 2)
+    params = nonlinear_forms(V, 0.1, False)
+    # one Newton step from zero cannot reach these tolerances on the cubic reaction
+    params['solver_parameters'] = {'snes_max_it': 1, 'snes_rtol': 1e-14, 'snes_atol': 1e-15}
+    P = FormFiredrake(**params, stop_at_divergence=stop)
+    rhs = P.apply_mass_matrix(P.u_exact(0.3))
+
+    if stop:
+        with pytest.raises(fd.exceptions.ConvergenceError):
+            P.solve_system(rhs, 0.5, P.u_init, 0.3)
+    else:
+        u = P.solve_system(rhs, 0.5, P.u_init, 0.3)
+        assert np.isfinite(abs(u)) and abs(u) > 0
+
+
+@pytest.mark.firedrake
+def test_spatial_error_floor_needs_its_parameters():
+    """The residual floor cannot do without the coarse space and the end time, and says which one is missing."""
+    import firedrake as fd
+    from pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake import (
+        SpatialErrorFloorFiredrake,
+    )
+    from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
+    from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+
+    coarse_mesh, fine_mesh = fd.MeshHierarchy(fd.UnitIntervalMesh(4), 1)
+    coarse_space = fd.FunctionSpace(coarse_mesh, 'CG', 2)
+    for given, missing in [({'coarse_space': coarse_space}, 'Tend'), ({'Tend': 1.0}, 'coarse_space')]:
+        with pytest.raises(AssertionError, match=missing):
+            run(
+                FormFiredrake,
+                nonlinear_forms(fd.FunctionSpace(fine_mesh, 'CG', 2), 0.1, False),
+                generic_implicit_mass,
+                0.1,
+                0.1,
+                1,
+                convergence_controllers={SpatialErrorFloorFiredrake: given},
+            )
+
+
+@pytest.mark.firedrake
 @pytest.mark.parametrize('n_coarse, saves_iterations', [(4, True), (64, False)])
 def test_spatial_error_floor(n_coarse, saves_iterations):
     """
