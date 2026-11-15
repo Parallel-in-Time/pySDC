@@ -129,18 +129,6 @@ def taylor_green(dt, Tend, periodic, num_nodes, maxiter, restol, nelems, nu):
     return P, uend
 
 
-def relative_differences(u, ref):
-    """Relative L2 differences in velocity and pressure of two solutions of identically built problems."""
-    import firedrake as fd
-
-    difference = fd.Function(ref.function_space())
-    for d, a, b in zip(difference.dat.data_wo, u.dat.data_ro, ref.dat.data_ro, strict=True):
-        d[:] = a - b
-    return [
-        fd.norm(d) / fd.norm(r) for d, r in zip(difference.subfunctions, ref.functionspace.subfunctions, strict=True)
-    ]
-
-
 @pytest.mark.firedrake
 @pytest.mark.parametrize('periodic', [False, True])
 def test_taylor_green_reproduces_FEniCS(periodic):
@@ -164,17 +152,17 @@ def test_taylor_green_order_reduction():
     """
     The finding of the FEniCS version: with four RADAU-RIGHT nodes, the same exact solution reaches the design order
     7 with periodic boundaries in x, while time-dependent Dirichlet data there pulls the pressure down towards the
-    stiff order 5. Consecutive step sizes are compared with each other, which cancels the spatial error.
+    stiff order 5. Consecutive step sizes are compared with each other, which cancels the spatial error. This is the
+    order study of the project's run script, on a coarser mesh.
     """
-    import numpy as np
+    from pySDC.projects.StroemungsRaum.run_Navier_Stokes_TaylorGreen_Firedrake import observed_order, order_study
 
     dts, Tend, num_nodes = [0.2, 0.1, 0.05, 0.025], 0.2, 4
     orders, finest = {}, {}
     for periodic in [True, False]:
-        solutions = [taylor_green(dt, Tend, periodic, num_nodes, 40, 1e-11, 16, 0.1)[1] for dt in dts]
-        errors = np.array([relative_differences(u, ref) for u, ref in zip(solutions[:-1], solutions[1:], strict=True)])
-        orders[periodic] = np.log2(errors[:-1] / errors[1:])[-1]
-        finest[periodic] = errors[-1]
+        dts_out, errors_u, errors_p = order_study(dts, Tend, periodic=periodic, nelems=16, num_nodes=num_nodes)
+        orders[periodic] = [observed_order(dts_out, errors)[-1] for errors in (errors_u, errors_p)]
+        finest[periodic] = [errors_u[-1], errors_p[-1]]
 
     design, stiff = 2 * num_nodes - 1, num_nodes + 1
     assert orders[True][0] > design - 1.0, orders
