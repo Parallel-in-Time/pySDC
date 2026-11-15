@@ -4,7 +4,6 @@ from pySDC.core.errors import DataError
 from pySDC.implementations.datatype_classes.container import MultiComponentContainer
 from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 
-
 #: how :func:`riesz_map` solves with the mass matrix, accurate to round-off
 MASS_SOLVER = {'ksp_type': 'cg', 'pc_type': 'jacobi', 'ksp_rtol': 1e-14, 'ksp_atol': 0.0}
 
