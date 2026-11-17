@@ -383,7 +383,7 @@ def test_newton_divergence(stop):
 def test_spatial_error_floor_needs_its_parameters():
     """
     The residual floor cannot do without the coarse space and the end time, and says which one is missing. It also
-    refuses a relative residual and more than one step at a time.
+    refuses a relative residual, but not several steps at a time.
     """
     import firedrake as fd
     from pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake import (
@@ -408,7 +408,7 @@ def test_spatial_error_floor_needs_its_parameters():
                 convergence_controllers={SpatialErrorFloorFiredrake: given},
             )
 
-    # a relative residual is not comparable with the error, and in a PFASST block one step would stop all of them
+    # a relative residual is not comparable with the error
     def description(residual_type):
         return {
             'problem_class': FormFiredrake,
@@ -422,17 +422,26 @@ def test_spatial_error_floor_needs_its_parameters():
 
     with pytest.raises(AssertionError, match='last_rel'):
         controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description('last_rel'))
-    with pytest.raises(NotImplementedError, match='one step at a time'):
-        controller_nonMPI(num_procs=2, controller_params={'logger_level': 30}, description=description('last_abs'))
-    controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description('last_abs'))
+    for num_procs in [1, 2]:
+        controller_nonMPI(
+            num_procs=num_procs, controller_params={'logger_level': 30}, description=description('last_abs')
+        )
+
+
+#: iterations per step of the residual floor on the 8-cell mesh in serial, from before it could run PFASST, when it
+#: stopped its step through `force_done`; it has to stop at the same iterations now that it sets `done`
+SPATIAL_ERROR_FLOOR_ITERATIONS = [4, 4, 4, 4, 4, 5, 5, 5, 5, 5]
 
 
 @pytest.mark.firedrake
-@pytest.mark.parametrize('n_coarse, saves_iterations', [(4, True), (64, False)])
-def test_spatial_error_floor(n_coarse, saves_iterations):
+@pytest.mark.parametrize(
+    'n_coarse, num_procs, saves_iterations', [(4, 1, True), (64, 1, False), (4, 2, True), (4, 4, True)]
+)
+def test_spatial_error_floor(n_coarse, num_procs, saves_iterations):
     """
     With a large spatial error (8 cells), the residual floor from the spatial error estimate stops the iterations
-    early without losing accuracy. With a small one (128 cells), the time error dominates and restol decides alone.
+    early without losing accuracy, in SDC and in PFASST on 2 and 4 steps. With a small one (128 cells), the time error
+    dominates and restol decides alone.
     """
     import firedrake as fd
     import numpy as np
@@ -443,37 +452,49 @@ def test_spatial_error_floor(n_coarse, saves_iterations):
     )
     from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+    from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
 
     coarse_mesh, fine_mesh = fd.MeshHierarchy(fd.UnitIntervalMesh(n_coarse), 1)
     coarse_space = fd.FunctionSpace(coarse_mesh, 'CG', 2)
-    params = nonlinear_forms(fd.FunctionSpace(fine_mesh, 'CG', 2), 0.1, False, smooth=False)
+    # PFASST coarsens to the mesh the floor compares with, SDC runs on the fine mesh alone
+    spaces = [fd.FunctionSpace(fine_mesh, 'CG', 2)] + ([coarse_space] if num_procs > 1 else [])
+    per_level = [nonlinear_forms(V, 0.1, False, smooth=False) for V in spaces]
 
     def go(convergence_controllers):
         description = {
             'problem_class': FormFiredrake,
-            'problem_params': params,
+            'problem_params': {key: [forms[key] for forms in per_level] for key in per_level[0]},
             'sweeper_class': generic_implicit_mass,
             'sweeper_params': SWEEPER_PARAMS,
             'level_params': {'dt': 0.1, 'restol': 1e-8},
             'step_params': {'maxiter': 50},
+            'base_transfer_class': base_transfer_mass,
+            'space_transfer_class': MeshToMeshFiredrakeHierarchy,
             'convergence_controllers': convergence_controllers,
         }
-        controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+        controller = controller_nonMPI(
+            num_procs=num_procs, controller_params={'logger_level': 30}, description=description
+        )
         P = controller.MS[0].levels[0].prob
         uend, stats = controller.run(u0=P.u_exact(0), t0=0, Tend=1.0)
         # the L2 error against the exact solution itself: its interpolant would hide the spatial error
         P.t.assign(1.0)
         error = fd.sqrt(fd.assemble((P.u_exact_expr - uend.functionspace) ** 2 * fd.dx(degree=10)))
-        return sum(me[1] for me in get_sorted(stats, type='niter')), error
+        return [me[1] for me in get_sorted(stats, type='niter', sortby='time')], error, uend.functionspace
 
-    iterations_restol, error_restol = go({})
-    iterations, error = go({SpatialErrorFloorFiredrake: {'coarse_space': coarse_space, 'Tend': 1.0}})
+    iterations_restol, error_restol, u_restol = go({})
+    iterations, error, u = go({SpatialErrorFloorFiredrake: {'coarse_space': coarse_space, 'Tend': 1.0}})
 
     assert np.isclose(error, error_restol, rtol=1e-3), (error, error_restol)
+    # what the floor leaves of the iteration error is well within the spatial error
+    assert fd.norm(u - u_restol) < 0.1 * error_restol, (fd.norm(u - u_restol), error_restol)
     if saves_iterations:
-        assert iterations < 0.7 * iterations_restol, (iterations, iterations_restol)
+        assert sum(iterations) < 0.7 * sum(iterations_restol), (iterations, iterations_restol)
     else:
         assert iterations == iterations_restol, (iterations, iterations_restol)
+    if num_procs == 1 and saves_iterations:
+        assert iterations == SPATIAL_ERROR_FLOOR_ITERATIONS, iterations
 
 
 def two_component_forms(V0, kind):
