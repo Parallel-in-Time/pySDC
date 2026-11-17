@@ -37,6 +37,9 @@ What is here
 ``tests/``
     Asserts the claims below, so they stay true.
 
+``setups_firedrake.py``, ``run_examples_firedrake.py``
+    The same study with the Firedrake ports of the problem classes, see `The study with Firedrake`_.
+
 How to run it
 -------------
 
@@ -196,6 +199,71 @@ PFASST is the direction that is sensitive to the solution restriction: ``base_tr
 restricts ``u`` by L2 projection rather than by sampling, which the MLSDC table above cannot tell
 apart but which is worth up to a factor of two here, and on the vortex at 8 steps the difference
 between a converged answer and an O(1) wrong one.
+
+The study with Firedrake
+------------------------
+
+``run_examples_firedrake.py`` runs the whole study with the Firedrake problem classes, the mesh hierarchy transfer for
+h and the interpolation transfer for p, and writes ``data/fem_with_firedrake_out.txt`` and
+``data/fem_with_firedrake_orders.png`` (8 minutes on a laptop):
+
+.. code-block:: bash
+
+    python -m pySDC.projects.FEM_with_FEniCS.run_examples_firedrake
+
+The problem classes follow Firedrake's conventions: its default Lagrange nodes (Gauss-Lobatto points) and default
+triangulation. The residual is a load vector, measured in the norm dual to :math:`L^2`, i.e. the :math:`L^2` norm of
+the function it represents. That norm does not depend on the mesh, so one tolerance per example serves every family,
+element order and level: 2e-9 for ``heat``, 1e-6 for ``burgers``, 1e-8 for ``grayscott`` and 1e-7 for ``vortex``.
+
+**High order pays, CG1 does not.** MLSDC speed-up over SDC on 2 / 3 levels (h-coarsening, equal fine-level dofs):
+
+=============  =============  =============  =============
+example        CG1            CG2            CG4
+=============  =============  =============  =============
+``heat``       0.93x / 0.84x  1.24x / 1.05x  1.24x / 1.57x
+``burgers``    0.83x / 0.73x  0.87x / 0.73x  1.30x / 1.94x
+``grayscott``  0.77x / 0.65x  0.83x / 0.70x  1.14x / 1.11x
+=============  =============  =============  =============
+
+**Coarsen the mesh, not the order.** At CG4, coarsening in the element order (p) instead of the mesh (h) gives 1.24x /
+1.05x instead of 1.24x / 1.57x for ``heat``, 0.87x / 0.73x instead of 1.30x / 1.94x for ``burgers`` and 0.83x / 0.70x
+instead of 1.14x / 1.11x for ``grayscott``.
+
+**CG and DG behave the same.** With h-coarsening, the DG versions take exactly the iterations of the CG ones on every
+level, and give the same speed-ups.
+
+**PFASST** on 2 levels takes 1.5-2x the iterations of serial MLSDC on 8 parallel steps (``heat`` 3.00 to 4.50,
+``burgers`` 2.00 to 4.00, ``grayscott`` 3.62 to 5.38, ``vortex`` 5.25 to 10.38 per step), and stays within the
+examples' tolerances of the serial solution.
+
+**The vortex is not a savings case.** A coarse level costs more than it saves there (0.79x on 2 levels, 0.72x on 3),
+but MLSDC and PFASST still reach the SDC solution.
+
+Stopping at the spatial error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A residual tolerance is a guess at how accurate the time stepping needs to be. Below the error of the spatial
+discretization, further iterations cannot make the solution more accurate. ``get_description(...,
+spatial_error_floor=True)`` adds the convergence controller
+:class:`~pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake`,
+which also stops a step once its residual is below its share :math:`e_x \Delta t / T` of the spatial error :math:`e_x`.
+It estimates :math:`e_x` once per step from what the next coarser mesh of the hierarchy cannot represent. The study
+runs it for SDC and 2-level MLSDC (CG, h), iterations per step, 8 steps:
+
+=============  =====================  =======================  ===============  =============
+example        SDC: restol / + floor  MLSDC: restol / + floor  change in u      spatial error
+=============  =====================  =======================  ===============  =============
+``heat``       5.75 / 5.75            3.00 / 3.00              0                1.5e-16
+``burgers``    4.00 / 4.00            2.00 / 2.00              0                5.6e-11
+``grayscott``  6.38 / 6.38            3.62 / 3.62              0                4.6e-08
+``vortex``     5.38 / 1.25            5.25 / 1.12              1.6e-2 / 6.9e-3  9.9e-02
+=============  =====================  =======================  ===============  =============
+
+The three 1D problems are resolved in space far beyond their residual tolerance, so the floor never stops a step
+early. The vortex is not: its spatial error is about 0.1, and one sweep per step already gets the time stepping below
+its share of it. Stopping there saves four of every five iterations, and the solution moves by much less than its
+spatial error. The controller works on one step at a time, so it is not used with PFASST.
 
 Why earlier attempts did not pay off
 ------------------------------------
