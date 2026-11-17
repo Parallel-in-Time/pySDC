@@ -280,97 +280,16 @@ jobs:
             data_libpressio
             coverage_libpressio.dat
 
-  user_firedrake_tests:
-    runs-on: ubuntu-latest
-    container:
-      # Tag 2026.10.0
-      image: firedrakeproject/firedrake-vanilla-default@sha256:b3f8026897fe982b345227e36085b89430f98b389fdd1152a4d24619aa598744
-      options: --user root
-      volumes:
-        - ${{ github.workspace }}:/repositories
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-      - name: Fix HOME
-        # For unknown reasons GitHub actions overwrite HOME to /github/home
-        # which will break everything unless fixed
-        # (https://github.com/actions/runner/issues/863)
-        run: echo "HOME=/home/firedrake" >> "$GITHUB_ENV"
-      - name: Checkout pySDC
-        uses: actions/checkout@v7
-        with: 
-          path: ./pySDC
-      - name: Checkout gusto
-        uses: actions/checkout@v7
-        with:
-          repository: firedrakeproject/gusto
-          path: ./gusto_repo
-          # Gusto has no releases; main as of 2026-11-11, tested against Firedrake 2026.10.0
-          ref: b81bc873b0a21a88aa8455e43f53cc2c9c3e3c1c
-      - name: Create virtual environment
-        # pass '--system-site-packages' so Firedrake can be found
-        run: python3 -m venv --system-site-packages venv-pySDC
-
-      - name: Install pySDC
-        run: |
-          . venv-pySDC/bin/activate
-          pip install -e /repositories/pySDC
-          # The Firedrake image ships mpi-pytest for its own suite, but don't depend on that:
-          # the MPI tests here are collected through its `parallel` marker.
-          pip install "mpi-pytest>=2026.0"
-          # test installation
-          python -c "import pySDC; print(f'pySDC module: {pySDC}')"
-          # what Firedrake needs but does not declare, see etc/environment-firedrake.yml
-          python -c "import sys, numpy; v = tuple(int(x) for x in numpy.__version__.split('.')[:2]); assert sys.version_info >= (3, 11) and v >= (2, 1), f'Firedrake needs Python >= 3.11 and NumPy >= 2.1, got {sys.version_info[:2]} and {numpy.__version__}'"
-      - name: Install gusto
-        run: |
-          . venv-pySDC/bin/activate
-          pip install -e /repositories/gusto_repo
-          # test installation
-          python -c "import gusto; print(f'gusto module: {gusto}')"
-      - name: run pytest
-        run: |
-          . venv-pySDC/bin/activate
-          firedrake-clean
-          # `cd /repositories/pySDC`, not `./pySDC`: the container mounts the workspace at
-          # /repositories, so those are the same directory reached by two different paths. pySDC is
-          # installed editable from /repositories/pySDC, so that is the prefix its modules report,
-          # and `source = ['pySDC']` only matches when the working directory agrees -- sitting in
-          # ./pySDC is why this job has always measured nothing. `..` is the workspace either way,
-          # so the moves in the next step are unaffected.
-          cd /repositories/pySDC
-          # the projects' tests run in their own jobs, see user_firedrake_tests_conda
-          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 --ignore=/repositories/pySDC/pySDC/tests/test_projects" \
-            bash etc/run_mpi_tests.sh /repositories/pySDC/pySDC/tests firedrake
-        timeout-minutes: 45
-      - name: Make coverage report
-        run: |
-
-          cd /repositories/pySDC
-          mv data ../data_firedrake
-          coverage combine
-          mv .coverage ../coverage_firedrake.dat
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-artifacts-firedrake
-          path: |
-            data_firedrake
-            coverage_firedrake.dat
-
   user_firedrake_tests_conda:
-    # The Firedrake tests of user_firedrake_tests without the Docker image: Firedrake pip-installed on
-    # top of conda-forge's PETSc (see etc/environment-firedrake.yml), which also works on macOS. The
-    # Gusto tests stay in the Docker job only: Gusto has no releases and follows Firedrake's own images.
-    # The two Firedrake projects run here only, each in its own job of the matrix, in parallel with the
-    # library tests, as the other projects do in project_cpu_tests_linux; they take more than half the
-    # Firedrake test time.
+    # The Firedrake and Gusto tests, without Firedrake's Docker image: Firedrake pip-installed on top of
+    # conda-forge's PETSc (see etc/environment-firedrake.yml), which also works on macOS. The Gusto tests and
+    # the two Firedrake projects run each in its own job of the matrix, in parallel with the library tests, as
+    # the other projects do in project_cpu_tests_linux; together they take more than half the test time.
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        suite: [library, FEM_with_Firedrake, StroemungsRaum]
+        suite: [library, Gusto, FEM_with_Firedrake, StroemungsRaum]
     env:
       # must match the petsc4py pin in etc/environment-firedrake.yml
       FIREDRAKE_VERSION: '2026.10.0'
@@ -402,6 +321,13 @@ jobs:
           pip install --no-build-isolation --no-deps "firedrake==$FIREDRAKE_VERSION"
           # then its Python dependencies, which the step above skipped
           pip install "firedrake==$FIREDRAKE_VERSION"
+      - name: Install Gusto
+        if: matrix.suite == 'Gusto'
+        # Gusto has no releases; main as of 2026-11-11, tested against Firedrake 2026.10.0. Its netCDF4 and
+        # vtk come from the conda environment, built against the same MPI and HDF5.
+        run: |
+          pip install --no-deps "gusto @ git+https://github.com/firedrakeproject/gusto@b81bc873b0a21a88aa8455e43f53cc2c9c3e3c1c"
+          python -c "import gusto; print(f'gusto module: {gusto}')"
       - name: Install pySDC
         run: |
           pip install --no-deps -e .
@@ -413,25 +339,26 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
+          LIBRARY="coverage run -m pytest --continue-on-collection-errors -v --durations=0 --ignore=pySDC/tests/test_projects"
           if [ "${{ matrix.suite }}" = library ]; then
-            PYTEST="coverage run -m pytest --continue-on-collection-errors -v --durations=0 --ignore=pySDC/tests/test_projects" \
-              bash etc/run_mpi_tests.sh pySDC/tests 'firedrake and not gusto'
+            PYTEST="$LIBRARY" bash etc/run_mpi_tests.sh pySDC/tests 'firedrake and not gusto'
+          elif [ "${{ matrix.suite }}" = Gusto ]; then
+            PYTEST="$LIBRARY" bash etc/run_mpi_tests.sh pySDC/tests gusto
           else
-            bash etc/run_mpi_tests.sh pySDC/tests/test_projects/test_${{ matrix.suite }} 'firedrake and not gusto'
+            bash etc/run_mpi_tests.sh pySDC/tests/test_projects/test_${{ matrix.suite }} firedrake
           fi
         timeout-minutes: 45
       - name: Make coverage report
         run: |
           coverage combine
           mv .coverage coverage_firedrake_conda_${{ matrix.suite }}.dat
-          # the projects' plots go where the docs look for Firedrake results, e.g. the FEM study's gallery picture
-          if [ "${{ matrix.suite }}" != library ] && [ -d data ]; then mv data data_firedrake; fi
+          # where the docs look for Firedrake results: tutorial step 7 D, E and G, and the FEM study's gallery picture
+          if [ -d data ]; then mv data data_firedrake; fi
       - name: Uploading artifacts
         uses: actions/upload-artifact@v7
         with:
           name: test-artifacts-firedrake-conda-${{ matrix.suite }}
           path: |
-            data
             data_firedrake
             coverage_firedrake_conda_${{ matrix.suite }}.dat
 
@@ -489,7 +416,7 @@ jobs:
     # every one of those images would be missing. The same goes for the tutorial
     # results included from `data/`, among them step 7 F's from the GPU job, so a
     # pull request from a fork, which cannot reach the GPUs, gets no docs build.
-    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_firedrake_tests_conda, user_monodomain_tests_linux, gpu_hardware_tests]
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests_conda, user_monodomain_tests_linux, gpu_hardware_tests]
     defaults:
       run:
         shell: bash -l {0}
@@ -546,7 +473,7 @@ jobs:
     if: >-
       (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
       && !cancelled()
-    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_firedrake_tests_conda, user_monodomain_tests_linux, gpu_hardware_tests]
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests_conda, user_monodomain_tests_linux, gpu_hardware_tests]
     permissions:
       # write: push the data branch on master. GitHub downgrades it to read for pull requests from forks.
       contents: write

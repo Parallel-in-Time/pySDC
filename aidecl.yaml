@@ -2,7 +2,7 @@ schema_version: 1.0.0
 project:
   name: pySDC
   repository: github.com/Parallel-in-Time/pySDC
-  version: '5.9'
+  version: '5.10'
   license: BSD-2-Clause
   content_type: software
 ai_usage:
@@ -29,17 +29,19 @@ ai_usage:
         - 'Counts as AI-generated: PRs authored by the Copilot coding agent'
         - 'Counts as AI-assisted: human-authored PRs it reviewed'
   code_proportion:
-    ai_generated_percent: 19
-    ai_assisted_percent: 2
-    human_only_percent: 79
+    ai_generated_percent: 25
+    ai_assisted_percent: 0
+    human_only_percent: 75
     method: audit_estimated
     estimation_notes: >-
-      Ballpark, from git blame over all tracked code files on master (~166k lines, .py/.sh/.yml/.toml/.cfg),
+      Ballpark, from git blame over all tracked code files on master (~171k lines, .py/.sh/.yml/.toml/.cfg),
       attributing each surviving line to the commit that last touched it. AI-generated counts Claude Code
       commits and PRs authored by the Copilot coding agent; AI-assisted counts human-authored PRs reviewed
       by Copilot. pySDC dates from 2014 and no AI was used before 2026, so the whole-repository figures are
       dominated by pre-2026 code. Restricted to code last touched in 2026 the split is roughly
-      85% AI-generated, 9% AI-assisted, 6% human-only. Reproduce with etc/aidecl_audit.py.
+      94% AI-generated, 1% AI-assisted, 5% human-only. AI-assisted fell from 2% in 5.9 because most of the
+      Copilot-reviewed lines were rewritten or removed since, the FEniCS code among them. Reproduce with
+      etc/aidecl_audit.py.
   components:
     - name: PINN and FNO playgrounds
       description: pySDC/playgrounds/PINN and pySDC/playgrounds/learned_qdelta (~7100 lines)
@@ -128,7 +130,24 @@ ai_usage:
         - Claude
       notes: >-
         The ported problems, the FEM study and the StroemungsRaum project were human-written with FEniCS; the
-        Firedrake versions reproduce them to round-off. FEniCS itself was removed from pySDC with them.
+        Firedrake versions follow Firedrake's conventions and are tested against their own recorded values.
+        FEniCS itself was removed from pySDC with them.
+    - name: DeltaSDC and SDC4SDEs projects
+      description: >-
+        pySDC/projects/DeltaSDC, the study of node solves in low precision in delta form, and
+        pySDC/projects/SDC4SDEs, SDC for stochastic differential equations after arXiv:2610.23693, with their tests
+      ai_involvement: significant
+      tools_used:
+        - Claude
+    - name: Faster finite-difference solves
+      description: >-
+        solve_precision and the FFT and multigrid solvers of the finite-difference problems
+        (helpers/multigrid.py, on CPUs and GPUs), the reused factorization of their direct solve, and the GPU kernels
+        of the delta-form sweepers
+      ai_involvement: significant
+      tools_used:
+        - Claude
+      notes: Extends the human-written finite-difference problems.
     - name: Rayleigh-Benard project
       description: RBC project
       ai_involvement: minimal
@@ -141,11 +160,12 @@ ai_usage:
       tools_used:
         - Claude
       notes: >-
-        Human-written. In 2026, Claude wrote the docstrings that were missing or contradicted the code, and
-        fixed the bugs that review turned up, in pull requests of their own.
+        Human-written. In 2026, Claude wrote the docstrings that were missing or contradicted the code, fixed the
+        bugs that review turned up, and sped up the sweepers, the mesh data type and the statistics, in pull
+        requests of their own.
   summary: >-
     Reviewing PRs, adding new features, increased testing coverage, refactoring, code analysis and simplification,
     removing code smell
 declaration:
   declared_by: Robert Speck
-  date: '2026-09-28'
+  date: '2026-11-17'
