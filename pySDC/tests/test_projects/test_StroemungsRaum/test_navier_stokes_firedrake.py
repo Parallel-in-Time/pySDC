@@ -187,6 +187,60 @@ def test_taylor_green_order_reduction():
     assert finest['dirichlet'][1] / finest['differentiated'][1] > 5.0, finest
 
 
+@pytest.mark.firedrake
+@pytest.mark.parametrize('case', ['dirichlet', 'differentiated'])
+def test_taylor_green_multilevel_and_parallel_steps(case):
+    """
+    With meshes shared by the steps and a mesh hierarchy for the levels, MLSDC, PFASST on four steps and both together
+    reach the SDC solution, with pointwise and with differentiated boundary data.
+    """
+    import firedrake as fd
+    import numpy as np
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+    from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
+    from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
+    from pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step import PrepareStep
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
+        NavierStokes2DTaylorGreenFiredrake,
+        zero_mean_pressure,
+    )
+
+    coarse, fine = fd.MeshHierarchy(fd.RectangleMesh(8, 8, 0.5, 0.5, originX=-0.5, originY=-0.5), 1)
+
+    def run(levels, num_procs):
+        description = {
+            'problem_class': NavierStokes2DTaylorGreenFiredrake,
+            'problem_params': {
+                'mesh': [fine, coarse] if levels == 2 else fine,
+                'nu': 0.05,
+                **TAYLOR_GREEN_CASES[case],
+                'solver_parameters': {'snes_atol': 1e-13, 'snes_rtol': 1e-13},
+            },
+            'sweeper_class': generic_implicit_mass,
+            'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'},
+            'level_params': {'dt': 0.05, 'restol': 1e-10},
+            'step_params': {'maxiter': 40},
+            'convergence_controllers': {PrepareStep: {}},
+            'base_transfer_class': base_transfer_mass,
+            'space_transfer_class': MeshToMeshFiredrakeHierarchy,
+        }
+        controller = controller_nonMPI(
+            num_procs=num_procs, controller_params={'logger_level': 30}, description=description
+        )
+        P = controller.MS[0].levels[0].prob
+        uend, stats = controller.run(u0=P.u_exact(0.0), t0=0.0, Tend=0.2)
+        assert max(v for _, v in get_sorted(stats, type='niter')) < 40
+        return zero_mean_pressure(uend)
+
+    sdc = run(1, 1)
+    for levels, num_procs in [(2, 1), (1, 4), (2, 4)]:
+        u = run(levels, num_procs)
+        difference = max(np.abs(a - b).max() for a, b in zip(u.dat.data_ro, sdc.dat.data_ro, strict=True))
+        assert difference < 1e-8, (levels, num_procs, difference)
+
+
 # The projection scheme after two steps of dt = 1/1600 from t0 = 3.125e-4 (two RADAU-RIGHT nodes, LU implicit, Picard
 # explicit, exactly three iterations, `imex_1st_order_mass`): drag and lift, then u_x, u_y and p at the points of
 # REFERENCE_POINTS, recorded with this class as a check against unintended changes.
@@ -248,7 +302,10 @@ def test_step_data_needs_the_convergence_controller():
         NavierStokes2DTaylorGreenFiredrake,
     )
 
-    for P in [NavierStokes2DTaylorGreenFiredrake(nelems=4, differentiated_bc=True), NavierStokes2DProjectionFiredrake()]:
+    for P in [
+        NavierStokes2DTaylorGreenFiredrake(nelems=4, differentiated_bc=True),
+        NavierStokes2DProjectionFiredrake(),
+    ]:
         u = P.u_exact(0.0)
         with pytest.raises(RuntimeError, match='PrepareStep'):
             P.solve_system(P.apply_mass_matrix(u), 0.1, u, 0.1)

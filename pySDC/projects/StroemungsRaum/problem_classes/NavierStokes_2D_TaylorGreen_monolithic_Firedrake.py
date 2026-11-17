@@ -61,7 +61,7 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
     Parameters
     ----------
     nelems : int, optional
-        Number of squares per direction, each split into two triangles.
+        Number of squares per direction, each split into two triangles, ignored if `mesh` is given.
     order : int, optional
         Degree of the velocity elements (Taylor-Hood).
     nu : float, optional
@@ -76,6 +76,10 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         PETSc options for the nonlinear solves, by default Newton with tight tolerances.
     LHS_cache_size : int, optional
         Number of solvers kept, see ``FormFiredrake``.
+    mesh : firedrake.MeshGeometry, optional
+        A mesh of :math:`[-0.5, 0.5]^2`, periodic in :math:`x` if `periodic`, with the boundary ids of the default
+        ones (1, 2 at :math:`x = \mp 0.5`, 3, 4 at :math:`y = \mp 0.5`). Steps and levels have to share meshes for
+        MLSDC and PFASST: one mesh for all steps, the meshes of a ``MeshHierarchy`` for the levels.
     """
 
     def __init__(
@@ -87,13 +91,14 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         differentiated_bc=False,
         solver_parameters=None,
         LHS_cache_size=12,
+        mesh=None,
     ):
         """Initialization, see the class docstring for the arguments."""
         # boundary ids: 1, 2 at x = -+0.5, 3, 4 at y = -+0.5
-        if periodic:
+        if mesh is None and periodic:
             mesh = fd.PeriodicRectangleMesh(nelems, nelems, 1, 1, direction='x')
             mesh.coordinates.dat.data[:] -= 0.5
-        else:
+        elif mesh is None:
             mesh = fd.RectangleMesh(nelems, nelems, 0.5, 0.5, originX=-0.5, originY=-0.5)
         V = fd.VectorFunctionSpace(mesh, 'CG', order)
         W = V * fd.FunctionSpace(mesh, 'CG', order - 1)
