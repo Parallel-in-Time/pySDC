@@ -1,0 +1,19 @@
+pySDC/projects/deprecated/node_failure/README.rst
+  s_234ff217a70910::t_30ca86c0bf61c5 51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dde577b2ba7f8c556def875d545e1d04b8a2ddd4",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
