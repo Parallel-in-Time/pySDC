@@ -69,6 +69,13 @@ def test_E_MPI():
 
 
 @pytest.mark.firedrake
+def test_H():
+    from pySDC.tutorial.step_7.H_pySDC_with_Firedrake_forms import main
+
+    main()
+
+
+@pytest.mark.firedrake
 @pytest.mark.gusto
 def test_F(monkeypatch):
     """

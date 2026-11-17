@@ -53,7 +53,7 @@ To build your own setup, copy one from ``setups.py``. The three pieces that matt
 .. code-block:: python
 
     description['sweeper_class'] = generic_implicit_mass      # or imex_1st_order_mass
-    description['base_transfer_class'] = base_transfer_mass   # tau and u0 by P^T, u by L2 projection
+    description['base_transfer_class'] = base_transfer_mass   # tau by P^T, u0 and u by L2 projection
     description['base_transfer_params'] = {'finter': False}
 
 and a problem class whose ``eval_f`` returns the assembled weak form rather than
@@ -210,7 +210,9 @@ None of them is visible in a discretisation test, and none of them raises anythi
 2. **The dual convention stopped at the first coarse level.** ``u0`` is carried in the dual space on
    coarse levels, but only the finest transfer put it there, so three levels did not converge.
 3. **The same convention broke across step boundaries**, because ``uend`` was handed over primal.
-   That is why PFASST did not work with the mass matrix.
+   That is why PFASST did not work with the mass matrix. Both are gone with the convention itself: ``u0`` is now
+   a solution on every level, restricted by L2 projection like the nodes, which hands the coarse sweep the same
+   :math:`P^T M u_0`.
 4. **The coarsening hid all of it.** Reducing the collocation nodes to one makes the coarse level
    asymptotically inert -- it can neither help nor hurt, and it masks a broken transfer. Combined
    with ``Problem.apply_mass_matrix`` silently defaulting to the identity, a wrong mass matrix

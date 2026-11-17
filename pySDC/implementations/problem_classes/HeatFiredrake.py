@@ -1,14 +1,15 @@
-from pySDC.core.problem import Problem, WorkCounter
-from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh, IMEX_firedrake_mesh
-import firedrake as fd
-import numpy as np
 from functools import cached_property
+
+import firedrake as fd
 from mpi4py import MPI
 
+from pySDC.implementations.problem_classes.HeatEquation_1D_FormFiredrake import Heat1DMassFiredrake
 
-class Heat1DForcedFiredrake(Problem):
+
+class Heat1DForcedFiredrake(Heat1DMassFiredrake):
     r"""
-    Forced 1D heat equation with Dirichlet BCs and Firedrake finite elements, IMEX with diffusion implicit.
+    Forced 1D heat equation with Dirichlet BCs and Firedrake finite elements, IMEX with diffusion implicit, in the
+    mass-matrix formulation.
 
     Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
 
@@ -30,171 +31,41 @@ class Heat1DForcedFiredrake(Problem):
     .. math::
         u(x, t) = \sin(\pi x)\cos(t) + c.
 
-    Here, the problem is discretized with finite elements using firedrake. Hence, the problem
-    is reformulated to the *weak formulation*
+    The problem is discretized with finite elements in the *weak formulation*
 
-    .. math:
-        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.
+    .. math::
+        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx,
 
-    We invert the Laplacian implicitly and treat the forcing term explicitly.
-    The solvers for the arising variational problems are cached for multiple collocation nodes and step sizes.
+    i.e. :math:`M u' = -\nu K u + M f`, with the diffusion implicit and the (interpolated) forcing explicit. The mass
+    matrix is never inverted: use the mass-matrix sweepers, such as
+    :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass`. Everything is inherited
+    from :class:`~pySDC.implementations.problem_classes.HeatEquation_1D_FormFiredrake.Heat1DMassFiredrake`, with
+    Firedrake's default placement of the Lagrange nodes and a communicator for spatial parallelism.
 
     Parameters
     ----------
-    nvars : int, optional
-        Spatial resolution, i.e., numbers of degrees of freedom in space.
+    n : int, optional
+        Number of cells, ignored if `mesh` is given.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
     c: float, optional
         Constant for the Dirichlet boundary condition :math: `c`
+    order : int, optional
+        Degree of the Lagrange elements.
     LHS_cache_size : int, optional
         Cache size for variational problem solvers
+    mesh : firedrake.MeshGeometry, optional
+        A mesh of :math:`[0, 1]`, for instance from a hierarchy.
     comm : MPI communicator, optional
-        Supply an MPI communicator for spatial parallelism
+        Supply an MPI communicator for spatial parallelism, ignored if `mesh` is given.
     """
 
-    dtype_u = firedrake_mesh
-    dtype_f = IMEX_firedrake_mesh
-
     def __init__(self, n=30, nu=0.1, c=0.0, order=4, LHS_cache_size=12, mesh=None, comm=None):
-        """
-        Initialization
-
-        Args:
-            n (int): Number of degrees of freedom
-            nu (float): Diffusion parameter
-            c (float): Boundary condition constant
-            order (int): Order of finite elements
-            LHS_cache_size (int): Size of the cache for solvers
-            mesh (Firedrake mesh, optional): Give a custom mesh, for instance from a hierarchy
-            comm (mpi4pi.Intracomm, optional): MPI communicator for spatial parallelism
-        """
+        """Initialization, see the class docstring for the arguments."""
         comm = MPI.COMM_WORLD if comm is None else comm
-
-        # prepare Firedrake mesh and function space
         self.mesh = fd.UnitIntervalMesh(n, comm=comm) if mesh is None else mesh
-        self.V = fd.FunctionSpace(self.mesh, "CG", order)
-
-        # prepare pySDC problem class infrastructure by passing the function space to super init
-        super().__init__(self.V)
-        self._makeAttributeAndRegister(
-            'n', 'nu', 'c', 'order', 'LHS_cache_size', 'comm', localVars=locals(), readOnly=True
-        )
-
-        # prepare caches and IO variables for solvers
-        self.solvers = {}
-        self.tmp_in = fd.Function(self.V)
-        self.tmp_out = fd.Function(self.V)
-
-        # prepare work counters
-        self.work_counters['solver_setup'] = WorkCounter()
-        self.work_counters['solves'] = WorkCounter()
-        self.work_counters['rhs'] = WorkCounter()
-
-    def eval_f(self, u, t):
-        """
-        Evaluate the right hand side.
-        The forcing term is simply interpolated to the grid.
-        The Laplacian is evaluated via a variational problem, where the mass matrix is inverted and homogeneous boundary conditions are applied.
-        Note that we cache the solver to obtain much better performance.
-
-        Parameters
-        ----------
-        u : dtype_u
-            Solution at which to evaluate
-        t : float
-            Time at which to evaluate
-
-        Returns
-        -------
-        f : dtype_f
-            The evaluated right hand side
-        """
-        # construct and cache a solver for the implicit part of the right hand side evaluation
-        if not hasattr(self, '_solv_eval_f_implicit'):
-            v = fd.TestFunction(self.V)
-            u_trial = fd.TrialFunction(self.V)
-
-            a = u_trial * v * fd.dx
-            L_impl = -fd.inner(self.nu * fd.nabla_grad(self.tmp_in), fd.nabla_grad(v)) * fd.dx
-
-            bcs = [fd.bcs.DirichletBC(self.V, fd.Constant(0), area) for area in [1, 2]]
-
-            prob = fd.LinearVariationalProblem(a, L_impl, self.tmp_out, bcs=bcs)
-            self._solv_eval_f_implicit = fd.LinearVariationalSolver(prob)
-
-        # copy the solution we want to evaluate at into the input buffer
-        self.tmp_in.assign(u.functionspace)
-
-        # perform the solve using the cached solver
-        self._solv_eval_f_implicit.solve()
-
-        me = self.dtype_f(self.init)
-
-        # copy the result of the solver from the output buffer to the variable this function returns
-        me.impl.assign(self.tmp_out)
-
-        # evaluate explicit part.
-        # Because it does not depend on the current solution, we can simply interpolate the expression
-        self.t.assign(t)
-        me.expl.interpolate(self.forcing)
-
-        self.work_counters['rhs']()
-
-        return me
-
-    def solve_system(self, rhs, factor, *args, **kwargs):
-        r"""
-        Linear solver for :math:`(M - factor nu * Lap) u = rhs`.
-
-        Parameters
-        ----------
-        rhs : dtype_f
-            Right-hand side for the nonlinear system.
-        factor : float
-            Abbrev. for the node-to-node stepsize (or any other factor required).
-        *args, **kwargs
-            Take the initial guess ``u0`` and the current time ``t`` of the generic interface, neither is used here.
-
-        Returns
-        -------
-        u : dtype_u
-            Solution.
-        """
-
-        # construct and cache a solver for the current factor (preconditioner entry times step size)
-        if factor not in self.solvers.keys():
-
-            # check if we need to evict something from the cache
-            if len(self.solvers) >= self.LHS_cache_size:
-                self.solvers.pop(list(self.solvers.keys())[0])
-
-            u = fd.TrialFunction(self.V)
-            v = fd.TestFunction(self.V)
-
-            a = u * v * fd.dx + fd.Constant(factor) * fd.inner(self.nu * fd.nabla_grad(u), fd.nabla_grad(v)) * fd.dx
-            L = fd.inner(self.tmp_in, v) * fd.dx
-
-            bcs = [fd.bcs.DirichletBC(self.V, fd.Constant(self.c), area) for area in [1, 2]]
-
-            prob = fd.LinearVariationalProblem(a, L, self.tmp_out, bcs=bcs)
-            self.solvers[factor] = fd.LinearVariationalSolver(prob)
-
-            self.work_counters['solver_setup']()
-
-        # copy solver rhs to the input buffer. Copying also to the output buffer uses it as initial guess
-        self.tmp_in.assign(rhs.functionspace)
-        self.tmp_out.assign(rhs.functionspace)
-
-        # call the cached solver
-        self.solvers[factor].solve()
-
-        # copy from output buffer to return variable
-        me = self.dtype_u(self.init)
-        me.assign(self.tmp_out)
-
-        self.work_counters['solves']()
-        return me
+        super().__init__(n=n, order=order, variant=None, nu=nu, c=c, mesh=self.mesh, LHS_cache_size=LHS_cache_size)
+        self._makeAttributeAndRegister('comm', localVars=locals(), readOnly=True)
 
     @cached_property
     def x(self):
@@ -207,58 +78,3 @@ class Heat1DForcedFiredrake(Problem):
             Symbolic spatial coordinate, used to interpolate expressions on the mesh.
         """
         return fd.SpatialCoordinate(self.mesh)
-
-    @cached_property
-    def t(self):
-        """
-        Time as a Firedrake constant, assigned before each interpolation so the kernels compile only once.
-
-        Returns
-        -------
-        t : firedrake.Constant
-            Time at which the time-dependent expressions are evaluated.
-        """
-        return fd.Constant(0.0)
-
-    @cached_property
-    def forcing(self):
-        """
-        Symbolic forcing term :math:`f(x, t)` in terms of the time constant :attr:`t`.
-
-        Returns
-        -------
-        f : ufl.core.expr.Expr
-            Forcing term, interpolated in :meth:`eval_f`.
-        """
-        return -(fd.sin(self.t) - self.nu * np.pi**2 * fd.cos(self.t)) * fd.sin(np.pi * self.x[0])
-
-    @cached_property
-    def exact_solution(self):
-        """
-        Symbolic exact solution :math:`u(x, t)` in terms of the time constant :attr:`t`.
-
-        Returns
-        -------
-        u : ufl.core.expr.Expr
-            Exact solution, interpolated in :meth:`u_exact`.
-        """
-        return fd.cos(self.t) * fd.sin(np.pi * self.x[0]) + self.c
-
-    def u_exact(self, t):
-        r"""
-        Routine to compute the exact solution at time :math:`t`.
-
-        Parameters
-        ----------
-        t : float
-            Time of the exact solution.
-
-        Returns
-        -------
-        me : dtype_u
-            Exact solution.
-        """
-        self.t.assign(t)
-        me = self.u_init
-        me.interpolate(self.exact_solution)
-        return me

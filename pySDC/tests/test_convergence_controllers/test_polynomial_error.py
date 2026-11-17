@@ -237,12 +237,14 @@ def test_polynomial_error_firedrake(dt=1.0, num_nodes=3, useMPI=False):
     import numpy as np
 
     if useMPI:
-        from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI as sweeper_class
+        from pySDC.implementations.sweeper_classes.imex_1st_order_mass_MPI import (
+            imex_1st_order_mass_MPI as sweeper_class,
+        )
         from mpi4py import MPI
 
         comm = MPI.COMM_WORLD
     else:
-        from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit as sweeper_class
+        from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass as sweeper_class
 
         comm = None
 
@@ -305,7 +307,7 @@ def test_polynomial_error_firedrake_in_run(rel_error):
     """
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+    from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
     from pySDC.implementations.convergence_controller_classes.estimate_polynomial_error import (
         EstimatePolynomialErrorFiredrake,
     )
@@ -313,7 +315,7 @@ def test_polynomial_error_firedrake_in_run(rel_error):
     description = {
         'problem_class': Heat1DForcedFiredrake,
         'problem_params': {'n': 8},
-        'sweeper_class': imex_1st_order,
+        'sweeper_class': imex_1st_order_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3},
         'level_params': {'dt': 0.1, 'restol': 1e-10},
         'step_params': {'maxiter': 10},

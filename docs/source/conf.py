@@ -70,7 +70,7 @@ napoleon_type_aliases = {
     'dtype_f': ':py:attr:`~pySDC.core.problem.Problem.dtype_f`',
     'matrix': 'matrix',
 }
-autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy', 'firedrake', 'gusto', 'vtk', 'vtkmodules']
+autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy', 'firedrake', 'gusto', 'ufl', 'vtk', 'vtkmodules']
 # the source of members imported from mocked modules (Firedrake, Gusto, ...) is not there to show
 viewcode_follow_imported_members = False
 
@@ -97,6 +97,7 @@ NOT_IN_BROWSER = {
     'tutorial/step_7/E_*': 'it needs Firedrake.',
     'tutorial/step_7/F_*': 'it needs Firedrake and Gusto.',
     'tutorial/step_7/G_*': 'it needs a GPU and CuPy.',
+    'tutorial/step_7/H_*': 'it needs Firedrake.',
     'tutorial/step_9/E_*': 'it runs on several processes with MPI (mpi4py).',
 }
 nb_execution_excludepatterns = [f'{page}.py' for page in NOT_IN_BROWSER]

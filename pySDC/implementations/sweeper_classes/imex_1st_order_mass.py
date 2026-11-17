@@ -1,4 +1,4 @@
-from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass, integrate_load_vectors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
@@ -11,6 +11,16 @@ class imex_1st_order_mass(imex_1st_order):
     The end point is only available as a copy of the last node: ``compute_end_point`` raises unless the right end of
     the interval is a node and ``do_coll_update`` is off.
     """
+
+    def integrate(self):
+        """
+        Integrate the sum of the implicit and explicit right-hand sides, see
+        :func:`~pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors`.
+
+        Returns:
+            list: dt Q (f_I + f_E) at the nodes 1, ..., M, load vectors like f
+        """
+        return integrate_load_vectors(self, [f.impl + f.expl for f in self.level.f[1:]])
 
     def update_nodes(self):
         """
@@ -36,11 +46,8 @@ class imex_1st_order_mass(imex_1st_order):
         # get QF(u^k)
         integral = self.integrate()
 
-        # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
-        if L.level_index == 0:
-            u0 = P.apply_mass_matrix(L.u[0])
-        else:
-            u0 = L.u[0]
+        # u0 is a solution on every level, the transfer restricts it by L2 projection
+        u0 = P.apply_mass_matrix(L.u[0])
 
         for m in range(M):
             # subtract QIFI(u^k)_m + QEFE(u^k)_m
@@ -90,12 +97,6 @@ class imex_1st_order_mass(imex_1st_order):
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
-            # On coarse levels u[0] is carried in the dual space: the transfer hands down P^T M u0 and
-            # the sweep consumes it as-is. PFASST copies uend straight into the next step's u[0]
-            # (controller.recv_full), so what we hand over has to be dual as well -- otherwise the step
-            # boundary feeds a primal value into a slot that is read as M u0.
-            if L.level_index > 0:
-                L.uend = P.apply_mass_matrix(L.uend)
         else:
             raise NotImplementedError('Mass matrix sweeper expect u_M = u_end')
 

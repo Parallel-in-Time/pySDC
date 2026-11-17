@@ -14,10 +14,11 @@
 #
 # [Firedrake](https://github.com/firedrakeproject/firedrake) is a finite element library with similar features as
 # FEniCS. This example runs the same forced heat equation as the [FEniCS example](A_pySDC_with_FEniCS), but
-# implemented in Firedrake. The setup proceeds very much as in earlier tutorials; the interesting part is rather the
-# problem class. See
-# [pySDC/implementations/problem_classes/HeatFiredrake.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/HeatFiredrake.py)
-# as a blueprint for how to implement problems with Firedrake in a way that pySDC understands.
+# implemented in Firedrake. As in the FEniCS example, the problem is posed in mass-matrix form, `M u' = f(u)`, with
+# `f` a load vector, so pySDC never inverts the mass matrix: the sweepers are the mass-matrix ones, and the multilevel
+# run uses the mass-matrix transfer. The problem class,
+# [pySDC/implementations/problem_classes/HeatFiredrake.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/HeatFiredrake.py),
+# is given by its weak forms; [Part H](H_pySDC_with_Firedrake_forms) shows how to write such a class yourself.
 #
 # ## Single level, serial or parallel across the nodes
 #
@@ -41,8 +42,8 @@ def setup(useMPIsweeper):
         description and controller_params parameter dictionaries
     """
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
-    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-    from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI
+    from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+    from pySDC.implementations.sweeper_classes.imex_1st_order_mass_MPI import imex_1st_order_mass_MPI
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
     from pySDC.implementations.hooks.log_work import LogWork
     from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
@@ -78,7 +79,7 @@ def setup(useMPIsweeper):
     description = dict()
     description['problem_class'] = Heat1DForcedFiredrake
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order_MPI if useMPIsweeper else imex_1st_order
+    description['sweeper_class'] = imex_1st_order_mass_MPI if useMPIsweeper else imex_1st_order_mass
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -89,7 +90,9 @@ def setup(useMPIsweeper):
 # %% [markdown]
 # ## Three levels
 #
-# Multilevel SDC, serial, coarsened in space from 128 to 32 to 4 elements, with interpolation of the right-hand side.
+# Multilevel SDC, serial, coarsened in space from 128 to 32 to 4 elements. The transfer of the mass-matrix
+# formulation restricts load vectors with the transpose of the interpolation, and evaluates the right-hand side anew
+# after prolongation instead of interpolating it.
 
 
 # %%
@@ -101,8 +104,8 @@ def setup_ML():
         description and controller_params parameter dictionaries
     """
     from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake
-    from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-    from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI
+    from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+    from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
     from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrake
     from pySDC.implementations.hooks.log_errors import LogGlobalErrorPostRun
     from pySDC.implementations.hooks.log_work import LogWork
@@ -126,9 +129,6 @@ def setup_ML():
     problem_params['n'] = [128, 32, 4]
     problem_params['c'] = 1.0
 
-    base_transfer_params = dict()
-    base_transfer_params['finter'] = True
-
     controller_params = dict()
     controller_params['logger_level'] = 15 if MPI.COMM_WORLD.rank == 0 else 30
     controller_params['hook_class'] = [LogGlobalErrorPostRun, LogWork]
@@ -136,12 +136,12 @@ def setup_ML():
     description = dict()
     description['problem_class'] = Heat1DForcedFiredrake
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order
+    description['sweeper_class'] = imex_1st_order_mass
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
     description['space_transfer_class'] = MeshToMeshFiredrake
-    description['base_transfer_params'] = base_transfer_params
+    description['base_transfer_class'] = base_transfer_mass
 
     return description, controller_params
 
@@ -182,7 +182,7 @@ def runHeatFiredrake(useMPIsweeper=False, ML=False):
     # see what we get
     error = get_sorted(stats, type='e_global_post_run')
     work_solver_setup = get_sorted(stats, type='work_solver_setup')
-    work_solves = get_sorted(stats, type='work_solves')
+    work_solves = get_sorted(stats, type='work_solver')
     work_rhs = get_sorted(stats, type='work_rhs')
     niter = get_sorted(stats, type='niter')
 
@@ -210,10 +210,11 @@ def runHeatFiredrake(useMPIsweeper=False, ML=False):
     # do tests that we got the same as last time
     n_nodes = 1 if useMPIsweeper else description['sweeper_params']['num_nodes']
     assert error[0][1] < 2e-7
-    assert tot_iter == (10 if ML else 29)
+    assert tot_iter == (13 if ML else 29)
     assert tot_solver_setup == n_nodes
     assert tot_solves == n_nodes * tot_iter
-    assert tot_rhs == n_nodes * tot_iter + (n_nodes + 1) * len(niter)
+    # with several levels, f is evaluated anew at every node after the coarse-grid correction is prolonged
+    assert tot_rhs == n_nodes * tot_iter * (2 if ML else 1) + (n_nodes + 1) * len(niter)
 
 
 # %% [markdown]

@@ -2,8 +2,42 @@ from pySDC.core.errors import ParameterError
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
+def integrate_load_vectors(sweeper, F):
+    """
+    Integrate right-hand side values over the collocation nodes, dt Q F, for the mass-matrix sweepers.
+
+    Unlike the parent sweepers' ``integrate``, each sum starts from its first term instead of a zero ``dtype_u``: in
+    the mass formulation the right-hand side is a load vector, which a backend may keep apart from solution data (the
+    Firedrake data types do, and refuse to mix them).
+
+    Args:
+        sweeper: The mass-matrix sweeper
+        F (list): Right-hand side values at the nodes 1, ..., M
+
+    Returns:
+        list: dt Q F at the nodes 1, ..., M
+    """
+    L = sweeper.level
+    Q = sweeper.coll.Qmat
+    me = []
+    for m in range(1, sweeper.coll.num_nodes + 1):
+        me.append(L.dt * Q[m, 1] * F[0])
+        for j in range(2, sweeper.coll.num_nodes + 1):
+            me[-1] += L.dt * Q[m, j] * F[j - 1]
+    return me
+
+
 class generic_implicit_mass(generic_implicit):
     """Fully implicit SDC sweeper for the mass-matrix formulation (no M^-1 anywhere)."""
+
+    def integrate(self):
+        """
+        Integrate the right-hand side, see :func:`integrate_load_vectors`.
+
+        Returns:
+            list: dt Q f at the nodes 1, ..., M, load vectors like f
+        """
+        return integrate_load_vectors(self, self.level.f[1:])
 
     def update_nodes(self):
         """
@@ -31,11 +65,8 @@ class generic_implicit_mass(generic_implicit):
         # get QF(u^k)
         integral = self.integrate()
 
-        # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
-        if L.level_index == 0:
-            u0 = P.apply_mass_matrix(L.u[0])
-        else:
-            u0 = L.u[0]
+        # u0 is a solution on every level, the transfer restricts it by L2 projection
+        u0 = P.apply_mass_matrix(L.u[0])
 
         for m in range(M):
             # get -QdF(u^k)_m
@@ -86,12 +117,6 @@ class generic_implicit_mass(generic_implicit):
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
-            # On coarse levels u[0] is carried in the dual space: the transfer hands down P^T M u0 and
-            # the sweep consumes it as-is. PFASST copies uend straight into the next step's u[0]
-            # (controller.recv_full), so what we hand over has to be dual as well -- otherwise the step
-            # boundary feeds a primal value into a slot that is read as M u0.
-            if L.level_index > 0:
-                L.uend = P.apply_mass_matrix(L.uend)
         else:
             raise NotImplementedError('Mass matrix sweeper expect u_M = u_end')
 
@@ -125,12 +150,7 @@ class generic_implicit_mass(generic_implicit):
         res = self.integrate()
         for m in range(self.coll.num_nodes):
 
-            # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
-
-            if L.level_index == 0:
-                res[m] += P.apply_mass_matrix(L.u[0] - L.u[m + 1])
-            else:
-                res[m] += L.u[0] - P.apply_mass_matrix(L.u[m + 1])
+            res[m] += P.apply_mass_matrix(L.u[0] - L.u[m + 1])
             # add tau if associated
             if L.tau[m] is not None:
                 res[m] += L.tau[m]
