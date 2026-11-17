@@ -282,14 +282,14 @@ jobs:
 
   user_firedrake_tests_conda:
     # The Firedrake and Gusto tests, without Firedrake's Docker image: Firedrake pip-installed on top of
-    # conda-forge's PETSc (see etc/environment-firedrake.yml), which also works on macOS. The two Firedrake
-    # projects run each in its own job of the matrix, in parallel with the library tests, as the other
-    # projects do in project_cpu_tests_linux; they take more than half the Firedrake test time.
+    # conda-forge's PETSc (see etc/environment-firedrake.yml), which also works on macOS. The Gusto tests and
+    # the two Firedrake projects run each in its own job of the matrix, in parallel with the library tests, as
+    # the other projects do in project_cpu_tests_linux; together they take more than half the test time.
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        suite: [library, FEM_with_Firedrake, StroemungsRaum]
+        suite: [library, Gusto, FEM_with_Firedrake, StroemungsRaum]
     env:
       # must match the petsc4py pin in etc/environment-firedrake.yml
       FIREDRAKE_VERSION: '2026.10.0'
@@ -322,6 +322,7 @@ jobs:
           # then its Python dependencies, which the step above skipped
           pip install "firedrake==$FIREDRAKE_VERSION"
       - name: Install Gusto
+        if: matrix.suite == 'Gusto'
         # Gusto has no releases; main as of 2026-11-11, tested against Firedrake 2026.10.0. Its netCDF4 and
         # vtk come from the conda environment, built against the same MPI and HDF5.
         run: |
@@ -338,9 +339,11 @@ jobs:
           echo "print('Loading sitecustomize.py...')
           import coverage
           coverage.process_startup() " > sitecustomize.py
+          LIBRARY="coverage run -m pytest --continue-on-collection-errors -v --durations=0 --ignore=pySDC/tests/test_projects"
           if [ "${{ matrix.suite }}" = library ]; then
-            PYTEST="coverage run -m pytest --continue-on-collection-errors -v --durations=0 --ignore=pySDC/tests/test_projects" \
-              bash etc/run_mpi_tests.sh pySDC/tests firedrake
+            PYTEST="$LIBRARY" bash etc/run_mpi_tests.sh pySDC/tests 'firedrake and not gusto'
+          elif [ "${{ matrix.suite }}" = Gusto ]; then
+            PYTEST="$LIBRARY" bash etc/run_mpi_tests.sh pySDC/tests gusto
           else
             bash etc/run_mpi_tests.sh pySDC/tests/test_projects/test_${{ matrix.suite }} firedrake
           fi
