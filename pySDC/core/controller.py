@@ -341,7 +341,7 @@ class Controller(object):
                     )
 
     def step_is_active(self, time: float, block_start: float, t0: float, Tend: float, dt: float) -> bool:
-        """
+        r"""
         Whether a step starting at `time`, in a block starting at `block_start`, still has work.
 
         The default is that a step runs if it starts before the end of the interval, so a block
@@ -349,13 +349,14 @@ class Controller(object):
         answers this from `block_start` instead and runs the block whole.
 
         "Before" means by more than the round-off in `time`. The start times are accumulated from
-        `t0` by repeated addition of `dt`, and each addition is off by at most eps T / 2, with
-        T = max(|t0|, |Tend|) bounding the times involved. After the N ~ |Tend - t0| / dt additions
-        it takes to get to `Tend`, plus the rounding of `dt` itself, which adds up to
-        eps |Tend - t0| / 2, `time` can be off by (N T + |Tend - t0|) eps / 2, on either side of
-        `Tend`. Twice that is the tolerance here, so a step starting at `Tend` up to round-off does
-        not run past it, while a last step that does not fit into the interval still runs, past
-        `Tend`.
+        `t0` by repeated addition of `dt`, and each addition is off by at most
+        :math:`\varepsilon T / 2`, with :math:`T = \max(|t_0|, |T_{end}|)` bounding the times involved and
+        :math:`\varepsilon` the machine epsilon. After the :math:`N \approx |T_{end} - t_0| / \Delta t`
+        additions it takes to get to `Tend`, plus the rounding of `dt` itself, which adds up to
+        :math:`\varepsilon |T_{end} - t_0| / 2`, `time` can be off by
+        :math:`(N T + |T_{end} - t_0|)\, \varepsilon / 2`, on either side of `Tend`. Twice that is the
+        tolerance here, so a step starting at `Tend` up to round-off does not run past it, while a last
+        step that does not fit into the interval still runs, past `Tend`.
 
         Args:
             time (float): when this step starts
