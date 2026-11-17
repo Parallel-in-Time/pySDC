@@ -1,0 +1,440 @@
+pySDC/tests/test_helpers/test_spectral_helper_1d_chebychev.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 329,332,338,413,417,426
+pySDC/tests/test_projects/test_DeltaSDC/test_gpu.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-37
+docs/source/projects/SDC4SDEs.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 1
+docs/source/projects/FEM_with_Firedrake.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 1
+pySDC/playgrounds/deprecated/FEniCS/heat_equation_M.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-210
+pySDC/playgrounds/deprecated/FEniCSx/HeatEquation_1D_FEniCSx_matrix_forced.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-245
+pySDC/projects/DAE/tests/test_problems.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 456,519-520,522-523
+pySDC/tests/test_transfer_classes/test_firedrake_p_coarsening.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-100
+.github/workflows/sbom.yml
+  s_edc09aac9d24f7::t_eefea6f76bc561 5,79,106
+pySDC/implementations/controller_classes/ParaDiag.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 98,106,113,115,138,151,157-169,181
+pySDC/projects/SDC4SDEs/sweeper.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-160
+.github/workflows/ci_pipeline.yml
+  s_edc09aac9d24f7::t_eefea6f76bc561 46-49,85,90,143,155,231,243,287-288,310-311,325-326,344-345,362-438,491,493,527,550
+pySDC/projects/gallery.yml
+  s_edc09aac9d24f7::t_eefea6f76bc561 90-101,129-132
+pySDC/projects/matrixPFASST/controller_matrix_nonMPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 63,88,95,99
+pySDC/projects/StroemungsRaum/hooks/hooks_NSE_IMEX_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-98
+pySDC/implementations/problem_classes/generic_ND_FD.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 17-65,108-114,120-121,288,313-326,329,436,530-532,567-586,593-594,596-601,656-714
+pySDC/tests/test_helpers/test_fieldsIO.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 208-210,216-229
+pySDC/implementations/sweeper_classes/multi_implicit.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 48-51,56,59-60,81,83-85,88-99,102-111,114
+pySDC/tests/test_sweepers/test_Runge_Kutta_Nystrom.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-42
+pySDC/playgrounds/deprecated/FEniCSx/playground.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-43
+pySDC/tests/test_datatypes/test_firedrake_mesh.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 21-23,42-44,64-65,86-168,185-190,207-212,228-231,242,245,254,256
+pySDC/implementations/problem_classes/FormFiredrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-383
+pySDC/tests/test_projects/test_FEM_with_Firedrake/test_setups_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-214
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-176
+pySDC/implementations/sweeper_classes/generic_implicit.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 68-71,75-80
+pySDC/tests/test_convergence_controllers/test_polynomial_error.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 43,240-242,247,310,318
+docs/source/project_papers.json
+  s_edc09aac9d24f7::t_eefea6f76bc561 186-198
+pySDC/projects/deprecated/node_failure/boussinesq_example.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 3,9
+pySDC/projects/SDC4SDEs/studies.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-241
+pySDC/projects/GPU/etc/venv_jusuf/setup.sh
+  s_edc09aac9d24f7::t_eefea6f76bc561 2-5,11-12,15,18-20,22-29,31-34,36-45
+pySDC/playgrounds/deprecated/FEniCS/order_reduction/test_order_reduction.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-145
+pySDC/implementations/problem_classes/Boussinesq_2D_FD_imex.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 192
+pySDC/projects/DeltaSDC/genuine.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-84
+pySDC/projects/FEM_with_Firedrake/README.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-341
+pySDC/implementations/convergence_controller_classes/adaptivity.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 2,661-665,673-674,678,686-687,722,735-736,750-751,765,770,790
+pySDC/implementations/problem_classes/boussinesq_helpers/standard_integrators.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 255,299,344,627
+pySDC/projects/StroemungsRaum/problem_classes/ConvectionDiffusion_2D_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-71
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-199
+pySDC/implementations/sweeper_classes/Runge_Kutta_Nystrom.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 199
+pySDC/implementations/sweeper_classes/delta_form_MPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 91-93
+pySDC/implementations/datatype_classes/firedrake_mesh.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 7-44,48-53,56,62-64,69-72,75,77-78,85-89,95-121,124,127,138,143-144,150,153-157,159,161-163,218-236,248-259
+pySDC/tutorial/step_7/torch_heat.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 2
+pySDC/tests/test_controllers/test_step_is_active.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 35-64
+pySDC/projects/GPU/environment.yml
+  s_edc09aac9d24f7::t_eefea6f76bc561 9-10
+pySDC/implementations/sweeper_classes/imex_1st_order_mass_MPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-107
+pySDC/implementations/transfer_classes/TransferFiredrakeMesh.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1,5-43,48-55,100-135,140-143,157-163,165,167,169,207-208,215-254
+pySDC/tests/test_helpers/test_gusto_coupling.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 5-6
+pySDC/implementations/transfer_classes/BaseTransfer_mass.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 45-46
+pySDC/tests/test_problems/test_RayleighBenard3D.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 128
+pySDC/tests/test_sweepers/test_imex_1st_order_mass_MPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-46
+pySDC/implementations/problem_classes/Quench.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 337
+pySDC/playgrounds/deprecated/FEniCS/order_reduction/problem_classes.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-196
+pySDC/implementations/sweeper_classes/explicit.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 70-73,77-82
+pySDC/tests/test_convergence_controllers/test_error_convergence_controllers.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 234-255,258-278
+pySDC/projects/deprecated/node_failure/README.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 51
+pySDC/implementations/problem_classes/GrayScott_1D_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-102
+pySDC/projects/DAE/problems/discontinuousTestDAE.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 33,37-40,47-49,66,69,103
+etc/environment-firedrake.yml
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-38
+pySDC/implementations/sweeper_classes/imex_1st_order_mass.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1,15-24,49-50,105-106
+pySDC/projects/StroemungsRaum/run_heat_equation_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-80
+pySDC/helpers/testing.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 101-105,107-111
+pySDC/projects/SDC4SDEs/brownian.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-112
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_TaylorGreen_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-160
+pySDC/helpers/multigrid.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-584
+pySDC/projects/FEM_with_Firedrake/problem_classes/Burgers_1D_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-69
+pySDC/tests/test_problems/test_heat_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 7,9-10,15,25,29,33-39,44,46-48,51,58-61,64-71
+pySDC/implementations/sweeper_classes/imex_1st_order.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 48-50,56,78-83,87-93,95-96
+pySDC/tests/test_projects/test_StroemungsRaum/test_hooks_plotting_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-107
+pySDC/tests/test_sweepers/test_boris_sweeper.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-44
+pySDC/implementations/controller_classes/controller_ParaDiag_MPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 47
+pySDC/projects/StroemungsRaum/convergence_controllers/prepare_step.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-32
+pySDC/tests/conftest.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 20
+pySDC/tutorial/step_7/B_pySDC_with_PETSc.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-244
+pySDC/projects/FEM_with_Firedrake/run_examples_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-245
+pySDC/projects/PinTSimE/switch_estimator.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 302-303,333-337
+pySDC/tests/test_problems/test_form_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-567
+pySDC/tests/test_helpers/test_multigrid.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-392
+pySDC/implementations/controller_classes/controller_ParaDiag_nonMPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 37
+pySDC/implementations/convergence_controller_classes/basic_restarting.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 207-208,213-215
+pySDC/playgrounds/deprecated/FEniCSx/HeatEquation_1D_FEniCSx_matrix_forced_2.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-272
+pySDC/playgrounds/deprecated/FEniCS/mass_playground.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-78
+pySDC/projects/GPU/etc/venv_jusuf/config.sh
+  s_edc09aac9d24f7::t_eefea6f76bc561 11-17
+pySDC/tests/test_convergence_controllers/test_crash.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 47
+pySDC/projects/StroemungsRaum/README.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 29-31,33-39,41-133,137,142-143,146-150,156-185
+pySDC/projects/DeltaSDC/tests/test_genuine.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-36
+pySDC/implementations/convergence_controller_classes/spatial_error_floor_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-140
+pySDC/projects/SDC4SDEs/README.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-125
+pySDC/tests/test_projects/test_StroemungsRaum/test_navier_stokes_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-311
+pySDC/tests/test_sweepers/test_MPI_sweeper.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 91,101-110,112,147-191
+  s_edc09aac9d24f7::t_5b5145dba7eb41 192-193
+pySDC/tests/test_tutorials/test_step_7.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 4,6,13-14,16,21-22,24,29-30,32,36,43,50-51,58-59,65-73,78,102,111-112,116,142,151-152,154
+pySDC/tests/test_projects/test_FEM_with_Firedrake/test_fem_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-119
+pySDC/tutorial/README.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 7
+pySDC/core/problem.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 118-121
+pySDC/implementations/problem_classes/generic_spectral.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 332-334,440-442
+aidecl.yaml
+  s_edc09aac9d24f7::t_eefea6f76bc561 50-52,94,120-133
+SECURITY.md
+  s_edc09aac9d24f7::t_eefea6f76bc561 53
+pySDC/playgrounds/deprecated/FEniCS/vortex.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-87
+pySDC/helpers/ufl_forms.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-86
+pySDC/playgrounds/time_dep_BCs/README.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 8-9
+pyproject.toml
+  s_edc09aac9d24f7::t_eefea6f76bc561 92
+pySDC/implementations/sweeper_classes/generic_implicit_MPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 45-52,117,136-152
+  s_edc09aac9d24f7::t_cfc955515325ec 153
+pySDC/tests/test_sweepers/test_compute_end_point.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 28-34
+etc/modal_gpu_tests.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 30,32,37-40,43-44
+pySDC/playgrounds/deprecated/FEniCS/heat_equation_Minv.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-76
+pySDC/projects/PinTSimE/battery_model.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 398-400
+pySDC/tutorial/step_7/D_pySDC_with_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-265
+README.md
+  s_edc09aac9d24f7::t_eefea6f76bc561 32-36,39-41,87,89-94
+.gitignore
+  s_edc09aac9d24f7::t_eefea6f76bc561 168
+pySDC/playgrounds/12th_PinT_Workshop/2_Add_new_problem.ipynb
+  s_edc09aac9d24f7::t_eefea6f76bc561 402
+pySDC/playgrounds/deprecated/FEniCS/fenics_sdc.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-132
+docs/source/tutorial/step_7.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 6-12
+pySDC/implementations/sweeper_classes/boris_2nd_order.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 3,49-65
+  s_edc09aac9d24f7::t_19a832bf57a0fd 66
+pySDC/playgrounds/deprecated/FEniCS/order_reduction/run_convergence.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-205
+pySDC/projects/GPU/etc/venv_jusuf/activate.sh
+  s_edc09aac9d24f7::t_eefea6f76bc561 9,12-13,16-17
+pySDC/projects/GPU/etc/venv_jusuf/readme.md
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-2,4-7,9,11-13,15,18,21-24,26-28,30-32
+pySDC/projects/StroemungsRaum/plotting/plots_convection_diffusion_equation_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-65
+pySDC/implementations/controller_classes/controller_nonMPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 118-122,130,181-183,585-586
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_equations_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-86
+pySDC/helpers/spectral_helper.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 387,392-400,674-679
+pySDC/playgrounds/deprecated/FEniCS/HookClass_FEniCS_output.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-79
+pySDC/helpers/firedrake_ensemble_communicator.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 6-13,82,93,100,109,118
+pySDC/projects/SDC4SDEs/baselines.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-59
+etc/run_mpi_tests.sh
+  s_edc09aac9d24f7::t_eefea6f76bc561 19-20,27,82-83
+pySDC/projects/FEM_with_Firedrake/setups_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-248
+pySDC/projects/FEM_with_Firedrake/problem_classes/DG_1D_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-291
+pySDC/projects/StroemungsRaum/problem_classes/HeatEquation_2D_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-62
+pySDC/projects/DeltaSDC/environment.yml
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-13
+docs/contrib/02_continuous_integration.md
+  s_edc09aac9d24f7::t_eefea6f76bc561 150,154,212-290,292-303
+pySDC/core/convergence_controller.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 70,448,452-464,507
+pySDC/tests/test_convergence_controllers/test_adaptive_collocation.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 138,145,152,169-174,199-217
+pySDC/tests/test_projects/test_FEM_with_Firedrake/test_examples_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-295
+pySDC/tutorial/step_7/README.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 7-9,11-17,20-21
+pySDC/implementations/controller_classes/controller_MPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 99-102,107,159,173-177,507-510,597-598
+pySDC/core/controller.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 343-344,351-359,364,371
+pySDC/helpers/fieldsIO.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 330,335,441-442
+pySDC/implementations/problem_classes/VorticityVelocity_2D_Firedrake_periodic.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-152
+pySDC/projects/SDC4SDEs/environment.yml
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-13
+pySDC/projects/DeltaSDC/tests/test_multigrid.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-23
+pySDC/tests/test_ci/test_run_mpi_tests.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 50-51,62,65-67,97-105
+  s_edc09aac9d24f7::t_393d863130d7e4 106-107
+docs/source/conf.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 48,73,85,93-99,104,233
+pySDC/projects/PinTSimE/hardcoded_solutions.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 6,33-34,196-199,442,465,481-483,485,490,492
+pySDC/tests/test_hooks/test_log_to_file.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 237,244-247,249
+pySDC/tests/test_problems/test_vortex_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-77
+pySDC/tests/test_sweepers/test_preconditioners.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 131-157
+  s_edc09aac9d24f7::t_e14780da2ec715 130
+docs/source/projects/DeltaSDC.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 1
+pySDC/projects/GPU/etc/venv_jusuf/modules.sh
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-4,6
+pySDC/implementations/problem_classes/HeatFiredrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-2,6-7,10-13,15,18,20,23,25-27,30,32-35,39-40,43-48,50-52,54,57-58,61-87,89,92
+pySDC/projects/DeltaSDC/README.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-52
+pySDC/projects/deprecated/node_failure/controller_nonMPI_hard_faults.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 4
+pySDC/implementations/transfer_classes/BaseTransferDelta.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 44-49,52,56-60,68-71
+pySDC/tests/test_controllers/test_controller_MPI_uend.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-33
+pySDC/tests/test_convergence_controllers/test_adaptivity.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 234-283
+pySDC/tutorial/step_7/E_pySDC_with_Gusto.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-450
+pySDC/projects/DeltaSDC/krylov.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-174
+pySDC/tutorial/step_7/C_pySDC_with_PyTorch.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-146
+pySDC/tests/test_transfer_classes/test_base_transfer_MPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 17-23
+pySDC/tests/test_problems/test_heat_chebychev.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 67
+pySDC/tutorial/step_7/A_pySDC_with_mpi4pyfft.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-206
+pySDC/tests/test_sweepers/test_delta_form.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 119-151,636-684
+pySDC/implementations/sweeper_classes/generic_implicit_mass.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1,5-29,33-41,68-69,153,165-177
+pySDC/implementations/problem_classes/HeatEquation_ND_FD.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 40-41
+pySDC/projects/SDC4SDEs/tests/test_sdc4sdes.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-158
+pySDC/implementations/convergence_controller_classes/estimate_extrapolation_error.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 224-244
+  s_edc09aac9d24f7::t_33a2cbd86da49d 245
+pySDC/projects/StroemungsRaum/plotting/plots_Navier_Stokes_projection_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-61
+pySDC/tests/test_transfer_classes/test_BaseTransferDelta.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 338-357
+pySDC/playgrounds/PinT_Workshop_2025/2_Coupling_pySDC_to_libraries.ipynb
+  s_edc09aac9d24f7::t_eefea6f76bc561 17,169,352-357
+pySDC/implementations/convergence_controller_classes/estimate_embedded_error.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 3,352-353,355,357-358,363-368,373-374,377-386
+pySDC/tests/test_transfer_classes/test_space_transfer_properties.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 175-226
+pySDC/projects/StroemungsRaum/plotting/plots_heat_equation_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-75
+pySDC/projects/StroemungsRaum/run_accuracy/run_accuracy_heat_equation_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-80
+pySDC/tests/test_convergence_controllers/test_extrapolation_within_Q.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 52
+pySDC/tests/test_projects/test_StroemungsRaum/test_run_scripts_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-58
+pySDC/projects/DeltaSDC/tests/test_krylov.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-39
+pySDC/tests/test_problems/test_FD_solve_precision.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 71-78,81,85,90,92,106,109,127-143,146-152,167-185
+pySDC/tutorial/step_7/G_pySDC_with_Firedrake_forms.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-266
+pySDC/playgrounds/deprecated/FEniCSx/heat_equation_raw.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-108
+pySDC/playgrounds/deprecated/FEniCS/weak_formulation_heat.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-68
+pySDC/implementations/datatype_classes/container.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 9,17,19
+pySDC/playgrounds/deprecated/FEniCSx/heat_equation_M.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-209
+pySDC/playgrounds/deprecated/FEniCSx/HookClass_FEniCS_output.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-79
+pySDC/playgrounds/deprecated/FEniCS/playground.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-22
+pySDC/projects/DeltaSDC/multigrid.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-103
+docs/source/index.rst
+  s_edc09aac9d24f7::t_eefea6f76bc561 13
+pySDC/projects/SDC4SDEs/run.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-104
+pySDC/tests/test_problems/test_grayscott_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-93
+pySDC/tests/test_projects/test_StroemungsRaum/test_heat_convdiff_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-82
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_projection_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-151
+pySDC/implementations/convergence_controller_classes/hotrod.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 88,91
+pySDC/projects/SDC4SDEs/problem_classes.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-277
+pySDC/implementations/transfer_classes/TransferMesh.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 28-81,126,133-135
+pySDC/playgrounds/time_dep_BCs/heat_time_dep_BCs.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 22
+pySDC/playgrounds/PinT_Workshop_2025/1_Add_problem_class.ipynb
+  s_edc09aac9d24f7::t_eefea6f76bc561 623
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_equations_monolithic_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-50
+pySDC/projects/PinTSimE/tests/test_SwitchEstimator.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 166-186,367,419
+  s_edc09aac9d24f7::t_22a2a5447b968a 165
+pySDC/tests/test_helpers/test_testing.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 65-85
+pySDC/tests/test_problems/test_heat_mass_firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-54
+pySDC/projects/StroemungsRaum/meshs/cylinder.msh
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-6830
+pySDC/tests/test_problems/test_form_firedrake_parallel.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-134
+pySDC/tutorial/step_7/E_2_plot_pySDC_with_Gusto_result.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-219
+pySDC/projects/StroemungsRaum/run_convection_diffusion_equation_Firedrake.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-81
+pySDC/tests/test_convergence_controllers/test_basic_restarting.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 434-477
+pySDC/implementations/sweeper_classes/delta_form.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 66-67,70,74-142,151-162,411-414,572-584,613-615,637-649,685-687,702
+  s_edc09aac9d24f7::t_ce08fe56969513 703-704
+pySDC/tests/test_sweepers/test_mass_residual.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-91
+pySDC/tests/test_controllers/test_controller_ParaDiag_nonMPI.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 301-302,319-337
+  s_edc09aac9d24f7::t_b407e062caa7bf 338-339
+pySDC/tests/test_transfer_classes/test_firedrake_transfer.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 7,20-21,50,64-65,91-130,133-210
+pySDC/tests/test_helpers/test_ufl_forms.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-152
+pySDC/tutorial/step_7/F_pySDC_on_GPU.py
+  s_edc09aac9d24f7::t_eefea6f76bc561 1-190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b17bc11052e92b3dda6e071cf0fa380f57518f90",
+  "prompts": {},
+  "sessions": {
+    "s_edc09aac9d24f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4923286-fd97-42e3-a4b1-ac7f9cdfd54d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
