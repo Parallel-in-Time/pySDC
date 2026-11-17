@@ -1,5 +1,5 @@
 r"""
-The 2D periodic vorticity problem with Firedrake, in the mass-matrix formulation, in two variants.
+The 2D periodic vorticity problem with Firedrake, in the mass-matrix formulation.
 
 On the unit square with periodic boundaries, the vorticity :math:`\omega` is advected by the velocity it induces and
 diffuses,
@@ -7,19 +7,11 @@ diffuses,
 .. math::
     \omega_t = \nu \Delta \omega - u \cdot \nabla \omega, \quad u = (\psi_y, -\psi_x), \quad -\Delta \psi = \omega,
 
-starting from a double shear layer. The stream function :math:`\psi` is a derived quantity, which the two variants
-treat differently:
-
-- :class:`Vortex2DFiredrake` solves the vorticity alone and computes :math:`\psi` by a Poisson solve in every
-  right-hand side evaluation. This is the port of
-  :class:`~pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass`, with
-  the sign of the advection corrected, see :func:`advection`.
-- :class:`Vortex2DMixedFiredrake` makes :math:`\psi` an unknown next to :math:`\omega`, and the Poisson equation an
-  algebraic equation of the system, given by forms like everything else.
-
-They converge to the same collocation solution in the same SDC iterations; the mixed one costs more per iteration on
-small meshes, since every vector operation handles both fields. On the periodic domain :math:`\psi` is only defined
-up to a constant, which drops out of the velocity; the Poisson solves remove it with a null space.
+starting from a double shear layer. :class:`Vortex2DFiredrake` solves for the vorticity and computes the stream
+function :math:`\psi` by a Poisson solve in every right-hand side evaluation. This is the port of
+:class:`~pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass`, with the
+sign of the advection corrected, see :func:`advection`. On the periodic domain :math:`\psi` is only defined up to a
+constant, which drops out of the velocity; the Poisson solves remove it with a null space.
 """
 
 import firedrake as fd
@@ -162,68 +154,3 @@ class Vortex2DFiredrake(FormFiredrakeIMEX):
         """
         assert t == 0, 'There is no exact solution of the vortex problem, only the initial value at t = 0'
         return super().u_exact(t)
-
-
-class Vortex2DMixedFiredrake(FormFiredrakeIMEX):
-    r"""
-    The periodic vorticity problem with the stream function as an unknown; see the module docstring. The unknowns are
-    :math:`(\omega, \psi)` on a mixed space, the mass form acts on :math:`\omega` only, and the Poisson equation
-    :math:`0 = (\omega, q) - (\nabla \psi, \nabla q)` is part of the implicit right-hand side, so it is solved with the
-    diffusion. Advection is explicit. The constant mode of :math:`\psi` is removed by a null space on the solves.
-
-    Parameters
-    ----------
-    n, order, nu, rho, delta, mesh, LHS_cache_size :
-        As for :class:`Vortex2DFiredrake`.
-    """
-
-    def __init__(self, n=32, order=2, nu=0.01, rho=50, delta=0.05, mesh=None, LHS_cache_size=12):
-        """Initialization, see the class docstring for the arguments."""
-        mesh = fd.PeriodicUnitSquareMesh(n, n) if mesh is None else mesh
-        V = fd.FunctionSpace(mesh, 'CG', order)
-        W = V * V
-
-        def mass(u, z):
-            w, _ = fd.split(u)
-            v, _ = fd.split(z)
-            return w * v * fd.dx
-
-        def implicit(u, z):
-            w, psi = fd.split(u)
-            v, q = fd.split(z)
-            return (-nu * fd.inner(fd.grad(w), fd.grad(v)) + w * q - fd.inner(fd.grad(psi), fd.grad(q))) * fd.dx
-
-        def explicit(u, z):
-            w, psi = fd.split(u)
-            v, _ = fd.split(z)
-            return advection(psi, w, v)
-
-        super().__init__(
-            W,
-            mass,
-            implicit,
-            explicit,
-            solver_parameters=MUMPS_NULL_PIVOTS,
-            nullspace=fd.MixedVectorSpaceBasis(W, [W.sub(0), fd.VectorSpaceBasis(constant=True, comm=mesh.comm)]),
-            LHS_cache_size=LHS_cache_size,
-        )
-        self._makeAttributeAndRegister('n', 'order', 'nu', 'rho', 'delta', localVars=locals(), readOnly=True)
-        self._initial_vorticity = double_shear_layer(mesh, rho, delta)
-        self._V = V
-
-    def u_exact(self, t):
-        """
-        The initial value: the vorticity and its stream function. There is no exact solution for later times.
-
-        Args:
-            t (float): Time, must be 0
-
-        Returns:
-            dtype_u: The initial vorticity and stream function
-        """
-        assert t == 0, 'There is no exact solution of the vortex problem, only the initial value at t = 0'
-        me = self.u_init
-        w, psi = me.functionspace.subfunctions
-        w.interpolate(self._initial_vorticity)
-        poisson_solver(self._V, w, psi).solve()
-        return me

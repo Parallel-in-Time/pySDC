@@ -1,6 +1,6 @@
 """
-Tests for the periodic vorticity problem with Firedrake, with the stream function from a Poisson solve in the
-right-hand side (`Vortex2DFiredrake`) and as an unknown on a mixed space (`Vortex2DMixedFiredrake`).
+Tests for the periodic vorticity problem with Firedrake (`Vortex2DFiredrake`), with the stream function from a Poisson
+solve in every right-hand side evaluation.
 """
 
 import pytest
@@ -50,44 +50,28 @@ def test_reference_values():
 
 
 @pytest.mark.firedrake
-@pytest.mark.parametrize('levels', [1, 2])
-def test_mixed_matches_poisson_solve(levels):
+def test_mlsdc_matches_sdc():
     """
-    With the stream function as an unknown, SDC and MLSDC take the same iterations and reach the same vorticity as
-    with the stream function from a Poisson solve: both converge to the same collocation solution.
+    MLSDC on two meshes of a hierarchy converges to the SDC solution, in no more iterations. It saves none here: the
+    coarse level does not pay for itself on the vortex, see the FEM study.
     """
     import firedrake as fd
     import numpy as np
-    from pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic import (
-        Vortex2DFiredrake,
-        Vortex2DMixedFiredrake,
-    )
+    from pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic import Vortex2DFiredrake
 
-    meshes = list(fd.MeshHierarchy(fd.PeriodicUnitSquareMesh(8, 8), 1))[::-1][:levels]
-    w_poisson, iterations_poisson = run(Vortex2DFiredrake, meshes, maxiter=30, restol=1e-9, nsteps=3)
-    w_mixed, iterations_mixed = run(Vortex2DMixedFiredrake, meshes, maxiter=30, restol=1e-9, nsteps=3)
+    meshes = list(fd.MeshHierarchy(fd.PeriodicUnitSquareMesh(8, 8), 1))[::-1]
+    w_sdc, iterations_sdc = run(Vortex2DFiredrake, meshes[:1], maxiter=30, restol=1e-9, nsteps=3)
+    w_mlsdc, iterations_mlsdc = run(Vortex2DFiredrake, meshes, maxiter=30, restol=1e-9, nsteps=3)
 
-    assert iterations_mixed == iterations_poisson, (iterations_mixed, iterations_poisson)
-    difference = np.abs(w_mixed.dat.data_ro - w_poisson.dat.data_ro).max() / np.abs(w_poisson.dat.data_ro).max()
-    assert difference < 1e-9, difference
+    assert np.mean(iterations_mlsdc) <= np.mean(iterations_sdc), (iterations_mlsdc, iterations_sdc)
+    difference = np.abs(w_mlsdc.dat.data_ro - w_sdc.dat.data_ro).max() / np.abs(w_sdc.dat.data_ro).max()
+    assert difference < 1e-8, difference
 
 
 @pytest.mark.firedrake
-def test_initial_value():
-    """The mixed variant starts from the stream function of the initial vorticity; neither has later exact values."""
-    import firedrake as fd
-    import numpy as np
-    from pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic import (
-        Vortex2DFiredrake,
-        Vortex2DMixedFiredrake,
-    )
+def test_initial_value_only():
+    """The vortex has no exact solution, only an initial value."""
+    from pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic import Vortex2DFiredrake
 
-    mixed = Vortex2DMixedFiredrake(n=8)
-    w, psi = mixed.u_exact(0.0).functionspace.subfunctions
-    q = fd.TestFunction(psi.function_space())
-    residual = fd.assemble((fd.inner(fd.grad(psi), fd.grad(q)) - w * q) * fd.dx)
-    assert np.abs(residual.dat.data_ro).max() < 1e-12
-
-    for P in [mixed, Vortex2DFiredrake(n=8)]:
-        with pytest.raises(AssertionError):
-            P.u_exact(0.1)
+    with pytest.raises(AssertionError):
+        Vortex2DFiredrake(n=8).u_exact(0.1)
