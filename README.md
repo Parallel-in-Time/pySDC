@@ -28,7 +28,7 @@
 | pySDC/helpers/multigrid.py                                                                             |      188 |        1 |     99% |       576 |
 | pySDC/helpers/plot\_helper.py                                                                          |       33 |        2 |     94% |  118, 167 |
 | pySDC/helpers/problem\_helper.py                                                                       |      103 |        0 |    100% |           |
-| pySDC/helpers/pySDC\_as\_gusto\_time\_discretization.py                                                |       92 |       92 |      0% |     1-250 |
+| pySDC/helpers/pySDC\_as\_gusto\_time\_discretization.py                                                |       92 |        2 |     98% |  115, 157 |
 | pySDC/helpers/pysdc\_helper.py                                                                         |       19 |        1 |     95% |        89 |
 | pySDC/helpers/setup\_helper.py                                                                         |       19 |        0 |    100% |           |
 | pySDC/helpers/spectral\_helper.py                                                                      |      797 |       57 |     93% |155, 196, 250, 353-354, 576, 937, 946, 1032-1035, 1100, 1188, 1287, 1336, 1638-1684, 1777-1780, 1814, 1825-1847, 1963, 2041-2043 |
@@ -50,7 +50,7 @@
 | pySDC/implementations/convergence\_controller\_classes/check\_iteration\_estimator.py                  |       46 |        1 |     98% |        39 |
 | pySDC/implementations/convergence\_controller\_classes/crash.py                                        |       45 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/estimate\_contraction\_factor.py                |       23 |        0 |    100% |           |
-| pySDC/implementations/convergence\_controller\_classes/estimate\_embedded\_error.py                    |      115 |       26 |     77% |34, 37-38, 58, 101, 107, 110-117, 221, 251-252, 266-287 |
+| pySDC/implementations/convergence\_controller\_classes/estimate\_embedded\_error.py                    |      115 |       25 |     78% |34, 37-38, 58, 101, 110-117, 221, 251-252, 266-287 |
 | pySDC/implementations/convergence\_controller\_classes/estimate\_extrapolation\_error.py               |      163 |        4 |     98% |103, 379, 410, 414 |
 | pySDC/implementations/convergence\_controller\_classes/estimate\_polynomial\_error.py                  |       97 |       10 |     90% |55, 210, 236-245 |
 | pySDC/implementations/convergence\_controller\_classes/hotrod.py                                       |       38 |        4 |     89% |85, 96, 126-127 |
@@ -58,7 +58,7 @@
 | pySDC/implementations/convergence\_controller\_classes/interpolate\_between\_restarts.py               |       41 |        3 |     93% | 55, 93-94 |
 | pySDC/implementations/convergence\_controller\_classes/spatial\_error\_floor\_firedrake.py             |       32 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/spread\_step\_sizes.py                          |       61 |        0 |    100% |           |
-| pySDC/implementations/convergence\_controller\_classes/step\_size\_limiter.py                          |       63 |        9 |     86% |176-181, 204-215 |
+| pySDC/implementations/convergence\_controller\_classes/step\_size\_limiter.py                          |       63 |        0 |    100% |           |
 | pySDC/implementations/convergence\_controller\_classes/store\_uold.py                                  |       14 |        0 |    100% |           |
 | pySDC/implementations/datatype\_classes/container.py                                                   |       25 |        0 |    100% |           |
 | pySDC/implementations/datatype\_classes/cupy\_mesh.py                                                  |       66 |        6 |     91% |5-6, 12-13, 63, 71 |
@@ -98,7 +98,7 @@
 | pySDC/implementations/problem\_classes/FullSolarSystem.py                                              |       43 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/GeneralizedFisher\_1D\_FD\_implicit.py                          |       57 |        2 |     96% |  178, 181 |
 | pySDC/implementations/problem\_classes/GeneralizedFisher\_1D\_PETSc.py                                 |      243 |        2 |     99% |  126, 223 |
-| pySDC/implementations/problem\_classes/GenericGusto.py                                                 |      110 |      110 |      0% |     1-315 |
+| pySDC/implementations/problem\_classes/GenericGusto.py                                                 |      110 |        8 |     93% |91, 156, 182-186, 307-311 |
 | pySDC/implementations/problem\_classes/GrayScott\_1D\_Firedrake.py                                     |       19 |        0 |    100% |           |
 | pySDC/implementations/problem\_classes/GrayScott\_2D\_PETSc\_periodic.py                               |      305 |        2 |     99% |  175, 281 |
 | pySDC/implementations/problem\_classes/GrayScott\_MPIFFT.py                                            |      297 |        6 |     98% |266-277, 290-291 |
@@ -405,7 +405,7 @@
 | pySDC/tutorial/step\_7/B\_pySDC\_with\_PETSc.py                                                        |       92 |        2 |     98% |    63, 71 |
 | pySDC/tutorial/step\_7/C\_pySDC\_with\_PyTorch.py                                                      |       44 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/D\_pySDC\_with\_Firedrake.py                                                    |      110 |        0 |    100% |           |
-| pySDC/tutorial/step\_7/E\_pySDC\_with\_Gusto.py                                                        |      112 |      112 |      0% |    40-364 |
+| pySDC/tutorial/step\_7/E\_pySDC\_with\_Gusto.py                                                        |      112 |       10 |     91% |157-162, 226-233, 361 |
 | pySDC/tutorial/step\_7/F\_pySDC\_on\_GPU.py                                                            |       43 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/G\_pySDC\_with\_Firedrake\_forms.py                                             |       67 |        0 |    100% |           |
 | pySDC/tutorial/step\_7/torch\_heat.py                                                                  |      133 |       28 |     79% |15-16, 77-81, 99, 113, 126-127, 211-212, 241, 259-262, 280-282, 289-297, 360 |
@@ -419,7 +419,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                           |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                             |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                              |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                              | **33153** | **4295** | **87%** |           |
+| **TOTAL**                                                                                              | **33153** | **3991** | **88%** |           |
 
 46 empty files skipped.
 
