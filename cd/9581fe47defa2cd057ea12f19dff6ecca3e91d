@@ -1,0 +1,21 @@
+pySDC/projects/FEM_with_FEniCS/README.rst
+  s_234ff217a70910::t_fb36b444c8a304 41,203-204,206-208,214-241,258-260
+pySDC/tests/test_projects/test_FEM_with_FEniCS/test_fem_firedrake.py
+  s_234ff217a70910::t_6699f9b1631582 110-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cd9581fe47defa2cd057ea12f19dff6ecca3e91d",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
