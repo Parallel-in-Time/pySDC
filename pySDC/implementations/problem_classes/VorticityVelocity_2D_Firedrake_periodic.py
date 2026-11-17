@@ -119,8 +119,7 @@ class Vortex2DFiredrake(FormFiredrakeIMEX):
 
     def __init__(self, n=32, order=2, nu=0.01, rho=50, delta=0.05, mesh=None, LHS_cache_size=12):
         """Initialization, see the class docstring for the arguments."""
-        # `diagonal='right'` splits the squares like DOLFIN's UnitSquareMesh
-        mesh = fd.PeriodicUnitSquareMesh(n, n, diagonal='right') if mesh is None else mesh
+        mesh = fd.PeriodicUnitSquareMesh(n, n) if mesh is None else mesh
         V = fd.FunctionSpace(mesh, 'CG', order)
         self.psi = fd.Function(V)
         self._w = fd.Function(V)
@@ -180,7 +179,7 @@ class Vortex2DMixedFiredrake(FormFiredrakeIMEX):
 
     def __init__(self, n=32, order=2, nu=0.01, rho=50, delta=0.05, mesh=None, LHS_cache_size=12):
         """Initialization, see the class docstring for the arguments."""
-        mesh = fd.PeriodicUnitSquareMesh(n, n, diagonal='right') if mesh is None else mesh
+        mesh = fd.PeriodicUnitSquareMesh(n, n) if mesh is None else mesh
         V = fd.FunctionSpace(mesh, 'CG', order)
         W = V * V
 

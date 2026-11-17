@@ -29,9 +29,6 @@ class GrayScott1DFiredrake(FormFiredrake):
         Number of cells, ignored if `mesh` is given.
     order : int, optional
         Degree of the Lagrange elements.
-    variant : str, optional
-        Where the Lagrange elements have their nodes. By default Firedrake's, ``'spectral'`` (Gauss-Lobatto points),
-        which is better conditioned at high degrees than ``'equispaced'``, where FEniCS puts them.
     Du, Dv : float, optional
         Diffusion rates of :math:`u` and :math:`v`.
     A : float, optional
@@ -55,7 +52,6 @@ class GrayScott1DFiredrake(FormFiredrake):
         self,
         n=256,
         order=4,
-        variant=None,
         Du=1.0,
         Dv=0.01,
         A=0.09,
@@ -66,7 +62,7 @@ class GrayScott1DFiredrake(FormFiredrake):
     ):
         """Initialization, see the class docstring for the arguments."""
         mesh = fd.IntervalMesh(n, 100) if mesh is None else mesh
-        V = fd.FunctionSpace(mesh, 'CG', order, variant=variant)
+        V = fd.FunctionSpace(mesh, 'CG', order)
 
         def mass(w, q):
             return fd.inner(w, q) * fd.dx

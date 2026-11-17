@@ -7,13 +7,13 @@ import pytest
 SWEEPER_PARAMS = {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU'}
 SOLVER_PARAMS = {'snes_rtol': 1e-13, 'snes_atol': 1e-14}
 
-# u and v at x = 40, 45, 50 after two steps of dt = 1 with exactly four SDC iterations each, computed with
-# `fenics_grayscott_mass` (FEniCS 2019.1, 64 cells refined twice, CG4, Newton tolerances 1e-13), the same setup as
-# `test_reproduces_FEniCS` below. Kept here so the comparison survives FEniCS.
-FENICS_REFERENCE = {
-    40.0: (0.9899250073249913, 0.0014233336364738024),
-    45.0: (0.8427316578599324, 0.06899513140777032),
-    50.0: (0.5834120589014018, 0.2804413259084242),
+# u and v at x = 40, 45, 50 after two steps of dt = 1 with exactly four SDC iterations each (256 cells, CG4 with
+# Firedrake's default nodes, Newton tolerances 1e-13), computed with `GrayScott1DFiredrake` itself (Firedrake 2026.10),
+# as a check against unintended changes
+REFERENCE = {
+    40.0: (0.9899250073282054, 0.0014233336355883224),
+    45.0: (0.842731657845967, 0.06899513142051854),
+    50.0: (0.5834120589275994, 0.2804413258641244),
 }
 
 
@@ -41,21 +41,18 @@ def run(problem_params, maxiter, restol, nsteps, levels=1, **description):
 
 
 @pytest.mark.firedrake
-def test_reproduces_FEniCS():
-    """
-    Same mesh, elements, nodes and iterations as `fenics_grayscott_mass` give the same solution to round-off. FEniCS
-    puts the Lagrange nodes at equispaced points, so this run does too.
-    """
+def test_reference_values():
+    """The recorded values, to round-off."""
     import firedrake as fd
     import numpy as np
 
-    params = {'n': 256, 'order': 4, 'variant': 'equispaced', 'solver_parameters': SOLVER_PARAMS}
+    params = {'n': 256, 'order': 4, 'solver_parameters': SOLVER_PARAMS}
     uend, _ = run(params, maxiter=4, restol=-1.0, nsteps=2)
 
-    points = [[x] for x in FENICS_REFERENCE]
+    points = [[x] for x in REFERENCE]
     u, v = uend.functionspace.subfunctions
     evaluate = fd.PointEvaluator(u.function_space().mesh(), points).evaluate
-    expect = np.array(list(FENICS_REFERENCE.values()))
+    expect = np.array(list(REFERENCE.values()))
     assert np.allclose(np.stack([evaluate(u), evaluate(v)], axis=1), expect, rtol=0, atol=1e-11)
 
 

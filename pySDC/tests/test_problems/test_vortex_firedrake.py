@@ -6,10 +6,10 @@ right-hand side (`Vortex2DFiredrake`) and as an unknown on a mixed space (`Vorte
 import pytest
 
 POINTS = [[0.1, 0.25], [0.3, 0.7], [0.55, 0.26], [0.8, 0.5]]
-# the vorticity at POINTS after two steps of dt = 0.001 (32 x 32 squares, CG2, nu = 0.01, rho = 50, delta = 0.05, three
+# the vorticity at POINTS after two steps of dt = 0.001 (32 x 32 squares with Firedrake's default diagonal, CG2, nu = 0.01, rho = 50, delta = 0.05, three
 # RADAU-RIGHT nodes, LU, exactly three iterations), computed with `Vortex2DFiredrake` itself (Firedrake 2026.10), as a
 # check against unintended changes. It no longer matches FEniCS, whose advection has the opposite sign.
-REFERENCE = [44.8108513149479, -1.076848186417392, 34.914573875870076, -0.29732767182419345]
+REFERENCE = [44.811970527860026, -1.1220729397285363, 35.09452421651993, -0.29732767768767804]
 
 
 def run(problem_class, meshes, maxiter, restol, nsteps):
@@ -43,7 +43,7 @@ def test_reference_values():
     import numpy as np
     from pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic import Vortex2DFiredrake
 
-    mesh = fd.PeriodicUnitSquareMesh(32, 32, diagonal='right')
+    mesh = fd.PeriodicUnitSquareMesh(32, 32)
     w, _ = run(Vortex2DFiredrake, [mesh], maxiter=3, restol=-1.0, nsteps=2)
     values = fd.PointEvaluator(mesh, POINTS).evaluate(w)
     assert np.allclose(values, REFERENCE, rtol=0, atol=1e-11), values
@@ -63,7 +63,7 @@ def test_mixed_matches_poisson_solve(levels):
         Vortex2DMixedFiredrake,
     )
 
-    meshes = list(fd.MeshHierarchy(fd.PeriodicUnitSquareMesh(8, 8, diagonal='right'), 1))[::-1][:levels]
+    meshes = list(fd.MeshHierarchy(fd.PeriodicUnitSquareMesh(8, 8), 1))[::-1][:levels]
     w_poisson, iterations_poisson = run(Vortex2DFiredrake, meshes, maxiter=30, restol=1e-9, nsteps=3)
     w_mixed, iterations_mixed = run(Vortex2DMixedFiredrake, meshes, maxiter=30, restol=1e-9, nsteps=3)
 
