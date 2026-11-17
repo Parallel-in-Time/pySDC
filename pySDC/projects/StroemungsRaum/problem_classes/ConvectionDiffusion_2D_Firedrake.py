@@ -38,9 +38,9 @@ class ConvDiff2DFiredrake(FormFiredrakeIMEX):
 
     def __init__(self, c_nvars=64, order=2, nu=0.01, sigma=0.05, LHS_cache_size=12):
         """Initialization, see the class docstring for the arguments."""
-        # Firedrake takes the upper corner here, not the lengths; `diagonal='right'` and equispaced nodes are DOLFIN's
-        mesh = fd.RectangleMesh(c_nvars, c_nvars, 0.5, 0.5, originX=-0.5, originY=-0.5, diagonal='right')
-        V = fd.FunctionSpace(mesh, 'CG', order, variant='equispaced')
+        # Firedrake takes the upper corner here, not the lengths
+        mesh = fd.RectangleMesh(c_nvars, c_nvars, 0.5, 0.5, originX=-0.5, originY=-0.5)
+        V = fd.FunctionSpace(mesh, 'CG', order)
 
         t = fd.Constant(0.0)
         x, y = fd.SpatialCoordinate(mesh)
@@ -67,8 +67,6 @@ class ConvDiff2DFiredrake(FormFiredrakeIMEX):
             bcs=(fd.DirichletBC(V, u_exact, 'on_boundary'),),
             t=t,
             u_exact=u_exact,
-            # the implicit systems are linear
-            solver_parameters={'snes_type': 'ksponly'},
             LHS_cache_size=LHS_cache_size,
         )
         self._makeAttributeAndRegister('c_nvars', 'order', 'nu', 'sigma', localVars=locals(), readOnly=True)

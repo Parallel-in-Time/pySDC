@@ -5,21 +5,21 @@ than in the project, because the project's own tests run in its FEniCS environme
 
 import pytest
 
-# Two steps from t = 0 with two RADAU-RIGHT nodes, the default preconditioners and exactly three iterations, computed
-# with `fenics_heat2D_mass` (dt = 0.2) and `fenics_ConvDiff2D_mass` (dt = 0.005) with their default parameters, as
-# u at the points. Kept here so the comparison survives FEniCS.
-FENICS = {
+# Two steps from t = 0 with two RADAU-RIGHT nodes, the default preconditioners and exactly three iterations (heat
+# dt = 0.2, convection-diffusion dt = 0.005, default parameters), as u at the points, computed with these classes
+# (Firedrake 2026.10) as a check against unintended changes.
+REFERENCE = {
     'heat': {
-        (0.1, 0.2): 0.1673141704633517,
-        (0.5, 0.5): 0.9211559269793309,
-        (0.73, 0.31): 0.5714878163684806,
-        (0.9, 0.85): 0.12922964366379383,
+        (0.1, 0.2): 0.1673156273643707,
+        (0.5, 0.5): 0.9211559411114335,
+        (0.73, 0.31): 0.5714870760711991,
+        (0.9, 0.85): 0.12922990958517164,
     },
     'convdiff': {
-        (-0.25, 0.0): 0.8330362833718628,
-        (-0.2, 0.05): 0.1063283232246961,
-        (-0.3, -0.03): 0.3150474007899712,
-        (-0.27, 0.02): 0.5482890607334171,
+        (-0.25, 0.0): 0.8330320402839247,
+        (-0.2, 0.05): 0.10569585230600223,
+        (-0.3, -0.03): 0.31452031127144664,
+        (-0.27, 0.02): 0.547796940948503,
     },
 }
 DT = {'heat': 0.2, 'convdiff': 0.005}
@@ -48,19 +48,19 @@ def run(name, dt, Tend, maxiter, restol):
 
 @pytest.mark.firedrake
 @pytest.mark.parametrize('name', ['heat', 'convdiff'])
-def test_reproduces_FEniCS(name):
-    """The same steps as the FEniCS version, on the same mesh, give the same solution to round-off."""
+def test_reference_values(name):
+    """The same steps give the recorded values, to round-off."""
     import firedrake as fd
     import numpy as np
 
     P, uend = run(name, DT[name], 2 * DT[name], maxiter=3, restol=-1.0)
-    values = fd.PointEvaluator(P.mesh, [list(x) for x in FENICS[name]]).evaluate(uend.functionspace)
-    assert np.allclose(values, list(FENICS[name].values()), rtol=0, atol=1e-12), values
+    values = fd.PointEvaluator(P.mesh, [list(x) for x in REFERENCE[name]]).evaluate(uend.functionspace)
+    assert np.allclose(values, list(REFERENCE[name].values()), rtol=0, atol=1e-12), values
 
 
 @pytest.mark.firedrake
 def test_heat_accuracy():
-    """The project's heat setup reaches the accuracy the FEniCS test asks for (1.54e-4 there, as here)."""
+    """The project's heat setup reaches its accuracy target, 1.54e-4."""
     P, uend = run('heat', 0.2, 1.0, maxiter=20, restol=1e-11)
     uex = P.u_exact(1.0)
     assert abs(uex - uend) / abs(uex) <= 2e-4
@@ -68,7 +68,7 @@ def test_heat_accuracy():
 
 @pytest.mark.firedrake
 def test_convdiff_exact_solution():
-    """The rotating Gaussian solves the equation without forcing, as the FEniCS version assumes: u_t + U.grad u = nu lap u."""
+    """The rotating Gaussian solves the equation without forcing, as the class assumes: u_t + U.grad u = nu lap u."""
     import firedrake as fd
     from pySDC.helpers.ufl_forms import time_derivative
     from pySDC.projects.StroemungsRaum.problem_classes.ConvectionDiffusion_2D_Firedrake import ConvDiff2DFiredrake

@@ -1,7 +1,6 @@
 """
 The Taylor-Green order study of :mod:`pySDC.projects.StroemungsRaum.run_Navier_Stokes_TaylorGreen_FEniCS` with the
-Firedrake port of the problem class, :class:`NavierStokes2DTaylorGreenFiredrake`. The ``differentiated_bc`` option of
-the FEniCS version is not ported.
+Firedrake port of the problem class, :class:`NavierStokes2DTaylorGreenFiredrake`.
 """
 
 import firedrake as fd
@@ -9,21 +8,33 @@ import numpy as np
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass_diffbc import generic_implicit_mass_diffbc
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
     NavierStokes2DTaylorGreenFiredrake,
 )
 
 
-def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxiter=40, restol=2e-9, newton_tol=1e-13):
+def setup(
+    t0=0.0,
+    dt=0.1,
+    periodic=False,
+    differentiated_bc=False,
+    nelems=24,
+    nu=0.1,
+    num_nodes=4,
+    maxiter=40,
+    restol=2e-9,
+    newton_tol=1e-13,
+):
     """
-    The parameters of the FEniCS version, with its residual tolerance 1e-12 converted to the dual norm the Firedrake
-    data types use: on the default mesh, the dual norm of a residual is about 1700 times the norm FEniCS takes (the L2
-    norm of the function with the residual's entries as coefficients), so 1e-12 becomes about 2e-9.
+    The parameters of the order study. The residual tolerance is in the norm dual to L2 that the Firedrake data types
+    measure residuals in; 2e-9 is well below the time errors the study resolves.
 
     Args:
         t0 (float): Initial time
         dt (float): Step size
         periodic (bool): Periodic instead of time-dependent Dirichlet boundaries in x
+        differentiated_bc (bool): Impose the time-dependent boundary data in differentiated form
         nelems (int): Number of squares per direction
         nu (float): Kinematic viscosity
         num_nodes (int): Number of collocation nodes
@@ -41,9 +52,10 @@ def setup(t0=0.0, dt=0.1, periodic=False, nelems=24, nu=0.1, num_nodes=4, maxite
             'order': 2,
             'nu': nu,
             'periodic': periodic,
+            'differentiated_bc': differentiated_bc,
             'solver_parameters': {'snes_atol': newton_tol, 'snes_rtol': newton_tol},
         },
-        'sweeper_class': generic_implicit_mass,
+        'sweeper_class': generic_implicit_mass_diffbc if differentiated_bc else generic_implicit_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': num_nodes, 'QI': 'LU'},
         'level_params': {'restol': restol, 'dt': dt},
         'step_params': {'maxiter': maxiter},
@@ -89,7 +101,7 @@ def run_postprocessing(P, uend, Tend):
     return relative_errors(uend, P.u_exact(Tend))
 
 
-def order_study(dts, Tend, periodic=False, **kwargs):
+def order_study(dts, Tend, **kwargs):
     """
     Observed temporal order by comparing consecutive step sizes with each other on the same mesh, which cancels the
     spatial error (it dominates the error against the exact solution on any affordable mesh).
@@ -97,15 +109,14 @@ def order_study(dts, Tend, periodic=False, **kwargs):
     Args:
         dts (list of float): Step sizes, largest first, each half the previous
         Tend (float): Final time, an integer multiple of every step size
-        periodic (bool): Periodic instead of time-dependent Dirichlet boundaries in x
-        kwargs: Passed on to :func:`setup`
+        kwargs: Passed on to :func:`setup`, e.g. `periodic` or `differentiated_bc`
 
     Returns:
         The step sizes the errors belong to (one fewer than `dts`), and the relative velocity and pressure errors
     """
     solutions = []
     for dt in dts:
-        description, controller_params, t0 = setup(dt=dt, periodic=periodic, **kwargs)
+        description, controller_params, t0 = setup(dt=dt, **kwargs)
         solutions.append(run_simulation(description, controller_params, t0, Tend)[2])
     errors = [relative_errors(u, ref) for u, ref in zip(solutions[:-1], solutions[1:], strict=True)]
     return dts[:-1], [e[0] for e in errors], [e[1] for e in errors]
@@ -118,12 +129,18 @@ def observed_order(dts, errors):
 
 def main():
     """
-    Run the order study for both boundary types. RADAU-RIGHT with M nodes has design order 2M-1 and drops to M+1 with
-    time-dependent boundary data on a stiff problem, so M = 4 shows the gap: 7 against 5 in the pressure.
+    Run the order study for the three boundary treatments. RADAU-RIGHT with M nodes has design order 2M-1 and drops to
+    M+1 with time-dependent boundary data on a stiff problem, so M = 4 shows the gap, which the differentiated
+    boundary conditions mostly close.
     """
     Tend, dts = 0.2, [0.2, 0.1, 0.05, 0.025]
-    for label, periodic in [('periodic', True), ('time-dependent Dirichlet', False)]:
-        dts_out, errors_u, errors_p = order_study(dts, Tend, periodic=periodic)
+    cases = [
+        ('periodic', dict(periodic=True)),
+        ('time-dependent Dirichlet', dict(periodic=False)),
+        ('time-dependent Dirichlet, differentiated', dict(periodic=False, differentiated_bc=True)),
+    ]
+    for label, kwargs in cases:
+        dts_out, errors_u, errors_p = order_study(dts, Tend, **kwargs)
         print(f'\n{label} boundary conditions in x:')
         print(f'{"dt":>10} {"err(u)":>12} {"order(u)":>9} {"err(p)":>12} {"order(p)":>9}')
         orders_u = [None] + observed_order(dts_out, errors_u)

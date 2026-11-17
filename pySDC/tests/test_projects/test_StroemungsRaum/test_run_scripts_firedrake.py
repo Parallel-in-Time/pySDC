@@ -1,6 +1,6 @@
 """
 Tests for the Firedrake ports of StroemungsRaum's Taylor-Green and monolithic run scripts and of the heat accuracy
-study, mirroring what the FEniCS tests assert about them.
+study.
 """
 
 import pytest
@@ -25,7 +25,7 @@ def test_taylor_green_benchmark(periodic):
 
 @pytest.mark.firedrake
 def test_monolithic_run_script():
-    """One step of the monolithic cylinder flow, within the coarse-mesh tolerances of the FEniCS test against FEATFLOW."""
+    """One step of the monolithic cylinder flow, within the coarse-mesh tolerances against FEATFLOW."""
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.projects.StroemungsRaum.run_Navier_Stokes_equations_monolithic_Firedrake import run_simulation, setup
 

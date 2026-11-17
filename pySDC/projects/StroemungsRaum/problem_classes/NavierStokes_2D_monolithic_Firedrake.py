@@ -1,9 +1,6 @@
 import os
-import xml.etree.ElementTree as ET
 
 import firedrake as fd
-import numpy as np
-from firedrake.petsc import PETSc
 
 from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
 
@@ -13,10 +10,8 @@ INFLOW, OUTFLOW, WALLS, CYLINDER = 1, 2, 3, 4
 
 def cylinder_mesh(comm=fd.COMM_WORLD):
     """
-    The mesh of the channel with a cylinder, read from ``meshs/cylinder.xml``, the DOLFIN XML file the FEniCS version
-    uses, so that both discretize the same mesh. Firedrake cannot read that format, so the vertices and triangles are
-    put into a PETSc DMPlex, and the boundary facets are labelled with the geometric predicates of the FEniCS version:
-    the inflow at x = 0, the outflow at x = 2.2, the walls at y = 0 and y = 0.41, and the cylinder for the rest.
+    The mesh of the channel with a cylinder, ``meshs/cylinder.msh``, with its boundaries tagged: the inflow at x = 0,
+    the outflow at x = 2.2, the walls at y = 0 and y = 0.41, and the cylinder.
 
     Args:
         comm (mpi4py.MPI.Intracomm): Communicator to distribute the mesh over
@@ -24,30 +19,7 @@ def cylinder_mesh(comm=fd.COMM_WORLD):
     Returns:
         firedrake.MeshGeometry: The mesh, with the boundary ids `INFLOW`, `OUTFLOW`, `WALLS` and `CYLINDER`
     """
-    if comm.rank == 0:
-        mesh = ET.parse(f'{os.path.dirname(__file__)}/../meshs/cylinder.xml').getroot().find('mesh')
-        coords = np.array([[float(v.get('x')), float(v.get('y'))] for v in mesh.find('vertices')])
-        cells = np.array([[int(c.get(key)) for key in ('v0', 'v1', 'v2')] for c in mesh.find('cells')], dtype=np.int32)
-    else:
-        coords, cells = np.zeros((0, 2)), np.zeros((0, 3), dtype=np.int32)
-
-    plex = PETSc.DMPlex().createFromCellList(2, cells, coords, comm=comm)
-    plex.markBoundaryFaces('boundary_faces', 1)
-    plex.createLabel('Face Sets')
-    if plex.getStratumSize('boundary_faces', 1) > 0:
-        for face in plex.getStratumIS('boundary_faces', 1).getIndices():
-            x, y = plex.computeCellGeometryFVM(face)[1]
-            if np.isclose(x, 0):
-                label = INFLOW
-            elif np.isclose(x, 2.2):
-                label = OUTFLOW
-            elif np.isclose(y, 0) or np.isclose(y, 0.41):
-                label = WALLS
-            else:
-                label = CYLINDER
-            plex.setLabelValue('Face Sets', face, label)
-    plex.removeLabel('boundary_faces')
-    return fd.Mesh(plex, comm=comm)
+    return fd.Mesh(f'{os.path.dirname(__file__)}/../meshs/cylinder.msh', comm=comm)
 
 
 def drag_lift(u, p, nu, mesh):

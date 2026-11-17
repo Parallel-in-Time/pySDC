@@ -9,8 +9,7 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
     r"""
     Incompressible Navier-Stokes with a manufactured, travelling Taylor-Green solution on :math:`[-0.5, 0.5]^2`,
     monolithic, with Firedrake and given by its weak forms. This is the port of
-    :class:`~pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS.fenics_NSE_2D_TaylorGreen`
-    without its ``differentiated_bc`` option, on the same meshes.
+    :class:`~pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS.fenics_NSE_2D_TaylorGreen`.
 
     The exact solution
 
@@ -23,9 +22,8 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
     computed with time-dependent Dirichlet values on :math:`x = \pm 0.5` or with periodic boundaries there, which
     isolates the order reduction caused by the time-dependent boundary data (see the project's README).
 
-    The forcing :math:`g = u_t + u \cdot \nabla u - \nu \Delta u + \nabla p` is derived from the exact solution by UFL,
-    and interpolated into Lagrange elements two degrees above the velocity, with equispaced nodes, as the FEniCS version
-    does with its ``Expression``. The forms are those of
+    The forcing :math:`g = u_t + u \cdot \nabla u - \nu \Delta u + \nabla p` is derived from the exact solution by UFL
+    and enters the form as an expression. The forms are those of
     :class:`~pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_Firedrake.NavierStokes2DMonolithicFiredrake`
     plus the forcing, and everything else comes from
     :class:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake`.
@@ -40,20 +38,33 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         Kinematic viscosity :math:`\nu`.
     periodic : bool, optional
         Periodic instead of time-dependent Dirichlet boundaries on :math:`x = \pm 0.5`.
+    differentiated_bc : bool, optional
+        Impose the time-dependent boundary data in differentiated form, see :meth:`prepare_step`. Needs time-dependent
+        data (not `periodic`) and the sweeper
+        :class:`~pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass_diffbc.generic_implicit_mass_diffbc`.
     solver_parameters : dict, optional
-        PETSc options for the nonlinear solves, by default Newton with tolerances like those of the FEniCS version.
+        PETSc options for the nonlinear solves, by default Newton with tight tolerances.
     LHS_cache_size : int, optional
         Number of solvers kept, see ``FormFiredrake``.
     """
 
-    def __init__(self, nelems=32, order=2, nu=0.02, periodic=False, solver_parameters=None, LHS_cache_size=12):
+    def __init__(
+        self,
+        nelems=32,
+        order=2,
+        nu=0.02,
+        periodic=False,
+        differentiated_bc=False,
+        solver_parameters=None,
+        LHS_cache_size=12,
+    ):
         """Initialization, see the class docstring for the arguments."""
-        # `diagonal='right'` splits the squares like DOLFIN does. Boundary ids: 1, 2 at x = -+0.5, 3, 4 at y = -+0.5.
+        # boundary ids: 1, 2 at x = -+0.5, 3, 4 at y = -+0.5
         if periodic:
-            mesh = fd.PeriodicRectangleMesh(nelems, nelems, 1, 1, direction='x', diagonal='right')
+            mesh = fd.PeriodicRectangleMesh(nelems, nelems, 1, 1, direction='x')
             mesh.coordinates.dat.data[:] -= 0.5
         else:
-            mesh = fd.RectangleMesh(nelems, nelems, 0.5, 0.5, originX=-0.5, originY=-0.5, diagonal='right')
+            mesh = fd.RectangleMesh(nelems, nelems, 0.5, 0.5, originX=-0.5, originY=-0.5)
         V = fd.VectorFunctionSpace(mesh, 'CG', order)
         W = V * fd.FunctionSpace(mesh, 'CG', order - 1)
 
@@ -71,8 +82,6 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         forcing = (
             time_derivative(u_ex, t) + fd.dot(u_ex, fd.nabla_grad(u_ex)) - nu * fd.div(fd.grad(u_ex)) + fd.grad(p_ex)
         )
-        # interpolated with equispaced nodes, where DOLFIN puts them: Firedrake's default for high degrees differs
-        forcing = fd.interpolate(forcing, fd.VectorFunctionSpace(mesh, 'CG', order + 2, variant='equispaced'))
 
         mass, rhs = navier_stokes_forms(nu, forcing)
 
@@ -83,6 +92,8 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         )
         if not periodic:
             bcs += (fd.DirichletBC(W.sub(0), u_ex, (1, 2)), fd.DirichletBC(W.sub(1), p_ex, (1, 2)))
+        if differentiated_bc and periodic:
+            raise ValueError('differentiated_bc has no effect without time-dependent boundary data')
         if solver_parameters is None:
             solver_parameters = {'snes_atol': 1e-10, 'snes_rtol': 1e-9}
 
@@ -96,5 +107,51 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
             solver_parameters=solver_parameters,
             LHS_cache_size=LHS_cache_size,
         )
-        self._makeAttributeAndRegister('nelems', 'order', 'nu', 'periodic', localVars=locals(), readOnly=True)
+        self._makeAttributeAndRegister(
+            'nelems', 'order', 'nu', 'periodic', 'differentiated_bc', localVars=locals(), readOnly=True
+        )
         self.mesh = mesh
+        #: the time derivative of the exact solution, whose boundary values the differentiated conditions integrate
+        self._rate = time_derivative(self.u_exact_expr, t)
+
+    def prepare_step(self, t0, dt, coll):
+        r"""
+        Impose the boundary data of the step's collocation nodes in differentiated form. Rather than evaluating the
+        data at the node, :math:`g(\tau_m)`, the boundary values are recovered from its time derivative by the
+        collocation quadrature,
+
+        .. math::
+            g_m = g(t_0) + \Delta t \sum_j Q_{mj}\, \dot{g}(\tau_j),
+
+        which is consistent with the collocation polynomial instead of exact pointwise; the two differ by the
+        quadrature error. That recovers most of the order the time-dependent data costs, see the project's README.
+        The derivative comes from UFL. The values are handed to the solves as the boundary values to impose at the
+        node times, the mechanism coarse levels use for the restricted fine solution
+        (:meth:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.use_restricted_boundary_values`),
+        so on coarse levels of MLSDC and PFASST the restriction takes over, as it should.
+
+        Called once per step by
+        :class:`~pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass_diffbc.generic_implicit_mass_diffbc`.
+
+        Args:
+            t0 (float): Start of the step
+            dt (float): Step size
+            coll: The sweeper's collocation rule
+        """
+        if not self.differentiated_bc:
+            raise RuntimeError(
+                'prepare_step imposes differentiated boundary conditions, which this problem was not set up for; use '
+                'generic_implicit_mass or pass differentiated_bc=True'
+            )
+        times = [t0 + dt * tau for tau in coll.nodes]
+        rates = []
+        for tau in times:
+            self.t.assign(tau)
+            rates.append(self.dtype_u(self.u_init.functionspace.interpolate(self._rate)))
+        values = []
+        for m in range(coll.num_nodes):
+            value = self.u_exact(t0)
+            for j, rate in enumerate(rates):
+                value += dt * coll.Qmat[m + 1, j + 1] * rate
+            values.append(value)
+        self.use_restricted_boundary_values(values, times)

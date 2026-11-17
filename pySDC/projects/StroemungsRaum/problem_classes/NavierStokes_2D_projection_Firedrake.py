@@ -69,8 +69,6 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
             bcs=velocity_bcs(V, t),
             t=t,
             u_exact=fd.as_vector([0.0, 0.0]),
-            # the tentative velocity solve is linear
-            solver_parameters={'snes_type': 'ksponly'},
             LHS_cache_size=LHS_cache_size,
         )
         self._makeAttributeAndRegister('nu', 'order', localVars=locals(), readOnly=True)
