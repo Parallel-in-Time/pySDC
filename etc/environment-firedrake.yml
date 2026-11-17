@@ -2,8 +2,8 @@
 
 # Firedrake without its Docker image: conda-forge's prebuilt PETSc instead of the 20-40 min source
 # build that firedrake-configure drives. The PETSc/petsc4py pin must equal the petsc4py== pin of the
-# Firedrake release the CI job installs (2026.10.0 -> 3.26.0, the version in the Docker image of
-# user_firedrake_tests); bump the two together. The job then pip-installs Firedrake itself, which
+# Firedrake release the CI job installs (2026.10.0 -> 3.26.0, the version in Firedrake's 2026.10.0 Docker
+# image); bump the two together. The job then pip-installs Firedrake itself, which
 # cannot go in a pip: section here, since it has to be built without build isolation against this PETSc.
 name: pySDC
 channels:
@@ -17,6 +17,9 @@ dependencies:
   - mpi4py
   - h5py=*=mpi_openmpi_*
   - pandas
+  # for Gusto, which the CI job pip-installs from git: built against this MPI and HDF5
+  - netcdf4=*=mpi_openmpi_*
+  - vtk
   # building Firedrake and its JIT-compiled kernels
   - compilers
   - pkg-config

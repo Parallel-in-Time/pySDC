@@ -50,7 +50,7 @@ pySDC uses several third-party dependencies. We monitor our dependencies for kno
 Every [release](https://github.com/Parallel-in-Time/pySDC/releases) comes with software bills of materials (SBOMs) in CycloneDX format, generated from the installed environments with the exact versions resolved on the day of the release:
 
 - `sbom-pySDC.cdx.json`: the core install, i.e. `pip install pySDC`
-- `sbom-env-<name>.cdx.json`: the optional backends in `etc/environment-<name>.yml` (PETSc, MPI, CuPy, PyTorch, ...)
+- `sbom-env-<name>.cdx.json`: the optional backends in `etc/environment-<name>.yml` (PETSc, MPI, CuPy, PyTorch, ...); `sbom-env-firedrake.cdx.json` also covers Firedrake and Gusto, which are pip-installed on top of `etc/environment-firedrake.yml`
 - `sbom-project-<name>.cdx.json`: the environments of the projects in `pySDC/projects/<name>`
 
 The ones for the newest release are always at `https://github.com/Parallel-in-Time/pySDC/releases/latest/download/<file>`, e.g. [sbom-pySDC.cdx.json](https://github.com/Parallel-in-Time/pySDC/releases/latest/download/sbom-pySDC.cdx.json).
