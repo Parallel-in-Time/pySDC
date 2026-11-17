@@ -9,6 +9,24 @@ Changelog
 
 |:arrow_left:| :doc:`Back to main page <./index>`
 
+.. _CHANGELOG/version-5.10-—-november-17,-2026:
+
+Version 5.10 — November 17, 2026
+--------------------------------
+
+Version 5.10 replaces FEniCS with `Firedrake <https://www.firedrakeproject.org>`_\ , now at 2026.10. Problems can be written
+as UFL weak forms and are solved in mass-matrix form, so the mass matrix is never inverted; residuals are measured in
+the dual norm, and a convergence controller stops iterating at the spatial error, also with PFASST. The FEM study,
+Gray-Scott, the periodic vortex and ``StroemungsRaum`` all run this way. Two new projects arrived: ``DeltaSDC`` runs the
+node solves of SDC and MLSDC in low precision in delta form, and ``SDC4SDEs`` brings SDC to stochastic differential
+equations, while `@brownbaerchen <https://github.com/brownbaerchen>`_ added 3D Rayleigh-Bénard runs at Ra = 10^8 and a
+setup for JUPITER. The finite-difference problems solve faster, with a reused factorization, by FFT or by geometric
+multigrid, also on GPUs, and the sweepers do less work per node. About twenty fixes, most of them for errors that gave
+wrong results without a warning, cover the controllers, adaptivity, the switch estimator and the transfer classes, and
+every release now comes with SBOMs. Three changes are **not backward compatible**\ : FEniCS is gone, and with it tutorial
+step 7 part A, so parts B–H are now A–G; ``FEM_with_FEniCS`` is now ``FEM_with_Firedrake``\ ; and ``Heat1DForcedFiredrake`` is
+in mass-matrix form and needs the mass sweepers.
+
 .. _CHANGELOG/version-5.9-—-september-28,-2026:
 
 Version 5.9 — September 28, 2026

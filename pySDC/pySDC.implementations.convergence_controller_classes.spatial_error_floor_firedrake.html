@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=696bab92"></script>
+    <script src="../_static/documentation_options.js?v=f5ca5f3c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -62,7 +62,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="5.9" />
+  <meta name="docsearch:version" content="5.10" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -668,10 +668,15 @@ sweepers it is a load vector, whose norm (<a class="reference internal" href="py
 is that of the function it represents. For diffusive problems, it bounds the iteration error up to a modest
 constant, which is why <span class="math notranslate nohighlight">\(\gamma = 1\)</span> is a safe default.</p>
 <p>The estimate assumes a smooth solution, so that the error of a degree <span class="math notranslate nohighlight">\(p\)</span> space falls by <span class="math notranslate nohighlight">\(2^{p+1}\)</span> when
-the mesh is refined once. It needs a coarse space on the next coarser mesh of a <code class="docutils literal notranslate"><span class="pre">MeshHierarchy</span></code>, an absolute
-residual (<code class="docutils literal notranslate"><span class="pre">residual_type</span></code> <code class="docutils literal notranslate"><span class="pre">'full_abs'</span></code> or <code class="docutils literal notranslate"><span class="pre">'last_abs'</span></code>), since a relative one is not comparable with the error,
-and one step at a time (SDC or MLSDC): it stops its step through <code class="docutils literal notranslate"><span class="pre">force_done</span></code>, which a block of PFASST steps
-shares, so one step meeting its budget would stop all of them.</p>
+the mesh is refined once. It needs a coarse space on the next coarser mesh of a <code class="docutils literal notranslate"><span class="pre">MeshHierarchy</span></code> and an absolute
+residual (<code class="docutils literal notranslate"><span class="pre">residual_type</span></code> <code class="docutils literal notranslate"><span class="pre">'full_abs'</span></code> or <code class="docutils literal notranslate"><span class="pre">'last_abs'</span></code>), since a relative one is not comparable with the error.</p>
+<p>It works with PFASST, too, because it only adds to the convergence decision of its own step: each step keeps its
+own estimate, from its own end point, and is declared done right after
+<a class="reference internal" href="pySDC.core.check_convergence.html#pySDC.core.check_convergence.CheckConvergence" title="pySDC.core.check_convergence.CheckConvergence"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckConvergence</span></code></a> decided on the usual criteria (hence the control order
+above 200). Sharing the decision across the block is then left to <code class="docutils literal notranslate"><span class="pre">CheckConvergence.communicate_convergence</span></code>, so
+a step still finishes only once the one before it has. Setting <code class="docutils literal notranslate"><span class="pre">force_done</span></code> instead would not do: the MPI
+controller reads it as “abort the block” and skips the communication, and with <code class="docutils literal notranslate"><span class="pre">all_to_done</span></code> it is shared by
+all steps.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -682,21 +687,9 @@ shares, so one step meeting its budget would stop all of them.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_parameters">
-<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/convergence_controller_classes/spatial_error_floor_firedrake.html#SpatialErrorFloorFiredrake.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_parameters" title="Link to this definition">#</a></dt>
-<dd><p>Make sure the coarse space and the end time are given, and the residual is absolute.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><em>bool</em> – Whether the parameters are compatible
-str: The error message</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.post_iteration_processing">
-<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/convergence_controller_classes/spatial_error_floor_firedrake.html#SpatialErrorFloorFiredrake.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.post_iteration_processing" title="Link to this definition">#</a></dt>
-<dd><p>Compare the residual on the finest level with the spatial error budget of the step.</p>
+<dt class="sig sig-object py" id="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_iteration_status">
+<span class="sig-name descname"><span class="pre">check_iteration_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/convergence_controller_classes/spatial_error_floor_firedrake.html#SpatialErrorFloorFiredrake.check_iteration_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_iteration_status" title="Link to this definition">#</a></dt>
+<dd><p>Declare the step converged if its residual on the finest level is within its spatial error budget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -706,6 +699,18 @@ str: The error message</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/convergence_controller_classes/spatial_error_floor_firedrake.html#SpatialErrorFloorFiredrake.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_parameters" title="Link to this definition">#</a></dt>
+<dd><p>Make sure the coarse space and the end time are given, and the residual is absolute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>bool</em> – Whether the parameters are compatible
+str: The error message</p>
 </dd>
 </dl>
 </dd></dl>
@@ -731,14 +736,10 @@ str: The error message</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.setup_status_variables">
 <span class="sig-name descname"><span class="pre">setup_status_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/convergence_controller_classes/spatial_error_floor_firedrake.html#SpatialErrorFloorFiredrake.setup_status_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.setup_status_variables" title="Link to this definition">#</a></dt>
-<dd><p>Refuse several steps at once, once the controller knows how many it runs.</p>
+<dd><p>Keep the transfer buffers, and a place for the estimate on every step, since each step has its own end point.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>controller</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.Controller</span></code>) – The controller</p></li>
-<li><p><strong>MS</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <em>optional</em>) – The steps of a non-MPI controller</p></li>
-<li><p><strong>comm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">mpi4py.MPI.Intracomm</span></code>, <em>optional</em>) – The time communicator of an MPI controller</p></li>
-</ul>
+<dd class="field-odd"><p><strong>controller</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.Controller</span></code>) – The controller</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -820,8 +821,8 @@ solution, this is about the error of the coarse space, so dividing it by <span c
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake"><code class="docutils literal notranslate"><span class="pre">SpatialErrorFloorFiredrake</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">check_iteration_status()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_parameters"><code class="docutils literal notranslate"><span class="pre">check_parameters()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">post_iteration_processing()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">setup_status_variables()</span></code></a></li>
 </ul>

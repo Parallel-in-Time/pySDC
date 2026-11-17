@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../../../../_static/documentation_options.js?v=696bab92"></script>
+    <script src="../../../../_static/documentation_options.js?v=f5ca5f3c"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="5.9" />
+  <meta name="docsearch:version" content="5.10" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -490,10 +490,16 @@
 <span class="sd">    constant, which is why :math:`\gamma = 1` is a safe default.</span>
 
 <span class="sd">    The estimate assumes a smooth solution, so that the error of a degree :math:`p` space falls by :math:`2^{p+1}` when</span>
-<span class="sd">    the mesh is refined once. It needs a coarse space on the next coarser mesh of a ``MeshHierarchy``, an absolute</span>
-<span class="sd">    residual (``residual_type`` ``'full_abs'`` or ``'last_abs'``), since a relative one is not comparable with the error,</span>
-<span class="sd">    and one step at a time (SDC or MLSDC): it stops its step through ``force_done``, which a block of PFASST steps</span>
-<span class="sd">    shares, so one step meeting its budget would stop all of them.</span>
+<span class="sd">    the mesh is refined once. It needs a coarse space on the next coarser mesh of a ``MeshHierarchy`` and an absolute</span>
+<span class="sd">    residual (``residual_type`` ``'full_abs'`` or ``'last_abs'``), since a relative one is not comparable with the error.</span>
+
+<span class="sd">    It works with PFASST, too, because it only adds to the convergence decision of its own step: each step keeps its</span>
+<span class="sd">    own estimate, from its own end point, and is declared done right after</span>
+<span class="sd">    :class:`~pySDC.core.check_convergence.CheckConvergence` decided on the usual criteria (hence the control order</span>
+<span class="sd">    above 200). Sharing the decision across the block is then left to ``CheckConvergence.communicate_convergence``, so</span>
+<span class="sd">    a step still finishes only once the one before it has. Setting ``force_done`` instead would not do: the MPI</span>
+<span class="sd">    controller reads it as "abort the block" and skips the communication, and with ``all_to_done`` it is shared by</span>
+<span class="sd">    all steps.</span>
 
 <span class="sd">    Parameters:</span>
 <span class="sd">        coarse_space (firedrake.FunctionSpace): Space of the same kind on the next coarser mesh of the hierarchy</span>
@@ -515,7 +521,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: The updated params dictionary</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">'control_order'</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">'gamma'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">'control_order'</span><span class="p">:</span> <span class="mi">210</span><span class="p">,</span> <span class="s1">'gamma'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)}</span></div>
 
 
 <div class="viewcode-block" id="SpatialErrorFloorFiredrake.check_parameters">
@@ -541,12 +547,10 @@
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.html#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.setup_status_variables">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Refuse several steps at once, once the controller knows how many it runs.</span>
+<span class="sd">        Keep the transfer buffers, and a place for the estimate on every step, since each step has its own end point.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
-<span class="sd">            MS (list, optional): The steps of a non-MPI controller</span>
-<span class="sd">            comm (mpi4py.MPI.Intracomm, optional): The time communicator of an MPI controller</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
@@ -554,21 +558,14 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1">#: the transfer buffers of :func:`coarse_space_error`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c1">#: the time of the step the estimate belongs to, and the estimate</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">estimate</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">steps</span><span class="p">,</span> <span class="n">comm</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'MS'</span><span class="p">),</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'comm'</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">comm</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> works on one step at a time: in a block of PFASST steps, one step meeting its '</span>
-                <span class="s1">'budget would stop all of them'</span>
-            <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_status_variable_to_step</span><span class="p">(</span><span class="s1">'spatial_error'</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="SpatialErrorFloorFiredrake.post_iteration_processing">
-<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.html#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.post_iteration_processing">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SpatialErrorFloorFiredrake.check_iteration_status">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.html#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake.check_iteration_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Compare the residual on the finest level with the spatial error budget of the step.</span>
+<span class="sd">        Declare the step converged if its residual on the finest level is within its spatial error budget.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            controller (pySDC.Controller): The controller</span>
@@ -578,16 +575,18 @@
 <span class="sd">            None</span>
 <span class="sd">        """</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="c1"># the spatial error hardly changes while the step iterates, so it is estimated once per step: on the FEM study</span>
-        <span class="c1"># that left every iteration count unchanged and cut the time spent here 3-10 times</span>
-        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">S</span><span class="o">.</span><span class="n">time</span><span class="p">:</span>
+        <span class="c1"># the spatial error hardly changes while the step iterates, so it is estimated from the initial guess and once</span>
+        <span class="c1"># more after the first iteration only: on the FEM study that left every iteration count unchanged and cut the</span>
+        <span class="c1"># time spent here 3-10 times</span>
+        <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">u</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">functionspace</span>
             <span class="n">degree</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">function_space</span><span class="p">()</span><span class="o">.</span><span class="n">ufl_element</span><span class="p">()</span><span class="o">.</span><span class="n">embedded_superdegree</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">estimate</span> <span class="o">=</span> <span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">coarse_space_error</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">coarse_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="n">e_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">e_x</span> <span class="o">*</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Tend</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Residual </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> below the spatial error budget of </span><span class="si">{</span><span class="n">e_x</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
-            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="kc">True</span></div>
+            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">spatial_error</span> <span class="o">=</span> <span class="n">coarse_space_error</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">coarse_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">spatial_error</span> <span class="o">*</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Tend</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">'Residual </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1"> below the spatial error budget of </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">spatial_error</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">S</span>
+            <span class="p">)</span>
+            <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span></div>
 </div>
 
 </pre></div>
