@@ -48,6 +48,8 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'pySDC/pySDC.implementations.transfer_classes.TransferFiredrakeMesh';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <script type="module" src="../_static/run-in-browser.js?v=11117657"></script>
@@ -55,7 +57,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="TransferMesh" href="pySDC.implementations.transfer_classes.TransferMesh.html" />
-    <link rel="prev" title="TransferFenicsMesh" href="pySDC.implementations.transfer_classes.TransferFenicsMesh.html" />
+    <link rel="prev" title="BaseTransfer_mass" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html" />
   
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
@@ -436,6 +438,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.hotrod.html">hotrod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.inexactness.html">inexactness</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.interpolate_between_restarts.html">interpolate_between_restarts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.html">spatial_error_floor_firedrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spread_step_sizes.html">spread_step_sizes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.step_size_limiter.html">step_size_limiter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.store_uold.html">store_uold</a></li>
@@ -444,7 +447,6 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.datatype_classes.html">datatype_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.container.html">container</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.cupy_mesh.html">cupy_mesh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.fenics_mesh.html">fenics_mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.firedrake_mesh.html">firedrake_mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.mesh.html">mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.particles.html">particles</a></li>
@@ -485,15 +487,15 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.DiscontinuousTestODE.html">DiscontinuousTestODE</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FastWaveSlowWave_0D.html">FastWaveSlowWave_0D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FermiPastaUlamTsingou.html">FermiPastaUlamTsingou</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FormFiredrake.html">FormFiredrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FullSolarSystem.html">FullSolarSystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html">GeneralizedFisher_1D_FD_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc.html">GeneralizedFisher_1D_PETSc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GenericGusto.html">GenericGusto</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html">GrayScott_1D_FEniCS_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_Firedrake.html">GrayScott_1D_Firedrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html">GrayScott_2D_PETSc_periodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_MPIFFT.html">GrayScott_MPIFFT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HarmonicOscillator.html">HarmonicOscillator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html">HeatEquation_1D_FEniCS_matrix_forced</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced.html">HeatEquation_2D_PETSc_forced</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_Chebychev.html">HeatEquation_Chebychev</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_ND_FD.html">HeatEquation_ND_FD</a></li>
@@ -510,7 +512,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.RayleighBenard3D.html">RayleighBenard3D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.TestEquation_0D.html">TestEquation_0D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Van_der_Pol_implicit.html">Van_der_Pol_implicit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html">VorticityVelocity_2D_FEniCS_periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic.html">VorticityVelocity_2D_Firedrake_periodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian.html">generic_MPIFFT_Laplacian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_ND_FD.html">generic_ND_FD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_spectral.html">generic_spectral</a></li>
@@ -535,6 +537,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order.html">imex_1st_order</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html">imex_1st_order_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html">imex_1st_order_mass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass_MPI.html">imex_1st_order_mass_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.multi_implicit.html">multi_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.verlet.html">verlet</a></li>
 </ul>
@@ -544,7 +547,6 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferDeltaMPI.html">BaseTransferDeltaMPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferMPI.html">BaseTransferMPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html">BaseTransfer_mass</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFenicsMesh.html">TransferFenicsMesh</a></li>
 <li class="toctree-l3 current active"><a aria-current="page" class="current reference internal" href="#">TransferFiredrakeMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh.html">TransferMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_FFT.html">TransferMesh_FFT</a></li>
@@ -574,6 +576,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.stats_helper.html">stats_helper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.testing.html">testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.transfer_helper.html">transfer_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.ufl_forms.html">ufl_forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.visualization_tools.html">visualization_tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.vtkIO.html">vtkIO</a></li>
 </ul>
@@ -650,7 +653,28 @@
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MeshToMeshFiredrake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrake"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pySDC.core.space_transfer.html#pySDC.core.space_transfer.SpaceTransfer" title="pySDC.core.space_transfer.SpaceTransfer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTransfer</span></code></a></p>
-<p>This implementation can restrict and prolong between Firedrake meshes</p>
+<p>This implementation can restrict and prolong between Firedrake meshes, by interpolation.</p>
+<p>On the same mesh, between Lagrange spaces of different degrees (p-coarsening), interpolation into the finer space
+is the exact inclusion of the coarse space. For the mass-matrix formulation, used through
+<a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html#pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass" title="pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass"><code class="xref py py-class docutils literal notranslate"><span class="pre">base_transfer_mass</span></code></a>, <a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict_dual" title="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict_dual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">restrict_dual()</span></code></a>
+restricts load vectors with the transpose of that prolongation and <a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.project" title="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.project"><code class="xref py py-meth docutils literal notranslate"><span class="pre">project()</span></code></a> restricts solutions by
+<span class="math notranslate nohighlight">\(L^2\)</span> projection, which are then exact as well. For meshes of a hierarchy, use
+<a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy" title="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshToMeshFiredrakeHierarchy</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.project">
+<span class="sig-name descname"><span class="pre">project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrake.project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.project" title="Link to this definition">#</a></dt>
+<dd><p>Restrict a solution by <span class="math notranslate nohighlight">\(L^2\)</span> projection, <span class="math notranslate nohighlight">\(M_c^{-1} P^T M_f u\)</span>, with <span class="math notranslate nohighlight">\(P^T\)</span> as in
+<a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict_dual" title="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict_dual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">restrict_dual()</span></code></a>. The mass matrices are assembled once per space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>F</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_mesh</span></code>) – Fine solution</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>firedrake_mesh</em> – Coarse solution</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.prolong">
 <span class="sig-name descname"><span class="pre">prolong</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrake.prolong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.prolong" title="Link to this definition">#</a></dt>
@@ -679,13 +703,33 @@
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict_dual">
+<span class="sig-name descname"><span class="pre">restrict_dual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrake.restrict_dual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict_dual" title="Link to this definition">#</a></dt>
+<dd><p>Restrict a load vector (dual data) with <span class="math notranslate nohighlight">\(P^T\)</span>, the adjoint of the interpolation <a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.prolong" title="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.prolong"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prolong()</span></code></a> uses.</p>
+<p>For nested spaces, such as lower-degree Lagrange elements on the same mesh, every coarse basis function is a
+combination of fine ones through <span class="math notranslate nohighlight">\(P\)</span>, so this gives exactly the coarse load vector of the same
+functional.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>F</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_mesh</span></code>) – Fine dual data, e.g. the FAS correction or <span class="math notranslate nohighlight">\(M u_0\)</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>firedrake_dual_mesh</em> – Coarse dual data</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MeshToMeshFiredrakeHierarchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrakeHierarchy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MeshToMeshFiredrakeHierarchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrakeHierarchy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pySDC.core.space_transfer.html#pySDC.core.space_transfer.SpaceTransfer" title="pySDC.core.space_transfer.SpaceTransfer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTransfer</span></code></a></p>
-<p>This implementation can restrict and prolong between Firedrake meshes that are generated from a hierarchy.
+<p>This implementation can restrict and prolong between Firedrake meshes that are generated from a hierarchy.</p>
+<p>For the mass-matrix formulation, used through
+<a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html#pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass" title="pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass"><code class="xref py py-class docutils literal notranslate"><span class="pre">base_transfer_mass</span></code></a>, it also restricts load
+vectors with <a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.restrict_dual" title="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.restrict_dual"><code class="xref py py-meth docutils literal notranslate"><span class="pre">restrict_dual()</span></code></a> and solutions by <span class="math notranslate nohighlight">\(L^2\)</span> projection with <a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.project" title="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.project"><code class="xref py py-meth docutils literal notranslate"><span class="pre">project()</span></code></a>.
 Example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
@@ -695,6 +739,29 @@ Example:</p>
 <span class="n">mesh</span> <span class="o">=</span> <span class="n">hierarchy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.buffers">
+<span class="sig-name descname"><span class="pre">buffers</span></span><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.buffers" title="Link to this definition">#</a></dt>
+<dd><p>the buffers of <a class="reference internal" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.run_transfer" title="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.run_transfer"><code class="xref py py-func docutils literal notranslate"><span class="pre">run_transfer()</span></code></a>, one pair per kind of transfer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.project">
+<span class="sig-name descname"><span class="pre">project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrakeHierarchy.project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.project" title="Link to this definition">#</a></dt>
+<dd><p>Restrict a solution by <span class="math notranslate nohighlight">\(L^2\)</span> projection, <span class="math notranslate nohighlight">\(M_c^{-1} P^T M_f u\)</span>.</p>
+<p>Unlike injection, this is well defined for discontinuous spaces and does not depend on point values. The mass
+matrices are assembled once per space, see
+<a class="reference internal" href="pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map" title="pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">riesz_map()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>F</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_mesh</span></code>) – Fine solution</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>firedrake_mesh</em> – Coarse solution</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.prolong">
 <span class="sig-name descname"><span class="pre">prolong</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrakeHierarchy.prolong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.prolong" title="Link to this definition">#</a></dt>
@@ -723,6 +790,47 @@ Example:</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.restrict_dual">
+<span class="sig-name descname"><span class="pre">restrict_dual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#MeshToMeshFiredrakeHierarchy.restrict_dual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.restrict_dual" title="Link to this definition">#</a></dt>
+<dd><p>Restrict a load vector (dual data) with <span class="math notranslate nohighlight">\(P^T\)</span>, the transpose of the prolongation.</p>
+<p>For nested spaces, every coarse basis function is a combination of fine ones through <span class="math notranslate nohighlight">\(P\)</span>, so this gives
+exactly the coarse load vector of the same functional. Injecting instead would read the load vector as if it
+were a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>F</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_mesh</span></code>) – Fine dual data, e.g. the FAS correction or <span class="math notranslate nohighlight">\(M u_0\)</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>firedrake_dual_mesh</em> – Coarse dual data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.run_transfer">
+<span class="sig-name descname"><span class="pre">run_transfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/transfer_classes/TransferFiredrakeMesh.html#run_transfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.run_transfer" title="Link to this definition">#</a></dt>
+<dd><p>Run the transfer <cite>op</cite> (<code class="docutils literal notranslate"><span class="pre">'prolong'</span></code>, <code class="docutils literal notranslate"><span class="pre">'restrict'</span></code> or <code class="docutils literal notranslate"><span class="pre">'inject'</span></code>) of Firedrake’s transfer manager from <cite>source</cite>
+to <cite>target</cite>, through buffers kept in <cite>buffers</cite>.</p>
+<p>The manager records the data versions of every pair of source and target it has seen, and never forgets a pair, so
+transferring fresh objects every time adds one record per call, which a long run accumulates. Through the buffers
+it sees the same pair every time. <cite>buffers</cite> is a dict owned by the caller, which keeps the buffers as long as it
+lives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The transfer</p></li>
+<li><p><strong>source</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.Function</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.Cofunction</span></code>) – What to transfer</p></li>
+<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.Function</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.Cofunction</span></code>) – Where the result goes</p></li>
+<li><p><strong>buffers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – The caller’s buffers, filled on first use</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>target</cite></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -738,12 +846,12 @@ Example:</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="pySDC.implementations.transfer_classes.TransferFenicsMesh.html"
+       href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">TransferFenicsMesh</p>
+        <p class="prev-next-title">BaseTransfer_mass</p>
       </div>
     </a>
     <a class="right-next"
@@ -775,15 +883,21 @@ Example:</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake"><code class="docutils literal notranslate"><span class="pre">MeshToMeshFiredrake</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.project"><code class="docutils literal notranslate"><span class="pre">project()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict_dual"><code class="docutils literal notranslate"><span class="pre">restrict_dual()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy"><code class="docutils literal notranslate"><span class="pre">MeshToMeshFiredrakeHierarchy</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.buffers"><code class="docutils literal notranslate"><span class="pre">buffers</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.project"><code class="docutils literal notranslate"><span class="pre">project()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.prolong"><code class="docutils literal notranslate"><span class="pre">prolong()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.restrict"><code class="docutils literal notranslate"><span class="pre">restrict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.restrict_dual"><code class="docutils literal notranslate"><span class="pre">restrict_dual()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.run_transfer"><code class="docutils literal notranslate"><span class="pre">run_transfer()</span></code></a></li>
 </ul>
   </nav></div>
 

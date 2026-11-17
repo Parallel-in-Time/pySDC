@@ -23,6 +23,7 @@ Submodules
    pySDC.helpers.stats_helper
    pySDC.helpers.testing
    pySDC.helpers.transfer_helper
+   pySDC.helpers.ufl_forms
    pySDC.helpers.visualization_tools
    pySDC.helpers.vtkIO
 

@@ -1,0 +1,7 @@
+spatial\_error\_floor\_firedrake
+================================
+
+.. automodule:: pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake
+   :members:
+   :show-inheritance:
+   :undoc-members:

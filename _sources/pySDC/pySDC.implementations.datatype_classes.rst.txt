@@ -9,7 +9,6 @@ Submodules
 
    pySDC.implementations.datatype_classes.container
    pySDC.implementations.datatype_classes.cupy_mesh
-   pySDC.implementations.datatype_classes.fenics_mesh
    pySDC.implementations.datatype_classes.firedrake_mesh
    pySDC.implementations.datatype_classes.mesh
    pySDC.implementations.datatype_classes.particles

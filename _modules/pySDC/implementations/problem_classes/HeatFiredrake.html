@@ -432,211 +432,98 @@
                 <article class="bd-article">
                   
   <h1>Source code for pySDC.implementations.problem_classes.HeatFiredrake</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">WorkCounter</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.firedrake_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">firedrake_mesh</span><span class="p">,</span> <span class="n">IMEX_firedrake_mesh</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ufl_forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">time_derivative</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.problem_classes.FormFiredrake</span><span class="w"> </span><span class="kn">import</span> <span class="n">FormFiredrakeIMEX</span>
 
 
 <div class="viewcode-block" id="Heat1DForcedFiredrake">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Heat1DForcedFiredrake</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Heat1DForcedFiredrake</span><span class="p">(</span><span class="n">FormFiredrakeIMEX</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">    Forced 1D heat equation with Dirichlet BCs and Firedrake finite elements, IMEX with diffusion implicit.</span>
+<span class="sd">    Forced 1D heat equation with Dirichlet boundary values and Firedrake finite elements, IMEX with the diffusion</span>
+<span class="sd">    implicit, in the mass-matrix formulation and given by its weak forms.</span>
 
-<span class="sd">    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions</span>
-
-<span class="sd">    .. math::</span>
-<span class="sd">        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f</span>
-
-<span class="sd">    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by</span>
+<span class="sd">    The equation</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).</span>
+<span class="sd">        \frac{\partial u}{\partial t} = \nu \frac{\partial^2 u}{\partial x^2} + f</span>
 
-<span class="sd">    For initial conditions with constant c</span>
-
-<span class="sd">    .. math::</span>
-<span class="sd">        u(x, 0) = \sin(\pi x) + c,</span>
-
-<span class="sd">    the exact solution is given by</span>
+<span class="sd">    on :math:`[0, 1]` has the exact solution</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        u(x, t) = \sin(\pi x)\cos(t) + c.</span>
+<span class="sd">        u(x, t) = \sin(\pi x) \cos(t) + c, \quad \text{or} \quad u(x, t) = \cos(\pi x) \cos(t) + c</span>
 
-<span class="sd">    Here, the problem is discretized with finite elements using firedrake. Hence, the problem</span>
-<span class="sd">    is reformulated to the *weak formulation*</span>
+<span class="sd">    with `time_dependent_bc`, whose Dirichlet values are then :math:`\pm \cos(t) + c`. The forcing</span>
+<span class="sd">    :math:`f = u_t - \nu u_{xx}` is derived from the exact solution by UFL and enters the form as an expression. The</span>
+<span class="sd">    weak formulation</span>
 
-<span class="sd">    .. math:</span>
-<span class="sd">        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx</span>
 
-<span class="sd">    We invert the Laplacian implicitly and treat the forcing term explicitly.</span>
-<span class="sd">    The solvers for the arising variational problems are cached for multiple collocation nodes and step sizes.</span>
+<span class="sd">    gives :math:`M u' = -\nu K u + F`, with the diffusion implicit and the forcing explicit. The mass matrix is never</span>
+<span class="sd">    inverted: use the mass-matrix sweepers, such as</span>
+<span class="sd">    :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass`. Everything else comes from</span>
+<span class="sd">    :class:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    nvars : int, optional</span>
-<span class="sd">        Spatial resolution, i.e., numbers of degrees of freedom in space.</span>
+<span class="sd">    n : int, optional</span>
+<span class="sd">        Number of cells, ignored if `mesh` is given.</span>
 <span class="sd">    nu : float, optional</span>
 <span class="sd">        Diffusion coefficient :math:`\nu`.</span>
-<span class="sd">    c: float, optional</span>
-<span class="sd">        Constant for the Dirichlet boundary condition :math: `c`</span>
+<span class="sd">    c : float, optional</span>
+<span class="sd">        Constant shift :math:`c` of the solution.</span>
+<span class="sd">    order : int, optional</span>
+<span class="sd">        Degree of the Lagrange elements.</span>
+<span class="sd">    time_dependent_bc : bool, optional</span>
+<span class="sd">        Use the solution with time-dependent boundary values.</span>
 <span class="sd">    LHS_cache_size : int, optional</span>
-<span class="sd">        Cache size for variational problem solvers</span>
+<span class="sd">        Number of solvers kept, see ``FormFiredrake``.</span>
+<span class="sd">    mesh : firedrake.MeshGeometry, optional</span>
+<span class="sd">        A mesh of :math:`[0, 1]`, for instance from a ``MeshHierarchy`` for several levels.</span>
 <span class="sd">    comm : MPI communicator, optional</span>
-<span class="sd">        Supply an MPI communicator for spatial parallelism</span>
+<span class="sd">        Communicator for spatial parallelism, ignored if `mesh` is given.</span>
 <span class="sd">    """</span>
 
-    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">firedrake_mesh</span>
-    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">IMEX_firedrake_mesh</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">LHS_cache_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Initialization</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            n (int): Number of degrees of freedom</span>
-<span class="sd">            nu (float): Diffusion parameter</span>
-<span class="sd">            c (float): Boundary condition constant</span>
-<span class="sd">            order (int): Order of finite elements</span>
-<span class="sd">            LHS_cache_size (int): Size of the cache for solvers</span>
-<span class="sd">            mesh (Firedrake mesh, optional): Give a custom mesh, for instance from a hierarchy</span>
-<span class="sd">            comm (mpi4pi.Intracomm, optional): MPI communicator for spatial parallelism</span>
-<span class="sd">        """</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">time_dependent_bc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">LHS_cache_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization, see the class docstring for the arguments."""</span>
         <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span> <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">comm</span>
-
-        <span class="c1"># prepare Firedrake mesh and function space</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">UnitIntervalMesh</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span> <span class="k">if</span> <span class="n">mesh</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mesh</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">"CG"</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">'CG'</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
 
-        <span class="c1"># prepare pySDC problem class infrastructure by passing the function space to super init</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
-            <span class="s1">'n'</span><span class="p">,</span> <span class="s1">'nu'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">,</span> <span class="s1">'order'</span><span class="p">,</span> <span class="s1">'LHS_cache_size'</span><span class="p">,</span> <span class="s1">'comm'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">SpatialCoordinate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">time_dependent_bc</span> <span class="k">else</span> <span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">u_exact</span> <span class="o">=</span> <span class="n">shape</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span>
+        <span class="n">forcing</span> <span class="o">=</span> <span class="n">time_derivative</span><span class="p">(</span><span class="n">u_exact</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">nu</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">u_exact</span><span class="p">))</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">mass</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">u</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">dx</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">diffusion</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">nu</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">fd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">dx</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">source</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">forcing</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">dx</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">V</span><span class="p">,</span>
+            <span class="n">mass</span><span class="p">,</span>
+            <span class="n">diffusion</span><span class="p">,</span>
+            <span class="n">source</span><span class="p">,</span>
+            <span class="n">bcs</span><span class="o">=</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">u_exact</span><span class="p">,</span> <span class="s1">'on_boundary'</span><span class="p">),),</span>
+            <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
+            <span class="n">u_exact</span><span class="o">=</span><span class="n">u_exact</span><span class="p">,</span>
+            <span class="n">LHS_cache_size</span><span class="o">=</span><span class="n">LHS_cache_size</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="c1"># prepare caches and IO variables for solvers</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_in</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_out</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
-
-        <span class="c1"># prepare work counters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'solver_setup'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'solves'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
-
-<div class="viewcode-block" id="Heat1DForcedFiredrake.eval_f">
-<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.eval_f">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Evaluate the right hand side.</span>
-<span class="sd">        The forcing term is simply interpolated to the grid.</span>
-<span class="sd">        The Laplacian is evaluated via a variational problem, where the mass matrix is inverted and homogeneous boundary conditions are applied.</span>
-<span class="sd">        Note that we cache the solver to obtain much better performance.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        u : dtype_u</span>
-<span class="sd">            Solution at which to evaluate</span>
-<span class="sd">        t : float</span>
-<span class="sd">            Time at which to evaluate</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        f : dtype_f</span>
-<span class="sd">            The evaluated right hand side</span>
-<span class="sd">        """</span>
-        <span class="c1"># construct and cache a solver for the implicit part of the right hand side evaluation</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'_solv_eval_f_implicit'</span><span class="p">):</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
-            <span class="n">u_trial</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
-
-            <span class="n">a</span> <span class="o">=</span> <span class="n">u_trial</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">dx</span>
-            <span class="n">L_impl</span> <span class="o">=</span> <span class="o">-</span><span class="n">fd</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_in</span><span class="p">),</span> <span class="n">fd</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">dx</span>
-
-            <span class="n">bcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">fd</span><span class="o">.</span><span class="n">bcs</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">area</span><span class="p">)</span> <span class="k">for</span> <span class="n">area</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
-
-            <span class="n">prob</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">LinearVariationalProblem</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">L_impl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_out</span><span class="p">,</span> <span class="n">bcs</span><span class="o">=</span><span class="n">bcs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_solv_eval_f_implicit</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">LinearVariationalSolver</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
-
-        <span class="c1"># copy the solution we want to evaluate at into the input buffer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_in</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
-
-        <span class="c1"># perform the solve using the cached solver</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_solv_eval_f_implicit</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
-
-        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-
-        <span class="c1"># copy the result of the solver from the output buffer to the variable this function returns</span>
-        <span class="n">me</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_out</span><span class="p">)</span>
-
-        <span class="c1"># evaluate explicit part.</span>
-        <span class="c1"># Because it does not depend on the current solution, we can simply interpolate the expression</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-        <span class="n">me</span><span class="o">.</span><span class="n">expl</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forcing</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]()</span>
-
-        <span class="k">return</span> <span class="n">me</span></div>
-
-
-<div class="viewcode-block" id="Heat1DForcedFiredrake.solve_system">
-<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.solve_system">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Linear solver for :math:`(M - factor nu * Lap) u = rhs`.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        rhs : dtype_f</span>
-<span class="sd">            Right-hand side for the nonlinear system.</span>
-<span class="sd">        factor : float</span>
-<span class="sd">            Abbrev. for the node-to-node stepsize (or any other factor required).</span>
-<span class="sd">        *args, **kwargs</span>
-<span class="sd">            Take the initial guess ``u0`` and the current time ``t`` of the generic interface, neither is used here.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        u : dtype_u</span>
-<span class="sd">            Solution.</span>
-<span class="sd">        """</span>
-
-        <span class="c1"># construct and cache a solver for the current factor (preconditioner entry times step size)</span>
-        <span class="k">if</span> <span class="n">factor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-
-            <span class="c1"># check if we need to evict something from the cache</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LHS_cache_size</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
-
-            <span class="n">u</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
-
-            <span class="n">a</span> <span class="o">=</span> <span class="n">u</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">fd</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">dx</span>
-            <span class="n">L</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_in</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">dx</span>
-
-            <span class="n">bcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">fd</span><span class="o">.</span><span class="n">bcs</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">),</span> <span class="n">area</span><span class="p">)</span> <span class="k">for</span> <span class="n">area</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
-
-            <span class="n">prob</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">LinearVariationalProblem</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_out</span><span class="p">,</span> <span class="n">bcs</span><span class="o">=</span><span class="n">bcs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">LinearVariationalSolver</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'solver_setup'</span><span class="p">]()</span>
-
-        <span class="c1"># copy solver rhs to the input buffer. Copying also to the output buffer uses it as initial guess</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_in</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">rhs</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_out</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">rhs</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
-
-        <span class="c1"># call the cached solver</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
-
-        <span class="c1"># copy from output buffer to return variable</span>
-        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
-        <span class="n">me</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_out</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'solves'</span><span class="p">]()</span>
-        <span class="k">return</span> <span class="n">me</span></div>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span>
+            <span class="s1">'n'</span><span class="p">,</span> <span class="s1">'order'</span><span class="p">,</span> <span class="s1">'nu'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">,</span> <span class="s1">'time_dependent_bc'</span><span class="p">,</span> <span class="s1">'comm'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Heat1DForcedFiredrake.x">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.x">[docs]</a>
@@ -651,73 +538,6 @@
 <span class="sd">            Symbolic spatial coordinate, used to interpolate expressions on the mesh.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="n">fd</span><span class="o">.</span><span class="n">SpatialCoordinate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Heat1DForcedFiredrake.t">
-<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t">[docs]</a>
-    <span class="nd">@cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Time as a Firedrake constant, assigned before each interpolation so the kernels compile only once.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        t : firedrake.Constant</span>
-<span class="sd">            Time at which the time-dependent expressions are evaluated.</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Heat1DForcedFiredrake.forcing">
-<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.forcing">[docs]</a>
-    <span class="nd">@cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Symbolic forcing term :math:`f(x, t)` in terms of the time constant :attr:`t`.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        f : ufl.core.expr.Expr</span>
-<span class="sd">            Forcing term, interpolated in :meth:`eval_f`.</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
-
-
-<div class="viewcode-block" id="Heat1DForcedFiredrake.exact_solution">
-<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.exact_solution">[docs]</a>
-    <span class="nd">@cached_property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">exact_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Symbolic exact solution :math:`u(x, t)` in terms of the time constant :attr:`t`.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        u : ufl.core.expr.Expr</span>
-<span class="sd">            Exact solution, interpolated in :meth:`u_exact`.</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="n">fd</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">fd</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span></div>
-
-
-<div class="viewcode-block" id="Heat1DForcedFiredrake.u_exact">
-<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.HeatFiredrake.html#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.u_exact">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
-<span class="sd">        Routine to compute the exact solution at time :math:`t`.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        t : float</span>
-<span class="sd">            Time of the exact solution.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        me : dtype_u</span>
-<span class="sd">            Exact solution.</span>
-<span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
-        <span class="n">me</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exact_solution</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">me</span></div>
 </div>
 
 </pre></div>

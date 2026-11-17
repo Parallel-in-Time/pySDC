@@ -436,6 +436,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.hotrod.html">hotrod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.inexactness.html">inexactness</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.interpolate_between_restarts.html">interpolate_between_restarts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.html">spatial_error_floor_firedrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spread_step_sizes.html">spread_step_sizes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.step_size_limiter.html">step_size_limiter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.store_uold.html">store_uold</a></li>
@@ -444,7 +445,6 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.datatype_classes.html">datatype_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.container.html">container</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.cupy_mesh.html">cupy_mesh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.fenics_mesh.html">fenics_mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.firedrake_mesh.html">firedrake_mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.mesh.html">mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.particles.html">particles</a></li>
@@ -485,15 +485,15 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.DiscontinuousTestODE.html">DiscontinuousTestODE</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FastWaveSlowWave_0D.html">FastWaveSlowWave_0D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FermiPastaUlamTsingou.html">FermiPastaUlamTsingou</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FormFiredrake.html">FormFiredrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FullSolarSystem.html">FullSolarSystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html">GeneralizedFisher_1D_FD_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc.html">GeneralizedFisher_1D_PETSc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GenericGusto.html">GenericGusto</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html">GrayScott_1D_FEniCS_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_Firedrake.html">GrayScott_1D_Firedrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html">GrayScott_2D_PETSc_periodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_MPIFFT.html">GrayScott_MPIFFT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HarmonicOscillator.html">HarmonicOscillator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html">HeatEquation_1D_FEniCS_matrix_forced</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced.html">HeatEquation_2D_PETSc_forced</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_Chebychev.html">HeatEquation_Chebychev</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_ND_FD.html">HeatEquation_ND_FD</a></li>
@@ -510,7 +510,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.RayleighBenard3D.html">RayleighBenard3D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.TestEquation_0D.html">TestEquation_0D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Van_der_Pol_implicit.html">Van_der_Pol_implicit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html">VorticityVelocity_2D_FEniCS_periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic.html">VorticityVelocity_2D_Firedrake_periodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian.html">generic_MPIFFT_Laplacian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_ND_FD.html">generic_ND_FD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_spectral.html">generic_spectral</a></li>
@@ -535,6 +535,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order.html">imex_1st_order</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html">imex_1st_order_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html">imex_1st_order_mass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass_MPI.html">imex_1st_order_mass_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.multi_implicit.html">multi_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.verlet.html">verlet</a></li>
 </ul>
@@ -544,7 +545,6 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferDeltaMPI.html">BaseTransferDeltaMPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferMPI.html">BaseTransferMPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html">BaseTransfer_mass</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFenicsMesh.html">TransferFenicsMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html">TransferFiredrakeMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh.html">TransferMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_FFT.html">TransferMesh_FFT</a></li>
@@ -574,6 +574,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.stats_helper.html">stats_helper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.testing.html">testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.transfer_helper.html">transfer_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.ufl_forms.html">ufl_forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.visualization_tools.html">visualization_tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.vtkIO.html">vtkIO</a></li>
 </ul>
@@ -675,6 +676,17 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/sweeper_classes/generic_implicit_mass.html#generic_implicit_mass.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass.integrate" title="Link to this definition">#</a></dt>
+<dd><p>Integrate the right-hand side, see <a class="reference internal" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors" title="pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors"><code class="xref py py-func docutils literal notranslate"><span class="pre">integrate_load_vectors()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>list</em> – dt Q f at the nodes 1, …, M, load vectors like f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass.update_nodes">
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/sweeper_classes/generic_implicit_mass.html#generic_implicit_mass.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass.update_nodes" title="Link to this definition">#</a></dt>
 <dd><p>Fully implicit sweep for problems posed in mass-matrix form, M u’ = f(u), where eval_f
@@ -688,6 +700,26 @@ receive it already applied from the space-time transfer.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors">
+<span class="sig-name descname"><span class="pre">integrate_load_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sweeper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/sweeper_classes/generic_implicit_mass.html#integrate_load_vectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors" title="Link to this definition">#</a></dt>
+<dd><p>Integrate right-hand side values over the collocation nodes, dt Q F, for the mass-matrix sweepers.</p>
+<p>Unlike the parent sweepers’ <code class="docutils literal notranslate"><span class="pre">integrate</span></code>, each sum starts from its first term instead of a zero <code class="docutils literal notranslate"><span class="pre">dtype_u</span></code>: in
+the mass formulation the right-hand side is a load vector, which a backend may keep apart from solution data (the
+Firedrake data types do, and refuse to mix them).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sweeper</strong> – The mass-matrix sweeper</p></li>
+<li><p><strong>F</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – Right-hand side values at the nodes 1, …, M</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>list</em> – dt Q F at the nodes 1, …, M</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -742,9 +774,11 @@ receive it already applied from the space-time transfer.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass"><code class="docutils literal notranslate"><span class="pre">generic_implicit_mass</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass.compute_end_point"><code class="docutils literal notranslate"><span class="pre">compute_end_point()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass.compute_residual"><code class="docutils literal notranslate"><span class="pre">compute_residual()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass.integrate"><code class="docutils literal notranslate"><span class="pre">integrate()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass.update_nodes"><code class="docutils literal notranslate"><span class="pre">update_nodes()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors"><code class="docutils literal notranslate"><span class="pre">integrate_load_vectors()</span></code></a></li>
 </ul>
   </nav></div>
 

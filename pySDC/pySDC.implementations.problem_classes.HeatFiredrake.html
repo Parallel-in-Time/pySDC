@@ -438,6 +438,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.hotrod.html">hotrod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.inexactness.html">inexactness</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.interpolate_between_restarts.html">interpolate_between_restarts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.html">spatial_error_floor_firedrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spread_step_sizes.html">spread_step_sizes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.step_size_limiter.html">step_size_limiter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.store_uold.html">store_uold</a></li>
@@ -446,7 +447,6 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="pySDC.implementations.datatype_classes.html">datatype_classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.container.html">container</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.cupy_mesh.html">cupy_mesh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.fenics_mesh.html">fenics_mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.firedrake_mesh.html">firedrake_mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.mesh.html">mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.particles.html">particles</a></li>
@@ -487,15 +487,15 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.DiscontinuousTestODE.html">DiscontinuousTestODE</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FastWaveSlowWave_0D.html">FastWaveSlowWave_0D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FermiPastaUlamTsingou.html">FermiPastaUlamTsingou</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FormFiredrake.html">FormFiredrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FullSolarSystem.html">FullSolarSystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html">GeneralizedFisher_1D_FD_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc.html">GeneralizedFisher_1D_PETSc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GenericGusto.html">GenericGusto</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html">GrayScott_1D_FEniCS_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_Firedrake.html">GrayScott_1D_Firedrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html">GrayScott_2D_PETSc_periodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_MPIFFT.html">GrayScott_MPIFFT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HarmonicOscillator.html">HarmonicOscillator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html">HeatEquation_1D_FEniCS_matrix_forced</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced.html">HeatEquation_2D_PETSc_forced</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_Chebychev.html">HeatEquation_Chebychev</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_ND_FD.html">HeatEquation_ND_FD</a></li>
@@ -512,7 +512,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.RayleighBenard3D.html">RayleighBenard3D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.TestEquation_0D.html">TestEquation_0D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Van_der_Pol_implicit.html">Van_der_Pol_implicit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html">VorticityVelocity_2D_FEniCS_periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic.html">VorticityVelocity_2D_Firedrake_periodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian.html">generic_MPIFFT_Laplacian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_ND_FD.html">generic_ND_FD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_spectral.html">generic_spectral</a></li>
@@ -537,6 +537,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order.html">imex_1st_order</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html">imex_1st_order_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html">imex_1st_order_mass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass_MPI.html">imex_1st_order_mass_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.multi_implicit.html">multi_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.verlet.html">verlet</a></li>
 </ul>
@@ -546,7 +547,6 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferDeltaMPI.html">BaseTransferDeltaMPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferMPI.html">BaseTransferMPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html">BaseTransfer_mass</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFenicsMesh.html">TransferFenicsMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html">TransferFiredrakeMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh.html">TransferMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_FFT.html">TransferMesh_FFT</a></li>
@@ -576,6 +576,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.stats_helper.html">stats_helper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.testing.html">testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.transfer_helper.html">transfer_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.ufl_forms.html">ufl_forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.visualization_tools.html">visualization_tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.vtkIO.html">vtkIO</a></li>
 </ul>
@@ -650,134 +651,39 @@
 <span id="heatfiredrake"></span><h1>HeatFiredrake<a class="headerlink" href="#module-pySDC.implementations.problem_classes.HeatFiredrake" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Heat1DForcedFiredrake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LHS_cache_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="pySDC.core.problem.html#pySDC.core.problem.Problem" title="pySDC.core.problem.Problem"><code class="xref py py-class docutils literal notranslate"><span class="pre">Problem</span></code></a></p>
-<p>Forced 1D heat equation with Dirichlet BCs and Firedrake finite elements, IMEX with diffusion implicit.</p>
-<p>Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Heat1DForcedFiredrake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_dependent_bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">LHS_cache_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX" title="pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">FormFiredrakeIMEX</span></code></a></p>
+<p>Forced 1D heat equation with Dirichlet boundary values and Firedrake finite elements, IMEX with the diffusion
+implicit, in the mass-matrix formulation and given by its weak forms.</p>
+<p>The equation</p>
 <div class="math notranslate nohighlight">
-\[\frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f\]</div>
-<p>for <span class="math notranslate nohighlight">\(x \in \Omega:=[0,1]\)</span>, where the forcing term <span class="math notranslate nohighlight">\(f\)</span> is defined by</p>
+\[\frac{\partial u}{\partial t} = \nu \frac{\partial^2 u}{\partial x^2} + f\]</div>
+<p>on <span class="math notranslate nohighlight">\([0, 1]\)</span> has the exact solution</p>
 <div class="math notranslate nohighlight">
-\[f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).\]</div>
-<p>For initial conditions with constant c</p>
+\[u(x, t) = \sin(\pi x) \cos(t) + c, \quad \text{or} \quad u(x, t) = \cos(\pi x) \cos(t) + c\]</div>
+<p>with <cite>time_dependent_bc</cite>, whose Dirichlet values are then <span class="math notranslate nohighlight">\(\pm \cos(t) + c\)</span>. The forcing
+<span class="math notranslate nohighlight">\(f = u_t - \nu u_{xx}\)</span> is derived from the exact solution by UFL and enters the form as an expression. The
+weak formulation</p>
 <div class="math notranslate nohighlight">
-\[u(x, 0) = \sin(\pi x) + c,\]</div>
-<p>the exact solution is given by</p>
-<div class="math notranslate nohighlight">
-\[u(x, t) = \sin(\pi x)\cos(t) + c.\]</div>
-<p>Here, the problem is discretized with finite elements using firedrake. Hence, the problem
-is reformulated to the <em>weak formulation</em></p>
-<p>We invert the Laplacian implicitly and treat the forcing term explicitly.
-The solvers for the arising variational problems are cached for multiple collocation nodes and step sizes.</p>
+\[\int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx\]</div>
+<p>gives <span class="math notranslate nohighlight">\(M u' = -\nu K u + F\)</span>, with the diffusion implicit and the forcing explicit. The mass matrix is never
+inverted: use the mass-matrix sweepers, such as
+<a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html#pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass" title="pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass"><code class="xref py py-class docutils literal notranslate"><span class="pre">imex_1st_order_mass</span></code></a>. Everything else comes from
+<a class="reference internal" href="pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX" title="pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX"><code class="xref py py-class docutils literal notranslate"><span class="pre">FormFiredrakeIMEX</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nvars</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em>) – Spatial resolution, i.e., numbers of degrees of freedom in space.</p></li>
+<li><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em>) – Number of cells, ignored if <cite>mesh</cite> is given.</p></li>
 <li><p><strong>nu</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <em>optional</em>) – Diffusion coefficient <span class="math notranslate nohighlight">\(\nu\)</span>.</p></li>
-<li><p><strong>c</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <em>optional</em>) – Constant for the Dirichlet boundary condition :math: <cite>c</cite></p></li>
-<li><p><strong>LHS_cache_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em>) – Cache size for variational problem solvers</p></li>
-<li><p><strong>comm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">MPI</span> <span class="pre">communicator</span></code>, <em>optional</em>) – Supply an MPI communicator for spatial parallelism</p></li>
+<li><p><strong>c</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <em>optional</em>) – Constant shift <span class="math notranslate nohighlight">\(c\)</span> of the solution.</p></li>
+<li><p><strong>order</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em>) – Degree of the Lagrange elements.</p></li>
+<li><p><strong>time_dependent_bc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Use the solution with time-dependent boundary values.</p></li>
+<li><p><strong>LHS_cache_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em>) – Number of solvers kept, see <code class="docutils literal notranslate"><span class="pre">FormFiredrake</span></code>.</p></li>
+<li><p><strong>mesh</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.MeshGeometry</span></code>, <em>optional</em>) – A mesh of <span class="math notranslate nohighlight">\([0, 1]\)</span>, for instance from a <code class="docutils literal notranslate"><span class="pre">MeshHierarchy</span></code> for several levels.</p></li>
+<li><p><strong>comm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">MPI</span> <span class="pre">communicator</span></code>, <em>optional</em>) – Communicator for spatial parallelism, ignored if <cite>mesh</cite> is given.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.dtype_f">
-<span class="sig-name descname"><span class="pre">dtype_f</span></span><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.dtype_f" title="Link to this definition">#</a></dt>
-<dd><p>alias of <a class="reference internal" href="pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh" title="pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">IMEX_firedrake_mesh</span></code></a></p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.dtype_u">
-<span class="sig-name descname"><span class="pre">dtype_u</span></span><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.dtype_u" title="Link to this definition">#</a></dt>
-<dd><p>alias of <a class="reference internal" href="pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh" title="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_mesh</span></code></a></p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.eval_f">
-<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.eval_f" title="Link to this definition">#</a></dt>
-<dd><p>Evaluate the right hand side.
-The forcing term is simply interpolated to the grid.
-The Laplacian is evaluated via a variational problem, where the mass matrix is inverted and homogeneous boundary conditions are applied.
-Note that we cache the solver to obtain much better performance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<a class="reference internal" href="pySDC.core.problem.html#pySDC.core.problem.Problem.dtype_u" title="pySDC.core.problem.Problem.dtype_u"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dtype_u</span></code></a>) – Solution at which to evaluate</p></li>
-<li><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Time at which to evaluate</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>f</strong> (<a class="reference internal" href="pySDC.core.problem.html#pySDC.core.problem.Problem.dtype_f" title="pySDC.core.problem.Problem.dtype_f"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dtype_f</span></code></a>) – The evaluated right hand side</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.exact_solution">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">exact_solution</span></span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake.exact_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.exact_solution" title="Link to this definition">#</a></dt>
-<dd><p>Symbolic exact solution <span class="math notranslate nohighlight">\(u(x, t)\)</span> in terms of the time constant <a class="reference internal" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t" title="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ufl.core.expr.Expr</span></code>) – Exact solution, interpolated in <a class="reference internal" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.u_exact" title="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.u_exact"><code class="xref py py-meth docutils literal notranslate"><span class="pre">u_exact()</span></code></a>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.forcing">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">forcing</span></span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake.forcing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.forcing" title="Link to this definition">#</a></dt>
-<dd><p>Symbolic forcing term <span class="math notranslate nohighlight">\(f(x, t)\)</span> in terms of the time constant <a class="reference internal" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t" title="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>f</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ufl.core.expr.Expr</span></code>) – Forcing term, interpolated in <a class="reference internal" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.eval_f" title="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.eval_f"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eval_f()</span></code></a>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.solve_system">
-<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.solve_system" title="Link to this definition">#</a></dt>
-<dd><p>Linear solver for <span class="math notranslate nohighlight">\((M - factor nu * Lap) u = rhs\)</span>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<a class="reference internal" href="pySDC.core.problem.html#pySDC.core.problem.Problem.dtype_f" title="pySDC.core.problem.Problem.dtype_f"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dtype_f</span></code></a>) – Right-hand side for the nonlinear system.</p></li>
-<li><p><strong>factor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Abbrev. for the node-to-node stepsize (or any other factor required).</p></li>
-<li><p><strong>*args</strong> – Take the initial guess <code class="docutils literal notranslate"><span class="pre">u0</span></code> and the current time <code class="docutils literal notranslate"><span class="pre">t</span></code> of the generic interface, neither is used here.</p></li>
-<li><p><strong>**kwargs</strong> – Take the initial guess <code class="docutils literal notranslate"><span class="pre">u0</span></code> and the current time <code class="docutils literal notranslate"><span class="pre">t</span></code> of the generic interface, neither is used here.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>u</strong> (<a class="reference internal" href="pySDC.core.problem.html#pySDC.core.problem.Problem.dtype_u" title="pySDC.core.problem.Problem.dtype_u"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dtype_u</span></code></a>) – Solution.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">t</span></span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake.t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t" title="Link to this definition">#</a></dt>
-<dd><p>Time as a Firedrake constant, assigned before each interpolation so the kernels compile only once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.Constant</span></code>) – Time at which the time-dependent expressions are evaluated.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.u_exact">
-<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.u_exact" title="Link to this definition">#</a></dt>
-<dd><p>Routine to compute the exact solution at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Time of the exact solution.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>me</strong> (<a class="reference internal" href="pySDC.core.problem.html#pySDC.core.problem.Problem.dtype_u" title="pySDC.core.problem.Problem.dtype_u"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dtype_u</span></code></a>) – Exact solution.</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.x">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">x</span></span><a class="reference internal" href="../_modules/pySDC/implementations/problem_classes/HeatFiredrake.html#Heat1DForcedFiredrake.x"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.x" title="Link to this definition">#</a></dt>
@@ -841,14 +747,6 @@ Note that we cache the solver to obtain much better performance.</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake"><code class="docutils literal notranslate"><span class="pre">Heat1DForcedFiredrake</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.dtype_f"><code class="docutils literal notranslate"><span class="pre">dtype_f</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.dtype_u"><code class="docutils literal notranslate"><span class="pre">dtype_u</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.eval_f"><code class="docutils literal notranslate"><span class="pre">eval_f()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.exact_solution"><code class="docutils literal notranslate"><span class="pre">exact_solution</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.forcing"><code class="docutils literal notranslate"><span class="pre">forcing</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.solve_system"><code class="docutils literal notranslate"><span class="pre">solve_system()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.t"><code class="docutils literal notranslate"><span class="pre">t</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.u_exact"><code class="docutils literal notranslate"><span class="pre">u_exact()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.problem_classes.HeatFiredrake.Heat1DForcedFiredrake.x"><code class="docutils literal notranslate"><span class="pre">x</span></code></a></li>
 </ul>
 </li>

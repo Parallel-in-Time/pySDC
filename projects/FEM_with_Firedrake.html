@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Finite elements with pySDC: the mass-matrix route &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="../_static/documentation_options.js?v=696bab92"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'projects/FEM_with_Firedrake';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Low-precision implicit solves in SDC" href="DeltaSDC.html" />
+    <link rel="prev" title="Solving differential algebraic equations with SDC" href="DAE.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.9" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  <link rel="icon" href="../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1"><a href="index.html">Projects</a></p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="TOMS.html">Examples of the pySDC paper in ACM TOMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallelSDC.html">Attempts to parallelize SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parallelSDC_reloaded.html">Numerical experiment scripts for the parallel SDC paper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fwsw.html">Fast-Wave-Slow-Wave SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RDC.html">RDC: Rational Deferred Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asymp_conv.html">Asymptotic convergence of PFASST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrixPFASST.html">Matrix-based versions of PFASST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="second_order.html">Spectral Deferred Correction Methods for Second-Order Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Hamiltonian.html">Second-order Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SDC_showdown.html">What is the fastest SDC variant?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DAE.html">Solving differential algebraic equations with SDC</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Finite elements with pySDC: the mass-matrix route</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeltaSDC.html">Low-precision implicit solves in SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SDC4SDEs.html">SDC for stochastic differential equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AllenCahn_Bayreuth.html">Allen-Cahn problems from Bayreuth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PinTSimE.html">Parallel-in-time simulation for multi-modal energy systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monodomain.html">Exponential SDC for the Monodomain Equation in Cardiac Electrophysiology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RayleighBenard.html">SDC for Rayleigh-Benard convection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StroemungsRaum.html">StroemungsRaum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Performance analysis of pySDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Resilience.html">Resilience in SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soft_failure.html">Soft faults in SDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compression.html">Compression in pySDC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GPU.html">pySDC using GPUs</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Projects</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Finite elements with pySDC: the mass-matrix route</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="finite-elements-with-pysdc-the-mass-matrix-route">
+<h1>Finite elements with pySDC: the mass-matrix route<a class="headerlink" href="#finite-elements-with-pysdc-the-mass-matrix-route" title="Link to this heading">#</a></h1>
+<p>This project shows how to combine pySDC with finite elements, using <a class="reference external" href="https://www.firedrakeproject.org">Firedrake</a>
+for the spatial discretisation. It runs SDC, its multilevel variant MLSDC, and the parallel-in-time PFASST on four
+problems, and its main finding is this: <strong>with high-order elements, a multilevel hierarchy pays; with linear
+elements, it does not.</strong> At the same number of unknowns, three-level MLSDC reaches only 0.65x-0.84x the speed of SDC
+with linear elements, i.e. it costs more, but is 1.11x-1.94x faster than SDC with fourth-order elements.</p>
+<p>A finite element discretisation of <span class="math notranslate nohighlight">\(u_t = f(u)\)</span> gives a system <span class="math notranslate nohighlight">\(M u' = R(u)\)</span>, where <span class="math notranslate nohighlight">\(u\)</span> holds the
+coefficients of the solution, <span class="math notranslate nohighlight">\(M\)</span> is the <em>mass matrix</em> and <span class="math notranslate nohighlight">\(R(u)\)</span> is the assembled right-hand side. Both
+<span class="math notranslate nohighlight">\(M u\)</span> and <span class="math notranslate nohighlight">\(R(u)\)</span> are <em>load vectors</em>: their entries are integrals against the test functions, so they live
+in the dual space of the finite element space, not in the space itself. The usual way to bring this into a time
+integrator is to multiply by <span class="math notranslate nohighlight">\(M^{-1}\)</span>, which costs a linear solve per right-hand side evaluation. This project
+takes the other route throughout: <strong>the mass matrix is never inverted, anywhere.</strong> The problem classes hand the
+sweepers load vectors, and the mass-matrix sweepers (<code class="docutils literal notranslate"><span class="pre">generic_implicit_mass</span></code>, <code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass</span></code>) and the
+mass-matrix transfer between levels (<code class="docutils literal notranslate"><span class="pre">base_transfer_mass</span></code>) work with those directly.</p>
+<p>The 1d problems come with continuous (<code class="docutils literal notranslate"><span class="pre">CG</span></code>, the usual Lagrange elements) and discontinuous (<code class="docutils literal notranslate"><span class="pre">DG</span></code>) elements, and
+each multilevel hierarchy can be coarsened in either of two directions: a coarser mesh at fixed element order
+(<em>h-coarsening</em>), or a lower element order on the same mesh (<em>p-coarsening</em>). Each example declares the combinations
+it has a problem class for; <code class="docutils literal notranslate"><span class="pre">get_families</span></code> and <code class="docutils literal notranslate"><span class="pre">get_coarsenings</span></code> in <code class="docutils literal notranslate"><span class="pre">setups_firedrake.py</span></code> report them.</p>
+<section id="what-is-here">
+<h2>What is here<a class="headerlink" href="#what-is-here" title="Link to this heading">#</a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">setups_firedrake.py</span></code></dt><dd><p>Descriptions for the four examples:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">heat</span></code> – forced heat equation in 1D, IMEX: diffusion implicit, forcing explicit.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">burgers</span></code> – viscous Burgers in 1D, fully implicit, with a Newton solve per collocation node.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grayscott</span></code> – Gray-Scott reaction-diffusion in 1D, fully implicit, with a Newton solve per collocation node.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vortex</span></code> – vorticity-velocity in 2D, periodic, IMEX. The coarse level does not pay for itself here (0.79x
+on two levels); it is in the study as the 2d and periodic case, not as a savings case. CG and h only.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">get_description(example,</span> <span class="pre">nlevels,</span> <span class="pre">family,</span> <span class="pre">coarsening)</span></code> builds the pySDC description of any declared
+combination.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">problem_classes/Burgers_1D_Firedrake.py</span></code></dt><dd><p>The CG Burgers problem. The CG heat, Gray-Scott and vortex problems are general enough to live in
+<code class="docutils literal notranslate"><span class="pre">pySDC/implementations/problem_classes</span></code> (<code class="docutils literal notranslate"><span class="pre">HeatFiredrake</span></code>, <code class="docutils literal notranslate"><span class="pre">GrayScott_1D_Firedrake</span></code>,
+<code class="docutils literal notranslate"><span class="pre">VorticityVelocity_2D_Firedrake_periodic</span></code>).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">problem_classes/DG_1D_Firedrake.py</span></code></dt><dd><p>The DG versions of the three 1d problems: symmetric interior penalty (SIPG) for diffusion, Nitsche terms for
+Dirichlet data, and a local Lax-Friedrichs flux for the Burgers advection.</p>
+<p>The project’s problem classes are built on <code class="docutils literal notranslate"><span class="pre">FormFiredrake</span></code>: they give the mass form and the right-hand side
+form, and <code class="docutils literal notranslate"><span class="pre">FormFiredrake</span></code> assembles them, solves the implicit systems and applies the mass matrix.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">run_examples_firedrake.py</span></code></dt><dd><p>Runs every declared combination with SDC, MLSDC on 2 and 3 levels, and PFASST on up to 8 parallel steps, then the
+element-order comparison. Every table below comes from it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">pySDC/tests/test_projects/test_FEM_with_Firedrake/</span></code></dt><dd><p>The tests, which assert the claims below so they stay true. They are marked <code class="docutils literal notranslate"><span class="pre">firedrake</span></code> and run in pySDC’s
+Firedrake CI jobs.</p>
+</dd>
+</dl>
+</section>
+<section id="how-to-run-it">
+<h2>How to run it<a class="headerlink" href="#how-to-run-it" title="Link to this heading">#</a></h2>
+<p>You need Firedrake, which needs Python 3.11 or newer and NumPy 2.1 or newer. Firedrake’s own instructions are at
+<a class="reference external" href="https://www.firedrakeproject.org/install.html">https://www.firedrakeproject.org/install.html</a>. pySDC’s CI installs it on top of conda-forge’s PETSc, from the root of
+the pySDC repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>micromamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>etc/environment-firedrake.yml
+micromamba<span class="w"> </span>activate<span class="w"> </span>pySDC
+<span class="nb">export</span><span class="w"> </span><span class="nv">PETSC_DIR</span><span class="o">=</span><span class="nv">$CONDA_PREFIX</span><span class="w"> </span><span class="nv">PETSC_ARCH</span><span class="o">=</span><span class="w"> </span><span class="nv">CC</span><span class="o">=</span>mpicc<span class="w"> </span><span class="nv">CXX</span><span class="o">=</span>mpicxx
+<span class="c1"># Linux with conda-forge's compilers only: without these, every compiled kernel fails</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYOP2_CFLAGS</span><span class="o">=</span><span class="s1">'-fPIC -std=gnu11 -O3'</span><span class="w"> </span><span class="nv">PYOP2_LDFLAGS</span><span class="o">=</span><span class="s1">'-shared'</span>
+pip<span class="w"> </span>install<span class="w"> </span>libsupermesh<span class="w"> </span>firedrake-rtree<span class="w"> </span>petsctools
+pip<span class="w"> </span>install<span class="w"> </span>--no-build-isolation<span class="w"> </span>--no-deps<span class="w"> </span><span class="nv">firedrake</span><span class="o">==</span><span class="m">2026</span>.10.0
+pip<span class="w"> </span>install<span class="w"> </span><span class="nv">firedrake</span><span class="o">==</span><span class="m">2026</span>.10.0
+pip<span class="w"> </span>install<span class="w"> </span>--no-deps<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+<p>The PETSc version pinned in <code class="docutils literal notranslate"><span class="pre">etc/environment-firedrake.yml</span></code> must match the Firedrake release; the comments there and
+in the <code class="docutils literal notranslate"><span class="pre">user_firedrake_tests_conda</span></code> job of <code class="docutils literal notranslate"><span class="pre">.github/workflows/ci_pipeline.yml</span></code> explain the steps. Then, from the
+directory where the output should go:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pySDC.projects.FEM_with_Firedrake.run_examples_firedrake
+</pre></div>
+</div>
+<p>This writes every table below to <code class="docutils literal notranslate"><span class="pre">data/fem_with_firedrake_out.txt</span></code> and the element-order study as a plot to
+<code class="docutils literal notranslate"><span class="pre">data/fem_with_firedrake_orders.png</span></code>. The settings are sized for CI runtime, not for a production run. The tests
+run with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-m<span class="w"> </span>firedrake<span class="w"> </span>pySDC/tests/test_projects/test_FEM_with_Firedrake
+</pre></div>
+</div>
+<p>To build your own setup, copy one from <code class="docutils literal notranslate"><span class="pre">setups_firedrake.py</span></code>. The three pieces that matter are:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">description</span><span class="p">[</span><span class="s1">'sweeper_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit_mass</span>      <span class="c1"># or imex_1st_order_mass</span>
+<span class="n">description</span><span class="p">[</span><span class="s1">'base_transfer_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_transfer_mass</span>   <span class="c1"># tau by P^T, u0 and u by L2 projection</span>
+<span class="n">description</span><span class="p">[</span><span class="s1">'base_transfer_params'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'finter'</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>and a problem class whose <code class="docutils literal notranslate"><span class="pre">eval_f</span></code> returns the assembled weak form <span class="math notranslate nohighlight">\(R(u)\)</span> rather than <span class="math notranslate nohighlight">\(M^{-1}R(u)\)</span>, whose
+<code class="docutils literal notranslate"><span class="pre">solve_system</span></code> takes a right-hand side that is already a load vector, and which implements <code class="docutils literal notranslate"><span class="pre">apply_mass_matrix</span></code>.
+<code class="docutils literal notranslate"><span class="pre">FormFiredrake</span></code> does all three, given the forms.</p>
+<p>Then: <strong>high order, coarsened in h.</strong> CG or DG, they perform the same. The rest of this file is why, and what it took
+to make the DG half true.</p>
+<section id="how-the-work-is-counted">
+<h3>How the work is counted<a class="headerlink" href="#how-the-work-is-counted" title="Link to this heading">#</a></h3>
+<p>The tables compare <em>work</em>, not wall-clock time: the mean number of iterations per time step times the cost of one
+iteration in fine-level sweeps. One iteration costs one sweep on every level, each charged by its number of degrees
+of freedom (dofs) relative to the fine level, plus the restrictions of the solution to the coarse levels, each charged
+as 1% of a fine sweep (<code class="docutils literal notranslate"><span class="pre">RESTRICTION_COST</span></code> in <code class="docutils literal notranslate"><span class="pre">run_examples_firedrake.py</span></code>). The <em>speed-up</em> is the work of SDC
+divided by the work of the configuration; below 1.00x means MLSDC costs more than SDC.</p>
+</section>
+<section id="residual-tolerances">
+<h3>Residual tolerances<a class="headerlink" href="#residual-tolerances" title="Link to this heading">#</a></h3>
+<p>The iterations stop when the residual of the collocation problem drops below <code class="docutils literal notranslate"><span class="pre">restol</span></code>. That residual is a load
+vector, and pySDC’s Firedrake data types measure load vectors in the <em>dual norm</em>, the norm dual to <span class="math notranslate nohighlight">\(L^2\)</span>:
+<span class="math notranslate nohighlight">\(\sqrt{r^T M^{-1} r}\)</span>, which is the <span class="math notranslate nohighlight">\(L^2\)</span> norm of the function <span class="math notranslate nohighlight">\(w\)</span> with <span class="math notranslate nohighlight">\((w, v) = r(v)\)</span> for
+every test function <span class="math notranslate nohighlight">\(v\)</span>. Unlike a norm of the vector entries, it does not shrink as the mesh is refined, so
+one tolerance per example serves every element family, order and level: 2e-9 for <code class="docutils literal notranslate"><span class="pre">heat</span></code>, 1e-6 for <code class="docutils literal notranslate"><span class="pre">burgers</span></code>, 1e-8
+for <code class="docutils literal notranslate"><span class="pre">grayscott</span></code> and 1e-7 for <code class="docutils literal notranslate"><span class="pre">vortex</span></code> (<code class="docutils literal notranslate"><span class="pre">SETUPS</span></code> in <code class="docutils literal notranslate"><span class="pre">setups_firedrake.py</span></code>).</p>
+</section>
+</section>
+<section id="use-high-order-elements">
+<h2>Use high-order elements<a class="headerlink" href="#use-high-order-elements" title="Link to this heading">#</a></h2>
+<p>This is not a detail: it is what makes the multilevel hierarchy pay at all. At <em>identical</em> dof counts on every level,
+with only the element order changed (and the mesh refined to compensate), on h-coarsened hierarchies:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>example</p></th>
+<th class="head"><p>CG1</p></th>
+<th class="head"><p>CG2</p></th>
+<th class="head"><p>CG4</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">heat</span></code></p></td>
+<td><p>0.93x / 0.84x</p></td>
+<td><p>1.24x / 1.05x</p></td>
+<td><p>1.24x / 1.57x</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">burgers</span></code></p></td>
+<td><p>0.83x / 0.73x</p></td>
+<td><p>0.87x / 0.73x</p></td>
+<td><p>1.30x / 1.94x</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">grayscott</span></code></p></td>
+<td><p>0.77x / 0.65x</p></td>
+<td><p>0.83x / 0.70x</p></td>
+<td><p>1.14x / 1.11x</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>(speed-up of MLSDC over SDC on 2 / 3 levels)</p>
+<p>At CG1 nothing pays: every example loses on two and on three levels. At CG4 every example pays on both. The coarse
+level exists to approximate the smooth part of the error, and for smooth solutions a high-order space on a coarser mesh
+does that far better than a low-order space on a finer one at the same cost.</p>
+<p><code class="docutils literal notranslate"><span class="pre">test_examples_firedrake.py::test_high_order_elements_pay</span></code> asserts this in CI and plots the three-level speed-ups
+to <code class="docutils literal notranslate"><span class="pre">data/fem_with_firedrake_orders.png</span></code>, the picture on this project’s card in the gallery. To stay within CI
+runtime it runs 2 time steps instead of 8 and only CG1 and CG4, so the plotted values are close to, but not the same
+as, the ones in the table.</p>
+<p>This is the finite-element form of a result already known for finite differences, where MLSDC needs high-order
+<em>interpolation</em> – orders 4 to 6, with restriction left at order 2 (see <code class="docutils literal notranslate"><span class="pre">pySDC/tutorial/step_4</span></code>). The natural
+prolongation between nested finite element spaces <strong>is</strong> the inclusion, and its approximation order is the element
+order. So “use CG4” here and “use <code class="docutils literal notranslate"><span class="pre">iorder=6</span></code>” there are the same statement about the same operator.</p>
+</section>
+<section id="coarsen-in-h-not-in-p">
+<h2>Coarsen in h, not in p<a class="headerlink" href="#coarsen-in-h-not-in-p" title="Link to this heading">#</a></h2>
+<p>The same statement, pointed at the coarsening direction. Both ladders are nested, and with CG both halve the dof count
+per level – <code class="docutils literal notranslate"><span class="pre">CG4</span></code> on meshes of 512/256/128 cells against <code class="docutils literal notranslate"><span class="pre">CG4/CG2/CG1</span></code> on 512 cells give the identical
+2049/1025/513 – so for CG the two cost exactly the same per iteration and only the quality of the coarse space
+differs. (With DG the p ladder cannot halve: order 4/2/1 means 5/3/2 dofs per cell, so p-coarsening is charged more
+there as well.)</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>config</p></th>
+<th class="head"><p>SDC (work)</p></th>
+<th class="head"><p>MLSDC 2 levels</p></th>
+<th class="head"><p>MLSDC 3 levels</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>heat CG h</p></td>
+<td><p>5.75</p></td>
+<td><p>4.62 (1.24x)</p></td>
+<td><p>3.66 (1.57x)</p></td>
+</tr>
+<tr class="row-odd"><td><p>heat CG p</p></td>
+<td><p>5.75</p></td>
+<td><p>4.62 (1.24x)</p></td>
+<td><p>5.49 (1.05x)</p></td>
+</tr>
+<tr class="row-even"><td><p>heat DG h</p></td>
+<td><p>5.75</p></td>
+<td><p>4.62 (1.24x)</p></td>
+<td><p>3.66 (1.57x)</p></td>
+</tr>
+<tr class="row-odd"><td><p>heat DG p</p></td>
+<td><p>5.75</p></td>
+<td><p>4.92 (1.17x)</p></td>
+<td><p>6.24 (0.92x)</p></td>
+</tr>
+<tr class="row-even"><td><p>burgers CG h</p></td>
+<td><p>4.00</p></td>
+<td><p>3.08 (1.30x)</p></td>
+<td><p>2.06 (1.94x)</p></td>
+</tr>
+<tr class="row-odd"><td><p>burgers CG p</p></td>
+<td><p>4.00</p></td>
+<td><p>4.62 (0.87x)</p></td>
+<td><p>5.49 (0.73x)</p></td>
+</tr>
+<tr class="row-even"><td><p>burgers DG h</p></td>
+<td><p>4.00</p></td>
+<td><p>3.08 (1.30x)</p></td>
+<td><p>2.06 (1.94x)</p></td>
+</tr>
+<tr class="row-odd"><td><p>burgers DG p</p></td>
+<td><p>4.00</p></td>
+<td><p>4.92 (0.81x)</p></td>
+<td><p>6.24 (0.64x)</p></td>
+</tr>
+<tr class="row-even"><td><p>grayscott CG h</p></td>
+<td><p>6.38</p></td>
+<td><p>5.58 (1.14x)</p></td>
+<td><p>5.72 (1.11x)</p></td>
+</tr>
+<tr class="row-odd"><td><p>grayscott CG p</p></td>
+<td><p>6.38</p></td>
+<td><p>7.70 (0.83x)</p></td>
+<td><p>9.16 (0.70x)</p></td>
+</tr>
+<tr class="row-even"><td><p>grayscott DG h</p></td>
+<td><p>6.38</p></td>
+<td><p>5.58 (1.14x)</p></td>
+<td><p>5.72 (1.11x)</p></td>
+</tr>
+<tr class="row-odd"><td><p>grayscott DG p</p></td>
+<td><p>6.38</p></td>
+<td><p>8.20 (0.78x)</p></td>
+<td><p>10.40 (0.61x)</p></td>
+</tr>
+<tr class="row-even"><td><p>vortex CG h</p></td>
+<td><p>5.38</p></td>
+<td><p>6.77 (0.79x)</p></td>
+<td><p>7.48 (0.72x)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>(work, with the speed-up over SDC in brackets)</p>
+<p>h-coarsening is at least as good as p-coarsening in all six cases, and on three levels strictly better in all six.
+The reason is the one above: dropping from <code class="docutils literal notranslate"><span class="pre">CG4</span></code> to <code class="docutils literal notranslate"><span class="pre">CG2</span></code> to <code class="docutils literal notranslate"><span class="pre">CG1</span></code> on a fixed mesh leaves a coarse space with
+<span class="math notranslate nohighlight">\(O(h^2)\)</span> approximation error, while keeping <code class="docutils literal notranslate"><span class="pre">CG4</span></code> and doubling the cell size gives <span class="math notranslate nohighlight">\(O((2h)^5)\)</span>. The coarse
+level is there to resolve the smooth part of the error, and a low order resolves it badly however fine the mesh.</p>
+<p>With p-coarsening, the third level (order 1) lowers the iteration count in none of the six cases, so it only adds
+cost: three levels are worse than two every time.
+Order 2 still approximates the smooth error; order 1 does not.</p>
+</section>
+<section id="cg-or-dg">
+<h2>CG or DG<a class="headerlink" href="#cg-or-dg" title="Link to this heading">#</a></h2>
+<p>The same, once the DG hierarchy is built correctly. Of the 42 pairs of CG and DG iteration counts in the MLSDC table
+above and the PFASST table below, 39 agree exactly, all of the MLSDC ones among them. The other three are PFASST runs
+(heat with p-coarsening on 4 and 8 steps, Gray-Scott with h-coarsening on 2 steps) and differ by 0.12 iterations per
+step, i.e. one iteration summed over the 8 steps, which is where the iteration happens to cross its tolerance.</p>
+<p>That took two fixes, both of which CG gets for free and neither of which shows up in a discretisation test. Both are
+in the defect list below, items 5 and 6. Before them, DG looked like a dead end. The “broken hierarchy” column was
+measured in the original implementation of this study, before the fixes; the other two are the present ones:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>DG, h-coarsening</p></th>
+<th class="head"><p>broken hierarchy</p></th>
+<th class="head"><p>Galerkin hierarchy</p></th>
+<th class="head"><p>CG for reference</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>heat, 3 levels</p></td>
+<td><p>1.10x</p></td>
+<td><p>1.57x</p></td>
+<td><p>1.57x</p></td>
+</tr>
+<tr class="row-odd"><td><p>burgers, 3 levels</p></td>
+<td><p>0.79x</p></td>
+<td><p>1.94x</p></td>
+<td><p>1.94x</p></td>
+</tr>
+<tr class="row-even"><td><p>grayscott, 3 levels</p></td>
+<td><p>0.65x</p></td>
+<td><p>1.11x</p></td>
+<td><p>1.11x</p></td>
+</tr>
+<tr class="row-odd"><td><p>heat, PFASST 8 steps</p></td>
+<td><p>12.88 iters</p></td>
+<td><p>4.50 iters</p></td>
+<td><p>4.50 iters</p></td>
+</tr>
+<tr class="row-even"><td><p>burgers, PFASST 8 steps</p></td>
+<td><p>13.50 iters</p></td>
+<td><p>4.00 iters</p></td>
+<td><p>4.00 iters</p></td>
+</tr>
+<tr class="row-odd"><td><p>grayscott, PFASST 8 steps</p></td>
+<td><p>did not converge</p></td>
+<td><p>5.38 iters</p></td>
+<td><p>5.38 iters</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The difference that remains: at the same mesh and order, DG carries 25% more dofs (5 per cell against 4) for the same
+accuracy, because these solutions are smooth. Same iterations, more work per iteration. DG earns those dofs on
+discontinuities and on advection-dominated transport, which none of these examples have – so use it here only if you
+want it for other reasons, and know that the multilevel machinery will not hold you back.</p>
+<p>The penalty constant <span class="math notranslate nohighlight">\(\sigma\)</span> of the interior penalty method is not a tuning knob. In the original
+implementation, sweeping it over 1, 2, 5, 10, 40 changed nothing above the coercivity threshold (the value below which
+the discrete operator stops being positive definite); only <span class="math notranslate nohighlight">\(\sigma = 1\)</span> sat below it and wrecked the coarse
+correction. The setups use <span class="math notranslate nohighlight">\(\sigma = 10\)</span>. What matters is not how big it is but that it is <em>the same on every
+level</em>, which is item 6.</p>
+</section>
+<section id="what-it-demonstrates">
+<h2>What it demonstrates<a class="headerlink" href="#what-it-demonstrates" title="Link to this heading">#</a></h2>
+<p><strong>Savings</strong> – see the tables above. With h-coarsening, a third level pays clearly on heat and Burgers and is about
+neutral on Gray-Scott. Expect less from a multilevel hierarchy the more nonlinear the problem is.</p>
+<p><strong>Stability</strong> – PFASST with two levels, mean iterations per step as parallel steps are added:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>config</p></th>
+<th class="head"><p>1 step</p></th>
+<th class="head"><p>2</p></th>
+<th class="head"><p>4</p></th>
+<th class="head"><p>8</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>heat CG h</p></td>
+<td><p>3.00</p></td>
+<td><p>3.38</p></td>
+<td><p>3.75</p></td>
+<td><p>4.50</p></td>
+</tr>
+<tr class="row-odd"><td><p>heat CG p</p></td>
+<td><p>3.00</p></td>
+<td><p>3.50</p></td>
+<td><p>3.88</p></td>
+<td><p>4.62</p></td>
+</tr>
+<tr class="row-even"><td><p>heat DG h</p></td>
+<td><p>3.00</p></td>
+<td><p>3.38</p></td>
+<td><p>3.75</p></td>
+<td><p>4.50</p></td>
+</tr>
+<tr class="row-odd"><td><p>heat DG p</p></td>
+<td><p>3.00</p></td>
+<td><p>3.50</p></td>
+<td><p>4.00</p></td>
+<td><p>4.75</p></td>
+</tr>
+<tr class="row-even"><td><p>burgers CG h</p></td>
+<td><p>2.00</p></td>
+<td><p>2.50</p></td>
+<td><p>3.12</p></td>
+<td><p>4.00</p></td>
+</tr>
+<tr class="row-odd"><td><p>burgers CG p</p></td>
+<td><p>3.00</p></td>
+<td><p>3.00</p></td>
+<td><p>3.38</p></td>
+<td><p>4.12</p></td>
+</tr>
+<tr class="row-even"><td><p>burgers DG h</p></td>
+<td><p>2.00</p></td>
+<td><p>2.50</p></td>
+<td><p>3.12</p></td>
+<td><p>4.00</p></td>
+</tr>
+<tr class="row-odd"><td><p>burgers DG p</p></td>
+<td><p>3.00</p></td>
+<td><p>3.00</p></td>
+<td><p>3.38</p></td>
+<td><p>4.12</p></td>
+</tr>
+<tr class="row-even"><td><p>grayscott CG h</p></td>
+<td><p>3.62</p></td>
+<td><p>3.75</p></td>
+<td><p>4.50</p></td>
+<td><p>5.38</p></td>
+</tr>
+<tr class="row-odd"><td><p>grayscott CG p</p></td>
+<td><p>5.00</p></td>
+<td><p>5.12</p></td>
+<td><p>5.38</p></td>
+<td><p>5.75</p></td>
+</tr>
+<tr class="row-even"><td><p>grayscott DG h</p></td>
+<td><p>3.62</p></td>
+<td><p>3.88</p></td>
+<td><p>4.50</p></td>
+<td><p>5.38</p></td>
+</tr>
+<tr class="row-odd"><td><p>grayscott DG p</p></td>
+<td><p>5.00</p></td>
+<td><p>5.12</p></td>
+<td><p>5.38</p></td>
+<td><p>5.75</p></td>
+</tr>
+<tr class="row-even"><td><p>vortex CG h</p></td>
+<td><p>5.25</p></td>
+<td><p>6.25</p></td>
+<td><p>7.75</p></td>
+<td><p>10.38</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The growth out to 8 parallel steps is 1.15-2.0x, which is what PFASST is supposed to do. Every PFASST solution agrees
+with the one-step run in the <span class="math notranslate nohighlight">\(L^2\)</span> norm: to 1.9e-8 or better for heat and Gray-Scott, 1.9e-7 for the vortex and
+3.7e-7 for Burgers.</p>
+<p>PFASST is the direction that is sensitive to how the solution is restricted to the coarse level: <code class="docutils literal notranslate"><span class="pre">base_transfer_mass</span></code>
+restricts <code class="docutils literal notranslate"><span class="pre">u</span></code> by <span class="math notranslate nohighlight">\(L^2\)</span> projection rather than by sampling it at the coarse nodes. The MLSDC table cannot tell
+the two apart, but in the original implementation the projection was worth up to a factor of two in PFASST iterations,
+and on the vortex at 8 steps it made the difference between a converged answer and an <span class="math notranslate nohighlight">\(O(1)\)</span> wrong one.</p>
+</section>
+<section id="why-earlier-attempts-did-not-pay-off">
+<h2>Why earlier attempts did not pay off<a class="headerlink" href="#why-earlier-attempts-did-not-pay-off" title="Link to this heading">#</a></h2>
+<p>Multilevel SDC with finite elements had been tried in pySDC before and did not pay. It took fixing six separate
+defects. Note what they have in common: every one of them leaves a method that still converges, still to the right
+answer, with a coarse level that corrects far less than it should. None of them is visible in a discretisation test,
+and none of them raises anything. Here <span class="math notranslate nohighlight">\(P\)</span> is the prolongation from a coarse to a fine level and <span class="math notranslate nohighlight">\(\tau\)</span> is
+the FAS correction, the term that makes the coarse problem consistent with the fine one.</p>
+<ol class="arabic simple">
+<li><p><strong>The FAS</strong> <span class="math notranslate nohighlight">\(\tau\)</span> <strong>was restricted by interpolation.</strong> <span class="math notranslate nohighlight">\(\tau\)</span> is a load vector, not a nodal function,
+so it has to be restricted with <span class="math notranslate nohighlight">\(P^T\)</span>. Interpolating it is wrong by roughly <span class="math notranslate nohighlight">\(2^d\)</span> in <span class="math notranslate nohighlight">\(d\)</span>
+dimensions.</p></li>
+<li><p><strong>The dual convention stopped at the first coarse level.</strong> <code class="docutils literal notranslate"><span class="pre">u0</span></code> was carried in the dual space (as <span class="math notranslate nohighlight">\(M u_0\)</span>)
+on coarse levels, but only the finest transfer put it there, so three levels did not converge.</p></li>
+<li><p><strong>The same convention broke across step boundaries</strong>, because <code class="docutils literal notranslate"><span class="pre">uend</span></code> was handed over as a function rather than
+a load vector. That is why PFASST did not work with the mass matrix. Both are gone with the convention itself:
+<code class="docutils literal notranslate"><span class="pre">u0</span></code> is now a solution on every level, restricted by <span class="math notranslate nohighlight">\(L^2\)</span> projection like the nodes, which hands the
+coarse sweep the same <span class="math notranslate nohighlight">\(P^T M u_0\)</span>.</p></li>
+<li><p><strong>The coarsening hid all of it.</strong> Reducing the collocation nodes to one on the coarse level makes it
+asymptotically inert – it can neither help nor hurt, and it masks a broken transfer. Combined with
+<code class="docutils literal notranslate"><span class="pre">Problem.apply_mass_matrix</span></code> silently defaulting to the identity (it now raises), a wrong mass matrix produced a
+stalled iteration many sweeps later rather than an error.</p></li>
+<li><p><strong>The prolongation was not the inclusion, for DG.</strong> Between nested spaces, <span class="math notranslate nohighlight">\(P\)</span> should be the inclusion: a
+coarse function, unchanged, seen as a fine one. The original transfer built it by interpolation across meshes, i.e.
+by evaluating the coarse function at the fine dof positions. A fine dof sitting <em>on</em> a coarse facet has two coarse
+values there, and the point evaluation returns whichever cell its search finds first. The prolonged function is
+therefore continuous at every coarse facet: the jumps, which are the whole point of a DG space, are deleted. The
+error is <span class="math notranslate nohighlight">\(O(1)\)</span> in the jump and exactly zero for smooth data, which is why it survived a convergence test at
+<span class="math notranslate nohighlight">\(O(h^{p+1})\)</span>. A related trap on periodic meshes: dof coordinates taken from a global list place a dof on the
+periodic boundary on the far side of the domain, so the coarse function is extrapolated there. Here the
+prolongation is Firedrake’s own (<code class="docutils literal notranslate"><span class="pre">MeshToMeshFiredrakeHierarchy</span></code> for h, interpolation on the same mesh,
+<code class="docutils literal notranslate"><span class="pre">MeshToMeshFiredrake</span></code>, for p), which is the inclusion; <code class="docutils literal notranslate"><span class="pre">test_prolongation_preserves_jumps</span></code> and
+<code class="docutils literal notranslate"><span class="pre">test_prolongation_on_a_periodic_space</span></code> check it with random coarse data.</p></li>
+<li><p><strong>The interior penalty was rediscretised on every level.</strong> The CG bilinear form does not know which mesh it lives
+on, so rediscretising it on a coarse level gives exactly the Galerkin operator <span class="math notranslate nohighlight">\(P^T A_F P\)</span>. The SIPG form
+does know: its penalty scales as <span class="math notranslate nohighlight">\(\sigma p^2 / h\)</span>, so a coarser mesh halves it and a lower order divides it
+by <span class="math notranslate nohighlight">\((p_f/p_c)^2\)</span>. That is not a small perturbation – the penalty outweighs the volume term by
+<span class="math notranslate nohighlight">\(\sigma p^2\)</span>, so the coarse operator was wrong in its <em>dominant</em> term and corrected almost nothing.
+<code class="docutils literal notranslate"><span class="pre">setups_firedrake.py</span></code> therefore pins the penalty coefficient to <span class="math notranslate nohighlight">\(\alpha_l = \sigma p_0^2 \, h_l / h_0\)</span> on
+level <span class="math notranslate nohighlight">\(l\)</span> (level 0 is the finest), so that <span class="math notranslate nohighlight">\(\alpha_l / h_l\)</span> is the same on every level. With that and
+item 5, the rediscretised coarse operator is the Galerkin one, for both coarsening directions.</p></li>
+</ol>
+<p>The collocation nodes are kept on every level for a further reason: partial node coarsening (5 -&gt; 4, 5 -&gt; 3) was worse
+than no coarse level at all in the original implementation, because it destroys the stiff-limit annihilation that the
+<code class="docutils literal notranslate"><span class="pre">LU</span></code> preconditioner provides.</p>
+</section>
+<section id="stopping-at-the-spatial-error">
+<h2>Stopping at the spatial error<a class="headerlink" href="#stopping-at-the-spatial-error" title="Link to this heading">#</a></h2>
+<p>A residual tolerance is a guess at how accurate the time stepping needs to be. Below the error of the spatial
+discretization, further iterations cannot make the solution more accurate. <code class="docutils literal notranslate"><span class="pre">get_description(...,</span>
+<span class="pre">spatial_error_floor=True)</span></code> adds the convergence controller
+<a class="reference internal" href="../pySDC/pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.html#pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake" title="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpatialErrorFloorFiredrake</span></code></a>,
+which also stops a step once its residual is below its share <span class="math notranslate nohighlight">\(e_x \Delta t / T\)</span> of the spatial error <span class="math notranslate nohighlight">\(e_x\)</span>.
+It estimates <span class="math notranslate nohighlight">\(e_x\)</span> once per step from what the next coarser mesh of the hierarchy cannot represent. The study
+runs it for SDC and 2-level MLSDC (CG, h), iterations per step, 8 steps:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>example</p></th>
+<th class="head"><p>SDC: restol / + floor</p></th>
+<th class="head"><p>MLSDC: restol / + floor</p></th>
+<th class="head"><p>change in u</p></th>
+<th class="head"><p>spatial error</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">heat</span></code></p></td>
+<td><p>5.75 / 5.75</p></td>
+<td><p>3.00 / 3.00</p></td>
+<td><p>0</p></td>
+<td><p>1.3e-15</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">burgers</span></code></p></td>
+<td><p>4.00 / 4.00</p></td>
+<td><p>2.00 / 2.00</p></td>
+<td><p>0</p></td>
+<td><p>5.6e-11</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">grayscott</span></code></p></td>
+<td><p>6.38 / 6.38</p></td>
+<td><p>3.62 / 3.62</p></td>
+<td><p>0</p></td>
+<td><p>4.6e-08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vortex</span></code></p></td>
+<td><p>5.38 / 1.25</p></td>
+<td><p>5.25 / 1.12</p></td>
+<td><p>1.6e-2 / 6.9e-3</p></td>
+<td><p>9.9e-02</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The three 1D problems are resolved in space far beyond their residual tolerance, so the floor never stops a step
+early. The vortex is not: its spatial error is about 0.1, and one sweep per step already gets the time stepping below
+its share of it. Stopping there saves four of every five iterations, and the solution moves by much less than its
+spatial error.</p>
+</section>
+<section id="earlier-versions-of-this-study">
+<h2>Earlier versions of this study<a class="headerlink" href="#earlier-versions-of-this-study" title="Link to this heading">#</a></h2>
+<p>The study was first done with FEniCS, which pySDC no longer supports, and moved to Firedrake with the same problems
+and settings. The findings marked “in the original implementation” above come from that version and were not
+repeated; the conclusions of both versions are the same.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="DAE.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Solving differential algebraic equations with SDC</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="DeltaSDC.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Low-precision implicit solves in SDC</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-here">What is here</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-run-it">How to run it</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-work-is-counted">How the work is counted</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#residual-tolerances">Residual tolerances</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-high-order-elements">Use high-order elements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#coarsen-in-h-not-in-p">Coarsen in h, not in p</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cg-or-dg">CG or DG</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-demonstrates">What it demonstrates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-earlier-attempts-did-not-pay-off">Why earlier attempts did not pay off</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stopping-at-the-spatial-error">Stopping at the spatial error</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#earlier-versions-of-this-study">Earlier versions of this study</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Parallel-in-Time/pySDC/edit/master/docs/source//projects/FEM_with_Firedrake.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/projects/FEM_with_Firedrake.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

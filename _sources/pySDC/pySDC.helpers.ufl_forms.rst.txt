@@ -1,0 +1,7 @@
+ufl\_forms
+==========
+
+.. automodule:: pySDC.helpers.ufl_forms
+   :members:
+   :show-inheritance:
+   :undoc-members:

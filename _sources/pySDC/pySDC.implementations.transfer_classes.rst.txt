@@ -11,7 +11,6 @@ Submodules
    pySDC.implementations.transfer_classes.BaseTransferDeltaMPI
    pySDC.implementations.transfer_classes.BaseTransferMPI
    pySDC.implementations.transfer_classes.BaseTransfer_mass
-   pySDC.implementations.transfer_classes.TransferFenicsMesh
    pySDC.implementations.transfer_classes.TransferFiredrakeMesh
    pySDC.implementations.transfer_classes.TransferMesh
    pySDC.implementations.transfer_classes.TransferMesh_FFT

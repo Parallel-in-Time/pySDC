@@ -1,0 +1,7 @@
+GrayScott\_1D\_Firedrake
+========================
+
+.. automodule:: pySDC.implementations.problem_classes.GrayScott_1D_Firedrake
+   :members:
+   :show-inheritance:
+   :undoc-members:

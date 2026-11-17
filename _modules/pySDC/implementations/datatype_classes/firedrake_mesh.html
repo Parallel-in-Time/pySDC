@@ -438,40 +438,96 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.container</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiComponentContainer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.firedrake_ensemble_communicator</span><span class="w"> </span><span class="kn">import</span> <span class="n">FiredrakeEnsembleCommunicator</span>
 
+<span class="c1">#: how :func:`riesz_map` solves with the mass matrix; its relative tolerance is set per map</span>
+<span class="n">MASS_SOLVER</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'ksp_type'</span><span class="p">:</span> <span class="s1">'cg'</span><span class="p">,</span> <span class="s1">'pc_type'</span><span class="p">:</span> <span class="s1">'jacobi'</span><span class="p">,</span> <span class="s1">'ksp_atol'</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
+<span class="c1">#: tolerance of the mass solves behind the norm of dual data: the norm's error is about the square of it, here 1e-9,</span>
+<span class="c1">#: plenty for a stopping test, at a third to a half of the cost of solving to round-off</span>
+<span class="n">NORM_RTOL</span> <span class="o">=</span> <span class="mf">1e-4</span>
+
+
+<div class="viewcode-block" id="riesz_map">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">riesz_map</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    The L2 Riesz map of a primal space, one per space so its mass matrix is assembled once.</span>
+
+<span class="sd">    The mass matrix is solved with conjugate gradients and a Jacobi preconditioner, which converges in a few dozen</span>
+<span class="sd">    iterations whatever the mesh size, since the mass matrix is spectrally equivalent to its diagonal. A direct solver</span>
+<span class="sd">    would store a factorization of it on every level, only to measure residuals.</span>
+
+<span class="sd">    The maps are kept on the mesh, so they go when the mesh goes. A cache that outlives the mesh would keep the mesh,</span>
+<span class="sd">    its mass matrix, its solver and their MPI communicators alive for the whole process, and MPI runs out of</span>
+<span class="sd">    communicators after a few hundred problems.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        V (firedrake.FunctionSpace): The primal space</span>
+<span class="sd">        rtol (float): Relative tolerance of the mass solves. The default is round-off, which projections need; the</span>
+<span class="sd">            norm of dual data uses :data:`NORM_RTOL`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        firedrake.RieszMap: Maps a cofunction r to the function w with (w, v) = r(v) for all v in `V`</span>
+<span class="sd">    """</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">mesh</span><span class="p">()</span>
+    <span class="n">maps</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">'_pysdc_riesz_maps'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">maps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">maps</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_pysdc_riesz_maps</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># keyed by equality, since spaces are often rebuilt, e.g. by `Cofunction.function_space().dual()`</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">rtol</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">maps</span><span class="p">:</span>
+        <span class="n">maps</span><span class="p">[(</span><span class="n">V</span><span class="p">,</span> <span class="n">rtol</span><span class="p">)]</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">RieszMap</span><span class="p">(</span>
+            <span class="n">V</span><span class="p">,</span> <span class="s1">'L2'</span><span class="p">,</span> <span class="n">constant_jacobian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">MASS_SOLVER</span><span class="p">,</span> <span class="s1">'ksp_rtol'</span><span class="p">:</span> <span class="n">rtol</span><span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">maps</span><span class="p">[(</span><span class="n">V</span><span class="p">,</span> <span class="n">rtol</span><span class="p">)]</span></div>
+
+
 
 <div class="viewcode-block" id="firedrake_mesh">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">firedrake_mesh</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Wrapper for firedrake function data.</span>
+<span class="sd">    Wrapper for Firedrake data, either a ``Function`` (primal) or a ``Cofunction`` (dual).</span>
+
+<span class="sd">    Dual data are load vectors such as an assembled right-hand side :math:`R(u)` or :math:`M u`, which the</span>
+<span class="sd">    mass-matrix sweepers work with. Whether an instance is primal or dual is decided by the data it holds, so</span>
+<span class="sd">    arithmetic keeps the kind of its operands, and combining a primal with a dual instance raises a `DataError`.</span>
+<span class="sd">    Use :class:`firedrake_dual_mesh` to create dual data from a primal space.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        functionspace (firedrake.Function): firedrake data</span>
+<span class="sd">        functionspace (firedrake.Function or firedrake.Cofunction): firedrake data</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Args:</span>
-<span class="sd">            init (firedrake.FunctionSpace, firedrake.Function or firedrake_mesh): Function space to create a function</span>
-<span class="sd">                on, or</span>
-<span class="sd">                data to copy</span>
-<span class="sd">            val (float): Value to assign if `init` is a function space, ignored otherwise</span>
+<span class="sd">            init (firedrake.FunctionSpace, its dual, firedrake.Function, firedrake.Cofunction or firedrake_mesh):</span>
+<span class="sd">                Space to create data on, or data to copy</span>
+<span class="sd">            val (float): Value to assign if `init` is a space, ignored otherwise</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            DataError: If `init` has none of these types</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="n">fd</span><span class="o">.</span><span class="n">functionspaceimpl</span><span class="o">.</span><span class="n">WithGeometry</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">)</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">fd</span><span class="o">.</span><span class="n">functionspaceimpl</span><span class="o">.</span><span class="n">FiredrakeDualSpace</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Cofunction</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">fd</span><span class="o">.</span><span class="n">functionspaceimpl</span><span class="o">.</span><span class="n">WithGeometry</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">)</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">)</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">)</span> <span class="o">==</span> <span class="n">firedrake_mesh</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span> <span class="o">=</span> <span class="n">init</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deepcopy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">Cofunction</span><span class="p">,</span> <span class="n">firedrake_mesh</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s1">'functionspace'</span><span class="p">,</span> <span class="n">init</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deepcopy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'something went wrong during </span><span class="si">%s</span><span class="s1"> initialization'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+<div class="viewcode-block" id="firedrake_mesh.is_dual">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.is_dual">[docs]</a>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_dual</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Whether this holds a ``Cofunction``, i.e. a load vector, rather than a ``Function``."""</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="n">fd</span><span class="o">.</span><span class="n">Cofunction</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="firedrake_mesh.asnumpy">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.asnumpy">[docs]</a>
@@ -483,21 +539,37 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_operand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Make sure `other` can be added to or subtracted from this instance.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            DataError: If `other` is no `firedrake_mesh`, or one of the other kind (primal or dual)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">firedrake_mesh</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot combine </span><span class="si">%s</span><span class="s2"> with </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">is_dual</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dual</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'Cannot combine primal data (a Function) with dual data (a Cofunction)'</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_axpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Return a copy of this plus `alpha` times `other`, with `alpha` 1 or -1.</span>
+
+<span class="sd">        Both kinds are combined on their PETSc vectors, with the same result as Firedrake's ``assign`` of the sum:</span>
+<span class="sd">        that goes through a symbolic expression and costs 4-6 times as much for a ``Function``, and about ten times</span>
+<span class="sd">        as much for a ``Cofunction``.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_operand</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="n">firedrake_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">me</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">vec</span> <span class="k">as</span> <span class="n">x</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">vec_ro</span> <span class="k">as</span> <span class="n">y</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">axpy</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
-            <span class="n">me</span> <span class="o">=</span> <span class="n">firedrake_mesh</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">me</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axpy</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
-            <span class="n">me</span> <span class="o">=</span> <span class="n">firedrake_mesh</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">me</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot add </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axpy</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
@@ -508,24 +580,32 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            DataError: if other is not a float</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            fenics_mesh: copy of original values scaled by factor</span>
+<span class="sd">            firedrake_mesh: copy of original values scaled by factor</span>
 <span class="sd">        """</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">me</span> <span class="o">=</span> <span class="n">firedrake_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="n">me</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">me</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">vec</span> <span class="k">as</span> <span class="n">x</span><span class="p">:</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">me</span>
         <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s2">"Type error: cannot multiply </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Overloading the abs operator for mesh types</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            float: L2 norm</span>
-<span class="sd">        """</span>
+<span class="sd">        Primal data have the :math:`L^2` norm. Dual data :math:`r` have the norm dual to it,</span>
+<span class="sd">        :math:`\sqrt{r^T M^{-1} r}`, which is the :math:`L^2` norm of the function :math:`w` with</span>
+<span class="sd">        :math:`(w, v) = r(v)` for all test functions :math:`v`. Unlike a norm of the vector entries, it does not</span>
+<span class="sd">        shrink with the mesh width.</span>
 
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The norm</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dual</span><span class="p">:</span>
+            <span class="n">representer</span> <span class="o">=</span> <span class="n">riesz_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">function_space</span><span class="p">()</span><span class="o">.</span><span class="n">dual</span><span class="p">(),</span> <span class="n">NORM_RTOL</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">representer</span><span class="o">.</span><span class="n">dat</span><span class="p">))</span> <span class="o">**</span> <span class="mf">0.5</span>
         <span class="k">return</span> <span class="n">fd</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="s1">'L2'</span><span class="p">)</span>
 
 <div class="viewcode-block" id="firedrake_mesh.isend">
@@ -590,6 +670,28 @@
 
 
 
+<div class="viewcode-block" id="firedrake_dual_mesh">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">firedrake_dual_mesh</span><span class="p">(</span><span class="n">firedrake_mesh</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    A `firedrake_mesh` that creates dual data from a primal space, for problems whose right-hand side is a load vector.</span>
+
+<span class="sd">    Use it as ``dtype_f`` of problems for the mass-matrix sweepers: pySDC creates right-hand sides from the problem's</span>
+<span class="sd">    primal space, and this puts them on its dual. Copies and arithmetic behave as for `firedrake_mesh`.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Args:</span>
+<span class="sd">            init: As for `firedrake_mesh`, except that a primal space is replaced by its dual</span>
+<span class="sd">            val (float): Value to assign if `init` is a space, ignored otherwise</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">fd</span><span class="o">.</span><span class="n">functionspaceimpl</span><span class="o">.</span><span class="n">WithGeometry</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">init</span><span class="p">)</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+            <span class="n">init</span> <span class="o">=</span> <span class="n">init</span><span class="o">.</span><span class="n">dual</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="IMEX_firedrake_mesh">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IMEX_firedrake_mesh</span><span class="p">(</span><span class="n">MultiComponentContainer</span><span class="p">):</span>
@@ -603,6 +705,21 @@
 
     <span class="n">components</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'impl'</span><span class="p">,</span> <span class="s1">'expl'</span><span class="p">]</span>
     <span class="n">component_type</span> <span class="o">=</span> <span class="n">firedrake_mesh</span></div>
+
+
+
+<div class="viewcode-block" id="IMEX_firedrake_dual_mesh">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.firedrake_mesh.html#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_dual_mesh">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IMEX_firedrake_dual_mesh</span><span class="p">(</span><span class="n">IMEX_firedrake_mesh</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Datatype for IMEX integration with dual firedrake data, see `firedrake_dual_mesh`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        impl (firedrake_dual_mesh): implicit part</span>
+<span class="sd">        expl (firedrake_dual_mesh): explicit part</span>
+<span class="sd">    """</span>
+
+    <span class="n">component_type</span> <span class="o">=</span> <span class="n">firedrake_dual_mesh</span></div>
 
 </pre></div>
 

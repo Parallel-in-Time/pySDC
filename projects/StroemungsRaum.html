@@ -408,7 +408,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Hamiltonian.html">Second-order Problems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="SDC_showdown.html">What is the fastest SDC variant?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DAE.html">Solving differential algebraic equations with SDC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="FEM_with_FEniCS.html">Finite elements with pySDC: the mass-matrix route</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FEM_with_Firedrake.html">Finite elements with pySDC: the mass-matrix route</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DeltaSDC.html">Low-precision implicit solves in SDC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="SDC4SDEs.html">SDC for stochastic differential equations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="AllenCahn_Bayreuth.html">Allen-Cahn problems from Bayreuth</a></li>
@@ -505,42 +505,155 @@ efficient execution on large-scale HPC systems.</p>
 </section>
 <section id="model-problems-and-methods">
 <h2>Model Problems and Methods<a class="headerlink" href="#model-problems-and-methods" title="Link to this heading">#</a></h2>
-<p>Implemented examples and test cases include:</p>
+<p>The examples are finite-element discretizations in space, solved in time with
+spectral deferred corrections (SDC), and serve as benchmarks and demonstrators
+for scalable space–time CFD simulations:</p>
 <ul class="simple">
-<li><p>Heat equation</p></li>
-<li><p>Convection–diffusion and nonlinear convection–diffusion problems</p></li>
-<li><dl class="simple">
-<dt>Incompressible Navier–Stokes equations, using:</dt><dd><ul>
-<li><p>Projection methods</p></li>
-<li><p>Monolithic formulations</p></li>
-<li><p>DAE- and PDE sweepers</p></li>
+<li><p>the forced heat equation on the unit square,</p></li>
+<li><p>the convection–diffusion of a rotating Gaussian,</p></li>
+<li><p>the incompressible Navier–Stokes equations for the flow around a cylinder,
+with a projection scheme and in monolithic form,</p></li>
+<li><p>the incompressible Navier–Stokes equations with a manufactured Taylor–Green
+solution, to study the order reduction caused by time-dependent boundary
+conditions.</p></li>
 </ul>
-</dd>
-</dl>
-</li>
+<p>All of them use <a class="reference external" href="https://www.firedrakeproject.org">Firedrake</a>, a finite-element
+library in which a problem is written as weak forms in UFL, its form language. The
+problem classes are built on pySDC’s generic
+<code class="docutils literal notranslate"><span class="pre">pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake</span></code> (everything
+implicit) and <code class="docutils literal notranslate"><span class="pre">FormFiredrakeIMEX</span></code> (with an explicit part), which assemble the
+semi-discrete system <span class="math notranslate nohighlight">\(M u' = R(u)\)</span> from a mass form and right-hand-side forms.
+They never invert the mass matrix <span class="math notranslate nohighlight">\(M\)</span>: the right-hand side is handed to the
+sweepers as a <em>load vector</em>, the vector of the form’s values on the basis functions,
+which lives in the dual space of the finite-element functions. Accordingly, they run
+with pySDC’s mass-matrix sweepers <code class="docutils literal notranslate"><span class="pre">generic_implicit_mass</span></code> and
+<code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass</span></code>, and the SDC residual, itself a load vector, is measured in
+the <em>dual norm</em>, the norm dual to the <span class="math notranslate nohighlight">\(L^2\)</span> norm, which does not shrink with
+the mesh width.</p>
+<p>The project was first written with FEniCS, which pySDC no longer supports. The tests
+check the Firedrake classes against values recorded with them and, for the cylinder
+flow, against the FEATFLOW benchmark.</p>
+</section>
+<section id="organisation-of-the-project">
+<h2>Organisation of the project<a class="headerlink" href="#organisation-of-the-project" title="Link to this heading">#</a></h2>
+<p>Problem classes, in <code class="docutils literal notranslate"><span class="pre">problem_classes/</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">HeatEquation_2D_Firedrake.py</span></code>: <span class="math notranslate nohighlight">\(u_t = \nu \Delta u + f\)</span> on the unit square
+with the exact solution <span class="math notranslate nohighlight">\(u = \sin(\pi x) \sin(\pi y) \cos(t) + c\)</span>, so the
+Dirichlet values depend on time. Diffusion is implicit, the forcing <span class="math notranslate nohighlight">\(f\)</span>
+explicit (IMEX).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConvectionDiffusion_2D_Firedrake.py</span></code>: <span class="math notranslate nohighlight">\(u_t = -U \cdot \nabla u + \nu \Delta u\)</span>
+on <span class="math notranslate nohighlight">\([-0.5, 0.5]^2\)</span> with the rotation <span class="math notranslate nohighlight">\(U = (-4y, 4x)\)</span>, whose exact
+solution is a Gaussian that rotates and spreads. Diffusion is implicit, convection
+explicit.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NavierStokes_2D_monolithic_Firedrake.py</span></code>: the flow around a cylinder of the
+<em>DFG 2D-3 benchmark</em> (Schäfer and Turek, 1996): a channel of size
+<span class="math notranslate nohighlight">\(2.2 \times 0.41\)</span> with a cylinder of diameter 0.1, viscosity
+<span class="math notranslate nohighlight">\(\nu = 10^{-3}\)</span> and an inflow that rises and falls again over
+<span class="math notranslate nohighlight">\(t \in [0, 8]\)</span>. <em>Monolithic</em> means that velocity and pressure are solved for
+together, here with Taylor–Hood elements. The incompressibility constraint has no
+time derivative, so the mass matrix is singular and the system is a
+differential-algebraic equation; the mass-matrix sweeper handles this because it
+never inverts <span class="math notranslate nohighlight">\(M\)</span>. The module also reads the mesh and computes the drag and
+lift coefficients of the cylinder, the quantities the benchmark compares.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NavierStokes_2D_projection_Firedrake.py</span></code>: the same flow with a <em>projection
+scheme</em>: each implicit solve gives a tentative velocity, which a pressure Poisson
+equation and a velocity correction then project onto (approximately)
+divergence-free fields. The projection needs each node’s distance from the start of
+the step, which the convergence controller <code class="docutils literal notranslate"><span class="pre">convergence_controllers/prepare_step.py</span></code>
+(<code class="docutils literal notranslate"><span class="pre">PrepareStep</span></code>) hands to the problem once per step; with it, the scheme runs with
+pySDC’s standard <code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass</span></code> sweeper.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NavierStokes_2D_TaylorGreen_monolithic_Firedrake.py</span></code>: monolithic Navier–Stokes
+with a manufactured, travelling Taylor–Green solution on <span class="math notranslate nohighlight">\([-0.5, 0.5]^2\)</span>, with
+either time-dependent Dirichlet or periodic boundaries in <span class="math notranslate nohighlight">\(x\)</span>, and optionally
+differentiated boundary data, see below. Only the velocity is prescribed; the
+pressure is fixed up to its constant by a null space. Given a shared <code class="docutils literal notranslate"><span class="pre">mesh</span></code> (one
+for all steps, the meshes of a <code class="docutils literal notranslate"><span class="pre">MeshHierarchy</span></code> for the levels), it also runs with
+MLSDC and PFASST.</p></li>
 </ul>
-<p>These serve as benchmarks and demonstrators for scalable space–time CFD
-simulations.</p>
+<p>The mesh of the cylinder flow is <code class="docutils literal notranslate"><span class="pre">meshs/cylinder.msh</span></code>, a Gmsh file whose inflow,
+outflow, walls and cylinder are tagged, so the problem class loads it with
+Firedrake’s <code class="docutils literal notranslate"><span class="pre">Mesh</span></code>.</p>
+<p>Run scripts, in the project folder, and their plots, in <code class="docutils literal notranslate"><span class="pre">plotting/</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">run_heat_equation_Firedrake.py</span></code> and <code class="docutils literal notranslate"><span class="pre">run_convection_diffusion_equation_Firedrake.py</span></code>
+print the relative error at the final time and write the numerical and exact
+solution of every step to an HDF5 <code class="docutils literal notranslate"><span class="pre">CheckpointFile</span></code> of Firedrake in
+<code class="docutils literal notranslate"><span class="pre">data/heat_equation</span></code> or <code class="docutils literal notranslate"><span class="pre">data/convection_diffusion</span></code>.
+<code class="docutils literal notranslate"><span class="pre">plotting/plots_heat_equation_Firedrake.py</span></code> and
+<code class="docutils literal notranslate"><span class="pre">plotting/plots_convection_diffusion_equation_Firedrake.py</span></code> animate them and save
+the last frame and contour plots as PNG files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_accuracy/run_accuracy_heat_equation_Firedrake.py</span></code> runs the heat equation with
+four step sizes and plots the errors: with two RADAU-RIGHT nodes, the observed order
+is the design order 3.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_Navier_Stokes_equations_Firedrake.py</span></code> runs the projection scheme for the
+first steps of the cylinder flow and writes drag and lift of every step to
+<code class="docutils literal notranslate"><span class="pre">data/navier_stokes/Lift_Drag_Coefficients.txt</span></code>, and velocity and pressure to a
+<code class="docutils literal notranslate"><span class="pre">CheckpointFile</span></code> there (hooks in <code class="docutils literal notranslate"><span class="pre">hooks/hooks_NSE_IMEX_Firedrake.py</span></code>).
+<code class="docutils literal notranslate"><span class="pre">plotting/plots_Navier_Stokes_projection_Firedrake.py</span></code> draws velocity, pressure,
+vorticity, velocity magnitude and streamlines from it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_Navier_Stokes_equations_monolithic_Firedrake.py</span></code> runs the monolithic cylinder
+flow over the whole benchmark interval and records drag and lift of every step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_Navier_Stokes_TaylorGreen_Firedrake.py</span></code> runs the order study described below
+and prints errors and observed orders.</p></li>
+</ul>
+<p>On the coarse mesh of the project, the drag and lift of both cylinder-flow
+formulations after their first steps agree with the reference values of the FEATFLOW
+benchmark solution to within the error this mesh allows: <span class="math notranslate nohighlight">\(2 \cdot 10^{-2}\)</span> in
+drag and <span class="math notranslate nohighlight">\(10^{-4}\)</span> in lift for the monolithic run after one step of 0.01, and
+<span class="math notranslate nohighlight">\(5 \cdot 10^{-3}\)</span> and <span class="math notranslate nohighlight">\(5 \cdot 10^{-5}\)</span> for the projection scheme at
+<span class="math notranslate nohighlight">\(t = 0.005\)</span>.</p>
+<p>The run scripts advance one time step after the other (<code class="docutils literal notranslate"><span class="pre">controller_nonMPI</span></code> with one
+process). The problem classes take Firedrake’s default communicator, so the mesh can
+be distributed over several MPI ranks for parallelism in space; the tests check this
+for the monolithic cylinder flow on two ranks.</p>
 </section>
 <section id="order-reduction-from-time-dependent-boundary-conditions">
 <h2>Order reduction from time-dependent boundary conditions<a class="headerlink" href="#order-reduction-from-time-dependent-boundary-conditions" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">run_Navier_Stokes_TaylorGreen_FEniCS.py</span></code> runs a manufactured Taylor–Green
+<p><code class="docutils literal notranslate"><span class="pre">run_Navier_Stokes_TaylorGreen_Firedrake.py</span></code> runs a manufactured Taylor–Green
 solution on <span class="math notranslate nohighlight">\([-0.5, 0.5]^2\)</span> that is exactly one-periodic in <span class="math notranslate nohighlight">\(x\)</span> and
 constant on the top and bottom boundary. The <em>same</em> solution can therefore be
 computed with time-dependent Dirichlet conditions in <span class="math notranslate nohighlight">\(x\)</span> or with periodic
 ones, and the difference in the observed temporal order isolates the order
-reduction caused by the time-dependent boundary data alone.</p>
+reduction caused by the time-dependent boundary data alone. Only the velocity is
+prescribed; the pressure is fixed up to its constant by a null space.</p>
 <p>The number of collocation nodes decides whether the effect is visible: RADAU-RIGHT
-with <span class="math notranslate nohighlight">\(M\)</span> nodes drops from its design order <span class="math notranslate nohighlight">\(2M-1\)</span> to the stiff order
-<span class="math notranslate nohighlight">\(M+1\)</span>, so the gap is <span class="math notranslate nohighlight">\(M-2\)</span> and vanishes for <span class="math notranslate nohighlight">\(M = 2\)</span>. With
-<span class="math notranslate nohighlight">\(M = 4\)</span> the measured pressure orders are 7 with periodic and 5 with
-time-dependent Dirichlet conditions.</p>
+with <span class="math notranslate nohighlight">\(M\)</span> nodes has design order <span class="math notranslate nohighlight">\(2M-1\)</span>, and time-dependent boundary
+data pull it down towards the stiff order. With <span class="math notranslate nohighlight">\(M = 4\)</span> (24 × 24 squares,
+<span class="math notranslate nohighlight">\(\nu = 0.1\)</span>, <span class="math notranslate nohighlight">\(\Delta t\)</span> from 0.2 to 0.025) the measured pressure orders
+are 7.0 with periodic and 4.1 with time-dependent Dirichlet conditions, with finest
+pressure errors of 2.6e-5 and 1.8e-2. The velocity loses less (6.9 and 5.7).</p>
 <p>The third variant, <code class="docutils literal notranslate"><span class="pre">differentiated_bc</span></code>, imposes the boundary data on its time
 derivative and recovers the stage values by collocation quadrature instead of
 evaluating the data pointwise at the nodes. This is the boundary-condition
 analogue of the differentiated-constraint remedy explored in pull request #641,
-and it removes most of the penalty: at <span class="math notranslate nohighlight">\(M = 4\)</span> the pressure error drops by
-roughly an order of magnitude, to within a small factor of the periodic case.</p>
+and it removes most of the penalty: the pressure order goes up to 6.0 and its
+finest error down to 1.3e-4, more than a hundred times smaller than with the
+pointwise data and within a factor of five of the periodic case.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<p>The project needs Firedrake, which needs Python 3.11 or newer and NumPy 2.1 or
+newer. See the <a class="reference external" href="https://www.firedrakeproject.org/install.html">Firedrake installation instructions</a>. pySDC’s own way, used in its
+continuous integration (the <code class="docutils literal notranslate"><span class="pre">user_firedrake_tests_conda</span></code> job in
+<code class="docutils literal notranslate"><span class="pre">.github/workflows/ci_pipeline.yml</span></code>, which lists the exact commands), is to create
+a conda environment from <code class="docutils literal notranslate"><span class="pre">etc/environment-firedrake.yml</span></code>, which provides a prebuilt
+PETSc, to pip-install Firedrake 2026.10.0 against it, and to install pySDC into that
+environment with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code>. Then, from the root of the repository, for
+example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>pySDC/projects/StroemungsRaum/run_heat_equation_Firedrake.py
+python<span class="w"> </span>pySDC/projects/StroemungsRaum/plotting/plots_heat_equation_Firedrake.py
+</pre></div>
+</div>
+</section>
+<section id="tests">
+<h2>Tests<a class="headerlink" href="#tests" title="Link to this heading">#</a></h2>
+<p>The tests are in <code class="docutils literal notranslate"><span class="pre">pySDC/tests/test_projects/test_StroemungsRaum/</span></code> and carry the
+<code class="docutils literal notranslate"><span class="pre">firedrake</span></code> marker; they run in pySDC’s Firedrake CI jobs. One of them needs two
+MPI ranks, which <code class="docutils literal notranslate"><span class="pre">etc/run_mpi_tests.sh</span></code> provides through <code class="docutils literal notranslate"><span class="pre">mpi-pytest</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>etc/run_mpi_tests.sh<span class="w"> </span>pySDC/tests/test_projects/test_StroemungsRaum<span class="w"> </span>firedrake
+</pre></div>
+</div>
 </section>
 <section id="funding">
 <h2>Funding<a class="headerlink" href="#funding" title="Link to this heading">#</a></h2>
@@ -598,7 +711,10 @@ under grant number <strong>16ME0708</strong>.</p>
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scope-of-this-repository">Scope of This Repository</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-problems-and-methods">Model Problems and Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#organisation-of-the-project">Organisation of the project</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#order-reduction-from-time-dependent-boundary-conditions">Order reduction from time-dependent boundary conditions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tests">Tests</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#funding">Funding</a></li>
 </ul>
   </nav></div>

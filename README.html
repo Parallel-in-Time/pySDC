@@ -488,13 +488,16 @@ PFASST, advanced topics and ParaDiag</p></li>
 <li><p>Projects: many documented projects with defined and tested outcomes</p></li>
 <li><p>Many different examples, collocation types, data types already
 implemented</p></li>
-<li><p>Works with <a class="reference external" href="https://fenicsproject.org/">FEniCS</a>,
-<a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a> and
-<a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> (through
-<a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a>)</p></li>
+<li><p>Works with <a class="reference external" href="https://www.firedrakeproject.org/">Firedrake</a> finite
+elements (in mass-matrix form, also from weak forms alone),
+<a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a>,
+<a class="reference external" href="https://petsc.org/">PETSc</a> (through
+<a class="reference external" href="https://petsc.org/release/petsc4py/">petsc4py</a>), PyTorch and CuPy</p></li>
 <li><p>Continuous integration via <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">GitHub
 Actions</a></p></li>
-<li><p>Fully compatible with Python 3.10 - 3.13, runs at least on Ubuntu</p></li>
+<li><p>Fully compatible with Python 3.10 - 3.13 and NumPy 1 and 2, runs at
+least on Ubuntu; Firedrake needs Python 3.11 or newer and NumPy 2.1
+or newer</p></li>
 </ul>
 </section>
 <section id="getting-started">
@@ -532,8 +535,14 @@ tutorials. All <code class="docutils literal notranslate"><span class="pre">impo
 <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>‘s base directory is part of <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>.</p>
 <p>For many examples, <code class="docutils literal notranslate"><span class="pre">LaTeX</span></code> is used for the plots, i.e. a
 decent installation of this is needed in order to run those examples.
-When using <code class="docutils literal notranslate"><span class="pre">fenics</span></code> or <code class="docutils literal notranslate"><span class="pre">petsc4py</span></code>, a C++
-compiler is required (although installation may go through at first).</p>
+When using <code class="docutils literal notranslate"><span class="pre">petsc4py</span></code> or Firedrake, a C/C++
+compiler is required (although installation may go through at first).
+Firedrake is not a conda package: create the environment from
+<code class="docutils literal notranslate"><span class="pre">etc/environment-firedrake.yml</span></code> and install Firedrake into it with <code class="docutils literal notranslate"><span class="pre">pip</span></code>,
+as the “How to run it” section of
+<a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FEM_with_Firedrake/README.rst"><code class="docutils literal notranslate"><span class="pre">pySDC/projects/FEM_with_Firedrake/README.rst</span></code></a>
+spells out step by step, or follow
+<a class="reference external" href="https://www.firedrakeproject.org/install.html">Firedrake’s own instructions</a>.</p>
 <p>For more details on <code class="docutils literal notranslate"><span class="pre">pySDC</span></code>, check out <a class="reference external" href="http://www.parallel-in-time.org/pySDC">http://www.parallel-in-time.org/pySDC</a>.</p>
 </section>
 <section id="how-to-cite">

@@ -437,13 +437,13 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../step_7.html">Step-7: pySDC with external libraries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_FEniCS.html">Part A: pySDC and FEniCS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_mpi4pyfft.html">Part B: mpi4py-fft for parallel Fourier transforms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PETSc.html">Part C: Time-parallel pySDC with space-parallel PETSc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_PyTorch.html">Part D: pySDC and PyTorch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Firedrake.html">Part E: pySDC and Firedrake</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_with_Gusto.html">Part F: pySDC and Gusto</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_on_GPU.html">Part G: pySDC on GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_mpi4pyfft.html">Part A: mpi4py-fft for parallel Fourier transforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_PETSc.html">Part B: Time-parallel pySDC with space-parallel PETSc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PyTorch.html">Part C: pySDC and PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_Firedrake.html">Part D: pySDC and Firedrake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Gusto.html">Part E: pySDC and Gusto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_on_GPU.html">Part F: pySDC on GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_with_Firedrake_forms.html">Part G: pySDC from Firedrake forms</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../step_8.html">Step-8: Advanced topics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -663,7 +663,7 @@ space needs a fine mesh, otherwise the spatial error hides everything; hence the
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dt = 0.05000: computed order 4.791 (expected 6)
 dt = 0.02500: computed order 5.364 (expected 6)
 dt = 0.01250: computed order 5.675 (expected 6)
-dt = 0.00625: computed order 5.865 (expected 6)
+dt = 0.00625: computed order 5.870 (expected 6)
 </pre></div>
 </div>
 </div>
@@ -694,7 +694,7 @@ dt = 0.00625: computed order 5.865 (expected 6)
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/ec4dcf9c519e8cb0e6a2656489759279863a652bee981ac2b8440b3f16d82e7c.png" src="../../_images/ec4dcf9c519e8cb0e6a2656489759279863a652bee981ac2b8440b3f16d82e7c.png" />
+<img alt="../../_images/f68e75cf29ff0ba84b9009e5edafc9ae7c8a7ee4740ccfc89e0f705f5fa04323.png" src="../../_images/f68e75cf29ff0ba84b9009e5edafc9ae7c8a7ee4740ccfc89e0f705f5fa04323.png" />
 </div>
 </div>
 <p>The orders approach 6 from below. The large time steps are not in the asymptotic regime yet: for the largest,

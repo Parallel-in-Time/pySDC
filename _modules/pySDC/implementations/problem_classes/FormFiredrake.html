@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" data-theme="auto">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pySDC.implementations.problem_classes.FormFiredrake &#8212; pySDC</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "auto";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "auto";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ede09976" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="../../../../_static/documentation_options.js?v=696bab92"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pySDC/implementations/problem_classes/FormFiredrake';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script type="module" src="../../../../_static/run-in-browser.js?v=11117657"></script>
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="5.9" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  <link rel="icon" href="../../../../_static/favicon.ico" sizes="any">
+  <link rel="icon" href="../../../../_static/pysdc-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../../../../_static/apple-touch-icon.png">
+
+  </head>
+  <body data-default-mode="auto">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/pysdc-logo.svg" class="logo__image only-light" alt="pySDC"/>
+    <img src="../../../../_static/pysdc-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="pySDC"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../about.html">
+    About
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorial/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../projects/index.html">
+    Projects
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../development.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Parallel-in-Time/pySDC" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/pySDC" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pySDC.implementations.problem_classes.FormFiredrake</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pySDC.implementations.problem_classes.FormFiredrake</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">WorkCounter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.helpers.ufl_forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">implicit_system</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.firedrake_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">firedrake_mesh</span><span class="p">,</span>
+    <span class="n">firedrake_dual_mesh</span><span class="p">,</span>
+    <span class="n">IMEX_firedrake_dual_mesh</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">fd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake.assemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_assembler</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ufl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ufl.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">expand_derivatives</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ufl.algorithms.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_type</span>
+
+<span class="c1">#: solver options added for a linear implicit part: one linear solve per node solve instead of Newton</span>
+<span class="n">LINEAR</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'snes_type'</span><span class="p">:</span> <span class="s1">'ksponly'</span><span class="p">}</span>
+<span class="c1">#: and if its Jacobian does not depend on time either: assemble and factorize it once per factor and keep it</span>
+<span class="n">CONSTANT_JACOBIAN</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'snes_lag_jacobian'</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>
+    <span class="s1">'snes_lag_jacobian_persists'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">'snes_lag_preconditioner'</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>
+    <span class="s1">'snes_lag_preconditioner_persists'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="part_of">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.part_of">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">part_of</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">space</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    The view of `f` on `space`: its own space, or a sub-space of it at any depth, such as ``W.sub(0)`` of a mixed space</span>
+<span class="sd">    or ``V.sub(1)``, a component of a vector space. Writing to the view writes to `f`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        f (firedrake.Function): Function on the whole space</span>
+<span class="sd">        space (firedrake.FunctionSpace): The space of `f` or one of its sub-spaces</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        firedrake.Function: `f` on `space`</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">space</span> <span class="o">==</span> <span class="n">f</span><span class="o">.</span><span class="n">function_space</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">f</span>
+    <span class="k">return</span> <span class="n">part_of</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">space</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="n">space</span><span class="o">.</span><span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">space</span><span class="o">.</span><span class="n">component</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="FormFiredrake">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FormFiredrake</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Generic problem given by UFL weak forms and solved with Firedrake, with the right-hand side treated implicitly.</span>
+
+<span class="sd">    The semi-discrete system is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        M u' = R(u),</span>
+
+<span class="sd">    where :math:`M` is assembled from the mass form :math:`m(u, v)` and :math:`R(u)` from the right-hand side form</span>
+<span class="sd">    :math:`r(u, v)`, all of it treated implicitly (see :class:`FormFiredrakeIMEX` for an explicit part, and</span>
+<span class="sd">    :func:`~pySDC.helpers.ufl_forms.total_rhs` for joining the parts of a split problem). Time enters only through</span>
+<span class="sd">    the Firedrake ``Constant`` `t`, which is set to the requested time before every evaluation and solve, so forms,</span>
+<span class="sd">    boundary values and the exact solution can all depend on it.</span>
+
+<span class="sd">    This class never inverts :math:`M`: ``eval_f`` returns the load vector :math:`R(u)`, so it must be used with the</span>
+<span class="sd">    mass-matrix sweepers :class:`~pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass`</span>
+<span class="sd">    and :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass`.</span>
+
+<span class="sd">    **Dual vectors.** :math:`R(u)`, :math:`M u`, the right-hand sides of the solves and the sweeper's residual are load</span>
+<span class="sd">    vectors, which live in the dual space. They are stored as ``Cofunction`` objects (``dtype_f`` is</span>
+<span class="sd">    :class:`firedrake_dual_mesh`), so adding one to a solution by mistake raises, and their ``abs`` is the norm dual to</span>
+<span class="sd">    the :math:`L^2` norm, which the residual reports.</span>
+
+<span class="sd">    **Dirichlet boundary conditions.** Nothing is assembled with ``bcs``, because Firedrake zeros boundary rows *and*</span>
+<span class="sd">    columns then, while the collocation problem needs the full :math:`M u_0` and :math:`R(u)` on the rows of the</span>
+<span class="sd">    interior nodes. The boundary values are imposed only by the solves, where Firedrake replaces the boundary rows by</span>
+<span class="sd">    :math:`u = g(t)`. The boundary rows of the sweeper's residual therefore carry no equation; ``fix_residual`` zeros</span>
+<span class="sd">    them (the sweepers call it because ``fix_bc_for_residual`` is set).</span>
+
+<span class="sd">    **Several levels.** MLSDC and PFASST work with</span>
+<span class="sd">    :class:`~pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass` and</span>
+<span class="sd">    :class:`~pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy` on the</span>
+<span class="sd">    meshes of a Firedrake ``MeshHierarchy``. Give `V`, `bcs` and `u_exact` per level, as lists in the problem</span>
+<span class="sd">    parameters, since each lives on its level's mesh. On coarse levels, the solves impose the boundary values of the</span>
+<span class="sd">    restricted fine solution instead of the data (``use_restricted_boundary_values``), so the coarse correction is</span>
+<span class="sd">    zero on the boundary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    V : firedrake.FunctionSpace</span>
+<span class="sd">        Function space of the solution</span>
+<span class="sd">    mass : callable</span>
+<span class="sd">        Mass form :math:`m(u, v)`</span>
+<span class="sd">    rhs : callable</span>
+<span class="sd">        Right-hand side form :math:`r(u, v)`, may be nonlinear in :math:`u`</span>
+<span class="sd">    bcs : tuple of firedrake.DirichletBC, optional</span>
+<span class="sd">        Boundary conditions imposed in the solves. Their values may depend on `t`, and they may act on a sub-space,</span>
+<span class="sd">        such as one field of a mixed space or one component of a vector space. Pass a tuple, not a list: pySDC reads</span>
+<span class="sd">        lists in the problem parameters as one entry per level.</span>
+<span class="sd">    t : firedrake.Constant, optional</span>
+<span class="sd">        The time the forms depend on. A new one is made if none is given.</span>
+<span class="sd">    u_exact : UFL expression, optional</span>
+<span class="sd">        Exact solution in terms of `t` and a spatial coordinate. Needed for ``u_exact``.</span>
+<span class="sd">    solver_parameters : dict, optional</span>
+<span class="sd">        PETSc options for the solves, on top of Firedrake's defaults (Newton with a direct linear solver). If the</span>
+<span class="sd">        Jacobian of the implicit system does not contain the unknown, i.e. the implicit part is linear, one linear solve</span>
+<span class="sd">        replaces Newton's method (:data:`LINEAR`); if it does not contain `t` either, its assembly and factorization</span>
+<span class="sd">        are kept from one solve to the next (:data:`CONSTANT_JACOBIAN`). Options given here take precedence, e.g.</span>
+<span class="sd">        ``{'snes_lag_jacobian': 1}`` if the Jacobian depends on a coefficient that is changed between solves.</span>
+<span class="sd">    LHS_cache_size : int, optional</span>
+<span class="sd">        Number of solvers kept, one per factor</span>
+<span class="sd">    stop_at_divergence : bool, optional</span>
+<span class="sd">        Raise if a solve does not converge, instead of logging it</span>
+<span class="sd">    nullspace : firedrake.VectorSpaceBasis or firedrake.MixedVectorSpaceBasis, optional</span>
+<span class="sd">        Null space of the implicit systems, e.g. the constants of a pressure or stream function with no Dirichlet</span>
+<span class="sd">        condition. Passed on to the solves; a direct solver then needs null pivot detection, such as MUMPS with</span>
+<span class="sd">        ``'mat_mumps_icntl_24': 1``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">dtype_u</span> <span class="o">=</span> <span class="n">firedrake_mesh</span>
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">firedrake_dual_mesh</span>
+    <span class="n">fix_bc_for_residual</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">V</span><span class="p">,</span>
+        <span class="n">mass</span><span class="p">,</span>
+        <span class="n">rhs</span><span class="p">,</span>
+        <span class="n">bcs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">u_exact</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">LHS_cache_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">stop_at_divergence</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">nullspace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization, see the class docstring for the arguments."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">V</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rhs</span> <span class="o">=</span> <span class="n">rhs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bcs</span> <span class="o">=</span> <span class="p">()</span> <span class="k">if</span> <span class="n">bcs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">bcs</span>
+        <span class="c1"># the solves take their boundary values from this buffer: the data, or restricted values on coarse levels. A</span>
+        <span class="c1"># condition on a sub-space reads the matching part of it.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_solve_bcs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">bc</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">(</span><span class="n">g</span><span class="o">=</span><span class="n">part_of</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span> <span class="n">bc</span><span class="o">.</span><span class="n">function_space</span><span class="p">()))</span> <span class="k">for</span> <span class="n">bc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bcs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_restricted</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_exact_expr</span> <span class="o">=</span> <span class="n">u_exact</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver_parameters</span> <span class="o">=</span> <span class="n">solver_parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_divergence</span> <span class="o">=</span> <span class="n">stop_at_divergence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nullspace</span> <span class="o">=</span> <span class="n">nullspace</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_makeAttributeAndRegister</span><span class="p">(</span><span class="s1">'LHS_cache_size'</span><span class="p">,</span> <span class="n">localVars</span><span class="o">=</span><span class="nb">locals</span><span class="p">(),</span> <span class="n">readOnly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># buffers the cached forms and solvers are built on</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">Cofunction</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">dual</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+
+        <span class="c1"># assemblers are cached: fd.assemble would redo the symbolic preprocessing on every call</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mass_assembler</span> <span class="o">=</span> <span class="n">get_assembler</span><span class="p">(</span><span class="n">mass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rhs_assemblers</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_assembler</span><span class="p">(</span><span class="n">form</span><span class="p">)</span> <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_rhs_forms</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_solver_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_solver_parameters</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'ksp'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'solver_setup'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'solver'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WorkCounter</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_detect_solver_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Solver options the implicit system allows: :data:`LINEAR` if its Jacobian does not contain the unknown, plus</span>
+<span class="sd">        :data:`CONSTANT_JACOBIAN` if it does not contain the time `t` either.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The options</span>
+<span class="sd">        """</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">implicit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">,</span> <span class="n">fd</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">),</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+        <span class="n">terminals</span> <span class="o">=</span> <span class="n">extract_type</span><span class="p">(</span><span class="n">expand_derivatives</span><span class="p">(</span><span class="n">J</span><span class="p">),</span> <span class="n">ufl</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">Terminal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="ow">in</span> <span class="n">terminals</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="ow">in</span> <span class="n">terminals</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">LINEAR</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">LINEAR</span><span class="p">,</span> <span class="o">**</span><span class="n">CONSTANT_JACOBIAN</span><span class="p">}</span>
+
+<div class="viewcode-block" id="FormFiredrake.make_rhs_forms">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.make_rhs_forms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_rhs_forms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Forms assembled by ``eval_f``, all evaluated at the buffer ``self._u``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of ufl.Form: The one form of the full right-hand side</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rhs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">)]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assembler</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Assemble a form at `u`, without boundary conditions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            assembler: Firedrake assembler of a form in terms of ``self._u``</span>
+<span class="sd">            u (firedrake_mesh): Where to evaluate, a solution</span>
+<span class="sd">            out (firedrake_dual_mesh): Where to put the result</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            firedrake_dual_mesh: `out`</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_dual</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'Forms are evaluated at a solution (a Function), not at a load vector (a Cofunction)'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+        <span class="n">assembler</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">tensor</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="FormFiredrake.eval_f">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the right-hand side :math:`R(u)` at time `t`, without inverting the mass matrix.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (firedrake_mesh): Solution at which to evaluate</span>
+<span class="sd">            t (float): Time at which to evaluate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: The load vector :math:`R(u)`</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rhs_assemblers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FormFiredrake.apply_mass_matrix">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.apply_mass_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Apply the mass matrix, without boundary conditions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): Function to apply it to</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            firedrake_dual_mesh: :math:`M u`</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mass_assembler</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">firedrake_dual_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FormFiredrake.solve_system">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.solve_system">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Solve :math:`M u - \text{factor}\, R(u) = \text{rhs}` with the boundary conditions at time `t`.</span>
+
+<span class="sd">        The Jacobian comes from ``ufl.derivative``. One Firedrake ``NonlinearVariationalSolver`` is set up per factor</span>
+<span class="sd">        and cached; the oldest one is evicted once more than ``LHS_cache_size`` are around.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (firedrake_dual_mesh): Right-hand side, a load vector</span>
+<span class="sd">            factor (float): Prefactor of the implicit right-hand side, e.g. the node-to-node step size</span>
+<span class="sd">            u0 (dtype_u): Initial guess</span>
+<span class="sd">            t (float): Time of the solution</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: The solution</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u0</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+        <span class="c1"># Cofunction.assign would silently take the entries of a Function</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rhs</span><span class="o">.</span><span class="n">is_dual</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="s1">'The right-hand side of the solve must be a load vector (a Cofunction), not a Function'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_b</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">rhs</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+
+        <span class="c1"># matched with a tolerance: the transfer and the sweeper compute the node times separately, and a miss would</span>
+        <span class="c1"># silently impose the data instead, which stalls MLSDC</span>
+        <span class="n">restricted</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">u</span> <span class="k">for</span> <span class="n">_t</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_restricted</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">_t</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">)),</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">restricted</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bcs</span><span class="p">:</span>
+                <span class="n">bc</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">restricted</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">factor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LHS_cache_size</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">)))</span>
+
+            <span class="n">F</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">implicit_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">,</span> <span class="n">fd</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">),</span> <span class="n">fd</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">factor</span><span class="p">))</span>
+            <span class="n">problem</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">NonlinearVariationalProblem</span><span class="p">(</span><span class="n">F</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="n">bcs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_solve_bcs</span><span class="p">,</span> <span class="n">J</span><span class="o">=</span><span class="n">J</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">NonlinearVariationalSolver</span><span class="p">(</span>
+                <span class="n">problem</span><span class="p">,</span>
+                <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">default_solver_parameters</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_parameters</span> <span class="ow">or</span> <span class="p">{})},</span>
+                <span class="n">nullspace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nullspace</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'solver_setup'</span><span class="p">]()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">fd</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConvergenceError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_at_divergence</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'ksp'</span><span class="p">]</span><span class="o">.</span><span class="n">niter</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solvers</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">getLinearSolveIterations</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'solver'</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FormFiredrake.use_restricted_boundary_values">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.use_restricted_boundary_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">use_restricted_boundary_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Impose the boundary values of the restricted solution `u` in the solves at the times `t`, instead of the</span>
+<span class="sd">        boundary data, see :meth:`pySDC.core.problem.Problem.use_restricted_boundary_values`. FAS calls this on</span>
+<span class="sd">        coarse levels, so the coarse correction has homogeneous boundary values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (list of dtype_u): Restricted solution at the coarse nodes</span>
+<span class="sd">            t (list of float): Times of the coarse nodes</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_restricted</span> <span class="o">=</span> <span class="p">{</span><span class="n">_t</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">_u</span><span class="p">)</span> <span class="k">for</span> <span class="n">_u</span><span class="p">,</span> <span class="n">_t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="FormFiredrake.fix_residual">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.fix_residual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fix_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Zero the boundary rows of a residual. They hold no equation, since the solves replace them by the boundary</span>
+<span class="sd">        values, see the class docstring.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            res (dtype_u): Residual, changed in place</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">bc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bcs</span><span class="p">:</span>
+            <span class="n">bc</span><span class="o">.</span><span class="n">zero</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FormFiredrake.u_exact">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.u_exact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Interpolate the exact solution given at construction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): Time of the exact solution</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: Exact solution</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_exact_expr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> was set up without an exact solution'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_init</span>
+        <span class="n">me</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u_exact_expr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FormFiredrakeIMEX">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FormFiredrakeIMEX</span><span class="p">(</span><span class="n">FormFiredrake</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Generic problem given by UFL weak forms and solved with Firedrake, IMEX: :math:`r` implicit, :math:`r_E` explicit.</span>
+
+<span class="sd">    Everything else is as in :class:`FormFiredrake`; use it with</span>
+<span class="sd">    :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass`.</span>
+<span class="sd">    """</span>
+
+    <span class="n">dtype_f</span> <span class="o">=</span> <span class="n">IMEX_firedrake_dual_mesh</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">rhs_exp</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Initialization, see :class:`FormFiredrake` for the other arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (callable): Implicit part :math:`r(u, v)` of the right-hand side</span>
+<span class="sd">            rhs_exp (callable): Explicit part :math:`r_E(u, v)` of the right-hand side</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rhs_exp</span> <span class="o">=</span> <span class="n">rhs_exp</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FormFiredrakeIMEX.make_rhs_forms">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX.make_rhs_forms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_rhs_forms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Forms assembled by ``eval_f``, all evaluated at the buffer ``self._u``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of ufl.Form: Implicit and explicit part</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rhs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhs_exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="FormFiredrakeIMEX.eval_f">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.problem_classes.FormFiredrake.html#pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX.eval_f">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Evaluate the implicit and explicit right-hand sides at time `t`, without inverting the mass matrix.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (firedrake_mesh): Solution at which to evaluate</span>
+<span class="sd">            t (float): Time at which to evaluate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: The load vectors, with `impl` and `expl` parts</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assemble</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rhs_assemblers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">u</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assemble</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rhs_assemblers</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">u</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_counters</span><span class="p">[</span><span class="s1">'rhs'</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2014-2026, Robert Speck.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

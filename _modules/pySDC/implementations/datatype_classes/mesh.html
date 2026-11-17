@@ -435,9 +435,6 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="c1"># TODO : mpi4py cannot be imported before dolfin when using fenics mesh</span>
-    <span class="c1"># see https://github.com/Parallel-in-Time/pySDC/pull/285#discussion_r1145850590</span>
-    <span class="c1"># This should be dealt with at some point</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">MPI</span> <span class="o">=</span> <span class="kc">None</span>

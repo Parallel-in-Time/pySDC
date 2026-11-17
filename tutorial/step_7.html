@@ -54,7 +54,7 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Part A: pySDC and FEniCS" href="step_7/A_pySDC_with_FEniCS.html" />
+    <link rel="next" title="Part A: mpi4py-fft for parallel Fourier transforms" href="step_7/A_pySDC_with_mpi4pyfft.html" />
     <link rel="prev" title="Part C: MPI parallelization" href="step_6/C_MPI_parallelization.html" />
   
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -435,13 +435,13 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a aria-current="page" class="current reference internal" href="#">Step-7: pySDC with external libraries</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="step_7/A_pySDC_with_FEniCS.html">Part A: pySDC and FEniCS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="step_7/B_pySDC_with_mpi4pyfft.html">Part B: mpi4py-fft for parallel Fourier transforms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="step_7/C_pySDC_with_PETSc.html">Part C: Time-parallel pySDC with space-parallel PETSc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="step_7/D_pySDC_with_PyTorch.html">Part D: pySDC and PyTorch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="step_7/E_pySDC_with_Firedrake.html">Part E: pySDC and Firedrake</a></li>
-<li class="toctree-l2"><a class="reference internal" href="step_7/F_pySDC_with_Gusto.html">Part F: pySDC and Gusto</a></li>
-<li class="toctree-l2"><a class="reference internal" href="step_7/G_pySDC_on_GPU.html">Part G: pySDC on GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="step_7/A_pySDC_with_mpi4pyfft.html">Part A: mpi4py-fft for parallel Fourier transforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="step_7/B_pySDC_with_PETSc.html">Part B: Time-parallel pySDC with space-parallel PETSc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="step_7/C_pySDC_with_PyTorch.html">Part C: pySDC and PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="step_7/D_pySDC_with_Firedrake.html">Part D: pySDC and Firedrake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="step_7/E_pySDC_with_Gusto.html">Part E: pySDC and Gusto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="step_7/F_pySDC_on_GPU.html">Part F: pySDC on GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="step_7/G_pySDC_with_Firedrake_forms.html">Part G: pySDC from Firedrake forms</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="step_8.html">Step-8: Advanced topics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -523,20 +523,21 @@
 <p>pySDC can be used with external libraries, in particular for spatial discretization, parallelization and solving of linear and/or nonlinear systems.
 In the following, we show a few examples of pySDC + X.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="step_7/A_pySDC_with_FEniCS.html"><span class="doc">Part A: pySDC and FEniCS</span></a>. Finite elements in space, with and without inverting the mass matrix.</p></li>
-<li><p><a class="reference internal" href="step_7/B_pySDC_with_mpi4pyfft.html"><span class="doc">Part B: mpi4py-fft for parallel Fourier transforms</span></a>. The nonlinear Schrödinger equation with SDC, MLSDC and PFASST.</p></li>
-<li><p><a class="reference internal" href="step_7/C_pySDC_with_PETSc.html"><span class="doc">Part C: Time-parallel pySDC with space-parallel PETSc</span></a>. Space and time communicators, split by coloring.</p></li>
-<li><p><a class="reference internal" href="step_7/D_pySDC_with_PyTorch.html"><span class="doc">Part D: pySDC and PyTorch</span></a>. A tensor data type, and a network trained at the collocation nodes;
+<li><p><a class="reference internal" href="step_7/A_pySDC_with_mpi4pyfft.html"><span class="doc">Part A: mpi4py-fft for parallel Fourier transforms</span></a>. The nonlinear Schrödinger equation with SDC, MLSDC and PFASST.</p></li>
+<li><p><a class="reference internal" href="step_7/B_pySDC_with_PETSc.html"><span class="doc">Part B: Time-parallel pySDC with space-parallel PETSc</span></a>. Space and time communicators, split by coloring.</p></li>
+<li><p><a class="reference internal" href="step_7/C_pySDC_with_PyTorch.html"><span class="doc">Part C: pySDC and PyTorch</span></a>. A tensor data type, and a network trained at the collocation nodes;
 <code class="docutils literal notranslate"><span class="pre">torch_heat.py</span></code> holds the data type, the heat equation using it and the network.</p></li>
-<li><p><a class="reference internal" href="step_7/E_pySDC_with_Firedrake.html"><span class="doc">Part E: pySDC and Firedrake</span></a>. The heat equation of Part A, in Firedrake, serial, parallel across the nodes, or
-on three levels.</p></li>
-<li><p><a class="reference internal" href="step_7/F_pySDC_with_Gusto.html"><span class="doc">Part F: pySDC and Gusto</span></a>. pySDC as a time discretization for Gusto, in the Williamson 5 test case;
-<code class="docutils literal notranslate"><span class="pre">F_2_plot_pySDC_with_Gusto_result.py</span></code> plots its results.</p></li>
-<li><p><a class="reference internal" href="step_7/G_pySDC_on_GPU.html"><span class="doc">Part G: pySDC on GPUs</span></a>. A heat equation in finite differences with SDC, MLSDC and PFASST, all of it on the device.</p></li>
+<li><p><a class="reference internal" href="step_7/D_pySDC_with_Firedrake.html"><span class="doc">Part D: pySDC and Firedrake</span></a>. A forced heat equation with finite elements, in mass-matrix form, serial, parallel
+across the nodes, or on three levels.</p></li>
+<li><p><a class="reference internal" href="step_7/E_pySDC_with_Gusto.html"><span class="doc">Part E: pySDC and Gusto</span></a>. pySDC as a time discretization for Gusto, in the Williamson 5 test case;
+<code class="docutils literal notranslate"><span class="pre">E_2_plot_pySDC_with_Gusto_result.py</span></code> plots its results.</p></li>
+<li><p><a class="reference internal" href="step_7/F_pySDC_on_GPU.html"><span class="doc">Part F: pySDC on GPUs</span></a>. A heat equation in finite differences with SDC, MLSDC and PFASST, all of it on the device.</p></li>
+<li><p><a class="reference internal" href="step_7/G_pySDC_with_Firedrake_forms.html"><span class="doc">Part G: pySDC from Firedrake forms</span></a>. A nonlinear reaction-diffusion equation given only by its weak forms, with no
+problem class of its own, solved with fully implicit and IMEX SDC, and with MLSDC on a mesh hierarchy.</p></li>
 </ul>
 <p>Each part is a Python script in <a class="reference external" href="https://jupytext.readthedocs.io">jupytext</a> “percent” format: run it with <code class="docutils literal notranslate"><span class="pre">python</span></code>
-(or <code class="docutils literal notranslate"><span class="pre">mpirun</span></code>) in an environment with the library it needs, or read it on the website. Parts A, B, D, F and G also
-open as notebooks in Jupyter; C and E read their process layout from the command line and only run as scripts. None of them runs in the browser or in the environment the website is built in; where the CI produces
+(or <code class="docutils literal notranslate"><span class="pre">mpirun</span></code>) in an environment with the library it needs, or read it on the website. Parts A, C, E, F and G also
+open as notebooks in Jupyter; B and D read their process layout from the command line and only run as scripts. None of them runs in the browser or in the environment the website is built in; where the CI produces
 results, the pages show them.</p>
 <div class="toctree-wrapper compound">
 </div>
@@ -562,11 +563,11 @@ results, the pages show them.</p>
       </div>
     </a>
     <a class="right-next"
-       href="step_7/A_pySDC_with_FEniCS.html"
+       href="step_7/A_pySDC_with_mpi4pyfft.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Part A: pySDC and FEniCS</p>
+        <p class="prev-next-title">Part A: mpi4py-fft for parallel Fourier transforms</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

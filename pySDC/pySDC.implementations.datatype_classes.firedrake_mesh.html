@@ -48,6 +48,8 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'pySDC/pySDC.implementations.datatype_classes.firedrake_mesh';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <script type="module" src="../_static/run-in-browser.js?v=11117657"></script>
@@ -55,7 +57,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="mesh" href="pySDC.implementations.datatype_classes.mesh.html" />
-    <link rel="prev" title="fenics_mesh" href="pySDC.implementations.datatype_classes.fenics_mesh.html" />
+    <link rel="prev" title="cupy_mesh" href="pySDC.implementations.datatype_classes.cupy_mesh.html" />
   
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
@@ -436,6 +438,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.hotrod.html">hotrod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.inexactness.html">inexactness</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.interpolate_between_restarts.html">interpolate_between_restarts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.html">spatial_error_floor_firedrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.spread_step_sizes.html">spread_step_sizes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.step_size_limiter.html">step_size_limiter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.convergence_controller_classes.store_uold.html">store_uold</a></li>
@@ -444,7 +447,6 @@
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="pySDC.implementations.datatype_classes.html">datatype_classes</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.container.html">container</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.cupy_mesh.html">cupy_mesh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.fenics_mesh.html">fenics_mesh</a></li>
 <li class="toctree-l3 current active"><a aria-current="page" class="current reference internal" href="#">firedrake_mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.mesh.html">mesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.datatype_classes.particles.html">particles</a></li>
@@ -485,15 +487,15 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.DiscontinuousTestODE.html">DiscontinuousTestODE</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FastWaveSlowWave_0D.html">FastWaveSlowWave_0D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FermiPastaUlamTsingou.html">FermiPastaUlamTsingou</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FormFiredrake.html">FormFiredrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.FullSolarSystem.html">FullSolarSystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit.html">GeneralizedFisher_1D_FD_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc.html">GeneralizedFisher_1D_PETSc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GenericGusto.html">GenericGusto</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit.html">GrayScott_1D_FEniCS_implicit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_1D_Firedrake.html">GrayScott_1D_Firedrake</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic.html">GrayScott_2D_PETSc_periodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.GrayScott_MPIFFT.html">GrayScott_MPIFFT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HarmonicOscillator.html">HarmonicOscillator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.html">HeatEquation_1D_FEniCS_matrix_forced</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced.html">HeatEquation_2D_PETSc_forced</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_Chebychev.html">HeatEquation_Chebychev</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.HeatEquation_ND_FD.html">HeatEquation_ND_FD</a></li>
@@ -510,7 +512,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.RayleighBenard3D.html">RayleighBenard3D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.TestEquation_0D.html">TestEquation_0D</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.Van_der_Pol_implicit.html">Van_der_Pol_implicit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.html">VorticityVelocity_2D_FEniCS_periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic.html">VorticityVelocity_2D_Firedrake_periodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian.html">generic_MPIFFT_Laplacian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_ND_FD.html">generic_ND_FD</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.problem_classes.generic_spectral.html">generic_spectral</a></li>
@@ -535,6 +537,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order.html">imex_1st_order</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_MPI.html">imex_1st_order_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass.html">imex_1st_order_mass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.imex_1st_order_mass_MPI.html">imex_1st_order_mass_MPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.multi_implicit.html">multi_implicit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.sweeper_classes.verlet.html">verlet</a></li>
 </ul>
@@ -544,7 +547,6 @@
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferDeltaMPI.html">BaseTransferDeltaMPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransferMPI.html">BaseTransferMPI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.BaseTransfer_mass.html">BaseTransfer_mass</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFenicsMesh.html">TransferFenicsMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html">TransferFiredrakeMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh.html">TransferMesh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pySDC.implementations.transfer_classes.TransferMesh_FFT.html">TransferMesh_FFT</a></li>
@@ -574,6 +576,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.stats_helper.html">stats_helper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.testing.html">testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.transfer_helper.html">transfer_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.ufl_forms.html">ufl_forms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.visualization_tools.html">visualization_tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pySDC.helpers.vtkIO.html">vtkIO</a></li>
 </ul>
@@ -647,6 +650,27 @@
   <section id="module-pySDC.implementations.datatype_classes.firedrake_mesh">
 <span id="firedrake-mesh"></span><h1>firedrake_mesh<a class="headerlink" href="#module-pySDC.implementations.datatype_classes.firedrake_mesh" title="Link to this heading">#</a></h1>
 <dl class="py class">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_dual_mesh">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IMEX_firedrake_dual_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/firedrake_mesh.html#IMEX_firedrake_dual_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_dual_mesh" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh" title="pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">IMEX_firedrake_mesh</span></code></a></p>
+<p>Datatype for IMEX integration with dual firedrake data, see <cite>firedrake_dual_mesh</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>impl</strong> (<a class="reference internal" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh" title="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_dual_mesh</span></code></a>) – implicit part</p></li>
+<li><p><strong>expl</strong> (<a class="reference internal" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh" title="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_dual_mesh</span></code></a>) – explicit part</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_dual_mesh.component_type">
+<span class="sig-name descname"><span class="pre">component_type</span></span><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_dual_mesh.component_type" title="Link to this definition">#</a></dt>
+<dd><p>alias of <a class="reference internal" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh" title="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_dual_mesh</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IMEX_firedrake_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/firedrake_mesh.html#IMEX_firedrake_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pySDC.implementations.datatype_classes.container.html#pySDC.implementations.datatype_classes.container.MultiComponentContainer" title="pySDC.implementations.datatype_classes.container.MultiComponentContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiComponentContainer</span></code></a></p>
@@ -672,14 +696,45 @@
 
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.MASS_SOLVER">
+<span class="sig-name descname"><span class="pre">MASS_SOLVER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'ksp_atol':</span> <span class="pre">0.0,</span> <span class="pre">'ksp_type':</span> <span class="pre">'cg',</span> <span class="pre">'pc_type':</span> <span class="pre">'jacobi'}</span></span><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.MASS_SOLVER" title="Link to this definition">#</a></dt>
+<dd><p>how <a class="reference internal" href="#pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map" title="pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">riesz_map()</span></code></a> solves with the mass matrix; its relative tolerance is set per map</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.NORM_RTOL">
+<span class="sig-name descname"><span class="pre">NORM_RTOL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0001</span></span><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.NORM_RTOL" title="Link to this definition">#</a></dt>
+<dd><p>the norm’s error is about the square of it, here 1e-9,
+plenty for a stopping test, at a third to a half of the cost of solving to round-off</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tolerance of the mass solves behind the norm of dual data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">firedrake_dual_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/firedrake_mesh.html#firedrake_dual_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh" title="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_mesh</span></code></a></p>
+<p>A <cite>firedrake_mesh</cite> that creates dual data from a primal space, for problems whose right-hand side is a load vector.</p>
+<p>Use it as <code class="docutils literal notranslate"><span class="pre">dtype_f</span></code> of problems for the mass-matrix sweepers: pySDC creates right-hand sides from the problem’s
+primal space, and this puts them on its dual. Copies and arithmetic behave as for <cite>firedrake_mesh</cite>.</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">firedrake_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/firedrake_mesh.html#firedrake_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Wrapper for firedrake function data.</p>
+<p>Wrapper for Firedrake data, either a <code class="docutils literal notranslate"><span class="pre">Function</span></code> (primal) or a <code class="docutils literal notranslate"><span class="pre">Cofunction</span></code> (dual).</p>
+<p>Dual data are load vectors such as an assembled right-hand side <span class="math notranslate nohighlight">\(R(u)\)</span> or <span class="math notranslate nohighlight">\(M u\)</span>, which the
+mass-matrix sweepers work with. Whether an instance is primal or dual is decided by the data it holds, so
+arithmetic keeps the kind of its operands, and combining a primal with a dual instance raises a <cite>DataError</cite>.
+Use <a class="reference internal" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh" title="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake_dual_mesh</span></code></a> to create dual data from a primal space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>functionspace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.Function</span></code>) – firedrake data</p>
+<dd class="field-odd"><p><strong>functionspace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.Function</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.Cofunction</span></code>) – firedrake data</p>
 </dd>
 </dl>
 <dl class="py property">
@@ -723,6 +778,12 @@
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.is_dual">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_dual</span></span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/firedrake_mesh.html#firedrake_mesh.is_dual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.is_dual" title="Link to this definition">#</a></dt>
+<dd><p>Whether this holds a <code class="docutils literal notranslate"><span class="pre">Cofunction</span></code>, i.e. a load vector, rather than a <code class="docutils literal notranslate"><span class="pre">Function</span></code>.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.isend">
 <span class="sig-name descname"><span class="pre">isend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/firedrake_mesh.html#firedrake_mesh.isend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.isend" title="Link to this definition">#</a></dt>
@@ -743,6 +804,30 @@
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map">
+<span class="sig-name descname"><span class="pre">riesz_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/firedrake_mesh.html#riesz_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map" title="Link to this definition">#</a></dt>
+<dd><p>The L2 Riesz map of a primal space, one per space so its mass matrix is assembled once.</p>
+<p>The mass matrix is solved with conjugate gradients and a Jacobi preconditioner, which converges in a few dozen
+iterations whatever the mesh size, since the mass matrix is spectrally equivalent to its diagonal. A direct solver
+would store a factorization of it on every level, only to measure residuals.</p>
+<p>The maps are kept on the mesh, so they go when the mesh goes. A cache that outlives the mesh would keep the mesh,
+its mass matrix, its solver and their MPI communicators alive for the whole process, and MPI runs out of
+communicators after a few hundred problems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>V</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.FunctionSpace</span></code>) – The primal space</p></li>
+<li><p><strong>rtol</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Relative tolerance of the mass solves. The default is round-off, which projections need; the
+norm of dual data uses <a class="reference internal" href="#pySDC.implementations.datatype_classes.firedrake_mesh.NORM_RTOL" title="pySDC.implementations.datatype_classes.firedrake_mesh.NORM_RTOL"><code class="xref py py-data docutils literal notranslate"><span class="pre">NORM_RTOL</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>firedrake.RieszMap</em> – Maps a cofunction r to the function w with (w, v) = r(v) for all v in <cite>V</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -756,12 +841,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="pySDC.implementations.datatype_classes.fenics_mesh.html"
+       href="pySDC.implementations.datatype_classes.cupy_mesh.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">fenics_mesh</p>
+        <p class="prev-next-title">cupy_mesh</p>
       </div>
     </a>
     <a class="right-next"
@@ -792,18 +877,27 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_dual_mesh"><code class="docutils literal notranslate"><span class="pre">IMEX_firedrake_dual_mesh</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_dual_mesh.component_type"><code class="docutils literal notranslate"><span class="pre">component_type</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh"><code class="docutils literal notranslate"><span class="pre">IMEX_firedrake_mesh</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh.component_type"><code class="docutils literal notranslate"><span class="pre">component_type</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.IMEX_firedrake_mesh.components"><code class="docutils literal notranslate"><span class="pre">components</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.MASS_SOLVER"><code class="docutils literal notranslate"><span class="pre">MASS_SOLVER</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.NORM_RTOL"><code class="docutils literal notranslate"><span class="pre">NORM_RTOL</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_dual_mesh"><code class="docutils literal notranslate"><span class="pre">firedrake_dual_mesh</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh"><code class="docutils literal notranslate"><span class="pre">firedrake_mesh</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.asnumpy"><code class="docutils literal notranslate"><span class="pre">asnumpy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.bcast"><code class="docutils literal notranslate"><span class="pre">bcast()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.irecv"><code class="docutils literal notranslate"><span class="pre">irecv()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.is_dual"><code class="docutils literal notranslate"><span class="pre">is_dual</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.firedrake_mesh.isend"><code class="docutils literal notranslate"><span class="pre">isend()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map"><code class="docutils literal notranslate"><span class="pre">riesz_map()</span></code></a></li>
 </ul>
   </nav></div>
 

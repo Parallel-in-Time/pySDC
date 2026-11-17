@@ -1,0 +1,7 @@
+FormFiredrake
+=============
+
+.. automodule:: pySDC.implementations.problem_classes.FormFiredrake
+   :members:
+   :show-inheritance:
+   :undoc-members:

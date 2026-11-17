@@ -437,13 +437,13 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../step_7.html">Step-7: pySDC with external libraries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_FEniCS.html">Part A: pySDC and FEniCS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_mpi4pyfft.html">Part B: mpi4py-fft for parallel Fourier transforms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PETSc.html">Part C: Time-parallel pySDC with space-parallel PETSc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_PyTorch.html">Part D: pySDC and PyTorch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Firedrake.html">Part E: pySDC and Firedrake</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_with_Gusto.html">Part F: pySDC and Gusto</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_on_GPU.html">Part G: pySDC on GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_mpi4pyfft.html">Part A: mpi4py-fft for parallel Fourier transforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_PETSc.html">Part B: Time-parallel pySDC with space-parallel PETSc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PyTorch.html">Part C: pySDC and PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_Firedrake.html">Part D: pySDC and Firedrake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Gusto.html">Part E: pySDC and Gusto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_on_GPU.html">Part F: pySDC on GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_with_Firedrake_forms.html">Part G: pySDC from Firedrake forms</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../step_8.html">Step-8: Advanced topics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -717,31 +717,31 @@ from the problem class, which the controller has created inside its step, just l
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  3 -- residual: 8.80377594e-05
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  4 -- residual: 1.21707900e-05
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  4 -- residual: 1.21707898e-05
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  5 -- residual: 1.38272015e-06
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  5 -- residual: 1.38272041e-06
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  6 -- residual: 6.36445140e-07
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  6 -- residual: 6.36444635e-07
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  7 -- residual: 1.68954248e-07
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  7 -- residual: 1.68954753e-07
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  8 -- residual: 3.52596097e-08
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  8 -- residual: 3.52591843e-08
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  9 -- residual: 6.07145161e-09
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration:  9 -- residual: 6.07190400e-09
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration: 10 -- residual: 8.27727433e-10
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration: 10 -- residual: 8.28327559e-10
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration: 11 -- residual: 1.18803623e-10
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration: 11 -- residual: 1.18795435e-10
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration: 12 -- residual: 1.54759226e-11
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.100000 -- Iteration: 12 -- residual: 1.47928197e-11
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  1 -- residual: 6.69984764e-03
@@ -750,37 +750,37 @@ from the problem class, which the controller has created inside its step, just l
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  2 -- residual: 1.05518433e-03
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  3 -- residual: 1.40642623e-04
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  3 -- residual: 1.40642622e-04
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  4 -- residual: 1.85982054e-05
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  4 -- residual: 1.85982058e-05
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  5 -- residual: 2.79216744e-06
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  5 -- residual: 2.79216824e-06
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  6 -- residual: 1.12278619e-06
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  6 -- residual: 1.12278747e-06
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  7 -- residual: 2.85494348e-07
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  7 -- residual: 2.85496416e-07
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  8 -- residual: 5.78934111e-08
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  8 -- residual: 5.78932547e-08
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  9 -- residual: 9.68240499e-09
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration:  9 -- residual: 9.68205183e-09
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration: 10 -- residual: 1.26339266e-09
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration: 10 -- residual: 1.26374058e-09
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration: 11 -- residual: 1.82996056e-10
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration: 11 -- residual: 1.83461859e-10
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration: 12 -- residual: 1.95110716e-11
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Process  0 on time 0.200000 -- Iteration: 12 -- residual: 1.98485169e-11
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Finished run after 4.53e-02s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hooks - INFO: Finished run after 4.35e-02s
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Error after SDC iterations: 1.166689e-05
@@ -797,9 +797,9 @@ wrote its log to the file we named; here are its last lines:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-11-15 12:07:21,571 - hooks - default_hook - post_iteration - 26 - INFO: Process  0 on time 0.200000 -- Iteration: 11 -- residual: 1.82996056e-10
-2026-11-15 12:07:21,573 - hooks - default_hook - post_iteration - 26 - INFO: Process  0 on time 0.200000 -- Iteration: 12 -- residual: 1.95110716e-11
-2026-11-15 12:07:21,574 - hooks - timings - post_run - 287 - INFO: Finished run after 4.53e-02s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-11-17 17:21:25,907 - hooks - default_hook - post_iteration - 26 - INFO: Process  0 on time 0.200000 -- Iteration: 11 -- residual: 1.83461859e-10
+2026-11-17 17:21:25,909 - hooks - default_hook - post_iteration - 26 - INFO: Process  0 on time 0.200000 -- Iteration: 12 -- residual: 1.98485169e-11
+2026-11-17 17:21:25,910 - hooks - timings - post_run - 287 - INFO: Finished run after 4.35e-02s
 </pre></div>
 </div>
 </div>

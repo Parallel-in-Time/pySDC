@@ -20,6 +20,7 @@ Submodules
    pySDC.implementations.convergence_controller_classes.hotrod
    pySDC.implementations.convergence_controller_classes.inexactness
    pySDC.implementations.convergence_controller_classes.interpolate_between_restarts
+   pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake
    pySDC.implementations.convergence_controller_classes.spread_step_sizes
    pySDC.implementations.convergence_controller_classes.step_size_limiter
    pySDC.implementations.convergence_controller_classes.store_uold

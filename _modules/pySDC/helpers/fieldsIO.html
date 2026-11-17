@@ -490,10 +490,6 @@
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">dolfin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">df</span>  <span class="c1"># noqa: F841 (for some reason, dolfin always needs to be imported before mpi4py)</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">pass</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py.util.dtlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_numpy_dtype</span> <span class="k">as</span> <span class="n">MPI_DTYPE</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>

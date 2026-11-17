@@ -437,13 +437,13 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../step_7.html">Step-7: pySDC with external libraries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_FEniCS.html">Part A: pySDC and FEniCS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_mpi4pyfft.html">Part B: mpi4py-fft for parallel Fourier transforms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PETSc.html">Part C: Time-parallel pySDC with space-parallel PETSc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_PyTorch.html">Part D: pySDC and PyTorch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Firedrake.html">Part E: pySDC and Firedrake</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_with_Gusto.html">Part F: pySDC and Gusto</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_on_GPU.html">Part G: pySDC on GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/A_pySDC_with_mpi4pyfft.html">Part A: mpi4py-fft for parallel Fourier transforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/B_pySDC_with_PETSc.html">Part B: Time-parallel pySDC with space-parallel PETSc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/C_pySDC_with_PyTorch.html">Part C: pySDC and PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/D_pySDC_with_Firedrake.html">Part D: pySDC and Firedrake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/E_pySDC_with_Gusto.html">Part E: pySDC and Gusto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/F_pySDC_on_GPU.html">Part F: pySDC on GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../step_7/G_pySDC_with_Firedrake_forms.html">Part G: pySDC from Firedrake forms</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../step_8.html">Step-8: Advanced topics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -652,9 +652,9 @@ to restrict or interpolate but the values themselves.</p>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>step - WARNING: you have specified transfer classes, but only a single level
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SDC          : 12 iterations,  0.063 s, right-hand side evaluations per level [66]
-MLSDC        :  6 iterations,  0.077 s, right-hand side evaluations per level [66, 66]
-MLSDC+finter :  7 iterations,  0.085 s, right-hand side evaluations per level [41, 77]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SDC          : 12 iterations,  0.099 s, right-hand side evaluations per level [66]
+MLSDC        :  6 iterations,  0.118 s, right-hand side evaluations per level [66, 66]
+MLSDC+finter :  7 iterations,  0.130 s, right-hand side evaluations per level [41, 77]
 </pre></div>
 </div>
 </div>
@@ -685,7 +685,7 @@ MLSDC+finter :  7 iterations,  0.085 s, right-hand side evaluations per level [4
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total energy and relative deviation in iteration  0: 407936.7556966486 -- 0.00000000e+00
 Total energy and relative deviation in iteration 12: 406977.9425667247 -- 2.35039652e-03
 Total energy and relative deviation in iteration  0: 407936.7556966486 -- 0.00000000e+00
-Total energy and relative deviation in iteration  6: 406977.9425660006 -- 2.35039652e-03
+Total energy and relative deviation in iteration  6: 406977.9425660007 -- 2.35039652e-03
 Total energy and relative deviation in iteration  0: 407936.7556966486 -- 0.00000000e+00
 Total energy and relative deviation in iteration  7: 406977.9428639795 -- 2.35039579e-03
 </pre></div>

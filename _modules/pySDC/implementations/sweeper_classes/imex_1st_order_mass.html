@@ -432,7 +432,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for pySDC.implementations.sweeper_classes.imex_1st_order_mass</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit_mass</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit_mass</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.generic_implicit_mass</span><span class="w"> </span><span class="kn">import</span> <span class="n">generic_implicit_mass</span><span class="p">,</span> <span class="n">integrate_load_vectors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span><span class="w"> </span><span class="kn">import</span> <span class="n">imex_1st_order</span>
 
 
@@ -447,6 +447,19 @@
 <span class="sd">    The end point is only available as a copy of the last node: ``compute_end_point`` raises unless the right end of</span>
 <span class="sd">    the interval is a node and ``do_coll_update`` is off.</span>
 <span class="sd">    """</span>
+
+<div class="viewcode-block" id="imex_1st_order_mass.integrate">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.sweeper_classes.imex_1st_order_mass.html#pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.integrate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Integrate the sum of the implicit and explicit right-hand sides, see</span>
+<span class="sd">        :func:`~pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: dt Q (f_I + f_E) at the nodes 1, ..., M, load vectors like f</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">integrate_load_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span></div>
+
 
 <div class="viewcode-block" id="imex_1st_order_mass.update_nodes">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.sweeper_classes.imex_1st_order_mass.html#pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.update_nodes">[docs]</a>
@@ -474,11 +487,8 @@
         <span class="c1"># get QF(u^k)</span>
         <span class="n">integral</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">()</span>
 
-        <span class="c1"># This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level</span>
-        <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">level_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">u0</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">u0</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># u0 is a solution on every level, the transfer restricts it by L2 projection</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
             <span class="c1"># subtract QIFI(u^k)_m + QEFE(u^k)_m</span>
@@ -531,12 +541,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">right_is_node</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">do_coll_update</span><span class="p">:</span>
             <span class="c1"># a copy is sufficient</span>
             <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="c1"># On coarse levels u[0] is carried in the dual space: the transfer hands down P^T M u0 and</span>
-            <span class="c1"># the sweep consumes it as-is. PFASST copies uend straight into the next step's u[0]</span>
-            <span class="c1"># (controller.recv_full), so what we hand over has to be dual as well -- otherwise the step</span>
-            <span class="c1"># boundary feeds a primal value into a slot that is read as M u0.</span>
-            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">level_index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">L</span><span class="o">.</span><span class="n">uend</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Mass matrix sweeper expect u_M = u_end'</span><span class="p">)</span>
 

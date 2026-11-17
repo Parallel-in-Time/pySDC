@@ -33,15 +33,15 @@ Submodules
    pySDC.implementations.problem_classes.DiscontinuousTestODE
    pySDC.implementations.problem_classes.FastWaveSlowWave_0D
    pySDC.implementations.problem_classes.FermiPastaUlamTsingou
+   pySDC.implementations.problem_classes.FormFiredrake
    pySDC.implementations.problem_classes.FullSolarSystem
    pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit
    pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc
    pySDC.implementations.problem_classes.GenericGusto
-   pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit
+   pySDC.implementations.problem_classes.GrayScott_1D_Firedrake
    pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic
    pySDC.implementations.problem_classes.GrayScott_MPIFFT
    pySDC.implementations.problem_classes.HarmonicOscillator
-   pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced
    pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced
    pySDC.implementations.problem_classes.HeatEquation_Chebychev
    pySDC.implementations.problem_classes.HeatEquation_ND_FD
@@ -58,7 +58,7 @@ Submodules
    pySDC.implementations.problem_classes.RayleighBenard3D
    pySDC.implementations.problem_classes.TestEquation_0D
    pySDC.implementations.problem_classes.Van_der_Pol_implicit
-   pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
+   pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic
    pySDC.implementations.problem_classes.generic_MPIFFT_Laplacian
    pySDC.implementations.problem_classes.generic_ND_FD
    pySDC.implementations.problem_classes.generic_spectral

@@ -560,16 +560,8 @@
             <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="c1"># compute the residual for each node</span>
-
-        <span class="c1"># build QF(u)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">last_only</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'last'</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="c1"># add tau if associated</span>
-        <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">]</span>
         <span class="c1"># use abs function from data type here</span>
-        <span class="n">res_norm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">res_norm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_residual</span><span class="p">(</span><span class="n">last_only</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'last'</span><span class="p">))</span>
 
         <span class="c1"># find maximal residual over the nodes</span>
         <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">==</span> <span class="s1">'full_abs'</span><span class="p">:</span>
@@ -587,6 +579,27 @@
         <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SweeperMPI.node_residual">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.sweeper_classes.generic_implicit_MPI.html#pySDC.implementations.sweeper_classes.generic_implicit_MPI.SweeperMPI.node_residual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">node_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The collocation residual u0 + dt (QF)_m + tau_m - u_m at the node this rank administers.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            last_only (bool): Only the residual at the last node is needed, the other ranks may return anything</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: the residual</span>
+<span class="sd">        """</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">last_only</span><span class="o">=</span><span class="n">last_only</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># add tau if associated</span>
+        <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">tau</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">res</span></div>
 
 
 <div class="viewcode-block" id="SweeperMPI.predict">

@@ -432,22 +432,66 @@
                 <article class="bd-article">
                   
   <h1>Source code for pySDC.implementations.transfer_classes.TransferFiredrakeMesh</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="n">assemble</span><span class="p">,</span> <span class="n">interpolate</span><span class="p">,</span> <span class="n">TransferManager</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="n">assemble</span><span class="p">,</span> <span class="n">interpolate</span><span class="p">,</span> <span class="n">TestFunction</span><span class="p">,</span> <span class="n">TransferManager</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransferError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.core.space_transfer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaceTransfer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.firedrake_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">firedrake_mesh</span><span class="p">,</span> <span class="n">IMEX_firedrake_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.firedrake_mesh</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">firedrake_mesh</span><span class="p">,</span>
+    <span class="n">firedrake_dual_mesh</span><span class="p">,</span>
+    <span class="n">IMEX_firedrake_mesh</span><span class="p">,</span>
+    <span class="n">riesz_map</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cofunction</span>
 
 <span class="c1"># Firedrake's plain `inject` and `prolong` reject mixed spaces and give NaN when injecting H(div) spaces such as BDM</span>
 <span class="c1"># on immersed manifolds (Gusto's sphere); the transfer manager handles both.</span>
 <span class="n">_transfer_manager</span> <span class="o">=</span> <span class="n">TransferManager</span><span class="p">()</span>
 
 
+<div class="viewcode-block" id="run_transfer">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.run_transfer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_transfer</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">buffers</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Run the transfer `op` (``'prolong'``, ``'restrict'`` or ``'inject'``) of Firedrake's transfer manager from `source`</span>
+<span class="sd">    to `target`, through buffers kept in `buffers`.</span>
+
+<span class="sd">    The manager records the data versions of every pair of source and target it has seen, and never forgets a pair, so</span>
+<span class="sd">    transferring fresh objects every time adds one record per call, which a long run accumulates. Through the buffers</span>
+<span class="sd">    it sees the same pair every time. `buffers` is a dict owned by the caller, which keeps the buffers as long as it</span>
+<span class="sd">    lives.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        op (str): The transfer</span>
+<span class="sd">        source (firedrake.Function or firedrake.Cofunction): What to transfer</span>
+<span class="sd">        target (firedrake.Function or firedrake.Cofunction): Where the result goes</span>
+<span class="sd">        buffers (dict): The caller's buffers, filled on first use</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        `target`</span>
+<span class="sd">    """</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">function_space</span><span class="p">(),</span> <span class="n">target</span><span class="o">.</span><span class="n">function_space</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">buffers</span><span class="p">:</span>
+        <span class="n">buffers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">)(</span><span class="n">source</span><span class="o">.</span><span class="n">function_space</span><span class="p">()),</span> <span class="nb">type</span><span class="p">(</span><span class="n">target</span><span class="p">)(</span><span class="n">target</span><span class="o">.</span><span class="n">function_space</span><span class="p">()))</span>
+    <span class="n">source_buffer</span><span class="p">,</span> <span class="n">target_buffer</span> <span class="o">=</span> <span class="n">buffers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">source_buffer</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="nb">getattr</span><span class="p">(</span><span class="n">_transfer_manager</span><span class="p">,</span> <span class="n">op</span><span class="p">)(</span><span class="n">source_buffer</span><span class="p">,</span> <span class="n">target_buffer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">target_buffer</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="MeshToMeshFiredrake">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MeshToMeshFiredrake</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    This implementation can restrict and prolong between Firedrake meshes</span>
+<span class="sd">    This implementation can restrict and prolong between Firedrake meshes, by interpolation.</span>
+
+<span class="sd">    On the same mesh, between Lagrange spaces of different degrees (p-coarsening), interpolation into the finer space</span>
+<span class="sd">    is the exact inclusion of the coarse space. For the mass-matrix formulation, used through</span>
+<span class="sd">    :class:`~pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass`, :meth:`restrict_dual`</span>
+<span class="sd">    restricts load vectors with the transpose of that prolongation and :meth:`project` restricts solutions by</span>
+<span class="sd">    :math:`L^2` projection, which are then exact as well. For meshes of a hierarchy, use</span>
+<span class="sd">    :class:`MeshToMeshFiredrakeHierarchy`.</span>
 <span class="sd">    """</span>
 
 <div class="viewcode-block" id="MeshToMeshFiredrake.restrict">
@@ -496,6 +540,48 @@
             <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Unknown type of coarse data, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">u_fine</span></div>
+
+
+<div class="viewcode-block" id="MeshToMeshFiredrake.restrict_dual">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.restrict_dual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restrict_dual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Restrict a load vector (dual data) with :math:`P^T`, the adjoint of the interpolation :meth:`prolong` uses.</span>
+
+<span class="sd">        For nested spaces, such as lower-degree Lagrange elements on the same mesh, every coarse basis function is a</span>
+<span class="sd">        combination of fine ones through :math:`P`, so this gives exactly the coarse load vector of the same</span>
+<span class="sd">        functional.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            F (firedrake_mesh): Fine dual data, e.g. the FAS correction or :math:`M u_0`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            firedrake_dual_mesh: Coarse dual data</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">firedrake_mesh</span><span class="p">)</span> <span class="ow">and</span> <span class="n">F</span><span class="o">.</span><span class="n">is_dual</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'restrict_dual needs dual data, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">firedrake_dual_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">assemble</span><span class="p">(</span><span class="n">interpolate</span><span class="p">(</span><span class="n">TestFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">),</span> <span class="n">F</span><span class="o">.</span><span class="n">functionspace</span><span class="p">),</span> <span class="n">tensor</span><span class="o">=</span><span class="n">G</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">G</span></div>
+
+
+<div class="viewcode-block" id="MeshToMeshFiredrake.project">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrake.project">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Restrict a solution by :math:`L^2` projection, :math:`M_c^{-1} P^T M_f u`, with :math:`P^T` as in</span>
+<span class="sd">        :meth:`restrict_dual`. The mass matrices are assembled once per space.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            F (firedrake_mesh): Fine solution</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            firedrake_mesh: Coarse solution</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">firedrake_mesh</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">F</span><span class="o">.</span><span class="n">is_dual</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'project needs primal data, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="n">load</span> <span class="o">=</span> <span class="n">firedrake_mesh</span><span class="p">(</span><span class="n">riesz_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)(</span><span class="n">F</span><span class="o">.</span><span class="n">functionspace</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">firedrake_mesh</span><span class="p">(</span><span class="n">riesz_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">restrict_dual</span><span class="p">(</span><span class="n">load</span><span class="p">)</span><span class="o">.</span><span class="n">functionspace</span><span class="p">))</span></div>
 </div>
 
 
@@ -505,6 +591,10 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">MeshToMeshFiredrakeHierarchy</span><span class="p">(</span><span class="n">SpaceTransfer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This implementation can restrict and prolong between Firedrake meshes that are generated from a hierarchy.</span>
+
+<span class="sd">    For the mass-matrix formulation, used through</span>
+<span class="sd">    :class:`~pySDC.implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass`, it also restricts load</span>
+<span class="sd">    vectors with :meth:`restrict_dual` and solutions by :math:`L^2` projection with :meth:`project`.</span>
 <span class="sd">    Example:</span>
 
 <span class="sd">    .. code-block:: python</span>
@@ -518,15 +608,19 @@
 
 <span class="sd">    """</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_restrict</span><span class="p">(</span><span class="n">u_fine</span><span class="p">,</span> <span class="n">u_coarse</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Perform restriction in Firedrake"""</span>
-        <span class="n">_transfer_manager</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">u_fine</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="n">u_coarse</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialization, see :class:`~pySDC.core.space_transfer.SpaceTransfer`."""</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1">#: the buffers of :func:`run_transfer`, one pair per kind of transfer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_prolong</span><span class="p">(</span><span class="n">u_coarse</span><span class="p">,</span> <span class="n">u_fine</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_fine</span><span class="p">,</span> <span class="n">u_coarse</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Perform restriction in Firedrake"""</span>
+        <span class="n">run_transfer</span><span class="p">(</span><span class="s1">'inject'</span><span class="p">,</span> <span class="n">u_fine</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="n">u_coarse</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prolong</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_coarse</span><span class="p">,</span> <span class="n">u_fine</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Perform prolongation in Firedrake"""</span>
-        <span class="n">_transfer_manager</span><span class="o">.</span><span class="n">prolong</span><span class="p">(</span><span class="n">u_coarse</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="n">u_fine</span><span class="o">.</span><span class="n">functionspace</span><span class="p">)</span>
+        <span class="n">run_transfer</span><span class="p">(</span><span class="s1">'prolong'</span><span class="p">,</span> <span class="n">u_coarse</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="n">u_fine</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MeshToMeshFiredrakeHierarchy.restrict">
 <a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.restrict">[docs]</a>
@@ -569,13 +663,60 @@
             <span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">u_init</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_prolong</span><span class="p">(</span><span class="n">u_coarse</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">u_fine</span><span class="o">=</span><span class="n">F</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">IMEX_firedrake_mesh</span><span class="p">):</span>
-            <span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">f_init</span>
+            <span class="c1"># primal like G: the fine problem's own right-hand sides may be load vectors</span>
+            <span class="n">F</span> <span class="o">=</span> <span class="n">IMEX_firedrake_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_prolong</span><span class="p">(</span><span class="n">u_coarse</span><span class="o">=</span><span class="n">G</span><span class="o">.</span><span class="n">impl</span><span class="p">,</span> <span class="n">u_fine</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">impl</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_prolong</span><span class="p">(</span><span class="n">u_coarse</span><span class="o">=</span><span class="n">G</span><span class="o">.</span><span class="n">expl</span><span class="p">,</span> <span class="n">u_fine</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="s1">'Unknown type of coarse data, got </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">F</span></div>
+
+
+<div class="viewcode-block" id="MeshToMeshFiredrakeHierarchy.restrict_dual">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.restrict_dual">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restrict_dual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Restrict a load vector (dual data) with :math:`P^T`, the transpose of the prolongation.</span>
+
+<span class="sd">        For nested spaces, every coarse basis function is a combination of fine ones through :math:`P`, so this gives</span>
+<span class="sd">        exactly the coarse load vector of the same functional. Injecting instead would read the load vector as if it</span>
+<span class="sd">        were a function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            F (firedrake_mesh): Fine dual data, e.g. the FAS correction or :math:`M u_0`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            firedrake_dual_mesh: Coarse dual data</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">firedrake_mesh</span><span class="p">)</span> <span class="ow">and</span> <span class="n">F</span><span class="o">.</span><span class="n">is_dual</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'restrict_dual needs dual data, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">firedrake_dual_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">run_transfer</span><span class="p">(</span><span class="s1">'restrict'</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="n">G</span><span class="o">.</span><span class="n">functionspace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">G</span></div>
+
+
+<div class="viewcode-block" id="MeshToMeshFiredrakeHierarchy.project">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.transfer_classes.TransferFiredrakeMesh.html#pySDC.implementations.transfer_classes.TransferFiredrakeMesh.MeshToMeshFiredrakeHierarchy.project">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Restrict a solution by :math:`L^2` projection, :math:`M_c^{-1} P^T M_f u`.</span>
+
+<span class="sd">        Unlike injection, this is well defined for discontinuous spaces and does not depend on point values. The mass</span>
+<span class="sd">        matrices are assembled once per space, see</span>
+<span class="sd">        :func:`~pySDC.implementations.datatype_classes.firedrake_mesh.riesz_map`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            F (firedrake_mesh): Fine solution</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            firedrake_mesh: Coarse solution</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">firedrake_mesh</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">F</span><span class="o">.</span><span class="n">is_dual</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">TransferError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'project needs primal data, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="n">coarse_load</span> <span class="o">=</span> <span class="n">Cofunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">dual</span><span class="p">())</span>
+        <span class="n">run_transfer</span><span class="p">(</span><span class="s1">'restrict'</span><span class="p">,</span> <span class="n">riesz_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fine_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)(</span><span class="n">F</span><span class="o">.</span><span class="n">functionspace</span><span class="p">),</span> <span class="n">coarse_load</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffers</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">firedrake_mesh</span><span class="p">(</span><span class="n">riesz_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse_prob</span><span class="o">.</span><span class="n">init</span><span class="p">)(</span><span class="n">coarse_load</span><span class="p">))</span></div>
 </div>
 
 </pre></div>
