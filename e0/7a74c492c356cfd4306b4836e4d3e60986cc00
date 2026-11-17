@@ -1,0 +1,51 @@
+pySDC/implementations/transfer_classes/BaseTransfer_mass.py
+  s_234ff217a70910::t_dc5e6a4a4e5b69 45-47
+pySDC/implementations/problem_classes/FormFiredrake.py
+  s_234ff217a70910::t_5cf658cb1f27b5 1-2,227-231,242
+  s_234ff217a70910::t_978674ac886e0b 312-320
+  s_234ff217a70910::t_8ffb095f0e1375 165,172-173,182,336
+  s_234ff217a70910::t_bf935d343b7b9c 43-45
+  s_234ff217a70910::t_8e9e2a4bf7e0c6 5,42,157
+pySDC/implementations/sweeper_classes/generic_implicit_mass.py
+  s_234ff217a70910::t_dc5e6a4a4e5b69 68-69,153
+pySDC/tests/test_problems/test_form_firedrake.py
+  s_234ff217a70910::t_e1d86161d67d85 322-324
+  s_234ff217a70910::t_31ea405ab77064 270-272
+  s_234ff217a70910::t_3b33bc64fbee93 231-255,264
+  s_7657db1b41ed88::t_331336bfe3c70b 230
+pySDC/implementations/sweeper_classes/imex_1st_order_mass_MPI.py
+  s_234ff217a70910::t_dc5e6a4a4e5b69 58,94
+  s_234ff217a70910::t_010d2d40301a2d 84
+pySDC/projects/StroemungsRaum/sweepers/imex_1st_order_mass_NSE.py
+  s_234ff217a70910::t_dc5e6a4a4e5b69 35-36
+pySDC/projects/FEM_with_FEniCS/README.rst
+  s_234ff217a70910::t_20904482bfb4ef 56,213-215
+pySDC/implementations/sweeper_classes/imex_1st_order_mass.py
+  s_234ff217a70910::t_dc5e6a4a4e5b69 49-50
+pySDC/implementations/sweeper_classes/delta_form.py
+  s_234ff217a70910::t_dc5e6a4a4e5b69 718,752
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e07a74c492c356cfd4306b4836e4d3e60986cc00",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    },
+    "s_7657db1b41ed88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23ac8555-7630-4660-a15e-9f0718c4603a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
