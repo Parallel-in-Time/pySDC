@@ -38,7 +38,7 @@ What is here
     Asserts the claims below, so they stay true.
 
 ``setups_firedrake.py``, ``run_examples_firedrake.py``
-    The same study with the Firedrake ports of the problem classes, see `Re-measured with Firedrake`_.
+    The same study with the Firedrake ports of the problem classes, see `The study with Firedrake`_.
 
 How to run it
 -------------
@@ -200,43 +200,45 @@ restricts ``u`` by L2 projection rather than by sampling, which the MLSDC table 
 apart but which is worth up to a factor of two here, and on the vortex at 8 steps the difference
 between a converged answer and an O(1) wrong one.
 
-Re-measured with Firedrake
---------------------------
+The study with Firedrake
+------------------------
 
-``run_examples_firedrake.py`` runs the whole study with the Firedrake ports of the problem classes (each reproduces
-its FEniCS original to round-off with fixed iterations), the mesh hierarchy transfer for h and the interpolation
-transfer for p, and writes ``data/fem_with_firedrake_out.txt`` and ``data/fem_with_firedrake_orders.png``:
+``run_examples_firedrake.py`` runs the whole study with the Firedrake problem classes, the mesh hierarchy transfer for
+h and the interpolation transfer for p, and writes ``data/fem_with_firedrake_out.txt`` and
+``data/fem_with_firedrake_orders.png`` (8 minutes on a laptop):
 
 .. code-block:: bash
 
     python -m pySDC.projects.FEM_with_FEniCS.run_examples_firedrake
 
-The one setting that cannot carry over unchanged is the residual tolerance. FEniCS measured the residual, a load
-vector, by the L2 norm of its entries read as a function; the Firedrake data types measure it in the norm dual to L2,
-which does not shrink with the mesh. ``setups_firedrake.py`` scales each FEniCS tolerance by the ratio of the two
-norms on a fine-level residual (about 8 for Gray-Scott on [0, 100], 800-1700 for the problems on [0, 1], 8700 for the
-vortex).
+The problem classes follow Firedrake's conventions: its default Lagrange nodes (Gauss-Lobatto points) and default
+triangulation. The residual is a load vector, measured in the norm dual to :math:`L^2`, i.e. the :math:`L^2` norm of
+the function it represents. That norm does not depend on the mesh, so one tolerance per example serves every family,
+element order and level: 2e-9 for ``heat``, 1e-6 for ``burgers``, 1e-8 for ``grayscott`` and 1e-7 for ``vortex``.
 
-**Result: every conclusion above holds.** High order pays and CG1 does not, h beats p, CG and DG behave the same,
-and PFASST grows 1.2-1.9x out to 8 parallel steps. Of the 109 numbers in the element-order, MLSDC and PFASST tables
-above, 87 come out identical. 7 of the rest are the vortex (below); the other 15 differ by one iteration in a few of
-the 8 steps, for instance:
+**High order pays, CG1 does not.** MLSDC speed-up over SDC on 2 / 3 levels (h-coarsening, equal fine-level dofs):
 
-==========================  ===========  ======================
-config                      FEniCS       Firedrake, dual norm
-==========================  ===========  ======================
-heat CG1, 3 levels          1.05x        0.84x
-heat DG p, 2 levels         4.92 (work)  5.33 (work)
-grayscott DG h, 3 levels    1.14x        1.09x
-grayscott CG h, PFASST 2    3.75 iters   3.88 iters
-grayscott CG1, 3 levels     0.70x        0.65x
-==========================  ===========  ======================
+=============  =============  =============  =============
+example        CG1            CG2            CG4
+=============  =============  =============  =============
+``heat``       0.93x / 0.84x  1.24x / 1.05x  1.24x / 1.57x
+``burgers``    0.83x / 0.73x  0.87x / 0.73x  1.30x / 1.94x
+``grayscott``  0.77x / 0.65x  0.83x / 0.70x  1.14x / 1.11x
+=============  =============  =============  =============
 
-That is where the iterations stop, not a difference in the methods: the two norms are not proportional, so no single
-ratio makes every stopping decision come out the same. Measuring the residual the FEniCS way, with the FEniCS
-tolerances, Firedrake reproduces these five exactly (the other ten were not rerun that way). The vortex is the exception
-(SDC 5.50 against 5.75, MLSDC 0.74x/0.69x against 0.73x/0.67x): DOLFIN's ``refine`` triangulates the square differently
-from any Firedrake mesh, so it is a slightly different discretization.
+**Coarsen the mesh, not the order.** At CG4, coarsening in the element order (p) instead of the mesh (h) gives 1.24x /
+1.05x instead of 1.24x / 1.57x for ``heat``, 0.87x / 0.73x instead of 1.30x / 1.94x for ``burgers`` and 0.83x / 0.70x
+instead of 1.14x / 1.11x for ``grayscott``.
+
+**CG and DG behave the same.** With h-coarsening, the DG versions take exactly the iterations of the CG ones on every
+level, and give the same speed-ups.
+
+**PFASST** on 2 levels takes 1.5-2x the iterations of serial MLSDC on 8 parallel steps (``heat`` 3.00 to 4.50,
+``burgers`` 2.00 to 4.00, ``grayscott`` 3.62 to 5.38, ``vortex`` 5.25 to 10.38 per step), and stays within the
+examples' tolerances of the serial solution.
+
+**The vortex is not a savings case.** A coarse level costs more than it saves there (0.79x on 2 levels, 0.72x on 3),
+but MLSDC and PFASST still reach the SDC solution.
 
 Stopping at the spatial error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -253,9 +255,9 @@ runs it for SDC and 2-level MLSDC (CG, h), iterations per step, 8 steps:
 example        SDC: restol / + floor  MLSDC: restol / + floor  change in u      spatial error
 =============  =====================  =======================  ===============  =============
 ``heat``       5.75 / 5.75            3.00 / 3.00              0                1.5e-16
-``burgers``    4.12 / 4.12            2.12 / 2.12              0                5.6e-11
-``grayscott``  6.50 / 6.50            3.62 / 3.62              0                4.6e-08
-``vortex``     5.50 / 1.25            5.75 / 1.12              1.6e-2 / 6.9e-3  9.9e-02
+``burgers``    4.00 / 4.00            2.00 / 2.00              0                5.6e-11
+``grayscott``  6.38 / 6.38            3.62 / 3.62              0                4.6e-08
+``vortex``     5.38 / 1.25            5.25 / 1.12              1.6e-2 / 6.9e-3  9.9e-02
 =============  =====================  =======================  ===============  =============
 
 The three 1D problems are resolved in space far beyond their residual tolerance, so the floor never stops a step

@@ -107,8 +107,8 @@ def test_initial_value_only():
 @pytest.mark.firedrake
 def test_study_heat_h():
     """
-    The study's heat example, CG4 with h-coarsening, gives the speed-ups of the FEniCS study (1.24x on two levels,
-    1.57x on three), and MLSDC converges to the SDC solution.
+    The study's heat example, CG4 with h-coarsening, gives the speed-ups in the README (1.24x on two levels, 1.57x on
+    three), and MLSDC converges to the SDC solution.
     """
     import numpy as np
     from pySDC.projects.FEM_with_FEniCS.run_examples_firedrake import compare_mlsdc, l2_diff
