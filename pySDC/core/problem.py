@@ -308,6 +308,22 @@ class Problem(RegisterParams):
         """
         raise NotImplementedError
 
+    def prepare_step(self, t0: float, dt: float, coll: Any) -> None:
+        """
+        Called by the collocation sweepers once per step, when they predict, with the step and its collocation rule.
+        Does nothing by default.
+
+        A problem that needs to know the step it is solved in, not only the time of each solve, can do its setup here:
+        boundary values built from the whole step (differentiated boundary conditions), or the time from the start of
+        the step to a node (projection methods).
+
+        Args:
+            t0 (float): Start of the step
+            dt (float): Step size
+            coll: The sweeper's collocation rule, with the nodes and the matrix Q
+        """
+        pass
+
     def use_restricted_boundary_values(self, u: list, t: list) -> None:
         """
         Called by the FAS restriction on the coarse problem with the restricted fine solution `u` at the coarse

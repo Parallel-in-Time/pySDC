@@ -87,28 +87,28 @@ TAYLOR_GREEN_CASES = {
     'differentiated': dict(periodic=False, differentiated_bc=True),
     'periodic': dict(periodic=True),
 }
-# u_x, u_y and p of the Taylor-Green problem after two steps of dt = 0.05 (16 x 16 squares, nu = 0.05, two
+# u_x, u_y and p (its mean removed) of the Taylor-Green problem after two steps of dt = 0.05 (16 x 16 squares, nu = 0.05, two
 # RADAU-RIGHT nodes, LU, exactly three iterations, Newton tolerances 1e-13), recorded with this class (Firedrake
 # 2026.10) as a check against unintended changes.
 TAYLOR_GREEN_POINTS = [[0.1, 0.2], [-0.3, -0.1], [0.45, 0.3], [-0.2, 0.4]]
 TAYLOR_GREEN_REFERENCE = {
     'dirichlet': [
-        [1.000205728005674, -0.4411661474845772, 1.0836654413300941],
-        [0.8825937492201837, 0.49307129318579124, 1.0316782773977022],
-        [0.7411286526349095, 0.13678101793746505, 0.9811090637062253],
-        [1.1876223478752206, 0.01923599118929458, 0.9713018191938174],
+        [1.0002117925731555, -0.4408929172082426, 0.08358429908823417],
+        [0.8833952856699666, 0.4928559127201787, 0.031214562780409884],
+        [0.7410668720903961, 0.13738254815799716, -0.024430811993121332],
+        [1.1879845088090195, 0.01968006962449644, -0.026380183968608088],
     ],
     'differentiated': [
-        [1.0002255713288684, -0.4411855152950595, 1.083564557964147],
-        [0.8825130137574685, 0.4929627990452926, 1.0318914731488762],
-        [0.7412643144208172, 0.13660641089482248, 0.9812586559176729],
-        [1.187581060345629, 0.01914633454243825, 0.9710083365238055],
+        [1.000202626145264, -0.4408451337823731, 0.08439045904981597],
+        [0.8834618586784436, 0.49284666298741814, 0.03221513063068742],
+        [0.7410921757839597, 0.13731606264253515, -0.01883410747343272],
+        [1.1878685896890917, 0.019702068671412287, -0.02774524504893186],
     ],
     'periodic': [
-        [1.0002569069703042, -0.44086132180666576, 1.0844231070331143],
-        [0.8834034160760434, 0.4928050573665194, 1.0321255333274153],
-        [0.7410536287474639, 0.13728516511170485, 0.9811513691777825],
-        [1.1878002932967076, 0.01979576470764152, 0.972459948153029],
+        [1.0002288423899692, -0.4408593943035003, 0.08442595358070773],
+        [0.8834046491149585, 0.492795372714474, 0.032140038343238926],
+        [0.7410571453302516, 0.13737207480074992, -0.018833488165179293],
+        [1.1879402011702704, 0.01969327412617487, -0.027592509120414638],
     ],
 }
 
@@ -117,7 +117,6 @@ def taylor_green(dt, Tend, case, num_nodes, maxiter, restol, nelems, nu):
     """Run the Taylor-Green problem with SDC for one of TAYLOR_GREEN_CASES and return the problem and the end point."""
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
-    from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass_diffbc import generic_implicit_mass_diffbc
     from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
         NavierStokes2DTaylorGreenFiredrake,
     )
@@ -130,7 +129,7 @@ def taylor_green(dt, Tend, case, num_nodes, maxiter, restol, nelems, nu):
             **TAYLOR_GREEN_CASES[case],
             'solver_parameters': {'snes_atol': 1e-13, 'snes_rtol': 1e-13},
         },
-        'sweeper_class': generic_implicit_mass_diffbc if case == 'differentiated' else generic_implicit_mass,
+        'sweeper_class': generic_implicit_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': num_nodes, 'QI': 'LU'},
         'level_params': {'dt': dt, 'restol': restol},
         'step_params': {'maxiter': maxiter},
@@ -148,8 +147,12 @@ def test_taylor_green_reference_values(case):
     import firedrake as fd
     import numpy as np
 
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
+        zero_mean_pressure,
+    )
+
     P, uend = taylor_green(0.05, 0.1, case, num_nodes=2, maxiter=3, restol=-1.0, nelems=16, nu=0.05)
-    u, p = uend.functionspace.subfunctions
+    u, p = zero_mean_pressure(uend).subfunctions
     evaluate = fd.PointEvaluator(P.mesh, TAYLOR_GREEN_POINTS).evaluate
     values = np.column_stack([evaluate(u), evaluate(p)])
     assert np.allclose(values, TAYLOR_GREEN_REFERENCE[case], rtol=0, atol=1e-12), values
@@ -183,7 +186,7 @@ def test_taylor_green_order_reduction():
 
 
 # The projection scheme after two steps of dt = 1/1600 from t0 = 3.125e-4 (two RADAU-RIGHT nodes, LU implicit, Picard
-# explicit, exactly three iterations, `imex_1st_order_mass_NSE`): drag and lift, then u_x, u_y and p at the points of
+# explicit, exactly three iterations, `imex_1st_order_mass`): drag and lift, then u_x, u_y and p at the points of
 # REFERENCE_POINTS, recorded with this class as a check against unintended changes.
 PROJECTION_DRAG_LIFT = (0.1412337727444787, -0.00027963313489825364)
 PROJECTION_POINTS = [
@@ -200,13 +203,13 @@ def projection():
     from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_projection_Firedrake import (
         NavierStokes2DProjectionFiredrake,
     )
-    from pySDC.projects.StroemungsRaum.sweepers.imex_1st_order_mass_NSE import imex_1st_order_mass_NSE
+    from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 
     dt, t0 = 1 / 1600, 3.125e-4
     description = {
         'problem_class': NavierStokes2DProjectionFiredrake,
         'problem_params': {},
-        'sweeper_class': imex_1st_order_mass_NSE,
+        'sweeper_class': imex_1st_order_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 2, 'QI': 'LU', 'QE': 'PIC'},
         'level_params': {'dt': dt, 'restol': -1.0},
         'step_params': {'maxiter': 3},

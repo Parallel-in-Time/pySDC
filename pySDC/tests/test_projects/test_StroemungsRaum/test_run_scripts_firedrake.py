@@ -20,7 +20,8 @@ def test_taylor_green_benchmark(periodic):
     P, _, uend = run_simulation(description, controller_params, t0, Tend=0.1)
     error_u, error_p = run_postprocessing(P, uend, Tend=0.1)
     assert error_u < 1e-3, error_u
-    assert error_p < 1e-2, error_p
+    # relative to the pressure with its mean removed, whose size is its variation (4/17), not its mean (1)
+    assert error_p < 1e-1, error_p
 
 
 @pytest.mark.firedrake

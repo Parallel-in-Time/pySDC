@@ -14,8 +14,8 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
     Incompressible Navier-Stokes flow around a cylinder (the DFG benchmark 2D-3) with a projection method, IMEX, with
     Firedrake. This is the port of
     :class:`~pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_FEniCS.fenics_NSE_2D_mass`, on the same
-    mesh, to be used with its sweeper
-    :class:`~pySDC.projects.StroemungsRaum.sweepers.imex_1st_order_mass_NSE.imex_1st_order_mass_NSE`.
+    mesh, with the standard
+    :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass` sweeper.
 
     The problem is posed for the velocity :math:`u` alone, with the viscous term implicit and the convection explicit,
 
@@ -99,29 +99,40 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
         self._poisson = fd.LinearVariationalSolver(poisson)
         self._correction = fd.LinearVariationalSolver(correction)
 
-    def solve_system(self, rhs, factor, u0, t, dtau):
+    def prepare_step(self, t0, dt, coll):
+        """
+        Remember the start of the step: the projection uses the time from there to the node, see the class docstring.
+        Called once per step by the collocation sweepers, see :meth:`pySDC.core.problem.Problem.prepare_step`.
+
+        Args:
+            t0 (float): Start of the step
+            dt (float): Step size
+            coll: The sweeper's collocation rule
+        """
+        self._t0 = t0
+
+    def solve_system(self, rhs, factor, u0, t):
         r"""
-        Solve for the tentative velocity, :math:`M u^* - \text{factor}\, R_I(u^*) = \text{rhs}`, and project it, see
-        the class docstring.
+        Solve for the tentative velocity, :math:`M u^* - \text{factor}\, R_I(u^*) = \text{rhs}`, and project it with the
+        step :math:`\Delta\tau = t - t_0` from the start of the step, see the class docstring. The pressure is kept in
+        ``pn``.
 
         Args:
             rhs (firedrake_dual_mesh): Right-hand side, a load vector
             factor (float): Prefactor of the implicit right-hand side
             u0 (dtype_u): Initial guess
             t (float): Time of the node
-            dtau (float): Step from the start of the step to the node
 
         Returns:
             dtype_u: The velocity
-            firedrake.Function: The pressure, also kept in ``pn``
         """
         u = super().solve_system(rhs, factor, u0, t)
         self._u_star.assign(u.functionspace)
-        self._dtau.assign(dtau)
+        self._dtau.assign(t - self._t0)
         self._poisson.solve()
         self._correction.solve()
         u.functionspace.assign(self._u_new)
-        return u, self.pn
+        return u
 
     def drag_lift(self, u):
         """

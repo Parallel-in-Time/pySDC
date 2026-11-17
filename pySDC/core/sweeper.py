@@ -179,6 +179,8 @@ class Sweeper(object):
         L = self.level
         P = L.prob
 
+        P.prepare_step(L.time, L.dt, self.coll)
+
         # evaluate RHS at left point
         L.f[0] = P.eval_f(L.u[0], L.time)
 

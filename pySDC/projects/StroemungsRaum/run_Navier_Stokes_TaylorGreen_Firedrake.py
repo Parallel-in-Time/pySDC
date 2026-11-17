@@ -8,9 +8,9 @@ import numpy as np
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
-from pySDC.projects.StroemungsRaum.sweepers.generic_implicit_mass_diffbc import generic_implicit_mass_diffbc
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
     NavierStokes2DTaylorGreenFiredrake,
+    zero_mean_pressure,
 )
 
 
@@ -55,7 +55,7 @@ def setup(
             'differentiated_bc': differentiated_bc,
             'solver_parameters': {'snes_atol': newton_tol, 'snes_rtol': newton_tol},
         },
-        'sweeper_class': generic_implicit_mass_diffbc if differentiated_bc else generic_implicit_mass,
+        'sweeper_class': generic_implicit_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': num_nodes, 'QI': 'LU'},
         'level_params': {'restol': restol, 'dt': dt},
         'step_params': {'maxiter': maxiter},
@@ -78,16 +78,18 @@ def run_simulation(description, controller_params, t0, Tend):
 
 def relative_errors(u, uref):
     """
-    Relative L2 errors in velocity and pressure between two solutions of identically built problems. Separate runs
-    build separate (identical) meshes, so the difference is taken on the values.
+    Relative L2 errors in velocity and pressure between two solutions of identically built problems, with the
+    pressures compared up to their means, which the problem leaves free. Separate runs build separate (identical)
+    meshes, so the difference is taken on the values.
 
     Returns:
         tuple of float: relative L2 error in velocity and in pressure
     """
+    u, uref = zero_mean_pressure(u), zero_mean_pressure(uref)
     difference = fd.Function(uref.function_space())
     for d, a, b in zip(difference.dat.data_wo, u.dat.data_ro, uref.dat.data_ro, strict=True):
         d[:] = a - b
-    pairs = zip(difference.subfunctions, uref.functionspace.subfunctions, strict=True)
+    pairs = zip(difference.subfunctions, uref.subfunctions, strict=True)
     return tuple(fd.norm(d) / fd.norm(r) for d, r in pairs)
 
 

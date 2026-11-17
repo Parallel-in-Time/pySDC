@@ -16,7 +16,7 @@ from pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_Firedrake import LogLift
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_projection_Firedrake import (
     NavierStokes2DProjectionFiredrake,
 )
-from pySDC.projects.StroemungsRaum.sweepers.imex_1st_order_mass_NSE import imex_1st_order_mass_NSE
+from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
 
 DEFAULT_PATH = f'{os.path.dirname(__file__)}/data/navier_stokes/'
 
@@ -31,7 +31,7 @@ def setup(t0=3.125e-4):
     description = {
         'problem_class': NavierStokes2DProjectionFiredrake,
         'problem_params': {'nu': 0.001, 'order': 2},
-        'sweeper_class': imex_1st_order_mass_NSE,
+        'sweeper_class': imex_1st_order_mass,
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 2, 'QE': 'PIC', 'QI': 'LU'},
         'level_params': {'e_tol': 1e-9, 'dt': 1 / 1600},
         'step_params': {'maxiter': 10},
