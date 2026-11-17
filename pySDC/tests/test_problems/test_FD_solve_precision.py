@@ -68,18 +68,28 @@ def test_misconfigurations_raise():
         _problem('heat', nvars=64, solver_type='direct', solve_precision='float16')
     with pytest.raises(ProblemError, match='periodic'):
         _problem('heat', nvars=63, bc='dirichlet-zero', solver_type='FFT')
+    with pytest.raises(ProblemError, match='second-order Laplacian'):
+        _problem('heat', nvars=63, bc='neumann-zero', solver_type='MG')
+    with pytest.raises(ProblemError, match='second-order Laplacian'):
+        _problem('heat', nvars=64, order=4, solver_type='MG')
+    with pytest.raises(ProblemError, match='second-order Laplacian'):
+        _problem('advection', nvars=64, solver_type='MG')
+    with pytest.raises(ProblemError, match='real'):
+        _problem('heat', nvars=64, solver_type='MG', dtype='complex128')
 
 
+@pytest.mark.parametrize('solver_type', ['FFT', 'MG'])
 @pytest.mark.parametrize(
     'useGPU', [pytest.param(False, marks=pytest.mark.base), pytest.param(True, marks=pytest.mark.cupy)]
 )
-def test_half_precision_solve_reaches_double_precision_in_delta_form(useGPU):
+def test_half_precision_solve_reaches_double_precision_in_delta_form(useGPU, solver_type):
     """
     What the option is for: the delta form solves for a correction, so a half-precision solve costs
     iterations, not accuracy. Stock SDC hands the same solve the state, and stalls -- the control.
 
-    On a CPU the half-precision solve is an emulation; on a GPU it is cuFFT's half-precision
+    On a CPU the half-precision FFT solve is an emulation; on a GPU it is cuFFT's half-precision
     arithmetic, which is the case the correction-solve contract on ``Problem`` is written for.
+    Multigrid stores in half precision and computes in single on both.
     """
     from pySDC.helpers.stats_helper import get_sorted
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -93,9 +103,10 @@ def test_half_precision_solve_reaches_double_precision_in_delta_form(useGPU):
             'problem_params': {
                 'nvars': (32, 32),
                 'nu': 0.1,
-                'solver_type': 'FFT',
+                'solver_type': solver_type,
                 'solve_precision': precision,
                 'useGPU': useGPU,
+                'lintol': 1e-14,
             },
             'sweeper_class': sweeper_class,
             'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 3, 'QI': 'LU', **sweeper_extra},
@@ -113,9 +124,32 @@ def test_half_precision_solve_reaches_double_precision_in_delta_form(useGPU):
     assert floor(generic_implicit, 'float16') > 1e-6, 'the control: the state itself through float16'
 
 
+@pytest.mark.base
+@pytest.mark.parametrize(
+    'bc, nvars',
+    [('periodic', 4096), ('periodic', (64, 64)), ('periodic', (16, 16, 16))]
+    + [('dirichlet-zero', 2047), ('dirichlet-zero', (63, 63)), ('dirichlet-zero', (15, 15, 15))],
+)
+@pytest.mark.parametrize('precision, low, high', [(None, 0, 1e-12), ('float32', 1e-9, 1e-5), ('float16', 1e-5, 3e-3)])
+def test_multigrid_solve(bc, nvars, precision, low, high):
+    """
+    Multigrid reaches the accuracy of its format in 1D, 2D and 3D, periodic and with zero Dirichlet values, against a
+    direct solve with the class's own matrix, and counts its V-cycles.
+    """
+    prob = _problem('heat', nvars=nvars, bc=bc, solver_type='MG', solve_precision=precision)
+    assert low <= _error(prob, 1e-3) < high
+    assert prob.work_counters['MG'].niter > 0
+
+
 @pytest.mark.cupy
 @pytest.mark.parametrize(
-    'solver_type, precision, low, high', [('CG', 'float32', 1e-9, 1e-4), ('FFT', 'float16', 1e-5, 1e-2)]
+    'solver_type, precision, low, high',
+    [
+        ('CG', 'float32', 1e-9, 1e-4),
+        ('FFT', 'float16', 1e-5, 1e-2),
+        ('MG', 'float32', 1e-9, 1e-5),
+        ('MG', 'float16', 1e-5, 3e-3),
+    ],
 )
 def test_solve_precision_on_GPU(solver_type, precision, low, high):
     """On the device the reduced precision is genuine arithmetic, half precision included (cuFFT)."""
@@ -130,3 +164,22 @@ def test_solve_precision_on_GPU(solver_type, precision, low, high):
     error = float(abs(solves[precision] - solves[None]) / abs(solves[None]))
     assert low <= error < high, f'{precision} {solver_type} solve off by {error:.1e}'
     assert solves[precision].dtype == cp.float64
+
+
+@pytest.mark.cupy
+@pytest.mark.parametrize('nvars', [256, (64, 64)])
+@pytest.mark.parametrize('precision', [None, 'float32', 'float16'])
+def test_fused_gpu_fft_solve_is_bitwise_the_unfused_one(nvars, precision):
+    """The fused FFT solve of a real state on a GPU computes what the array operations compute, bit for bit."""
+    import cupy as cp
+
+    prob = _problem('heat', nvars=nvars, solver_type='FFT', solve_precision=precision, useGPU=True)
+    rng = cp.random.default_rng(0)
+    shape = prob.nvars if isinstance(prob.nvars, tuple) else (prob.nvars,)
+    for factor in (1e-3, 2e-3, 1e-3):  # the third call reuses the cached factor
+        rhs = rng.standard_normal(shape) * 1e-9  # a plain array, as solve_system hands it over
+        fused = prob._solve_fft_gpu(rhs, factor)
+        assert fused.dtype == cp.float64
+        assert cp.array_equal(fused, prob._solve_fft_unfused(rhs, factor))
+    assert len(prob._fft_factors) == 2
+    assert not prob._solve_fft_gpu(cp.zeros(shape), 1e-3).any()

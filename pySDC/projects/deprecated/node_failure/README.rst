@@ -48,7 +48,7 @@ The ``postproc_boussinesq`` script visualizes the results.
 The Gray-Scott test case
 ------------------------
 
-Another test case is the 1D Gray-Scott reaction diffusion model, see ``grayscott_example``.
+Another test case is the 1D Gray-Scott reaction diffusion model. Its runs used FEniCS, which pySDC no longer supports, so the script that produced them is gone; their results are kept in ``data``.
 With spatial coarsening enabled, this application plays well with PFASST and the goal of this part is to see how fault injections and recovery impact the convergence.
 We again inject faults randomly, but in a pre-defined way with a rate of 3%.
 The ``postproc_grayscott`` script visualizes the results. Also, the script ``animate_convergence`` can be used to create an animated convergence plot (and can be easily adapted for other examples, too).

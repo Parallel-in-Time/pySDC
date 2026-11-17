@@ -37,7 +37,8 @@ class heatNd_unforced(GenericNDimFinDiff):
     liniter : int, optional
         Max. iterations number for spatial solver.
     solver_type : str, optional
-        Solve the linear system directly or using CG.
+        How to solve the linear systems: ``'direct'``, ``'GMRES'``, ``'CG'``, ``'FFT'`` or ``'MG'`` (multigrid).
+        See :class:`GenericNDimFinDiff`.
     bc : str, optional
         Boundary conditions, either ``'periodic'`` or ``'dirichlet'``.
     sigma : float, optional

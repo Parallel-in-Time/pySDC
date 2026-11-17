@@ -115,6 +115,11 @@ class controller_nonMPI(Controller):
         for hook in self.hooks:
             hook.reset_stats()
 
+        # start from the step size in the description, not the one adaptivity left from a previous run
+        for S in self.MS:
+            for L in S.levels:
+                L.params.dt = L.params.dt_initial
+
         # initial ordering of the steps: 0,1,...,Np-1
         slots = list(range(num_procs))
 
@@ -122,7 +127,7 @@ class controller_nonMPI(Controller):
         time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
 
         # determine which steps are still active (time < Tend)
-        active = [self.step_is_active(time[p], time[0], Tend, self.MS[p].dt) for p in slots]
+        active = [self.step_is_active(time[p], block_start=time[0], t0=t0, Tend=Tend, dt=self.MS[p].dt) for p in slots]
 
         if not any(active):
             raise ControllerError('Nothing to do, check t0, dt and Tend.')
@@ -173,7 +178,9 @@ class controller_nonMPI(Controller):
                 time[active_slots[i]] = time[active_slots[i] - 1] + self.MS[active_slots[i] - 1].dt
 
             # determine new set of active steps and compress slots accordingly
-            active = [self.step_is_active(time[p], time[0], Tend, self.MS[p].dt) for p in slots]
+            active = [
+                self.step_is_active(time[p], block_start=time[0], t0=t0, Tend=Tend, dt=self.MS[p].dt) for p in slots
+            ]
             active_slots = list(itertools.compress(slots, active))
 
             # restart active steps (reset all values and pass uend to u0)
@@ -575,7 +582,8 @@ class controller_nonMPI(Controller):
                 for hook in self.hooks:
                     hook.pre_sweep(step=S, level_number=0)
 
-                S.levels[0].sweep.updateVariableCoeffs(k + 1)  # update QDelta coefficients if variable preconditioner
+                # update QDelta coefficients if variable preconditioner, indexed by the sweep count across iterations
+                S.levels[0].sweep.updateVariableCoeffs((S.status.iter - 1) * nsweeps + k + 1)
                 S.levels[0].sweep.update_nodes()
 
                 for hook in self.hooks:

@@ -329,7 +329,9 @@ class GenericSpectralLinear(Problem):
         if u0_hat is not None and 'direct' not in self.solver_type:
             if not hasattr(self, '_Pr_inv'):
                 self._Pr_inv = self.linalg.splu(self.Pr.astype(complex)).solve
-            u0_hat[...] = self._Pr_inv(u0_hat)
+            _u0_hat = self._Pr_inv(u0_hat)
+            # Pr is stored as complex even where the initial guess is real in spectral space
+            u0_hat[...] = _u0_hat if self.xp.iscomplexobj(u0_hat) else _u0_hat.real
 
         rhs_hat = (self.M @ rhs_hat.flatten()).reshape(rhs_hat.shape)
         rhs_hat = self.spectral.put_BCs_in_rhs_hat(rhs_hat, self._restricted_BCs_hat.get(t))
@@ -435,7 +437,9 @@ class GenericSpectralLinear(Problem):
             self.logger.warn(f'{self.solver_type} not converged! {info=}')
 
         sol_hat = self.spectral.u_init_forward
-        sol_hat[...] = (self.Pr @ _sol_hat).reshape(sol_hat.shape)
+        _sol_hat = (self.Pr @ _sol_hat).reshape(sol_hat.shape)
+        # the solver may work in complex arithmetic although the solution is real in spectral space
+        sol_hat[...] = _sol_hat if self.xp.iscomplexobj(sol_hat) else _sol_hat.real
 
         if self.spectral_space:
             return sol_hat

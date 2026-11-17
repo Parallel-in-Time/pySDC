@@ -189,6 +189,7 @@ class boussinesq_2d_imex(Problem):
             maxiter=self.gmres_maxiter,
             atol=0,
             callback=cb,
+            callback_type='legacy',
         )
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
         if factor != 0.0:

@@ -334,6 +334,7 @@ class Quench(Problem):
                     maxiter=self.liniter,
                     atol=0,
                     callback=self.work_counters['linear'],
+                    callback_type='legacy',
                 )
 
             if not np.isfinite(delta).all():

@@ -1,5 +1,5 @@
 """
-PyTorch helpers for step 7 part D: a tensor datatype, a heat equation problem using it and a (too) simple network.
+PyTorch helpers for step 7 part C: a tensor datatype, a heat equation problem using it and a (too) simple network.
 """
 
 import numpy as np

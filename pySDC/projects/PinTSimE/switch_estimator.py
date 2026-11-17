@@ -299,7 +299,8 @@ class SwitchEstimator(ConvergenceController):
         LagrangeInterpolation = LagrangeApproximation(points=t_interp, fValues=state_function)
 
         def p(t):
-            return LagrangeInterpolation.__call__(t)
+            # qmat>=0.1.22 returns shape (1,) for a scalar t, which breaks formatting and brentq
+            return LagrangeInterpolation(t).item()
 
         def fprime(t):
             r"""
@@ -329,6 +330,11 @@ class SwitchEstimator(ConvergenceController):
 
         newton_tol, newton_maxiter = 1e-14, 100
         t_switch = newton(t_interp[m_guess], p, fprime, newton_tol, newton_maxiter)
+
+        # The finite difference reaches 4 * dt_FD to the left, outside of steps not much larger than that, where Newton
+        # can fail and leave the step. The sign change of the state function across the step brackets a root, though.
+        if not t_interp[0] <= t_switch <= t_interp[-1]:
+            t_switch = sp.optimize.brentq(p, t_interp[0], t_interp[-1], xtol=np.spacing(t_interp[-1]))
         return t_switch
 
     @staticmethod

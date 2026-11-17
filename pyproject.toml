@@ -45,7 +45,6 @@ Tracker = "https://github.com/Parallel-in-Time/pySDC/issues"
 apps = [
     'petsc4py>=3.10.0',
     'mpi4py>=3.0.0',
-    'fenics>=2019.1.0',
     'mpi4py-fft>=2.0.2'
     ]
 dev = [
@@ -81,7 +80,6 @@ packages = ['pySDC']
 [tool.pytest.ini_options]
 markers = [
     'base: all basic tests',
-    'fenics: tests relying on FEniCS',
     'slow: tests taking much longer than bearable',
     'mpi4py: tests using MPI parallelism (but no other external library such as petsc)',
     'petsc: tests relying on PETSc/petsc4py',
@@ -91,6 +89,7 @@ markers = [
     'monodomain: tests the monodomain project, which requires previous compilation of c++ code',
     'pytorch: tests for PyTorch related things in pySDC',
     'firedrake: tests for firedrake',
+    'gusto: firedrake tests that also need Gusto, which only the Docker Firedrake job installs',
     # Added at runtime by mpi-pytest, and listed here so this stays the one place that
     # describes pySDC's markers. It takes the ranks a test needs: `@pytest.mark.parallel(3)`
     # or `@pytest.mark.parallel([2, 4])`. See etc/run_mpi_tests.sh for how CI runs them.

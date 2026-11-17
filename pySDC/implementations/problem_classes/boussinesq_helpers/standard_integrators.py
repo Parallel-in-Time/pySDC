@@ -252,6 +252,7 @@ class rk_imex:
             maxiter=self.problem.gmres_maxiter,
             atol=0,
             callback=cb,
+            callback_type='legacy',
         )
         if alpha != 0.0:
             self.logger.add(cb.getcounter())
@@ -295,6 +296,7 @@ class trapezoidal:
             maxiter=self.problem.gmres_maxiter,
             atol=0,
             callback=cb,
+            callback_type='legacy',
         )
         if alpha != 0.0:
             self.logger.add(cb.getcounter())
@@ -339,6 +341,7 @@ class bdf2:
             maxiter=self.problem.gmres_maxiter,
             atol=0,
             callback=cb,
+            callback_type='legacy',
         )
         if alpha != 0.0:
             self.logger.add(cb.getcounter())
@@ -621,6 +624,7 @@ class dirk:
             maxiter=self.problem.gmres_maxiter,
             atol=0,
             callback=cb,
+            callback_type='legacy',
         )
         if alpha != 0.0:
             self.logger.add(cb.getcounter())

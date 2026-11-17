@@ -2,6 +2,8 @@ import sys
 
 import pytest
 
+pytestmark = pytest.mark.gusto
+
 
 @pytest.fixture(autouse=True)
 def _gusto_running_tests(monkeypatch):

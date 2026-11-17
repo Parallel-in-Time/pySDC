@@ -88,7 +88,7 @@ def run(use_MPI, num_nodes, quad_type, residual_type, imex, init_guess, useNCCL,
 def individual_test(**kwargs):
     """
     Make a test if the result matches between the MPI and non-MPI versions of a sweeper.
-    Tests solution at the right end point and the residual.
+    Tests the solution at the node this rank sweeps, at the right end point and the residual.
     """
     if kwargs['useNCCL']:
         import cupy as xp
@@ -98,8 +98,18 @@ def individual_test(**kwargs):
     MPI = run(**kwargs, use_MPI=True)
     nonMPI = run(**kwargs, use_MPI=False)
 
+    # the nodes are what the sweepers compute, and the two have to agree on them to round-off
+    node = MPI.sweep.rank + 1
     assert xp.allclose(
-        MPI.uend, nonMPI.uend, rtol=0, atol=1e-14
+        MPI.u[node], nonMPI.u[node], rtol=0, atol=1e-14
+    ), f'Got different solutions at node {node}! {MPI.u[node]=} {nonMPI.u[node]=}'
+
+    # Without a node at the right end, the end point is u0 + dt sum_m w_m f(u_m), which takes a difference in the nodes
+    # up to dt sum_m |w_m| ||A|| times larger: 1e4 for the heat problem here. Agreement to round-off on the nodes
+    # therefore means agreement to this much on the end point, and no better.
+    amplification = 1 + MPI.dt * float(abs(MPI.sweep.coll.weights).sum()) * float(abs(MPI.prob.A).sum(axis=1).max())
+    assert xp.allclose(
+        MPI.uend, nonMPI.uend, rtol=0, atol=1e-14 * amplification
     ), f'Got different solutions at end point! {MPI.uend=} {nonMPI.uend=}'
     assert xp.allclose(MPI.status.residual, nonMPI.status.residual, rtol=0, atol=1e-14), 'Got different residuals!'
 
@@ -132,6 +142,53 @@ def test_sweeper(quad_type, residual_type, imex, init_guess, ML):
         useNCCL=False,
         ML=ML,
     )
+
+
+def make_level(sweeper, QI, QE):
+    from mpi4py import MPI
+    from pySDC.core.level import Level
+
+    if sweeper == 'imex':
+        from pySDC.implementations.sweeper_classes.imex_1st_order_MPI import imex_1st_order_MPI as sweeper_class
+        from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced as problem_class
+    elif sweeper == 'delta':
+        from pySDC.implementations.sweeper_classes.delta_form_MPI import delta_implicit_MPI as sweeper_class
+        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
+    else:
+        from pySDC.implementations.sweeper_classes.generic_implicit_MPI import generic_implicit_MPI as sweeper_class
+        from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d as problem_class
+
+    sweeper_params = {'num_nodes': MPI.COMM_WORLD.size, 'quad_type': 'RADAU-RIGHT', 'QI': QI, 'QE': QE}
+    return Level(problem_class, {}, sweeper_class, sweeper_params, {'dt': 0.1}, 0)
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(2)
+@pytest.mark.parametrize(
+    "sweeper, QI, QE",
+    [
+        ('generic', 'IE', 'PIC'),
+        ('generic', 'LU', 'PIC'),
+        ('delta', 'IE', 'PIC'),
+        ('imex', 'IE', 'PIC'),
+        ('imex', 'MIN-SR-S', 'EE'),
+    ],
+)
+def test_preconditioners_that_are_not_diagonal_are_refused(sweeper, QI, QE):
+    """Each rank keeps only its diagonal entry, so these used to run quietly as a different method than asked."""
+    from pySDC.core.errors import ParameterError
+
+    with pytest.raises(ParameterError):
+        make_level(sweeper, QI, QE)
+
+
+@pytest.mark.mpi4py
+@pytest.mark.parallel(2)
+@pytest.mark.parametrize("sweeper", ['generic', 'delta', 'imex'])
+@pytest.mark.parametrize("QI", ['MIN-SR-S', 'IEpar'])
+def test_diagonal_preconditioners_are_accepted(sweeper, QI):
+    """Also with an alias of Picard, which the IMEX sweeper used to reject by its name."""
+    assert make_level(sweeper, QI, 'Picard').sweep.parallelizable
 
 
 @pytest.mark.cupy

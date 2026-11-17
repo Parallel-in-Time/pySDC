@@ -16,12 +16,15 @@
 #
 # Usage: run_mpi_tests.sh <test-path> [marker]
 # Set $PYTEST to override how pytest is invoked (the firedrake job needs `python -m coverage`).
+# Set $MPIEXEC to override how the MPI passes are launched, e.g. `MPIEXEC=srun` under Slurm, where
+# some MPI libraries (ParaStationMPI on the JSC machines) have no `mpiexec` at all.
 set -u
 
 tests=$1
 marker=${2:-}
 
 : "${PYTEST:=coverage run -m pytest --continue-on-collection-errors -v --durations=0}"
+: "${MPIEXEC:=mpiexec}"
 
 # Options for the serial pass only. The GPU job spreads it over several devices with `pytest-xdist`,
 # which cannot go in $PYTEST: that is also how the MPI passes are launched, and xdist under mpiexec
@@ -76,7 +79,8 @@ for n in $ranks; do
     [ "$n" -eq 1 ] && continue
     sel="parallel[$n]"
     [ -n "$marker" ] && sel="$marker and $sel"
-    run_pass mpiexec -n "$n" $PYTEST -m "$sel" "$tests" || exit $?
+    # shellcheck disable=SC2086  # both are deliberately word-split, so that options can be passed along
+    run_pass $MPIEXEC -n "$n" $PYTEST -m "$sel" "$tests" || exit $?
 done
 
 # `parallel[1]` claims everything unmarked or explicitly serial

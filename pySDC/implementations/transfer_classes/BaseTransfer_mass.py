@@ -42,7 +42,8 @@ class base_transfer_mass(BaseTransfer):
         for m in range(1, SF.coll.num_nodes + 1):
             tmp_u.append(self.space_transfer.project(F.u[m]))
 
-        # restrict collocation values
+        # u0 is a solution on every level, restricted by L2 projection like the nodes: the coarse sweep then uses
+        # M_c M_c^-1 P^T M_f u0 = P^T M_f u0, the restricted load vector of the fine initial value
         G.u[0] = self.space_transfer.project(F.u[0])
         for n in range(1, SG.coll.num_nodes + 1):
             G.u[n] = self.Rcoll[n - 1, 0] * tmp_u[0]
@@ -100,15 +101,6 @@ class base_transfer_mass(BaseTransfer):
             G.uold[m] = PG.dtype_u(G.u[m])
             G.fold[m] = PG.dtype_f(G.f[m])
         PG.use_restricted_boundary_values(G.u[1:], [G.time + G.dt * tau for tau in SG.coll.nodes])
-
-        # u0 lives in the DUAL space on every coarse level: the finest level supplies it as M u0,
-        # and each further level restricts that dual vector with P^T. Without the else branch,
-        # level 1 -> 2 kept the primal `project` result from above and L2-projected an already-dual
-        # vector, which is why 2 levels worked and 3 did not.
-        if F.level_index == 0:
-            G.u[0] = self.space_transfer.restrict_dual(PF.apply_mass_matrix(F.u[0]))
-        else:
-            G.u[0] = self.space_transfer.restrict_dual(F.u[0])
 
         # works as a predictor
         G.status.unlocked = True

@@ -43,6 +43,10 @@ env:
   # one, which is why `mpiexec -n 3` there failed with "not enough slots available" while the same
   # command worked everywhere else. Each version ignores the other's variable.
   OMPI_MCA_rmaps_base_oversubscribe: 'true'
+  # OpenMPI picks UCX by default, and on runners with an Azure MANA NIC UCX fails to create its
+  # worker ("uct_iface_open(ud_verbs/mana_0:1) failed"), so every multi-rank test died with
+  # MPI_ERR_OTHER. The ranks all share one runner, where ob1 over shared memory is all we need.
+  OMPI_MCA_pml: ob1
 
 jobs:
 
@@ -78,12 +82,12 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        env: ['base', 'fenics', 'mpi4py', 'petsc', 'pytorch']
+        env: ['base', 'mpi4py', 'petsc', 'pytorch']
         python: ['3.10', '3.11', '3.12', '3.13']
         numpy: ['', '=1']
         # pySDC supports both NumPy majors, so every backend is run against both. NumPy 1 gets one
         # python rather than four: 1.26 is the last 1.x release, it does not support 3.13 at all,
-        # and 3.12 is the newest python all five backends still have NumPy 1 builds for.
+        # and 3.12 is the newest python all four backends still have NumPy 1 builds for.
         exclude:
           - {numpy: '=1', python: '3.10'}
           - {numpy: '=1', python: '3.11'}
@@ -136,6 +140,7 @@ jobs:
           - AllenCahn_Bayreuth
           - AsympConv
           - DAE
+          - DeltaSDC
           - FastWaveSlowWave
           - GPU
           - Hamiltonian
@@ -147,11 +152,10 @@ jobs:
           - Resilience
           - RayleighBenard
           - SDC_showdown
+          - SDC4SDEs
           - Second_orderSDC
           - soft_failure
           - TOMS
-          - StroemungsRaum
-          - FEM_with_FEniCS
           - TDDFT
         numpy: ['', '=1']
         # Both NumPy majors here too. No python axis to exclude against: every project environment
@@ -224,7 +228,7 @@ jobs:
           fi
       # This step only rents the GPU: the container runs pytest under coverage and its output is
       # streamed back here, so the log below is an ordinary pytest log.
-      - name: Run the cupy-marked tests on a T4
+      - name: Run the cupy-marked tests on four GPUs (T4, else L4, else A10G)
         env:
           MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
           MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
@@ -236,7 +240,7 @@ jobs:
           name: test-artifacts-gpu-hardware
           path: |
             coverage_GPU_hardware.dat
-            data/step_7_G_out.txt
+            data/step_7_F_out.txt
 
   user_libpressio_tests:
     runs-on: ubuntu-latest
@@ -280,7 +284,8 @@ jobs:
   user_firedrake_tests:
     runs-on: ubuntu-latest
     container:
-      image: firedrakeproject/firedrake-vanilla-default@sha256:455fabbe164276329a4cc91af54a05f56bf383dd3164195d0fa1182e981f6839
+      # Tag 2026.10.0
+      image: firedrakeproject/firedrake-vanilla-default@sha256:b3f8026897fe982b345227e36085b89430f98b389fdd1152a4d24619aa598744
       options: --user root
       volumes:
         - ${{ github.workspace }}:/repositories
@@ -302,8 +307,8 @@ jobs:
         with:
           repository: firedrakeproject/gusto
           path: ./gusto_repo
-          # Last known passing Gusto commit in CI run 24328039993 / job 71027429748
-          ref: f11fba9ee858aa84281baf41baa09704431ac0ff
+          # Gusto has no releases; main as of 2026-11-11, tested against Firedrake 2026.10.0
+          ref: b81bc873b0a21a88aa8455e43f53cc2c9c3e3c1c
       - name: Create virtual environment
         # pass '--system-site-packages' so Firedrake can be found
         run: python3 -m venv --system-site-packages venv-pySDC
@@ -317,6 +322,8 @@ jobs:
           pip install "mpi-pytest>=2026.0"
           # test installation
           python -c "import pySDC; print(f'pySDC module: {pySDC}')"
+          # what Firedrake needs but does not declare, see etc/environment-firedrake.yml
+          python -c "import sys, numpy; v = tuple(int(x) for x in numpy.__version__.split('.')[:2]); assert sys.version_info >= (3, 11) and v >= (2, 1), f'Firedrake needs Python >= 3.11 and NumPy >= 2.1, got {sys.version_info[:2]} and {numpy.__version__}'"
       - name: Install gusto
         run: |
           . venv-pySDC/bin/activate
@@ -334,7 +341,8 @@ jobs:
           # ./pySDC is why this job has always measured nothing. `..` is the workspace either way,
           # so the moves in the next step are unaffected.
           cd /repositories/pySDC
-          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0" \
+          # the projects' tests run in their own jobs, see user_firedrake_tests_conda
+          PYTEST="python -m coverage run -m pytest --continue-on-collection-errors -v --durations=0 --ignore=/repositories/pySDC/pySDC/tests/test_projects" \
             bash etc/run_mpi_tests.sh /repositories/pySDC/pySDC/tests firedrake
         timeout-minutes: 45
       - name: Make coverage report
@@ -351,7 +359,83 @@ jobs:
           path: |
             data_firedrake
             coverage_firedrake.dat
-         
+
+  user_firedrake_tests_conda:
+    # The Firedrake tests of user_firedrake_tests without the Docker image: Firedrake pip-installed on
+    # top of conda-forge's PETSc (see etc/environment-firedrake.yml), which also works on macOS. The
+    # Gusto tests stay in the Docker job only: Gusto has no releases and follows Firedrake's own images.
+    # The two Firedrake projects run here only, each in its own job of the matrix, in parallel with the
+    # library tests, as the other projects do in project_cpu_tests_linux; they take more than half the
+    # Firedrake test time.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [library, FEM_with_Firedrake, StroemungsRaum]
+    env:
+      # must match the petsc4py pin in etc/environment-firedrake.yml
+      FIREDRAKE_VERSION: '2026.10.0'
+      # PyOP2 picks the flags for its run-time kernel builds from the first word of `cc --version`,
+      # and conda-forge's gcc calls itself `x86_64-conda-linux-gnu-cc`, which it does not know. It
+      # then compiles with no flags at all, i.e. links an executable, and every kernel fails.
+      PYOP2_CFLAGS: '-fPIC -std=gnu11 -O3'
+      PYOP2_LDFLAGS: '-shared'
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: etc/environment-firedrake.yml
+      - name: Install additional packages as needed
+        run: |
+          micromamba install -y --file etc/environment-tests.yml --freeze-installed
+      - name: Install Firedrake against the conda PETSc
+        run: |
+          export PETSC_DIR=$CONDA_PREFIX PETSC_ARCH= CC=mpicc CXX=mpicxx
+          # Three steps, because one --no-build-isolation for everything fails: these are sdists
+          # whose own build backends (scikit-build-core, hatchling) are not in the env. Firedrake
+          # itself must build without isolation, or pip builds a second petsc4py for it.
+          pip install libsupermesh firedrake-rtree petsctools
+          pip install --no-build-isolation --no-deps "firedrake==$FIREDRAKE_VERSION"
+          # then its Python dependencies, which the step above skipped
+          pip install "firedrake==$FIREDRAKE_VERSION"
+      - name: Install pySDC
+        run: |
+          pip install --no-deps -e .
+          python -c "import firedrake, pySDC; print(firedrake.__file__, pySDC.__file__)"
+          # what Firedrake needs but does not declare, see etc/environment-firedrake.yml
+          python -c "import sys, numpy; v = tuple(int(x) for x in numpy.__version__.split('.')[:2]); assert sys.version_info >= (3, 11) and v >= (2, 1), f'Firedrake needs Python >= 3.11 and NumPy >= 2.1, got {sys.version_info[:2]} and {numpy.__version__}'"
+      - name: Run pytest
+        run: |
+          echo "print('Loading sitecustomize.py...')
+          import coverage
+          coverage.process_startup() " > sitecustomize.py
+          if [ "${{ matrix.suite }}" = library ]; then
+            PYTEST="coverage run -m pytest --continue-on-collection-errors -v --durations=0 --ignore=pySDC/tests/test_projects" \
+              bash etc/run_mpi_tests.sh pySDC/tests 'firedrake and not gusto'
+          else
+            bash etc/run_mpi_tests.sh pySDC/tests/test_projects/test_${{ matrix.suite }} 'firedrake and not gusto'
+          fi
+        timeout-minutes: 45
+      - name: Make coverage report
+        run: |
+          coverage combine
+          mv .coverage coverage_firedrake_conda_${{ matrix.suite }}.dat
+          # the projects' plots go where the docs look for Firedrake results, e.g. the FEM study's gallery picture
+          if [ "${{ matrix.suite }}" != library ] && [ -d data ]; then mv data data_firedrake; fi
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-artifacts-firedrake-conda-${{ matrix.suite }}
+          path: |
+            data
+            data_firedrake
+            coverage_firedrake_conda_${{ matrix.suite }}.dat
+
   user_monodomain_tests_linux:
     runs-on: ubuntu-latest
     defaults:
@@ -404,9 +488,9 @@ jobs:
     # that the tests themselves write into `data/` (which is gitignored), so
     # the "image file not readable" check is meaningless on a bare checkout -
     # every one of those images would be missing. The same goes for the tutorial
-    # results included from `data/`, among them step 7 G's from the GPU job, so a
+    # results included from `data/`, among them step 7 F's from the GPU job, so a
     # pull request from a fork, which cannot reach the GPUs, gets no docs build.
-    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux, gpu_hardware_tests]
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_firedrake_tests_conda, user_monodomain_tests_linux, gpu_hardware_tests]
     defaults:
       run:
         shell: bash -l {0}
@@ -440,7 +524,7 @@ jobs:
             grep "WARNING: image file not readable:" < sphinx_build.log | grep -v "coverage-badge.svg"
             exit 1
           fi
-          # The same for the results the tutorial parts that need MPI, FEniCS, ... include from the test jobs.
+          # The same for the results the tutorial parts that need MPI, Firedrake, ... include from the test jobs.
           includes_not_found=$(grep "WARNING: Include file" < sphinx_build.log | wc -l)
           if [ $includes_not_found != "0" ] ; then
             echo "Some included files were not found:"
@@ -463,7 +547,7 @@ jobs:
     if: >-
       (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
       && !cancelled()
-    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_monodomain_tests_linux, gpu_hardware_tests]
+    needs: [user_cpu_tests_linux, project_cpu_tests_linux, user_libpressio_tests, user_firedrake_tests, user_firedrake_tests_conda, user_monodomain_tests_linux, gpu_hardware_tests]
     permissions:
       # write: push the data branch on master. GitHub downgrades it to read for pull requests from forks.
       contents: write

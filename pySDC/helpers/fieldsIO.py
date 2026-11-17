@@ -56,10 +56,6 @@ import logging
 T = TypeVar("T")
 
 try:
-    try:
-        import dolfin as df  # noqa: F841 (for some reason, dolfin always needs to be imported before mpi4py)
-    except ImportError:
-        pass
     from mpi4py import MPI
     from mpi4py.util.dtlib import from_numpy_dtype as MPI_DTYPE
 except ImportError:
@@ -331,12 +327,12 @@ class FieldsIO:
             f.seek(offset)
             t = float(np.fromfile(f, dtype=T_DTYPE, count=1)[0])
             field = np.fromfile(f, dtype=self.dtype, count=self.nItems)
-        self.reshape(field)
+        field = self.reshape(field)
         return t, field
 
     def reshape(self, field):
         """Eventually reshape the field to correspond to the grid structure"""
-        pass
+        return field
 
 
 @FieldsIO.register(sID=0)
@@ -442,8 +438,8 @@ class Rectilinear(Scalar):
         self.setHeader(nVar, coords)
 
     def reshape(self, fields: np.ndarray):
-        """Reshape the fields to a N-d array (inplace operation)"""
-        fields.shape = (self.nVar, *self.gridSizes)
+        """Reshape the fields to a N-d array (returns a view, no copy)"""
+        return fields.reshape((self.nVar, *self.gridSizes))
 
     # -------------------------------------------------------------------------
     # Class specifics

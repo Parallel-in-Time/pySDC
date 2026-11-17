@@ -60,7 +60,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         assert hasattr(prob, 'A'), 'ERROR: need system matrix A for this (and linear problems!)'
 
-        A = prob.A.todense()
+        A = prob.A.toarray()
         Q = self.MS[0].levels[0].sweep.coll.Qmat[1:, 1:]
         Qd = self.MS[0].levels[0].sweep.QI[1:, 1:]
 
@@ -85,18 +85,18 @@ class controller_matrix_nonMPI(controller_nonMPI):
             prob_c = self.MS[0].levels[1].prob
             self.nspace_c = prob_c.init[0]
 
-            Ac = prob_c.A.todense()
+            Ac = prob_c.A.toarray()
             Qdc = self.MS[0].levels[1].sweep.QI[1:, 1:]
             nnodesc = self.MS[0].levels[1].sweep.coll.num_nodes
             Nc = np.zeros((nnodesc, nnodesc))
             Nc[:, -1] = 1
 
             if hasattr(self.MS[0].base_transfer.space_transfer, 'Pspace'):
-                TcfA = self.MS[0].base_transfer.space_transfer.Pspace.todense()
+                TcfA = self.MS[0].base_transfer.space_transfer.Pspace.toarray()
             else:
                 TcfA = np.eye(self.nspace_c)
             if hasattr(self.MS[0].base_transfer.space_transfer, 'Rspace'):
-                TfcA = self.MS[0].base_transfer.space_transfer.Rspace.todense()
+                TfcA = self.MS[0].base_transfer.space_transfer.Rspace.toarray()
             else:
                 TfcA = np.eye(self.nspace)
             TcfQ = self.MS[0].base_transfer.Pcoll

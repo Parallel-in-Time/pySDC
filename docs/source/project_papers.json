@@ -183,5 +183,18 @@
   "venue": "arXiv",
   "year": 2026,
   "type": "misc"
+ },
+ "10.48550/arXiv.2610.23693": {
+  "doi": "10.48550/arXiv.2610.23693",
+  "title": "Toward Spectral Deferred Correction Methods for Stochastic Differential Equations",
+  "authors": [
+   "Binkowski, Lisa",
+   "Christian, Matthew R.",
+   "Götschel, Sebastian",
+   "Minion, Michael L."
+  ],
+  "venue": "arXiv",
+  "year": 2026,
+  "type": "misc"
  }
 }

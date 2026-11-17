@@ -1,3 +1,4 @@
+from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass, integrate_load_vectors
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
@@ -10,6 +11,16 @@ class imex_1st_order_mass(imex_1st_order):
     The end point is only available as a copy of the last node: ``compute_end_point`` raises unless the right end of
     the interval is a node and ``do_coll_update`` is off.
     """
+
+    def integrate(self):
+        """
+        Integrate the sum of the implicit and explicit right-hand sides, see
+        :func:`~pySDC.implementations.sweeper_classes.generic_implicit_mass.integrate_load_vectors`.
+
+        Returns:
+            list: dt Q (f_I + f_E) at the nodes 1, ..., M, load vectors like f
+        """
+        return integrate_load_vectors(self, [f.impl + f.expl for f in self.level.f[1:]])
 
     def update_nodes(self):
         """
@@ -35,11 +46,8 @@ class imex_1st_order_mass(imex_1st_order):
         # get QF(u^k)
         integral = self.integrate()
 
-        # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
-        if L.level_index == 0:
-            u0 = P.apply_mass_matrix(L.u[0])
-        else:
-            u0 = L.u[0]
+        # u0 is a solution on every level, the transfer restricts it by L2 projection
+        u0 = P.apply_mass_matrix(L.u[0])
 
         for m in range(M):
             # subtract QIFI(u^k)_m + QEFE(u^k)_m
@@ -89,62 +97,10 @@ class imex_1st_order_mass(imex_1st_order):
         if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
-            # On coarse levels u[0] is carried in the dual space: the transfer hands down P^T M u0 and
-            # the sweep consumes it as-is. PFASST copies uend straight into the next step's u[0]
-            # (controller.recv_full), so what we hand over has to be dual as well -- otherwise the step
-            # boundary feeds a primal value into a slot that is read as M u0.
-            if L.level_index > 0:
-                L.uend = P.apply_mass_matrix(L.uend)
         else:
             raise NotImplementedError('Mass matrix sweeper expect u_M = u_end')
 
         return None
 
-    def compute_residual(self, stage=None):
-        """
-        Computation of the residual using the collocation matrix Q
-
-        Args:
-            stage (str): The current stage of the step the level belongs to
-        """
-
-        # get current level and problem description
-        L = self.level
-        P = L.prob
-
-        # Check if we want to skip the residual computation to gain performance
-        # Keep in mind that skipping any residual computation is likely to give incorrect outputs of the residual!
-        if stage in self.params.skip_residual_computation:
-            L.status.residual = 0.0 if L.status.residual is None else L.status.residual
-            return None
-
-        # check if there are new values (e.g. from a sweep)
-        # assert L.status.updated
-
-        # compute the residual for each node
-
-        # build QF(u)
-        res_norm = []
-        res = self.integrate()
-        for m in range(self.coll.num_nodes):
-            # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
-            if L.level_index == 0:
-                res[m] += P.apply_mass_matrix(L.u[0] - L.u[m + 1])
-            else:
-                res[m] += L.u[0] - P.apply_mass_matrix(L.u[m + 1])
-            # add tau if associated
-            if L.tau[m] is not None:
-                res[m] += L.tau[m]
-            # Due to different boundary conditions we might have to fix the residual
-            if L.prob.fix_bc_for_residual:
-                L.prob.fix_residual(res[m])
-            # use abs function from data type here
-            res_norm.append(abs(res[m]))
-
-        # find maximal residual over the nodes
-        L.status.residual = max(res_norm)
-
-        # indicate that the residual has seen the new values
-        L.status.updated = False
-
-        return None
+    # same residual as the implicit mass sweeper: the mass matrix enters it the same way
+    compute_residual = generic_implicit_mass.compute_residual

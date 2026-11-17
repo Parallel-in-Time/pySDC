@@ -3,6 +3,14 @@ import firedrake as fd
 import numpy as np
 
 
+def _function(buf):
+    """
+    The Firedrake function behind `buf`. `Ensemble` passes anything that is not a `Function` on to mpi4py's pickling
+    methods, so pySDC's `firedrake_mesh` must be unwrapped first.
+    """
+    return getattr(buf, 'functionspace', buf)
+
+
 class _Requests:
     """
     The requests Firedrake returns for sending or receiving a function, one per subfunction, to be waited on together
@@ -71,7 +79,7 @@ class FiredrakeEnsembleCommunicator:
             self.ensemble.ensemble_comm.Reduce(sendbuf, recvbuf, op, root)
         else:
             assert op == MPI.SUM
-            self.ensemble.reduce(sendbuf, recvbuf, root=root)
+            self.ensemble.reduce(_function(sendbuf), _function(recvbuf), root=root)
 
     def Allreduce(self, sendbuf, recvbuf, op=MPI.SUM):
         """
@@ -82,14 +90,14 @@ class FiredrakeEnsembleCommunicator:
             self.ensemble.ensemble_comm.Allreduce(sendbuf, recvbuf, op)
         else:
             assert op == MPI.SUM
-            self.ensemble.allreduce(sendbuf, recvbuf)
+            self.ensemble.allreduce(_function(sendbuf), _function(recvbuf))
 
     def Bcast(self, buf, root=0):
         """Wrap `Bcast` on the time communicator for numpy arrays and `Ensemble.bcast` for Firedrake functions."""
         if type(buf) in [np.ndarray]:
             self.ensemble.ensemble_comm.Bcast(buf, root)
         else:
-            self.ensemble.bcast(buf, root=root)
+            self.ensemble.bcast(_function(buf), root=root)
 
     def Irecv(self, buf, source, tag=MPI.ANY_TAG):
         """
@@ -98,7 +106,7 @@ class FiredrakeEnsembleCommunicator:
         """
         if type(buf) in [np.ndarray, list]:
             return self.ensemble.ensemble_comm.Irecv(buf=buf, source=source, tag=tag)
-        return _Requests(self.ensemble.irecv(buf, source, tag=tag))
+        return _Requests(self.ensemble.irecv(_function(buf), source, tag=tag))
 
     def Isend(self, buf, dest, tag=0):
         """
@@ -107,7 +115,7 @@ class FiredrakeEnsembleCommunicator:
         """
         if type(buf) in [np.ndarray, list]:
             return self.ensemble.ensemble_comm.Isend(buf=buf, dest=dest, tag=tag)
-        return _Requests(self.ensemble.isend(buf, dest, tag=tag))
+        return _Requests(self.ensemble.isend(_function(buf), dest, tag=tag))
 
     def Free(self):
         """

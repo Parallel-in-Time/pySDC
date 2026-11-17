@@ -42,6 +42,14 @@ class SweeperMPI(Sweeper):
                 f'The communicator in the {type(self).__name__} sweeper needs to have one rank for each node as of now! That means we need {self.coll.num_nodes} nodes, but got {self.params.comm.size} processes.'
             )
 
+        # each rank uses only its diagonal entry of the preconditioners, so anything off the diagonal would be dropped
+        if not self.parallelizable:
+            raise ParameterError(
+                f'{type(self).__name__} needs diagonal preconditioners, but got QI={self.params.QI!r}'
+                + (f' and QE={self.params.QE!r}' if hasattr(self.params, 'QE') else '')
+                + '. Use a diagonal QI such as "MIN-SR-S", "MIN-SR-NS", "IEpar" or "MIN-SR-FLEX", and QE="PIC".'
+            )
+
     @property
     def comm(self):
         """
@@ -105,16 +113,8 @@ class SweeperMPI(Sweeper):
             L.status.residual = 0.0 if L.status.residual is None else L.status.residual
             return None
 
-        # compute the residual for each node
-
-        # build QF(u)
-        res = self.integrate(last_only=L.params.residual_type[:4] == 'last')
-        res += L.u[0] - L.u[self.rank + 1]
-        # add tau if associated
-        if L.tau[self.rank] is not None:
-            res += L.tau[self.rank]
         # use abs function from data type here
-        res_norm = abs(res)
+        res_norm = abs(self.node_residual(last_only=L.params.residual_type[:4] == 'last'))
 
         # find maximal residual over the nodes
         if L.params.residual_type == 'full_abs':
@@ -132,6 +132,24 @@ class SweeperMPI(Sweeper):
         L.status.updated = False
 
         return None
+
+    def node_residual(self, last_only=False):
+        """
+        The collocation residual u0 + dt (QF)_m + tau_m - u_m at the node this rank administers.
+
+        Args:
+            last_only (bool): Only the residual at the last node is needed, the other ranks may return anything
+
+        Returns:
+            dtype_u: the residual
+        """
+        L = self.level
+        res = self.integrate(last_only=last_only)
+        res += L.u[0] - L.u[self.rank + 1]
+        # add tau if associated
+        if L.tau[self.rank] is not None:
+            res += L.tau[self.rank]
+        return res
 
     def predict(self):
         """

@@ -1,54 +1,32 @@
-Supercomputing Environment Template using Python Virtual Environments
-=================
+pySDC GPU environment for JUSUF
+===============================
 
-# Idea
-This project contains a lightweight set of scripts to easily create Python working environments on
-typical supercomputer setups, including creating Jupyter Kernels.
+A micromamba environment built from the same files as pySDC's GPU CI, `etc/environment-cupy.yml` and
+`etc/environment-tests.yml`, so it has the packages CI tests with: Python, NumPy, CuPy, the CUDA runtime and NCCL all
+come from conda-forge. Only MPI is different: conda-forge's *external* MPICH placeholder takes the place of OpenMPI,
+so that mpi4py loads ParaStationMPI from the JSC modules at run time and knows the batch system and the network.
 
-On Supercomputers, typically a basic environment based on **Environment Modules**. This setup is carefully
-curated and optimized, including compilers, MPI version etc. Extra Python packages can be installed
-with pip into user space. This, however, does not create a reproducible environment that can be used
-by other users as well.
+Create the environment once, on a login node (about a minute; needs `micromamba` on `PATH` or `MAMBA_EXE` set):
 
-Conceptually, with Virtual Environments, it is easily possible to create project-based virtual environments.
-These scripts streamline the creation and usage of such environments and make it easy for a users to share a setup
-and to put it under version control with the main code.
-
-Furthermore, in typical compute setup of scientific projects, one or more packages possibly are in active
-development. In the context of these setups, it is intended to include them as submodules and add integrate
-them into the workflow. This can e.g. mean that a compilation step is added in the setup step and
-setting appropriate environment variables is included in the activation step.
-
-# Details
-The setup is configured in the bash script `config.sh`. The user can define a name for the venv and directory
-where the venv files are stored. This defaults to the directory name of the containing folder and the "." folder
-of the scripts. Please **edit** this file if you want a custom name and location for the venv.
-
-The modules on top of which the the venv should be built are defined in `modules.sh`. Please **edit** the file
-to your needs.
-
-The file `requirements.txt` contains a list of packages to be installed during the setup process. Add required
-packages to this file to reproducibly add them to the venv.
-
-The script `setup.sh` creates the venv according to the config given in `config.sh`. Please **edit** this
-file to add a setup step for submodules (e.g. compilation of libraries). If only plain venvs are used, this file
-can remain unchanged. Note that the script *must* be ran at least once after the above configurations to actually create the environment.
-
-The script `activate.sh` sets the environment variables such that the venv can be used. Please **edit** this file
-to add environment variables for submodules. Note that the script must be *sourced* to take effect. Example:
 ```bash
-source <path_to_venv>/activate.sh
+bash setup.sh
 ```
 
-The script `create_kernel.sh` will create a kernel json file in the user's home directory that can be found
-by Jupyter and a helper script in the virtual environment folder.
+Then, in every shell or job script:
 
+```bash
+source <path to this directory>/activate.sh
+```
 
+`config.sh` sets the environment name and where micromamba keeps its files. The default is below `$SCRATCH`, which JSC
+sets for the active project (`jutil env activate -p <project>`), because the environment has tens of thousands of files
+and project storage is short of inodes; scratch is purged after a while, so rerun `setup.sh` when that happens.
+Set `MAMBA_ROOT_PREFIX` to put it elsewhere, the same for `setup.sh` and `activate.sh`.
 
-# Intended Workflow
-1. Edit `config.sh` to change name an location of the venv if required.
-2. Edit `modules.sh` to change the modules loaded prior to the creation of the venv.
-3. Edit `requirements.txt` to change the packages to be installed during setup.
-4. Edit `setup.sh` and `activate.sh` to add extra steps for custom modules.
-5. Create the environment with `bash setup.sh`.
-6. Create a kernel with `bash create_kernel.sh`.
+`modules.sh` loads only the system MPI. Any module that brings Python packages would shadow the environment's through
+`PYTHONPATH`: Python, SciPy-Stack and mpi4py, but also texlive, which loads the module Python. That is why it is no
+longer loaded here for LaTeX in plots.
+
+The mpi4py-fft fork that `setup.sh` installs is needed by the GPU spectral code until pySDC owns its distributed GPU
+FFT; see `docs/contrib/02_continuous_integration.md`, which also describes how to run the test suite on a Slurm
+cluster.

@@ -18,9 +18,9 @@ def test_addition(n=3, v1=1, v2=2):
 
     c = a + b
 
-    assert np.allclose(c.dat._numpy_data, v1 + v2)
-    assert np.allclose(a.dat._numpy_data, v1)
-    assert np.allclose(b.dat._numpy_data, v2)
+    assert np.allclose(c.dat.data_ro, v1 + v2)
+    assert np.allclose(a.dat.data_ro, v1)
+    assert np.allclose(b.dat.data_ro, v2)
 
 
 @pytest.mark.firedrake
@@ -39,9 +39,9 @@ def test_subtraction(n=3, v1=1, v2=2):
 
     c = a - b
 
-    assert np.allclose(c.dat._numpy_data, v1 - v2)
-    assert np.allclose(a.dat._numpy_data, v1)
-    assert np.allclose(b.dat._numpy_data, v2)
+    assert np.allclose(c.dat.data_ro, v1 - v2)
+    assert np.allclose(a.dat.data_ro, v1)
+    assert np.allclose(b.dat.data_ro, v2)
 
 
 @pytest.mark.firedrake
@@ -61,8 +61,8 @@ def test_right_multiplication(n=3, v1=1, v2=2):
 
     b = v2 * a
 
-    assert np.allclose(b.dat._numpy_data, v1 * v2)
-    assert np.allclose(a.dat._numpy_data, v1)
+    assert np.allclose(b.dat.data_ro, v1 * v2)
+    assert np.allclose(a.dat.data_ro, v1)
 
     with pytest.raises(DataError):
         'Dat kölsche Dom' * b
@@ -83,7 +83,89 @@ def test_norm(n=3, v1=-1):
     b = abs(a)
 
     assert np.isclose(b, np.sqrt(2) * abs(v1)), f'{b=}, {v1=}'
-    assert np.allclose(a.dat._numpy_data, v1)
+    assert np.allclose(a.dat.data_ro, v1)
+
+
+@pytest.mark.firedrake
+def test_dual_data(n=3):
+    """Dual data stay dual through copies and arithmetic, and cannot be mixed with primal data."""
+    from pySDC.core.errors import DataError
+    from pySDC.implementations.datatype_classes.firedrake_mesh import (
+        firedrake_mesh,
+        firedrake_dual_mesh,
+        IMEX_firedrake_dual_mesh,
+    )
+    import numpy as np
+    import firedrake as fd
+
+    V = fd.FunctionSpace(fd.UnitSquareMesh(n, n), "CG", 2)
+
+    a = firedrake_dual_mesh(V, val=1.0)
+    b = firedrake_mesh(fd.assemble(fd.TestFunction(V) * fd.dx))
+    assert isinstance(a.functionspace, fd.Cofunction) and a.is_dual and b.is_dual
+
+    for c in [firedrake_mesh(a), firedrake_dual_mesh(a), a + b, a - b, 2.0 * a]:
+        assert c.is_dual
+    assert np.allclose((a + 2.0 * b).dat.data_ro, 1 + 2 * b.dat.data_ro)
+
+    u = firedrake_mesh(V, val=1.0)
+    assert not u.is_dual
+    for operation in [lambda: u + a, lambda: a - u]:
+        with pytest.raises(DataError):
+            operation()
+
+    f = IMEX_firedrake_dual_mesh(V)
+    assert f.impl.is_dual and f.expl.is_dual and (f.impl + f.expl).is_dual
+
+
+@pytest.mark.firedrake
+def test_dual_norm():
+    """
+    The norm of dual data is that of the function they represent, so the load vector of a function has the norm of its
+    L2 projection on every mesh, while the norm of the entries shrinks with the mesh width.
+    """
+    from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
+    import numpy as np
+    import firedrake as fd
+
+    norms, entries = [], []
+    for n in [4, 16]:
+        V = fd.FunctionSpace(fd.UnitSquareMesh(n, n), "CG", 2)
+        x, y = fd.SpatialCoordinate(V.mesh())
+        expr = fd.sin(np.pi * x) * y
+        r = firedrake_mesh(fd.assemble(expr * fd.TestFunction(V) * fd.dx))
+
+        assert np.isclose(abs(r), fd.norm(fd.project(expr, V)), rtol=1e-6)
+        norms.append(abs(r))
+        entries.append(np.linalg.norm(r.dat.data_ro))
+
+    exact = (1 / 6) ** 0.5  # L2 norm of sin(pi x) y on the unit square
+    assert np.allclose(norms, exact, rtol=1e-3), norms
+    assert entries[1] < entries[0] / 3, entries
+
+
+@pytest.mark.firedrake
+def test_riesz_map_lives_with_its_mesh():
+    """
+    Equal spaces share one Riesz map, and the map does not keep its mesh alive: a cache that did would keep every
+    mesh's communicators too, and a long run of many problems would exhaust MPI's.
+    """
+    import gc
+    import weakref
+
+    import firedrake as fd
+    from pySDC.implementations.datatype_classes.firedrake_mesh import riesz_map
+
+    mesh = fd.UnitIntervalMesh(4)
+    V = fd.FunctionSpace(mesh, 'CG', 2)
+    r = fd.assemble(fd.TestFunction(V) * fd.dx)
+    assert riesz_map(V) is riesz_map(r.function_space().dual())
+    riesz_map(V)(r)
+
+    alive = weakref.ref(mesh)
+    del mesh, V, r
+    gc.collect()
+    assert alive() is None, 'the Riesz map keeps its mesh alive'
 
 
 @pytest.mark.firedrake
@@ -100,12 +182,12 @@ def test_addition_rhs(n=3, v1=1, v2=2):
 
     c = a + b
 
-    assert np.allclose(c.impl.dat._numpy_data, v1 + v2)
-    assert np.allclose(c.expl.dat._numpy_data, v1 + v2)
-    assert np.allclose(a.impl.dat._numpy_data, v1)
-    assert np.allclose(b.impl.dat._numpy_data, v2)
-    assert np.allclose(a.expl.dat._numpy_data, v1)
-    assert np.allclose(b.expl.dat._numpy_data, v2)
+    assert np.allclose(c.impl.dat.data_ro, v1 + v2)
+    assert np.allclose(c.expl.dat.data_ro, v1 + v2)
+    assert np.allclose(a.impl.dat.data_ro, v1)
+    assert np.allclose(b.impl.dat.data_ro, v2)
+    assert np.allclose(a.expl.dat.data_ro, v1)
+    assert np.allclose(b.expl.dat.data_ro, v2)
 
 
 @pytest.mark.firedrake
@@ -122,12 +204,12 @@ def test_subtraction_rhs(n=3, v1=1, v2=2):
 
     c = a - b
 
-    assert np.allclose(c.impl.dat._numpy_data, v1 - v2)
-    assert np.allclose(c.expl.dat._numpy_data, v1 - v2)
-    assert np.allclose(a.impl.dat._numpy_data, v1)
-    assert np.allclose(b.impl.dat._numpy_data, v2)
-    assert np.allclose(a.expl.dat._numpy_data, v1)
-    assert np.allclose(b.expl.dat._numpy_data, v2)
+    assert np.allclose(c.impl.dat.data_ro, v1 - v2)
+    assert np.allclose(c.expl.dat.data_ro, v1 - v2)
+    assert np.allclose(a.impl.dat.data_ro, v1)
+    assert np.allclose(b.impl.dat.data_ro, v2)
+    assert np.allclose(a.expl.dat.data_ro, v1)
+    assert np.allclose(b.expl.dat.data_ro, v2)
 
 
 @pytest.mark.firedrake
@@ -143,10 +225,10 @@ def test_rmul_rhs(n=3, v1=1, v2=2):
 
     b = v2 * a
 
-    assert np.allclose(a.impl.dat._numpy_data, v1)
-    assert np.allclose(b.impl.dat._numpy_data, v2 * v1)
-    assert np.allclose(a.expl.dat._numpy_data, v1)
-    assert np.allclose(b.expl.dat._numpy_data, v2 * v1)
+    assert np.allclose(a.impl.dat.data_ro, v1)
+    assert np.allclose(b.impl.dat.data_ro, v2 * v1)
+    assert np.allclose(a.expl.dat.data_ro, v1)
+    assert np.allclose(b.expl.dat.data_ro, v2 * v1)
 
 
 def _test_p2p_communication(comm, u):
@@ -157,10 +239,10 @@ def _test_p2p_communication(comm, u):
         u.assign(3.14)
         req = u.isend(dest=1, comm=comm, tag=0)
     elif comm.rank == 1:
-        assert not np.allclose(u.dat._numpy_data, 3.14)
+        assert not np.allclose(u.dat.data_ro, 3.14)
         req = u.irecv(source=0, comm=comm, tag=0)
     req.wait()
-    assert np.allclose(u.dat._numpy_data, 3.14)
+    assert np.allclose(u.dat.data_ro, 3.14)
 
 
 def _test_bcast(comm, u):
@@ -169,9 +251,9 @@ def _test_bcast(comm, u):
     if comm.rank == 0:
         u.assign(3.14)
     else:
-        assert not np.allclose(u.dat._numpy_data, 3.14)
+        assert not np.allclose(u.dat.data_ro, 3.14)
     u.bcast(root=0, comm=comm)
-    assert np.allclose(u.dat._numpy_data, 3.14)
+    assert np.allclose(u.dat.data_ro, 3.14)
 
 
 @pytest.mark.firedrake

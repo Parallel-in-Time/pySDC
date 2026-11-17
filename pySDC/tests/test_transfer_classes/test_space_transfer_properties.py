@@ -173,6 +173,58 @@ def test_mesh_to_mesh_injection():
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('iorder', [2, 4, 6])
+@pytest.mark.parametrize('periodic', [False, True])
+@pytest.mark.parametrize('nvars_fine, nvars_coarse', [(64, 16), (48, 32), (65, 16), (66, 32)])
+def test_mesh_to_mesh_shortcut_only_on_nested_grids(iorder, periodic, nvars_fine, nvars_coarse):
+    """
+    The `equidist_nested` shortcut is on by default, but it is only valid for grids nested with
+    factor 2: `nf = 2 nc` periodic, `nf = 2 nc + 1` Dirichlet. On any other pair of sizes it ignored
+    the order and gave an O(h) error, or an IndexError. There the default has to be the general
+    interpolation, which is the same algorithm. SciPy's barycentric weights use a random permutation
+    of the nodes, so two assemblies agree only up to the rounding of an order-`iorder` weight.
+    """
+    import pySDC.helpers.transfer_helper as th
+    from pySDC.implementations.transfer_classes.TransferMesh import _unit_grid, mesh_to_mesh
+
+    transfer = mesh_to_mesh(
+        get_problem(nvars_fine), get_problem(nvars_coarse), {'iorder': iorder, 'rorder': 2, 'periodic': periodic}
+    )
+    general = th.interpolation_matrix_1d(
+        _unit_grid(nvars_fine, periodic),
+        _unit_grid(nvars_coarse, periodic),
+        k=iorder,
+        periodic=periodic,
+        equidist_nested=False,
+    )
+    P, general = transfer.Pspace.toarray(), general.toarray()
+    tol = iorder * np.finfo(float).eps * np.abs(general).max()
+    assert np.allclose(P, general, rtol=0, atol=tol), 'Default is not the general interpolation'
+
+
+@pytest.mark.base
+@pytest.mark.parametrize('periodic', [False, True])
+@pytest.mark.parametrize('nvars_fine, nvars_coarse', [(64, 16), (48, 32), (65, 16), (66, 32)])
+def test_mesh_to_mesh_restriction_reproduces_constant(periodic, nvars_fine, nvars_coarse):
+    """
+    The restriction is the transposed interpolation, scaled by 0.5 on the nested factor-2 grids. For
+    any other coarsening that scale is wrong: periodic 64 -> 16 restricted a constant to 2.
+    Injection has no fine values to pick on grids that do not nest, so it has to refuse them.
+    """
+    from pySDC.core.errors import TransferError
+    from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+
+    fine, coarse = get_problem(nvars_fine), get_problem(nvars_coarse)
+    for iorder, rorder in [(2, 2), (6, 2), (4, 4)]:
+        transfer = mesh_to_mesh(fine, coarse, {'iorder': iorder, 'rorder': rorder, 'periodic': periodic})
+        R = transfer.Rspace.toarray()
+        assert np.allclose(R @ np.ones(nvars_fine), 1.0), 'Restriction does not reproduce a constant'
+
+    with pytest.raises(TransferError):
+        mesh_to_mesh(fine, coarse, {'iorder': 4, 'rorder': 0, 'periodic': periodic})
+
+
+@pytest.mark.base
 @pytest.mark.parametrize('ndim', [1, 2])
 def test_mesh_to_mesh_identity_without_coarsening(ndim):
     """Equal resolution on both levels has to give the identity in both directions."""

@@ -88,8 +88,9 @@ class delta_implicit_MPI(DeltaFormMixin, generic_implicit_MPI):
         t_node = lvl.time + lvl.dt * self.coll.nodes[rank]
         alpha = lvl.dt * self.QI[rank + 1, rank + 1]
 
-        u_old = prob.dtype_u(lvl.u[rank + 1])
-        f_old = prob.dtype_f(lvl.f[rank + 1])
+        # no copies: both are read only (the correction-solve contract), and the level gets new objects below
+        u_old = lvl.u[rank + 1]
+        f_old = lvl.f[rank + 1]
 
         residual = self._residual_nodes()
         self._set_work_scale(residual)

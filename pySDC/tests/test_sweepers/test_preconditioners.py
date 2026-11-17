@@ -128,6 +128,34 @@ def test_FLEX_preconditioner_in_MPI_sweepers(imex):
 
 
 @pytest.mark.base
+def test_FLEX_preconditioner_indexed_across_iterations():
+    """
+    MIN-SR-FLEX must see the global sweep number, so M iterations of one sweep each perform
+    exactly the same operations as one iteration of M sweeps: the results agree bitwise.
+    """
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+    from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+
+    num_nodes = 4
+
+    def run(maxiter, nsweeps):
+        description = {
+            'problem_class': testequation0d,
+            'problem_params': {'lambdas': [[-1e6]], 'u0': 1.0},
+            'sweeper_class': generic_implicit,
+            'sweeper_params': {'num_nodes': num_nodes, 'quad_type': 'RADAU-RIGHT', 'QI': 'MIN-SR-FLEX'},
+            'level_params': {'dt': 1.0, 'restol': -1, 'nsweeps': nsweeps},
+            'step_params': {'maxiter': maxiter},
+        }
+        controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
+        uend, _ = controller.run(u0=controller.MS[0].levels[0].prob.u_exact(0.0), t0=0.0, Tend=1.0)
+        return uend
+
+    assert np.array_equal(run(maxiter=num_nodes, nsweeps=1), run(maxiter=1, nsweeps=num_nodes))
+
+
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 @pytest.mark.parametrize("M", num_nodes)

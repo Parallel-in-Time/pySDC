@@ -44,7 +44,7 @@ class controller_ParaDiag_MPI(ParaDiag, controller_MPI):
         self.sweeper_params = description['sweeper_params']
 
         # each step needs its own G^-1, determined by where it sits in the block
-        self._G_inv_alpha = self.resolve_alpha(controller_params['alpha'], 0)
+        self._G_inv_alpha = self.resolve_alpha(controller_params['alpha'], 0, comm.size)
         description['sweeper_params']['G_inv'] = get_G_inv_matrix(
             comm.rank, comm.size, self._G_inv_alpha, description['sweeper_params']
         )

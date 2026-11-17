@@ -67,6 +67,7 @@ class ConvergenceController(object):
         assert params_ok, f'{type(self).__name__} -- {msg}'
         self.dependencies(controller, description)
         self.logger: logging.Logger = logging.getLogger(f"{type(self).__name__}")
+        self.pending_sends: list = []
 
         if self.params.useMPI:
             self.prepare_MPI_datatypes()
@@ -444,8 +445,22 @@ class ConvergenceController(object):
             req = comm.send(data, dest=dest, **kwargs)
         else:
             req = comm.isend(data, dest=dest, **kwargs)
+            self.keep_until_sent(req)
 
         return req
+
+    def keep_until_sent(self, req):
+        """
+        Hold on to a non-blocking send until it has completed.
+
+        The request is the only reference to the send buffer, which is usually a temporary. Callers fire and forget,
+        and once the request is garbage collected, MPI may read the buffer from freed memory: OpenMPI copies small
+        messages straight away, but ParaStationMPI does not, and the receiver got garbage.
+
+        Args:
+            req (mpi4py.MPI.Request): request handle of the send
+        """
+        self.pending_sends = [me for me in self.pending_sends if not me.Test()] + [req]
 
     def recv(self, comm, source, **kwargs):
         """
@@ -489,6 +504,7 @@ class ConvergenceController(object):
             req = comm.Send(buffer, dest=dest, **kwargs)
         else:
             req = comm.Isend(buffer, dest=dest, **kwargs)
+            self.keep_until_sent(req)
 
         return req
 

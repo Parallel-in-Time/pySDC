@@ -99,13 +99,6 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
             bool: Whether the parameters are compatible
             str: Error message
         """
-        if description["step_params"].get("restol", -1.0) >= 0:
-            return (
-                False,
-                "Extrapolation error needs constant order in time and hence restol in the step parameters \
-has to be smaller than 0!",
-            )
-
         if controller.params.mssdc_jac:
             return (
                 False,
@@ -227,6 +220,28 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
     """
     Implementation of the extrapolation error estimate for the non-MPI controller.
     """
+
+    def check_parameters(self, controller, params, description, **kwargs):
+        """
+        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            bool: Whether the parameters are compatible
+            str: Error message
+        """
+        if description["level_params"].get("restol", -1.0) >= 0:
+            return (
+                False,
+                "Extrapolation error needs constant order in time and hence restol in the level parameters \
+has to be smaller than 0!",
+            )
+
+        return super().check_parameters(controller, params, description, **kwargs)
 
     def setup(self, controller, params, description, **kwargs):
         """

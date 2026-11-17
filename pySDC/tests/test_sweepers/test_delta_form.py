@@ -117,6 +117,39 @@ def test_correction_precision_storage(precision):
 
 
 @pytest.mark.base
+@pytest.mark.parametrize('precision', ['float32', 'float16'])
+def test_real_correction_precision_on_a_complex_problem_is_refused(precision):
+    """A real array keeps only the real part of a complex correction, which used to move the answer by 5e-2."""
+    from pySDC.core.errors import ParameterError
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+
+    with pytest.raises(ParameterError):
+        run(
+            testequation0d,
+            {'lambdas': np.array([-1.3 + 0.4j]), 'u0': 1.0},
+            delta_implicit,
+            sweeper_params(correction_precision=precision),
+            0.1,
+            1,
+            40,
+        )
+
+
+@pytest.mark.base
+def test_complex_correction_precision_on_a_complex_problem():
+    from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+
+    problem_params = {'lambdas': np.array([-1.3 + 0.4j]), 'u0': 1.0}
+    u128, _, _ = run(testequation0d, problem_params, delta_implicit, sweeper_params(), 0.1, 1, 40)
+    u64, _, _ = run(
+        testequation0d, problem_params, delta_implicit, sweeper_params(correction_precision='complex64'), 0.1, 1, 40
+    )
+    assert abs(u128 - u64) < 1e-14, f'complex64 storage moved the answer by {abs(u128 - u64):.2e}'
+
+
+@pytest.mark.base
 def test_linear_implicit_reuses_stock_solve_system():
     """For a linear operator the stock solve_system already solves the correction equation."""
     from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
@@ -600,3 +633,52 @@ def test_half_precision_result_is_widened():
     controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=1e-1)
     deltas = controller.MS[0].levels[0].sweep._deltas
     assert deltas and all(delta.dtype == np.float64 for delta in deltas)
+
+
+@pytest.mark.cupy
+@pytest.mark.parametrize('case', ['implicit', 'imex', 'pfasst'])
+def test_gpu_rows_are_bitwise_the_loops(case, monkeypatch):
+    """
+    On a GPU, the residual and the integral are one kernel per node, which must give bitwise what the
+    loops give: single level, with a split right-hand side, and with tau on a coarse level of PFASST.
+    """
+    import cupy as cp
+
+    from pySDC.helpers.stats_helper import get_sorted
+    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced, heatNd_unforced
+    from pySDC.implementations.sweeper_classes import delta_form
+    from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+
+    problem = {'nvars': (64, 64), 'nu': 0.1, 'freq': (2, 2), 'bc': 'periodic', 'solver_type': 'FFT', 'useGPU': True}
+    description = {
+        'problem_class': heatNd_forced if case == 'imex' else heatNd_unforced,
+        'problem_params': problem,
+        'sweeper_class': delta_form.delta_imex_1st_order if case == 'imex' else delta_form.delta_implicit,
+        'sweeper_params': sweeper_params(linear_implicit=True),
+        'level_params': {'restol': -1, 'dt': 1e-2},
+        'step_params': {'maxiter': 5},
+    }
+    if case == 'pfasst':
+        description['problem_params'] = dict(problem, nvars=[(64, 64), (32, 32)])
+        description['space_transfer_class'] = mesh_to_mesh
+        description['space_transfer_params'] = {'iorder': 2, 'rorder': 2, 'periodic': True}
+
+    def run_gpu():
+        controller = controller_nonMPI(2 if case == 'pfasst' else 1, {'logger_level': 30}, description)
+        prob = controller.MS[0].levels[0].prob
+        uend, stats = controller.run(u0=prob.u_exact(0.0), t0=0.0, Tend=2e-2)
+        return uend, [value for _, value in get_sorted(stats, type='residual_post_iteration')]
+
+    kernels = []
+    row_kernel = delta_form._row_kernel
+    monkeypatch.setattr(delta_form, '_row_kernel', lambda *key: kernels.append(key) or row_kernel(*key))
+    u_rows, residuals_rows = run_gpu()
+    assert kernels, 'the GPU path was not taken'
+    if case == 'pfasst':
+        assert any(key[3] for key in kernels), 'no residual with tau was formed on the GPU'
+
+    monkeypatch.setattr(delta_form, '_gpu_rows', lambda sweeper, residual: None)
+    u_loops, residuals_loops = run_gpu()
+    assert cp.array_equal(u_rows, u_loops)
+    assert residuals_rows == residuals_loops

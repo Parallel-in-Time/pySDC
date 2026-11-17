@@ -14,6 +14,55 @@ from pySDC.core.problem import Problem, WorkCounter
 from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 
+_GPU_KERNELS = {}
+
+
+def _gpu_kernels():
+    """
+    The fused kernels of the FFT solve on a GPU, compiled once.
+
+    Each repeats the operations of the unfused code it replaces, in the same order and with the same roundings:
+    ``float16`` arithmetic in CuPy rounds every single operation to half precision.
+    """
+    if not _GPU_KERNELS:
+        import cupy as cp
+
+        # (b / scale) as the solve format, imaginary part zero
+        _GPU_KERNELS['scale_in'] = cp.ElementwiseKernel(
+            'float64 b, float64 s', 'T y', 'y = T(b / s)', 'pysdc_fft_scale_in'
+        )
+        # the real part, widened to float64, times scale
+        _GPU_KERNELS['scale_out'] = cp.ElementwiseKernel(
+            'T x, float64 s', 'float64 o', 'o = (double)x.real() * s', 'pysdc_fft_scale_out'
+        )
+        # (b / scale) * unit, rounded to half precision, into interleaved (re, im) pairs
+        _GPU_KERNELS['half_in'] = cp.ElementwiseKernel(
+            'raw float64 b, float64 s, float64 u',
+            'raw float16 d',
+            'd[2 * i] = float16((b[i] / s) * u); d[2 * i + 1] = float16(0.0)',
+            'pysdc_fft_half_in',
+        )
+        # the complex product of the spectrum with the factor, each operation rounded to half precision
+        _GPU_KERNELS['half_product'] = cp.ElementwiseKernel(
+            'raw float16 m',
+            'raw float16 s',
+            """
+            float16 re = s[2 * i], im = s[2 * i + 1], ir = m[2 * i], ii = m[2 * i + 1];
+            float16 rr = re * ir, mm = im * ii, ri = re * ii, mr = im * ir;
+            s[2 * i] = rr - mm;
+            s[2 * i + 1] = ri + mr;
+            """,
+            'pysdc_fft_half_product',
+        )
+        # the real part, widened to single precision, times unit (single), widened to double, times scale
+        _GPU_KERNELS['half_out'] = cp.ElementwiseKernel(
+            'raw float16 d, float32 u, float64 s',
+            'raw float64 o',
+            'o[i] = (double)((float)d[2 * i] * u) * s',
+            'pysdc_fft_half_out',
+        )
+    return _GPU_KERNELS
+
 
 class GenericNDimFinDiff(Problem):
     r"""
@@ -56,13 +105,20 @@ class GenericNDimFinDiff(Problem):
         Type of solver. Can be ``'direct'``, ``'GMRES'``, ``'CG'`` or, on periodic grids, ``'FFT'``:
         the operator is then circulant, so the FFT diagonalises it and a solve is two transforms
         and a division -- exact, and the cheapest solve there is on a GPU. ``'direct'`` keeps the
-        factorizations of the last ``max_cached_factorizations`` factors and reuses them.
+        factorizations of the last ``max_cached_factorizations`` factors and reuses them. ``'MG'`` is
+        geometric multigrid (:class:`~pySDC.helpers.multigrid.GeometricMultigrid`), for the
+        second-order Laplacian (``derivative=2``, ``order=2``, ``stencil_type='center'``) on periodic
+        grids or with ``bc='dirichlet-zero'``, and real states: V-cycles from a zero guess until the relative
+        residual is below ``lintol``, the accuracy of the solve's format is reached, or after
+        ``liniter`` cycles, whose number the work counter ``'MG'`` adds up. It needs no matrix, and on a
+        GPU on periodic 3D grids it runs on fused kernels.
     solve_precision : dtype-like or None, optional
         Precision the implicit solve runs at, independently of the state's ``dtype``. ``None``
         (default) solves at the operator's precision, exactly as without it. Otherwise the solve
         genuinely works in that precision: the sparse solvers on a copy of the operator held at it,
         ``'FFT'`` with transforms at it, and the result is widened back to ``dtype``. Sparse
-        matrices stop at single precision in SciPy and CuPy alike, so ``float16`` needs ``'FFT'``.
+        matrices stop at single precision in SciPy and CuPy alike, so ``float16`` needs ``'FFT'`` or
+        ``'MG'``; multigrid stores in half precision and computes in single, on a CPU too.
         On a GPU those are cuFFT's half-precision transforms (power-of-two grids), with every value
         stored and every product rounded in half precision. A CPU has no half-precision FFT, so
         there ``float16`` is *emulated*, by rounding through it around a single-precision
@@ -229,6 +285,7 @@ class GenericNDimFinDiff(Problem):
 
         self._factorizations = {}
 
+        self._coeff, self._derivative = coeff, derivative  # what the multigrid solve needs to know of A
         solve_precision = None if solve_precision is None else np.dtype(solve_precision)
         self._makeAttributeAndRegister('solve_precision', localVars=locals(), readOnly=True)
         self._setup_solve(solver_type, solve_precision, bc)
@@ -253,9 +310,23 @@ class GenericNDimFinDiff(Problem):
             first_column[0] = 1.0
             self._eigenvalues = self._fft.fftn((self.A @ first_column).reshape(self.nvars))
             self._half_plan = None
+        elif solver_type == 'MG':
+            from pySDC.helpers.multigrid import GeometricMultigrid
+
+            laplacian = (self._derivative, self.order, self.stencil_type) == (2, 2, 'center')
+            if bc not in ('periodic', 'dirichlet-zero') or not laplacian:
+                raise ProblemError(
+                    'multigrid solves the second-order Laplacian on periodic or zero-Dirichlet grids: needs '
+                    'bc="periodic" or "dirichlet-zero", derivative=2, order=2, stencil_type="center", got '
+                    f'{bc}, {self._derivative}, {self.order}, {self.stencil_type}'
+                )
+            if self.dtype.kind == 'c' or np.iscomplexobj(self._coeff):
+                raise ProblemError('multigrid solves real systems only')
+            self._multigrid = GeometricMultigrid(self.nvars[0], self.ndim, xp=self.xp, bc=bc)
+            self._mg_dtype = np.dtype(np.float16) if self._half else precision
         elif solve_precision is not None:
             if self._half:
-                raise ProblemError('sparse matrices stop at single precision; float16 needs solver_type="FFT"')
+                raise ProblemError('sparse matrices stop at single precision; float16 needs solver_type="FFT" or "MG"')
             self._A_solve = self.A.astype(precision)
             self._Id_solve = self.Id.astype(precision)
 
@@ -362,7 +433,7 @@ class GenericNDimFinDiff(Problem):
         sol : dtype_u
             The solution of the linear solver.
         """
-        if self.solver_type == 'FFT' or self.solve_precision is not None:
+        if self.solver_type in ['FFT', 'MG'] or self.solve_precision is not None:
             return self._solve_at_precision(rhs, factor, u0)
 
         solver_type, Id, A, nvars, lintol, liniter, sol = (
@@ -456,6 +527,9 @@ class GenericNDimFinDiff(Problem):
             sol[:] = self._solve_fft(rhs.view(self.xp.ndarray).reshape(self.nvars), factor)
             self.work_counters['FFT']()
             return sol
+        if self.solver_type == 'MG':
+            sol[:] = self._solve_mg(rhs.view(self.xp.ndarray).reshape(self.nvars), factor)
+            return sol
 
         precision = self._solve_dtype
 
@@ -490,14 +564,41 @@ class GenericNDimFinDiff(Problem):
         sol[:] = x.reshape(self.nvars)
         return sol
 
+    def _solve_mg(self, b, factor):
+        """
+        Multigrid for ``(I - factor * A) x = b`` in the solve's format, returned in that format.
+
+        In half precision, the right-hand side is scaled to a maximum of one first and the result
+        widened and scaled back, as in ``_solve_fft``: a correction of 1e-10 is below ``float16``'s
+        smallest subnormal.
+        """
+        scale = float(abs(b).max()) if self._half else 1.0
+        if scale == 0.0:
+            return self.xp.zeros_like(b)
+        x, cycles = self._multigrid.solve(
+            (b if scale == 1.0 else b / scale).astype(self._mg_dtype, copy=False),
+            factor * self._coeff,
+            self.lintol,
+            self.liniter,
+        )
+        self.work_counters['MG'].niter += cycles
+        return x if scale == 1.0 else x.astype(self.dtype) * scale
+
     def _solve_fft(self, b, factor):
         """
         ``ifft(fft(b) / (1 - factor * eigenvalues))`` at the solve precision, at the state's precision.
 
         The right-hand side is scaled to a maximum of one first and the result scaled back, which is
         exact for a linear solve and keeps a half-precision solve clear of underflow: a correction of
-        1e-10 is below ``float16``'s smallest subnormal.
+        1e-10 is below ``float16``'s smallest subnormal. A real state on a GPU takes
+        :meth:`_solve_fft_gpu`, which computes the same bit for bit with less memory traffic.
         """
+        if self.xp is not np and self.dtype.kind != 'c':
+            return self._solve_fft_gpu(b, factor)
+        return self._solve_fft_unfused(b, factor)
+
+    def _solve_fft_unfused(self, b, factor):
+        """:meth:`_solve_fft` with array operations, for any backend and a real or complex state."""
         scale = float(abs(b).max())
         if scale == 0.0:
             return self.xp.zeros_like(b)
@@ -552,3 +653,62 @@ class GenericNDimFinDiff(Problem):
         spectrum[..., 1::2] = re * ii + im * ir
         self._half_plan.fft(spectrum, data, cufft.CUFFT_INVERSE)
         return (data[..., 0::2].astype(cp.float32) + 1j * data[..., 1::2].astype(cp.float32)) * unit
+
+    def _solve_fft_gpu(self, b, factor):
+        """
+        The FFT solve of :meth:`_solve_fft` for a real state on a GPU, with fused kernels.
+
+        It computes exactly what :meth:`_solve_fft` and :meth:`_solve_fft_half` compute, operation by operation and
+        in the same order, so the results agree bit for bit. Only the memory traffic is less: the factor
+        ``1 / (1 - factor * eigenvalues)`` in the solve format is kept for every factor instead of being formed anew
+        in every call, and the scaling, the conversions and, in half precision, the complex product are one kernel
+        each instead of several.
+
+        The cache holds one array of the size of the state per factor, complex in the solve format, for the last
+        ``max_cached_factorizations`` factors. SDC with a fixed step size uses one factor per collocation node.
+        """
+        import cupy as cp
+
+        kernels = _gpu_kernels()
+        scale = float(abs(b).max())
+        if scale == 0.0:
+            return cp.zeros_like(b)
+        key = (factor, self._half)
+        cache = self.__dict__.setdefault('_fft_factors', {})
+        if key not in cache:
+            if len(cache) >= self.max_cached_factorizations:
+                cache.pop(next(iter(cache)))
+            inverse = 1.0 / (1.0 - factor * self._eigenvalues)
+            if self._half:
+                factors = cp.empty(inverse.shape[:-1] + (2 * inverse.shape[-1],), dtype=cp.float16)
+                factors[..., 0::2] = inverse.real.astype(cp.float16)
+                factors[..., 1::2] = inverse.imag.astype(cp.float16)
+            else:
+                factors = inverse.astype(np.promote_types(self._solve_dtype, np.complex64))
+            cache[key] = factors
+        factors = cache[key]
+        if not self._half:
+            y = kernels['scale_in'](
+                b, scale, cp.empty(b.shape, dtype=np.promote_types(self._solve_dtype, np.complex64))
+            )
+            spectrum = self._fft.fftn(y)
+            spectrum *= factors
+            return kernels['scale_out'](self._fft.ifftn(spectrum), scale)
+
+        from cupy.cuda import cufft
+
+        shape, n = tuple(self.nvars), b.size
+        unit = 1.0 / np.sqrt(n)
+        if self._half_plan is None:
+            self._half_plan = cufft.XtPlanNd(
+                shape, shape, 1, n, 'E', shape, 1, n, 'E', 1, 'E', order='C', last_axis=-1, last_size=None
+            )
+        data = cp.empty(shape[:-1] + (2 * shape[-1],), dtype=cp.float16)
+        kernels['half_in'](b, scale, unit, data, size=n)
+        spectrum = cp.empty_like(data)
+        self._half_plan.fft(data, spectrum, cufft.CUFFT_FORWARD)
+        kernels['half_product'](factors, spectrum, size=n)
+        self._half_plan.fft(spectrum, data, cufft.CUFFT_INVERSE)
+        x = cp.empty(shape, dtype=self.dtype)
+        kernels['half_out'](data, np.float32(unit), scale, x, size=n)
+        return x

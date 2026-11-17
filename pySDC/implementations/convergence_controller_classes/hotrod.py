@@ -85,10 +85,10 @@ class HotRod(ConvergenceController):
             controller.logger.warning("Hot Rod needs a detection threshold, which is now set to infinity, such that a \
 restart is never triggered!")
 
-        if description["step_params"].get("restol", -1.0) >= 0:
+        if description["level_params"].get("restol", -1.0) >= 0:
             return (
                 False,
-                "Hot Rod needs constant order in time and hence restol in the step parameters has to be \
+                "Hot Rod needs constant order in time and hence restol in the level parameters has to be \
 smaller than 0!",
             )
 

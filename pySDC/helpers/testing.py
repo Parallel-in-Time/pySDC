@@ -98,8 +98,17 @@ class DataChecker:
         ref = self._dataRef[key]
 
         assert len(data) == len(ref), f"data with len:{len(data)}) cannot be compared to ref with len:{len(ref)})"
+
+        # A reference stored as inf is a run that crashed. Those are not compared: at the edge of stability, whether
+        # a solver gives up or just converges is decided by round-off, so a different summation order or platform
+        # can turn it into a finite value. A finite reference that now crashes still fails.
+        compared = ~np.isinf(np.asarray(ref, dtype=float))
         assert np.allclose(
-            data, ref, atol=atol, rtol=rtol, equal_nan=True
+            np.asarray(data, dtype=float)[compared],
+            np.asarray(ref, dtype=float)[compared],
+            atol=atol,
+            rtol=rtol,
+            equal_nan=True,
         ), f"{key}, difference between data:{data} and ref:{ref}"
 
     def writeToJSON(self):

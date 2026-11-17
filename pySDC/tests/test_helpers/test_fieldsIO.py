@@ -205,15 +205,28 @@ def testToVTR(tmpdir, nVar, nX, nY, nZ, nSteps):
 @pytest.mark.parametrize("algo", ["ChatGPT", "Hybrid"])
 @pytest.mark.parametrize("dtypeIdx", [0, 1])
 @pytest.mark.parametrize("dim", [2, 3])
-def testRectilinear_MPI(tmpdir, dim, dtypeIdx, algo, nSteps, nVar):
-
+def testRectilinear_MPI(request, dim, dtypeIdx, algo, nSteps, nVar):
+    import shutil
+    import tempfile
     from mpi4py import MPI
     from pySDC.helpers.fieldsIO import Rectilinear, initGrid, writeFields_MPI, compareFields_MPI
 
     comm = MPI.COMM_WORLD
 
-    # `tmpdir` is per-rank, but every rank writes into the same files
-    tmpdir = comm.bcast(str(tmpdir), root=0)
+    # Every rank writes into the same files, so they go below the working directory, which all ranks share on a
+    # cluster too. pytest's `tmpdir` is per rank, and on a node-local disk there: ranks on another node could not
+    # open rank 0's files and the collective open hung.
+    if comm.rank == 0:
+        os.makedirs('data', exist_ok=True)
+    tmpdir = comm.bcast(os.path.abspath(tempfile.mkdtemp(dir='data')) if comm.rank == 0 else None, root=0)
+
+    def cleanup():
+        comm.Barrier()
+        if comm.rank == 0:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+    request.addfinalizer(cleanup)
+    assert comm.allreduce(os.path.isdir(tmpdir), op=MPI.LAND), f'{tmpdir} is not visible on every rank'
 
     allGridSizes = list(itertools.product(*[[61, 16]] * dim))
     fileNames = [f"{tmpdir}/testRectilinear{dim}D_MPI_{i}.pysdc" for i in range(len(allGridSizes))]

@@ -115,9 +115,10 @@ class Problem(RegisterParams):
     One more optional method serves the contract. ``eval_f_increment(base, delta, t)`` returns
     :math:`f(base+\delta) - f(base)` with the same splitting as :meth:`eval_f`, expanded so that
     every term carries an explicit factor :math:`\delta`. Without it the sweeper subtracts two
-    stored right-hand sides, a cancellation that carries the operator norm: on the FEniCS heat
-    equation, where :math:`|M^{-1}Ku|` is of order :math:`10^5`, it is already 7.7e-11 off in
-    double precision, and below double precision it binds before the solver does.
+    stored right-hand sides, a cancellation that carries the operator norm: on a finite element heat
+    equation with the mass matrix inverted, where :math:`|M^{-1}Ku|` is of order :math:`10^5`, it is
+    already 7.7e-11 off in double precision, and below double precision it binds before the solver
+    does.
     """
 
     logger: logging.Logger = logging.getLogger('problem')

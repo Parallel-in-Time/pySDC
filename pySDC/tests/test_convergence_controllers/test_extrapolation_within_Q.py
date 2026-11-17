@@ -49,6 +49,7 @@ def get_controller(dt, num_nodes, quad_type, useMPI, imex, **kwargs):
     sweeper_params = {}
     sweeper_params['quad_type'] = quad_type
     sweeper_params['num_nodes'] = num_nodes
+    sweeper_params['QI'] = kwargs.get('QI', 'IE')
     sweeper_params['comm'] = comm
 
     problem_params = {'degree': 20}

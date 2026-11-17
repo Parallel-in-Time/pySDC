@@ -34,7 +34,7 @@ class controller_ParaDiag_nonMPI(ParaDiag, controller_nonMPI):
         self.prepare_ParaDiag_params(controller_params, description)
 
         self.sweeper_params = description['sweeper_params']
-        self._G_inv_alpha = self.resolve_alpha(controller_params['alpha'], 0)
+        self._G_inv_alpha = self.resolve_alpha(controller_params['alpha'], 0, num_procs)
 
         # the steps are copies of the first one, so give that one its own G^-1 before they are built
         description['sweeper_params']['G_inv'] = get_G_inv_matrix(

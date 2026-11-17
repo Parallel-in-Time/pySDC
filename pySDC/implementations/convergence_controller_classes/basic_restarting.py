@@ -204,16 +204,15 @@ on...",
         Returns:
             None
         """
-        if S not in MS:
+        # update all steps at once, since the new counts are read from the old ones
+        if S is not MS[0]:
             return None
 
         restart_from = min([me.status.slot for me in MS if me.status.restart] + [size - 1])
 
-        if S.status.slot < restart_from:
-            MS[restart_from - S.status.slot].status.restarts_in_a_row = 0
-        else:
-            step = MS[S.status.slot - restart_from]
-            step.status.restarts_in_a_row = S.status.restarts_in_a_row + 1 if S.status.restart else 0
+        new = [me.status.restarts_in_a_row + 1 if me.status.restart else 0 for me in MS[restart_from:]]
+        for i, step in enumerate(MS):
+            step.status.restarts_in_a_row = new[i] if i < len(new) else 0
 
         return None
 

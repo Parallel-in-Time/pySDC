@@ -234,15 +234,19 @@ def test_restart(tmpdir, ODE=True):
 @pytest.mark.mpi4py
 @pytest.mark.parallel([1, 4])
 def test_loggingMPI():
+    import os
     import tempfile
     import shutil
     from mpi4py import MPI
 
     comm = MPI.COMM_WORLD
 
-    tmpdir = tempfile.mkdtemp() if comm.rank == 0 else None
-    tmpdir = comm.bcast(tmpdir, root=0)
+    # below the working directory, which all ranks share on a cluster too, unlike the node-local /tmp
+    if comm.rank == 0:
+        os.makedirs('data', exist_ok=True)
+    tmpdir = comm.bcast(os.path.abspath(tempfile.mkdtemp(dir='data')) if comm.rank == 0 else None, root=0)
     try:
+        assert comm.allreduce(os.path.isdir(tmpdir), op=MPI.LAND), f'{tmpdir} is not visible on every rank'
         test_logging(tmpdir, False, False)
     finally:
         if comm.rank == 0:

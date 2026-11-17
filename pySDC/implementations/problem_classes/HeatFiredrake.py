@@ -1,201 +1,95 @@
-from pySDC.core.problem import Problem, WorkCounter
-from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh, IMEX_firedrake_mesh
+from functools import cached_property
+
 import firedrake as fd
-import numpy as np
 from mpi4py import MPI
 
+from pySDC.helpers.ufl_forms import time_derivative
+from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrakeIMEX
 
-class Heat1DForcedFiredrake(Problem):
+
+class Heat1DForcedFiredrake(FormFiredrakeIMEX):
     r"""
-    Forced 1D heat equation with Dirichlet BCs and Firedrake finite elements, IMEX with diffusion implicit.
+    Forced 1D heat equation with Dirichlet boundary values and Firedrake finite elements, IMEX with the diffusion
+    implicit, in the mass-matrix formulation and given by its weak forms.
 
-    Example implementing the forced one-dimensional heat equation with Dirichlet boundary conditions
-
-    .. math::
-        \frac{d u}{d t} = \nu \frac{d^2 u}{d x^2} + f
-
-    for :math:`x \in \Omega:=[0,1]`, where the forcing term :math:`f` is defined by
+    The equation
 
     .. math::
-        f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t)).
+        \frac{\partial u}{\partial t} = \nu \frac{\partial^2 u}{\partial x^2} + f
 
-    For initial conditions with constant c
-
-    .. math::
-        u(x, 0) = \sin(\pi x) + c,
-
-    the exact solution is given by
+    on :math:`[0, 1]` has the exact solution
 
     .. math::
-        u(x, t) = \sin(\pi x)\cos(t) + c.
+        u(x, t) = \sin(\pi x) \cos(t) + c, \quad \text{or} \quad u(x, t) = \cos(\pi x) \cos(t) + c
 
-    Here, the problem is discretized with finite elements using firedrake. Hence, the problem
-    is reformulated to the *weak formulation*
+    with `time_dependent_bc`, whose Dirichlet values are then :math:`\pm \cos(t) + c`. The forcing
+    :math:`f = u_t - \nu u_{xx}` is derived from the exact solution by UFL and enters the form as an expression. The
+    weak formulation
 
-    .. math:
-        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx.
+    .. math::
+        \int_\Omega u_t v\,dx = - \nu \int_\Omega \nabla u \nabla v\,dx + \int_\Omega f v\,dx
 
-    We invert the Laplacian implicitly and treat the forcing term explicitly.
-    The solvers for the arising variational problems are cached for multiple collocation nodes and step sizes.
+    gives :math:`M u' = -\nu K u + F`, with the diffusion implicit and the forcing explicit. The mass matrix is never
+    inverted: use the mass-matrix sweepers, such as
+    :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass`. Everything else comes from
+    :class:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrakeIMEX`.
 
     Parameters
     ----------
-    nvars : int, optional
-        Spatial resolution, i.e., numbers of degrees of freedom in space.
+    n : int, optional
+        Number of cells, ignored if `mesh` is given.
     nu : float, optional
         Diffusion coefficient :math:`\nu`.
-    c: float, optional
-        Constant for the Dirichlet boundary condition :math: `c`
+    c : float, optional
+        Constant shift :math:`c` of the solution.
+    order : int, optional
+        Degree of the Lagrange elements.
+    time_dependent_bc : bool, optional
+        Use the solution with time-dependent boundary values.
     LHS_cache_size : int, optional
-        Cache size for variational problem solvers
+        Number of solvers kept, see ``FormFiredrake``.
+    mesh : firedrake.MeshGeometry, optional
+        A mesh of :math:`[0, 1]`, for instance from a ``MeshHierarchy`` for several levels.
     comm : MPI communicator, optional
-        Supply an MPI communicator for spatial parallelism
+        Communicator for spatial parallelism, ignored if `mesh` is given.
     """
 
-    dtype_u = firedrake_mesh
-    dtype_f = IMEX_firedrake_mesh
-
-    def __init__(self, n=30, nu=0.1, c=0.0, order=4, LHS_cache_size=12, mesh=None, comm=None):
-        """
-        Initialization
-
-        Args:
-            n (int): Number of degrees of freedom
-            nu (float): Diffusion parameter
-            c (float): Boundary condition constant
-            order (int): Order of finite elements
-            LHS_cache_size (int): Size of the cache for solvers
-            mesh (Firedrake mesh, optional): Give a custom mesh, for instance from a hierarchy
-            comm (mpi4pi.Intracomm, optional): MPI communicator for spatial parallelism
-        """
+    def __init__(self, n=30, nu=0.1, c=0.0, order=4, time_dependent_bc=False, LHS_cache_size=12, mesh=None, comm=None):
+        """Initialization, see the class docstring for the arguments."""
         comm = MPI.COMM_WORLD if comm is None else comm
-
-        # prepare Firedrake mesh and function space
         self.mesh = fd.UnitIntervalMesh(n, comm=comm) if mesh is None else mesh
-        self.V = fd.FunctionSpace(self.mesh, "CG", order)
+        V = fd.FunctionSpace(self.mesh, 'CG', order)
 
-        # prepare pySDC problem class infrastructure by passing the function space to super init
-        super().__init__(self.V)
+        t = fd.Constant(0.0)
+        x = fd.SpatialCoordinate(self.mesh)[0]
+        shape = fd.cos(fd.pi * x) if time_dependent_bc else fd.sin(fd.pi * x)
+        u_exact = shape * fd.cos(t) + c
+        forcing = time_derivative(u_exact, t) - nu * fd.div(fd.grad(u_exact))
+
+        def mass(u, v):
+            return u * v * fd.dx
+
+        def diffusion(u, v):
+            return -nu * fd.inner(fd.grad(u), fd.grad(v)) * fd.dx
+
+        def source(u, v):
+            return forcing * v * fd.dx
+
+        super().__init__(
+            V,
+            mass,
+            diffusion,
+            source,
+            bcs=(fd.DirichletBC(V, u_exact, 'on_boundary'),),
+            t=t,
+            u_exact=u_exact,
+            LHS_cache_size=LHS_cache_size,
+        )
         self._makeAttributeAndRegister(
-            'n', 'nu', 'c', 'order', 'LHS_cache_size', 'comm', localVars=locals(), readOnly=True
+            'n', 'order', 'nu', 'c', 'time_dependent_bc', 'comm', localVars=locals(), readOnly=True
         )
 
-        # prepare caches and IO variables for solvers
-        self.solvers = {}
-        self.tmp_in = fd.Function(self.V)
-        self.tmp_out = fd.Function(self.V)
-
-        # prepare work counters
-        self.work_counters['solver_setup'] = WorkCounter()
-        self.work_counters['solves'] = WorkCounter()
-        self.work_counters['rhs'] = WorkCounter()
-
-    def eval_f(self, u, t):
-        """
-        Evaluate the right hand side.
-        The forcing term is simply interpolated to the grid.
-        The Laplacian is evaluated via a variational problem, where the mass matrix is inverted and homogeneous boundary conditions are applied.
-        Note that we cache the solver to obtain much better performance.
-
-        Parameters
-        ----------
-        u : dtype_u
-            Solution at which to evaluate
-        t : float
-            Time at which to evaluate
-
-        Returns
-        -------
-        f : dtype_f
-            The evaluated right hand side
-        """
-        # construct and cache a solver for the implicit part of the right hand side evaluation
-        if not hasattr(self, '_solv_eval_f_implicit'):
-            v = fd.TestFunction(self.V)
-            u_trial = fd.TrialFunction(self.V)
-
-            a = u_trial * v * fd.dx
-            L_impl = -fd.inner(self.nu * fd.nabla_grad(self.tmp_in), fd.nabla_grad(v)) * fd.dx
-
-            bcs = [fd.bcs.DirichletBC(self.V, fd.Constant(0), area) for area in [1, 2]]
-
-            prob = fd.LinearVariationalProblem(a, L_impl, self.tmp_out, bcs=bcs)
-            self._solv_eval_f_implicit = fd.LinearVariationalSolver(prob)
-
-        # copy the solution we want to evaluate at into the input buffer
-        self.tmp_in.assign(u.functionspace)
-
-        # perform the solve using the cached solver
-        self._solv_eval_f_implicit.solve()
-
-        me = self.dtype_f(self.init)
-
-        # copy the result of the solver from the output buffer to the variable this function returns
-        me.impl.assign(self.tmp_out)
-
-        # evaluate explicit part.
-        # Because it does not depend on the current solution, we can simply interpolate the expression
-        x = fd.SpatialCoordinate(self.mesh)
-        me.expl.interpolate(-(np.sin(t) - self.nu * np.pi**2 * np.cos(t)) * fd.sin(np.pi * x[0]))
-
-        self.work_counters['rhs']()
-
-        return me
-
-    def solve_system(self, rhs, factor, *args, **kwargs):
-        r"""
-        Linear solver for :math:`(M - factor nu * Lap) u = rhs`.
-
-        Parameters
-        ----------
-        rhs : dtype_f
-            Right-hand side for the nonlinear system.
-        factor : float
-            Abbrev. for the node-to-node stepsize (or any other factor required).
-        *args, **kwargs
-            Take the initial guess ``u0`` and the current time ``t`` of the generic interface, neither is used here.
-
-        Returns
-        -------
-        u : dtype_u
-            Solution.
-        """
-
-        # construct and cache a solver for the current factor (preconditioner entry times step size)
-        if factor not in self.solvers.keys():
-
-            # check if we need to evict something from the cache
-            if len(self.solvers) >= self.LHS_cache_size:
-                self.solvers.pop(list(self.solvers.keys())[0])
-
-            u = fd.TrialFunction(self.V)
-            v = fd.TestFunction(self.V)
-
-            a = u * v * fd.dx + fd.Constant(factor) * fd.inner(self.nu * fd.nabla_grad(u), fd.nabla_grad(v)) * fd.dx
-            L = fd.inner(self.tmp_in, v) * fd.dx
-
-            bcs = [fd.bcs.DirichletBC(self.V, fd.Constant(self.c), area) for area in [1, 2]]
-
-            prob = fd.LinearVariationalProblem(a, L, self.tmp_out, bcs=bcs)
-            self.solvers[factor] = fd.LinearVariationalSolver(prob)
-
-            self.work_counters['solver_setup']()
-
-        # copy solver rhs to the input buffer. Copying also to the output buffer uses it as initial guess
-        self.tmp_in.assign(rhs.functionspace)
-        self.tmp_out.assign(rhs.functionspace)
-
-        # call the cached solver
-        self.solvers[factor].solve()
-
-        # copy from output buffer to return variable
-        me = self.dtype_u(self.init)
-        me.assign(self.tmp_out)
-
-        self.work_counters['solves']()
-        return me
-
-    @fd.utils.cached_property
+    @cached_property
     def x(self):
         """
         Spatial coordinate of the mesh, cached after the first access.
@@ -206,21 +100,3 @@ class Heat1DForcedFiredrake(Problem):
             Symbolic spatial coordinate, used to interpolate expressions on the mesh.
         """
         return fd.SpatialCoordinate(self.mesh)
-
-    def u_exact(self, t):
-        r"""
-        Routine to compute the exact solution at time :math:`t`.
-
-        Parameters
-        ----------
-        t : float
-            Time of the exact solution.
-
-        Returns
-        -------
-        me : dtype_u
-            Exact solution.
-        """
-        me = self.u_init
-        me.interpolate(np.cos(t) * fd.sin(np.pi * self.x[0]) + self.c)
-        return me

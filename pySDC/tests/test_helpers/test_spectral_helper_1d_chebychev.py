@@ -326,16 +326,16 @@ def test_tau_method2D(bc, nz, nx, bc_val, plotting=False):
     Ix = fft.get_Id()
     Dz = cheby.get_differentiation_matrix()
     Iz = cheby.get_Id()
-    A = sp.kron(Ix, Dz) - sp.kron(Dx, Iz)
+    A = (sp.kron(Ix, Dz) - sp.kron(Dx, Iz)).tolil()
 
     # put BCs in the system matrix
-    BCz = sp.eye(nz, format='lil') * 0
+    BCz = sp.lil_matrix((nz, nz))
     BCz[-1, :] = cheby.get_Dirichlet_BC_row(bc)
     BC = sp.kron(Ix, BCz, format='lil')
     A[BC != 0] = BC[BC != 0]
 
     # solve the system
-    sol_hat = (sp.linalg.spsolve(A, rhs_hat.flatten())).reshape(rhs.shape)
+    sol_hat = (sp.linalg.spsolve(A.tocsc(), rhs_hat.flatten())).reshape(rhs.shape)
 
     # transform back to real space
     _sol = fft.itransform(sol_hat, axes=(-2,)).real
@@ -410,11 +410,11 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
     A = sp.bmat([[O, D], [D, -I]], format='lil')
 
     # generate BC matrices
-    BCa = sp.eye(nz, format='lil') * 0
+    BCa = sp.lil_matrix((nz, nz))
     BCa[-1, :] = cheby.get_Dirichlet_BC_row(-1)
     BCa = sp.kron(Ix, BCa, format='lil')
 
-    BCb = sp.eye(nz, format='lil') * 0
+    BCb = sp.lil_matrix((nz, nz))
     BCb[-1, :] = cheby.get_Dirichlet_BC_row(1)
     BCb = sp.kron(Ix, BCb, format='lil')
     BC = sp.bmat([[BCa, O], [BCb, O]], format='lil')
@@ -423,7 +423,7 @@ def test_tau_method2D_diffusion(nz, nx, bc_val, plotting=False):
     A[BC != 0] = BC[BC != 0]
 
     # solve the system
-    sol_hat = (sp.linalg.spsolve(A, rhs_hat.flatten())).reshape(rhs.shape)
+    sol_hat = (sp.linalg.spsolve(A.tocsc(), rhs_hat.flatten())).reshape(rhs.shape)
 
     # transform back to real space
     _sol = fft.itransform(sol_hat, axes=(-2,)).real

@@ -335,3 +335,23 @@ def test_tau_is_substituted_not_discarded():
     assert abs(rewritten - reference) < 1e-13, f'the rewrite moved the answer by {abs(rewritten - reference):.3e}'
     assert zeroed > 1e-8, f'discarding tau floored at {zeroed:.2e}, so this controls nothing'
     assert not np.isclose(zeroed, delta), 'discarding tau and substituting it cannot be the same thing'
+
+
+@pytest.mark.base
+def test_tau_is_built_for_a_coarser_reader():
+    """
+    A level's tau must be built when a coarser level reads it, even if the level itself does not.
+
+    ``BaseTransfer.restrict`` folds the fine level's tau into the coarse one, so with only the
+    coarsest level ending on the quadrature update, skipping the middle level's tau drops the
+    finest-to-middle FAS correction from the coarsest end point. PFASST, because only the coarse
+    end point sent to the next step reads it.
+    """
+    from pySDC.core.base_transfer import BaseTransfer
+    from pySDC.implementations.sweeper_classes.delta_form import delta_implicit
+    from pySDC.implementations.transfer_classes.BaseTransferDelta import delta_transfer
+
+    update = [False, False, True]
+    stock = run([127, 63, 31], delta_implicit, BaseTransfer, num_procs=4, nsteps=4, do_coll_update=update)
+    delta = run([127, 63, 31], delta_implicit, delta_transfer, num_procs=4, nsteps=4, do_coll_update=update)
+    assert abs(stock - delta) < 1e-13, f'a coarser tau reader moved the answer by {abs(stock - delta):.3e}'
