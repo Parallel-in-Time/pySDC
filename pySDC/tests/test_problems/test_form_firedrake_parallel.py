@@ -25,7 +25,8 @@ def setup(case, comm):
     - `imex`: Part G of tutorial step 7, IMEX SDC with time-dependent Dirichlet values on a 2D mesh
     - `mlsdc`: the same fully implicit, on two levels, so that the coarse solves take restricted boundary values
     - `grayscott`: Gray-Scott, two unknowns on a mixed space, on three levels
-    - `floor`: the 1D nonlinear manufactured problem with the residual floor from the spatial error
+    - `floor`: the 1D nonlinear manufactured problem with the residual floor from the spatial error, on two levels,
+      the coarse one being the space the floor compares with
     """
     import firedrake as fd
     from pySDC.tutorial.step_7.G_pySDC_with_Firedrake_forms import get_forms
@@ -71,11 +72,12 @@ def setup(case, comm):
         )
 
         coarse_mesh, fine_mesh = fd.MeshHierarchy(fd.UnitIntervalMesh(4, comm=comm), 1)
+        spaces = [fd.FunctionSpace(mesh, 'CG', 2) for mesh in [fine_mesh, coarse_mesh]]
+        forms = [nonlinear_forms(V, 0.1, False, smooth=False) for V in spaces]
         description['problem_class'] = FormFiredrake
-        description['problem_params'] = nonlinear_forms(fd.FunctionSpace(fine_mesh, 'CG', 2), 0.1, False, smooth=False)
-        description['convergence_controllers'] = {
-            SpatialErrorFloorFiredrake: {'coarse_space': fd.FunctionSpace(coarse_mesh, 'CG', 2), 'Tend': 0.5}
-        }
+        description['problem_params'] = {key: [level[key] for level in forms] for key in forms[0]}
+        description['convergence_controllers'] = {SpatialErrorFloorFiredrake: {'coarse_space': spaces[1], 'Tend': 0.5}}
+        description.update(transfer)
         return description, [[0.2], [0.5], [0.7]]
 
     raise NotImplementedError(case)
@@ -112,23 +114,30 @@ def test_space_parallel_matches_serial(case):
 
 @pytest.mark.firedrake
 @pytest.mark.parallel([2, 4])
-def test_pfasst_across_time_ranks():
+@pytest.mark.parametrize('case', ['mlsdc', 'floor'])
+def test_pfasst_across_time_ranks(case):
     """
-    PFASST with two time ranks (each with one or two space ranks) gives the same solution as PFASST on two steps run
-    serially. On the coarse level, the initial value is a load vector, which is sent between the time ranks as such.
+    PFASST with two time ranks (each with one or two space ranks) gives the same solution, in the same iterations, as
+    PFASST on two steps run serially. On the coarse level, the initial value is a load vector, which is sent between
+    the time ranks as such. With the residual floor, each step stops on its own spatial error budget, but not before
+    the step before it.
     """
     import numpy as np
     from mpi4py import MPI
     from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
+    from pySDC.helpers.stats_helper import get_sorted
     from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
     ensemble = FiredrakeEnsembleCommunicator(MPI.COMM_WORLD, MPI.COMM_WORLD.size // 2)
-    description, points = setup('mlsdc', ensemble.space_comm)
+    description, points = setup(case, ensemble.space_comm)
     controller = controller_MPI(controller_params={'logger_level': 30}, description=description, comm=ensemble)
     P = controller.S.levels[0].prob
     Tend = 2 * description['level_params']['dt']
-    uend, _ = controller.run(u0=P.u_exact(0.0), t0=0.0, Tend=Tend)
+    uend, stats = controller.run(u0=P.u_exact(0.0), t0=0.0, Tend=Tend)
+    # each time rank only has the statistics of its own step
+    iterations = np.array(ensemble.allgather([me[1] for me in get_sorted(stats, type='niter', sortby='time')])).ravel()
 
-    values_serial, _ = run_nonMPI('mlsdc', MPI.COMM_SELF, num_procs=2, Tend=Tend)
+    values_serial, iterations_serial = run_nonMPI(case, MPI.COMM_SELF, num_procs=2, Tend=Tend)
     values = point_values(uend, points)
     assert np.allclose(values, values_serial, rtol=0, atol=1e-10), np.abs(values - values_serial).max()
+    assert np.array_equal(iterations, iterations_serial), (iterations, iterations_serial)

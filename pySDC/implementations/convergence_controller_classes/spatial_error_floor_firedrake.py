@@ -51,10 +51,16 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
     constant, which is why :math:`\gamma = 1` is a safe default.
 
     The estimate assumes a smooth solution, so that the error of a degree :math:`p` space falls by :math:`2^{p+1}` when
-    the mesh is refined once. It needs a coarse space on the next coarser mesh of a ``MeshHierarchy``, an absolute
-    residual (``residual_type`` ``'full_abs'`` or ``'last_abs'``), since a relative one is not comparable with the error,
-    and one step at a time (SDC or MLSDC): it stops its step through ``force_done``, which a block of PFASST steps
-    shares, so one step meeting its budget would stop all of them.
+    the mesh is refined once. It needs a coarse space on the next coarser mesh of a ``MeshHierarchy`` and an absolute
+    residual (``residual_type`` ``'full_abs'`` or ``'last_abs'``), since a relative one is not comparable with the error.
+
+    It works with PFASST, too, because it only adds to the convergence decision of its own step: each step keeps its
+    own estimate, from its own end point, and is declared done right after
+    :class:`~pySDC.core.check_convergence.CheckConvergence` decided on the usual criteria (hence the control order
+    above 200). Sharing the decision across the block is then left to ``CheckConvergence.communicate_convergence``, so
+    a step still finishes only once the one before it has. Setting ``force_done`` instead would not do: the MPI
+    controller reads it as "abort the block" and skips the communication, and with ``all_to_done`` it is shared by
+    all steps.
 
     Parameters:
         coarse_space (firedrake.FunctionSpace): Space of the same kind on the next coarser mesh of the hierarchy
@@ -74,7 +80,7 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
         Returns:
             dict: The updated params dictionary
         """
-        return {'control_order': 100, 'gamma': 1.0, **super().setup(controller, params, description, **kwargs)}
+        return {'control_order': 210, 'gamma': 1.0, **super().setup(controller, params, description, **kwargs)}
 
     def check_parameters(self, controller, params, description, **kwargs):
         """
@@ -94,12 +100,10 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
 
     def setup_status_variables(self, controller, **kwargs):
         """
-        Refuse several steps at once, once the controller knows how many it runs.
+        Keep the transfer buffers, and a place for the estimate on every step, since each step has its own end point.
 
         Args:
             controller (pySDC.Controller): The controller
-            MS (list, optional): The steps of a non-MPI controller
-            comm (mpi4py.MPI.Intracomm, optional): The time communicator of an MPI controller
 
         Returns:
             None
@@ -107,18 +111,11 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
         super().setup_status_variables(controller, **kwargs)
         #: the transfer buffers of :func:`coarse_space_error`
         self.buffers = {}
-        #: the time of the step the estimate belongs to, and the estimate
-        self.estimate = (None, None)
-        steps, comm = kwargs.get('MS'), kwargs.get('comm')
-        if (steps is not None and len(steps) > 1) or (comm is not None and comm.size > 1):
-            raise NotImplementedError(
-                f'{type(self).__name__} works on one step at a time: in a block of PFASST steps, one step meeting its '
-                'budget would stop all of them'
-            )
+        self.add_status_variable_to_step('spatial_error')
 
-    def post_iteration_processing(self, controller, S, **kwargs):
+    def check_iteration_status(self, controller, S, **kwargs):
         """
-        Compare the residual on the finest level with the spatial error budget of the step.
+        Declare the step converged if its residual on the finest level is within its spatial error budget.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -128,13 +125,15 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
             None
         """
         L = S.levels[0]
-        # the spatial error hardly changes while the step iterates, so it is estimated once per step: on the FEM study
-        # that left every iteration count unchanged and cut the time spent here 3-10 times
-        if S.status.iter == 1 or self.estimate[0] != S.time:
+        # the spatial error hardly changes while the step iterates, so it is estimated from the initial guess and once
+        # more after the first iteration only: on the FEM study that left every iteration count unchanged and cut the
+        # time spent here 3-10 times
+        if S.status.iter <= 1:
             u = L.u[-1].functionspace
             degree = u.function_space().ufl_element().embedded_superdegree
-            self.estimate = (S.time, coarse_space_error(u, self.params.coarse_space, self.buffers) / 2 ** (degree + 1))
-        e_x = self.estimate[1]
-        if L.status.residual <= self.params.gamma * e_x * L.dt / self.params.Tend:
-            self.debug(f'Residual {L.status.residual:.2e} below the spatial error budget of {e_x:.2e}', S)
-            S.status.force_done = True
+            S.status.spatial_error = coarse_space_error(u, self.params.coarse_space, self.buffers) / 2 ** (degree + 1)
+        if L.status.residual <= self.params.gamma * S.status.spatial_error * L.dt / self.params.Tend:
+            self.debug(
+                f'Residual {L.status.residual:.2e} below the spatial error budget of {S.status.spatial_error:.2e}', S
+            )
+            S.status.done = True
