@@ -23,7 +23,6 @@ up to a constant, which drops out of the velocity; the Poisson solves remove it 
 
 import firedrake as fd
 
-from pySDC.implementations.datatype_classes.firedrake_mesh import riesz_map
 from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrakeIMEX
 
 #: a direct solver that copes with the constant null space of the periodic Poisson problem
@@ -128,7 +127,6 @@ class Vortex2DFiredrake(FormFiredrakeIMEX):
             lambda w, v: -nu * fd.inner(fd.grad(w), fd.grad(v)) * fd.dx,
             lambda w, v: advection(self.psi, w, v),
             u_exact=double_shear_layer(mesh, rho, delta),
-            solver_parameters={'snes_type': 'ksponly'},
             LHS_cache_size=LHS_cache_size,
         )
         self._makeAttributeAndRegister('n', 'order', 'nu', 'rho', 'delta', localVars=locals(), readOnly=True)
@@ -138,13 +136,13 @@ class Vortex2DFiredrake(FormFiredrakeIMEX):
         Solve for the stream function of `u`, then evaluate the right-hand side, see ``FormFiredrakeIMEX.eval_f``.
 
         Args:
-            u (firedrake_mesh): Vorticity, or a load vector, which is evaluated at the function it represents
+            u (firedrake_mesh): Vorticity
             t (float): Time
 
         Returns:
             dtype_f: The load vectors, with `impl` and `expl` parts
         """
-        self._w.assign(riesz_map(self.V)(u.functionspace) if u.is_dual else u.functionspace)
+        self._w.assign(u.functionspace)
         self._poisson.solve()
         return super().eval_f(u, t)
 
@@ -201,7 +199,7 @@ class Vortex2DMixedFiredrake(FormFiredrakeIMEX):
             mass,
             implicit,
             explicit,
-            solver_parameters={'snes_type': 'ksponly', **MUMPS_NULL_PIVOTS},
+            solver_parameters=MUMPS_NULL_PIVOTS,
             nullspace=fd.MixedVectorSpaceBasis(W, [W.sub(0), fd.VectorSpaceBasis(constant=True, comm=mesh.comm)]),
             LHS_cache_size=LHS_cache_size,
         )
