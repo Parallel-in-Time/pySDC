@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/tutorial/step_7/E_pySDC_with_Firedrake.py: 100%</title>
+    <title>Coverage for pySDC/tutorial/step_7/D_pySDC_with_Firedrake.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_54cfdca1.js" defer></script>
@@ -11,7 +11,7 @@
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>tutorial<span class="sep">/</span>step_7<span class="sep">/</span>E_pySDC_with_Firedrake.py</b>:
+            <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>tutorial<span class="sep">/</span>step_7<span class="sep">/</span>D_pySDC_with_Firedrake.py</b>:
             <span class="pc_cov">100%</span>
         </h1>
         <aside id="help_panel_wrapper">
@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">7<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="z_11ffac7f7ab8bb8d_D_pySDC_with_PyTorch_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="z_11ffac7f7ab8bb8d_C_pySDC_with_PyTorch_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="z_11ffac7f7ab8bb8d_F_pySDC_with_Gusto_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="z_11ffac7f7ab8bb8d_E_pySDC_with_Gusto_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-17 15:14 +0000
+            created at 2026-11-17 17:16 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -92,15 +92,15 @@
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="com"># ---</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="com"># %% [markdown]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="com"># # Part E: pySDC and Firedrake</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="com"># # Part D: pySDC and Firedrake</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="com"># [Firedrake](https://github.com/firedrakeproject/firedrake) is a finite element library with similar features as</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="com"># FEniCS. This example runs the same forced heat equation as the [FEniCS example](A_pySDC_with_FEniCS), but</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="com"># implemented in Firedrake. As in the FEniCS example, the problem is posed in mass-matrix form, `M u&#x27; = f(u)`, with</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="com"># `f` a load vector, so pySDC never inverts the mass matrix: the sweepers are the mass-matrix ones, and the multilevel</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="com"># run uses the mass-matrix transfer. The problem class,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="com"># [Firedrake](https://github.com/firedrakeproject/firedrake) is a finite element library. This example runs a forced</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="com"># heat equation, $u_t = \nu u_{xx} + f$ on $[0, 1]$ with Dirichlet boundary values, discretized with finite elements in</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="com"># Firedrake. Finite elements give a system $M u&#x27; = f(u)$ with a mass matrix $M$ and $f$ a load vector, and pySDC solves</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="com"># it in this form, without ever inverting $M$: the sweepers are the mass-matrix ones, and the multilevel run uses the</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="com"># mass-matrix transfer. The problem class,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t"><span class="com"># [pySDC/implementations/problem_classes/HeatFiredrake.py](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/HeatFiredrake.py),</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="com"># is given by its weak forms; [Part H](H_pySDC_with_Firedrake_forms) shows how to write such a class yourself.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="com"># is given by its weak forms; [Part G](G_pySDC_with_Firedrake_forms) shows how to write such a class yourself.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t"><span class="com"># ## Single level, serial or parallel across the nodes</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
@@ -283,7 +283,7 @@
     <p class="run"><span class="n"><a id="t201" href="#t201">201</a></span><span class="t">        <span class="nam">timing</span> <span class="op">=</span> <span class="nam">get_sorted</span><span class="op">(</span><span class="nam">stats</span><span class="op">,</span> <span class="nam">type</span><span class="op">=</span><span class="str">&#x27;timing_run&#x27;</span><span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">[</span><span class="num">1</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t202" href="#t202">202</a></span><span class="t">        <span class="nam">variant</span> <span class="op">=</span> <span class="str">&#x27;three-level SDC&#x27;</span> <span class="key">if</span> <span class="nam">ML</span> <span class="key">else</span> <span class="op">(</span><span class="str">&#x27;SDC parallel across the nodes&#x27;</span> <span class="key">if</span> <span class="nam">useMPIsweeper</span> <span class="key">else</span> <span class="str">&#x27;serial SDC&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t203" href="#t203">203</a></span><span class="t">        <span class="nam">Path</span><span class="op">(</span><span class="str">&#x27;data&#x27;</span><span class="op">)</span><span class="op">.</span><span class="nam">mkdir</span><span class="op">(</span><span class="nam">parents</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">exist_ok</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t204" href="#t204">204</a></span><span class="t">        <span class="key">with</span> <span class="nam">open</span><span class="op">(</span><span class="str">&#x27;data/step_7_E_out.txt&#x27;</span><span class="op">,</span> <span class="str">&#x27;a&#x27;</span><span class="op">)</span> <span class="key">as</span> <span class="nam">file</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t204" href="#t204">204</a></span><span class="t">        <span class="key">with</span> <span class="nam">open</span><span class="op">(</span><span class="str">&#x27;data/step_7_D_out.txt&#x27;</span><span class="op">,</span> <span class="str">&#x27;a&#x27;</span><span class="op">)</span> <span class="key">as</span> <span class="nam">file</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t205" href="#t205">205</a></span><span class="t">            <span class="nam">file</span><span class="op">.</span><span class="nam">write</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t206" href="#t206">206</a></span><span class="t">                <span class="fst">f&#x27;</span><span class="op">{</span><span class="nam">variant</span><span class="op">:</span><span class="fst">30s</span><span class="op">}</span><span class="fst"> error </span><span class="op">{</span><span class="nam">error</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">[</span><span class="num">1</span><span class="op">]</span><span class="op">:</span><span class="fst">.2e</span><span class="op">}</span><span class="fst">, </span><span class="op">{</span><span class="nam">tot_iter</span><span class="op">:</span><span class="fst">2d</span><span class="op">}</span><span class="fst"> iterations, </span><span class="op">{</span><span class="nam">tot_solves</span><span class="op">:</span><span class="fst">3d</span><span class="op">}</span><span class="fst"> solves on the </span><span class="fst">&#x27;</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t207" href="#t207">207</a></span><span class="t">                <span class="fst">f&#x27;</span><span class="fst">finest level, time to solution </span><span class="op">{</span><span class="nam">timing</span><span class="op">:</span><span class="fst">.2f</span><span class="op">}</span><span class="fst"> s\n</span><span class="fst">&#x27;</span>&nbsp;</span><span class="r"></span></p>
@@ -302,9 +302,9 @@
     <p class="pln"><span class="n"><a id="t220" href="#t220">220</a></span><span class="t"><span class="com"># %% [markdown]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t221" href="#t221">221</a></span><span class="t"><span class="com"># The script runs in three different ways:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t222" href="#t222">222</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t223" href="#t223">223</a></span><span class="t"><span class="com"># - `python E_pySDC_with_Firedrake.py` for single-level serial SDC,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t224" href="#t224">224</a></span><span class="t"><span class="com"># - `mpiexec -np 3 python E_pySDC_with_Firedrake.py --useMPIsweeper` for single-level SDC, parallel across the nodes,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t225" href="#t225">225</a></span><span class="t"><span class="com"># - `python E_pySDC_with_Firedrake.py --ML` for three-level serial SDC.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t223" href="#t223">223</a></span><span class="t"><span class="com"># - `python D_pySDC_with_Firedrake.py` for single-level serial SDC,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t224" href="#t224">224</a></span><span class="t"><span class="com"># - `mpiexec -np 3 python D_pySDC_with_Firedrake.py --useMPIsweeper` for single-level SDC, parallel across the nodes,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t225" href="#t225">225</a></span><span class="t"><span class="com"># - `python D_pySDC_with_Firedrake.py --ML` for three-level serial SDC.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t226" href="#t226">226</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t227" href="#t227">227</a></span><span class="t"><span class="com"># Multilevel SDC reduces the number of SDC iterations quite a bit, but not necessarily the time to solution, partly</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t228" href="#t228">228</a></span><span class="t"><span class="com"># because more solvers are constructed on the coarse levels, and the parallel variant does the work of one node per</span>&nbsp;</span><span class="r"></span></p>
@@ -342,19 +342,19 @@
     <p class="pln"><span class="n"><a id="t260" href="#t260">260</a></span><span class="t"><span class="com"># variants in a Firedrake container, and checks their errors and work counts. These are its results, in the run that</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t261" href="#t261">261</a></span><span class="t"><span class="com"># built this page:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t262" href="#t262">262</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t263" href="#t263">263</a></span><span class="t"><span class="com"># :::{literalinclude} /../../data_firedrake/step_7_E_out.txt</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t263" href="#t263">263</a></span><span class="t"><span class="com"># :::{literalinclude} /../../data_firedrake/step_7_D_out.txt</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t264" href="#t264">264</a></span><span class="t"><span class="com"># :language: text</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t265" href="#t265">265</a></span><span class="t"><span class="com"># :::</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="z_11ffac7f7ab8bb8d_D_pySDC_with_PyTorch_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a class="nav" href="z_11ffac7f7ab8bb8d_C_pySDC_with_PyTorch_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a class="nav" href="z_11ffac7f7ab8bb8d_F_pySDC_with_Gusto_py.html">&#xbb; next</a>
+            <a class="nav" href="z_11ffac7f7ab8bb8d_E_pySDC_with_Gusto_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-17 15:14 +0000
+            created at 2026-11-17 17:16 +0000
         </p>
     </div>
 </footer>

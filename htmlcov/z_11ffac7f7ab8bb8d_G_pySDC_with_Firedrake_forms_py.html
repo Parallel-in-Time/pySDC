@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/tutorial/step_7/H_pySDC_with_Firedrake_forms.py: 100%</title>
+    <title>Coverage for pySDC/tutorial/step_7/G_pySDC_with_Firedrake_forms.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_54cfdca1.js" defer></script>
@@ -11,7 +11,7 @@
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>tutorial<span class="sep">/</span>step_7<span class="sep">/</span>H_pySDC_with_Firedrake_forms.py</b>:
+            <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>tutorial<span class="sep">/</span>step_7<span class="sep">/</span>G_pySDC_with_Firedrake_forms.py</b>:
             <span class="pc_cov">100%</span>
         </h1>
         <aside id="help_panel_wrapper">
@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">2<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="z_11ffac7f7ab8bb8d_G_pySDC_on_GPU_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="z_11ffac7f7ab8bb8d_F_pySDC_on_GPU_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_11ffac7f7ab8bb8d_torch_heat_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-17 15:14 +0000
+            created at 2026-11-17 17:16 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -92,13 +92,13 @@
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="com"># ---</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="com"># %% [markdown]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="com"># # Part H: pySDC from Firedrake forms</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="com"># # Part G: pySDC from Firedrake forms</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="com"># In [Part E](E_pySDC_with_Firedrake), the heat equation comes with a ready-made problem class. Here we write our own</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="com"># In [Part D](D_pySDC_with_Firedrake), the heat equation comes with a ready-made problem class. Here we write our own</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="com"># problem without writing a class at all: we write down the weak form of the equation, as we would for Firedrake</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="com"># anyway, and the generic problem class</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="com"># [`FormFiredrake`](https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/problem_classes/FormFiredrake.py)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="com"># builds everything pySDC needs from it. Part E&#x27;s heat equation is itself built this way.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="com"># builds everything pySDC needs from it. Part D&#x27;s heat equation is itself built this way.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="com"># ## The equation and its weak form</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
@@ -301,7 +301,7 @@
     <p class="run run2"><span class="n"><a id="t219" href="#t219">219</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t220" href="#t220">220</a></span><span class="t">    <span class="nam">print</span><span class="op">(</span><span class="nam">summary</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t221" href="#t221">221</a></span><span class="t">    <span class="nam">Path</span><span class="op">(</span><span class="str">&#x27;data&#x27;</span><span class="op">)</span><span class="op">.</span><span class="nam">mkdir</span><span class="op">(</span><span class="nam">parents</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">exist_ok</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t222" href="#t222">222</a></span><span class="t">    <span class="key">with</span> <span class="nam">open</span><span class="op">(</span><span class="str">&#x27;data/step_7_H_out.txt&#x27;</span><span class="op">,</span> <span class="str">&#x27;a&#x27;</span><span class="op">)</span> <span class="key">as</span> <span class="nam">file</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t222" href="#t222">222</a></span><span class="t">    <span class="key">with</span> <span class="nam">open</span><span class="op">(</span><span class="str">&#x27;data/step_7_G_out.txt&#x27;</span><span class="op">,</span> <span class="str">&#x27;a&#x27;</span><span class="op">)</span> <span class="key">as</span> <span class="nam">file</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t223" href="#t223">223</a></span><span class="t">        <span class="nam">file</span><span class="op">.</span><span class="nam">write</span><span class="op">(</span><span class="nam">summary</span> <span class="op">+</span> <span class="str">&#x27;\n&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t224" href="#t224">224</a></span><span class="t">    <span class="key">return</span> <span class="nam">result</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t225" href="#t225">225</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -343,19 +343,19 @@
     <p class="pln"><span class="n"><a id="t261" href="#t261">261</a></span><span class="t"><span class="com"># Firedrake does not run in the browser, nor in the environment this website is built in. Our CI runs this part in a</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t262" href="#t262">262</a></span><span class="t"><span class="com"># Firedrake container and checks its errors and work counts. These are its results, in the run that built this page:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t263" href="#t263">263</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t264" href="#t264">264</a></span><span class="t"><span class="com"># :::{literalinclude} /../../data_firedrake/step_7_H_out.txt</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t264" href="#t264">264</a></span><span class="t"><span class="com"># :::{literalinclude} /../../data_firedrake/step_7_G_out.txt</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t265" href="#t265">265</a></span><span class="t"><span class="com"># :language: text</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t266" href="#t266">266</a></span><span class="t"><span class="com"># :::</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="z_11ffac7f7ab8bb8d_G_pySDC_on_GPU_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a class="nav" href="z_11ffac7f7ab8bb8d_F_pySDC_on_GPU_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_11ffac7f7ab8bb8d_torch_heat_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-17 15:14 +0000
+            created at 2026-11-17 17:16 +0000
         </p>
     </div>
 </footer>

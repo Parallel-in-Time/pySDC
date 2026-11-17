@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for pySDC/tutorial/step_7/B_pySDC_with_mpi4pyfft.py: 100%</title>
+    <title>Coverage for pySDC/tutorial/step_7/A_pySDC_with_mpi4pyfft.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_54cfdca1.js" defer></script>
@@ -11,7 +11,7 @@
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>tutorial<span class="sep">/</span>step_7<span class="sep">/</span>B_pySDC_with_mpi4pyfft.py</b>:
+            <span class="text">Coverage for </span><b>pySDC<span class="sep">/</span>tutorial<span class="sep">/</span>step_7<span class="sep">/</span>A_pySDC_with_mpi4pyfft.py</b>:
             <span class="pc_cov">100%</span>
         </h1>
         <aside id="help_panel_wrapper">
@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">6<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="z_11ffac7f7ab8bb8d_A_pySDC_with_FEniCS_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="z_a1e8f71763f68ddb_pfasst_setup_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="z_11ffac7f7ab8bb8d_C_pySDC_with_PETSc_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="z_11ffac7f7ab8bb8d_B_pySDC_with_PETSc_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-17 15:14 +0000
+            created at 2026-11-17 17:16 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -92,7 +92,7 @@
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="com"># ---</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="com"># %% [markdown]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="com"># # Part B: mpi4py-fft for parallel Fourier transforms</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="com"># # Part A: mpi4py-fft for parallel Fourier transforms</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="com"># The most prominent parallel solver is, probably, the FFT. While many implementations or wrappers for Python exist,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="com"># we decided to use [mpi4py-fft](https://mpi4py-fft.readthedocs.io/en/latest/), which provided the easiest</span>&nbsp;</span><span class="r"></span></p>
@@ -104,7 +104,7 @@
     <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t"><span class="com"># The problem class `nonlinearschroedinger_imex` gets the MPI communicator, over which mpi4py-fft distributes the</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t"><span class="com"># grid, and `fft_to_fft` transfers between the levels. Each run appends its error, statistics of the iterations and</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t"><span class="com"># the time to solution to `data/step_7_B_out.txt`, from rank 0.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t"><span class="com"># the time to solution to `data/step_7_A_out.txt`, from rank 0.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t"><span class="com"># %%</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t"><span class="key">import</span> <span class="nam">numpy</span> <span class="key">as</span> <span class="nam">np</span>&nbsp;</span><span class="r"></span></p>
@@ -180,7 +180,7 @@
     <p class="run"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t">    <span class="nam">f</span> <span class="op">=</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t">    <span class="key">if</span> <span class="nam">rank</span> <span class="op">==</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">        <span class="nam">Path</span><span class="op">(</span><span class="str">&quot;data&quot;</span><span class="op">)</span><span class="op">.</span><span class="nam">mkdir</span><span class="op">(</span><span class="nam">parents</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">exist_ok</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">        <span class="nam">f</span> <span class="op">=</span> <span class="nam">open</span><span class="op">(</span><span class="str">&#x27;data/step_7_B_out.txt&#x27;</span><span class="op">,</span> <span class="str">&#x27;a&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">        <span class="nam">f</span> <span class="op">=</span> <span class="nam">open</span><span class="op">(</span><span class="str">&#x27;data/step_7_A_out.txt&#x27;</span><span class="op">,</span> <span class="str">&#x27;a&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">        <span class="nam">out</span> <span class="op">=</span> <span class="fst">f&#x27;</span><span class="fst">Running with ml=</span><span class="op">{</span><span class="nam">ml</span><span class="op">}</span><span class="fst"> and num_procs=</span><span class="op">{</span><span class="nam">num_procs</span><span class="op">}</span><span class="fst">...</span><span class="fst">&#x27;</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">        <span class="nam">f</span><span class="op">.</span><span class="nam">write</span><span class="op">(</span><span class="nam">out</span> <span class="op">+</span> <span class="str">&#x27;\n&#x27;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">        <span class="nam">print</span><span class="op">(</span><span class="nam">out</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -250,8 +250,8 @@
     <p class="pln"><span class="n"><a id="t168" href="#t168">168</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t169" href="#t169">169</a></span><span class="t"><span class="com"># SDC, MLSDC and PFASST with 10 steps in parallel (emulated in one process by `controller_nonMPI`), each in real</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t170" href="#t170">170</a></span><span class="t"><span class="com"># and in spectral space. The code runs in serial with</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t171" href="#t171">171</a></span><span class="t"><span class="com"># `python B_pySDC_with_mpi4pyfft.py`, and in parallel in space with, e.g., `mpirun -np 2 python</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t172" href="#t172">172</a></span><span class="t"><span class="com"># B_pySDC_with_mpi4pyfft.py`.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t171" href="#t171">171</a></span><span class="t"><span class="com"># `python A_pySDC_with_mpi4pyfft.py`, and in parallel in space with, e.g., `mpirun -np 2 python</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t172" href="#t172">172</a></span><span class="t"><span class="com"># A_pySDC_with_mpi4pyfft.py`.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t173" href="#t173">173</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t174" href="#t174">174</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t175" href="#t175">175</a></span><span class="t"><span class="com"># %%</span>&nbsp;</span><span class="r"></span></p>
@@ -259,7 +259,7 @@
     <p class="pln"><span class="n"><a id="t177" href="#t177">177</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t178" href="#t178">178</a></span><span class="t"><span class="str">    Little helper routine to run the whole thing</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t179" href="#t179">179</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t180" href="#t180">180</a></span><span class="t"><span class="str">    Note: This can also be run with &quot;mpirun -np 2 python B_pySDC_with_mpi4pyfft.py&quot;</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t180" href="#t180">180</a></span><span class="t"><span class="str">    Note: This can also be run with &quot;mpirun -np 2 python A_pySDC_with_mpi4pyfft.py&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t181" href="#t181">181</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t182" href="#t182">182</a></span><span class="t">    <span class="nam">run_simulation</span><span class="op">(</span><span class="nam">spectral</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">ml</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">num_procs</span><span class="op">=</span><span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t183" href="#t183">183</a></span><span class="t">    <span class="nam">run_simulation</span><span class="op">(</span><span class="nam">spectral</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">ml</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">num_procs</span><span class="op">=</span><span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -278,7 +278,7 @@
     <p class="pln"><span class="n"><a id="t196" href="#t196">196</a></span><span class="t"><span class="com"># mpi4py-fft does not run in the browser, nor in the environment this website is built in. These are the results of</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t197" href="#t197">197</a></span><span class="t"><span class="com"># our CI, which runs this part in an environment with mpi4py-fft, in the run that built this page:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t198" href="#t198">198</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t199" href="#t199">199</a></span><span class="t"><span class="com"># :::{literalinclude} /../../data/step_7_B_out.txt</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t199" href="#t199">199</a></span><span class="t"><span class="com"># :::{literalinclude} /../../data/step_7_A_out.txt</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t200" href="#t200">200</a></span><span class="t"><span class="com"># :language: text</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t201" href="#t201">201</a></span><span class="t"><span class="com"># :::</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t202" href="#t202">202</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
@@ -290,12 +290,12 @@
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="z_11ffac7f7ab8bb8d_A_pySDC_with_FEniCS_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a class="nav" href="z_a1e8f71763f68ddb_pfasst_setup_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a class="nav" href="z_11ffac7f7ab8bb8d_C_pySDC_with_PETSc_py.html">&#xbb; next</a>
+            <a class="nav" href="z_11ffac7f7ab8bb8d_B_pySDC_with_PETSc_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-17 15:14 +0000
+            created at 2026-11-17 17:16 +0000
         </p>
     </div>
 </footer>
