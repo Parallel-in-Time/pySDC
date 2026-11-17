@@ -234,7 +234,7 @@ def test_prolongation_on_a_periodic_space():
     from pySDC.implementations.datatype_classes.firedrake_mesh import firedrake_mesh
     from pySDC.implementations.transfer_classes.TransferFiredrakeMesh import MeshToMeshFiredrakeHierarchy
 
-    coarse_mesh, fine_mesh = fd.MeshHierarchy(fd.PeriodicUnitSquareMesh(8, 8, diagonal='right'), 1)
+    coarse_mesh, fine_mesh = fd.MeshHierarchy(fd.PeriodicUnitSquareMesh(8, 8), 1)
     spaces = [fd.FunctionSpace(m, 'CG', 2) for m in (fine_mesh, coarse_mesh)]
     fine, coarse = [SimpleNamespace(init=V, dtype_u=firedrake_mesh, u_init=firedrake_mesh(V)) for V in spaces]
     transfer = MeshToMeshFiredrakeHierarchy(fine, coarse, {})

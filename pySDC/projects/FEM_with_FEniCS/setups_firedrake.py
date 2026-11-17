@@ -1,13 +1,12 @@
 """
 The setups of :mod:`pySDC.projects.FEM_with_FEniCS.setups`, with the Firedrake ports of the problem classes.
 
-The per-example settings are those of the FEniCS setups, except for the residual tolerance. FEniCS measured the
-residual, a load vector, by the L2 norm of its entries read as a function; Firedrake measures it in the norm dual to
-L2. :func:`get_description` scales the FEniCS tolerance by the ratio of the two norms on the fine level, which
-:func:`norm_ratio` measures, so that the runs stop at comparable accuracy.
+The per-example settings are those of the FEniCS setups, except for the residual tolerances, which are set in the
+norm the Firedrake data types measure residuals in, the norm dual to L2. That norm does not depend on the mesh, so one
+tolerance per example serves every family, element order and level.
 
 Meshes come from Firedrake ``MeshHierarchy`` objects (h-coarsening) or are shared by all levels (p-coarsening, lower
-degrees). The 1D meshes are the same as FEniCS', the vortex's are not: DOLFIN's ``refine`` triangulates differently.
+degrees), with Firedrake's default triangulation and Lagrange nodes.
 """
 
 import math
@@ -40,7 +39,7 @@ COARSENINGS = ('h', 'p')
 SIGMA = 10.0
 NEWTON = {'snes_atol': 1e-12, 'snes_rtol': 1e-11}
 
-#: The settings of the FEniCS setups. `restol` is the FEniCS tolerance, in the norm of the entries.
+#: The settings of the examples. `restol` is the residual tolerance in the dual norm.
 SETUPS = {
     'heat': {
         'classes': {'CG': Heat1DMassFiredrake, 'DG': Heat1DDGFiredrake},
@@ -51,7 +50,7 @@ SETUPS = {
         'orders': [4, 2, 1],
         'dt': 0.2,
         'nsteps': 8,
-        'restol': 5e-10 / 500,
+        'restol': 2e-9,
         'maxiter': 20,
         'utol': 1e-8,
         'order_study': (1, 2, 4),
@@ -65,7 +64,7 @@ SETUPS = {
         'orders': [4, 2, 1],
         'dt': 0.02,
         'nsteps': 8,
-        'restol': 1e-9,
+        'restol': 1e-6,
         'maxiter': 30,
         'utol': 1e-6,
         'order_study': (1, 2, 4),
@@ -79,7 +78,7 @@ SETUPS = {
         'orders': [4, 2, 1],
         'dt': 1.0,
         'nsteps': 8,
-        'restol': 1e-9,
+        'restol': 1e-8,
         'maxiter': 30,
         'utol': 1e-6,
         'order_study': (1, 2, 4),
@@ -88,13 +87,13 @@ SETUPS = {
         'classes': {'CG': Vortex2DFiredrake},
         'sweeper_class': imex_1st_order_mass,
         'problem_params': {'nu': 0.01, 'delta': 0.05, 'rho': 50},
-        'base_mesh': lambda: fd.PeriodicUnitSquareMesh(8, 8, diagonal='right'),
+        'base_mesh': lambda: fd.PeriodicUnitSquareMesh(8, 8),
         'refinements': [2, 1, 0],
         'orders': [2],
         'coarsenings': ('h',),
         'dt': 0.001,
         'nsteps': 8,
-        'restol': 5e-9 / 500,
+        'restol': 1e-7,
         'maxiter': 30,
         'utol': 1e-6,
         'order_study': (),
@@ -166,8 +165,7 @@ def get_description(
         coarsening (str): 'h' for coarser meshes at fixed degree, 'p' for lower degrees on the fine mesh
         order (int, optional): Degree for h-coarsening, with the refinements shifted to keep the dofs per level
         dt (float, optional): Step size
-        restol (float, optional): Residual tolerance in the dual norm. By default the FEniCS one, scaled by
-            :func:`norm_ratio`
+        restol (float, optional): Residual tolerance in the dual norm, by default the example's
         maxiter (int, optional): Maximum number of iterations
         nsteps (int, optional): Number of steps
         spatial_error_floor (bool, optional): Also stop a step once its residual is below its share of the spatial
@@ -221,7 +219,7 @@ def get_description(
         problem_params['penalty'] = [SIGMA * orders[0] ** 2 * 2 ** (refinements[0] - r) for r in refinements]
 
     if restol is None:
-        restol = s['restol'] * norm_ratio(example, family, order)
+        restol = s['restol']
     description = {
         'problem_class': s['classes'][family],
         'problem_params': problem_params,
@@ -249,38 +247,3 @@ def get_description(
             SpatialErrorFloorFiredrake: {'coarse_space': coarse_space, 'Tend': Tend}
         }
     return description, {'logger_level': 30}, 0.0, Tend
-
-
-_RATIOS = {}
-
-
-def norm_ratio(example, family, order=None):
-    """
-    Ratio of the dual norm to the FEniCS norm of a residual on the fine level, measured once per example, family and
-    element order on the residual after two SDC iterations of the first step. The ratio depends on the order and the
-    mesh, so each order of the element-order study gets its own.
-
-    Args:
-        example (str): One of :data:`EXAMPLES`
-        family (str): 'CG' or 'DG'
-        order (int, optional): Degree, as for :func:`get_description`; by default the example's
-
-    Returns:
-        float: |r|_dual / |r|_FEniCS
-    """
-    from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
-    if (example, family, order) not in _RATIOS:
-        description, controller_params, t0, _ = get_description(example, family=family, order=order, restol=-1.0)
-        description['step_params']['maxiter'] = 2
-        controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-        L = controller.MS[0].levels[0]
-        P = L.prob
-        controller.run(u0=P.u_exact(t0), t0=t0, Tend=t0 + SETUPS[example]['dt'])
-        res = L.sweep.integrate()[-1] + P.apply_mass_matrix(L.u[0] - L.u[-1])
-        P.fix_residual(res)
-        entries = fd.Function(P.V)
-        with res.dat.vec_ro as source, entries.dat.vec_wo as target:
-            source.copy(target)
-        _RATIOS[(example, family, order)] = abs(res) / fd.norm(entries)
-    return _RATIOS[(example, family, order)]

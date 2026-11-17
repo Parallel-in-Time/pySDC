@@ -18,7 +18,7 @@ from pySDC.projects.FEM_with_FEniCS.setups_firedrake import (
     get_families,
     get_order_study,
     get_pfasst_procs,
-    norm_ratio,
+    SETUPS,
 )
 
 #: Cost of one solution restriction as a fraction of one fine-level sweep. Measured across the
@@ -222,10 +222,7 @@ def main():
             f.write(str(line) + '\n')
 
         out('Firedrake + pySDC, mass-matrix formulation throughout (no mass inverse anywhere).')
-        out('restol: the FEniCS one times the ratio of the dual norm to the FEniCS norm of a fine-level residual:')
-        for example in EXAMPLES:
-            for family in get_families(example):
-                out(f'  {example} [{family}]: ratio {norm_ratio(example, family):.3g}')
+        out('restol, in the norm dual to L2: ' + ', '.join(f'{e} {SETUPS[e]["restol"]:.0e}' for e in EXAMPLES))
         out(
             f'work = iterations x [sum(dofs_l / dofs_0) + (M+1)(nlevels-1) x {RESTRICTION_COST}], '
             'i.e. fine-level sweep equivalents including the solution restrictions.'

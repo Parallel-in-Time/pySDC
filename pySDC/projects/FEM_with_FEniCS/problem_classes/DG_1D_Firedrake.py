@@ -6,8 +6,6 @@ diffusion, Nitsche for Dirichlet data, local Lax-Friedrichs for the Burgers adve
 The ``penalty`` argument must be pinned to the fine level's value scaled by :math:`h_l / h_0` in a multilevel run.
 The SIPG form depends on the mesh and order it is built on, so rediscretising it per level changes the penalty -- the
 dominant term -- and the coarse operator stops being :math:`P^T A_F P`. See ``setups.py`` for the pinned ladder.
-
-All elements use equispaced nodes, where FEniCS puts them, so interpolated data are the same as there.
 """
 
 import firedrake as fd
@@ -71,8 +69,8 @@ class Heat1DDGFiredrake(FormFiredrakeIMEX):
         f(x, t) = -\sin(\pi x) (\sin(t) - \nu \pi^2 \cos(t))
 
     on :math:`[0, 1]` with :math:`u = c` on the boundary, imposed by Nitsche terms, and the exact solution
-    :math:`u = \sin(\pi x) \cos(t) + c`. The SIPG Laplacian with its Nitsche terms is implicit; the interpolated
-    forcing and the Nitsche load are explicit, as in the FEniCS version.
+    :math:`u = \sin(\pi x) \cos(t) + c`. The SIPG Laplacian with its Nitsche terms is implicit; the forcing and the
+    Nitsche load are explicit.
 
     Parameters
     ----------
@@ -97,12 +95,13 @@ class Heat1DDGFiredrake(FormFiredrakeIMEX):
     def __init__(self, n=256, order=4, nu=0.1, c=0.0, sigma=10.0, penalty=None, mesh=None, LHS_cache_size=12):
         """Initialization, see the class docstring for the arguments."""
         mesh = fd.UnitIntervalMesh(n) if mesh is None else mesh
-        V = fd.FunctionSpace(mesh, 'DG', order, variant='equispaced')
+        V = fd.FunctionSpace(mesh, 'DG', order)
         alpha = sigma * max(order, 1) ** 2 if penalty is None else penalty
 
         t = fd.Constant(0.0)
         x = fd.SpatialCoordinate(mesh)[0]
-        forcing = fd.interpolate(-fd.sin(fd.pi * x) * (fd.sin(t) - nu * fd.pi**2 * fd.cos(t)), V)
+        # the forcing enters the form as an expression, not interpolated into V first
+        forcing = -fd.sin(fd.pi * x) * (fd.sin(t) - nu * fd.pi**2 * fd.cos(t))
 
         def mass(u, v):
             return u * v * fd.dx
@@ -159,7 +158,7 @@ class Burgers1DDGFiredrake(FormFiredrake):
     ):
         """Initialization, see the class docstring for the arguments."""
         mesh = fd.UnitIntervalMesh(n) if mesh is None else mesh
-        V = fd.FunctionSpace(mesh, 'DG', order, variant='equispaced')
+        V = fd.FunctionSpace(mesh, 'DG', order)
         alpha = sigma * max(order, 1) ** 2 if penalty is None else penalty
         n_facet = fd.FacetNormal(mesh)
 
@@ -250,7 +249,7 @@ class GrayScott1DDGFiredrake(FormFiredrake):
     ):
         """Initialization, see the class docstring for the arguments."""
         mesh = fd.IntervalMesh(n, 100) if mesh is None else mesh
-        V = fd.FunctionSpace(mesh, 'DG', order, variant='equispaced')
+        V = fd.FunctionSpace(mesh, 'DG', order)
         alpha = sigma * max(order, 1) ** 2 if penalty is None else penalty
 
         def mass(w, q):

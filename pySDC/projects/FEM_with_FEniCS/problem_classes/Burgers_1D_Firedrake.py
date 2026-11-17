@@ -26,7 +26,7 @@ class Burgers1DFiredrake(FormFiredrake):
     mesh : firedrake.MeshGeometry, optional
         A mesh of :math:`[0, 1]`, e.g. from a ``MeshHierarchy`` for several levels.
     solver_parameters : dict, optional
-        PETSc options for the nonlinear solves, by default Newton with the tolerances of the FEniCS version.
+        PETSc options for the nonlinear solves, by default Newton with tight tolerances.
     LHS_cache_size : int, optional
         Number of solvers kept, see ``FormFiredrake``.
     """
@@ -34,8 +34,7 @@ class Burgers1DFiredrake(FormFiredrake):
     def __init__(self, n=128, order=4, nu=0.02, mesh=None, solver_parameters=None, LHS_cache_size=12):
         """Initialization, see the class docstring for the arguments."""
         mesh = fd.UnitIntervalMesh(n) if mesh is None else mesh
-        # equispaced nodes are where FEniCS puts them, so the interpolated initial value is the same
-        V = fd.FunctionSpace(mesh, 'CG', order, variant='equispaced')
+        V = fd.FunctionSpace(mesh, 'CG', order)
 
         def mass(u, v):
             return u * v * fd.dx

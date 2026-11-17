@@ -9,8 +9,8 @@ TOL = 1e-13
 SOLVER = {'snes_atol': TOL, 'snes_rtol': TOL}
 
 # Each case runs two steps with three RADAU-RIGHT nodes, LU and exactly three iterations. The reference values at the
-# points are those of the FEniCS class on the same mesh (Newton tolerances 1e-13 where it has a Newton loop), kept here
-# so the comparison survives FEniCS: (class, parameters, dt, IMEX, points, values).
+# points were computed with these classes (Firedrake 2026.10, default Lagrange nodes, Newton tolerances 1e-13 where
+# there is a Newton loop), as a check against unintended changes: (class, parameters, dt, IMEX, points, values).
 CASES = {
     'burgers': (
         'Burgers_1D_Firedrake.Burgers1DFiredrake',
@@ -18,7 +18,7 @@ CASES = {
         0.02,
         False,
         [0.1, 0.37, 0.61, 0.83],
-        [[0.8879057357403451], [-0.7848223213869855], [-0.6409229180400327], [0.3848063203728214]],
+        [[0.8879057355800254], [-0.7848223212380506], [-0.6409229179606641], [0.3848063203202955]],
     ),
     'heat_dg': (
         'DG_1D_Firedrake.Heat1DDGFiredrake',
@@ -26,7 +26,7 @@ CASES = {
         0.1,
         True,
         [0.1, 0.37, 0.61, 0.83],
-        [[1.3028572477656768], [1.8994607111659316], [1.922125872053953], [1.498894513871386]],
+        [[1.3028572476996685], [1.899460711092855], [1.922125871940941], [1.4988945137952487]],
     ),
     'burgers_dg': (
         'DG_1D_Firedrake.Burgers1DDGFiredrake',
@@ -34,7 +34,7 @@ CASES = {
         0.02,
         False,
         [0.1, 0.37, 0.61, 0.83],
-        [[0.8879057357374852], [-0.7848223205900324], [-0.6409229180476189], [0.3848063203572698]],
+        [[0.8879057355826151], [-0.7848223204487138], [-0.6409229179680823], [0.3848063203080977]],
     ),
     'grayscott_dg': (
         'DG_1D_Firedrake.GrayScott1DDGFiredrake',
@@ -43,10 +43,10 @@ CASES = {
         False,
         [40.1, 45.0, 49.0, 52.3],
         [
-            [0.9891717833731525, 0.0015764379115205058],
-            [0.8427426466616657, 0.06898068104806729],
-            [0.5995868301050684, 0.2656825812454307],
-            [0.6621106010648035, 0.20931083305301781],
+            [0.9891725727347049, 0.0015757858773579687],
+            [0.8427400292048042, 0.06898154472285171],
+            [0.5995921644855744, 0.265678672479725],
+            [0.6621086981216051, 0.20931950349326836],
         ],
     ),
 }
@@ -54,8 +54,8 @@ CASES = {
 
 @pytest.mark.firedrake
 @pytest.mark.parametrize('case', list(CASES))
-def test_reproduces_FEniCS(case):
-    """The same steps as the FEniCS class give the same solution to round-off."""
+def test_reference_values(case):
+    """The same steps give the recorded values, to round-off."""
     import importlib
 
     import firedrake as fd

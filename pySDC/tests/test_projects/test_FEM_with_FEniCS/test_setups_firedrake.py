@@ -1,7 +1,6 @@
 """
 The tests of ``pySDC/projects/FEM_with_FEniCS/tests/test_setups.py``, for the Firedrake setups
-(:mod:`pySDC.projects.FEM_with_FEniCS.setups_firedrake`). They pass `restol` explicitly where they only build
-descriptions, since the default tolerance is measured by running a step (see ``norm_ratio``).
+(:mod:`pySDC.projects.FEM_with_FEniCS.setups_firedrake`).
 """
 
 from itertools import pairwise
