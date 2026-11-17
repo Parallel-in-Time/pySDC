@@ -238,6 +238,31 @@ tolerances, Firedrake reproduces these five exactly (the other ten were not reru
 (SDC 5.50 against 5.75, MLSDC 0.74x/0.69x against 0.73x/0.67x): DOLFIN's ``refine`` triangulates the square differently
 from any Firedrake mesh, so it is a slightly different discretization.
 
+Stopping at the spatial error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A residual tolerance is a guess at how accurate the time stepping needs to be. Below the error of the spatial
+discretization, further iterations cannot make the solution more accurate. ``get_description(...,
+spatial_error_floor=True)`` adds the convergence controller
+:class:`~pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake`,
+which also stops a step once its residual is below its share :math:`e_x \Delta t / T` of the spatial error :math:`e_x`.
+It estimates :math:`e_x` once per step from what the next coarser mesh of the hierarchy cannot represent. The study
+runs it for SDC and 2-level MLSDC (CG, h), iterations per step, 8 steps:
+
+=============  =====================  =======================  ===============  =============
+example        SDC: restol / + floor  MLSDC: restol / + floor  change in u      spatial error
+=============  =====================  =======================  ===============  =============
+``heat``       5.75 / 5.75            3.00 / 3.00              0                1.5e-16
+``burgers``    4.12 / 4.12            2.12 / 2.12              0                5.6e-11
+``grayscott``  6.50 / 6.50            3.62 / 3.62              0                4.6e-08
+``vortex``     5.50 / 1.25            5.75 / 1.12              1.6e-2 / 6.9e-3  9.9e-02
+=============  =====================  =======================  ===============  =============
+
+The three 1D problems are resolved in space far beyond their residual tolerance, so the floor never stops a step
+early. The vortex is not: its spatial error is about 0.1, and one sweep per step already gets the time stepping below
+its share of it. Stopping there saves four of every five iterations, and the solution moves by much less than its
+spatial error. The controller works on one step at a time, so it is not used with PFASST.
+
 Why earlier attempts did not pay off
 ------------------------------------
 

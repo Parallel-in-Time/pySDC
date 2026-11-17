@@ -120,7 +120,6 @@ class Heat1DDGFiredrake(FormFiredrakeIMEX):
             rhs_exp,
             t=t,
             u_exact=fd.sin(fd.pi * x) * fd.cos(t) + c,
-            solver_parameters={'snes_type': 'ksponly'},
             LHS_cache_size=LHS_cache_size,
         )
         self._makeAttributeAndRegister('n', 'order', 'nu', 'c', 'sigma', 'penalty', localVars=locals(), readOnly=True)

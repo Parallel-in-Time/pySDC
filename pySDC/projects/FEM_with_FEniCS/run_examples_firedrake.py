@@ -91,6 +91,42 @@ def compare_mlsdc(example, family='CG', coarsening='h', out=print, **kwargs):
     return results
 
 
+def spatial_error(u):
+    """
+    The spatial error estimate of
+    :class:`~pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake`
+    for a solution on a mesh of a hierarchy: what the next coarser mesh cannot represent, divided by 2^(p+1).
+    """
+    from pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake import coarse_space_error
+
+    V = u.functionspace.function_space()
+    hierarchy, level = fd.mg.utils.get_level(V.mesh())
+    coarse = fd.FunctionSpace(hierarchy[level - 1], V.ufl_element())
+    return coarse_space_error(u.functionspace, coarse, {}) / 2 ** (V.ufl_element().embedded_superdegree + 1)
+
+
+def compare_spatial_error_floor(example, out=print, **kwargs):
+    """
+    SDC and 2-level MLSDC (CG, h-coarsening), stopped by the residual tolerance alone and also at the spatial error.
+    Returns the results keyed by (nlevels, floor).
+    """
+    results = {
+        (nlevels, floor): run(example, nlevels=nlevels, spatial_error_floor=floor, **kwargs)
+        for nlevels in (1, 2)
+        for floor in (False, True)
+    }
+
+    out(f'\n{example} [CG, h]: stopping at the residual tolerance, or also at the spatial error')
+    out(f'  {"levels":>7s} {"stop":>9s} {"niter":>7s} {"work":>7s} {"|u - u_restol|":>15s} {"spatial error":>14s}')
+    for (nlevels, floor), res in results.items():
+        diff = l2_diff(res['uend'], results[(nlevels, False)]['uend'])
+        out(
+            f'  {nlevels:7d} {"+ floor" if floor else "restol":>9s} {res["niter"]:7.2f} {res["work"]:7.2f} '
+            f'{diff:15.2e} {spatial_error(res["uend"]):14.2e}'
+        )
+    return results
+
+
 def check_pfasst(example, nlevels=2, family='CG', coarsening='h', procs=None, out=print, **kwargs):
     """PFASST over a growing number of parallel steps. Returns the results keyed by num_procs."""
     procs = get_pfasst_procs(example) if procs is None else procs
@@ -201,6 +237,7 @@ def main():
                 for coarsening in get_coarsenings(example):
                     compare_mlsdc(example, family=family, coarsening=coarsening, out=out)
                     check_pfasst(example, family=family, coarsening=coarsening, out=out)
+            compare_spatial_error_floor(example, out=out)
             if get_order_study(example):
                 speedups[example] = compare_orders(example, orders=get_order_study(example), out=out)
     if speedups:

@@ -14,6 +14,9 @@ import math
 
 import firedrake as fd
 
+from pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake import (
+    SpatialErrorFloorFiredrake,
+)
 from pySDC.implementations.problem_classes.GrayScott_1D_Firedrake import GrayScott1DFiredrake
 from pySDC.implementations.problem_classes.HeatEquation_1D_FormFiredrake import Heat1DMassFiredrake
 from pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic import Vortex2DFiredrake
@@ -142,7 +145,16 @@ def pays_off(example):
 
 
 def get_description(
-    example, nlevels=1, family='CG', coarsening='h', order=None, dt=None, restol=None, maxiter=None, nsteps=None
+    example,
+    nlevels=1,
+    family='CG',
+    coarsening='h',
+    order=None,
+    dt=None,
+    restol=None,
+    maxiter=None,
+    nsteps=None,
+    spatial_error_floor=False,
 ):
     """
     The pySDC description of one configuration, as :func:`pySDC.projects.FEM_with_FEniCS.setups.get_description`.
@@ -158,6 +170,10 @@ def get_description(
             :func:`norm_ratio`
         maxiter (int, optional): Maximum number of iterations
         nsteps (int, optional): Number of steps
+        spatial_error_floor (bool, optional): Also stop a step once its residual is below its share of the spatial
+            error, estimated on the next coarser mesh, with
+            :class:`~pySDC.implementations.convergence_controller_classes.spatial_error_floor_firedrake.SpatialErrorFloorFiredrake`.
+            CG only, and for SDC and MLSDC, not PFASST
 
     Returns:
         description (dict), controller_params (dict), t0 (float), Tend (float)
@@ -192,7 +208,8 @@ def get_description(
     else:
         if order is not None:
             raise ValueError('the order override only applies to h-coarsening')
-        fine = fd.MeshHierarchy(s['base_mesh'](), s['refinements'][0])[-1]
+        hierarchy = fd.MeshHierarchy(s['base_mesh'](), s['refinements'][0])
+        fine = hierarchy[-1]
         refinements = [s['refinements'][0]] * nlevels
         meshes = [fine] * nlevels
         orders = list(s['orders'][:nlevels])
@@ -218,7 +235,20 @@ def get_description(
         description['base_transfer_class'] = base_transfer_mass
         description['base_transfer_params'] = {'finter': False}
     nsteps = s['nsteps'] if nsteps is None else nsteps
-    return description, {'logger_level': 30}, 0.0, nsteps * description['level_params']['dt']
+    Tend = nsteps * description['level_params']['dt']
+    if spatial_error_floor:
+        if family != 'CG':
+            # shortcut: the DG classes need their interior penalty pinned for the coarse space, add it if DG needs this
+            raise ValueError('the spatial error floor is set up for CG only')
+        if refinements[0] < 1:
+            raise ValueError(f'the spatial error floor needs a coarser mesh than refinement {refinements[0]}')
+        # the fine level's space, built by the problem class on the next coarser mesh of the same hierarchy
+        coarse_mesh = hierarchy[refinements[0] - 1]
+        coarse_space = s['classes'][family](mesh=coarse_mesh, order=orders[0], **s['problem_params']).V
+        description['convergence_controllers'] = {
+            SpatialErrorFloorFiredrake: {'coarse_space': coarse_space, 'Tend': Tend}
+        }
+    return description, {'logger_level': 30}, 0.0, Tend
 
 
 _RATIOS = {}

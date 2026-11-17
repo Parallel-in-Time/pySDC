@@ -267,3 +267,23 @@ def test_a_coarse_level_that_does_not_pay_still_converges():
     for nlevels in (2, 3):
         res = run('vortex', nlevels=nlevels, **SHORT)
         assert l2_diff(res['uend'], sdc['uend']) < get_tolerance('vortex'), f'{nlevels}-level MLSDC disagrees'
+
+
+@pytest.mark.firedrake
+def test_spatial_error_floor_stops_where_iterating_no_longer_pays():
+    """
+    On the vortex the spatial error is large, and stopping at it saves most of the iterations while the result moves
+    by less than that error; on the heat equation it is far below the tolerance, and nothing changes.
+    """
+    from pySDC.projects.FEM_with_FEniCS.run_examples_firedrake import compare_spatial_error_floor, spatial_error
+
+    vortex = compare_spatial_error_floor('vortex', out=lambda *a: None, **SHORT)
+    for nlevels in (1, 2):
+        restol, floor = vortex[(nlevels, False)], vortex[(nlevels, True)]
+        assert floor['niter'] < restol['niter'] / 2, (nlevels, floor['niter'], restol['niter'])
+        assert l2_diff(floor['uend'], restol['uend']) < spatial_error(restol['uend'])
+
+    heat = compare_spatial_error_floor('heat', out=lambda *a: None, **SHORT)
+    for nlevels in (1, 2):
+        assert heat[(nlevels, True)]['niter'] == heat[(nlevels, False)]['niter']
+        assert l2_diff(heat[(nlevels, True)]['uend'], heat[(nlevels, False)]['uend']) == 0
