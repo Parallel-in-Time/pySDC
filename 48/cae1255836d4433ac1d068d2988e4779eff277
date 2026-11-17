@@ -1,0 +1,19 @@
+pySDC/implementations/problem_classes/VorticityVelocity_2D_Firedrake_periodic.py
+  s_234ff217a70910::t_1de8d0d7ae0461 139,145,202
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "48cae1255836d4433ac1d068d2988e4779eff277",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
