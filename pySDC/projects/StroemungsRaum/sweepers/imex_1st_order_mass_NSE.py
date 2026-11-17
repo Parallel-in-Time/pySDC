@@ -32,11 +32,8 @@ class imex_1st_order_mass_NSE(imex_1st_order_mass):
         # get QF(u^k)
         integral = self.integrate()
 
-        # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
-        if L.level_index == 0:
-            u0 = P.apply_mass_matrix(L.u[0])
-        else:
-            u0 = L.u[0]
+        # u0 is a solution on every level, the transfer restricts it by L2 projection
+        u0 = P.apply_mass_matrix(L.u[0])
 
         for m in range(M):
             # subtract QIFI(u^k)_m + QEFE(u^k)_m

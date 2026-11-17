@@ -42,14 +42,9 @@ class base_transfer_mass(BaseTransfer):
         for m in range(1, SF.coll.num_nodes + 1):
             tmp_u.append(self.space_transfer.project(F.u[m]))
 
-        # u0 is a load vector on every coarse level: the finest level supplies it as M u0, and each further level
-        # restricts that with P^T (L2-projecting it there as if it were a solution made three levels fail). f[0] is
-        # evaluated at the function it represents; it does not enter the mass-matrix sweeps anyway, as it appears in
-        # their right-hand sides and the known terms alike.
-        if F.level_index == 0:
-            G.u[0] = self.space_transfer.restrict_dual(PF.apply_mass_matrix(F.u[0]))
-        else:
-            G.u[0] = self.space_transfer.restrict_dual(F.u[0])
+        # u0 is a solution on every level, restricted by L2 projection like the nodes: the coarse sweep then uses
+        # M_c M_c^-1 P^T M_f u0 = P^T M_f u0, the restricted load vector of the fine initial value
+        G.u[0] = self.space_transfer.project(F.u[0])
         for n in range(1, SG.coll.num_nodes + 1):
             G.u[n] = self.Rcoll[n - 1, 0] * tmp_u[0]
             for m in range(1, SF.coll.num_nodes):

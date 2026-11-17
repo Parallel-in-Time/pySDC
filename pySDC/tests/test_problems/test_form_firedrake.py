@@ -228,6 +228,32 @@ def test_multilevel_needs_restricted_boundary_values(monkeypatch):
 
 
 @pytest.mark.firedrake
+def test_restricted_boundary_values_match_times_up_to_round_off():
+    """
+    The restricted boundary values are found by time. The transfer and the sweeper compute the node times separately,
+    so they may differ in the last bits, as 0.3 and 0.1 + 0.2 do; the solve must use the restricted values all the same.
+    """
+    import firedrake as fd
+    import numpy as np
+    from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
+
+    V = fd.FunctionSpace(fd.UnitIntervalMesh(8), 'CG', 2)
+    P = FormFiredrake(**nonlinear_forms(V, 0.1, False))
+    restricted = P.u_init
+    restricted.functionspace.assign(42.0)
+    P.use_restricted_boundary_values([restricted], [0.3])
+
+    assert 0.1 + 0.2 != 0.3
+    u = P.solve_system(P.apply_mass_matrix(P.u_exact(0.3)), 0.01, P.u_init, 0.1 + 0.2)
+    nodes = np.concatenate([bc.nodes for bc in P.bcs])
+    assert np.allclose(u.dat.data_ro[nodes], 42.0)
+
+    # at a time with no restricted values, the solve imposes the data
+    u = P.solve_system(P.apply_mass_matrix(P.u_exact(0.4)), 0.01, P.u_init, 0.4)
+    assert np.allclose(u.dat.data_ro[nodes], P.u_exact(0.4).dat.data_ro[nodes])
+
+
+@pytest.mark.firedrake
 def test_boundary_rows_of_residual():
     """
     The boundary rows of the mass-form residual carry no equation: they stay O(1) when the interior has converged.
@@ -235,14 +261,15 @@ def test_boundary_rows_of_residual():
     """
     import firedrake as fd
     import numpy as np
+    from pySDC.helpers.ufl_forms import total_rhs
     from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
 
     c = 3.14
     V = fd.FunctionSpace(fd.UnitIntervalMesh(8), 'CG', 2)
-    controller, _ = run(
-        FormFiredrake, heat_forms(V, 0.1, c, fd.Constant(0.0)), generic_implicit_mass, 0.5, 0.5, 50, 1e-13
-    )
+    forms = heat_forms(V, 0.1, c, fd.Constant(0.0))
+    forms['rhs'] = total_rhs(forms['rhs'], forms.pop('rhs_exp'))
+    controller, _ = run(FormFiredrake, forms, generic_implicit_mass, 0.5, 0.5, 50, 1e-13)
     L = controller.MS[0].levels[0]
     P = L.prob
     nodes = np.concatenate([bc.nodes for bc in P.bcs])
@@ -292,8 +319,9 @@ def test_solve_system_and_caching():
     with pytest.raises(DataError):
         P.apply_mass_matrix(P.apply_mass_matrix(u))
 
-    # a load vector is evaluated at the function it represents, as on coarse levels, where u0 is M u0
-    assert abs(P.eval_f(P.apply_mass_matrix(u), 0.3) - P.eval_f(u, 0.3)) < 1e-10 * abs(P.eval_f(u, 0.3))
+    # u0 is a solution on every level, so forms are never evaluated at a load vector
+    with pytest.raises(DataError):
+        P.eval_f(P.apply_mass_matrix(u), 0.3)
 
 
 @pytest.mark.firedrake

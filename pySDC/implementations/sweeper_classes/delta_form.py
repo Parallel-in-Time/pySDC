@@ -715,8 +715,7 @@ class DeltaFormMassMixin(DeltaFormMixin):
         M \delta_m - \alpha \left[F(u^k_m + \delta_m) - F(u^k_m)\right]
         = r_m + \Delta t \sum_{j<m} Q^\Delta_{mj}\, \Delta F_j.
 
-    Everything else is the delta form of :class:`DeltaFormMixin`. As with the mass-matrix sweepers, the initial value
-    below the finest level is already the load vector :math:`M u_0`.
+    Everything else is the delta form of :class:`DeltaFormMixin`.
 
     The correction is solved by the problem's ``solve_system_delta``, which has to solve the equation above, or by
     substituting :math:`y = u^k_m + \delta_m` into ``solve_system``, which is exact. The latter also handles a node with
@@ -750,11 +749,7 @@ class DeltaFormMassMixin(DeltaFormMixin):
         prob = lvl.prob
         eps = self.integrate()
         for m in range(self.coll.num_nodes):
-            # below the finest level, u0 is already the load vector M u0
-            if lvl.level_index == 0:
-                eps[m] += prob.apply_mass_matrix(lvl.u[0] - lvl.u[m + 1])
-            else:
-                eps[m] += lvl.u[0] - prob.apply_mass_matrix(lvl.u[m + 1])
+            eps[m] += prob.apply_mass_matrix(lvl.u[0] - lvl.u[m + 1])
             if lvl.tau[m] is not None:
                 eps[m] += lvl.tau[m]
         return eps

@@ -1,11 +1,12 @@
+import math
+
 from pySDC.core.errors import DataError
 from pySDC.core.problem import Problem, WorkCounter
-from pySDC.helpers.ufl_forms import implicit_system, total_rhs
+from pySDC.helpers.ufl_forms import implicit_system
 from pySDC.implementations.datatype_classes.firedrake_mesh import (
     firedrake_mesh,
     firedrake_dual_mesh,
     IMEX_firedrake_dual_mesh,
-    riesz_map,
 )
 import firedrake as fd
 from firedrake.assemble import get_assembler
@@ -38,10 +39,10 @@ class FormFiredrake(Problem):
         M u' = R(u),
 
     where :math:`M` is assembled from the mass form :math:`m(u, v)` and :math:`R(u)` from the right-hand side form
-    :math:`r(u, v)`, plus the explicit part :math:`r_E(u, v)` if one is given (this class treats it implicitly too,
-    see :class:`FormFiredrakeIMEX` for splitting). Time enters only through the Firedrake ``Constant`` `t`, which is
-    set to the requested time before every evaluation and solve, so forms, boundary values and the exact solution can
-    all depend on it.
+    :math:`r(u, v)`, all of it treated implicitly (see :class:`FormFiredrakeIMEX` for an explicit part, and
+    :func:`~pySDC.helpers.ufl_forms.total_rhs` for joining the parts of a split problem). Time enters only through
+    the Firedrake ``Constant`` `t`, which is set to the requested time before every evaluation and solve, so forms,
+    boundary values and the exact solution can all depend on it.
 
     This class never inverts :math:`M`: ``eval_f`` returns the load vector :math:`R(u)`, so it must be used with the
     mass-matrix sweepers :class:`~pySDC.implementations.sweeper_classes.generic_implicit_mass.generic_implicit_mass`
@@ -74,8 +75,6 @@ class FormFiredrake(Problem):
         Mass form :math:`m(u, v)`
     rhs : callable
         Right-hand side form :math:`r(u, v)`, may be nonlinear in :math:`u`
-    rhs_exp : callable, optional
-        Explicit part :math:`r_E(u, v)` of the right-hand side
     bcs : tuple of firedrake.DirichletBC, optional
         Boundary conditions imposed in the solves. Their values may depend on `t`, and they may act on a sub-space,
         such as one field of a mixed space or one component of a vector space. Pass a tuple, not a list: pySDC reads
@@ -105,7 +104,6 @@ class FormFiredrake(Problem):
         V,
         mass,
         rhs,
-        rhs_exp=None,
         bcs=None,
         t=None,
         u_exact=None,
@@ -118,7 +116,6 @@ class FormFiredrake(Problem):
         self.V = V
         self.mass = mass
         self.rhs = rhs
-        self.rhs_exp = rhs_exp
         self.bcs = () if bcs is None else bcs
         # the solves take their boundary values from this buffer: the data, or restricted values on coarse levels. A
         # condition on a sub-space reads the matching part of it.
@@ -157,12 +154,7 @@ class FormFiredrake(Problem):
         Returns:
             list of ufl.Form: The one form of the full right-hand side
         """
-        return [total_rhs(self.rhs, self.rhs_exp)(self._u, self._v)]
-
-    @property
-    def implicit_rhs(self):
-        """The part of the right-hand side the solves treat implicitly, as a callable (u, v) -> form."""
-        return total_rhs(self.rhs, self.rhs_exp)
+        return [self.rhs(self._u, self._v)]
 
     def _assemble(self, assembler, u, out):
         """
@@ -170,16 +162,15 @@ class FormFiredrake(Problem):
 
         Args:
             assembler: Firedrake assembler of a form in terms of ``self._u``
-            u (firedrake_mesh): Where to evaluate, a solution or a load vector, see ``eval_f``
+            u (firedrake_mesh): Where to evaluate, a solution
             out (firedrake_dual_mesh): Where to put the result
 
         Returns:
             firedrake_dual_mesh: `out`
         """
         if u.is_dual:
-            self._u.assign(riesz_map(self.V)(u.functionspace))
-        else:
-            self._u.assign(u.functionspace)
+            raise DataError('Forms are evaluated at a solution (a Function), not at a load vector (a Cofunction)')
+        self._u.assign(u.functionspace)
         assembler.assemble(tensor=out.functionspace)
         return out
 
@@ -187,13 +178,8 @@ class FormFiredrake(Problem):
         """
         Evaluate the right-hand side :math:`R(u)` at time `t`, without inverting the mass matrix.
 
-        On coarse levels, the mass-matrix sweepers keep the initial value as the load vector :math:`M u_0`, and the
-        controllers evaluate the right-hand side there too. A load vector is evaluated at the function it represents,
-        :math:`M^{-1} u`. (The sweepers do not depend on this value, it enters their right-hand sides and the known
-        terms they subtract alike.)
-
         Args:
-            u (firedrake_mesh): Solution at which to evaluate, or a load vector
+            u (firedrake_mesh): Solution at which to evaluate
             t (float): Time at which to evaluate
 
         Returns:
@@ -213,8 +199,6 @@ class FormFiredrake(Problem):
         Returns:
             firedrake_dual_mesh: :math:`M u`
         """
-        if u.is_dual:
-            raise DataError('The mass matrix applies to a solution (a Function), not to a load vector (a Cofunction)')
         return self._assemble(self._mass_assembler, u, firedrake_dual_mesh(self.init))
 
     def solve_system(self, rhs, factor, u0, t):
@@ -240,7 +224,11 @@ class FormFiredrake(Problem):
             raise DataError('The right-hand side of the solve must be a load vector (a Cofunction), not a Function')
         self._b.assign(rhs.functionspace)
 
-        restricted = self._restricted.get(t)
+        # matched with a tolerance: the transfer and the sweeper compute the node times separately, and a miss would
+        # silently impose the data instead, which stalls MLSDC
+        restricted = next(
+            (u for _t, u in self._restricted.items() if math.isclose(_t, t, rel_tol=1e-14, abs_tol=1e-14)), None
+        )
         if restricted is None:
             for bc in self.bcs:
                 bc.apply(self._g)
@@ -251,9 +239,7 @@ class FormFiredrake(Problem):
             if len(self.solvers) >= self.LHS_cache_size:
                 self.solvers.pop(next(iter(self.solvers)))
 
-            F, J = implicit_system(
-                self.mass, self.implicit_rhs, self._x, self._v, fd.TrialFunction(self.V), fd.Constant(factor)
-            )
+            F, J = implicit_system(self.mass, self.rhs, self._x, self._v, fd.TrialFunction(self.V), fd.Constant(factor))
             problem = fd.NonlinearVariationalProblem(F - self._b, self._x, bcs=self._solve_bcs, J=J)
             self.solvers[factor] = fd.NonlinearVariationalSolver(
                 problem, solver_parameters=self.solver_parameters, nullspace=self.nullspace
@@ -323,8 +309,15 @@ class FormFiredrakeIMEX(FormFiredrake):
     dtype_f = IMEX_firedrake_dual_mesh
 
     def __init__(self, V, mass, rhs, rhs_exp, **kwargs):
-        """Initialization, see :class:`FormFiredrake`. The explicit part `rhs_exp` is required here."""
-        super().__init__(V, mass, rhs, rhs_exp, **kwargs)
+        """
+        Initialization, see :class:`FormFiredrake` for the other arguments.
+
+        Args:
+            rhs (callable): Implicit part :math:`r(u, v)` of the right-hand side
+            rhs_exp (callable): Explicit part :math:`r_E(u, v)` of the right-hand side
+        """
+        self.rhs_exp = rhs_exp
+        super().__init__(V, mass, rhs, **kwargs)
 
     def make_rhs_forms(self):
         """
@@ -335,17 +328,12 @@ class FormFiredrakeIMEX(FormFiredrake):
         """
         return [self.rhs(self._u, self._v), self.rhs_exp(self._u, self._v)]
 
-    @property
-    def implicit_rhs(self):
-        """The part of the right-hand side the solves treat implicitly, as a callable (u, v) -> form."""
-        return self.rhs
-
     def eval_f(self, u, t):
         """
         Evaluate the implicit and explicit right-hand sides at time `t`, without inverting the mass matrix.
 
         Args:
-            u (firedrake_mesh): Solution at which to evaluate, or a load vector, see :meth:`FormFiredrake.eval_f`
+            u (firedrake_mesh): Solution at which to evaluate
             t (float): Time at which to evaluate
 
         Returns:

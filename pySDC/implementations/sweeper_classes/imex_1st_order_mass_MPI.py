@@ -38,11 +38,6 @@ class imex_1st_order_mass_MPI(SweeperMPI, imex_1st_order_mass):
         # with last_only, the other ranks get nothing; give them a zero of the right kind
         return 0.0 * f if me is None else me
 
-    def _mass_u0(self):
-        """M u0 on the finest level; below it, u0 is already the load vector."""
-        L = self.level
-        return L.prob.apply_mass_matrix(L.u[0]) if L.level_index == 0 else L.u[0]
-
     def update_nodes(self):
         """
         Update the value at this rank's collocation node, one sweep
@@ -60,7 +55,7 @@ class imex_1st_order_mass_MPI(SweeperMPI, imex_1st_order_mass):
         # M u0 + dt Q F(u^k) - dt QI_mm FI(u^k)_m + tau; QE is zero on the diagonal
         rhs = self.integrate()
         rhs -= L.dt * self.QI[m + 1, m + 1] * L.f[m + 1].impl
-        rhs += self._mass_u0()
+        rhs += L.prob.apply_mass_matrix(L.u[0])
         if L.tau[m] is not None:
             rhs += L.tau[m]
 
@@ -86,7 +81,7 @@ class imex_1st_order_mass_MPI(SweeperMPI, imex_1st_order_mass):
         L = self.level
         P = L.prob
         res = self.integrate(last_only=last_only)
-        res += self._mass_u0() - P.apply_mass_matrix(L.u[self.rank + 1])
+        res += P.apply_mass_matrix(L.u[0] - L.u[self.rank + 1])
         if L.tau[self.rank] is not None:
             res += L.tau[self.rank]
         # Due to different boundary conditions we might have to fix the residual
@@ -96,8 +91,7 @@ class imex_1st_order_mass_MPI(SweeperMPI, imex_1st_order_mass):
 
     def compute_end_point(self):
         """
-        Copy the last node to the end point on every rank; below the finest level, hand it on as a load vector, as
-        :meth:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point` does.
+        Copy the last node to the end point on every rank.
 
         Returns:
             None
@@ -107,10 +101,7 @@ class imex_1st_order_mass_MPI(SweeperMPI, imex_1st_order_mass):
         if not self.coll.right_is_node or self.params.do_coll_update:
             raise NotImplementedError('Mass matrix sweeper expect u_M = u_end')
 
-        # the buffer is solution data on every rank: below the finest level u[0] would be a load vector
         root = self.comm.size - 1
         L.uend = P.dtype_u(L.u[-1]) if self.rank == root else P.u_init
         self.comm.Bcast(L.uend, root=root)
-        if L.level_index > 0:
-            L.uend = P.apply_mass_matrix(L.uend)
         return None
