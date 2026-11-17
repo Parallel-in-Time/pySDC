@@ -286,4 +286,5 @@ def test_spatial_error_floor_stops_where_iterating_no_longer_pays():
     heat = compare_spatial_error_floor('heat', out=lambda *a: None, **SHORT)
     for nlevels in (1, 2):
         assert heat[(nlevels, True)]['niter'] == heat[(nlevels, False)]['niter']
-        assert l2_diff(heat[(nlevels, True)]['uend'], heat[(nlevels, False)]['uend']) == 0
+        # the same iterations, so the same result up to round-off, which differs between separate runs (9e-17 on CI)
+        assert l2_diff(heat[(nlevels, True)]['uend'], heat[(nlevels, False)]['uend']) < 1e-12
