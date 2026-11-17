@@ -208,9 +208,13 @@
 | pySDC/projects/DeltaSDC/krylov.py                                                                   |       78 |       23 |     71% |23-49, 84-88, 104, 107, 113, 115, 127-135, 163-164 |
 | pySDC/projects/DeltaSDC/multigrid.py                                                                |       51 |        7 |     86% |37-40, 90-91, 101-102 |
 | pySDC/projects/FEM\_with\_FEniCS/problem\_classes/Burgers\_1D\_FEniCS.py                            |       61 |        0 |    100% |           |
+| pySDC/projects/FEM\_with\_FEniCS/problem\_classes/Burgers\_1D\_Firedrake.py                         |       18 |        0 |    100% |           |
 | pySDC/projects/FEM\_with\_FEniCS/problem\_classes/DG\_1D\_FEniCS.py                                 |       55 |        0 |    100% |           |
+| pySDC/projects/FEM\_with\_FEniCS/problem\_classes/DG\_1D\_Firedrake.py                              |       69 |        0 |    100% |           |
 | pySDC/projects/FEM\_with\_FEniCS/run\_examples.py                                                   |       87 |        2 |     98% |  188, 190 |
+| pySDC/projects/FEM\_with\_FEniCS/run\_examples\_firedrake.py                                        |      109 |        2 |     98% |  239, 241 |
 | pySDC/projects/FEM\_with\_FEniCS/setups.py                                                          |       69 |        0 |    100% |           |
+| pySDC/projects/FEM\_with\_FEniCS/setups\_firedrake.py                                               |       78 |        0 |    100% |           |
 | pySDC/projects/FastWaveSlowWave/AcousticAdvection\_1D\_FD\_imex\_multiscale.py                      |       13 |        0 |    100% |           |
 | pySDC/projects/FastWaveSlowWave/HookClass\_acoustic.py                                              |       12 |        0 |    100% |           |
 | pySDC/projects/FastWaveSlowWave/plot\_dispersion.py                                                 |      111 |        3 |     97% | 28, 32-33 |
@@ -425,7 +429,7 @@
 | pySDC/tutorial/step\_9/D\_adaptive\_alpha.py                                                        |       31 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/E\_paradiag\_MPI.py                                                          |       14 |        0 |    100% |           |
 | pySDC/tutorial/step\_9/paradiag\_setup.py                                                           |       57 |        0 |    100% |           |
-| **TOTAL**                                                                                           | **34086** | **4595** | **87%** |           |
+| **TOTAL**                                                                                           | **34360** | **4597** | **87%** |           |
 
 46 empty files skipped.
 
