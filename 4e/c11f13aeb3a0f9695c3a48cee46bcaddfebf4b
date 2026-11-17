@@ -1,0 +1,32 @@
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_FEniCS.py
+  s_234ff217a70910::t_bc013f361798e9 320-323
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_projection_Firedrake.py
+  s_234ff217a70910::t_c89d3df54e58e6 18-20,81-82,109,133-134
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_equations_Firedrake.py
+  s_234ff217a70910::t_41e1419934b1c1 20,39-40
+pySDC/tests/test_projects/test_StroemungsRaum/test_navier_stokes_firedrake.py
+  s_234ff217a70910::t_41e1419934b1c1 120,137,209,219,239-243,247-250
+  s_234ff217a70910::t_3cada587c0072a 244-246,251-254
+pySDC/projects/StroemungsRaum/convergence_controllers/prepare_step.py
+  s_234ff217a70910::t_eae6b3a57ca2d2 1-32
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_Firedrake.py
+  s_234ff217a70910::t_c89d3df54e58e6 73-74,146-147,165,174,187-195
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_TaylorGreen_Firedrake.py
+  s_234ff217a70910::t_c89d3df54e58e6 11,64-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4ec11f13aeb3a0f9695c3a48cee46bcaddfebf4b",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
