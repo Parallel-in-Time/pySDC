@@ -62,10 +62,10 @@
         <p class="text">
             <a id="prevFileLink" class="nav" href="z_91faa57f8583c837_GenericGusto_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_GrayScott_2D_PETSc_periodic_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_GrayScott_1D_Firedrake_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-15 12:02 +0000
+            created at 2026-11-17 11:15 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -96,15 +96,15 @@
     <p class="exc exc2 show_exc"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">    1D Gray-Scott reaction-diffusion system with FEniCS finite elements, fully implicit with FEniCS&#x27; Newton solver.</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="str">    The Gray-Scott system [1]_ describes a reaction-diffusion process of two substances :math:`u` and :math:`v`,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="str">    where they diffuse over time. During the reaction :math:`u` is used up with overall decay rate :math:`B`,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="str">    whereas :math:`v` is produced with feed rate :math:`A`. :math:`D_u,\, D_v` are the diffusion rates for</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="str">    where they diffuse over time. :math:`u` is fed in with rate :math:`A` and used up by the reaction, which</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="str">    produces :math:`v`, and :math:`v` decays with rate :math:`B`. :math:`D_u,\, D_v` are the diffusion rates for</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="str">    :math:`u,\, v`. This process is described by the one-dimensional model with homogeneous Neumann boundary conditions</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="str">    .. math::</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="str">        \frac{\partial u}{\partial t} = D_u \Delta u - u v^2 + A (1 - u),</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t"><span class="str">    .. math::</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t"><span class="str">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B u</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t"><span class="str">        \frac{\partial v}{\partial t} = D_v \Delta v + u v^2 - B v</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t"><span class="str">    for :math:`x \in \Omega:=[0, 100]`. The *weak formulation* of the problem can be obtained by multiplying the</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t"><span class="str">    system with a test function :math:`q`:</span>&nbsp;</span><span class="r"></span></p>
@@ -113,7 +113,7 @@
     <p class="exc exc2 show_exc"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t"><span class="str">        \int_\Omega u_t q\,dx = \int_\Omega D_u \Delta u q - u v^2 q + A (1 - u) q\,dx,</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t"><span class="str">    .. math::</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t"><span class="str">        \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B u q\,dx,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t"><span class="str">        \int_\Omega v_t q\,dx = \int_\Omega D_v \Delta v q + u v^2 q - B v q\,dx,</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t"><span class="str">    The Laplacians are integrated by parts, and no Dirichlet conditions are imposed, so the boundary terms drop out and</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t"><span class="str">    the boundaries are zero-flux. The spatial solve of the weak formulation is realized by ``FEniCS`` [2]_.</span>&nbsp;</span><span class="r"></span></p>
@@ -139,9 +139,9 @@
     <p class="exc exc2 show_exc"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t"><span class="str">    Dv: float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t"><span class="str">        Diffusion rate for :math:`v`.</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t"><span class="str">    A : float, optional</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t"><span class="str">        Feed rate for :math:`v`.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t"><span class="str">        Feed rate for :math:`u`.</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t"><span class="str">    B : float, optional</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t"><span class="str">        Overall decay rate for :math:`u`.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t"><span class="str">        Decay rate for :math:`v`.</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t"><span class="str">    newton_tol : float, optional</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t"><span class="str">        Absolute tolerance of the node-local Newton solve. It has to be tighter than the SDC residual</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t"><span class="str">        tolerance, otherwise the node-local solve, not the SDC iteration, sets the accuracy floor.</span>&nbsp;</span><span class="r"></span></p>
@@ -505,10 +505,10 @@
         <p>
             <a class="nav" href="z_91faa57f8583c837_GenericGusto_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a class="nav" href="z_91faa57f8583c837_GrayScott_2D_PETSc_periodic_py.html">&#xbb; next</a>
+            <a class="nav" href="z_91faa57f8583c837_GrayScott_1D_Firedrake_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-15 12:02 +0000
+            created at 2026-11-17 11:15 +0000
         </p>
     </div>
 </footer>
