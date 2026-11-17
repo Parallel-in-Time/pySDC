@@ -1,0 +1,25 @@
+pySDC/implementations/convergence_controller_classes/estimate_embedded_error.py
+  s_234ff217a70910::t_6feb0a56dd1c27 119-120,216-217
+pySDC/implementations/problem_classes/Piline.py
+  s_234ff217a70910::t_6feb0a56dd1c27 154-155
+pySDC/implementations/convergence_controller_classes/hotrod.py
+  s_234ff217a70910::t_6feb0a56dd1c27 85-86
+pySDC/implementations/convergence_controller_classes/estimate_extrapolation_error.py
+  s_234ff217a70910::t_6feb0a56dd1c27 135-136,504-505
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "27b1e583f65b8ecebbc3bf4d6ac3f3474ebb819c",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
