@@ -1,0 +1,44 @@
+pySDC/projects/StroemungsRaum/README.rst
+  s_234ff217a70910::t_7cb57abe0d3caa 43,48-49,52-56,62-64
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_Firedrake.py
+  s_234ff217a70910::t_f33e3dacbf2f2c 73,162,169,171
+  s_234ff217a70910::t_d2f7f128dd0909 7-33,52-54,117-118,120,125-126,137
+pySDC/core/problem.py
+  s_234ff217a70910::t_740a3c0e6d70a5 311-326
+pySDC/tests/test_projects/test_StroemungsRaum/test_navier_stokes_firedrake.py
+  s_234ff217a70910::t_c4246f667a6ad8 96-99,102-105,108-111
+  s_234ff217a70910::t_42ae12320a46ec 189,206,212
+  s_234ff217a70910::t_11bd766c11e757 90,150-153,155
+  s_234ff217a70910::t_f33e3dacbf2f2c 132
+pySDC/core/sweeper.py
+  s_234ff217a70910::t_740a3c0e6d70a5 182-183
+pySDC/implementations/sweeper_classes/generic_implicit_MPI.py
+  s_234ff217a70910::t_740a3c0e6d70a5 165-166
+pySDC/tests/test_projects/test_StroemungsRaum/test_run_scripts_firedrake.py
+  s_234ff217a70910::t_fbf494340fccae 23-24
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_FEniCS.py
+  s_234ff217a70910::t_f33e3dacbf2f2c 319,321
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_projection_Firedrake.py
+  s_234ff217a70910::t_31430e1a55f815 17-18,102-114,116-118,131,135
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_TaylorGreen_Firedrake.py
+  s_234ff217a70910::t_f33e3dacbf2f2c 58
+  s_234ff217a70910::t_498ea0cd62aebb 13,81-83,88,92
+pySDC/projects/StroemungsRaum/run_Navier_Stokes_equations_Firedrake.py
+  s_234ff217a70910::t_42ae12320a46ec 19,34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "98c2c87836943675de2e13fd5c6be85e7e7bfaff",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
