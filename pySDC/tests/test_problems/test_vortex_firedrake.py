@@ -7,9 +7,9 @@ import pytest
 
 POINTS = [[0.1, 0.25], [0.3, 0.7], [0.55, 0.26], [0.8, 0.5]]
 # the vorticity at POINTS after two steps of dt = 0.001 (32 x 32 squares, CG2, nu = 0.01, rho = 50, delta = 0.05, three
-# RADAU-RIGHT nodes, LU, exactly three iterations), computed with `fenics_vortex_2d_mass` from FEniCS 2019.1 on the
-# unrefined 32 x 32 mesh. Kept here so the comparison survives FEniCS.
-FENICS_REFERENCE = [44.8119705278601, -1.0941718994856566, 34.72165742787179, -0.29972712561954923]
+# RADAU-RIGHT nodes, LU, exactly three iterations), computed with `Vortex2DFiredrake` itself (Firedrake 2026.10), as a
+# check against unintended changes. It no longer matches FEniCS, whose advection has the opposite sign.
+REFERENCE = [44.8108513149479, -1.076848186417392, 34.914573875870076, -0.29732767182419345]
 
 
 def run(problem_class, meshes, maxiter, restol, nsteps):
@@ -37,8 +37,8 @@ def run(problem_class, meshes, maxiter, restol, nsteps):
 
 
 @pytest.mark.firedrake
-def test_reproduces_FEniCS():
-    """The Poisson-solve variant reproduces the FEniCS version to round-off on the same mesh."""
+def test_reference_values():
+    """The Poisson-solve variant still gives the recorded values, to round-off."""
     import firedrake as fd
     import numpy as np
     from pySDC.implementations.problem_classes.VorticityVelocity_2D_Firedrake_periodic import Vortex2DFiredrake
@@ -46,7 +46,7 @@ def test_reproduces_FEniCS():
     mesh = fd.PeriodicUnitSquareMesh(32, 32, diagonal='right')
     w, _ = run(Vortex2DFiredrake, [mesh], maxiter=3, restol=-1.0, nsteps=2)
     values = fd.PointEvaluator(mesh, POINTS).evaluate(w)
-    assert np.allclose(values, FENICS_REFERENCE, rtol=0, atol=1e-11), values
+    assert np.allclose(values, REFERENCE, rtol=0, atol=1e-11), values
 
 
 @pytest.mark.firedrake

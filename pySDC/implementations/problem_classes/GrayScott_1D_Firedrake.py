@@ -30,8 +30,8 @@ class GrayScott1DFiredrake(FormFiredrake):
     order : int, optional
         Degree of the Lagrange elements.
     variant : str, optional
-        Where the Lagrange elements have their nodes. The default ``'equispaced'`` puts them where FEniCS does, so the
-        interpolated initial value is the same; Firedrake's own default for high degrees is ``'spectral'``.
+        Where the Lagrange elements have their nodes. By default Firedrake's, ``'spectral'`` (Gauss-Lobatto points),
+        which is better conditioned at high degrees than ``'equispaced'``, where FEniCS puts them.
     Du, Dv : float, optional
         Diffusion rates of :math:`u` and :math:`v`.
     A : float, optional
@@ -55,7 +55,7 @@ class GrayScott1DFiredrake(FormFiredrake):
         self,
         n=256,
         order=4,
-        variant='equispaced',
+        variant=None,
         Du=1.0,
         Dv=0.01,
         A=0.09,

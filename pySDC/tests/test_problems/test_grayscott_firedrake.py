@@ -42,11 +42,15 @@ def run(problem_params, maxiter, restol, nsteps, levels=1, **description):
 
 @pytest.mark.firedrake
 def test_reproduces_FEniCS():
-    """Same mesh, elements, nodes and iterations as `fenics_grayscott_mass` give the same solution to round-off."""
+    """
+    Same mesh, elements, nodes and iterations as `fenics_grayscott_mass` give the same solution to round-off. FEniCS
+    puts the Lagrange nodes at equispaced points, so this run does too.
+    """
     import firedrake as fd
     import numpy as np
 
-    uend, _ = run({'n': 256, 'order': 4, 'solver_parameters': SOLVER_PARAMS}, maxiter=4, restol=-1.0, nsteps=2)
+    params = {'n': 256, 'order': 4, 'variant': 'equispaced', 'solver_parameters': SOLVER_PARAMS}
+    uend, _ = run(params, maxiter=4, restol=-1.0, nsteps=2)
 
     points = [[x] for x in FENICS_REFERENCE]
     u, v = uend.functionspace.subfunctions

@@ -12,7 +12,8 @@ treat differently:
 
 - :class:`Vortex2DFiredrake` solves the vorticity alone and computes :math:`\psi` by a Poisson solve in every
   right-hand side evaluation. This is the port of
-  :class:`~pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass`.
+  :class:`~pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass`, with
+  the sign of the advection corrected, see :func:`advection`.
 - :class:`Vortex2DMixedFiredrake` makes :math:`\psi` an unknown next to :math:`\omega`, and the Poisson equation an
   algebraic equation of the system, given by forms like everything else.
 
@@ -56,17 +57,17 @@ def double_shear_layer(mesh, rho, delta):
     def lower(k):
         return rho * (1 - fd.tanh(rho * (y - (0.25 + k))) ** 2)
 
-    # as transcribed from the FEniCS version, whose first image enters with +; it lies at y = -3.25 and contributes
-    # exp(-375) on the unit square
-    w = upper(-4) + lower(-4)
-    for k in range(-3, 5):
-        w = w - upper(k) + lower(k)
+    w = sum(lower(k) - upper(k) for k in range(-4, 5))
     return w - delta * 2 * fd.pi * fd.cos(2 * fd.pi * (x + 0.25))
 
 
 def advection(psi, w, v):
-    r"""The advection form :math:`(\psi_y \omega_x - \psi_x \omega_y, v)`, i.e. :math:`-(u \cdot \nabla \omega, v)`."""
-    return (psi.dx(1) * w.dx(0) - psi.dx(0) * w.dx(1)) * v * fd.dx
+    r"""
+    The advection form :math:`-(u \cdot \nabla \omega, v) = (\psi_x \omega_y - \psi_y \omega_x, v)` with
+    :math:`u = (\psi_y, -\psi_x)`. The FEniCS version has the opposite sign, which advects the vorticity with
+    :math:`-u`, a velocity it does not induce.
+    """
+    return (psi.dx(0) * w.dx(1) - psi.dx(1) * w.dx(0)) * v * fd.dx
 
 
 def poisson_solver(V, w, psi):
@@ -83,7 +84,10 @@ def poisson_solver(V, w, psi):
         firedrake.LinearVariationalSolver: The solver
     """
     p, q = fd.TrialFunction(V), fd.TestFunction(V)
-    problem = fd.LinearVariationalProblem(fd.inner(fd.grad(p), fd.grad(q)) * fd.dx, w * q * fd.dx, psi)
+    # the matrix never changes, so it is assembled and factorized once
+    problem = fd.LinearVariationalProblem(
+        fd.inner(fd.grad(p), fd.grad(q)) * fd.dx, w * q * fd.dx, psi, constant_jacobian=True
+    )
     nullspace = fd.VectorSpaceBasis(constant=True, comm=V.mesh().comm)
     return fd.LinearVariationalSolver(problem, nullspace=nullspace, solver_parameters=MUMPS_NULL_PIVOTS)
 
@@ -92,7 +96,8 @@ class Vortex2DFiredrake(FormFiredrakeIMEX):
     r"""
     The periodic vorticity problem, with the stream function computed by a Poisson solve in every right-hand side
     evaluation; see the module docstring. Diffusion is implicit, advection explicit. This is the port of
-    :class:`~pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass`.
+    :class:`~pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d_mass`, with
+    the sign of the advection corrected.
 
     Parameters
     ----------
