@@ -1,0 +1,23 @@
+pySDC/tests/test_projects/test_StroemungsRaum/test_navier_stokes_firedrake.py
+  s_234ff217a70910::t_ac9c98113c7c76 240
+  s_234ff217a70910::t_783ebcc7dfb69d 190-239,241-243,305-308
+pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_TaylorGreen_monolithic_Firedrake.py
+  s_234ff217a70910::t_6a890b52b71f07 64,79-82,94
+  s_234ff217a70910::t_783ebcc7dfb69d 98,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b6f0c39aa6cba8f650b986cb630b1a6b7535aedd",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
