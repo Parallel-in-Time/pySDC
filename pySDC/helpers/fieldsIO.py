@@ -56,10 +56,6 @@ import logging
 T = TypeVar("T")
 
 try:
-    try:
-        import dolfin as df  # noqa: F841 (for some reason, dolfin always needs to be imported before mpi4py)
-    except ImportError:
-        pass
     from mpi4py import MPI
     from mpi4py.util.dtlib import from_numpy_dtype as MPI_DTYPE
 except ImportError:

@@ -1,6 +1,7 @@
 """
-The convection-diffusion equation of :mod:`pySDC.projects.StroemungsRaum.run_convection_diffusion_equation_FEniCS` with the Firedrake port of the
-problem class. The solutions go to a Firedrake ``CheckpointFile``, which ``plotting/plots_convection_diffusion_equation_Firedrake.py``
+The convection-diffusion of a rotating Gaussian with
+:class:`~pySDC.projects.StroemungsRaum.problem_classes.ConvectionDiffusion_2D_Firedrake.ConvDiff2DFiredrake`. The
+solutions go to a Firedrake ``CheckpointFile``, which ``plotting/plots_convection_diffusion_equation_Firedrake.py``
 reads.
 """
 
@@ -21,9 +22,9 @@ DEFAULT_PATH = f'{os.path.dirname(__file__)}/data/convection_diffusion/'
 
 def setup(t0=0.0):
     """
-    The parameters of the FEniCS version, with its residual tolerance 1e-12 converted to the dual norm the Firedrake
-    data types use: on this 64 x 64 mesh with P2 elements, the dual norm of a residual is about 1.2e4 times the norm
-    FEniCS takes (the L2 norm of the function with the residual's entries as coefficients), so 1e-12 becomes about 1e-8.
+    The parameters of the project's original study. Its residual tolerance, 1e-12 in the L2 norm of the function with
+    the residual's entries as coefficients, is converted to the dual norm the Firedrake data types use: on this 64 x 64
+    mesh with P2 elements, the dual norm of a residual is about 1.2e4 times larger, so 1e-12 becomes about 1e-8.
 
     Returns:
         description and controller_params dictionaries, and t0

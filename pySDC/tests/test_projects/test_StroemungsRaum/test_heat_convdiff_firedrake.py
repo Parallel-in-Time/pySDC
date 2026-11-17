@@ -1,6 +1,5 @@
 """
-Tests for the Firedrake ports of StroemungsRaum's 2D heat and convection-diffusion problems. They live here rather
-than in the project, because the project's own tests run in its FEniCS environment, and these need Firedrake.
+Tests for StroemungsRaum's 2D heat and convection-diffusion problems.
 """
 
 import pytest

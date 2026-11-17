@@ -22,13 +22,13 @@ def setup(case, comm):
     """
     The description of a test case on meshes distributed over `comm`, and the points to compare the solutions at.
 
-    - `imex`: Part H of tutorial step 7, IMEX SDC with time-dependent Dirichlet values on a 2D mesh
+    - `imex`: Part G of tutorial step 7, IMEX SDC with time-dependent Dirichlet values on a 2D mesh
     - `mlsdc`: the same fully implicit, on two levels, so that the coarse solves take restricted boundary values
     - `grayscott`: Gray-Scott, two unknowns on a mixed space, on three levels
     - `floor`: the 1D nonlinear manufactured problem with the residual floor from the spatial error
     """
     import firedrake as fd
-    from pySDC.tutorial.step_7.H_pySDC_with_Firedrake_forms import get_forms
+    from pySDC.tutorial.step_7.G_pySDC_with_Firedrake_forms import get_forms
     from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrake, FormFiredrakeIMEX
     from pySDC.implementations.problem_classes.GrayScott_1D_Firedrake import GrayScott1DFiredrake
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass

@@ -12,9 +12,7 @@ from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_Fi
 class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
     r"""
     Incompressible Navier-Stokes flow around a cylinder (the DFG benchmark 2D-3) with a projection method, IMEX, with
-    Firedrake. This is the port of
-    :class:`~pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_FEniCS.fenics_NSE_2D_mass`, on the same
-    mesh, with the standard
+    Firedrake, with the standard
     :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass` sweeper and the
     convergence controller :class:`~pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step.PrepareStep`,
     which tells it where each step starts.

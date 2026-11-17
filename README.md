@@ -29,13 +29,16 @@ implemented.
 -   Projects: many documented projects with defined and tested outcomes
 -   Many different examples, collocation types, data types already
     implemented
--   Works with [FEniCS](https://fenicsproject.org/),
-    [mpi4py-fft](https://mpi4py-fft.readthedocs.io/en/latest/) and
-    [PETSc](http://www.mcs.anl.gov/petsc/) (through
-    [petsc4py](https://bitbucket.org/petsc/petsc4py))
+-   Works with [Firedrake](https://www.firedrakeproject.org/) finite
+    elements (in mass-matrix form, also from weak forms alone),
+    [mpi4py-fft](https://mpi4py-fft.readthedocs.io/en/latest/),
+    [PETSc](https://petsc.org/) (through
+    [petsc4py](https://petsc.org/release/petsc4py/)), PyTorch and CuPy
 -   Continuous integration via [GitHub
     Actions](https://github.com/Parallel-in-Time/pySDC/actions)
--   Fully compatible with Python 3.10 - 3.13, runs at least on Ubuntu
+-   Fully compatible with Python 3.10 - 3.13 and NumPy 1 and 2, runs at
+    least on Ubuntu; Firedrake needs Python 3.11 or newer and NumPy 2.1
+    or newer
 
 ## Getting started
 
@@ -81,8 +84,14 @@ tutorials. All `import` statements there assume that the
 
 For many examples, `LaTeX` is used for the plots, i.e. a
 decent installation of this is needed in order to run those examples.
-When using `fenics` or `petsc4py`, a C++
+When using `petsc4py` or Firedrake, a C/C++
 compiler is required (although installation may go through at first).
+Firedrake is not a conda package: create the environment from
+`etc/environment-firedrake.yml` and install Firedrake into it with `pip`,
+as the "How to run it" section of
+[`pySDC/projects/FEM_with_Firedrake/README.rst`](pySDC/projects/FEM_with_Firedrake/README.rst)
+spells out step by step, or follow
+[Firedrake's own instructions](https://www.firedrakeproject.org/install.html).
 
 For more details on `pySDC`, check out http://www.parallel-in-time.org/pySDC.
 

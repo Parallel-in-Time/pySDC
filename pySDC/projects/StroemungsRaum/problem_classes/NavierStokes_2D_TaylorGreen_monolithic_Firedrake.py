@@ -35,8 +35,7 @@ def zero_mean_pressure(w):
 class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
     r"""
     Incompressible Navier-Stokes with a manufactured, travelling Taylor-Green solution on :math:`[-0.5, 0.5]^2`,
-    monolithic, with Firedrake and given by its weak forms. This is the port of
-    :class:`~pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_FEniCS.fenics_NSE_2D_TaylorGreen`.
+    monolithic, with Firedrake and given by its weak forms.
 
     The exact solution
 

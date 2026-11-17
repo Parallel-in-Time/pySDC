@@ -2,7 +2,7 @@ name: SBOMs
 
 # Software bills of materials (CycloneDX) for every release, attached to it as assets; see SECURITY.md.
 # One for the core install from pyproject.toml, and one per conda environment file, since those pull in
-# what pyproject.toml cannot express (MPI, PETSc, FEniCS, CUDA, ...). The environments are scanned as
+# what pyproject.toml cannot express (MPI, PETSc, CUDA, ...). The environments are scanned as
 # installed, so the SBOMs carry the exact versions resolved on the day of the release. The file names
 # carry no version, so `releases/latest/download/<name>` always points at the newest one.
 on:
@@ -76,7 +76,7 @@ jobs:
         # The environments pySDC runs in; lint, tests and postprocess are tooling. Missing files are
         # skipped, so this also works for tags that predate some of them.
         run: |
-          echo "files=$(ls etc/environment-{base,cupy,fenics,mpi4py,petsc,pytorch}.yml \
+          echo "files=$(ls etc/environment-{base,cupy,mpi4py,petsc,pytorch}.yml \
             pySDC/projects/*/environment.yml pySDC/projects/Monodomain/etc/environment-monodomain.yml \
             2>/dev/null | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
 
@@ -103,7 +103,7 @@ jobs:
       - uses: anchore/sbom-action/download-syft@v0
         id: syft
       - name: Generate SBOM
-        # etc/environment-fenics.yml -> sbom-env-fenics, pySDC/projects/DAE/... -> sbom-project-DAE
+        # etc/environment-petsc.yml -> sbom-env-petsc, pySDC/projects/DAE/... -> sbom-project-DAE
         run: |
           case "${{ matrix.yml }}" in
             etc/*) NAME=env-$(basename "${{ matrix.yml }}" .yml | sed 's/^environment-//') ;;

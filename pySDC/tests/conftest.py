@@ -17,7 +17,7 @@ import numpy as np
 import pytest
 
 # the markers the CI jobs select for this tree
-CI_MARKERS = {'base', 'fenics', 'mpi4py', 'petsc', 'pytorch', 'firedrake', 'cupy'}
+CI_MARKERS = {'base', 'mpi4py', 'petsc', 'pytorch', 'firedrake', 'cupy'}
 # deliberately not run by CI; run them with `-m benchmark`
 NOT_IN_CI = {'benchmark'}
 

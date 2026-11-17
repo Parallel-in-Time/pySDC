@@ -24,7 +24,7 @@ def cylinder_mesh(comm=fd.COMM_WORLD):
 
 def drag_lift(u, p, nu, mesh):
     """
-    Drag and lift coefficients of the cylinder, as in the DFG benchmark and the FEniCS versions.
+    Drag and lift coefficients of the cylinder, as in the DFG benchmark.
 
     Args:
         u: Velocity, a function or a UFL expression of one
@@ -94,9 +94,7 @@ def navier_stokes_forms(nu, forcing=None):
 class NavierStokes2DMonolithicFiredrake(FormFiredrake):
     r"""
     Incompressible Navier-Stokes flow around a cylinder (the DFG benchmark 2D-3), monolithic, with Firedrake and
-    given by its weak forms. This is the port of
-    :class:`~pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_monolithic_FEniCS.fenics_NSE_2D_Monolithic`,
-    on the same mesh.
+    given by its weak forms.
 
     The velocity :math:`u` and the pressure :math:`p` solve
 
@@ -125,7 +123,8 @@ class NavierStokes2DMonolithicFiredrake(FormFiredrake):
     mesh : firedrake.MeshGeometry, optional
         The mesh, by default :func:`cylinder_mesh`.
     solver_parameters : dict, optional
-        PETSc options for the nonlinear solves, by default Newton with tolerances like those of the FEniCS version.
+        PETSc options for the nonlinear solves, by default Newton with absolute tolerance 1e-10 and relative
+        tolerance 1e-9.
     LHS_cache_size : int, optional
         Number of solvers kept, see ``FormFiredrake``.
     """

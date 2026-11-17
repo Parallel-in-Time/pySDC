@@ -10,7 +10,7 @@ pySDC
    Prototyping spectral deferred corrections, from a single sweep to space-time parallel PFASST.
 
    :bdg-primary:`SDC` :bdg-primary:`MLSDC` :bdg-primary:`PFASST` :bdg-primary:`ParaDiag`
-   :bdg-secondary:`NumPy` :bdg-secondary:`CuPy` :bdg-secondary:`FEniCS` :bdg-secondary:`Firedrake`
+   :bdg-secondary:`NumPy` :bdg-secondary:`CuPy` :bdg-secondary:`Firedrake`
    :bdg-secondary:`PETSc` :bdg-secondary:`MPI`
 
 pySDC solves initial value problems :math:`u' = f(u, t)` with spectral deferred corrections (SDC): each time step

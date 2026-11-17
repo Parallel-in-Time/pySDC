@@ -6,9 +6,7 @@ from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrakeIME
 class ConvDiff2DFiredrake(FormFiredrakeIMEX):
     r"""
     2D convection-diffusion of a rotating Gaussian on :math:`[-0.5, 0.5]^2` with time-dependent Dirichlet values,
-    IMEX, with Firedrake and given by its weak forms. This is the port of
-    :class:`~pySDC.projects.StroemungsRaum.problem_classes.ConvectionDiffusion_2D_FEniCS.fenics_ConvDiff2D_mass`, on
-    the same mesh.
+    IMEX, with Firedrake and given by its weak forms.
 
     The equation :math:`u_t = -U \cdot \nabla u + \nu \Delta u` with the rotation :math:`U = (-4y, 4x)` has the exact
     solution

@@ -7,9 +7,7 @@ from pySDC.implementations.problem_classes.FormFiredrake import FormFiredrakeIME
 class Heat2DFiredrake(FormFiredrakeIMEX):
     r"""
     Forced 2D heat equation on the unit square with time-dependent Dirichlet values, IMEX, with Firedrake and given by
-    its weak forms. This is the port of
-    :class:`~pySDC.projects.StroemungsRaum.problem_classes.HeatEquation_2D_FEniCS.fenics_heat2D_mass`, on the same
-    mesh.
+    its weak forms.
 
     The equation :math:`u_t = \nu \Delta u + f` has the exact solution
     :math:`u = \sin(\pi x) \sin(\pi y) \cos(t) + c`. The diffusion is treated implicitly, the forcing explicitly. The

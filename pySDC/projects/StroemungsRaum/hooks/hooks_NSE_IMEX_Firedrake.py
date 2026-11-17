@@ -1,7 +1,6 @@
 """
-The hooks of :mod:`pySDC.projects.StroemungsRaum.hooks.hooks_NSE_IMEX_FEniCS` for the Firedrake ports of the flow around
-the cylinder. Solutions go to a Firedrake ``CheckpointFile`` (HDF5, with the mesh), which takes the place of the XDMF
-checkpoints of the FEniCS version.
+Hooks for the flow around the cylinder: drag and lift of every step, and the solutions of every step, which go to a
+Firedrake ``CheckpointFile`` (HDF5, with the mesh).
 """
 
 import os
@@ -19,7 +18,7 @@ class LogLiftDrag(Hooks):
     """
     Record the drag and lift coefficients of the cylinder at the end of every step, as ``drag_post_step`` and
     ``lift_post_step``, with the time the step ends at (the time of ``uend``). Works with every problem class that has
-    ``drag_lift(uend)``, i.e. the monolithic and the projection port.
+    ``drag_lift(uend)``, i.e. the monolithic and the projection version of the cylinder flow.
     """
 
     def post_step(self, step, level_number):
@@ -49,7 +48,7 @@ class LogLiftDrag(Hooks):
 class LogWriteSolutions(Hooks):
     """
     Write velocity and pressure at the end of every step to ``Cylinder_solutions.h5``, as ``un`` and ``pn`` with the
-    step number as index. The pressure is the one the projection port keeps in ``pn``. Read them back with
+    step number as index. The pressure is the one the projection scheme keeps in ``pn``. Read them back with
     ``CheckpointFile(..., 'r')``, ``load_mesh()`` and ``load_function(mesh, 'un', idx=step)``.
 
     Set the class attribute `path` to write somewhere else than the project's ``data/navier_stokes`` folder.

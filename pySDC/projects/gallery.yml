@@ -87,9 +87,9 @@
         end-at: 'L.u[m + 1] = L.u[0] + integral[m]'
       summary: Sweepers, problems and scripts for solving differential-algebraic equations with SDC.
     - title: Finite elements, the mass-matrix route
-      page: FEM_with_FEniCS
-      image: data/fem_with_fenics_orders.png
-      summary: SDC, MLSDC and PFASST with FEniCS, never inverting the mass matrix, and why high-order elements make MLSDC pay.
+      page: FEM_with_Firedrake
+      image: data_firedrake/fem_with_firedrake_orders.png
+      summary: SDC, MLSDC and PFASST with Firedrake, never inverting the mass matrix, and why high-order elements make MLSDC pay.
     - title: Low-precision implicit solves in SDC
       page: DeltaSDC
       summary: Implicit solves in SDC in single or half precision, without losing the accuracy of the collocation problem.
@@ -126,10 +126,10 @@
     - title: StrömungsRaum
       page: StroemungsRaum
       excerpt:
-        file: pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_FEniCS.py
-        start-at: 'F = df.dot(u, self.v) * df.dx'
-        end-at: 'self.step = NewtonStep(F, df.derivative(F, self.w))'
-      summary: SDC with FEniCS for heat, convection-diffusion and incompressible Navier-Stokes flows.
+        file: pySDC/projects/StroemungsRaum/problem_classes/NavierStokes_2D_monolithic_Firedrake.py
+        start-at: 'def rhs(w, z):'
+        end-at: ') * fd.dx'
+      summary: SDC with Firedrake for heat, convection-diffusion and incompressible Navier-Stokes flows.
 
 - section: High-performance computing
   projects:

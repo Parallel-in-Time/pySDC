@@ -47,7 +47,9 @@ ai_usage:
       tools_used:
         - Claude
     - name: Finite-difference and FEniCS example playgrounds
-      description: Burgers 1D, Allen-Cahn 1D and FEniCS order-reduction playgrounds (~2300 lines)
+      description: >-
+        Burgers 1D, Allen-Cahn 1D and FEniCS order-reduction playgrounds (~2300 lines; the FEniCS ones are in
+        pySDC/playgrounds/deprecated since pySDC dropped FEniCS)
       ai_involvement: significant
       tools_used:
         - GitHub Copilot
@@ -89,7 +91,7 @@ ai_usage:
     - name: GPU ports and the GPU CI job
       description: >-
         useGPU for the finite-difference problems (replacing HeatEquation_ND_FD_CuPy) and the Allen-Cahn Newton
-        solves, mesh_to_mesh on GPUs, sharing one NCCL communicator per MPI communicator, tutorial step 7 G, and
+        solves, mesh_to_mesh on GPUs, sharing one NCCL communicator per MPI communicator, tutorial step 7 F, and
         the CI job on real GPUs (etc/modal_gpu_tests.py, etc/gpu_bind.py)
       ai_involvement: significant
       tools_used:
@@ -115,8 +117,20 @@ ai_usage:
       ai_involvement: significant
       tools_used:
         - Claude
-    - name: StroemungsRaum and Rayleigh-Benard projects
-      description: FEniCS flow examples and RBC project (~3100 lines)
+    - name: Firedrake finite elements in mass-matrix form, and the FEniCS ports
+      description: >-
+        FormFiredrake and helpers/ufl_forms.py, primal and dual Firedrake data, the mass-matrix transfers and the
+        delta-form and node-parallel mass-matrix sweepers, the spatial error floor, tutorial step 7 G, the Firedrake
+        ports of the former FEniCS problems, the FEM_with_Firedrake study, and the StroemungsRaum project on
+        Firedrake, with their tests
+      ai_involvement: significant
+      tools_used:
+        - Claude
+      notes: >-
+        The ported problems, the FEM study and the StroemungsRaum project were human-written with FEniCS; the
+        Firedrake versions reproduce them to round-off. FEniCS itself was removed from pySDC with them.
+    - name: Rayleigh-Benard project
+      description: RBC project
       ai_involvement: minimal
       tools_used:
         - GitHub Copilot

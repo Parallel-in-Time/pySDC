@@ -1,9 +1,6 @@
 import numpy as np
 
 try:
-    # TODO : mpi4py cannot be imported before dolfin when using fenics mesh
-    # see https://github.com/Parallel-in-Time/pySDC/pull/285#discussion_r1145850590
-    # This should be dealt with at some point
     from mpi4py import MPI
 except ImportError:
     MPI = None

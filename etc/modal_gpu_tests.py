@@ -27,9 +27,9 @@ COVERAGE_OUT = 'coverage_GPU_hardware.dat'
 #: The whole `cupy`-marked selection, which is what CI runs.
 DEFAULT_TREES = ['pySDC/tests', 'pySDC/projects/GPU/tests']
 
-#: Results the tests write for the website: tutorial step 7 G, which only a GPU can run. Carried back like the
+#: Results the tests write for the website: tutorial step 7 F, which only a GPU can run. Carried back like the
 #: coverage data, the docs job includes them.
-RESULTS = ['data/step_7_G_out.txt']
+RESULTS = ['data/step_7_F_out.txt']
 
 #: Four of them. The space-time tests ask for four ranks and NCCL wants a GPU per rank, and the
 #: serial pass -- most of the job -- is spread over the same four rather than leaving three idle.

@@ -80,7 +80,7 @@ def test_mlsdc_in_degree_matches_sdc(example):
     import numpy as np
 
     if example == 'heat':
-        from pySDC.implementations.problem_classes.HeatEquation_1D_FormFiredrake import Heat1DMassFiredrake as cls
+        from pySDC.implementations.problem_classes.HeatFiredrake import Heat1DForcedFiredrake as cls
         from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass as sweeper
 
         params = {'mesh': fd.UnitIntervalMesh(16), 'nu': 0.1, 'c': 1.0, 'time_dependent_bc': True}

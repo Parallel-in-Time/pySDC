@@ -1,7 +1,7 @@
 """
-Plots of :mod:`pySDC.projects.StroemungsRaum.run_heat_equation_Firedrake`, as those of the FEniCS version: the numerical
-and exact solutions as surfaces with the cross-section along the diagonal, frame by frame, and contours of the final
-step. Reads the ``CheckpointFile`` the run script writes.
+Plots of :mod:`pySDC.projects.StroemungsRaum.run_heat_equation_Firedrake`: the numerical and exact solutions as
+surfaces with the cross-section along the diagonal, frame by frame, and contours of the final step. Reads the
+``CheckpointFile`` the run script writes.
 """
 
 import json

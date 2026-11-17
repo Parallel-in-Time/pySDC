@@ -45,7 +45,6 @@ Tracker = "https://github.com/Parallel-in-Time/pySDC/issues"
 apps = [
     'petsc4py>=3.10.0',
     'mpi4py>=3.0.0',
-    'fenics>=2019.1.0',
     'mpi4py-fft>=2.0.2'
     ]
 dev = [
@@ -81,7 +80,6 @@ packages = ['pySDC']
 [tool.pytest.ini_options]
 markers = [
     'base: all basic tests',
-    'fenics: tests relying on FEniCS',
     'slow: tests taking much longer than bearable',
     'mpi4py: tests using MPI parallelism (but no other external library such as petsc)',
     'petsc: tests relying on PETSc/petsc4py',

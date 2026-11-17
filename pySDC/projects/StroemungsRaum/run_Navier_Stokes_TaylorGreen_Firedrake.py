@@ -1,6 +1,6 @@
 """
-The Taylor-Green order study of :mod:`pySDC.projects.StroemungsRaum.run_Navier_Stokes_TaylorGreen_FEniCS` with the
-Firedrake port of the problem class, :class:`NavierStokes2DTaylorGreenFiredrake`.
+The Taylor-Green order study of the project, see its README: the temporal order of SDC with periodic, pointwise
+Dirichlet and differentiated Dirichlet boundary data in x, with :class:`NavierStokes2DTaylorGreenFiredrake`.
 """
 
 import firedrake as fd
