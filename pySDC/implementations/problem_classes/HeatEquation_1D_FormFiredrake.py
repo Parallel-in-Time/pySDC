@@ -80,8 +80,6 @@ class Heat1DMassFiredrake(FormFiredrakeIMEX):
             bcs=(fd.DirichletBC(V, u_exact, 'on_boundary'),),
             t=t,
             u_exact=u_exact,
-            # the implicit systems are linear
-            solver_parameters={'snes_type': 'ksponly'},
             LHS_cache_size=LHS_cache_size,
         )
         self._makeAttributeAndRegister('n', 'order', 'nu', 'c', 'time_dependent_bc', localVars=locals(), readOnly=True)

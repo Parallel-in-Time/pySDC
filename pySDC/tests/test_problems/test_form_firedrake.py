@@ -254,6 +254,35 @@ def test_restricted_boundary_values_match_times_up_to_round_off():
 
 
 @pytest.mark.firedrake
+def test_solver_options_follow_the_forms():
+    """
+    A nonlinear implicit part gets Newton, a linear one a single linear solve, and a linear one that does not depend
+    on time keeps its factorization, which gives the same solutions as factorizing every time.
+    """
+    import firedrake as fd
+    import numpy as np
+    from pySDC.helpers.ufl_forms import total_rhs
+    from pySDC.implementations.problem_classes.FormFiredrake import CONSTANT_JACOBIAN, LINEAR, FormFiredrake
+
+    V = fd.FunctionSpace(fd.UnitIntervalMesh(8), 'CG', 2)
+    t = fd.Constant(0.0)
+    forms = heat_forms(V, 0.1, 0.0, t)
+    forms['rhs'] = total_rhs(forms['rhs'], forms.pop('rhs_exp'))
+
+    assert FormFiredrake(**nonlinear_forms(V, 0.1, False)).default_solver_parameters == {}
+    assert FormFiredrake(**forms).default_solver_parameters == {**LINEAR, **CONSTANT_JACOBIAN}
+    time_dependent = dict(forms, rhs=lambda u, v: fd.cos(t) * forms['rhs'](u, v))
+    assert FormFiredrake(**time_dependent).default_solver_parameters == LINEAR
+
+    kept = FormFiredrake(**forms)
+    fresh = FormFiredrake(**forms, solver_parameters={'snes_lag_jacobian': 1, 'snes_lag_preconditioner': 1})
+    for time in [0.1, 0.2, 0.3]:
+        u, w = (P.solve_system(P.apply_mass_matrix(P.u_exact(time)), 0.05, P.u_init, time) for P in (kept, fresh))
+        assert np.allclose(u.dat.data_ro, w.dat.data_ro, rtol=0, atol=1e-13)
+    assert kept.work_counters['solver_setup'].niter == 1
+
+
+@pytest.mark.firedrake
 def test_boundary_rows_of_residual():
     """
     The boundary rows of the mass-form residual carry no equation: they stay O(1) when the interior has converged.

@@ -97,8 +97,6 @@ def get_forms(imex, mesh):
     if imex:
         params['rhs'] = lambda u, v: diffusion(u, v) + forcing
         params['rhs_exp'] = reaction
-        # the implicit systems are linear now: one linear solve, no Newton iteration around it
-        params['solver_parameters'] = {'snes_type': 'ksponly'}
     else:
         params['rhs'] = lambda u, v: diffusion(u, v) + reaction(u, v) + forcing
     return params
@@ -109,8 +107,10 @@ def get_forms(imex, mesh):
 #
 # `FormFiredrake` treats the whole right-hand side implicitly, so every SDC node needs a nonlinear solve. Firedrake
 # does it with Newton's method, and the Jacobian comes from differentiating the forms symbolically. `FormFiredrakeIMEX`
-# takes a second, explicit right-hand side: here the reaction, so the implicit systems become linear. Either way, the
-# problem class never inverts the mass matrix. It hands pySDC $M u$ and $R(u)$ instead, which is what the
+# takes a second, explicit right-hand side: here the reaction, so the implicit systems become linear. The problem class
+# notices that from the forms: it then solves each system with one linear solve instead of Newton's method, and since
+# the operator does not depend on time either, it factorizes it once per prefactor and keeps the factorization. Either
+# way, the problem class never inverts the mass matrix. It hands pySDC $M u$ and $R(u)$ instead, which is what the
 # *mass-matrix sweepers* `generic_implicit_mass` and `imex_1st_order_mass` work with.
 #
 # The boundary values enter only in the solves. As a result, the rows of the SDC residual that belong to boundary

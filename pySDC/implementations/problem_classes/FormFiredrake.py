@@ -10,6 +10,19 @@ from pySDC.implementations.datatype_classes.firedrake_mesh import (
 )
 import firedrake as fd
 from firedrake.assemble import get_assembler
+import ufl
+from ufl.algorithms import expand_derivatives
+from ufl.algorithms.analysis import extract_type
+
+#: solver options added for a linear implicit part: one linear solve per node solve instead of Newton
+LINEAR = {'snes_type': 'ksponly'}
+#: and if its Jacobian does not depend on time either: assemble and factorize it once per factor and keep it
+CONSTANT_JACOBIAN = {
+    'snes_lag_jacobian': -2,
+    'snes_lag_jacobian_persists': True,
+    'snes_lag_preconditioner': -2,
+    'snes_lag_preconditioner_persists': True,
+}
 
 
 def part_of(f, space):
@@ -84,7 +97,11 @@ class FormFiredrake(Problem):
     u_exact : UFL expression, optional
         Exact solution in terms of `t` and a spatial coordinate. Needed for ``u_exact``.
     solver_parameters : dict, optional
-        PETSc options for the nonlinear solves. Defaults to Firedrake's (Newton with a direct linear solver).
+        PETSc options for the solves, on top of Firedrake's defaults (Newton with a direct linear solver). If the
+        Jacobian of the implicit system does not contain the unknown, i.e. the implicit part is linear, one linear solve
+        replaces Newton's method (:data:`LINEAR`); if it does not contain `t` either, its assembly and factorization
+        are kept from one solve to the next (:data:`CONSTANT_JACOBIAN`). Options given here take precedence, e.g.
+        ``{'snes_lag_jacobian': 1}`` if the Jacobian depends on a coefficient that is changed between solves.
     LHS_cache_size : int, optional
         Number of solvers kept, one per factor
     stop_at_divergence : bool, optional
@@ -141,11 +158,28 @@ class FormFiredrake(Problem):
         self._mass_assembler = get_assembler(mass(self._u, self._v))
         self._rhs_assemblers = [get_assembler(form) for form in self.make_rhs_forms()]
         self.solvers = {}
+        self.default_solver_parameters = self._detect_solver_parameters()
 
         self.work_counters['rhs'] = WorkCounter()
         self.work_counters['ksp'] = WorkCounter()
         self.work_counters['solver_setup'] = WorkCounter()
         self.work_counters['solver'] = WorkCounter()
+
+    def _detect_solver_parameters(self):
+        """
+        Solver options the implicit system allows: :data:`LINEAR` if its Jacobian does not contain the unknown, plus
+        :data:`CONSTANT_JACOBIAN` if it does not contain the time `t` either.
+
+        Returns:
+            dict: The options
+        """
+        _, J = implicit_system(self.mass, self.rhs, self._x, self._v, fd.TrialFunction(self.V), fd.Constant(1.0))
+        terminals = extract_type(expand_derivatives(J), ufl.core.terminal.Terminal)
+        if self._x in terminals:
+            return {}
+        if self.t in terminals:
+            return dict(LINEAR)
+        return {**LINEAR, **CONSTANT_JACOBIAN}
 
     def make_rhs_forms(self):
         """
@@ -242,7 +276,9 @@ class FormFiredrake(Problem):
             F, J = implicit_system(self.mass, self.rhs, self._x, self._v, fd.TrialFunction(self.V), fd.Constant(factor))
             problem = fd.NonlinearVariationalProblem(F - self._b, self._x, bcs=self._solve_bcs, J=J)
             self.solvers[factor] = fd.NonlinearVariationalSolver(
-                problem, solver_parameters=self.solver_parameters, nullspace=self.nullspace
+                problem,
+                solver_parameters={**self.default_solver_parameters, **(self.solver_parameters or {})},
+                nullspace=self.nullspace,
             )
             self.work_counters['solver_setup']()
 

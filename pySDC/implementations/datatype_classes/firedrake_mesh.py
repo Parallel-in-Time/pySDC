@@ -4,11 +4,14 @@ from pySDC.core.errors import DataError
 from pySDC.implementations.datatype_classes.container import MultiComponentContainer
 from pySDC.helpers.firedrake_ensemble_communicator import FiredrakeEnsembleCommunicator
 
-#: how :func:`riesz_map` solves with the mass matrix, accurate to round-off
-MASS_SOLVER = {'ksp_type': 'cg', 'pc_type': 'jacobi', 'ksp_rtol': 1e-14, 'ksp_atol': 0.0}
+#: how :func:`riesz_map` solves with the mass matrix; its relative tolerance is set per map
+MASS_SOLVER = {'ksp_type': 'cg', 'pc_type': 'jacobi', 'ksp_atol': 0.0}
+#: tolerance of the mass solves behind the norm of dual data: the norm's error is about the square of it, here 1e-9,
+#: plenty for a stopping test, at a third to a half of the cost of solving to round-off
+NORM_RTOL = 1e-4
 
 
-def riesz_map(V):
+def riesz_map(V, rtol=1e-14):
     """
     The L2 Riesz map of a primal space, one per space so its mass matrix is assembled once.
 
@@ -22,6 +25,8 @@ def riesz_map(V):
 
     Args:
         V (firedrake.FunctionSpace): The primal space
+        rtol (float): Relative tolerance of the mass solves. The default is round-off, which projections need; the
+            norm of dual data uses :data:`NORM_RTOL`.
 
     Returns:
         firedrake.RieszMap: Maps a cofunction r to the function w with (w, v) = r(v) for all v in `V`
@@ -31,9 +36,11 @@ def riesz_map(V):
     if maps is None:
         maps = mesh._pysdc_riesz_maps = {}
     # keyed by equality, since spaces are often rebuilt, e.g. by `Cofunction.function_space().dual()`
-    if V not in maps:
-        maps[V] = fd.RieszMap(V, 'L2', constant_jacobian=True, solver_parameters=MASS_SOLVER)
-    return maps[V]
+    if (V, rtol) not in maps:
+        maps[(V, rtol)] = fd.RieszMap(
+            V, 'L2', constant_jacobian=True, solver_parameters={**MASS_SOLVER, 'ksp_rtol': rtol}
+        )
+    return maps[(V, rtol)]
 
 
 class firedrake_mesh(object):
@@ -103,18 +110,14 @@ class firedrake_mesh(object):
         """
         Return a copy of this plus `alpha` times `other`, with `alpha` 1 or -1.
 
-        Dual data are combined on their PETSc vectors: ``Cofunction.assign`` of a sum goes through a symbolic UFL
-        ``FormSum`` and costs about ten times as much as the same for a ``Function``.
+        Both kinds are combined on their PETSc vectors, with the same result as Firedrake's ``assign`` of the sum:
+        that goes through a symbolic expression and costs 4-6 times as much for a ``Function``, and about ten times
+        as much for a ``Cofunction``.
         """
         self._check_operand(other)
         me = firedrake_mesh(self)
-        if self.is_dual:
-            with me.dat.vec as x, other.dat.vec_ro as y:
-                x.axpy(alpha, y)
-        elif alpha == 1.0:
-            me.functionspace.assign(self.functionspace + other.functionspace)
-        else:
-            me.functionspace.assign(self.functionspace - other.functionspace)
+        with me.dat.vec as x, other.dat.vec_ro as y:
+            x.axpy(alpha, y)
         return me
 
     def __add__(self, other):
@@ -137,11 +140,8 @@ class firedrake_mesh(object):
 
         try:
             me = firedrake_mesh(self)
-            if self.is_dual:
-                with me.dat.vec as x:
-                    x.scale(other)
-            else:
-                me.functionspace.assign(other * self.functionspace)
+            with me.dat.vec as x:
+                x.scale(other)
             return me
         except TypeError as e:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self))) from e
@@ -159,7 +159,7 @@ class firedrake_mesh(object):
             float: The norm
         """
         if self.is_dual:
-            representer = riesz_map(self.functionspace.function_space().dual())(self.functionspace)
+            representer = riesz_map(self.functionspace.function_space().dual(), NORM_RTOL)(self.functionspace)
             return abs(self.functionspace.dat.inner(representer.dat)) ** 0.5
         return fd.norm(self.functionspace, 'L2')
 

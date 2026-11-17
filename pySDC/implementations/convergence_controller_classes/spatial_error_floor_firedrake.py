@@ -34,8 +34,9 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
     Stop iterating once the residual is small compared with the spatial discretization error, for Firedrake problems.
 
     Iterating further cannot make the solution more accurate than its spatial error allows. This controller estimates
-    that error at the end of the step, :math:`e_x = \|u - P R u\| / 2^{p+1}` (see :func:`coarse_space_error`), and
-    declares the step converged once (on the last collocation node, the end point for RADAU-RIGHT)
+    that error at the end of the step, :math:`e_x = \|u - P R u\| / 2^{p+1}` (see :func:`coarse_space_error`), once
+    per step after its first iteration, and declares the step converged once (on the last collocation node, the end
+    point for RADAU-RIGHT)
 
     .. math::
         \|r\| \le \gamma \, e_x \, \Delta t / T,
@@ -106,6 +107,8 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
         super().setup_status_variables(controller, **kwargs)
         #: the transfer buffers of :func:`coarse_space_error`
         self.buffers = {}
+        #: the time of the step the estimate belongs to, and the estimate
+        self.estimate = (None, None)
         steps, comm = kwargs.get('MS'), kwargs.get('comm')
         if (steps is not None and len(steps) > 1) or (comm is not None and comm.size > 1):
             raise NotImplementedError(
@@ -125,9 +128,13 @@ class SpatialErrorFloorFiredrake(ConvergenceController):
             None
         """
         L = S.levels[0]
-        u = L.u[-1].functionspace
-        degree = u.function_space().ufl_element().embedded_superdegree
-        e_x = coarse_space_error(u, self.params.coarse_space, self.buffers) / 2 ** (degree + 1)
+        # the spatial error hardly changes while the step iterates, so it is estimated once per step: on the FEM study
+        # that left every iteration count unchanged and cut the time spent here 3-10 times
+        if S.status.iter == 1 or self.estimate[0] != S.time:
+            u = L.u[-1].functionspace
+            degree = u.function_space().ufl_element().embedded_superdegree
+            self.estimate = (S.time, coarse_space_error(u, self.params.coarse_space, self.buffers) / 2 ** (degree + 1))
+        e_x = self.estimate[1]
         if L.status.residual <= self.params.gamma * e_x * L.dt / self.params.Tend:
             self.debug(f'Residual {L.status.residual:.2e} below the spatial error budget of {e_x:.2e}', S)
             S.status.force_done = True
