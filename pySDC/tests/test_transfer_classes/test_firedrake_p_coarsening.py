@@ -70,18 +70,27 @@ def run(problem_class, problem_params, sweeper_class, orders, dt, nsteps, restol
 
 
 @pytest.mark.firedrake
-def test_mlsdc_in_degree_matches_sdc():
+@pytest.mark.parametrize('example', ['heat', 'grayscott'])
+def test_mlsdc_in_degree_matches_sdc(example):
     """
     MLSDC coarsening in the degree on one mesh converges to the SDC solution: the heat equation with time-dependent
-    boundary values, on two and three levels.
+    boundary values (two and three levels), and Gray-Scott on a mixed space.
     """
     import firedrake as fd
     import numpy as np
-    from pySDC.implementations.problem_classes.HeatEquation_1D_FormFiredrake import Heat1DMassFiredrake as cls
-    from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass as sweeper
 
-    params = {'mesh': fd.UnitIntervalMesh(16), 'nu': 0.1, 'c': 1.0, 'time_dependent_bc': True}
-    ladders, dt, restol = [[4, 2], [4, 2, 1]], 0.1, 1e-11
+    if example == 'heat':
+        from pySDC.implementations.problem_classes.HeatEquation_1D_FormFiredrake import Heat1DMassFiredrake as cls
+        from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass as sweeper
+
+        params = {'mesh': fd.UnitIntervalMesh(16), 'nu': 0.1, 'c': 1.0, 'time_dependent_bc': True}
+        ladders, dt, restol = [[4, 2], [4, 2, 1]], 0.1, 1e-11
+    else:
+        from pySDC.implementations.problem_classes.GrayScott_1D_Firedrake import GrayScott1DFiredrake as cls
+        from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass as sweeper
+
+        params = {'mesh': fd.IntervalMesh(64, 100), 'solver_parameters': {'snes_rtol': 1e-13, 'snes_atol': 1e-14}}
+        ladders, dt, restol = [[4, 2]], 1.0, 1e-8
 
     u_sdc, iterations_sdc = run(cls, params, sweeper, [4], dt, 3, restol)
     for orders in ladders:
