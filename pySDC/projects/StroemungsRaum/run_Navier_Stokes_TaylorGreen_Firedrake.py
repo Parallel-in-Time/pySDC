@@ -8,6 +8,7 @@ import numpy as np
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+from pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step import PrepareStep
 from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
     NavierStokes2DTaylorGreenFiredrake,
     zero_mean_pressure,
@@ -60,6 +61,8 @@ def setup(
         'level_params': {'restol': restol, 'dt': dt},
         'step_params': {'maxiter': maxiter},
     }
+    if differentiated_bc:
+        description['convergence_controllers'] = {PrepareStep: {}}
     return description, {'logger_level': 30}, t0
 
 

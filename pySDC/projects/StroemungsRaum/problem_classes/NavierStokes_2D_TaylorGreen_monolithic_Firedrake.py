@@ -70,7 +70,8 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         Periodic instead of time-dependent Dirichlet boundaries on :math:`x = \pm 0.5`.
     differentiated_bc : bool, optional
         Impose the time-dependent boundary data in differentiated form, see :meth:`prepare_step`. Needs time-dependent
-        data (not `periodic`).
+        data (not `periodic`) and the convergence controller
+        :class:`~pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step.PrepareStep`.
     solver_parameters : dict, optional
         PETSc options for the nonlinear solves, by default Newton with tight tolerances.
     LHS_cache_size : int, optional
@@ -142,6 +143,8 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         self.mesh = mesh
         #: the time derivative of the exact solution, whose boundary values the differentiated conditions integrate
         self._rate = time_derivative(self.u_exact_expr, t)
+        #: whether :meth:`prepare_step` has built differentiated boundary values
+        self._prepared = False
 
     def prepare_step(self, t0, dt, coll):
         r"""
@@ -159,16 +162,16 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
         (:meth:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.use_restricted_boundary_values`),
         so on coarse levels of MLSDC and PFASST the restriction takes over, as it should.
 
-        Called once per step by the collocation sweepers, see :meth:`pySDC.core.problem.Problem.prepare_step`.
+        Called once per step by :class:`~pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step.PrepareStep`.
 
         Args:
             t0 (float): Start of the step
             dt (float): Step size
             coll: The sweeper's collocation rule
         """
-        # every collocation sweeper calls this once per step; without differentiated data there is nothing to do
         if not self.differentiated_bc:
             return
+        self._prepared = True
         times = [t0 + dt * tau for tau in coll.nodes]
         rates = []
         for tau in times:
@@ -181,3 +184,12 @@ class NavierStokes2DTaylorGreenFiredrake(FormFiredrake):
                 value += dt * coll.Qmat[m + 1, j + 1] * rate
             values.append(value)
         self.use_restricted_boundary_values(values, times)
+
+    def solve_system(self, rhs, factor, u0, t):
+        """
+        Solve as :meth:`~pySDC.implementations.problem_classes.FormFiredrake.FormFiredrake.solve_system` does, after
+        making sure that differentiated boundary values are there if they were asked for.
+        """
+        if self.differentiated_bc and not self._prepared:
+            raise RuntimeError('Differentiated boundary conditions need the PrepareStep convergence controller')
+        return super().solve_system(rhs, factor, u0, t)

@@ -117,6 +117,7 @@ def taylor_green(dt, Tend, case, num_nodes, maxiter, restol, nelems, nu):
     """Run the Taylor-Green problem with SDC for one of TAYLOR_GREEN_CASES and return the problem and the end point."""
     from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
     from pySDC.implementations.sweeper_classes.generic_implicit_mass import generic_implicit_mass
+    from pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step import PrepareStep
     from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
         NavierStokes2DTaylorGreenFiredrake,
     )
@@ -133,6 +134,7 @@ def taylor_green(dt, Tend, case, num_nodes, maxiter, restol, nelems, nu):
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': num_nodes, 'QI': 'LU'},
         'level_params': {'dt': dt, 'restol': restol},
         'step_params': {'maxiter': maxiter},
+        'convergence_controllers': {PrepareStep: {}},
     }
     controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
     P = controller.MS[0].levels[0].prob
@@ -204,6 +206,7 @@ def projection():
         NavierStokes2DProjectionFiredrake,
     )
     from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+    from pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step import PrepareStep
 
     dt, t0 = 1 / 1600, 3.125e-4
     description = {
@@ -213,6 +216,7 @@ def projection():
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 2, 'QI': 'LU', 'QE': 'PIC'},
         'level_params': {'dt': dt, 'restol': -1.0},
         'step_params': {'maxiter': 3},
+        'convergence_controllers': {PrepareStep: {}},
     }
     controller = controller_nonMPI(num_procs=1, controller_params={'logger_level': 30}, description=description)
     P = controller.MS[0].levels[0].prob
@@ -232,3 +236,19 @@ def test_projection_reference_values():
     evaluate = fd.PointEvaluator(P.mesh, [list(x) for x in REFERENCE_POINTS]).evaluate
     values = np.column_stack([evaluate(uend.functionspace), evaluate(P.pn)])
     assert np.allclose(values, PROJECTION_POINTS, rtol=0, atol=1e-12), values
+
+
+@pytest.mark.firedrake
+def test_step_data_needs_the_convergence_controller():
+    """Without PrepareStep, the projection and the differentiated boundary conditions refuse to solve."""
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_projection_Firedrake import (
+        NavierStokes2DProjectionFiredrake,
+    )
+    from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_TaylorGreen_monolithic_Firedrake import (
+        NavierStokes2DTaylorGreenFiredrake,
+    )
+
+    for P in [NavierStokes2DTaylorGreenFiredrake(nelems=4, differentiated_bc=True), NavierStokes2DProjectionFiredrake()]:
+        u = P.u_exact(0.0)
+        with pytest.raises(RuntimeError, match='PrepareStep'):
+            P.solve_system(P.apply_mass_matrix(u), 0.1, u, 0.1)

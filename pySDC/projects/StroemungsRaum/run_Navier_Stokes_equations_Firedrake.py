@@ -17,6 +17,7 @@ from pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_projection_Fi
     NavierStokes2DProjectionFiredrake,
 )
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+from pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step import PrepareStep
 
 DEFAULT_PATH = f'{os.path.dirname(__file__)}/data/navier_stokes/'
 
@@ -35,6 +36,8 @@ def setup(t0=3.125e-4):
         'sweeper_params': {'quad_type': 'RADAU-RIGHT', 'num_nodes': 2, 'QE': 'PIC', 'QI': 'LU'},
         'level_params': {'e_tol': 1e-9, 'dt': 1 / 1600},
         'step_params': {'maxiter': 10},
+        # the projection needs the start of every step
+        'convergence_controllers': {PrepareStep: {}},
     }
     controller_params = {'logger_level': 20, 'hook_class': [LogLiftDrag]}
     return description, controller_params, t0

@@ -15,7 +15,9 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
     Firedrake. This is the port of
     :class:`~pySDC.projects.StroemungsRaum.problem_classes.NavierStokes_2D_FEniCS.fenics_NSE_2D_mass`, on the same
     mesh, with the standard
-    :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass` sweeper.
+    :class:`~pySDC.implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass` sweeper and the
+    convergence controller :class:`~pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step.PrepareStep`,
+    which tells it where each step starts.
 
     The problem is posed for the velocity :math:`u` alone, with the viscous term implicit and the convection explicit,
 
@@ -76,6 +78,8 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
 
         # pressure Poisson equation and velocity correction, set up once: the step and u* come in through buffers
         self.pn = fd.Function(Q)
+        #: the start of the current step, set by :meth:`prepare_step`
+        self._t0 = None
         self._dtau = fd.Constant(1.0)
         self._u_star = fd.Function(V)
         self._u_new = fd.Function(V)
@@ -102,7 +106,7 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
     def prepare_step(self, t0, dt, coll):
         """
         Remember the start of the step: the projection uses the time from there to the node, see the class docstring.
-        Called once per step by the collocation sweepers, see :meth:`pySDC.core.problem.Problem.prepare_step`.
+        Called once per step by :class:`~pySDC.projects.StroemungsRaum.convergence_controllers.prepare_step.PrepareStep`.
 
         Args:
             t0 (float): Start of the step
@@ -126,6 +130,8 @@ class NavierStokes2DProjectionFiredrake(FormFiredrakeIMEX):
         Returns:
             dtype_u: The velocity
         """
+        if self._t0 is None:
+            raise RuntimeError('The projection needs the start of the step: add the PrepareStep convergence controller')
         u = super().solve_system(rhs, factor, u0, t)
         self._u_star.assign(u.functionspace)
         self._dtau.assign(t - self._t0)

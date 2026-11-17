@@ -316,9 +316,11 @@ class fenics_NSE_2D_TaylorGreen(Problem):
         coll : pySDC.core.collocation.CollBase
             Collocation rule of the sweeper, supplying the nodes and the matrix Q.
         """
-        # every collocation sweeper calls this once per step; without differentiated data there is nothing to do
         if not self.differentiated_bc:
-            return
+            raise RuntimeError(
+                'prepare_step builds the differentiated boundary conditions, which this problem '
+                'was not set up for; use generic_implicit_mass or pass differentiated_bc=True'
+            )
 
         M = coll.num_nodes
         Q = coll.Qmat[1:, 1:]
