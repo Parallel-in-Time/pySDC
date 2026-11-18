@@ -14,6 +14,8 @@ Development
    docs/contrib/07_release_guide
    docs/contrib/08_ai_usage
    Code of conduct <CODE_OF_CONDUCT>
+   Governance <GOVERNANCE>
+   Security policy <SECURITY>
 
 Tests
 -----
