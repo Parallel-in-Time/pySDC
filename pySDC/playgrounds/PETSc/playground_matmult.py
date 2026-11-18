@@ -24,7 +24,7 @@ x.assemblyBegin()
 x.assemblyEnd()
 
 # set up 2nd order FD matrix, taken from https://bitbucket.org/petsc/petsc4py/src/master/demo/kspsolve/petsc-mat.py
-A = da.createMatrix()
+A = da.createMat()
 A.setType('aij')  # sparse
 A.setFromOptions()
 A.setPreallocationNNZ((5, 5))

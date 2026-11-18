@@ -13,7 +13,7 @@ class petsc_vec(PETSc.Vec):
             obj = PETSc.Vec.__new__(cls)
             init.copy(obj)
         elif isinstance(init, PETSc.DMDA):
-            tmp = init.createGlobalVector()
+            tmp = init.createGlobalVec()
             obj = petsc_vec(tmp)
             objarr = init.getVecArray(obj)
             objarr[:] = val

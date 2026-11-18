@@ -9,7 +9,7 @@ dependencies:
   - matplotlib>=3.0
   - dill>=0.2.6
   - openmpi
-  - petsc4py<3.22
+  - petsc4py
   - mpi4py>=3.0.0
   - pip
   - pip:

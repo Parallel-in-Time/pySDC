@@ -39,7 +39,7 @@ class Fisher_full(object):
         self.row = PETSc.Mat.Stencil()
         self.col = PETSc.Mat.Stencil()
 
-        self.mat = self.da.createMatrix()
+        self.mat = self.da.createMat()
         self.mat.setType('aij')  # sparse
         self.mat.setFromOptions()
         self.mat.setPreallocationNNZ((3, 3))
@@ -128,7 +128,7 @@ class Fisher_split(object):
         self.row = PETSc.Mat.Stencil()
         self.col = PETSc.Mat.Stencil()
 
-        self.mat = self.da.createMatrix()
+        self.mat = self.da.createMat()
         self.mat.setType('aij')  # sparse
         self.mat.setFromOptions()
         self.mat.setPreallocationNNZ((3, 3))

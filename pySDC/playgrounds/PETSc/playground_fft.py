@@ -17,7 +17,7 @@ def main():
             xa[i, j] = j * n + i
     print('x=', rank, x.getArray(), xs, xe, ys, ye)
 
-    A = da.createMatrix()
+    A = da.createMat()
     A.setType(PETSc.Mat.Type.FFTW)  # sparse
     A.setFromOptions()
 

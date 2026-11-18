@@ -51,7 +51,7 @@ def main():
     # ya[0,0] = 10.0
     # print(y.getArray()[0], z.getArray()[0])
 
-    A = da.createMatrix()
+    A = da.createMat()
     A.setType('aij')  # sparse
     A.setFromOptions()
     A.setPreallocationNNZ((5, 5))
@@ -94,7 +94,7 @@ def main():
     A.view()
     exit()
 
-    Id = da.createMatrix()
+    Id = da.createMat()
     Id.setType('aij')  # sparse
     Id.setFromOptions()
     Id.setPreallocationNNZ((5, 5))
