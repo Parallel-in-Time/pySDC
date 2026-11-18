@@ -67,7 +67,7 @@ anonymous.
 
 ## Verifying Releases
 
-Releases after v5.10 are uploaded to PyPI by the GitHub Actions workflow
+Releases from v5.10.1 on are uploaded to PyPI by the GitHub Actions workflow
 [`.github/workflows/pypi.yml`](./.github/workflows/pypi.yml) through
 [trusted publishing](https://docs.pypi.org/trusted-publishers/). The upload attaches a signed attestation
 ([PEP 740](https://peps.python.org/pep-0740/)) to every file. It is signed with [Sigstore](https://www.sigstore.dev/),
@@ -83,8 +83,8 @@ pypi-attestations verify pypi --repository https://github.com/Parallel-in-Time/p
 ```
 
 The command downloads the file and its attestation from PyPI and fails unless the signature is valid and was made by a
-workflow in `Parallel-in-Time/pySDC`. The wheel of 5.10.1 is named `pysdc-5.10.1-py2.py3-none-any.whl`; later wheels
-are `py3` only.
+workflow in `Parallel-in-Time/pySDC`. The wheel name in the example holds from 5.10.2 on; the wheel of 5.10.1 is named
+`pysdc-5.10.1-py2.py3-none-any.whl`.
 
 ## Dependencies
 

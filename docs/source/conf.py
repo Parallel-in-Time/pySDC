@@ -20,7 +20,7 @@ author = (
     'Jakob Fritz, Jemma Shipton, Abdelouahed Ouardghi, Gayatri Čaklović'
 )
 version = '5.10'
-release = '5.10.1'
+release = '5.10.2'
 
 extensions = [
     'sphinx.ext.autodoc',
