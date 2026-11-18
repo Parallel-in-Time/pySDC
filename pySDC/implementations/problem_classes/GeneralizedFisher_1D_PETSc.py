@@ -468,6 +468,16 @@ class petsc_fisher_multiimplicit(Problem):
         A.assemble()
         return A
 
+    def _zero_boundary(self, fa):
+        """
+        Zero the first and last grid point of a ``DMDAArray``. Its indices are global, and only the first and last
+        rank own these points.
+        """
+        if self.xs == 0:
+            fa[0] = 0
+        if self.xe == self.nvars:
+            fa[self.nvars - 1] = 0
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the right-hand side of the problem.
@@ -488,15 +498,13 @@ class petsc_fisher_multiimplicit(Problem):
         f = self.dtype_f(self.init)
         self.A.mult(u, f.comp1)
         fa1 = DMDAArray(self.init, f.comp1)
-        fa1[0] = 0
-        fa1[-1] = 0
+        self._zero_boundary(fa1)
 
         fa2 = DMDAArray(self.init, f.comp2)
         xa = DMDAArray(self.init, u)
         u = xa[self.xs : self.xe]
         fa2[self.xs : self.xe] = self.lambda0**2 * u * (1 - u**self.nu)
-        fa2[0] = 0
-        fa2[-1] = 0
+        self._zero_boundary(fa2)
 
         return f
 
@@ -656,8 +664,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         xa = DMDAArray(self.init, u)
         u = xa[self.xs : self.xe]
         fa2[self.xs : self.xe] += self.lambda0**2 * u * (1 - u**self.nu)
-        fa2[0] = 0
-        fa2[-1] = 0
+        self._zero_boundary(fa2)
 
         return f
 
@@ -753,15 +760,13 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
         f = self.dtype_f(self.init)
         self.A.mult(u, f.impl)
         fa1 = DMDAArray(self.init, f.impl)
-        fa1[0] = 0
-        fa1[-1] = 0
+        self._zero_boundary(fa1)
 
         fa2 = DMDAArray(self.init, f.expl)
         xa = DMDAArray(self.init, u)
         u = xa[self.xs : self.xe]
         fa2[self.xs : self.xe] = self.lambda0**2 * u * (1 - u**self.nu)
-        fa2[0] = 0
-        fa2[-1] = 0
+        self._zero_boundary(fa2)
 
         return f
 
