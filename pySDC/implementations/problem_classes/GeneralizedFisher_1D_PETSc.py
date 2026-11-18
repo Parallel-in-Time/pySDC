@@ -379,7 +379,7 @@ class petsc_fisher_multiimplicit(Problem):
         self.snes_itercount = 0
         self.snes_ncalls = 0
         self.F = self.init.createGlobalVec()
-        self.J = self.init.createMatrix()
+        self.J = self.init.createMat()
 
     def __get_A(self):
         r"""
@@ -391,7 +391,7 @@ class petsc_fisher_multiimplicit(Problem):
             Discretization matrix.
         """
         # create matrix and set basic options
-        A = self.init.createMatrix()
+        A = self.init.createMat()
         A.setType('aij')  # sparse
         A.setFromOptions()
         A.setPreallocationNNZ((3, 3))
@@ -437,7 +437,7 @@ class petsc_fisher_multiimplicit(Problem):
         """
 
         # create matrix and set basic options
-        A = self.init.createMatrix()
+        A = self.init.createMat()
         A.setType('aij')  # sparse
         A.setFromOptions()
         A.setPreallocationNNZ((3, 3))
@@ -557,7 +557,7 @@ class petsc_fisher_multiimplicit(Problem):
         # assign residual function and Jacobian
         F = self.init.createGlobalVec()
         self.snes.setFunction(target.formFunction, F)
-        J = self.init.createMatrix()
+        J = self.init.createMat()
         self.snes.setJacobian(target.formJacobian, J)
 
         self.snes.solve(rhs, me)

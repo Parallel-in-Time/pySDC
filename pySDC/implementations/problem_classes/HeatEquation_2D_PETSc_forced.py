@@ -128,7 +128,7 @@ class heat2d_petsc_forced(Problem):
             Matrix A defining the 2D Laplace operator.
         """
         # create matrix and set basic options
-        A = self.init.createMatrix()
+        A = self.init.createMat()
         A.setType('aij')  # sparse
         A.setFromOptions()
         A.setPreallocationNNZ((5, 5))
@@ -173,7 +173,7 @@ class heat2d_petsc_forced(Problem):
         """
 
         # create matrix and set basic options
-        Id = self.init.createMatrix()
+        Id = self.init.createMat()
         Id.setType('aij')  # sparse
         Id.setFromOptions()
         Id.setPreallocationNNZ((1, 1))
