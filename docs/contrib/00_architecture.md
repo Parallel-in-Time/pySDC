@@ -1,0 +1,62 @@
+# Architecture overview
+
+`pySDC` solves initial value problems $du/dt = f(u, t)$ with spectral deferred corrections (SDC) and the methods
+built on it: multi-level SDC (MLSDC), the parallel full approximation scheme in space and time (PFASST), and
+parallel-across-the-steps ParaDiag iterations. This page explains which parts the code consists of and how they work
+together. The [tutorial](https://parallel-in-time.org/pySDC/) shows the same parts at work, step by step.
+
+## Setting up and running a simulation
+
+A simulation is described by two dictionaries and handed to a controller:
+
+```python
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+description = {
+    'problem_class': MyProblem,       # what to solve: the right-hand side f(u, t)
+    'problem_params': {...},
+    'sweeper_class': MySweeper,       # how to solve it: the SDC iteration
+    'sweeper_params': {...},          # e.g. quadrature nodes, preconditioner
+    'level_params': {'dt': 0.1, 'restol': 1e-10},
+    'step_params': {'maxiter': 20},
+}
+controller = controller_nonMPI(num_procs=1, controller_params={}, description=description)
+P = controller.MS[0].levels[0].prob
+uend, stats = controller.run(u0=P.u_exact(0.0), t0=0.0, Tend=1.0)
+```
+
+`description` can also contain transfer classes between levels (`space_transfer_class`, `base_transfer_class`) and
+`convergence_controllers`. If an entry of `problem_params`, `sweeper_params` or `level_params` is a list, `pySDC`
+builds one level per list item, finest first. This is how MLSDC and PFASST get their hierarchy.
+
+## The parts
+
+```
+Controller ── runs the time loop, decides what happens next
+ └─ Step (one per time step solved in parallel)
+     ├─ Level 0 (finest) ── Sweeper ── Problem ── data types
+     ├─ Level 1          ── Sweeper ── Problem
+     └─ transfer between levels: BaseTransfer (in time) using SpaceTransfer (in space)
+Convergence controllers and hooks plug into the controller at fixed points.
+```
+
+- **Controller** (base class in `pySDC/core/controller.py`, implementations in `implementations/controller_classes`): Owns the time loop. It moves each step through its stages (predict, sweep, communicate, restrict, prolong) and asks the convergence controllers when a step is done. `controller_nonMPI` emulates `num_procs` parallel time steps in one process; `controller_MPI` runs one time step per MPI rank; the ParaDiag controllers solve several steps at once with a diagonalized preconditioner.
+- **Step** (base class in `pySDC/core/step.py`): Bundles the levels of one time step, the transfer operators between them, and the step's status (iteration count, whether it is done). Steps know their neighbors, through which the solution is passed on.
+- **Level** (base class in `pySDC/core/level.py`): Holds the data at the quadrature nodes: the solution `u`, the right-hand side `f`, the end value `uend`, the `residual`, and the FAS correction `tau` that a coarse level receives from the finer one. Its `level_params` set the step size `dt` and the residual tolerance `restol`.
+- **Sweeper** (base class in `pySDC/core/sweeper.py`, implementations in `implementations/sweeper_classes`): Carries out the SDC iteration on one level: `predict`, `update_nodes` (one sweep), `compute_residual`, `compute_end_point` and `integrate`. The quadrature nodes and the collocation and Q-Δ matrices come from the companion package [`qmat`](https://github.com/Parallel-in-Time/qmat).
+- **Problem** (base class in `pySDC/core/problem.py`, implementations in `implementations/problem_classes`): Defines the equation: `eval_f` evaluates the right-hand side, `solve_system` solves the implicit systems the sweeper needs, `u_exact` gives an exact or reference solution. It also fixes the data types of `u` and `f`.
+- **Data types** (implementations in `implementations/datatype_classes`): The objects the solution is stored in: `mesh` (a NumPy array), `imex_mesh` (implicit and explicit parts of the right-hand side stored separately), and variants for CuPy, PETSc, Firedrake and particles.
+- **Transfer** (base class in `pySDC/core/base_transfer.py`, `pySDC/core/space_transfer.py`, implementations in `implementations/transfer_classes`): `BaseTransfer` restricts and prolongs between levels, including the FAS correction, and uses a `SpaceTransfer` to coarsen and refine in space.
+- **Convergence controllers** (base class in `pySDC/core/convergence_controller.py`, implementations in `implementations/convergence_controller_classes`): Plug into the controller to decide when to stop iterating (`CheckConvergence`, always added), to adapt the step size, to restart a step, or to estimate errors.
+- **Hooks** (base class in `pySDC/core/hooks.py`, implementations in `implementations/hooks`): Called at fixed points of the run (`pre_run`, `pre_step`, `post_sweep`, `post_iteration`, `post_step`, `post_run`, ...) to record statistics or write the solution. The controller returns what they record as `stats`, which `pySDC.helpers.stats_helper` (`filter_stats`, `get_sorted`) reads.
+- **Helpers** (implementations in `pySDC/helpers`): Shared tools that are not part of the algorithm: spectral and finite-difference discretizations, file output (`fieldsIO`), plotting, test utilities.
+
+## Where to extend `pySDC`
+
+Most new work is a new problem class, sweeper, convergence controller or hook, written as a subclass of the
+corresponding base class; the controller and the rest of `pySDC/core` rarely need to change. The page on
+[custom implementations](./04_custom_implementations.md) shows how. Research code that uses `pySDC` for a paper or a
+study lives in `pySDC/projects`, see [adding a new project](./06_new_project.md).
+
+:arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
+:arrow_right: [Next to Pull Requests Recommendations](./01_pull_requests.md)

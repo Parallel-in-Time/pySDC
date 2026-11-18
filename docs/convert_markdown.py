@@ -13,7 +13,7 @@ import json
 import m2r2
 import numpy as np
 
-mdFiles = ['README.md', 'CONTRIBUTING.md', 'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'GOVERNANCE.md', 'SECURITY.md', 'docs/contrib']
+mdFiles = ['README.md', 'CONTRIBUTING.md', 'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'GOVERNANCE.md', 'ROADMAP.md', 'SECURITY.md', 'docs/contrib']
 
 docSources = 'docs/source'
 

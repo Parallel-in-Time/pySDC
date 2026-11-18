@@ -44,8 +44,7 @@ Current maintainers: [@pancetta](https://github.com/pancetta) (Robert Speck, For
 ## How decisions are made
 
 - **Day-to-day changes** go through pull requests. A core developer or maintainer merges a pull request once the CI
-  passes and the review comments are resolved. Changes to `pySDC/core` and changes that alter the user interface need
-  the approval of at least one core developer or maintainer other than the author.
+  passes and the review comments are resolved.
 - **Larger changes**, such as API-breaking changes, dropping support for a Python or NumPy version, or adding a
   required dependency, are first discussed in a GitHub issue. API-breaking changes are developed on a release branch
   (`v6`, ...) whose roadmap is written down in a dedicated issue, as described in the

@@ -25,6 +25,13 @@ some_feature  # to add a new feature (implementation, ...)
 
 Those changes should be compatible with the existing API (_i.e_ not break it), and **avoid any change** in the current user interface. In particular, it should not modify default values for parameters or remove attributes of existing classes. But new attributes or parameters can be added with pre-set default values, and new classes can be added in the `pySDC.implementations` module.
 
+## Tests are part of the change
+
+A pull request that adds functionality must add tests for it to the automated test suite in `pySDC/tests` (or, for a
+project, in its `tests` folder, see [adding a new project](./06_new_project.md)). A pull request that fixes a bug
+should add a test that fails without the fix. Pull requests without such tests are not merged unless the reviewers
+agree that the change cannot be tested sensibly.
+
 > :bell: During the revision of your pull request, it can happen that additional changes are done to the `upstream/master` branch (in parallel-in-time/pySDC repo). In that case, don't hesitate to regularly merge them into your local branch to solve eventual conflicts, for instance :
 >
 > ```bash
