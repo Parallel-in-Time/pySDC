@@ -60,6 +60,7 @@ for more details. Additional guideline are also given on how to
 
 
 #. `GitHub Forks and Pull Requests <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models>`_
+#. :doc:`Architecture Overview <./docs/contrib/00_architecture>`
 #. :doc:`Pull Requests Recommendations <./docs/contrib/01_pull_requests>`
 #. :doc:`Continuous Integration <./docs/contrib/02_continuous_integration>`
 #. :doc:`Naming Conventions <./docs/contrib/03_naming_conventions>`
