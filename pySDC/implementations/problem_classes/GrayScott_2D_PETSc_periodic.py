@@ -443,7 +443,7 @@ class petsc_grayscott_multiimplicit(Problem):
         A : PETSc matrix object
             Discretization matrix.
         """
-        A = self.init.createMatrix()
+        A = self.init.createMat()
         A.setType('aij')  # sparse
         A.setFromOptions()
         A.setPreallocationNNZ((5, 5))
@@ -507,7 +507,7 @@ class petsc_grayscott_multiimplicit(Problem):
             Identity matrix.
         """
 
-        Id = self.init.createMatrix()
+        Id = self.init.createMat()
         Id.setType('aij')  # sparse
         Id.setFromOptions()
         Id.setPreallocationNNZ((1, 1))
@@ -613,7 +613,7 @@ class petsc_grayscott_multiimplicit(Problem):
 
         F = self.init.createGlobalVec()
         self.snes.setFunction(target.formFunction, F)
-        J = self.init.createMatrix()
+        J = self.init.createMat()
         self.snes.setJacobian(target.formJacobian, J)
 
         self.snes.solve(rhs, me)
@@ -732,7 +732,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         # assign residual function and Jacobian
         F = self.init.createGlobalVec()
         self.snes.setFunction(target.formFunction, F)
-        J = self.init.createMatrix()
+        J = self.init.createMat()
         self.snes.setJacobian(target.formJacobian, J)
 
         self.snes.solve(rhs, me)

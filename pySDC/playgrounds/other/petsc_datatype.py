@@ -10,7 +10,7 @@ class mymesh(PETSc.Vec):
             obj = PETSc.Vec().__new__(cls)
             init.copy(obj)
         elif isinstance(init, PETSc.DMDA):
-            tmp = init.createGlobalVector()
+            tmp = init.createGlobalVec()
             obj = mymesh(tmp)
             objarr = init.getVecArray(obj)
             objarr[:] = val
