@@ -1,0 +1,39 @@
+etc/environment-petsc.yml
+  s_d7f87f28d499c6::t_0e8157a910b83a 12
+pySDC/playgrounds/PETSc/playground_matmult.py
+  s_d7f87f28d499c6::t_0fc128d91de1fa 27
+pySDC/playgrounds/PETSc/playground_ts.py
+  s_d7f87f28d499c6::t_0fc128d91de1fa 42,131
+pySDC/implementations/problem_classes/HeatEquation_2D_PETSc_forced.py
+  s_d7f87f28d499c6::t_0e8157a910b83a 131,176
+pySDC/implementations/datatype_classes/petsc_vec.py
+  s_d7f87f28d499c6::t_adb2bc28c8930f 16
+pySDC/implementations/problem_classes/GrayScott_2D_PETSc_periodic.py
+  s_d7f87f28d499c6::t_0e8157a910b83a 446,510,616,735
+pySDC/playgrounds/other/petsc_datatype.py
+  s_d7f87f28d499c6::t_adb2bc28c8930f 13
+pySDC/playgrounds/PETSc/playground_parallel.py
+  s_d7f87f28d499c6::t_0fc128d91de1fa 30
+pySDC/playgrounds/PETSc/playground_fft.py
+  s_d7f87f28d499c6::t_0fc128d91de1fa 20
+pySDC/playgrounds/PETSc/playground_data.py
+  s_d7f87f28d499c6::t_0fc128d91de1fa 54,97
+pySDC/implementations/problem_classes/GeneralizedFisher_1D_PETSc.py
+  s_d7f87f28d499c6::t_0e8157a910b83a 382,394,440,560
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e507083238abcc04729b88afc68e49f972d7ae58",
+  "prompts": {},
+  "sessions": {
+    "s_d7f87f28d499c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1f8bf11-d32c-4683-96d6-aa4a2f9bd837",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
