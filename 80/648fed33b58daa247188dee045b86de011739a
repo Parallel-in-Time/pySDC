@@ -1,0 +1,19 @@
+etc/environment-cupy.yml
+  s_1bea8137ddeecb::t_5f35552a2d647a 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "80648fed33b58daa247188dee045b86de011739a",
+  "prompts": {},
+  "sessions": {
+    "s_1bea8137ddeecb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8781df23-a68b-4b47-b7f1-28e26c0b29be",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
