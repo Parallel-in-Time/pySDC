@@ -1,0 +1,35 @@
+.github/workflows/ci_pipeline.yml
+  s_1bea8137ddeecb::t_94094d6d1a9d86 86,89,91,95-100,166-168
+README.md
+  s_1bea8137ddeecb::t_5f2d6bcb600b0c 39
+etc/environment-petsc.yml
+  s_1bea8137ddeecb::t_47e34a68317a3c 12
+pySDC/implementations/datatype_classes/petsc_vec.py
+  s_1bea8137ddeecb::t_542c8c1054108a 16
+pySDC/implementations/problem_classes/GeneralizedFisher_1D_PETSc.py
+  s_1bea8137ddeecb::t_22df76a66b87e4 382,394,440,560
+pySDC/implementations/problem_classes/GrayScott_2D_PETSc_periodic.py
+  s_1bea8137ddeecb::t_517a2548ddd2a3 446,510,616,735
+pySDC/implementations/problem_classes/HeatEquation_2D_PETSc_forced.py
+  s_1bea8137ddeecb::t_b553891523f035 131,176
+pySDC/projects/DAE/environment.yml
+  s_1bea8137ddeecb::t_1625a9981f711e 8
+pySDC/projects/SDC_showdown/environment.yml
+  s_1bea8137ddeecb::t_090b4f335cba94 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a37b54ab9d731fa4312e0e5f2d4f3885a4abef01",
+  "prompts": {},
+  "sessions": {
+    "s_1bea8137ddeecb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8781df23-a68b-4b47-b7f1-28e26c0b29be",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
