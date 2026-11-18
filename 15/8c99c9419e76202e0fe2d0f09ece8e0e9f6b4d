@@ -1,0 +1,21 @@
+.github/workflows/pypi.yml
+  s_234ff217a70910::t_b96f178365b40f 1-74
+docs/contrib/07_release_guide.md
+  s_234ff217a70910::t_b1af4d710bf67f 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "158c99c9419e76202e0fe2d0f09ece8e0e9f6b4d",
+  "prompts": {},
+  "sessions": {
+    "s_234ff217a70910": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be712508-2787-4fc6-885f-a82c1452456a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
