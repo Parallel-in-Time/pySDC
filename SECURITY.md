@@ -83,7 +83,8 @@ pypi-attestations verify pypi --repository https://github.com/Parallel-in-Time/p
 ```
 
 The command downloads the file and its attestation from PyPI and fails unless the signature is valid and was made by a
-workflow in `Parallel-in-Time/pySDC`.
+workflow in `Parallel-in-Time/pySDC`. The wheel of 5.10.1 is named `pysdc-5.10.1-py2.py3-none-any.whl`; later wheels
+are `py3` only.
 
 ## Dependencies
 

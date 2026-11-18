@@ -8,6 +8,7 @@ version = '5.10.1'
 description = 'A Python implementation of spectral deferred correction methods and the likes'
 license = {text = "BSD-2-Clause"}
 readme = 'README.md'
+requires-python = '>=3'
 authors=[
     {name='Robert Speck', email='r.speck@fz-juelich.de'},
     {name='Thibaut Lunet', email='thibaut.lunet@tuhh.de'},
