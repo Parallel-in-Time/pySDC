@@ -1,0 +1,34 @@
+docs/contrib/00_architecture.md
+  s_bff04222c6f8e1::t_39d1db4809511f 46,48
+  s_bff04222c6f8e1::t_cae5eb20124608 1-42,53-62
+  s_bff04222c6f8e1::t_f1f8fe4c6e38b3 43-45,47,49-52
+CONTRIBUTING.md
+  s_bff04222c6f8e1::t_ccc3d38ed9bb31 40-48
+docs/convert_markdown.py
+  s_bff04222c6f8e1::t_a46ac379cd4c95 16
+docs/source/development.rst
+  s_bff04222c6f8e1::t_a46ac379cd4c95 19
+  s_bff04222c6f8e1::t_ccc3d38ed9bb31 8
+GOVERNANCE.md
+  s_bff04222c6f8e1::t_716526b98482ef 47
+ROADMAP.md
+  s_bff04222c6f8e1::t_d40f234da2f4d6 1-39
+docs/contrib/01_pull_requests.md
+  s_bff04222c6f8e1::t_b2cce8393b6bf4 28-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5fd8ca0da0e54fc881dd09f453580ecefaaf025f",
+  "prompts": {},
+  "sessions": {
+    "s_bff04222c6f8e1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d724e0f5-5c5a-4812-96e2-452d66be1436",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
