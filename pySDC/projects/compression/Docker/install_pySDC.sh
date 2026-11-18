@@ -17,7 +17,8 @@ cd /pySDC
 # underneath it. Held explicitly rather than relying on the image's preinstalled numpy happening to
 # satisfy the resolver.
 pip install -e . "numpy<2"
-python -m pip install pytest
+# pytest-timeout for the `timeout` that pyproject.toml sets
+python -m pip install pytest pytest-timeout
 python -m pip install coverage
 python -m pip install "mpi4py<4.1.0"
 

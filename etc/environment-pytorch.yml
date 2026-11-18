@@ -6,7 +6,6 @@ channels:
 dependencies:
   - numpy
   - scipy>=0.17.1
-  - sympy>=1.0
   - pytorch
   - matplotlib>=3.0
   - dill

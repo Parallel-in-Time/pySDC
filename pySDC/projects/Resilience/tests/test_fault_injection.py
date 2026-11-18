@@ -35,23 +35,25 @@ def test_float_conversion():
     bit = [0, 11, 8]
     nan_counter = 0
     num_tests = int(1e3)
-    for i in range(num_tests):
-        # generate a random number almost between the full range of python float
-        rand = get_random_float(rng)
-        # convert to bytes and back
-        res = injector.to_float(injector.to_binary(rand))
-        assert np.isclose(res, rand), f"Conversion between bytes and float failed for {rand}: result: {res}"
+    # flipping exponent bits can give inf or nan, whose division warns; the nan_counter below counts them
+    with pytest.warns(RuntimeWarning, match='invalid value'):
+        for i in range(num_tests):
+            # generate a random number almost between the full range of python float
+            rand = get_random_float(rng)
+            # convert to bytes and back
+            res = injector.to_float(injector.to_binary(rand))
+            assert np.isclose(res, rand), f"Conversion between bytes and float failed for {rand}: result: {res}"
 
-        # flip some exponent bits
-        for i in range(len(exp)):
-            res = injector.flip_bit(rand, bit[i]) / rand
-            if np.isfinite(res):
-                assert exp[i] in [
-                    res,
-                    1.0 / res,
-                ], f'Bitflip failed: expected ratio: {exp[i]}, got: {res:.2e} or {1./res:.2e}'
-            else:
-                nan_counter += 1
+            # flip some exponent bits
+            for i in range(len(exp)):
+                res = injector.flip_bit(rand, bit[i]) / rand
+                if np.isfinite(res):
+                    assert exp[i] in [
+                        res,
+                        1.0 / res,
+                    ], f'Bitflip failed: expected ratio: {exp[i]}, got: {res:.2e} or {1./res:.2e}'
+                else:
+                    nan_counter += 1
     if nan_counter > 0:
         print(f'When flipping bits, we got nan {nan_counter} times out of {num_tests} tests')
 
@@ -242,7 +244,8 @@ def generate_stats(strategy, load=False, stats_path='data'):
         strategies=[strategy],
         stats_path=str(stats_path),
     )
-    with np.errstate(all='warn'):  # get consistent behaviour across platforms
+    # get consistent behaviour across platforms; underflow stays ignored, as by default, since scipy's solve_ivp underflows
+    with np.errstate(all='warn', under='ignore'):
         stats.run_stats_generation(runs=2, step=1)
     return stats
 

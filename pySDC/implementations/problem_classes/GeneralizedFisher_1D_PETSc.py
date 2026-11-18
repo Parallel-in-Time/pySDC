@@ -2,7 +2,7 @@ import numpy as np
 from petsc4py import PETSc
 
 from pySDC.core.problem import Problem
-from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
+from pySDC.implementations.datatype_classes.petsc_vec import DMDAArray, petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
 class Fisher_full(object):
@@ -67,18 +67,18 @@ class Fisher_full(object):
             Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        f = self.da.getVecArray(F)
+        x = DMDAArray(self.da, self.localX)
+        f = DMDAArray(self.da, F)
 
-        for i in range(self.xs, self.xe):
-            if i == 0 or i == self.mx - 1:
-                f[i] = x[i]
-            else:
-                u = x[i]  # center
-                u_e = x[i + 1]  # east
-                u_w = x[i - 1]  # west
-                u_xx = (u_e - 2 * u + u_w) / self.dx**2
-                f[i] = x[i] - self.factor * (u_xx + self.prob.lambda0**2 * x[i] * (1 - x[i] ** self.prob.nu))
+        # the first and last grid points keep their values, the interior ones have both neighbours
+        lo, hi = max(self.xs, 1), min(self.xe, self.mx - 1)
+        f[self.xs : lo] = x[self.xs : lo]
+        f[hi : self.xe] = x[hi : self.xe]
+        u = x[lo:hi]  # center
+        u_e = x[lo + 1 : hi + 1]  # east
+        u_w = x[lo - 1 : hi - 1]  # west
+        u_xx = (u_e - 2 * u + u_w) / self.dx**2
+        f[lo:hi] = u - self.factor * (u_xx + self.prob.lambda0**2 * u * (1 - u**self.prob.nu))
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -101,7 +101,7 @@ class Fisher_full(object):
             Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
+        x = DMDAArray(self.da, self.localX)
         P.zeroEntries()
 
         for i in range(self.xs, self.xe):
@@ -174,15 +174,16 @@ class Fisher_reaction(object):
             Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        f = self.da.getVecArray(F)
+        x = DMDAArray(self.da, self.localX)
+        f = DMDAArray(self.da, F)
         mx = self.da.getSizes()[0]
         xs, xe = self.da.getRanges()[0]
-        for i in range(xs, xe):
-            if i == 0 or i == mx - 1:
-                f[i] = x[i]
-            else:
-                f[i] = x[i] - self.factor * self.prob.lambda0**2 * x[i] * (1 - x[i] ** self.prob.nu)
+        # the first and last grid points keep their values
+        lo, hi = max(xs, 1), min(xe, mx - 1)
+        f[xs:lo] = x[xs:lo]
+        f[hi:xe] = x[hi:xe]
+        u = x[lo:hi]
+        f[lo:hi] = u - self.factor * self.prob.lambda0**2 * u * (1 - u**self.prob.nu)
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -205,7 +206,7 @@ class Fisher_reaction(object):
             Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
+        x = DMDAArray(self.da, self.localX)
         P.zeroEntries()
         row = PETSc.Mat.Stencil()
         mx = self.da.getSizes()[0]
@@ -486,14 +487,14 @@ class petsc_fisher_multiimplicit(Problem):
 
         f = self.dtype_f(self.init)
         self.A.mult(u, f.comp1)
-        fa1 = self.init.getVecArray(f.comp1)
+        fa1 = DMDAArray(self.init, f.comp1)
         fa1[0] = 0
         fa1[-1] = 0
 
-        fa2 = self.init.getVecArray(f.comp2)
-        xa = self.init.getVecArray(u)
-        for i in range(self.xs, self.xe):
-            fa2[i] = self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
+        fa2 = DMDAArray(self.init, f.comp2)
+        xa = DMDAArray(self.init, u)
+        u = xa[self.xs : self.xe]
+        fa2[self.xs : self.xe] = self.lambda0**2 * u * (1 - u**self.nu)
         fa2[0] = 0
         fa2[-1] = 0
 
@@ -585,7 +586,7 @@ class petsc_fisher_multiimplicit(Problem):
         lam1 = self.lambda0 / 2.0 * ((self.nu / 2.0 + 1) ** 0.5 + (self.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1**2 - self.lambda0**2)
         me = self.dtype_u(self.init)
-        xa = self.init.getVecArray(me)
+        xa = DMDAArray(self.init, me)
         for i in range(self.xs, self.xe):
             xa[i] = (
                 1
@@ -651,10 +652,10 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         f = self.dtype_f(self.init)
         self.A.mult(u, f)
 
-        fa2 = self.init.getVecArray(f)
-        xa = self.init.getVecArray(u)
-        for i in range(self.xs, self.xe):
-            fa2[i] += self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
+        fa2 = DMDAArray(self.init, f)
+        xa = DMDAArray(self.init, u)
+        u = xa[self.xs : self.xe]
+        fa2[self.xs : self.xe] += self.lambda0**2 * u * (1 - u**self.nu)
         fa2[0] = 0
         fa2[-1] = 0
 
@@ -751,14 +752,14 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
 
         f = self.dtype_f(self.init)
         self.A.mult(u, f.impl)
-        fa1 = self.init.getVecArray(f.impl)
+        fa1 = DMDAArray(self.init, f.impl)
         fa1[0] = 0
         fa1[-1] = 0
 
-        fa2 = self.init.getVecArray(f.expl)
-        xa = self.init.getVecArray(u)
-        for i in range(self.xs, self.xe):
-            fa2[i] = self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
+        fa2 = DMDAArray(self.init, f.expl)
+        xa = DMDAArray(self.init, u)
+        u = xa[self.xs : self.xe]
+        fa2[self.xs : self.xe] = self.lambda0**2 * u * (1 - u**self.nu)
         fa2[0] = 0
         fa2[-1] = 0
 

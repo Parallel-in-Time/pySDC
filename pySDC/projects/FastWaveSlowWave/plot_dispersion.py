@@ -4,7 +4,6 @@ matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import numpy as np
-import sympy
 from pylab import rcParams
 
 from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
@@ -17,13 +16,9 @@ from pySDC.core.step import Step
 
 def findomega(stab_fh):
     assert np.array_equal(np.shape(stab_fh), [2, 2]), 'Not 2x2 matrix...'
-    omega = sympy.Symbol('omega')
-    func = (sympy.exp(-1j * omega) - stab_fh[0, 0]) * (sympy.exp(-1j * omega) - stab_fh[1, 1]) - stab_fh[
-        0, 1
-    ] * stab_fh[1, 0]
-    solsym = sympy.solve(func, omega)
-    sol0 = complex(solsym[0])
-    sol1 = complex(solsym[1])
+    # (exp(-i omega) - a) (exp(-i omega) - d) = b c is a quadratic in z = exp(-i omega), and omega = i log(z)
+    a, b, c, d = np.asarray(stab_fh, dtype=complex).ravel()
+    sol0, sol1 = 1j * np.log(np.roots([1, -(a + d), a * d - b * c]))
     if sol0.real >= 0:
         sol = sol0
     elif sol1.real >= 0:

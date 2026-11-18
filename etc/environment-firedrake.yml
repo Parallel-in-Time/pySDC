@@ -33,7 +33,6 @@ dependencies:
   - numpy>=2.1
   - scipy>=0.17.1
   - matplotlib>=3.0
-  - sympy>=1.0
   - dill>=0.2.6
   - pip
   - pip:

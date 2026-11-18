@@ -68,7 +68,12 @@ class EstimateContractionFactor(ConvergenceController):
                 L.status.contraction_factor = (
                     L.status.error_embedded_estimate / L.status.error_embedded_estimate_last_iter
                 )
-                if self.params.e_tol is not None:
+                if self.params.e_tol is not None and L.status.contraction_factor == 1:
+                    # without contraction it is converged already or never; the formula below divides by log(1) = 0
+                    L.status.iter_to_convergence = (
+                        0 if L.status.error_embedded_estimate <= self.params.e_tol else float('inf')
+                    )
+                elif self.params.e_tol is not None:
                     L.status.iter_to_convergence = max(
                         [
                             0,

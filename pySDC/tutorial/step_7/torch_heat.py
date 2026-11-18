@@ -71,7 +71,7 @@ class Tensor(torch.Tensor):
             float: absolute maximum of all mesh values
         """
         # take absolute values of the mesh values
-        local_absval = float(torch.amax(torch.abs(self)))
+        local_absval = float(torch.amax(torch.abs(self.detach())))
 
         if self.comm is not None:
             if self.comm.Get_size() > 1:

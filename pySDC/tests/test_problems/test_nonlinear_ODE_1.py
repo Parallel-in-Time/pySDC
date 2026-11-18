@@ -32,7 +32,9 @@ def test_singularity():
         't': t0,
     }
 
-    sol = nonlinear_ODE_class.solve_system(**args)
+    # the Newton derivative divides by sqrt(1 - u), which is zero at the singularity
+    with pytest.warns(RuntimeWarning, match='divide by zero'):
+        sol = nonlinear_ODE_class.solve_system(**args)
     assert abs(sol - 1) < 1e-14, f"Solution is not close enough to the value at singularity! Expected 1, got {sol}"
     assert (
         nonlinear_ODE_class.newton_itercount == nonlinear_ODE_class.newton_maxiter
@@ -85,7 +87,9 @@ def test_SDC_on_problem_class():
         controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
         P = controller.MS[0].levels[0].prob
-        uend, _ = controller.run(u0=P.u_exact(t0), t0=t0, Tend=Tend)
+        # iterates overshoot the singularity at u = 1, where sqrt(1 - u) is not defined
+        with pytest.warns(RuntimeWarning, match='invalid value encountered in sqrt'):
+            uend, _ = controller.run(u0=P.u_exact(t0), t0=t0, Tend=Tend)
         errors.append(abs(P.u_exact(Tend) - uend))
 
     # the error is dominated by the last step, which ends at the singularity: there the scheme

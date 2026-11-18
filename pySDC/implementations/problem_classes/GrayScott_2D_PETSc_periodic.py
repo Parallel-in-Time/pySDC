@@ -2,7 +2,7 @@ import numpy as np
 from petsc4py import PETSc
 
 from pySDC.core.problem import Problem
-from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
+from pySDC.implementations.datatype_classes.petsc_vec import DMDAArray, petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
 class GS_full(object):
@@ -58,34 +58,33 @@ class GS_full(object):
             Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        f = self.da.getVecArray(F)
+        x = DMDAArray(self.da, self.localX)
+        f = DMDAArray(self.da, F)
         (xs, xe), (ys, ye) = self.da.getRanges()
-        for j in range(ys, ye):
-            for i in range(xs, xe):
-                u = x[i, j]  # center
-                u_e = x[i + 1, j]  # east
-                u_w = x[i - 1, j]  # west
-                u_s = x[i, j + 1]  # south
-                u_n = x[i, j - 1]  # north
-                u_xx = u_e - 2 * u + u_w
-                u_yy = u_n - 2 * u + u_s
-                f[i, j, 0] = x[i, j, 0] - (
-                    self.factor
-                    * (
-                        self.prob.Du * (u_xx[0] / self.dx**2 + u_yy[0] / self.dy**2)
-                        - x[i, j, 0] * x[i, j, 1] ** 2
-                        + self.prob.A * (1 - x[i, j, 0])
-                    )
-                )
-                f[i, j, 1] = x[i, j, 1] - (
-                    self.factor
-                    * (
-                        self.prob.Dv * (u_xx[1] / self.dx**2 + u_yy[1] / self.dy**2)
-                        + x[i, j, 0] * x[i, j, 1] ** 2
-                        - self.prob.B * x[i, j, 1]
-                    )
-                )
+        # all owned points at once; the periodic DMDA has ghost points on every side for the neighbours
+        u = x[xs:xe, ys:ye]  # center
+        u_e = x[xs + 1 : xe + 1, ys:ye]  # east
+        u_w = x[xs - 1 : xe - 1, ys:ye]  # west
+        u_s = x[xs:xe, ys + 1 : ye + 1]  # south
+        u_n = x[xs:xe, ys - 1 : ye - 1]  # north
+        u_xx = u_e - 2 * u + u_w
+        u_yy = u_n - 2 * u + u_s
+        f[xs:xe, ys:ye, 0] = u[..., 0] - (
+            self.factor
+            * (
+                self.prob.Du * (u_xx[..., 0] / self.dx**2 + u_yy[..., 0] / self.dy**2)
+                - u[..., 0] * u[..., 1] ** 2
+                + self.prob.A * (1 - u[..., 0])
+            )
+        )
+        f[xs:xe, ys:ye, 1] = u[..., 1] - (
+            self.factor
+            * (
+                self.prob.Dv * (u_xx[..., 1] / self.dx**2 + u_yy[..., 1] / self.dy**2)
+                + u[..., 0] * u[..., 1] ** 2
+                - self.prob.B * u[..., 1]
+            )
+        )
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -108,7 +107,7 @@ class GS_full(object):
             Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
+        x = DMDAArray(self.da, self.localX)
         P.zeroEntries()
         row = PETSc.Mat.Stencil()
         col = PETSc.Mat.Stencil()
@@ -116,28 +115,27 @@ class GS_full(object):
 
         for j in range(ys, ye):
             for i in range(xs, xe):
+                u, v = x[i, j]
                 # diagnoal 2-by-2 block (for u and v)
                 row.index = (i, j)
                 col.index = (i, j)
                 row.field = 0
                 col.field = 0
-                val = 1.0 - self.factor * (
-                    self.prob.Du * (-2.0 / self.dx**2 - 2.0 / self.dy**2) - x[i, j, 1] ** 2 - self.prob.A
-                )
+                val = 1.0 - self.factor * (self.prob.Du * (-2.0 / self.dx**2 - 2.0 / self.dy**2) - v**2 - self.prob.A)
                 P.setValueStencil(row, col, val)
                 row.field = 0
                 col.field = 1
-                val = self.factor * 2.0 * x[i, j, 0] * x[i, j, 1]
+                val = self.factor * 2.0 * u * v
                 P.setValueStencil(row, col, val)
                 row.field = 1
                 col.field = 1
                 val = 1.0 - self.factor * (
-                    self.prob.Dv * (-2.0 / self.dx**2 - 2.0 / self.dy**2) + 2.0 * x[i, j, 0] * x[i, j, 1] - self.prob.B
+                    self.prob.Dv * (-2.0 / self.dx**2 - 2.0 / self.dy**2) + 2.0 * u * v - self.prob.B
                 )
                 P.setValueStencil(row, col, val)
                 row.field = 1
                 col.field = 0
-                val = -self.factor * x[i, j, 1] ** 2
+                val = -self.factor * v**2
                 P.setValueStencil(row, col, val)
 
                 # coupling through finite difference part
@@ -223,15 +221,12 @@ class GS_reaction(object):
             Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        f = self.da.getVecArray(F)
+        x = DMDAArray(self.da, self.localX)
+        f = DMDAArray(self.da, F)
         (xs, xe), (ys, ye) = self.da.getRanges()
-        for j in range(ys, ye):
-            for i in range(xs, xe):
-                f[i, j, 0] = x[i, j, 0] - (
-                    self.factor * (-x[i, j, 0] * x[i, j, 1] ** 2 + self.prob.A * (1 - x[i, j, 0]))
-                )
-                f[i, j, 1] = x[i, j, 1] - (self.factor * (x[i, j, 0] * x[i, j, 1] ** 2 - self.prob.B * x[i, j, 1]))
+        u, v = x[xs:xe, ys:ye, 0], x[xs:xe, ys:ye, 1]
+        f[xs:xe, ys:ye, 0] = u - (self.factor * (-u * v**2 + self.prob.A * (1 - u)))
+        f[xs:xe, ys:ye, 1] = v - (self.factor * (u * v**2 - self.prob.B * v))
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -254,27 +249,28 @@ class GS_reaction(object):
             Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
+        x = DMDAArray(self.da, self.localX)
         P.zeroEntries()
         row = PETSc.Mat.Stencil()
         col = PETSc.Mat.Stencil()
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
+                u, v = x[i, j]
                 row.index = (i, j)
                 col.index = (i, j)
                 row.field = 0
                 col.field = 0
-                P.setValueStencil(row, col, 1.0 - self.factor * (-x[i, j, 1] ** 2 - self.prob.A))
+                P.setValueStencil(row, col, 1.0 - self.factor * (-(v**2) - self.prob.A))
                 row.field = 0
                 col.field = 1
-                P.setValueStencil(row, col, self.factor * 2.0 * x[i, j, 0] * x[i, j, 1])
+                P.setValueStencil(row, col, self.factor * 2.0 * u * v)
                 row.field = 1
                 col.field = 1
-                P.setValueStencil(row, col, 1.0 - self.factor * (2.0 * x[i, j, 0] * x[i, j, 1] - self.prob.B))
+                P.setValueStencil(row, col, 1.0 - self.factor * (2.0 * u * v - self.prob.B))
                 row.field = 1
                 col.field = 0
-                P.setValueStencil(row, col, -self.factor * x[i, j, 1] ** 2)
+                P.setValueStencil(row, col, -self.factor * v**2)
 
         P.assemble()
         if J != P:
@@ -548,12 +544,12 @@ class petsc_grayscott_multiimplicit(Problem):
         f = self.dtype_f(self.init)
         self.AMat.mult(u, f.comp1)
 
-        fa = self.init.getVecArray(f.comp2)
-        xa = self.init.getVecArray(u)
-        for i in range(self.xs, self.xe):
-            for j in range(self.ys, self.ye):
-                fa[i, j, 0] = -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.A * (1 - xa[i, j, 0])
-                fa[i, j, 1] = xa[i, j, 0] * xa[i, j, 1] ** 2 - self.B * xa[i, j, 1]
+        fa = DMDAArray(self.init, f.comp2)
+        xa = DMDAArray(self.init, u)
+        owned = (slice(self.xs, self.xe), slice(self.ys, self.ye))
+        u, v = xa[(*owned, 0)], xa[(*owned, 1)]
+        fa[(*owned, 0)] = -u * v**2 + self.A * (1 - u)
+        fa[(*owned, 1)] = u * v**2 - self.B * v
 
         return f
 
@@ -641,7 +637,7 @@ class petsc_grayscott_multiimplicit(Problem):
         assert t == 0, 'ERROR: u_exact is only valid for the initial solution'
 
         me = self.dtype_u(self.init)
-        xa = self.init.getVecArray(me)
+        xa = DMDAArray(self.init, me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 xa[i, j, 0] = 1.0 - 0.5 * np.power(
@@ -696,12 +692,12 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         f = self.dtype_f(self.init)
         self.AMat.mult(u, f)
 
-        fa = self.init.getVecArray(f)
-        xa = self.init.getVecArray(u)
-        for i in range(self.xs, self.xe):
-            for j in range(self.ys, self.ye):
-                fa[i, j, 0] += -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.A * (1 - xa[i, j, 0])
-                fa[i, j, 1] += xa[i, j, 0] * xa[i, j, 1] ** 2 - self.B * xa[i, j, 1]
+        fa = DMDAArray(self.init, f)
+        xa = DMDAArray(self.init, u)
+        owned = (slice(self.xs, self.xe), slice(self.ys, self.ye))
+        u, v = xa[(*owned, 0)], xa[(*owned, 1)]
+        fa[(*owned, 0)] += -u * v**2 + self.A * (1 - u)
+        fa[(*owned, 1)] += u * v**2 - self.B * v
 
         return f
 
@@ -784,12 +780,12 @@ class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
         f = self.dtype_f(self.init)
         self.AMat.mult(u, f.impl)
 
-        fa = self.init.getVecArray(f.expl)
-        xa = self.init.getVecArray(u)
-        for i in range(self.xs, self.xe):
-            for j in range(self.ys, self.ye):
-                fa[i, j, 0] = -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.A * (1 - xa[i, j, 0])
-                fa[i, j, 1] = xa[i, j, 0] * xa[i, j, 1] ** 2 - self.B * xa[i, j, 1]
+        fa = DMDAArray(self.init, f.expl)
+        xa = DMDAArray(self.init, u)
+        owned = (slice(self.xs, self.xe), slice(self.ys, self.ye))
+        u, v = xa[(*owned, 0)], xa[(*owned, 1)]
+        fa[(*owned, 0)] = -u * v**2 + self.A * (1 - u)
+        fa[(*owned, 1)] = u * v**2 - self.B * v
 
         return f
 

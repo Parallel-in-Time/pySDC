@@ -1,4 +1,5 @@
 import runpy
+import sys
 
 import pytest
 
@@ -9,6 +10,8 @@ import pytest
 def test_part(part):
     import matplotlib.pyplot as plt
 
+    # another test may have imported the part already, and runpy warns when it would run an imported module again
+    sys.modules.pop(f'pySDC.tutorial.step_8.{part}', None)
     try:
         runpy.run_module(f'pySDC.tutorial.step_8.{part}', run_name='__main__')
     finally:

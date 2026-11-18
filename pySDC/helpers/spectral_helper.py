@@ -1604,18 +1604,20 @@ class SpectralHelper:
             + [axis for axis in range(self.ndim) if axis not in _axes]
         )
 
-        pfft = PFFT(
-            comm=self.comm,
-            shape=self.global_shape[1:],
-            axes=_axes,  # TODO: control the order of the transforms better
-            dtype='D',
-            collapse=False,
-            backend=self.fft_backend,
-            comm_backend=self.fft_comm_backend,
-            padding=padding,
-            transforms=transforms,
-            grid=grid,
-        )
+        # mpi4py-fft plans by running the transforms on uninitialised buffers, whose garbage may overflow or be NaN
+        with np.errstate(all='ignore'):
+            pfft = PFFT(
+                comm=self.comm,
+                shape=self.global_shape[1:],
+                axes=_axes,  # TODO: control the order of the transforms better
+                dtype='D',
+                collapse=False,
+                backend=self.fft_backend,
+                comm_backend=self.fft_comm_backend,
+                padding=padding,
+                transforms=transforms,
+                grid=grid,
+            )
 
         # do a transform to do the planning
         _u = newDistArray(pfft, forward_output=False)

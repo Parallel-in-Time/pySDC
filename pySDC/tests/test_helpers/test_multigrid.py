@@ -101,7 +101,8 @@ def test_hopeless_format_returns_no_worse_than_zero():
     mg = GeometricMultigrid(4096, 1)
     grid = np.arange(4096) / 4096
     b = (np.sin(np.pi * grid) + grid).astype(np.float16)
-    x, cycles = mg.solve(b, 1e8 / 4096**2, rtol=1e-10, maxiter=50)
+    with pytest.warns(RuntimeWarning, match='overflow'):
+        x, cycles = mg.solve(b, 1e8 / 4096**2, rtol=1e-10, maxiter=50)
     assert cycles == 1 and not x.any() and mg.relative_residual == 1.0
 
 
