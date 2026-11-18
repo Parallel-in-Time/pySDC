@@ -146,6 +146,7 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
     Test if errors and warnings are raised correctly.
     """
     import numpy as np
+    from scipy.sparse.linalg import MatrixRankWarning
     from pySDC.core.errors import ProblemError
     from pySDC.implementations.problem_classes.AllenCahn_1D_FD import (
         allencahn_front_fullyimplicit,
@@ -194,12 +195,14 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
             (full_periodic.solve_system, args_periodic),
             (multi_periodic.solve_system_2, args_periodic),
         ]:
-            with pytest.raises(ProblemError):
+            # the nan in factor makes the Newton matrix singular before the solver checks for nan
+            with pytest.raises(ProblemError), pytest.warns(MatrixRankWarning, match='singular'):
                 solve(**args)
 
     else:
         # test if warnings are raised when nan values arise
-        full_front.solve_system(**args_front)
+        with pytest.warns(MatrixRankWarning, match='singular'):
+            full_front.solve_system(**args_front)
         assert f'Newton got nan after {newton_maxiter} iterations...' in caplog.text
         assert 'Newton did not converge after 1 iterations, error is nan' in caplog.text
         assert (
@@ -207,7 +210,8 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
         ), 'Number of Newton iterations in fully-implicit front case does not match with maximum number of iterations!'
         caplog.clear()
 
-        finel_front.solve_system(**args_front)
+        with pytest.warns(MatrixRankWarning, match='singular'):
+            finel_front.solve_system(**args_front)
         assert f'Newton got nan after {newton_maxiter} iterations...' in caplog.text
         assert 'Newton did not converge after 1 iterations, error is nan' in caplog.text
         assert (
@@ -215,7 +219,8 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
         ), "Number of Newton iterations in case of using Finel's trick does not match with maximum number of iterations!"
         caplog.clear()
 
-        full_periodic.solve_system(**args_periodic)
+        with pytest.warns(MatrixRankWarning, match='singular'):
+            full_periodic.solve_system(**args_periodic)
         assert f'Newton got nan after {newton_maxiter} iterations...' in caplog.text
         assert 'Newton did not converge after 1 iterations, error is nan' in caplog.text
         assert (
@@ -223,7 +228,8 @@ def test_capture_errors_and_warnings(caplog, stop_at_nan):
         ), 'Number of Newton iterations in fully-implicit periodic case does not match with maximum number of iterations!'
         caplog.clear()
 
-        multi_periodic.solve_system_2(**args_periodic)
+        with pytest.warns(MatrixRankWarning, match='singular'):
+            multi_periodic.solve_system_2(**args_periodic)
         assert f'Newton got nan after {newton_maxiter} iterations...' in caplog.text
         assert 'Newton did not converge after 1 iterations, error is nan' in caplog.text
         assert (

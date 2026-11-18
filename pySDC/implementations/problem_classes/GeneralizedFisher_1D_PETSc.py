@@ -2,7 +2,7 @@ import numpy as np
 from petsc4py import PETSc
 
 from pySDC.core.problem import Problem
-from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
+from pySDC.implementations.datatype_classes.petsc_vec import DMDAArray, petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
 class Fisher_full(object):
@@ -67,8 +67,8 @@ class Fisher_full(object):
             Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        f = self.da.getVecArray(F)
+        x = DMDAArray(self.da, self.localX)
+        f = DMDAArray(self.da, F)
 
         for i in range(self.xs, self.xe):
             if i == 0 or i == self.mx - 1:
@@ -101,7 +101,7 @@ class Fisher_full(object):
             Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
+        x = DMDAArray(self.da, self.localX)
         P.zeroEntries()
 
         for i in range(self.xs, self.xe):
@@ -174,8 +174,8 @@ class Fisher_reaction(object):
             Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        f = self.da.getVecArray(F)
+        x = DMDAArray(self.da, self.localX)
+        f = DMDAArray(self.da, F)
         mx = self.da.getSizes()[0]
         xs, xe = self.da.getRanges()[0]
         for i in range(xs, xe):
@@ -205,7 +205,7 @@ class Fisher_reaction(object):
             Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
+        x = DMDAArray(self.da, self.localX)
         P.zeroEntries()
         row = PETSc.Mat.Stencil()
         mx = self.da.getSizes()[0]
@@ -486,12 +486,12 @@ class petsc_fisher_multiimplicit(Problem):
 
         f = self.dtype_f(self.init)
         self.A.mult(u, f.comp1)
-        fa1 = self.init.getVecArray(f.comp1)
+        fa1 = DMDAArray(self.init, f.comp1)
         fa1[0] = 0
         fa1[-1] = 0
 
-        fa2 = self.init.getVecArray(f.comp2)
-        xa = self.init.getVecArray(u)
+        fa2 = DMDAArray(self.init, f.comp2)
+        xa = DMDAArray(self.init, u)
         for i in range(self.xs, self.xe):
             fa2[i] = self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
         fa2[0] = 0
@@ -585,7 +585,7 @@ class petsc_fisher_multiimplicit(Problem):
         lam1 = self.lambda0 / 2.0 * ((self.nu / 2.0 + 1) ** 0.5 + (self.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1**2 - self.lambda0**2)
         me = self.dtype_u(self.init)
-        xa = self.init.getVecArray(me)
+        xa = DMDAArray(self.init, me)
         for i in range(self.xs, self.xe):
             xa[i] = (
                 1
@@ -651,8 +651,8 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         f = self.dtype_f(self.init)
         self.A.mult(u, f)
 
-        fa2 = self.init.getVecArray(f)
-        xa = self.init.getVecArray(u)
+        fa2 = DMDAArray(self.init, f)
+        xa = DMDAArray(self.init, u)
         for i in range(self.xs, self.xe):
             fa2[i] += self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
         fa2[0] = 0
@@ -751,12 +751,12 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
 
         f = self.dtype_f(self.init)
         self.A.mult(u, f.impl)
-        fa1 = self.init.getVecArray(f.impl)
+        fa1 = DMDAArray(self.init, f.impl)
         fa1[0] = 0
         fa1[-1] = 0
 
-        fa2 = self.init.getVecArray(f.expl)
-        xa = self.init.getVecArray(u)
+        fa2 = DMDAArray(self.init, f.expl)
+        xa = DMDAArray(self.init, u)
         for i in range(self.xs, self.xe):
             fa2[i] = self.lambda0**2 * xa[i] * (1 - xa[i] ** self.nu)
         fa2[0] = 0

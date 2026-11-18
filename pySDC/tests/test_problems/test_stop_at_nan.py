@@ -32,8 +32,12 @@ def test_battery_implicit():
 def test_grayscott(name):
     from pySDC.implementations.problem_classes import GrayScott_MPIFFT
 
+    from scipy.sparse.linalg import MatrixRankWarning
+
     problem_class = getattr(GrayScott_MPIFFT, f'grayscott_{name}')
-    check_stop_at_nan(
-        lambda **kwargs: problem_class(nvars=(16, 16), **kwargs),
-        lambda prob, rhs, u0: prob.solve_system_2(rhs, 0.1, u0, 0),
-    )
+    # the nan right-hand side makes the Newton matrix singular
+    with pytest.warns(MatrixRankWarning, match='singular'):
+        check_stop_at_nan(
+            lambda **kwargs: problem_class(nvars=(16, 16), **kwargs),
+            lambda prob, rhs, u0: prob.solve_system_2(rhs, 0.1, u0, 0),
+        )

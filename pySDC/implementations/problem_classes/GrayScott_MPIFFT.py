@@ -677,7 +677,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
                 tmpgv.flatten(), self.xp.array([0, 1])
             )
             # invert dg matrix
-            b = sp.linalg.spsolve(dg, g)
+            b = sp.linalg.spsolve(dg.tocsc(), g)
             # update real space vectors
             tmpu[:] -= b[::2].reshape(self.nvars)
             tmpv[:] -= b[1::2].reshape(self.nvars)
@@ -911,7 +911,7 @@ class grayscott_mi_linear(grayscott_imex_linear):
                 tmpgv.flatten(), self.xp.array([0, 1])
             )
             # invert dg matrix
-            b = sp.linalg.spsolve(dg, g)
+            b = sp.linalg.spsolve(dg.tocsc(), g)
             # update real-space vectors
             tmpu[:] -= b[::2].reshape(self.nvars)
             tmpv[:] -= b[1::2].reshape(self.nvars)

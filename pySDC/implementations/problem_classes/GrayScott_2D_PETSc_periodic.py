@@ -2,7 +2,7 @@ import numpy as np
 from petsc4py import PETSc
 
 from pySDC.core.problem import Problem
-from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
+from pySDC.implementations.datatype_classes.petsc_vec import DMDAArray, petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
 class GS_full(object):
@@ -58,8 +58,8 @@ class GS_full(object):
             Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        f = self.da.getVecArray(F)
+        x = DMDAArray(self.da, self.localX)
+        f = DMDAArray(self.da, F)
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
@@ -108,7 +108,7 @@ class GS_full(object):
             Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
+        x = DMDAArray(self.da, self.localX)
         P.zeroEntries()
         row = PETSc.Mat.Stencil()
         col = PETSc.Mat.Stencil()
@@ -223,8 +223,8 @@ class GS_reaction(object):
             Overwrites F.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        f = self.da.getVecArray(F)
+        x = DMDAArray(self.da, self.localX)
+        f = DMDAArray(self.da, F)
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
@@ -254,7 +254,7 @@ class GS_reaction(object):
             Matrix status.
         """
         self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
+        x = DMDAArray(self.da, self.localX)
         P.zeroEntries()
         row = PETSc.Mat.Stencil()
         col = PETSc.Mat.Stencil()
@@ -548,8 +548,8 @@ class petsc_grayscott_multiimplicit(Problem):
         f = self.dtype_f(self.init)
         self.AMat.mult(u, f.comp1)
 
-        fa = self.init.getVecArray(f.comp2)
-        xa = self.init.getVecArray(u)
+        fa = DMDAArray(self.init, f.comp2)
+        xa = DMDAArray(self.init, u)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 fa[i, j, 0] = -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.A * (1 - xa[i, j, 0])
@@ -641,7 +641,7 @@ class petsc_grayscott_multiimplicit(Problem):
         assert t == 0, 'ERROR: u_exact is only valid for the initial solution'
 
         me = self.dtype_u(self.init)
-        xa = self.init.getVecArray(me)
+        xa = DMDAArray(self.init, me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 xa[i, j, 0] = 1.0 - 0.5 * np.power(
@@ -696,8 +696,8 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         f = self.dtype_f(self.init)
         self.AMat.mult(u, f)
 
-        fa = self.init.getVecArray(f)
-        xa = self.init.getVecArray(u)
+        fa = DMDAArray(self.init, f)
+        xa = DMDAArray(self.init, u)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 fa[i, j, 0] += -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.A * (1 - xa[i, j, 0])
@@ -784,8 +784,8 @@ class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
         f = self.dtype_f(self.init)
         self.AMat.mult(u, f.impl)
 
-        fa = self.init.getVecArray(f.expl)
-        xa = self.init.getVecArray(u)
+        fa = DMDAArray(self.init, f.expl)
+        xa = DMDAArray(self.init, u)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 fa[i, j, 0] = -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.A * (1 - xa[i, j, 0])

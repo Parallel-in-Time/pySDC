@@ -3,7 +3,7 @@ from petsc4py import PETSc
 
 from pySDC.core.errors import ParameterError, ProblemError
 from pySDC.core.problem import Problem
-from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex
+from pySDC.implementations.datatype_classes.petsc_vec import DMDAArray, petsc_vec, petsc_vec_imex
 
 
 # noinspection PyUnusedLocal
@@ -215,7 +215,7 @@ class heat2d_petsc_forced(Problem):
         self.A.mult(u, f.impl)
 
         # evaluate forcing term for explicit part
-        fa = self.init.getVecArray(f.expl)
+        fa = DMDAArray(self.init, f.expl)
         xv, yv = np.meshgrid(range(self.xs, self.xe), range(self.ys, self.ye), indexing='ij')
         fa[self.xs : self.xe, self.ys : self.ye] = (
             -np.sin(np.pi * self.freq * xv * self.dx)
@@ -269,7 +269,7 @@ class heat2d_petsc_forced(Problem):
         """
 
         me = self.dtype_u(self.init)
-        xa = self.init.getVecArray(me)
+        xa = DMDAArray(self.init, me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 xa[i, j] = np.sin(np.pi * self.freq * i * self.dx) * np.sin(np.pi * self.freq * j * self.dy) * np.cos(t)

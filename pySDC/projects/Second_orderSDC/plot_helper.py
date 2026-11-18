@@ -375,12 +375,12 @@ class PlotManager(object):  # pragma: no cover
                 file = open(self.cwd + 'data/{}_order_vs_approx_order.csv'.format(self.error_type), 'a')
 
             for ii in range(0, N):
-                approx_order['pos'][0, ii] = np.polyfit(
-                    np.log(time_data[ii, :]), np.log(error_data['pos'][jj, ii, :]), 1
-                )[0].real
-                approx_order['vel'][0, ii] = np.polyfit(
-                    np.log(time_data[ii, :]), np.log(error_data['vel'][jj, ii, :]), 1
-                )[0].real
+                for key in ['pos', 'vel']:
+                    error = error_data[key][jj, ii, :]
+                    # an error that is exactly zero has reached round-off and has no order
+                    approx_order[key][0, ii] = (
+                        np.polyfit(np.log(time_data[ii, :]), np.log(error), 1)[0].real if np.all(error > 0) else np.nan
+                    )
             if jj == 2:
                 file.write(
                     str(order_data['pos'][:, jj, 1])

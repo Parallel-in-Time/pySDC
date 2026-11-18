@@ -247,6 +247,10 @@ jobs:
       image: brownbaerchen/libpressio:amd64_2
       volumes:
         - ${{ github.workspace }}:/pySDC
+    env:
+      # the container runs as root, in a home it does not own
+      PIP_ROOT_USER_ACTION: ignore
+      PIP_NO_CACHE_DIR: '1'
     defaults:
       run:
         shell: bash -l {0}
@@ -298,6 +302,8 @@ jobs:
       # then compiles with no flags at all, i.e. links an executable, and every kernel fails.
       PYOP2_CFLAGS: '-fPIC -std=gnu11 -O3'
       PYOP2_LDFLAGS: '-shared'
+      # Firedrake hands sys.argv to PETSc, which then reports pytest's own options as unused when it finalizes
+      PETSC_OPTIONS: '-options_left 0'
     defaults:
       run:
         shell: bash -l {0}

@@ -130,7 +130,7 @@ def run_problem(
 
     # initialize controller parameters
     controller_params = {}
-    controller_params['logger_level'] = 10
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = [ArtificialAdaptivity, LogStepSize, LogRestarts]
     controller_params['mssdc_jac'] = False
 

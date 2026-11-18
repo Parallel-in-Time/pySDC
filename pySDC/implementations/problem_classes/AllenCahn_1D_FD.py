@@ -966,7 +966,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
             )
 
             # newton update: u1 = u0 - g/dg
-            u -= spsolve(dg, g)
+            u -= spsolve(dg.tocsc(), g)
             # u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]
             # increase iteration count
             n += 1
