@@ -5,6 +5,7 @@ Development
    :maxdepth: 1
 
    How to contribute <CONTRIBUTING>
+   docs/contrib/00_architecture
    docs/contrib/01_pull_requests
    docs/contrib/02_continuous_integration
    docs/contrib/03_naming_conventions
@@ -14,6 +15,9 @@ Development
    docs/contrib/07_release_guide
    docs/contrib/08_ai_usage
    Code of conduct <CODE_OF_CONDUCT>
+   Governance <GOVERNANCE>
+   Roadmap <ROADMAP>
+   Security policy <SECURITY>
 
 Tests
 -----

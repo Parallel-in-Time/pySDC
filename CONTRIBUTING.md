@@ -37,13 +37,14 @@ for more details. Additional guideline are also given on how to
 > for the rules on AI-assisted contributions.
 
 1. [GitHub Forks and Pull Requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models)
-2. [Pull Requests Recommendations](./docs/contrib/01_pull_requests.md)
-3. [Continuous Integration](./docs/contrib/02_continuous_integration.md)
-4. [Naming Conventions](./docs/contrib/03_naming_conventions.md)
-5. [Custom Implementations](./docs/contrib/04_custom_implementations.md)
-6. [Documenting Code](./docs/contrib/05_documenting_code.md)
-7. [Adding a project](./docs/contrib/06_new_project.md)
-8. [Publishing a new release](./docs/contrib/07_release_guide.md)
-9. [Using AI tools](./docs/contrib/08_ai_usage.md)
+2. [Architecture Overview](./docs/contrib/00_architecture.md)
+3. [Pull Requests Recommendations](./docs/contrib/01_pull_requests.md)
+4. [Continuous Integration](./docs/contrib/02_continuous_integration.md)
+5. [Naming Conventions](./docs/contrib/03_naming_conventions.md)
+6. [Custom Implementations](./docs/contrib/04_custom_implementations.md)
+7. [Documenting Code](./docs/contrib/05_documenting_code.md)
+8. [Adding a project](./docs/contrib/06_new_project.md)
+9. [Publishing a new release](./docs/contrib/07_release_guide.md)
+10. [Using AI tools](./docs/contrib/08_ai_usage.md)
 
 :arrow_left: [Back to main page](./README.md)
