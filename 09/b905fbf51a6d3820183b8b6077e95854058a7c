@@ -1,0 +1,19 @@
+pySDC/projects/Second_orderSDC/plot_helper.py
+  s_bff04222c6f8e1::t_3901b85c1d8e58 189,197,211,219
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "09b905fbf51a6d3820183b8b6077e95854058a7c",
+  "prompts": {},
+  "sessions": {
+    "s_bff04222c6f8e1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d724e0f5-5c5a-4812-96e2-452d66be1436",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
