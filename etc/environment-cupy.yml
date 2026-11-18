@@ -19,6 +19,7 @@ dependencies:
   - matplotlib>=3.0
   - dill>=0.2.6
   - cupy>=14  # 14 renamed the iterative solvers' `tol` argument to `rtol`
+  - cuda-cudart  # libcudart.so, which conda-forge's CUDA 13 cupy and libcurand do not pull in
   - nccl  # `cupy.cuda.nccl` is an empty shim without it, and conda-forge's cupy does not pull it
   # the GPU project's configs go through `spectral_helper`, and its runs are MPI-decomposed
   - openmpi
