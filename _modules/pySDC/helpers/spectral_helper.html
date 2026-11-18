@@ -2270,18 +2270,20 @@
             <span class="o">+</span> <span class="p">[</span><span class="n">axis</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span> <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_axes</span><span class="p">]</span>
         <span class="p">)</span>
 
-        <span class="n">pfft</span> <span class="o">=</span> <span class="n">PFFT</span><span class="p">(</span>
-            <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span>
-            <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
-            <span class="n">axes</span><span class="o">=</span><span class="n">_axes</span><span class="p">,</span>  <span class="c1"># TODO: control the order of the transforms better</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s1">'D'</span><span class="p">,</span>
-            <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span><span class="p">,</span>
-            <span class="n">comm_backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_comm_backend</span><span class="p">,</span>
-            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
-            <span class="n">transforms</span><span class="o">=</span><span class="n">transforms</span><span class="p">,</span>
-            <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="c1"># mpi4py-fft plans by running the transforms on uninitialised buffers, whose garbage may overflow or be NaN</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="s1">'ignore'</span><span class="p">):</span>
+            <span class="n">pfft</span> <span class="o">=</span> <span class="n">PFFT</span><span class="p">(</span>
+                <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span>
+                <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                <span class="n">axes</span><span class="o">=</span><span class="n">_axes</span><span class="p">,</span>  <span class="c1"># TODO: control the order of the transforms better</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="s1">'D'</span><span class="p">,</span>
+                <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_backend</span><span class="p">,</span>
+                <span class="n">comm_backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fft_comm_backend</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+                <span class="n">transforms</span><span class="o">=</span><span class="n">transforms</span><span class="p">,</span>
+                <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="c1"># do a transform to do the planning</span>
         <span class="n">_u</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="n">pfft</span><span class="p">,</span> <span class="n">forward_output</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>

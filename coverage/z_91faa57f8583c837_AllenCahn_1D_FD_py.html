@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_91faa57f8583c837_AllenCahn_2D_FD_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-18 08:31 +0000
+            created at 2026-11-18 09:28 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -1048,7 +1048,7 @@
     <p class="run run2"><span class="n"><a id="t966" href="#t966">966</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t967" href="#t967">967</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t968" href="#t968">968</a></span><span class="t">            <span class="com"># newton update: u1 = u0 - g/dg</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t969" href="#t969">969</a></span><span class="t">            <span class="nam">u</span> <span class="op">-=</span> <span class="nam">spsolve</span><span class="op">(</span><span class="nam">dg</span><span class="op">,</span> <span class="nam">g</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t969" href="#t969">969</a></span><span class="t">            <span class="nam">u</span> <span class="op">-=</span> <span class="nam">spsolve</span><span class="op">(</span><span class="nam">dg</span><span class="op">.</span><span class="nam">tocsc</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="nam">g</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t970" href="#t970">970</a></span><span class="t">            <span class="com"># u -= gmres(dg, g, x0=z, rtol=self.lin_tol)[0]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t971" href="#t971">971</a></span><span class="t">            <span class="com"># increase iteration count</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t972" href="#t972">972</a></span><span class="t">            <span class="nam">n</span> <span class="op">+=</span> <span class="num">1</span>&nbsp;</span><span class="r"></span></p>
@@ -1075,7 +1075,7 @@
             <a class="nav" href="z_91faa57f8583c837_AllenCahn_2D_FD_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.3">coverage.py v7.17.3</a>,
-            created at 2026-11-18 08:31 +0000
+            created at 2026-11-18 09:28 +0000
         </p>
     </div>
 </footer>

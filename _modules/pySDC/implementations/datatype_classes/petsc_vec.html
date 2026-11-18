@@ -432,9 +432,79 @@
                 <article class="bd-article">
                   
   <h1>Source code for pySDC.implementations.datatype_classes.petsc_vec</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">petsc4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">PETSc</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">petsc4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">PETSc</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pySDC.implementations.datatype_classes.container</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiComponentContainer</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_shift</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Turn one global grid index, as petsc4py's ``getVecArray`` takes it, into a local one."""</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">index</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">slice</span><span class="p">(</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">index</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">index</span><span class="o">.</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">.</span><span class="n">step</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">index</span> <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">index</span> <span class="ow">is</span> <span class="bp">Ellipsis</span> <span class="k">else</span> <span class="n">index</span> <span class="o">-</span> <span class="n">start</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_dmda_layout</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Starts, shape and strides (in elements) of a vector with local size ``size`` on ``da``: owned points, or owned and</span>
+<span class="sd">    ghost points. Cached on the DMDA, since the problem classes build arrays in their innermost loops.</span>
+<span class="sd">    """</span>
+    <span class="n">layouts</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s1">'pySDC_layouts'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">layouts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">layouts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">da</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s1">'pySDC_layouts'</span><span class="p">,</span> <span class="n">layouts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">size</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">layouts</span><span class="p">:</span>
+        <span class="n">dof</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">getDof</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ranges</span> <span class="ow">in</span> <span class="p">[</span><span class="n">da</span><span class="o">.</span><span class="n">getRanges</span><span class="p">(),</span> <span class="n">da</span><span class="o">.</span><span class="n">getGhostRanges</span><span class="p">()]:</span>
+            <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="n">dof</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">sizes</span><span class="p">):</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Vector local size </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s1"> is not compatible with the DMDA local sizes'</span><span class="p">)</span>
+        <span class="c1"># the components of a point are contiguous, and the first grid index runs fastest</span>
+        <span class="n">strides</span> <span class="o">=</span> <span class="p">[</span><span class="n">dof</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">sizes</span><span class="p">[:</span><span class="n">i</span><span class="p">]))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sizes</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">dof</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sizes</span><span class="p">,</span> <span class="n">strides</span> <span class="o">=</span> <span class="n">sizes</span> <span class="o">+</span> <span class="p">[</span><span class="n">dof</span><span class="p">],</span> <span class="n">strides</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">layouts</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">start</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">sizes</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">strides</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">layouts</span><span class="p">[</span><span class="n">size</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="DMDAArray">
+<a class="viewcode-back" href="../../../../pySDC/pySDC.implementations.datatype_classes.petsc_vec.html#pySDC.implementations.datatype_classes.petsc_vec.DMDAArray">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DMDAArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    The local part of a vector on a ``DMDA``, indexed by global grid indices with the components last, as</span>
+<span class="sd">    ``DMDA.getVecArray`` gives it. petsc4py builds that by setting the shape and strides of a NumPy array, which</span>
+<span class="sd">    NumPy deprecated in 2.4 and 2.5, so this makes a strided view instead. Like petsc4py, it holds the vector's buffer</span>
+<span class="sd">    until the array is released, which is when PETSc learns of the writes.</span>
+<span class="sd">    """</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'array'</span><span class="p">,</span> <span class="s1">'starts'</span><span class="p">,</span> <span class="s1">'_ndim'</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">starts</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">strides</span> <span class="o">=</span> <span class="n">_dmda_layout</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">vec</span><span class="o">.</span><span class="n">getLocalSize</span><span class="p">())</span>
+        <span class="n">buffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">getBuffer</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">buffer</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">buffer</span><span class="o">.</span><span class="n">itemsize</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">strides</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starts</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_shift</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">starts</span><span class="p">))</span> <span class="o">+</span> <span class="n">index</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ndim</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="n">_shift</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">starts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="p">(</span><span class="n">index</span><span class="p">)]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_local</span><span class="p">(</span><span class="n">index</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span></div>
+
 
 
 <div class="viewcode-block" id="petsc_vec">
@@ -451,7 +521,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">DMDA</span><span class="p">):</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="n">init</span><span class="o">.</span><span class="n">createGlobalVec</span><span class="p">()</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">petsc_vec</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-            <span class="n">objarr</span> <span class="o">=</span> <span class="n">init</span><span class="o">.</span><span class="n">getVecArray</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="n">objarr</span> <span class="o">=</span> <span class="n">DMDAArray</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
             <span class="n">objarr</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Vec</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>

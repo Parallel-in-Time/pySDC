@@ -648,6 +648,26 @@
   <section id="module-pySDC.implementations.datatype_classes.petsc_vec">
 <span id="petsc-vec"></span><h1>petsc_vec<a class="headerlink" href="#module-pySDC.implementations.datatype_classes.petsc_vec" title="Link to this heading">#</a></h1>
 <dl class="py class">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.petsc_vec.DMDAArray">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DMDAArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/petsc_vec.html#DMDAArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.petsc_vec.DMDAArray" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The local part of a vector on a <code class="docutils literal notranslate"><span class="pre">DMDA</span></code>, indexed by global grid indices with the components last, as
+<code class="docutils literal notranslate"><span class="pre">DMDA.getVecArray</span></code> gives it. petsc4py builds that by setting the shape and strides of a NumPy array, which
+NumPy deprecated in 2.4 and 2.5, so this makes a strided view instead. Like petsc4py, it holds the vector’s buffer
+until the array is released, which is when PETSc learns of the writes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.petsc_vec.DMDAArray.array">
+<span class="sig-name descname"><span class="pre">array</span></span><a class="headerlink" href="#pySDC.implementations.datatype_classes.petsc_vec.DMDAArray.array" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.petsc_vec.DMDAArray.starts">
+<span class="sig-name descname"><span class="pre">starts</span></span><a class="headerlink" href="#pySDC.implementations.datatype_classes.petsc_vec.DMDAArray.starts" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="pySDC.implementations.datatype_classes.petsc_vec.petsc_vec">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">petsc_vec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/implementations/datatype_classes/petsc_vec.html#petsc_vec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pySDC.implementations.datatype_classes.petsc_vec.petsc_vec" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Vec</span></code></p>
@@ -808,6 +828,11 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.petsc_vec.DMDAArray"><code class="docutils literal notranslate"><span class="pre">DMDAArray</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.petsc_vec.DMDAArray.array"><code class="docutils literal notranslate"><span class="pre">array</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.petsc_vec.DMDAArray.starts"><code class="docutils literal notranslate"><span class="pre">starts</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.petsc_vec.petsc_vec"><code class="docutils literal notranslate"><span class="pre">petsc_vec</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.petsc_vec.petsc_vec.bcast"><code class="docutils literal notranslate"><span class="pre">bcast()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pySDC.implementations.datatype_classes.petsc_vec.petsc_vec.irecv"><code class="docutils literal notranslate"><span class="pre">irecv()</span></code></a></li>
