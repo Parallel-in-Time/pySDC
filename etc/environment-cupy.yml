@@ -11,6 +11,9 @@ name: pySDC
 channels:
   - conda-forge
 dependencies:
+  # Not a cap, but needed: etc/modal_gpu_tests.py installs this file into Modal's existing base
+  # environment, and without a python spec there micromamba downgraded python and lost pip.
+  - python>=3.11
   - numpy>=1.15.4
   - scipy>=0.17.1
   - matplotlib>=3.0
