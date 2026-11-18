@@ -83,15 +83,21 @@ jobs:
       max-parallel: 8
       matrix:
         env: ['base', 'mpi4py', 'petsc', 'pytorch']
-        python: ['3.10', '3.11', '3.12', '3.13']
+        python: ['3.11', '3.12', '3.13', '3.14', '3.15']
         numpy: ['', '=1']
         # pySDC supports both NumPy majors, so every backend is run against both. NumPy 1 gets one
-        # python rather than four: 1.26 is the last 1.x release, it does not support 3.13 at all,
+        # python rather than five: 1.26 is the last 1.x release, it does not support 3.13 at all,
         # and 3.12 is the newest python all four backends still have NumPy 1 builds for.
+        # Python 3.10 is end of life and no longer tested, but nothing in pySDC refuses it.
         exclude:
-          - {numpy: '=1', python: '3.10'}
           - {numpy: '=1', python: '3.11'}
           - {numpy: '=1', python: '3.13'}
+          - {numpy: '=1', python: '3.14'}
+          - {numpy: '=1', python: '3.15'}
+          # conda-forge has no Python 3.15 builds of vtk (in the base environment) or PyTorch yet.
+          # Drop these two once it does.
+          - {env: 'base', python: '3.15'}
+          - {env: 'pytorch', python: '3.15'}
     defaults:
       run:
         shell: bash -l {0}
@@ -157,9 +163,9 @@ jobs:
           - soft_failure
           - TOMS
         numpy: ['', '=1']
-        # Both NumPy majors here too. No python axis to exclude against: every project environment
-        # allows the whole 3.10-3.13 range, so `numpy=1` simply resolves the newest python that has
-        # NumPy 1 builds for that project's backends.
+        # Both NumPy majors here too. No python axis to exclude against: no project environment pins
+        # python, so each job resolves the newest python its backends are built for, and `numpy=1`
+        # the newest that has NumPy 1 builds for them.
     defaults:
       run:
         shell: bash -l {0}

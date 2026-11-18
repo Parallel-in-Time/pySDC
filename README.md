@@ -36,7 +36,7 @@ implemented.
     [petsc4py](https://petsc.org/release/petsc4py/)), PyTorch and CuPy
 -   Continuous integration via [GitHub
     Actions](https://github.com/Parallel-in-Time/pySDC/actions)
--   Fully compatible with Python 3.10 - 3.13 and NumPy 1 and 2, runs at
+-   Fully compatible with Python 3.11 - 3.15 and NumPy 1 and 2, runs at
     least on Ubuntu; Firedrake needs Python 3.11 or newer and NumPy 2.1
     or newer
 
