@@ -1,0 +1,21 @@
+SECURITY.md
+  s_bff04222c6f8e1::t_74c86c9db8ffa5 86-87
+pyproject.toml
+  s_bff04222c6f8e1::t_8200172264e943 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cc444471b13926e3b0342b71e9c5785f4f1d32ba",
+  "prompts": {},
+  "sessions": {
+    "s_bff04222c6f8e1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d724e0f5-5c5a-4812-96e2-452d66be1436",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
