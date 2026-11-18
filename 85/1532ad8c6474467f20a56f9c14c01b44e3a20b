@@ -1,0 +1,23 @@
+pySDC/tests/test_problems/test_GeneralizedFisher_PETSc.py
+  s_14a8dece7fcf26::t_263d15b033c04b 22-25,27
+  s_14a8dece7fcf26::t_90b123c85e6554 1-21,26,28-33
+  s_14a8dece7fcf26::t_039230e94ae08b 34
+pySDC/implementations/problem_classes/GeneralizedFisher_1D_PETSc.py
+  s_14a8dece7fcf26::t_adc35bfdc93dd6 471-480,501,507,667,763,769
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "851532ad8c6474467f20a56f9c14c01b44e3a20b",
+  "prompts": {},
+  "sessions": {
+    "s_14a8dece7fcf26": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4804dd3a-c2e8-43c5-8fb5-08ee7eb53c8a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
