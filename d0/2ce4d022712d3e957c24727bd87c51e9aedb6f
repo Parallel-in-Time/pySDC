@@ -1,0 +1,25 @@
+CITATION.cff
+  s_bff04222c6f8e1::t_6dbbef5236e776 44,46
+docs/source/conf.py
+  s_bff04222c6f8e1::t_6dbbef5236e776 23
+pyproject.toml
+  s_bff04222c6f8e1::t_6dbbef5236e776 7
+README.md
+  s_bff04222c6f8e1::t_a8187557d60c72 64-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d02ce4d022712d3e957c24727bd87c51e9aedb6f",
+  "prompts": {},
+  "sessions": {
+    "s_bff04222c6f8e1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d724e0f5-5c5a-4812-96e2-452d66be1436",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Robert Speck <pancetta@users.noreply.github.com>"
+    }
+  }
+}
