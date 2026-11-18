@@ -564,7 +564,7 @@
 <span class="sd">            Matrix A defining the 2D Laplace operator.</span>
 <span class="sd">        """</span>
         <span class="c1"># create matrix and set basic options</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMat</span><span class="p">()</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">'aij'</span><span class="p">)</span>  <span class="c1"># sparse</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setPreallocationNNZ</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
@@ -609,7 +609,7 @@
 <span class="sd">        """</span>
 
         <span class="c1"># create matrix and set basic options</span>
-        <span class="n">Id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="n">Id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMat</span><span class="p">()</span>
         <span class="n">Id</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">'aij'</span><span class="p">)</span>  <span class="c1"># sparse</span>
         <span class="n">Id</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
         <span class="n">Id</span><span class="o">.</span><span class="n">setPreallocationNNZ</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>

@@ -833,7 +833,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">snes_ncalls</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createGlobalVec</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMat</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__get_A</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
@@ -845,7 +845,7 @@
 <span class="sd">            Discretization matrix.</span>
 <span class="sd">        """</span>
         <span class="c1"># create matrix and set basic options</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMat</span><span class="p">()</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">'aij'</span><span class="p">)</span>  <span class="c1"># sparse</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setPreallocationNNZ</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
@@ -893,7 +893,7 @@
 <span class="sd">        """</span>
 
         <span class="c1"># create matrix and set basic options</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMat</span><span class="p">()</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">'aij'</span><span class="p">)</span>  <span class="c1"># sparse</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
         <span class="n">A</span><span class="o">.</span><span class="n">setPreallocationNNZ</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
@@ -1022,7 +1022,7 @@
         <span class="c1"># assign residual function and Jacobian</span>
         <span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createGlobalVec</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">setFunction</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">formFunction</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
-        <span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMatrix</span><span class="p">()</span>
+        <span class="n">J</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">createMat</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">setJacobian</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">formJacobian</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">snes</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">me</span><span class="p">)</span>
