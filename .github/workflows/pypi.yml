@@ -1,0 +1,74 @@
+name: PyPI
+
+# Builds the sdist and wheel of every release from a clean checkout of its tag and uploads them to
+# PyPI with trusted publishing (OIDC), so no API token is stored anywhere. Building here rather than
+# on a maintainer's machine keeps local files out of the sdist: 5.9's carried ~9000 files of local
+# worktrees, because hatchling packs whatever is in the directory and not ignored by git.
+#
+# One-time setup on pypi.org, by a maintainer of the pySDC project there: Manage project -> Publishing
+# -> add a GitHub publisher with owner Parallel-in-Time, repository pySDC, workflow pypi.yml and
+# environment pypi. Then create the environment `pypi` in this repository's settings (Environments).
+on:
+  release:
+    types: [published]
+  # to upload a release that predates this workflow, or one whose upload failed
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to upload to PyPI'
+        required: true
+  # tests changes to this file: builds and checks, but uploads nothing
+  pull_request:
+    paths: ['.github/workflows/pypi.yml']
+
+env:
+  TAG: ${{ github.event.release.tag_name || inputs.tag }}
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Build and check
+        run: |
+          python -m pip install build twine
+          python -m build
+          python -m twine check --strict dist/*
+      - name: Check that the version is the tag's
+        # v5.10 -> 5.10; PyPI versions are immutable, so a forgotten bump must stop here
+        if: env.TAG != ''
+        run: |
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          test "$VERSION" = "${TAG#v}" || { echo "pyproject.toml has version $VERSION, the tag is $TAG"; exit 1; }
+          ls dist/ | grep -qx "pysdc-$VERSION.tar.gz"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pySDC/
+    permissions:
+      # trusted publishing: PyPI accepts this workflow's OIDC token instead of an API token
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@v1.14.3

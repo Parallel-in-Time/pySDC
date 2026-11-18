@@ -31,7 +31,7 @@ git branch -D new-release       # delete locally
 Finally, [draft a new release](https://github.com/Parallel-in-Time/pySDC/releases/new) associated to a new tag 
 `v*.*.*` (with `*.*.*` the new version, and the ` + Create new tag: ... on publish` button).
 Add a comprehensive summary of the main changes, with appropriate thanks to all the contributors (cf previous releases), and publish it. This will trigger automatically a release update on [Zenodo](https://zenodo.org/doi/10.5281/zenodo.594191).
-For uploading the new release on [PyPI](https://pypi.org/project/pySDC/), this is done manually so you'll have to ask [Robert Speck (@pancetta)](https://github.com/pancetta) for support (ideally send him a quick email).
+Publishing the release also uploads it to [PyPI](https://pypi.org/project/pySDC/): the `PyPI` workflow (`.github/workflows/pypi.yml`) builds the sdist and wheel from the tag and publishes them with trusted publishing, after checking that the version in `pyproject.toml` is the tag's. If that upload fails, rerun it from the Actions tab with the tag as input. The `SBOMs` workflow attaches the SBOMs to the release in the same way.
 
 :arrow_left: [Back to adding Project](./06_new_project.md) ---
 :arrow_up: [Contributing Summary](./../../CONTRIBUTING.md) ---
